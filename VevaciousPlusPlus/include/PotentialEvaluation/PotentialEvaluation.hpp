@@ -9,7 +9,11 @@
 #define POTENTIALEVALUATION_HPP_
 
 #include "HomotopyContinuationReadyPotential.hpp"
-#include "MassCorrectedPotential.hpp"
+#include "PotentialFromPolynomialAndMasses.hpp"
+#include "MassSquaredMatrix.hpp"
+#include "PolynomialCoefficient.hpp"
+#include "PolynomialSum.hpp"
+#include "RunningParameterManager.hpp"
 
 // This file is just to collect a lot of #include statements.
 

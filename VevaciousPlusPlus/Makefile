@@ -18,12 +18,17 @@ LHPCDIR=./LHPC/
 LHPCLIBNAME=LHPC
 LHPCINCLUDEDIR=$(LHPCDIR)/include/
 LHPCLIBDIR=$(LHPCDIR)/lib/
-CCFLAGS=-Wall -O3 -I./include/ -I$(LHPCINCLUDEDIR)
+EIGENDIR=./Eigen/
+CCFLAGS=-Wall -O3 -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
- source/PotentialEvaluation/MassCorrectedPotential.cpp \
+ source/PotentialEvaluation/MassSquaredMatrix.cpp \
+ source/PotentialEvaluation/PolynomialCoefficient.cpp \
+ source/PotentialEvaluation/PolynomialSum.cpp \
+ source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
+ source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \

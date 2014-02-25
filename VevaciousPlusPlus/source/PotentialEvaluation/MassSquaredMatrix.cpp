@@ -1,27 +1,26 @@
 /*
- * PotentialFunction.cpp
+ * MassSquaredMatrix.cpp
  *
  *  Created on: Feb 25, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/PotentialEvaluation/PotentialFunction.hpp"
+#include "../../include/VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  PotentialFunction::PotentialFunction() :
-    fieldNames(),
-    numberOfFields( 0 )
+  MassSquaredMatrix::MassSquaredMatrix() :
+    eigenMatrix()
   {
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "PotentialFunction::PotentialFunction()";
+    << "MassSquaredMatrix::MassSquaredMatrix()";
     std::cout << std::endl;/**/
   }
 
-  PotentialFunction::~PotentialFunction()
+  MassSquaredMatrix::~MassSquaredMatrix()
   {
     // This does nothing.
   }
