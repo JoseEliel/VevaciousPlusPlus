@@ -1,0 +1,128 @@
+<VevaciousModelFile>
+
+<ModelFileDetails
+ ModelName="PhiFourthTest"
+ VevaciousMajorVersion="2" VevaciousMinorVersion="0" />
+
+<!-- All variables which are NOT explicitly given in AllowedNonZeroVariables
+     are assumed to be zero. This allows for a model to be given in terms of
+     all possible scalar fields, while slight edits to AllowedNonZeroVariables
+     can then specify which fields are assumed to be zero (by omission from
+     AllowedNonZeroVariables). -->
+<AllowedNonZeroVariables>
+
+  <!-- The fields should be given as a newline-separated list of character
+       strings. Field names should be strings of alphanumeric characters but
+       may not begin with a numeric digit, and may also include a
+       comma-separated list of integers in square brackets after the
+       alphanumeric string (spaces allowed within the square brackets, but
+       nowhere else). The names are also case-sensitive.
+       Examples:
+       phi
+       phi1 (is distinct from just phi)
+       h
+       H (is distinct from h)
+       stopleftvev
+       vSel[3]
+       MatrixOfFields[4, 2]
+       f1g3
+       and so on. -->
+  <FieldVariables>
+    phi
+  </FieldVariables>
+  
+  <!-- Every block that will be read in from an SLHA file should be enumerated
+       here in a newline-separated list. Block names are NOT case-sensitive
+       (following the SLHA conventions). Any blocks not explicitly mentioned
+       here will be treated as zero in the rest of the model file!
+       N.B.: Only a subset of possible SLHA-style blocks are permitted: those
+       where each line is of the form of a set of integer indices followed by
+       a single floating-point number. The number of indices is not limited.
+       For a block named BLAH, the elements are referred to in this model file
+       as BLAH[ 1 ] or BLAH[ 2, 3 ] or BLAH[4,5,6] and so on for blocks with
+       1, 2 or 3 indices and so on. Also, blocks which are just a single line
+       with a single floating-point number are permitted, but must be referred
+       to with empty square brackets: BLAH[] (e.g. the ALPHA block of the
+       original SUSY Les Houches Accords). -->
+  <SlhaBlocks>
+    GAUGE
+    YU
+    HMIX
+    PHIFOURTH
+    LOOPPHIFOURTH
+  </SlhaBlocks>
+  
+  <!-- Alternative strings for SLHA block parameters can be given here, each on
+       its own line, in the form alias=slha or alias=slha[index(es)]. For
+       example, g=GAUGE would mean that g[1] is treated as the entry 1 of the
+       SLHA block GAUGE, while g1=GAUGE[1] would mean the same for g1.
+       Furthermore, ycharmtop=YU[2, 3] would mean that ycharmtop is treated as
+       entry 2, 3 in the block YU. See comment above <SlhaBlocks>. -->
+  <SlhaAliases>
+    lambda = PHIFOURTH[1]
+    looplambda = LOOPPHIFOURTH[ 1 ]
+    g=GAUGE[1]
+    y=YU
+    tb=HMIX[2]
+    mASq = HMIX[ 4 ]
+  </SlhaAliases>
+
+  <!-- Every other non-zero parameter should appear here, each on a separate
+       line, in the form
+       (variable name)=(type of variable)[(list of relevant arguments)]
+       and if a parameter references another parameter, it MUST come further
+       down the list than the referenced parameter. (All elements of SLHA
+       blocks from SlhaBlocks or through SlhaAliases may be referenced
+       here.) -->
+  <DerivedParameters>
+    deltalambda = SUBTRACT[ looplambda, lambda ]
+    beta=ATAN[ tb ]
+    cb=COS[ beta ]
+    sb=SIN[ beta ]
+    sbcb = MULTIPLY[ sb, cb ]
+    Bmu=MULTIPLY[ sbcb, mAsq ]
+    Sqrt2=POW[ 2.0, 0.5 ]
+    tbSq=POW[ tb, 2 ]
+    tbSqPlusOne=ADD[ tbSq, 1.0 ]
+    sbcbAlt = DIVIDE[tb, tbSqPlusOne]
+  </DerivedParameters>
+
+</AllowedNonZeroVariables>
+
+<!-- Polynomials (which make up the tree-level potential and also the elements
+     of the mass-squared matrices) are always expanded out, have no brackets,
+     and are interpreted with the standard operator precedence. Raising x to
+     the nth power can be written using a caret: x^n, for example. Division is
+     not possible, unfortunately, none of '/', 'Ö', nor "^-" are permitted:
+     please expand out e.g. 4.0/8.0 as 0.5 or use DerivedParameters for such
+     things as 1 divided by a parameter from an SLHA file. -->
+<!-- I need to explain the form of TreeLevelPotential...-->
+<TreeLevelPotential>
+  0.25 * lambda * phi^4 - 0.5 * Bmu * phi^2
+</TreeLevelPotential>
+
+<!-- I need to explain the form of LoopCorrections...-->
+<LoopCorrections RenormalizationScheme="MSBAR" GaugeFixing="LANDAU" >
+
+  <!-- I need to explain the form of ExtraPolynomialPart...-->
+  <ExtraPolynomialPart>
+    deltalambda * phi^4
+  </ExtraPolynomialPart>
+
+  <!-- I need to explain the form of MassSquaredMatrix...-->
+  <MassSquaredMatrix SpinType="ScalarBoson" MultiplicityFactor="1" >
+    12.0 * g^2 * phi^2 - 2.0 * Bmu
+  </MassSquaredMatrix>
+  <MassSquaredMatrix SpinType="WeylFermion" MultiplicityFactor="6" >
+    y[ 2, 2 ]^2 * phi^2 + y[ 2, 3 ]^2 * phi^2
+    y[ 2, 2 ] * y[ 3, 2 ] * phi^2 + y[ 2, 3 ] * y[ 3, 3 ] * phi^2
+    y[ 3, 2 ] * y[ 2, 2 ] * phi^2 + y[ 3, 3 ] * y[ 2, 3 ] * phi^2
+    y[ 2, 3 ]^2 * phi^2 + y[ 3, 3 ]^2 * phi^2
+  </MassSquaredMatrix>
+  <MassSquaredMatrix SpinType="GaugeBoson" MultiplicityFactor="1" >
+    Sqrt2^2 * 0.25 * g^2 * phi^2
+  </MassSquaredMatrix>
+
+</LoopCorrections>
+
+</VevaciousModelFile>
