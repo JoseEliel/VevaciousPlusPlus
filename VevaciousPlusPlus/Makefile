@@ -24,6 +24,7 @@ CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/MassSquaredMatrix.cpp \
+ source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PolynomialCoefficient.cpp \
  source/PotentialEvaluation/PolynomialSum.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \

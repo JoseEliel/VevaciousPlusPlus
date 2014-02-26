@@ -10,31 +10,15 @@
 namespace VevaciousPlusPlus
 {
 
-  PolynomialSum::PolynomialSum()
+  PolynomialSum::PolynomialSum() :
+    polynomialTerms()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PolynomialPotential::PolynomialPotential()";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   PolynomialSum::~PolynomialSum()
   {
     // This does nothing.
-  }
-
-
-  double PolynomialSum::operator()(
-                        std::vector< double > const& fieldConfiguration ) const
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PolynomialSum::operator()(...)";
-    std::cout << std::endl;
-
-    return 0.0;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -16,15 +16,29 @@ namespace VevaciousPlusPlus
   class MassSquaredMatrix
   {
   public:
-    MassSquaredMatrix();
+    MassSquaredMatrix(
+                    std::map< std::string, std::string > const& attributeMap );
     virtual
     ~MassSquaredMatrix();
 
 
+    // This adds a new element and returns a reference to it.
+    PolynomialSum& AddNewElement();
+
 
   protected:
+    std::vector< PolynomialSum > matrixElements;
     Eigen::MatrixXd eigenMatrix;
   };
+
+
+
+
+  inline PolynomialSum& MassSquaredMatrix::AddNewElement()
+  {
+    matrixElements.push_back( PolynomialSum() );
+    return matrixElements.back();
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* MASSSQUAREDMATRIX_HPP_ */

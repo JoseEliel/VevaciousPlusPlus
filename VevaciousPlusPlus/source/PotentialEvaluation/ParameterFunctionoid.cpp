@@ -1,7 +1,7 @@
 /*
- * MassSquaredMatrix.cpp
+ * ParameterFunctionoid.cpp
  *
- *  Created on: Feb 25, 2014
+ *  Created on: Feb 26, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
@@ -10,18 +10,16 @@
 namespace VevaciousPlusPlus
 {
 
-  MassSquaredMatrix::MassSquaredMatrix(
-                   std::map< std::string, std::string > const& attributeMap ) :
-    eigenMatrix()
+  ParameterFunctionoid::ParameterFunctionoid()
   {
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "MassSquaredMatrix::MassSquaredMatrix( ... )";
+    << "ParameterFunctionoid::ParameterFunctionoid()";
     std::cout << std::endl;/**/
   }
 
-  MassSquaredMatrix::~MassSquaredMatrix()
+  ParameterFunctionoid::~ParameterFunctionoid()
   {
     // This does nothing.
   }

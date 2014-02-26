@@ -43,39 +43,34 @@
        1, 2 or 3 indices and so on. Also, blocks which are just a single line
        with a single floating-point number are permitted, but must be referred
        to with empty square brackets: BLAH[] (e.g. the ALPHA block of the
-       original SUSY Les Houches Accords). -->
+       original SUSY Les Houches Accords).
+       Aliases for the blocks may also be given here, by NAME = alias. For
+       example, GAUGE = g would both denote that the GAUGE block is to be read
+       in from the SLHA file, and also that g[1] in the rest of this model file
+       is equivalent to GAUGE[1] and so on. -->
   <SlhaBlocks>
-    GAUGE
-    YU
+    GAUGE = g
+    YU=y
     HMIX
     PHIFOURTH
     LOOPPHIFOURTH
   </SlhaBlocks>
-  
-  <!-- Alternative strings for SLHA block parameters can be given here, each on
-       its own line, in the form alias=slha or alias=slha[index(es)]. For
-       example, g=GAUGE would mean that g[1] is treated as the entry 1 of the
-       SLHA block GAUGE, while g1=GAUGE[1] would mean the same for g1.
-       Furthermore, ycharmtop=YU[2, 3] would mean that ycharmtop is treated as
-       entry 2, 3 in the block YU. See comment above <SlhaBlocks>. -->
-  <SlhaAliases>
-    lambda = PHIFOURTH[1]
-    looplambda = LOOPPHIFOURTH[ 1 ]
-    g=GAUGE[1]
-    y=YU
-    tb=HMIX[2]
-    mASq = HMIX[ 4 ]
-  </SlhaAliases>
 
   <!-- Every other non-zero parameter should appear here, each on a separate
        line, in the form
        (variable name)=(type of variable)[(list of relevant arguments)]
        and if a parameter references another parameter, it MUST come further
        down the list than the referenced parameter. (All elements of SLHA
-       blocks from SlhaBlocks or through SlhaAliases may be referenced
-       here.) -->
+       blocks from SlhaBlocks may be referenced here but only through first
+       creating parameters of the SLHAELEMENT type.) -->
   <DerivedParameters>
-    deltalambda = SUBTRACT[ looplambda, lambda ]
+    g1=SLHAELEMENT[g,1]
+    ycharmtop=SLHAELEMENT[YU, 2, 3]
+    lambda = SLHAELEMENT[ PHIFOURTH, 1 ]
+    looplambda = SLHAELEMENT[ LOOPPHIFOURTH, 1 ]
+    deltalambda = MINUS[ looplambda, lambda ]
+    tb=SLHAELEMENT[HMIX,2]
+    mASq = SLHAELEMENT[HMIX, 4]
     beta=ATAN[ tb ]
     cb=COS[ beta ]
     sb=SIN[ beta ]
@@ -83,7 +78,7 @@
     Bmu=MULTIPLY[ sbcb, mAsq ]
     Sqrt2=POW[ 2.0, 0.5 ]
     tbSq=POW[ tb, 2 ]
-    tbSqPlusOne=ADD[ tbSq, 1.0 ]
+    tbSqPlusOne=PLUS[ tbSq, 1.0 ]
     sbcbAlt = DIVIDE[tb, tbSqPlusOne]
   </DerivedParameters>
 
@@ -92,10 +87,11 @@
 <!-- Polynomials (which make up the tree-level potential and also the elements
      of the mass-squared matrices) are always expanded out, have no brackets,
      and are interpreted with the standard operator precedence. Raising x to
-     the nth power can be written using a caret: x^n, for example. Division is
-     not possible, unfortunately, none of '/', 'Ö', nor "^-" are permitted:
-     please expand out e.g. 4.0/8.0 as 0.5 or use DerivedParameters for such
-     things as 1 divided by a parameter from an SLHA file. -->
+     the nth power (where n is a natural number) can be written using a caret:
+     x^n, for example. This does not work for constant numbers! Division is not
+     possible, unfortunately, none of '/', 'Ö', nor "^-" are permitted: please
+     expand out e.g. 4.0/8.0 as 0.5 or use DerivedParameters for such things as
+     a ratio of parameters from an SLHA file. -->
 <!-- I need to explain the form of TreeLevelPotential...-->
 <TreeLevelPotential>
   0.25 * lambda * phi^4 - 0.5 * Bmu * phi^2

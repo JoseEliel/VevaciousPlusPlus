@@ -65,8 +65,14 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    static std::string const digitChars;
+    static std::string const dotAndDigits;
+    static std::string const allowedVariableInitials;
+    static std::string const allowedVariableChars;
+
     RunningParameterManager runningParameters;
     PolynomialSum treeLevelPotential;
+    PolynomialSum polynomialLoopCorrections;
     std::vector< MassSquaredMatrix > massSquaredMatrices;
     double vectorMassCorrectionConstant;
     std::vector< PolynomialSum > polynomialGradient;
@@ -75,6 +81,22 @@ namespace VevaciousPlusPlus
 
 
     PotentialFromPolynomialAndMasses();
+
+    // This puts all index brackets into a consistent form.
+    std::string FormatVariable( std::string const& unformattedVariable ) const;
+
+    // This interprets stringToParse as a sum of polynomial terms and sets
+    // polynomialSum accordingly.
+    void ParseSumOfPolynomialTerms( std::string const& stringToParse,
+                                    PolynomialSum& polynomialSum );
+
+    // This reads in a whole number or variable (including possible raising to
+    // a power), applies the correct operation to polynomialTerm, and then
+    // returns the position of the character just after the interpreted word.
+    size_t
+    PutNextNumberOrVariableIntoPolynomial( std::string const& stringToParse,
+                                           size_t wordStart,
+                                           PolynomialTerm& polynomialTerm );
 
     // This sets the renormalization scale and broadcasts it to the running
     // parameters.

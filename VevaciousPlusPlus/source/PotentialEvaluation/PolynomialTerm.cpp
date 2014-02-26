@@ -10,15 +10,29 @@
 namespace VevaciousPlusPlus
 {
 
-  PolynomialTerm::PolynomialTerm()
+  PolynomialTerm::PolynomialTerm( bool const coefficientIsPositive ) :
+    isValid( true ),
+    coefficientConstant( -1.0 )
   {
-    // TODO Auto-generated constructor stub
+    if( coefficientIsPositive )
+    {
+      coefficientConstant = 1.0;
+    }
 
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PolynomialTerm::PolynomialTerm( " << coefficientIsPositive << " )";
+    std::cout << std::endl;/**/
   }
 
   PolynomialTerm::~PolynomialTerm()
   {
-    // TODO Auto-generated destructor stub
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PolynomialTerm::~PolynomialTerm()";
+    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */
