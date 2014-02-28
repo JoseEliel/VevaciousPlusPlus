@@ -10,19 +10,29 @@
 namespace VevaciousPlusPlus
 {
 
-  PolynomialTerm::PolynomialTerm( bool const coefficientIsPositive ) :
+  PolynomialTerm::PolynomialTerm() :
     isValid( true ),
-    coefficientConstant( -1.0 )
+    coefficientConstant( 1.0 ),
+    fieldProductByIndex(),
+    functionoidProduct()
   {
-    if( coefficientIsPositive )
-    {
-      coefficientConstant = 1.0;
-    }
-
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "PolynomialTerm::PolynomialTerm( " << coefficientIsPositive << " )";
+    << "PolynomialTerm::PolynomialTerm()";
+    std::cout << std::endl;/**/
+  }
+
+  PolynomialTerm::PolynomialTerm( PolynomialTerm const& copySource ) :
+    isValid( copySource.isValid ),
+    coefficientConstant( copySource.coefficientConstant ),
+    fieldProductByIndex( copySource.fieldProductByIndex ),
+    functionoidProduct( copySource.functionoidProduct )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PolynomialTerm::PolynomialTerm( [copy] )";
     std::cout << std::endl;/**/
   }
 
@@ -35,4 +45,25 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
+
+  // This adds runningParameter to the set of functionoids which multiply
+  // coefficientConstant to form the scale-dependent coefficient.
+  void
+  PolynomialTerm::MultiplyBy( ParameterFunctionoid* const runningParameter,
+                              unsigned int const powerInt )
+  {
+    if( runningParameter == NULL )
+    {
+      isValid = false;
+    }
+    else
+    {
+      for( unsigned int powerCount( 0 );
+           powerCount < powerInt;
+           ++powerCount )
+      {
+        functionoidProduct.push_back( runningParameter );
+      }
+    }
+  }
 } /* namespace VevaciousPlusPlus */

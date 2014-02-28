@@ -33,29 +33,46 @@ namespace VevaciousPlusPlus
     polynomialHessian(),
     scaleSlopeOfGradient()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "MassCorrectedPotential::MassCorrectedPotential( \""
-    << modelFilename << "\" )";
-    std::cout << std::endl;/**/
-
-
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
     BOL::VectorlikeArray< std::string > elementLines;
-    fileParser.openRootElementOfFile( modelFilename );
+    bool successfullyReadElement(
+                           fileParser.openRootElementOfFile( modelFilename ) );
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse XML of " + modelFilename );
+    }
     // The model file should always have the XML elements in the correct order!
+    // <ModelFileDetails>
+    successfullyReadElement = fileParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <ModelFileDetails>." );
+    }
+    // </ModelFileDetails>
     // <AllowedNonZeroVariables>
-    fileParser.readNextElement();
-    elementParser.loadString( fileParser.getCurrentElementContent() );
+    successfullyReadElement = fileParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <AllowedNonZeroVariables>." );
+    }
+    successfullyReadElement
+    = elementParser.loadString( fileParser.getCurrentElementContent() );
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <AllowedNonZeroVariables>." );
+    }
     //   <FieldVariables>
-    elementParser.readNextElement();
+    successfullyReadElement = elementParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <FieldVariables>." );
+    }
     BOL::StringParser::parseByChar(
                                elementParser.getTrimmedCurrentElementContent(),
                                     elementLines,
                                     '\n');
-    for( unsigned int lineIndex( 0 );
+    for( int lineIndex( 0 );
          lineIndex < elementLines.getSize();
          ++lineIndex )
     {
@@ -64,14 +81,19 @@ namespace VevaciousPlusPlus
     numberOfFields = fieldNames.size();
     //   </FieldVariables>
     //   <SlhaBlocks>
-    elementParser.readNextElement();
+    successfullyReadElement = elementParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <SlhaBlocks>." );
+    }
     std::string slhaString;
     std::string aliasString;
+    elementLines.clearEntries();
     BOL::StringParser::parseByChar(
                                elementParser.getTrimmedCurrentElementContent(),
                                     elementLines,
                                     '\n');
-    for( unsigned int lineIndex( 0 );
+    for( int lineIndex( 0 );
          lineIndex < elementLines.getSize();
          ++lineIndex )
     {
@@ -84,13 +106,18 @@ namespace VevaciousPlusPlus
     }
     //   </SlhaBlocks>
     //   <DerivedParameters>
-    elementParser.readNextElement();
+    successfullyReadElement = elementParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <DerivedParameters>." );
+    }
     std::string readableName;
+    elementLines.clearEntries();
     BOL::StringParser::parseByChar(
                                elementParser.getTrimmedCurrentElementContent(),
                                     elementLines,
                                     '\n');
-    for( unsigned int lineIndex( 0 );
+    for( int lineIndex( 0 );
          lineIndex < elementLines.getSize();
          ++lineIndex )
     {
@@ -99,48 +126,59 @@ namespace VevaciousPlusPlus
     //   </DerivedParameters>
     // </AllowedNonZeroVariables>
     // <TreeLevelPotential>
-    fileParser.readNextElement();
+    successfullyReadElement = fileParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <TreeLevelPotential>." );
+    }
     ParseSumOfPolynomialTerms( fileParser.getTrimmedCurrentElementContent(),
                                treeLevelPotential );
     // </TreeLevelPotential>
     // <LoopCorrections>
-    fileParser.readNextElement();
-    std::string renormalizationScheme(
-         fileParser.getCurrentElementAttributes()[ "RenormalizationScheme" ] );
+    successfullyReadElement = fileParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <LoopCorrections>." );
+    }
+    std::string
+    renormalizationScheme( fileParser.getCurrentElementAttributes().find(
+                                           "RenormalizationScheme" )->second );
     if( renormalizationScheme.compare( "\"MSBAR\"" ) == 0 )
     {
       vectorMassCorrectionConstant = ( 5.0 / 6.0 );
     }
     elementParser.loadString( fileParser.getCurrentElementContent() );
-    //   <ExtraPolynomialPart>
-    elementParser.readNextElement();
-    ParseSumOfPolynomialTerms( elementParser.getTrimmedCurrentElementContent(),
-                               polynomialLoopCorrections );
-    //   </ExtraPolynomialPart>
-    //   <MassSquaredMatrix> (start of first MassSquaredMatrix)
     while( elementParser.readNextElement() )
     {
-      if( !(elementParser.currentElementNameMatches( "MassSquaredMatrix" )) )
+      //   <ExtraPolynomialPart>
+      if( elementParser.currentElementNameMatches( "ExtraPolynomialPart" ) )
       {
-        break;
+        ParseSumOfPolynomialTerms(
+                              elementParser.getTrimmedCurrentElementContent(),
+                                   polynomialLoopCorrections );
       }
-      massSquaredMatrices.push_back( MassSquaredMatrix(
+      //   </ExtraPolynomialPart>
+      //   <MassSquaredMatrix>
+      else if( elementParser.currentElementNameMatches( "MassSquaredMatrix" ) )
+      {
+        massSquaredMatrices.push_back( MassSquaredMatrix(
                                elementParser.getCurrentElementAttributes() ) );
-      BOL::StringParser::parseByChar(
+        elementLines.clearEntries();
+        BOL::StringParser::parseByChar(
                                elementParser.getTrimmedCurrentElementContent(),
-                                      elementLines,
-                                      '\n');
-      for( unsigned int lineIndex( 0 );
-           lineIndex < elementLines.getSize();
-           ++lineIndex )
-      {
-        ParseSumOfPolynomialTerms( elementLines[ lineIndex ],
+                                        elementLines,
+                                        '\n');
+        for( int lineIndex( 0 );
+             lineIndex < elementLines.getSize();
+             ++lineIndex )
+        {
+          ParseSumOfPolynomialTerms( elementLines[ lineIndex ],
                                   massSquaredMatrices.back().AddNewElement() );
+        }
       }
+      //   </MassSquaredMatrix>
     }
-    //   </MassSquaredMatrix> (end of last MassSquaredMatrix)
     // </LoopCorrections>
-
   }
 
   PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
@@ -273,19 +311,13 @@ namespace VevaciousPlusPlus
     return std::string( indicesStream.str() );
   }
 
+
   // This interprets stringToParse as a sum of polynomial terms and sets
   // polynomialSum accordingly.
   void PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
                                               std::string const& stringToParse,
                                                  PolynomialSum& polynomialSum )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms( \""
-    << stringToParse << "\", ... ) called.";
-    std::cout << std::endl;/**/
-
     std::vector< PolynomialTerm >&
     polynomialTerms( polynomialSum.PolynomialTerms() );
     polynomialTerms.clear();
@@ -307,7 +339,11 @@ namespace VevaciousPlusPlus
       wordStart = 1;
     }
     // Now we have skipped any initial '+' or '-', so we start the 1st term.
-    polynomialTerms.push_back( PolynomialTerm( positiveTerm ) );
+    polynomialTerms.push_back( PolynomialTerm() );
+    if( !positiveTerm )
+    {
+      polynomialTerms.back().MultiplyBy( -1.0 );
+    }
     wordStart = PutNextNumberOrVariableIntoPolynomial( stringToParse,
                                                        wordStart,
                                                       polynomialTerms.back() );
@@ -331,13 +367,22 @@ namespace VevaciousPlusPlus
         }
         // Now we make the new term based on whether it is added or subtracted
         // in the sum.
-        polynomialTerms.push_back( PolynomialTerm( ( stringToParse[ wordStart ]
-                                                     == '+' ) ) );
+        polynomialTerms.push_back( PolynomialTerm() );
+        if( stringToParse[ wordStart ] == '-' )
+        {
+          polynomialTerms.back().MultiplyBy( -1.0 );
+        }
       }
       // Now we parse the next word.
       wordStart = PutNextNumberOrVariableIntoPolynomial( stringToParse,
-                                                         wordStart,
+                                                         (++wordStart),
                                                       polynomialTerms.back() );
+    }
+    if( !(polynomialTerms.back().IsValid()) )
+    {
+      // If last term, which we just built in the last iteration of the loop,
+      // was invalid, we remove it from the polynomial sum.
+      polynomialTerms.pop_back();
     }
   }
 
@@ -393,15 +438,19 @@ namespace VevaciousPlusPlus
             throw std::runtime_error(
                            "Model file had malformed scientific E notation." );
           }
-          polynomialTerm.MultiplyBy( BOL::StringParser::stringToDouble(
+        }
+        // If it is a number, we multiply the polynomial term and return the
+        // position of the char just after the chars that we have just parsed.
+        polynomialTerm.MultiplyBy( BOL::StringParser::stringToDouble(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
-          return wordEnd;
-        }
+        return wordEnd;
       }
       else if( allowedVariableInitials.find( stringToParse[ wordStart ] )
                != std::string::npos )
       {
+        // Otherwise we have to check to see if it is a string that could be a
+        // field variable name or a string mapping to a functionoid.
         wordEnd = stringToParse.find_first_not_of( allowedVariableChars,
                                                    wordStart );
         if( ( wordEnd < ( stringToParse.size() - 1 ) )
@@ -414,8 +463,16 @@ namespace VevaciousPlusPlus
           {
             throw std::runtime_error( "Model file had unclosed [...]." );
           }
+          // Since stringToParse[ wordEnd ] is ']', it is OK to increment
+          // wordEnd by 1 so that the ']' is included in the substring taken
+          // for parsing later.
+          wordEnd += 1;
         }
-        int powerInt( 1 );
+        // For comparison, we need the string to be in the proper format:
+        std::string
+        variableString( FormatVariable( stringToParse.substr( wordStart,
+                                                 ( wordEnd - wordStart ) ) ) );
+        unsigned int powerInt( 1 );
         if( ( wordEnd < stringToParse.size() )
             &&
             ( stringToParse[ wordEnd ] == '^' ) )
@@ -425,18 +482,40 @@ namespace VevaciousPlusPlus
               ( digitChars.find( stringToParse[ wordEnd + 1 ] )
                 == std::string::npos ) )
           {
+            // Only positive integers are allowed as exponents. It's easier to
+            // also demand that no '+' or whitespace chars are allowed.
             throw std::runtime_error(
                               "Model file had invalid exponent after \'^\'." );
           }
-          powerInt = BOL::StringParser::stringToInt(
-              stringToParse.substr( ( wordEnd + 1 ),
-                                   stringToParse.find_first_not_of( digitChars,
-                                                         ( wordEnd + 1 ) ) ) );
+          wordStart = ( wordEnd + 1 );
+          wordEnd = stringToParse.find_first_not_of( digitChars,
+                                                     wordStart );
+          powerInt
+          = BOL::StringParser::stringToInt( stringToParse.substr( wordStart,
+                                                   ( wordEnd - wordStart ) ) );
         }
+        // First we check for a field name:
+        for( unsigned int fieldIndex( 0 );
+             fieldIndex < fieldNames.size();
+             ++fieldIndex )
+        {
+          if( fieldNames[ fieldIndex ].compare( variableString ) == 0 )
+          {
+            // If it is a field name, we raise its power in the polynomial term
+            // and return position of the char just after the parsed chars.
+            polynomialTerm.RaiseFieldPower( fieldIndex,
+                                            powerInt );
+            return wordEnd;
+          }
+        }
+        // If we get to here, it wasn't a field name, so we try to get a
+        // functionoid from runningParameters, which will return NULL if the
+        // string doesn't map to any functionoid, and polynomialTerm.MultiplyBy
+        // will set its internal validity flag to false on being given NULL.
         polynomialTerm.MultiplyBy( runningParameters.GetFunctionoid(
-                               FormatVariable( stringToParse.substr( wordStart,
-                                                 ( wordEnd - wordStart ) ) ) ),
+                                                              variableString ),
                                    powerInt );
+        return wordEnd;
       }
       else if( ( stringToParse[ wordStart ] == '+' )
                ||

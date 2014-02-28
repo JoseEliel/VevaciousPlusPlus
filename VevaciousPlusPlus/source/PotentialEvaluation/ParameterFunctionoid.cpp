@@ -10,7 +10,8 @@
 namespace VevaciousPlusPlus
 {
 
-  ParameterFunctionoid::ParameterFunctionoid()
+  ParameterFunctionoid::ParameterFunctionoid() :
+    currentValue( 0.0 )
   {
     // placeholder:
     /**/std::cout << std::endl

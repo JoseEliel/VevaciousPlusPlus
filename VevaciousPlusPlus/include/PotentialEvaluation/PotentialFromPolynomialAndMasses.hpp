@@ -10,6 +10,7 @@
 
 #include "../StandardIncludes.hpp"
 #include "HomotopyContinuationReadyPotential.hpp"
+#include "PolynomialTerm.hpp"
 #include "PolynomialSum.hpp"
 #include "MassSquaredMatrix.hpp"
 #include "RunningParameterManager.hpp"

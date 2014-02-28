@@ -19,6 +19,13 @@ namespace VevaciousPlusPlus
     ParameterFunctionoid();
     virtual
     ~ParameterFunctionoid();
+
+
+    double operator()() const{ return currentValue; }
+
+
+  protected:
+    double currentValue;
   };
 
 } /* namespace VevaciousPlusPlus */

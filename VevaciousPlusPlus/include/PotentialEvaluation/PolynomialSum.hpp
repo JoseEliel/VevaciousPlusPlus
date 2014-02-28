@@ -39,7 +39,7 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnValue( 0.0 );
-    for( std::vector< PolynomialTerm >::iterator
+    for( std::vector< PolynomialTerm >::const_iterator
          whichTerm( polynomialTerms.begin() );
          whichTerm < polynomialTerms.end();
          ++whichTerm )
