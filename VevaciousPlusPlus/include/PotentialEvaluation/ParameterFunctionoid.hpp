@@ -21,7 +21,16 @@ namespace VevaciousPlusPlus
     ~ParameterFunctionoid();
 
 
+    // This returns the value of the functionoid based on the last update.
     double operator()() const{ return currentValue; }
+
+    // This should update currentValue based on logarithmOfScale and any other
+    // functionoids that this functionoid is dependent on.
+    virtual void
+    UpdateForNewLogarithmOfScale( double const logarithmOfScale ) = 0;
+
+    // This is mainly for debugging.
+    virtual std::string AsString() = 0;
 
 
   protected:

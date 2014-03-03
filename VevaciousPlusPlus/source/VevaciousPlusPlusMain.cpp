@@ -39,14 +39,14 @@ int main( int argumentCount,
   //   between the vacua parameterized by splines, as implemented in the
   //   BounceWithSplines class, which requires an instance of a class derived
   //   from the PotentialFunction abstract base clases.
-  // Hence creating an instance of the PotentialFromPolynomialAndMasses class, which
-  // inherits from both HomotopyContinuationReadyPotential and
+  // Hence creating an instance of the PotentialFromPolynomialAndMasses class,
+  // which inherits from both HomotopyContinuationReadyPotential and
   // PotentialFunction (through HomotopyContinuationReadyPotential itself
   // already being derived from PotentialFunction), forms the basis of the
   // components of the VevaciousPlusPlus object.
 
-  // The PotentialFromPolynomialAndMasses constructor takes a string with the name of the
-  // model file (including the path):
+  // The PotentialFromPolynomialAndMasses constructor takes a string with the
+  // name of the model file (including the path):
   VevaciousPlusPlus::PotentialFromPolynomialAndMasses
   potentialFunction( argumentParser.fromTag( "model",
                                              "./ModelFiles/SM.vin" ) );
@@ -68,6 +68,35 @@ int main( int argumentCount,
   std::string slhaFile( argumentParser.fromTag( "slha",
                                                 "slha.out" ) );
   vevaciousPlusPlus.RunPoint( slhaFile );
+
+  // debugging:
+  /**/std::cout << std::endl << "debugging:"
+  << std::endl;
+  std::vector< double > testConfiguration;
+  testConfiguration.push_back( 0.0 );
+  potentialFunction.UpdateParameters( slhaFile );
+  std::cout << "potentialFunction(";
+  for( std::vector< double >::iterator
+       whichField( testConfiguration.begin() );
+       whichField < testConfiguration.end();
+       ++whichField )
+  {
+    std::cout << " " << *whichField;
+  }
+  std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout << std::endl;
+  testConfiguration.back() = 1.0;
+  potentialFunction.UpdateParameters( slhaFile );
+  std::cout << "potentialFunction(";
+  for( std::vector< double >::iterator
+       whichField( testConfiguration.begin() );
+       whichField < testConfiguration.end();
+       ++whichField )
+  {
+    std::cout << " " << *whichField;
+  }
+  std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout << std::endl;/**/
 
   // Write the results:
   vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "output",

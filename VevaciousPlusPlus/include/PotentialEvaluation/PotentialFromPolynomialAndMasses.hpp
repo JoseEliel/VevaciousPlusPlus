@@ -72,6 +72,7 @@ namespace VevaciousPlusPlus
     static std::string const allowedVariableChars;
 
     RunningParameterManager runningParameters;
+    double renormalizationScaleSquared;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
     std::vector< MassSquaredMatrix > massSquaredMatrices;
@@ -140,7 +141,16 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                                 double const temperatureValue )
   {
+    UpdateRenormalizationScale( fieldConfiguration,
+                                temperatureValue );
     return treeLevelPotential( fieldConfiguration );
+  }
+
+  // This puts all index brackets into a consistent form.
+  inline std::string PotentialFromPolynomialAndMasses::FormatVariable(
+                                 std::string const& unformattedVariable ) const
+  {
+    return RunningParameterManager::FormatVariable( unformattedVariable );
   }
 
 } /* namespace VevaciousPlusPlus */

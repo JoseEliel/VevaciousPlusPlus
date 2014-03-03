@@ -16,11 +16,29 @@ namespace VevaciousPlusPlus
   class MassSquaredMatrix
   {
   public:
+    enum SpinType
+    {
+      scalarBoson,
+      weylFermion,
+      gaugeBoson,
+      notSet
+    };
+
     MassSquaredMatrix(
                     std::map< std::string, std::string > const& attributeMap );
     virtual
     ~MassSquaredMatrix();
 
+
+    // This returns the eigenvalues of the matrix.
+    std::vector< double > const&
+    MassesSquared( std::vector< double > const& fieldConfiguration );
+
+    // This returns the number of identical copies of this mass-squared matrix
+    // that the model has.
+    double MultiplicityFactor() const{ return multiplicityFactor; }
+
+    SpinType GetSpinType() const{ return spinType; }
 
     // This adds a new element and returns a reference to it.
     PolynomialSum& AddNewElement();
@@ -29,6 +47,9 @@ namespace VevaciousPlusPlus
   protected:
     std::vector< PolynomialSum > matrixElements;
     Eigen::MatrixXd eigenMatrix;
+    std::vector< double > massesSquared;
+    double multiplicityFactor;
+    SpinType spinType;
   };
 
 

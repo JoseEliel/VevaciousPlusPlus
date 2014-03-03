@@ -9,7 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
-  std::string const VevaciousPlusPlus::versionString( "2.prealpha.0011" );
+  std::string const VevaciousPlusPlus::versionString( "2.prealpha.0012" );
   std::string const VevaciousPlusPlus::citationString( "[none as yet]" );
 
   VevaciousPlusPlus::VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,

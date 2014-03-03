@@ -15,6 +15,7 @@
 #include "PolynomialSum.hpp"
 #include "ParameterFunctionoid.hpp"
 #include "RunningParameterManager.hpp"
+#include "SlhaFunctionoid.hpp"
 
 // This file is just to collect a lot of #include statements.
 

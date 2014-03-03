@@ -102,7 +102,7 @@
 
   <!-- I need to explain the form of ExtraPolynomialPart...-->
   <ExtraPolynomialPart>
-    deltalambda * phi^4
+    deltalambda * phi^4 + 2.0E-1 * unknown[ 1, 2, 3 ] * phi^2
   </ExtraPolynomialPart>
 
   <!-- I need to explain the form of MassSquaredMatrix...-->

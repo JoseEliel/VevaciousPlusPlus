@@ -25,6 +25,7 @@ namespace VevaciousPlusPlus
                                            std::string const& modelFilename ) :
     HomotopyContinuationReadyPotential(),
     runningParameters(),
+    renormalizationScaleSquared( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     massSquaredMatrices(),
@@ -102,7 +103,7 @@ namespace VevaciousPlusPlus
                                                      &aliasString,
                                                      "=" ) );
       runningParameters.AddValidSlhaBlock( slhaString,
-                                           aliasString );
+                      BOL::StringParser::trimFromFrontAndBack( aliasString ) );
     }
     //   </SlhaBlocks>
     //   <DerivedParameters>
@@ -194,10 +195,50 @@ namespace VevaciousPlusPlus
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "MassCorrectedPotential::operator()(...)";
-    std::cout << std::endl;
+    << "PotentialFromPolynomialAndMasses::operator()(...)";
+    std::cout << std::endl;/**/
 
-    return 0.0;/**/
+    UpdateRenormalizationScale( fieldConfiguration,
+                                temperatureValue );
+    double returnValue( treeLevelPotential( fieldConfiguration )
+                        + polynomialLoopCorrections( fieldConfiguration ) );
+    double correctionValue( 0.0 );
+    for( std::vector< MassSquaredMatrix >::iterator
+         massSquaredMatrix( massSquaredMatrices.begin() );
+         massSquaredMatrix < massSquaredMatrices.end();
+         ++massSquaredMatrix )
+    {
+      if( massSquaredMatrix->GetSpinType() == MassSquaredMatrix::scalarBoson )
+      {
+        correctionValue
+        = ScalarBosonCorrection( massSquaredMatrix->MassesSquared(
+                                                          fieldConfiguration ),
+                                 temperatureValue );
+      }
+      else if( massSquaredMatrix->GetSpinType()
+               == MassSquaredMatrix::weylFermion )
+      {
+        correctionValue
+        = WeylFermionCorrection( massSquaredMatrix->MassesSquared(
+                                                          fieldConfiguration ),
+                                 temperatureValue );
+      }
+      else if( massSquaredMatrix->GetSpinType()
+               == MassSquaredMatrix::gaugeBoson )
+      {
+        correctionValue
+        = GaugeBosonCorrection( massSquaredMatrix->MassesSquared(
+                                                          fieldConfiguration ),
+                                temperatureValue );
+      }
+      else
+      {
+        correctionValue = 0.0;
+      }
+      returnValue += ( correctionValue
+                       * massSquaredMatrix->MultiplicityFactor() );
+    }
+    return returnValue;
   }
 
   // This updates all the parameters of the potential that are not field
@@ -209,9 +250,11 @@ namespace VevaciousPlusPlus
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "MassCorrectedPotential::UpdateParameters( \"" << slhaFilename
+    << "PotentialFromPolynomialAndMasses::UpdateParameters( \"" << slhaFilename
     << "\" )";
     std::cout << std::endl;/**/
+
+    runningParameters.UpdateSlhaParameters( slhaFilename );
   }
 
   // This returns the square of the scale (in GeV^2) relevant to tunneling
@@ -261,6 +304,7 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses() :
     HomotopyContinuationReadyPotential(),
     runningParameters(),
+    renormalizationScaleSquared( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     massSquaredMatrices(),
@@ -272,43 +316,6 @@ namespace VevaciousPlusPlus
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
     // constructors.
-  }
-
-
-  // This puts all index brackets into a consistent form.
-  std::string PotentialFromPolynomialAndMasses::FormatVariable(
-                                 std::string const& unformattedVariable ) const
-  {
-    size_t openBracket( unformattedVariable.find( '[' ) );
-    if( openBracket == std::string::npos )
-    {
-      return std::string( unformattedVariable );
-    }
-    if( unformattedVariable[ unformattedVariable.size() - 1 ] != ']' )
-    {
-      throw std::runtime_error(
-                         "In parsing model file, [...] not closed properly." );
-    }
-    std::vector< int > indicesVector( BOL::StringParser::stringToIntVector(
-                              unformattedVariable.substr(  ( openBracket + 1 ),
-                        ( unformattedVariable.size() - openBracket - 2 ) ) ) );
-    std::stringstream indicesStream;
-    indicesStream << unformattedVariable.substr( 0,
-                                                 openBracket );
-    indicesStream << '[';
-    for( std::vector< int >::iterator
-         whichIndex( indicesVector.begin() );
-         whichIndex < indicesVector.end();
-         ++whichIndex )
-    {
-      if( whichIndex != indicesVector.begin() )
-      {
-        indicesStream << ',';
-      }
-      indicesStream << *whichIndex;
-    }
-    indicesStream  << ']';
-    return std::string( indicesStream.str() );
   }
 
 
@@ -537,6 +544,18 @@ namespace VevaciousPlusPlus
                                       std::vector< double > fieldConfiguration,
                                            double const evaluationTemperature )
   {
+    renormalizationScaleSquared
+    = ( 1.0 + ( evaluationTemperature * evaluationTemperature ) );
+    for( std::vector< double >::iterator
+        whichField( fieldConfiguration.begin() );
+        whichField < fieldConfiguration.end();
+        ++whichField )
+    {
+      renormalizationScaleSquared += ( (*whichField) * (*whichField) );
+    }
+    runningParameters.UpdateRunningParameters(
+                                         sqrt( renormalizationScaleSquared ) );
+
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "

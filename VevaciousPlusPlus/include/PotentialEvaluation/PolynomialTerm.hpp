@@ -62,12 +62,35 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnValue( coefficientConstant );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PolynomialTerm::operator()(";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << ' ' << *whichField;
+    }
+    std::cout
+    << " ) called. returnValue = " << returnValue << ", coefficientConstant = "
+    << coefficientConstant << std::endl;/**/
+
     for( std::vector< unsigned int >::const_iterator
          whichField( fieldProductByIndex.begin() );
          whichField < fieldProductByIndex.end();
          ++whichField )
     {
       returnValue *= fieldConfiguration[ *whichField ];
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "fieldConfiguration[ *whichField ] = "
+      << fieldConfiguration[ *whichField ] << ", returnValue = "
+      << returnValue;
+      std::cout << std::endl;/**/
     }
     for( std::vector< ParameterFunctionoid* >::const_iterator
          whichFunctionoid( functionoidProduct.begin() );
@@ -75,6 +98,13 @@ namespace VevaciousPlusPlus
          ++whichFunctionoid )
     {
       returnValue *= (*(*whichFunctionoid))();
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "(*(*whichFunctionoid))() = " << (*(*whichFunctionoid))()
+      << ", returnValue = " << returnValue;
+      std::cout << std::endl;/**/
     }
     return returnValue;
   }

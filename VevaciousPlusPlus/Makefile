@@ -31,6 +31,7 @@ SOURCES=source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
+ source/PotentialEvaluation/SlhaFunctionoid.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
