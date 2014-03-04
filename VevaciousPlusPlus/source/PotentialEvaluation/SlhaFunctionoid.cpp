@@ -62,8 +62,9 @@ namespace VevaciousPlusPlus
 
     if( numberOfScales > 1 )
     {
-      double currentScale;
-      Eigen::MatrixXd scaleDependenceMatrix( numberOfScales, numberOfScales );
+      double logarithmOfScale;
+      Eigen::MatrixXd scaleDependenceMatrix( numberOfScales,
+                                             numberOfScales );
       Eigen::VectorXd scaleDependenceVector( numberOfScales );
       for( unsigned int whichScale( 0 );
            whichScale < numberOfScales;
@@ -71,23 +72,28 @@ namespace VevaciousPlusPlus
       {
         scaleDependenceVector( whichScale )
         = (*slhaBlock)[ whichScale + 1 ]( indexVector );
-        currentScale = (*slhaBlock)[ whichScale + 1 ].getScale();
-        scaleDependenceMatrix( whichScale, 0 ) = 1.0;
-        scaleDependenceMatrix( whichScale, 1 ) = currentScale;
+        logarithmOfScale = log( (*slhaBlock)[ whichScale + 1 ].getScale() );
+        scaleDependenceMatrix( whichScale,
+                               0 ) = 1.0;
+        scaleDependenceMatrix( whichScale,
+                               1 ) = logarithmOfScale;
         for( unsigned int whichPower( 2 );
              whichPower < numberOfScales;
              ++whichPower )
         {
-          scaleDependenceMatrix( whichScale, whichPower ) = pow( currentScale,
-                                                                 whichPower );
+          scaleDependenceMatrix( whichScale,
+                                 whichPower ) = pow( logarithmOfScale,
+                                                     whichPower );
         }
       }
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
       << std::endl
-      << "scaleDependenceMatrix = " << std::endl << scaleDependenceMatrix
-      << std::endl << "scaleDependenceVector = " << scaleDependenceVector;
+      << "scaleDependenceMatrix = " << std::endl
+      << scaleDependenceMatrix << std::endl
+      << "scaleDependenceVector = " << std::endl
+      << scaleDependenceVector << std::endl;
       std::cout << std::endl;/**/
 
       // Now we solve for the coefficients:
@@ -111,7 +117,7 @@ namespace VevaciousPlusPlus
     }
     else
     {
-      scaleLogarithmPowerCoefficients.assign(1,
+      scaleLogarithmPowerCoefficients.assign( 1,
                                             (*slhaBlock)[ 1 ]( indexVector ) );
     }
   }

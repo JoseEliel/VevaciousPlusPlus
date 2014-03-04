@@ -85,7 +85,19 @@ int main( int argumentCount,
   }
   std::cout << " ) = " << potentialFunction( testConfiguration );
   std::cout << std::endl;
-  testConfiguration.back() = 1.0;
+  testConfiguration.back() = 300.0;
+  potentialFunction.UpdateParameters( slhaFile );
+  std::cout << "potentialFunction(";
+  for( std::vector< double >::iterator
+       whichField( testConfiguration.begin() );
+       whichField < testConfiguration.end();
+       ++whichField )
+  {
+    std::cout << " " << *whichField;
+  }
+  std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout << std::endl;
+  testConfiguration.back() = 1000.0;
   potentialFunction.UpdateParameters( slhaFile );
   std::cout << "potentialFunction(";
   for( std::vector< double >::iterator

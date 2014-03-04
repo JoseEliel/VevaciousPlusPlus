@@ -74,32 +74,40 @@ namespace VevaciousPlusPlus
     << currentValue;
     std::cout << std::endl;/**/
 
+    double termContribution( 0.0 );
+
     for( unsigned int whichPower( 1 );
          whichPower < scaleLogarithmPowerCoefficients.size();
          ++whichPower )
     {
-      currentValue *= scaleLogarithmPowerCoefficients[ whichPower ];
+      termContribution = scaleLogarithmPowerCoefficients[ whichPower ];
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
       << std::endl
       << "scaleLogarithmPowerCoefficients[ " << whichPower << " ] = "
-      << scaleLogarithmPowerCoefficients[ whichPower ] << ", currentValue = "
-      << currentValue;
+      << scaleLogarithmPowerCoefficients[ whichPower ]
+      << ", termContribution = " << termContribution;
       std::cout << std::endl;/**/
 
       for( unsigned int powerCount( 0 );
            powerCount < whichPower;
            ++powerCount )
       {
-        currentValue *= logarithmOfScale;
+        termContribution *= logarithmOfScale;
 
         // debugging:
         /**/std::cout << std::endl << "debugging:"
         << std::endl
-        << "currentValue = " << currentValue;
+        << "termContribution = " << termContribution;
         std::cout << std::endl;/**/
       }
+      currentValue += termContribution;
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "currentValue = " << currentValue;
+      std::cout << std::endl;/**/
     }
   }
 
