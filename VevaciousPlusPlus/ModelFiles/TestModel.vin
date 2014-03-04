@@ -30,6 +30,14 @@
   <FieldVariables>
     phi
   </FieldVariables>
+
+  <!-- The renormalization scale for running couplings is chosen to be Q such
+       that Q^2 = M^2 + sum of squares of field values of the field
+       configuration, where M is given here (in GeV). The default is the mass
+       of the Z boson. -->
+  <MinimumRenormalizationScale>
+    91.1876
+  </MinimumRenormalizationScale>
   
   <!-- Every block that will be read in from an SLHA file should be enumerated
        here in a newline-separated list. Block names are NOT case-sensitive

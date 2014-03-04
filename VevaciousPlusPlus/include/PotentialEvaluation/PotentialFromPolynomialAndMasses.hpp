@@ -73,6 +73,7 @@ namespace VevaciousPlusPlus
 
     RunningParameterManager runningParameters;
     double renormalizationScaleSquared;
+    double minimumRenormalizationScaleSquared;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
     std::vector< MassSquaredMatrix > massSquaredMatrices;

@@ -26,6 +26,7 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPotential(),
     runningParameters(),
     renormalizationScaleSquared( NAN ),
+    minimumRenormalizationScaleSquared( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     massSquaredMatrices(),
@@ -81,6 +82,17 @@ namespace VevaciousPlusPlus
     }
     numberOfFields = fieldNames.size();
     //   </FieldVariables>
+    //   <MinimumRenormalizationScale>
+    successfullyReadElement = elementParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw
+      std::runtime_error( "Could not parse <MinimumRenormalizationScale>." );
+    }
+    minimumRenormalizationScaleSquared = BOL::StringParser::stringToDouble(
+                             elementParser.getTrimmedCurrentElementContent() );
+    minimumRenormalizationScaleSquared *= minimumRenormalizationScaleSquared;
+    //   </MinimumRenormalizationScale>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
     if( !successfullyReadElement )
@@ -305,6 +317,7 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPotential(),
     runningParameters(),
     renormalizationScaleSquared( NAN ),
+    minimumRenormalizationScaleSquared( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     massSquaredMatrices(),
@@ -545,7 +558,8 @@ namespace VevaciousPlusPlus
                                            double const evaluationTemperature )
   {
     renormalizationScaleSquared
-    = ( 1.0 + ( evaluationTemperature * evaluationTemperature ) );
+    = ( minimumRenormalizationScaleSquared
+        + ( evaluationTemperature * evaluationTemperature ) );
     for( std::vector< double >::iterator
         whichField( fieldConfiguration.begin() );
         whichField < fieldConfiguration.end();
