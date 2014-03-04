@@ -11,6 +11,7 @@
 #include "../StandardIncludes.hpp"
 #include "Eigen/Dense"
 
+
 namespace VevaciousPlusPlus
 {
   class MassSquaredMatrix

@@ -39,6 +39,10 @@ Block Yu Q=  6.70648073E+02  # (SUSY Scale)
 block PHIFOURTH Q=  1.0E+02  #
  1  0.1
 block PHIFOURTH Q=  1.0E+03  #
- 1  0.08
+ 1  0.05
+block PHIFOURTH Q=  1.0E+04  #
+ 1  0.01
+block PHIFOURTH Q=  1.0E+05  #
+ 1  0.02
 block LOOPPHIFOURTH Q=  1.0E+02  #
  1  0.12
