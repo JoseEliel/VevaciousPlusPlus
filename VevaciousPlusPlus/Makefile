@@ -22,7 +22,9 @@ EIGENDIR=./Eigen/
 CCFLAGS=-Wall -O3 -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
-SOURCES=source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
+SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
+ source/PotentialEvaluation/ConstantFunctionoid.cpp \
+ source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/MassSquaredMatrix.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PolynomialCoefficient.cpp \
@@ -32,6 +34,7 @@ SOURCES=source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaFunctionoid.cpp \
+ source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \

@@ -10,6 +10,7 @@
 
 #include "../StandardIncludes.hpp"
 #include "Eigen/Dense"
+#include "PolynomialSum.hpp"
 
 
 namespace VevaciousPlusPlus

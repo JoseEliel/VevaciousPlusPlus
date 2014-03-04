@@ -82,8 +82,8 @@
     beta=ATAN[ tb ]
     cb=COS[ beta ]
     sb=SIN[ beta ]
-    sbcb = MULTIPLY[ sb, cb ]
-    Bmu=MULTIPLY[ sbcb, mAsq ]
+    sbcb = TIMES[ sb, cb ]
+    Bmu=TIMES[ sbcb, mASq ]
     Sqrt2=POW[ 2.0, 0.5 ]
     tbSq=POW[ tb, 2 ]
     tbSqPlusOne=PLUS[ tbSq, 1.0 ]
@@ -102,7 +102,7 @@
      a ratio of parameters from an SLHA file. -->
 <!-- I need to explain the form of TreeLevelPotential...-->
 <TreeLevelPotential>
-  0.25 * lambda * phi^4 - 0.5 * Bmu * phi^2
+  .25 * lambda * phi^4 - 50e-002 * Bmu * phi^2
 </TreeLevelPotential>
 
 <!-- I need to explain the form of LoopCorrections...-->
@@ -110,7 +110,7 @@
 
   <!-- I need to explain the form of ExtraPolynomialPart...-->
   <ExtraPolynomialPart>
-    deltalambda * phi^4 + 2.0E-1 * unknown[ 1, 2, 3 ] * phi^2
+    .25e-00 * deltalambda * phi^4 + 2.0E-1 * unknown[ 1, 2, 3 ] * phi^2
   </ExtraPolynomialPart>
 
   <!-- I need to explain the form of MassSquaredMatrix...-->

@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
   class ParameterFunctionoid
   {
   public:
-    ParameterFunctionoid();
+    ParameterFunctionoid( double const currentValue = 0.0 );
     virtual
     ~ParameterFunctionoid();
 

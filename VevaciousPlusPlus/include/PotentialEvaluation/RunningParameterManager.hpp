@@ -12,6 +12,7 @@
 #include "ParameterFunctionoid.hpp"
 #include "SLHA.hpp"
 #include "SlhaFunctionoid.hpp"
+#include "ConstantFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -60,7 +61,9 @@ namespace VevaciousPlusPlus
     std::vector< ParameterFunctionoid* > parameterFunctionoidPointers;
     std::vector< SlhaFunctionoid* > slhaFunctionoidPointers;
     std::map< std::string, ParameterFunctionoid* > parameterFunctionoidMap;
-    std::map< std::string, ParameterFunctionoid* >::iterator functionoidFinder;
+    std::map< std::string, ParameterFunctionoid* >::iterator parameterFinder;
+    std::map< double, ParameterFunctionoid* > constantFunctionoidMap;
+    std::map< double, ParameterFunctionoid* >::iterator constantFinder;
     LHPC::SlhaParser slhaParser;
     std::vector< RestrictedSlhaBlock* > slhaBlockPointers;
     std::map< std::string, RestrictedSlhaBlock* > slhaBlockMap;
@@ -74,6 +77,11 @@ namespace VevaciousPlusPlus
     // and NULL is returned.
     ParameterFunctionoid* GetSlhaFunctionoid( std::string const& blockName,
                                               std::string const& indexString );
+
+    // This returns a pair of functionoid pointers which match the arguments
+    // in commaSeparatedAliases.
+    std::pair< ParameterFunctionoid*, ParameterFunctionoid* >
+    FindFunctionoidPair( std::string const& commaSeparatedAliases );
   };
 
 
@@ -100,33 +108,6 @@ namespace VevaciousPlusPlus
                                                            ( openBracket + 1 ),
                    ( unformattedVariable.size() - openBracket - 2 ) ) ) << ']';
     return std::string( formattedStream.str() );
-  }
-
-  // This returns a pointer to the ParameterFunctionoid mapped to by
-  // parameterString, returning NULL if there is none.
-  inline ParameterFunctionoid*
-  RunningParameterManager::GetFunctionoid( std::string const& parameterString )
-  {
-    functionoidFinder = parameterFunctionoidMap.find( parameterString );
-    if( functionoidFinder != parameterFunctionoidMap.end() )
-    {
-      return functionoidFinder->second;
-    }
-    size_t bracketPosition( parameterString.find_first_of( '[' ) );
-    if( bracketPosition < ( parameterString.size() - 2 ) )
-    {
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "parameterString = \"" << parameterString << "\"";
-      std::cout << std::endl;/**/
-
-      return GetSlhaFunctionoid( parameterString.substr( 0,
-                                                         bracketPosition ),
-                               parameterString.substr( ( bracketPosition + 1 ),
-                          ( parameterString.size() - bracketPosition - 2 ) ) );
-    }
-    return NULL;
   }
 
   // This updates all SlhaFunctionoids with data from a new SLHA file.
@@ -189,7 +170,6 @@ namespace VevaciousPlusPlus
       (*whichParameter)->UpdateForNewLogarithmOfScale( logarithmOfScale );
     }
   }
-
 
   // This puts all index brackets into a consistent form.
   inline std::string RunningParameterManager::FormatIndexBracketContent(

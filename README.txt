@@ -64,17 +64,18 @@
  Phase 4) Download and compile the LesHouchesParserClasses (LHPC) C++ library.
           The files are available at
           http://www.hepforge.org/downloads/lhpc
-          (link last checked 2013-08-29) or
+          (link last checked 2014-03-04) or
           https://github.com/benoleary/LesHouchesParserClasses_CPP
-          (link last checked 2013-08-29). The installation should just be
-          downloading, unzipping, and then running make.
+          (link last checked 2014-03-04). The installation should just be
+          downloading, unzipping, and then running make. Version 0.8.7 or later
+          is necessary!
  Phase 5) Download the Eigen header library, available from
           http://eigen.tuxfamily.org/index.php?title=Main_Page#Download
           (link last checked 2014-02-25). No compilation is necessary.
  Phase 6) Compile VevaciousPlusPlus. The Makefile should be edited to have the
           correct paths to the header files and library file of LHPC (these are
           /path/to/unzipped/LHPC/include/ and /path/to/unzipped/LHPC/lib/ by
-          default). LHPC version 0.8.5 or higher is required. The Makefile
+          default). LHPC version 0.8.7 or higher is required. The Makefile
           should also have the correct path to the header files from Eigen.
 
 

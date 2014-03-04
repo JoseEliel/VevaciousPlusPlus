@@ -9,13 +9,14 @@
 
 namespace VevaciousPlusPlus
 {
-  std::string const
-  PotentialFromPolynomialAndMasses::digitChars( "0123456789" );
+  std::string const PotentialFromPolynomialAndMasses::digitChars(
+                                               BOL::StringParser::digitChars );
   std::string const
   PotentialFromPolynomialAndMasses::dotAndDigits( "."
                               + PotentialFromPolynomialAndMasses::digitChars );
   std::string const PotentialFromPolynomialAndMasses::allowedVariableInitials(
-                       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                                      BOL::StringParser::lowercaseAlphabetChars
+                                 + BOL::StringParser::uppercaseAlphabetChars );
   std::string const PotentialFromPolynomialAndMasses::allowedVariableChars(
                       PotentialFromPolynomialAndMasses::allowedVariableInitials
                                  + PotentialFromPolynomialAndMasses::digitChars
@@ -416,6 +417,14 @@ namespace VevaciousPlusPlus
                                                               size_t wordStart,
                                                PolynomialTerm& polynomialTerm )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::"
+    << "PutNextNumberOrVariableIntoPolynomial( \"" << stringToParse << "\", "
+    << wordStart << ", ... ) called.";
+    std::cout << std::endl;/**/
+
     size_t wordEnd( 0 );
     while( wordStart < stringToParse.size() )
     {
@@ -425,12 +434,44 @@ namespace VevaciousPlusPlus
       {
         wordEnd = stringToParse.find_first_not_of( dotAndDigits,
                                                    wordStart );
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "It's a number.";
+        if( wordEnd != std::string::npos )
+        {
+          std::cout
+          << "stringToParse[ " << wordEnd << " ] = \'"
+          << stringToParse[ wordEnd ] << "\'" << std::endl;
+        }
+        std::cout << std::endl;/**/
+
         if( ( wordEnd != std::string::npos )
             &&
             ( ( stringToParse[ wordEnd ] == 'e' )
               ||
               ( stringToParse[ wordEnd ] == 'E' ) ) )
         {
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "It's in scientific E notation. wordEnd = " << wordEnd
+          << ", stringToParse.size() = " << stringToParse.size();
+          if( wordEnd < ( stringToParse.size() - 2 ) )
+          {
+            std::cout
+            << "stringToParse[ " << ( wordEnd + 1 ) << " ] = \'"
+            << stringToParse[ ( wordEnd + 1 ) ] << "\'" << std::endl;
+          }
+          if( wordEnd < ( stringToParse.size() - 3 ) )
+          {
+            std::cout
+            << "stringToParse[ " << ( wordEnd + 2 ) << " ] = \'"
+            << stringToParse[ ( wordEnd + 2 ) ] << "\'" << std::endl;
+          }
+          std::cout << std::endl;/**/
+
           // If the number is in "e notation", we have to check that it is not
           // malformed:
           if( ( wordEnd < ( stringToParse.size() - 2 ) )
