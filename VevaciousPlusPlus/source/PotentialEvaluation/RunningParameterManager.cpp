@@ -114,13 +114,6 @@ namespace VevaciousPlusPlus
     std::string bracketedString( parameterString.substr( ( wordEnd + 1 ),
                                  ( parameterString.size() - wordEnd - 2 ) ) );
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "aliasString = \"" << aliasString << "\", typeString = \"" << typeString
-    << "\", bracketedString = \"" << bracketedString << "\"";
-    std::cout << std::endl;/**/
-
     ParameterFunctionoid* createdFunctionoid( NULL );
     bool notAlreadyDeclared( true );
     if( typeString.compare( "SLHAELEMENT" ) == 0 )
@@ -434,13 +427,6 @@ namespace VevaciousPlusPlus
   RunningParameterManager::GetSlhaFunctionoid( std::string const& blockName,
                                                std::string const& indexString )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "RunningParameterManager::GetSlhaFunctionoid( \"" << blockName
-    << "\", \"" << indexString << "\" ) called.";
-    std::cout << std::endl;/**/
-
     ParameterFunctionoid* returnPointer( NULL );
 
     // First we check to see if blockName was an alias:
@@ -450,13 +436,6 @@ namespace VevaciousPlusPlus
     {
       properBlockName = &(slhaAliasFinder->second);
     }
-
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "*properBlockName = " << *properBlockName;
-    std::cout << std::endl;/**/
 
     slhaBlockFinder = slhaBlockMap.find( *properBlockName );
     if( slhaBlockFinder != slhaBlockMap.end() )
@@ -504,39 +483,6 @@ namespace VevaciousPlusPlus
       slhaFunctionoid->SetBlockPointer( slhaBlockFinder->second );
       returnPointer = slhaFunctionoid;
     }
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "slhaBlockMap:";
-    for( std::map< std::string, RestrictedSlhaBlock* >::iterator
-         whichPair( slhaBlockMap.begin() );
-         whichPair != slhaBlockMap.end();
-         ++whichPair )
-    {
-      std::cout << "\"" << whichPair->first << "\" -> " << whichPair->second;
-      if( whichPair->second != NULL )
-      {
-        std::cout << " (\"" << whichPair->second->getName() << "\")";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl << "parameterFunctionoidMap:" << std::endl;
-    for( std::map< std::string, ParameterFunctionoid* >::iterator
-         whichPair( parameterFunctionoidMap.begin() );
-         whichPair != parameterFunctionoidMap.end();
-         ++whichPair )
-    {
-      std::cout << "\"" << whichPair->first << "\" -> " << whichPair->second;
-      if( whichPair->second != NULL )
-      {
-        std::cout << " (\"" << whichPair->second->AsString() << "\")";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;/**/
-
-
     return returnPointer;
   }
 

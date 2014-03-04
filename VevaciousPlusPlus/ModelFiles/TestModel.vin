@@ -70,7 +70,35 @@
        and if a parameter references another parameter, it MUST come further
        down the list than the referenced parameter. (All elements of SLHA
        blocks from SlhaBlocks may be referenced here but only through first
-       creating parameters of the SLHAELEMENT type.) -->
+       creating parameters of the SLHAELEMENT type.) Constant numbers may be
+       used in places of aliases.
+       Allowed types:
+       SLHAELEMENT: takes SLHA block name or alias, then set of indices,
+                    e.g. SLHAELEMENT[YU, 2, 3]
+                    
+       Binary operations: all these take 2 aliases as arguments,
+                          e.g. DIVIDE[ blah, bloop ] or PLUS[ 2.0, foo ]
+       PLUS: adds the arguments
+       MINUS: subtracts the 2nd argument from the 1st
+       TIMES: multiplies the arguments
+       DIVIDE: divides the 1st argument by the 2nd
+       POW: raises the 1st argument to the power of the 2nd
+       
+       Unary operations: all these take 1 alias as the arguement,
+                         e.g. ATAN[ bar ] or SQRT[ 6 ]
+       SQRT: square root
+       EXP: e to the power of the argument
+       LOG: logarithm in base e
+       TAN: tangent
+       SIN: sine
+       COS: cosine
+       TAN: tangent
+       ASIN: arcsine (inverse sine)
+       ACOS: arccosine (inverse cosine)
+       ATAN: arctangent (inverse tangent)
+       SINH: hyperbolic sine
+       COSH: hyperbolic cosine
+       TANH: hyperbolic tangent -->
   <DerivedParameters>
     g1=SLHAELEMENT[g,1]
     ycharmtop=SLHAELEMENT[YU, 2, 3]

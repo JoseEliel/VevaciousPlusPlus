@@ -116,30 +116,6 @@ namespace VevaciousPlusPlus
   {
     slhaParser.readFile( slhaFilename );
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "slhaBlockPointers.size() = " << slhaBlockPointers.size();
-    for( std::vector< RestrictedSlhaBlock* >::iterator
-         whichBlock( slhaBlockPointers.begin() );
-         whichBlock < slhaBlockPointers.end();
-         ++whichBlock )
-    {
-      std::cout
-      << std::endl << "Block " << (*whichBlock)->getName() << std::endl;
-      for( int whichScale( 1 );
-           whichScale <= (*whichBlock)->getNumberOfCopiesWithDifferentScale();
-           ++whichScale )
-      {
-        std::cout
-        << "scale copy " << whichScale << " has scale "
-        << (*(*whichBlock))[ whichScale ].getScale() << std::endl
-        << "as string =" << std::endl
-        << (*(*whichBlock))[ whichScale ].getAsString();
-      }
-    }
-    std::cout << std::endl;/**/
-
     for( std::vector< SlhaFunctionoid* >::iterator
          whichParameter( slhaFunctionoidPointers.begin() );
          whichParameter < slhaFunctionoidPointers.end();
@@ -155,12 +131,6 @@ namespace VevaciousPlusPlus
                                             double const renormalizationScale )
   {
     double const logarithmOfScale( log( renormalizationScale ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "logarithmOfScale = " << logarithmOfScale;
-    std::cout << std::endl;/**/
 
     for( std::vector< ParameterFunctionoid* >::iterator
          whichParameter( parameterFunctionoidPointers.begin() );
