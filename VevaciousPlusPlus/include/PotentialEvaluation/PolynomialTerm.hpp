@@ -44,6 +44,11 @@ namespace VevaciousPlusPlus
     void MultiplyBy( ParameterFunctionoid* const runningParameter,
                      unsigned int const powerInt );
 
+    // This resets the PolynomialTerm to be as if freshly constructed.
+    void ResetValues();
+
+    // This is mainly for debugging.
+    std::string AsString() const;
 
 
   protected:
@@ -126,6 +131,45 @@ namespace VevaciousPlusPlus
     {
       fieldProductByIndex.push_back( fieldIndex );
     }
+  }
+
+  // This resets the PolynomialTerm to be as if freshly constructed.
+  inline void PolynomialTerm::ResetValues()
+  {
+    isValid = true;
+    coefficientConstant =  1.0;
+    fieldProductByIndex.clear();
+    functionoidProduct.clear();
+  }
+
+  // This is mainly for debugging.
+  inline std::string PolynomialTerm::AsString() const
+  {
+    std::stringstream returnStream;
+    returnStream
+    << "isValid = " << isValid << std::endl
+    << "coefficientConstant = " << coefficientConstant << std::endl
+    << "fieldProductByIndex = {";
+    for( std::vector< unsigned int >::const_iterator
+         fieldIndex( fieldProductByIndex.begin() );
+         fieldIndex < fieldProductByIndex.end();
+         ++fieldIndex )
+    {
+      returnStream << " " << *fieldIndex;
+    }
+    returnStream
+    << " }" << std::endl
+    << "functionoidProduct = {";
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         functionoidPointer( functionoidProduct.begin() );
+         functionoidPointer < functionoidProduct.end();
+         ++functionoidPointer )
+    {
+      returnStream << " " << *functionoidPointer;
+    }
+    returnStream
+    << " }" << std::endl;
+    return std::string( returnStream.str() );
   }
 
 } /* namespace VevaciousPlusPlus */

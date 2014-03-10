@@ -14,24 +14,29 @@ SHELL=/bin/sh
 CC=g++
 AR=ar
 ARFLAGS=rcs
-LHPCDIR=./LHPC/
+#LHPCDIR=./LHPC/
+LHPCDIR=../../../machine-specific/LHPC/
 LHPCLIBNAME=LHPC
 LHPCINCLUDEDIR=$(LHPCDIR)/include/
 LHPCLIBDIR=$(LHPCDIR)/lib/
-EIGENDIR=./Eigen/
+#EIGENDIR=./Eigen/
+EIGENDIR=../../../machine-specific/Eigen/
 CCFLAGS=-Wall -O3 -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
+#CCFLAGS=-Wall -O3 -g -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
+ source/PotentialEvaluation/ComplexMassMatrix.cpp \
  source/PotentialEvaluation/ConstantFunctionoid.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
- source/PotentialEvaluation/MassSquaredMatrix.cpp \
+ source/PotentialEvaluation/MassesSquaredFromPolynomials.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PolynomialCoefficient.cpp \
  source/PotentialEvaluation/PolynomialSum.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
+ source/PotentialEvaluation/RealMassesSquaredMatrix.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaFunctionoid.cpp \
  source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \

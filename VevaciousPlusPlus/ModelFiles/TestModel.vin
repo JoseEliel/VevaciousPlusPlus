@@ -59,6 +59,7 @@
   <SlhaBlocks>
     GAUGE = g
     YU=y
+    IMYU
     HMIX
     PHIFOURTH
     LOOPPHIFOURTH
@@ -141,19 +142,34 @@
     .25e-00 * deltalambda * phi^4 + 2.0E-1 * unknown[ 1, 2, 3 ] * phi^2
   </ExtraPolynomialPart>
 
-  <!-- I need to explain the form of MassSquaredMatrix...-->
-  <MassSquaredMatrix SpinType="ScalarBoson" MultiplicityFactor="1" >
+  <!-- I need to explain the forms of RealBosonMassSquaredMatrix &
+       WeylFermionMassMatrix...-->
+  <RealBosonMassSquaredMatrix SpinType="ScalarBoson" MultiplicityFactor="1" >
     12.0 * g1^2 * phi^2 - 2.0 * Bmu
-  </MassSquaredMatrix>
-  <MassSquaredMatrix SpinType="WeylFermion" MultiplicityFactor="6" >
-    y[ 2, 2 ]^2 * phi^2 + y[ 2, 3 ]^2 * phi^2
-    y[ 2, 2 ] * y[ 3, 2 ] * phi^2 + y[ 2, 3 ] * y[ 3, 3 ] * phi^2
-    y[ 3, 2 ] * y[ 2, 2 ] * phi^2 + y[ 3, 3 ] * y[ 2, 3 ] * phi^2
-    y[ 2, 3 ]^2 * phi^2 + y[ 3, 3 ]^2 * phi^2
-  </MassSquaredMatrix>
-  <MassSquaredMatrix SpinType="GaugeBoson" MultiplicityFactor="1" >
+  </RealBosonMassSquaredMatrix>
+  <!-- This is a toy analogue of the mass matrix for the vector of Weyl
+       fermions ( charm_L, charm_R^c, top_L, top_R^c ) -->
+  <WeylFermionMassMatrix SpinType="WeylFermion" MultiplicityFactor="3" >
+    0.0
+    y[ 2, 2 ] * phi + i * IMYU[ 2, 2 ] * phi
+    0.0
+    y[ 2, 3 ] * phi + I * IMYU[ 2, 3 ] * phi
+    y[ 2, 2 ] * phi + i * IMYU[ 2, 2 ] * phi
+    0.0
+    y[ 2, 3 ] * phi + I * IMYU[ 2, 3 ] * phi
+    0.0
+    0.0
+    y[ 3, 2 ] * phi + j * IMYU[ 3, 2 ] * phi
+    0.0
+    y[ 3, 3 ] * phi + J * IMYU[ 3, 3 ] * phi
+    y[ 3, 2 ] * phi + j * IMYU[ 3, 2 ] * phi
+    0.0
+    y[ 3, 3 ] * phi + J * IMYU[ 3, 3 ] * phi
+    0.0
+  </WeylFermionMassMatrix>
+  <RealBosonMassSquaredMatrix SpinType="GaugeBoson" MultiplicityFactor="1" >
     Sqrt2^2 * 0.25 * g[1]^2 * phi^2
-  </MassSquaredMatrix>
+  </RealBosonMassSquaredMatrix>
 
 </LoopCorrections>
 

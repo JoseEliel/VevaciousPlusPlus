@@ -23,21 +23,11 @@ namespace VevaciousPlusPlus
     slhaAliasMap(),
     slhaAliasFinder()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RunningParameterManager::RunningParameterManager()";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   RunningParameterManager::~RunningParameterManager()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RunningParameterManager::~RunningParameterManager()";
-    std::cout << std::endl;/**/
-
     for( int deletionIndex( parameterFunctionoidPointers.size() - 1 );
          deletionIndex >= 0;
          --deletionIndex )
@@ -85,13 +75,6 @@ namespace VevaciousPlusPlus
   void RunningParameterManager::CreateDerivedParameter(
                                            std::string const& parameterString )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RunningParameterManager::CreateDerivedParameter( \"" << parameterString
-    << "\" )";
-    std::cout << std::endl;/**/
-
     size_t wordEnd( parameterString.find_first_of( '=' ) );
     if( ( wordEnd == std::string::npos )
         ||

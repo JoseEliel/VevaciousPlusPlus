@@ -18,6 +18,7 @@ int main( int argumentCount,
                                       "init",
                                       "VevaciousPlusPlusInitialization.xml" );
 
+
   // To create the VevaciousPlusPlus object, one must know what kind of
   // strategies one wants to use to minimize the potential and to calculate
   // tunneling between vacua. These strategies are chosen by passing instances
@@ -71,6 +72,13 @@ int main( int argumentCount,
 
   // debugging:
   /**/std::cout << std::endl << "debugging:"
+  << std::endl
+  << "Ran vevaciousPlusPlus.RunPoint( \"" << slhaFile << "\" )";
+  std::cout << std::endl;/**/
+
+
+  // debugging:
+  /**/std::cout << std::endl << "debugging:"
   << std::endl;
   std::vector< double > testConfiguration;
   testConfiguration.push_back( 0.0 );
@@ -108,7 +116,7 @@ int main( int argumentCount,
     std::cout << " " << *whichField;
   }
   std::cout << " ) = " << potentialFunction( testConfiguration );
-  std::cout << std::endl;/**/
+  std::cout << std::endl;
 
   // Write the results:
   vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "output",

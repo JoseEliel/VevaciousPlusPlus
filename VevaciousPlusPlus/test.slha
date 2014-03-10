@@ -36,6 +36,16 @@ Block Yu Q=  6.70648073E+02  # (SUSY Scale)
   3  1     0.00000000E+00   # Real(Yu(3,1),dp)
   3  2     0.00000000E+00   # Real(Yu(3,2),dp)
   3  3     8.86578793E-01   # Real(Yu(3,3),dp)
+Block IMYU Q=  6.70648073E+02  # (SUSY Scale)
+  1  1     0.00000000E+00   # Real(Yu(1,1),dp)
+  1  2     0.00000000E+00   # Real(Yu(1,2),dp)
+  1  3     0.00000000E+00   # Real(Yu(1,3),dp)
+  2  1     0.00000000E+00   # Real(Yu(2,1),dp)
+  2  2     1.00000000E-04   # Real(Yu(2,2),dp)
+  2  3     2.30000000E-04   # Real(Yu(2,3),dp)
+  3  1     0.00000000E+00   # Real(Yu(3,1),dp)
+  3  2     3.20000000E-04   # Real(Yu(3,2),dp)
+  3  3     3.30000000E-02   # Real(Yu(3,3),dp)
 block PHIFOURTH Q=  1.0E+02  #
  1  0.1
 block PHIFOURTH Q=  1.0E+03  #

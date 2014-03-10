@@ -26,6 +26,8 @@ namespace VevaciousPlusPlus
 
     std::vector< PolynomialTerm >& PolynomialTerms(){ return polynomialTerms; }
 
+    // This is mainly for debugging:
+    std::string AsString() const;
 
   protected:
     std::vector< PolynomialTerm > polynomialTerms;
@@ -39,6 +41,21 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnValue( 0.0 );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PolynomialSum::operator()( {";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << " " << *whichField;
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;/**/
+
     for( std::vector< PolynomialTerm >::const_iterator
          whichTerm( polynomialTerms.begin() );
          whichTerm < polynomialTerms.end();
@@ -47,6 +64,21 @@ namespace VevaciousPlusPlus
       returnValue += (*whichTerm)( fieldConfiguration );
     }
     return returnValue;
+  }
+
+  // This is mainly for debugging:
+  inline std::string PolynomialSum::AsString() const
+  {
+    std::stringstream returnStream;
+    returnStream << "PolynomialSum =" << std::endl;
+    for( std::vector< PolynomialTerm >::const_iterator
+         whichTerm( polynomialTerms.begin() );
+         whichTerm < polynomialTerms.end();
+         ++whichTerm )
+    {
+      returnStream << whichTerm->AsString() << std::endl;
+    }
+    return std::string( returnStream.str() );
   }
 
 } /* namespace VevaciousPlusPlus */

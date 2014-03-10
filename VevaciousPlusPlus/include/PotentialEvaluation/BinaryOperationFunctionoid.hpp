@@ -65,12 +65,12 @@ namespace VevaciousPlusPlus
                                        (*secondFunctionoid)() );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "[" << this->AsString()
     << "].UpdateForNewLogarithmOfScale( " << logarithmOfScale
     << " ) called. currentValue = " << currentValue;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   // This is mainly for debugging.

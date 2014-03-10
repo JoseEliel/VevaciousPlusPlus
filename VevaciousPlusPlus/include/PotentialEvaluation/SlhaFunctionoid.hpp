@@ -57,22 +57,22 @@ namespace VevaciousPlusPlus
                                                 double const logarithmOfScale )
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "[" << this->AsString()
     << "].UpdateForNewLogarithmOfScale( " << logarithmOfScale
     << " ) called. currentValue was " << currentValue;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     currentValue = scaleLogarithmPowerCoefficients[ 0 ];
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "scaleLogarithmPowerCoefficients[ 0 ] = "
     << scaleLogarithmPowerCoefficients[ 0 ] << ", currentValue = "
     << currentValue;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     double termContribution( 0.0 );
 
@@ -83,12 +83,12 @@ namespace VevaciousPlusPlus
       termContribution = scaleLogarithmPowerCoefficients[ whichPower ];
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "scaleLogarithmPowerCoefficients[ " << whichPower << " ] = "
       << scaleLogarithmPowerCoefficients[ whichPower ]
       << ", termContribution = " << termContribution;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       for( unsigned int powerCount( 0 );
            powerCount < whichPower;
@@ -97,17 +97,17 @@ namespace VevaciousPlusPlus
         termContribution *= logarithmOfScale;
 
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "termContribution = " << termContribution;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
       }
       currentValue += termContribution;
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "currentValue = " << currentValue;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
   }
 

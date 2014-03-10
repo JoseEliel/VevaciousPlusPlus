@@ -16,11 +16,7 @@ namespace VevaciousPlusPlus
     fieldProductByIndex(),
     functionoidProduct()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PolynomialTerm::PolynomialTerm()";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   PolynomialTerm::PolynomialTerm( PolynomialTerm const& copySource ) :
@@ -29,20 +25,12 @@ namespace VevaciousPlusPlus
     fieldProductByIndex( copySource.fieldProductByIndex ),
     functionoidProduct( copySource.functionoidProduct )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PolynomialTerm::PolynomialTerm( [copy] )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   PolynomialTerm::~PolynomialTerm()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PolynomialTerm::~PolynomialTerm()";
-    std::cout << std::endl;/**/
+    // This does nothing.
   }
 
 

@@ -9,13 +9,15 @@
 #define POTENTIALEVALUATION_HPP_
 
 #include "BinaryOperationFunctionoid.hpp"
+#include "ComplexMassMatrix.hpp"
 #include "ConstantFunctionoid.hpp"
 #include "HomotopyContinuationReadyPotential.hpp"
-#include "MassSquaredMatrix.hpp"
+#include "MassesSquaredFromPolynomials.hpp"
 #include "ParameterFunctionoid.hpp"
 #include "PolynomialCoefficient.hpp"
 #include "PolynomialSum.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"
+#include "RealMassesSquaredMatrix.hpp"
 #include "RunningParameterManager.hpp"
 #include "SlhaFunctionoid.hpp"
 #include "UnaryOperationFunctionoid.hpp"

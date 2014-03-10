@@ -13,11 +13,7 @@ namespace VevaciousPlusPlus
   ParameterFunctionoid::ParameterFunctionoid( double const currentValue ) :
     currentValue( currentValue )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "ParameterFunctionoid::ParameterFunctionoid()";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   ParameterFunctionoid::~ParameterFunctionoid()

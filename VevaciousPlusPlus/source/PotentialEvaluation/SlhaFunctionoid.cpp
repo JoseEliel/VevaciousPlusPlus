@@ -18,21 +18,6 @@ namespace VevaciousPlusPlus
                                      NAN )
   {
     // This constructor is just an initialization list.
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "SlhaFunctionoid::SlhaFunctionoid( \"" << indexString << "\" )"
-    << std::endl
-    << "slhaBlock = " << slhaBlock << ", indexVector =";
-    for( std::vector< int >::const_iterator
-         whichIndex( indexVector.begin() );
-         whichIndex < indexVector.end();
-         ++whichIndex )
-    {
-      std::cout << " " << *whichIndex;
-    }
-    std::cout << std::endl;/**/
   }
 
   SlhaFunctionoid::~SlhaFunctionoid()

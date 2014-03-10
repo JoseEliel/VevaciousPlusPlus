@@ -12,7 +12,9 @@
 #include "HomotopyContinuationReadyPotential.hpp"
 #include "PolynomialTerm.hpp"
 #include "PolynomialSum.hpp"
-#include "MassSquaredMatrix.hpp"
+#include "RealMassesSquaredMatrix.hpp"
+#include "ComplexMassMatrix.hpp"
+#include "MassesSquaredFromPolynomials.hpp"
 #include "RunningParameterManager.hpp"
 
 namespace VevaciousPlusPlus
@@ -70,13 +72,17 @@ namespace VevaciousPlusPlus
     static std::string const dotAndDigits;
     static std::string const allowedVariableInitials;
     static std::string const allowedVariableChars;
+    static double const loopFactor;
+    static double const thermalFactor;
 
     RunningParameterManager runningParameters;
     double renormalizationScaleSquared;
     double minimumRenormalizationScaleSquared;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
-    std::vector< MassSquaredMatrix > massSquaredMatrices;
+    std::vector< RealMassesSquaredMatrix > scalarSquareMasses;
+    std::vector< ComplexMassMatrix > fermionMasses;
+    std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
     double vectorMassCorrectionConstant;
     std::vector< PolynomialSum > polynomialGradient;
     std::vector< std::vector< PolynomialSum > > polynomialHessian;
@@ -88,7 +94,12 @@ namespace VevaciousPlusPlus
     // This puts all index brackets into a consistent form.
     std::string FormatVariable( std::string const& unformattedVariable ) const;
 
-    // This interprets stringToParse as a sum of polynomial terms and sets
+    // This interprets stringToParse as a sum of complex polynomial terms and
+    // sets polynomialSum accordingly.
+    void ParseSumOfPolynomialTerms( std::string const& stringToParse,
+                   std::pair< PolynomialSum, PolynomialSum >& polynomialSums );
+
+    // This interprets stringToParse as a sum of real polynomial terms and sets
     // polynomialSum accordingly.
     void ParseSumOfPolynomialTerms( std::string const& stringToParse,
                                     PolynomialSum& polynomialSum );
@@ -96,34 +107,53 @@ namespace VevaciousPlusPlus
     // This reads in a whole number or variable (including possible raising to
     // a power), applies the correct operation to polynomialTerm, and then
     // returns the position of the character just after the interpreted word.
+    // If there was a factor of "i", "I", "j", or "J", imaginaryTerm is set to
+    // true.
     size_t
     PutNextNumberOrVariableIntoPolynomial( std::string const& stringToParse,
                                            size_t wordStart,
-                                           PolynomialTerm& polynomialTerm );
+                                           PolynomialTerm& polynomialTerm,
+                                           bool& imaginaryTerm );
 
     // This sets the renormalization scale and broadcasts it to the running
     // parameters.
     void UpdateRenormalizationScale(
-                                    std::vector< double > fieldConfiguration,
-                                        double const evaluationTemperature );
+                               std::vector< double > const& fieldConfiguration,
+                                     double const evaluationTemperature );
 
-    // This evaluates the sum of corrections for a set of real scalar degrees
-    // of freedom with masses-squared given by massesSquared at a temperature
+    // This evaluates the sum of corrections for the real scalar degrees
+    // of freedom with masses-squared given by scalarSquareMasses evaluated for
+    // the field configuration given by fieldConfiguration at a temperature
     // given by evaluationTemperature.
-    double ScalarBosonCorrection( std::vector< double > const& massesSquared,
-                                  double const evaluationTemperature );
+    double
+    ScalarBosonCorrections( std::vector< double > const& fieldConfiguration,
+                            double const evaluationTemperature );
 
     // This evaluates the sum of corrections for a set of Weyl fermion degrees
-    // of freedom with masses-squared given by massesSquared at a temperature
+    // of freedom with masses-squared given by fermionMasses evaluated for
+    // the field configuration given by fieldConfiguration at a temperature
     // given by evaluationTemperature.
-    double WeylFermionCorrection( std::vector< double > const& massesSquared,
-                                  double const evaluationTemperature );
+    double
+    WeylFermionCorrections( std::vector< double > const& fieldConfiguration,
+                            double const evaluationTemperature );
 
-    // This evaluates the sum of corrections for a set of vector gauge boson
-    // degrees of freedom (transverse modes) with masses-squared given by
-    // massesSquared at a temperature given by evaluationTemperature.
-    double GaugeBosonCorrection( std::vector< double > const& massesSquared,
-                                 double const evaluationTemperature );
+    // This evaluates the sum of corrections for the real scalar degrees
+    // of freedom with masses-squared given by vectorSquareMasses evaluated for
+    // the field configuration given by fieldConfiguration at a temperature
+    // given by evaluationTemperature.
+    double
+    GaugeBosonCorrections( std::vector< double > const& fieldConfiguration,
+                           double const evaluationTemperature );
+
+    // This returns the J function thermal correction for a bosonic degree of
+    // freedom based on a lookup table.
+    double bosonThermalFunction(
+                        double const massSquaredOverTemperatureSquared ) const;
+
+    // This returns the J function thermal correction for a fermionic degree of
+    // freedom based on a lookup table.
+    double fermionThermalFunction(
+                        double const massSquaredOverTemperatureSquared ) const;
 
     // This prepares system of polynomials for the homotopy continuation as a
     // set of polynomials in the field variables with coefficients from the
@@ -137,6 +167,91 @@ namespace VevaciousPlusPlus
   };
 
 
+
+
+  inline double PotentialFromPolynomialAndMasses::operator()(
+                               std::vector< double > const& fieldConfiguration,
+                                                double const temperatureValue )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PotentialFromPolynomialAndMasses::operator()( {";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << " " << *whichField;
+    }
+    std::cout << " }, " << temperatureValue << " ) called.";
+    std::cout << std::endl;/**/
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "renormalizationScaleSquared = " << renormalizationScaleSquared
+    << std::endl
+    << "minimumRenormalizationScaleSquared = "
+    << minimumRenormalizationScaleSquared
+    << std::endl
+    << "treeLevelPotential = " << treeLevelPotential.AsString()
+    << std::endl
+    << "polynomialLoopCorrections = " << polynomialLoopCorrections.AsString();
+    std::cout << std::endl;
+
+    UpdateRenormalizationScale( fieldConfiguration,
+                                temperatureValue );
+
+    std::cout << std::endl
+    << "renormalizationScaleSquared = " << renormalizationScaleSquared;
+    std::cout << std::endl;
+
+    runningParameters.UpdateRunningParameters(
+                                         sqrt( renormalizationScaleSquared ) );
+
+    std::cout << std::endl
+    << "treeLevelPotential( fieldConfiguration ) = "
+    << treeLevelPotential( fieldConfiguration ) << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl
+    << "polynomialLoopCorrections( fieldConfiguration ) = "
+    << polynomialLoopCorrections( fieldConfiguration ) << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl
+    << "ScalarBosonCorrections( fieldConfiguration, temperatureValue ) = "
+    << ScalarBosonCorrections( fieldConfiguration, temperatureValue )
+    << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl
+    << "WeylFermionCorrections( fieldConfiguration, temperatureValue ) = "
+    << WeylFermionCorrections( fieldConfiguration, temperatureValue )
+    << std::endl;
+    std::cout << std::endl
+    << "GaugeBosonCorrections( fieldConfiguration, temperatureValue ) = "
+    << GaugeBosonCorrections( fieldConfiguration, temperatureValue )
+    << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;/**/
+
+    return ( treeLevelPotential( fieldConfiguration )
+             + polynomialLoopCorrections( fieldConfiguration )
+             + ScalarBosonCorrections( fieldConfiguration,
+                                       temperatureValue )
+             + WeylFermionCorrections( fieldConfiguration,
+                                       temperatureValue )
+             + GaugeBosonCorrections( fieldConfiguration,
+                                      temperatureValue ) );
+  }
+
+  // This updates all the parameters of the potential that are not field
+  // values based on the values that appear in blocks in the SLHA format in
+  // the file given by slhaFilename.
+  inline void PotentialFromPolynomialAndMasses::UpdateParameters(
+                                              std::string const& slhaFilename )
+  {
+    runningParameters.UpdateSlhaParameters( slhaFilename );
+  }
 
   inline double PotentialFromPolynomialAndMasses::QuickApproximation(
                                std::vector< double > const& fieldConfiguration,
@@ -152,6 +267,23 @@ namespace VevaciousPlusPlus
                                  std::string const& unformattedVariable ) const
   {
     return RunningParameterManager::FormatVariable( unformattedVariable );
+  }
+
+  // This interprets stringToParse as a sum of real polynomial terms and sets
+  // polynomialSum accordingly.
+  inline void PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
+                                              std::string const& stringToParse,
+                                                 PolynomialSum& polynomialSum )
+  {
+    std::pair< PolynomialSum, PolynomialSum > complexSum;
+    ParseSumOfPolynomialTerms( stringToParse,
+                               complexSum );
+    if( !(complexSum.second.PolynomialTerms().empty()) )
+    {
+      throw std::runtime_error(
+                      "Polynomial that should be real has imaginary factor!" );
+    }
+    polynomialSum.PolynomialTerms() = complexSum.first.PolynomialTerms();
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -1,5 +1,5 @@
 /*
- * MassSquaredMatrix.cpp
+ * MassesSquaredFromPolynomials.cpp
  *
  *  Created on: Feb 25, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
@@ -10,10 +10,8 @@
 namespace VevaciousPlusPlus
 {
 
-  MassSquaredMatrix::MassSquaredMatrix(
+  MassesSquaredFromPolynomials::MassesSquaredFromPolynomials(
                    std::map< std::string, std::string > const& attributeMap ) :
-    matrixElements(),
-    eigenMatrix(),
     massesSquared(),
     multiplicityFactor( 1.0 ),
     spinType( notSet )
@@ -41,30 +39,28 @@ namespace VevaciousPlusPlus
         spinType = gaugeBoson;
       }
     }
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "MassSquaredMatrix::MassSquaredMatrix( ... )";
-    std::cout << std::endl;/**/
   }
 
-  MassSquaredMatrix::~MassSquaredMatrix()
+  MassesSquaredFromPolynomials::MassesSquaredFromPolynomials(
+                             MassesSquaredFromPolynomials const& copySource ) :
+    massesSquared( copySource.massesSquared ),
+    multiplicityFactor( copySource.multiplicityFactor ),
+    spinType( copySource.spinType )
+  {
+    // This constructor is just an initialization list.
+  }
+
+  MassesSquaredFromPolynomials::MassesSquaredFromPolynomials() :
+    massesSquared(),
+    multiplicityFactor( NAN ),
+    spinType( notSet )
+  {
+    // This constructor is just an initialization list.
+  }
+
+  MassesSquaredFromPolynomials::~MassesSquaredFromPolynomials()
   {
     // This does nothing.
-  }
-
-
-  // This returns the eigenvalues of the matrix.
-  std::vector< double > const& MassSquaredMatrix::MassesSquared(
-                              std::vector< double > const& fieldConfiguration )
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "MassSquaredMatrix::MassesSquared( ... )";
-    std::cout << std::endl;
-
-    return massesSquared;/**/
   }
 
 } /* namespace VevaciousPlusPlus */
