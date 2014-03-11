@@ -16,6 +16,7 @@
 #include "ComplexMassMatrix.hpp"
 #include "MassesSquaredFromPolynomials.hpp"
 #include "RunningParameterManager.hpp"
+#include "ThermalFunctions.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -148,12 +149,15 @@ namespace VevaciousPlusPlus
     // This returns the J function thermal correction for a bosonic degree of
     // freedom based on a lookup table.
     double bosonThermalFunction(
-                        double const massSquaredOverTemperatureSquared ) const;
+                         double const massSquaredOverTemperatureSquared ) const
+    { return ThermalFunctions::BosonicJ( massSquaredOverTemperatureSquared ); }
 
     // This returns the J function thermal correction for a fermionic degree of
     // freedom based on a lookup table.
     double fermionThermalFunction(
-                        double const massSquaredOverTemperatureSquared ) const;
+                         double const massSquaredOverTemperatureSquared ) const
+    { return
+      ThermalFunctions::FermionicJ( massSquaredOverTemperatureSquared ); }
 
     // This prepares system of polynomials for the homotopy continuation as a
     // set of polynomials in the field variables with coefficients from the
@@ -173,66 +177,8 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                                 double const temperatureValue )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PotentialFromPolynomialAndMasses::operator()( {";
-    for( std::vector< double >::const_iterator
-         whichField( fieldConfiguration.begin() );
-         whichField < fieldConfiguration.end();
-         ++whichField )
-    {
-      std::cout << " " << *whichField;
-    }
-    std::cout << " }, " << temperatureValue << " ) called.";
-    std::cout << std::endl;/**/
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "renormalizationScaleSquared = " << renormalizationScaleSquared
-    << std::endl
-    << "minimumRenormalizationScaleSquared = "
-    << minimumRenormalizationScaleSquared
-    << std::endl
-    << "treeLevelPotential = " << treeLevelPotential.AsString()
-    << std::endl
-    << "polynomialLoopCorrections = " << polynomialLoopCorrections.AsString();
-    std::cout << std::endl;
-
     UpdateRenormalizationScale( fieldConfiguration,
                                 temperatureValue );
-
-    std::cout << std::endl
-    << "renormalizationScaleSquared = " << renormalizationScaleSquared;
-    std::cout << std::endl;
-
-    runningParameters.UpdateRunningParameters(
-                                         sqrt( renormalizationScaleSquared ) );
-
-    std::cout << std::endl
-    << "treeLevelPotential( fieldConfiguration ) = "
-    << treeLevelPotential( fieldConfiguration ) << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "polynomialLoopCorrections( fieldConfiguration ) = "
-    << polynomialLoopCorrections( fieldConfiguration ) << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "ScalarBosonCorrections( fieldConfiguration, temperatureValue ) = "
-    << ScalarBosonCorrections( fieldConfiguration, temperatureValue )
-    << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "WeylFermionCorrections( fieldConfiguration, temperatureValue ) = "
-    << WeylFermionCorrections( fieldConfiguration, temperatureValue )
-    << std::endl;
-    std::cout << std::endl
-    << "GaugeBosonCorrections( fieldConfiguration, temperatureValue ) = "
-    << GaugeBosonCorrections( fieldConfiguration, temperatureValue )
-    << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;/**/
 
     return ( treeLevelPotential( fieldConfiguration )
              + polynomialLoopCorrections( fieldConfiguration )

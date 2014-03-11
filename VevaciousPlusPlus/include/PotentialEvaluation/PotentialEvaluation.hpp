@@ -20,6 +20,7 @@
 #include "RealMassesSquaredMatrix.hpp"
 #include "RunningParameterManager.hpp"
 #include "SlhaFunctionoid.hpp"
+#include "ThermalFunctions.hpp"
 #include "UnaryOperationFunctionoid.hpp"
 
 // This file is just to collect a lot of #include statements.

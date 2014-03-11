@@ -39,6 +39,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/RealMassesSquaredMatrix.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaFunctionoid.cpp \
+ source/PotentialEvaluation/ThermalFunctions.cpp \
  source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \

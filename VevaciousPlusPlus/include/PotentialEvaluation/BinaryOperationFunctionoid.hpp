@@ -41,7 +41,7 @@ namespace VevaciousPlusPlus
 
     // This re-calculates the coefficients of the polynomial of the logarithm
     // of the scale used in evaluating the functionoid.
-    void UpdateForNewLogarithmOfScale( double const logarithmOfScale );
+    virtual void UpdateForNewLogarithmOfScale( double const logarithmOfScale );
 
     // This is mainly for debugging.
     virtual std::string AsString();

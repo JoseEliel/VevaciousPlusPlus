@@ -254,6 +254,9 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
+    << "end of PotentialFromPolynomialAndMasses::"
+    << "PotentialFromPolynomialAndMasses( \"" << modelFilename << "\" )"
+    << std::endl
     << "renormalizationScaleSquared = " << renormalizationScaleSquared
     << std::endl
     << "minimumRenormalizationScaleSquared = "
@@ -625,6 +628,23 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                            double const evaluationTemperature )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::UpdateRenormalizationScale( {";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << " " << *whichField;
+    }
+    std::cout
+    << " }, " << evaluationTemperature
+    << " ) called. renormalizationScaleSquared was "
+    << renormalizationScaleSquared;
+    std::cout << std::endl;/**/
+
     renormalizationScaleSquared
     = ( minimumRenormalizationScaleSquared
         + ( evaluationTemperature * evaluationTemperature ) );
@@ -635,6 +655,13 @@ namespace VevaciousPlusPlus
     {
       renormalizationScaleSquared += ( (*whichField) * (*whichField) );
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "renormalizationScaleSquared now is " << renormalizationScaleSquared;
+    std::cout << std::endl;/**/
+
     runningParameters.UpdateRunningParameters(
                                          sqrt( renormalizationScaleSquared ) );
   }
@@ -698,8 +725,8 @@ namespace VevaciousPlusPlus
         }
         if( evaluationTemperature > 1.0 )
         {
-          currentThermalCorrection
-          += bosonThermalFunction( (*massSquared) * evaluationTemperature );
+          currentThermalCorrection += bosonThermalFunction( (*massSquared)
+                                                 * inverseTemperatureSquared );
         }
       }
       totalQuantumCorrection
@@ -707,6 +734,34 @@ namespace VevaciousPlusPlus
       totalThermalCorrection
       += ( scalarSet->MultiplicityFactor() * currentThermalCorrection );
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::ScalarBosonCorrections( {";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << " " << *whichField;
+    }
+    std::cout << " } ) finishing." << std::endl
+    << "totalQuantumCorrection = " << totalQuantumCorrection << std::endl
+    << "( loopFactor * totalQuantumCorrection ) = "
+    << ( loopFactor * totalQuantumCorrection ) << std::endl
+    << "totalThermalCorrection = " << totalThermalCorrection << std::endl
+    << "( thermalFactor * totalThermalCorrection * evaluationTemperature"
+    << " * evaluationTemperature * evaluationTemperature"
+    << " * evaluationTemperature ) = "
+    << ( thermalFactor * totalThermalCorrection
+         * evaluationTemperature * evaluationTemperature
+         * evaluationTemperature * evaluationTemperature ) << std::endl
+    << "returning = " << ( ( loopFactor * totalQuantumCorrection )
+                           + ( thermalFactor * totalThermalCorrection
+                               * evaluationTemperature * evaluationTemperature
+              * evaluationTemperature * evaluationTemperature ) ) << std::endl;
+    std::cout << std::endl;/**/
+
     return ( ( loopFactor * totalQuantumCorrection )
              + ( thermalFactor * totalThermalCorrection
                  * evaluationTemperature * evaluationTemperature
@@ -760,7 +815,7 @@ namespace VevaciousPlusPlus
         if( abs( *massSquared ) > 1.0 )
         {
           currentQuantumCorrection += ( (*massSquared) * (*massSquared)
-                                      * ( log( abs( *massSquared )
+                                        * ( log( abs( *massSquared )
                                                / renormalizationScaleSquared )
                                           - 1.5 ) );
 
@@ -772,8 +827,17 @@ namespace VevaciousPlusPlus
         }
         if( evaluationTemperature > 1.0 )
         {
-          currentThermalCorrection
-          += fermionThermalFunction( (*massSquared) * evaluationTemperature );
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "*massSquared = " << *massSquared << ", evaluationTemperature = "
+          << evaluationTemperature
+          << ", ( (*massSquared) * inverseTemperatureSquared ) = "
+          << ( (*massSquared) * inverseTemperatureSquared );
+          std::cout << std::endl;/**/
+
+          currentThermalCorrection += fermionThermalFunction( (*massSquared)
+                                                 * inverseTemperatureSquared );
         }
       }
       totalQuantumCorrection += ( fermionSet->MultiplicityFactor()
@@ -781,10 +845,41 @@ namespace VevaciousPlusPlus
       totalThermalCorrection += ( fermionSet->MultiplicityFactor()
                                   * currentThermalCorrection );
     }
-    return ( -2.0 * ( ( loopFactor * totalQuantumCorrection )
-                      + ( thermalFactor * totalThermalCorrection
-                          * evaluationTemperature * evaluationTemperature
-                         * evaluationTemperature * evaluationTemperature ) ) );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::WeylFermionCorrections( {";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << " " << *whichField;
+    }
+    std::cout << " } ) finishing." << std::endl
+    << "totalQuantumCorrection = " << totalQuantumCorrection << std::endl
+    << "( loopFactor * totalQuantumCorrection ) = "
+    << ( loopFactor * totalQuantumCorrection ) << std::endl
+    << "totalThermalCorrection = " << totalThermalCorrection << std::endl
+    << "( thermalFactor * totalThermalCorrection * evaluationTemperature"
+    << " * evaluationTemperature * evaluationTemperature"
+    << " * evaluationTemperature ) = "
+    << ( thermalFactor * totalThermalCorrection
+         * evaluationTemperature * evaluationTemperature
+         * evaluationTemperature * evaluationTemperature ) << std::endl
+    << "returning = " << ( 2.0 * ( ( thermalFactor * totalThermalCorrection
+        * evaluationTemperature * evaluationTemperature
+        * evaluationTemperature * evaluationTemperature )
+      - ( loopFactor * totalQuantumCorrection ) ) ) << std::endl;
+    std::cout << std::endl;/**/
+
+    // The thermal corrections already account for the sign of fermionic
+    // contributions, while the zero-temperature corrections need to be
+    // subtracted.
+    return ( 2.0 * ( ( thermalFactor * totalThermalCorrection
+                       * evaluationTemperature * evaluationTemperature
+                       * evaluationTemperature * evaluationTemperature )
+                     - ( loopFactor * totalQuantumCorrection ) ) );
   }
 
   // This evaluates the sum of corrections for the real scalar degrees
@@ -846,8 +941,8 @@ namespace VevaciousPlusPlus
         }
         if( evaluationTemperature > 1.0 )
         {
-          currentThermalCorrection
-          += bosonThermalFunction( (*massSquared) * evaluationTemperature );
+          currentThermalCorrection += bosonThermalFunction( (*massSquared)
+                                                 * inverseTemperatureSquared );
         }
       }
       totalQuantumCorrection
@@ -855,6 +950,34 @@ namespace VevaciousPlusPlus
       totalThermalCorrection
       += ( vectorSet->MultiplicityFactor() * currentThermalCorrection );
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::GaugeBosonCorrections( {";
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      std::cout << " " << *whichField;
+    }
+    std::cout << " } ) finishing." << std::endl
+    << "totalQuantumCorrection = " << totalQuantumCorrection << std::endl
+    << "( loopFactor * totalQuantumCorrection ) = "
+    << ( loopFactor * totalQuantumCorrection ) << std::endl
+    << "totalThermalCorrection = " << totalThermalCorrection << std::endl
+    << "( thermalFactor * totalThermalCorrection * evaluationTemperature"
+    << " * evaluationTemperature * evaluationTemperature"
+    << " * evaluationTemperature ) = "
+    << ( thermalFactor * totalThermalCorrection
+         * evaluationTemperature * evaluationTemperature
+         * evaluationTemperature * evaluationTemperature ) << std::endl
+    << "returning = " << ( ( 3.0 * loopFactor * totalQuantumCorrection )
+        + ( 2.0 * thermalFactor * totalThermalCorrection
+            * evaluationTemperature * evaluationTemperature
+            * evaluationTemperature * evaluationTemperature ) ) << std::endl;
+    std::cout << std::endl;/**/
+
     // Note that vectors have different degrees of freedom for the zero-
     // and non-zero-temperature corrections!
     return ( ( 3.0 * loopFactor * totalQuantumCorrection )
@@ -863,33 +986,6 @@ namespace VevaciousPlusPlus
                  * evaluationTemperature * evaluationTemperature ) );
   }
 
-  // This returns the J function thermal correction for a bosonic degree of
-  // freedom based on a lookup table.
-  double PotentialFromPolynomialAndMasses::bosonThermalFunction(
-                         double const massSquaredOverTemperatureSquared ) const
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PotentialFromPolynomialAndMasses::bosonThermalFunction( "
-    << massSquaredOverTemperatureSquared << " )";
-    std::cout << std::endl;
-    return 0.0;/**/
-  }
-
-  // This returns the J function thermal correction for a fermionic degree of
-  // freedom based on a lookup table.
-  double PotentialFromPolynomialAndMasses::fermionThermalFunction(
-                         double const massSquaredOverTemperatureSquared ) const
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PotentialFromPolynomialAndMasses::fermionThermalFunction( "
-    << massSquaredOverTemperatureSquared << " )";
-    std::cout << std::endl;
-    return 0.0;/**/
-  }
 
   // This prepares system of polynomials for the homotopy continuation as a
   // set of polynomials in the field variables with coefficients from the

@@ -132,12 +132,35 @@ namespace VevaciousPlusPlus
   {
     double const logarithmOfScale( log( renormalizationScale ) );
 
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "RunningParameterManager::UpdateRunningParameters( "
+    << renormalizationScale << " ) called. logarithmOfScale = "
+    << logarithmOfScale;
+    std::cout << std::endl;/**/
+
+
     for( std::vector< ParameterFunctionoid* >::iterator
          whichParameter( parameterFunctionoidPointers.begin() );
          whichParameter < parameterFunctionoidPointers.end();
          ++whichParameter )
     {
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "calling " << (*whichParameter)->AsString()
+      << "->UpdateForNewLogarithmOfScale( " << logarithmOfScale
+      << " ). before, (*(*whichParameter))() = " << (*(*whichParameter))();
+      std::cout << std::endl;/**/
+
       (*whichParameter)->UpdateForNewLogarithmOfScale( logarithmOfScale );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "after, (*(*whichParameter))() = " << (*(*whichParameter))();
+      std::cout << std::endl;/**/
     }
   }
 

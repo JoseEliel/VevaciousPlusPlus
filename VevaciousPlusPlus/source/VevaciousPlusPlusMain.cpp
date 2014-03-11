@@ -93,6 +93,10 @@ int main( int argumentCount,
   }
   std::cout << " ) = " << potentialFunction( testConfiguration );
   std::cout << std::endl;
+  double testTemperature( 10.0 );
+  std::cout << "at temperature " << testTemperature << ", potentialFunction = "
+  << potentialFunction( testConfiguration,
+                        testTemperature );
   testConfiguration.back() = 300.0;
   potentialFunction.UpdateParameters( slhaFile );
   std::cout << "potentialFunction(";
@@ -105,6 +109,10 @@ int main( int argumentCount,
   }
   std::cout << " ) = " << potentialFunction( testConfiguration );
   std::cout << std::endl;
+  testTemperature = 145.0;
+  std::cout << "at temperature " << testTemperature << ", potentialFunction = "
+  << potentialFunction( testConfiguration,
+                        testTemperature );
   testConfiguration.back() = 1000.0;
   potentialFunction.UpdateParameters( slhaFile );
   std::cout << "potentialFunction(";
@@ -116,6 +124,12 @@ int main( int argumentCount,
     std::cout << " " << *whichField;
   }
   std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout << std::endl;
+  testTemperature = 205.0;
+  std::cout << "at temperature " << testTemperature << ", potentialFunction = "
+  << potentialFunction( testConfiguration,
+                        testTemperature );
+  std::cout << std::endl;
   std::cout << std::endl;
 
   // Write the results:

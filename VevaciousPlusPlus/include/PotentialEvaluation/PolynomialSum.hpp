@@ -41,21 +41,6 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnValue( 0.0 );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialSum::operator()( {";
-    for( std::vector< double >::const_iterator
-         whichField( fieldConfiguration.begin() );
-         whichField < fieldConfiguration.end();
-         ++whichField )
-    {
-      std::cout << " " << *whichField;
-    }
-    std::cout << " } ) called.";
-    std::cout << std::endl;/**/
-
     for( std::vector< PolynomialTerm >::const_iterator
          whichTerm( polynomialTerms.begin() );
          whichTerm < polynomialTerms.end();
