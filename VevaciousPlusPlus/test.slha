@@ -48,11 +48,19 @@ Block IMYU Q=  6.70648073E+02  # (SUSY Scale)
   3  3     3.30000000E-02   # Real(Yu(3,3),dp)
 block PHIFOURTH Q=  1.0E+02  #
  1  0.1
+ 2  0.6
 block PHIFOURTH Q=  1.0E+03  #
  1  0.02
+ 2  0.6
 block PHIFOURTH Q=  1.0E+04  #
  1  0.01
+ 2  0.6
 block PHIFOURTH Q=  1.0E+05  #
  1  0.02
+ 2  0.6
 block LOOPPHIFOURTH Q=  1.0E+02  #
  1  0.12
+block PHIFOURTHVEVS Q=  1.0E+02  #
+ 1  123.4
+ 2  -26
+ 

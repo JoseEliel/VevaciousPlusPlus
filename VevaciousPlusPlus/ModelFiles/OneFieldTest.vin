@@ -35,7 +35,6 @@
        referenced. -->
   <FieldVariables>
     phi
-    sigma
   </FieldVariables>
 
   <!-- The number given here is taken to be an energy in GeV, refered to as
@@ -163,8 +162,7 @@
                                    DerivedParameters above)
        -->
   <DsbMinimum>
-    phi = PHIFOURTHVEVS[ 1 ]
-     sigma= 2.0* sbcbAlt * PHIFOURTHVEVS[2] + Sqrt2^2 * I^6 * oneThird
+    phi = 0.5^2 * sbcbAlt * PHIFOURTHVEVS[1] + Sqrt2^2 * I^6 * oneThird
   </DsbMinimum>
 
 </AllowedNonZeroVariables>

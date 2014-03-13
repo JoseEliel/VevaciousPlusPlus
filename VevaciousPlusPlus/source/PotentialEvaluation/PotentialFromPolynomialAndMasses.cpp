@@ -30,6 +30,7 @@ namespace VevaciousPlusPlus
                                            std::string const& modelFilename ) :
     HomotopyContinuationReadyPotential(),
     runningParameters(),
+    dsbFieldValuePolynomials(),
     renormalizationScaleSquared( NAN ),
     minimumRenormalizationScaleSquared( NAN ),
     treeLevelPotential(),
@@ -85,9 +86,11 @@ namespace VevaciousPlusPlus
          lineIndex < elementLines.getSize();
          ++lineIndex )
     {
-      fieldNames.push_back( FormatVariable( elementLines[ lineIndex ] ) );
+      fieldNames.push_back( BOL::StringParser::trimFromFrontAndBack(
+                               FormatVariable( elementLines[ lineIndex ] ) ) );
     }
     numberOfFields = fieldNames.size();
+    dsbFieldValuePolynomials.resize( numberOfFields );
     //   </FieldVariables>
     //   <MinimumRenormalizationScale>
     successfullyReadElement = elementParser.readNextElement();
@@ -144,6 +147,47 @@ namespace VevaciousPlusPlus
       runningParameters.CreateDerivedParameter( elementLines[ lineIndex ] );
     }
     //   </DerivedParameters>
+    //   <DsbMinimum>
+    successfullyReadElement = elementParser.readNextElement();
+    if( !successfullyReadElement )
+    {
+      throw std::runtime_error( "Could not parse <DsbMinimum>." );
+    }
+    elementLines.clearEntries();
+    BOL::StringParser::parseByChar(
+                               elementParser.getTrimmedCurrentElementContent(),
+                                    elementLines,
+                                    '\n');
+    for( int lineIndex( 0 );
+         lineIndex < elementLines.getSize();
+         ++lineIndex )
+    {
+      size_t equalsPosition( elementLines[ lineIndex ].find( '=' ) );
+      if( !( equalsPosition < ( elementLines[ lineIndex ].size() - 1 ) ) )
+      {
+        std::string errorMessage(
+                 "Field given no value in DsbMinimum! (Offending line = \"" );
+        errorMessage.append( elementLines[ lineIndex ] );
+        errorMessage.append( "\")" );
+        throw std::runtime_error( errorMessage );
+      }
+      unsigned int fieldIndex( FieldIndex(
+                                       BOL::StringParser::trimFromFrontAndBack(
+                                           elementLines[ lineIndex ].substr( 0,
+                                                        equalsPosition ) ) ) );
+      if( !( fieldIndex < fieldNames.size() ) )
+      {
+        std::string errorMessage( "Unknown field (\"" );
+        errorMessage.append( elementLines[ lineIndex ].substr( 0,
+                                                            equalsPosition ) );
+        errorMessage.append( "\") given value in DsbMinimum!" );
+        throw std::runtime_error( errorMessage );
+      }
+      ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
+                      elementLines[ lineIndex ].substr( equalsPosition + 1 ) ),
+                                 dsbFieldValuePolynomials[ fieldIndex ] );
+    }
+    //   </DsbMinimum>
     // </AllowedNonZeroVariables>
     // <TreeLevelPotential>
     successfullyReadElement = fileParser.readNextElement();
@@ -256,6 +300,15 @@ namespace VevaciousPlusPlus
     << std::endl
     << "end of PotentialFromPolynomialAndMasses::"
     << "PotentialFromPolynomialAndMasses( \"" << modelFilename << "\" )"
+    << std::endl << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      std::cout << fieldNames[ fieldIndex ] << ": "
+      << dsbFieldValuePolynomials[ fieldIndex ].AsString() << std::endl;
+    }
+    std::cout
     << std::endl
     << "renormalizationScaleSquared = " << renormalizationScaleSquared
     << std::endl
@@ -416,6 +469,14 @@ namespace VevaciousPlusPlus
           ||
           ( stringToParse[ wordStart ] == '-' ) )
       {
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "imaginaryTerm = " << imaginaryTerm << std::endl
+        << "polynomialTerm:"
+        << std::endl << polynomialTerm.AsString();
+        std::cout << std::endl;/**/
+
         if( polynomialTerm.IsValid() )
         {
           if( imaginaryTerm )
@@ -440,6 +501,15 @@ namespace VevaciousPlusPlus
                                                          polynomialTerm,
                                                          imaginaryTerm );
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "imaginaryTerm = " << imaginaryTerm << std::endl
+    << "polynomialTerm:"
+    << std::endl << polynomialTerm.AsString();
+    std::cout << std::endl;/**/
+
     if( polynomialTerm.IsValid() )
     {
       if( imaginaryTerm )
@@ -514,6 +584,14 @@ namespace VevaciousPlusPlus
         polynomialTerm.MultiplyBy( BOL::StringParser::stringToDouble(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "multiplied by number: " << stringToParse.substr( wordStart,
+                                                     ( wordEnd - wordStart ) );
+        std::cout << std::endl;/**/
+
         return wordEnd;
       }
       else if( allowedVariableInitials.find( stringToParse[ wordStart ] )
@@ -575,6 +653,12 @@ namespace VevaciousPlusPlus
               ||
               ( variableString[ 0 ] == 'J' ) ) )
         {
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "power of imaginary unit = " << powerInt;
+          std::cout << std::endl;/**/
+
           if( ( powerInt % 2 ) == 1 )
           {
             imaginaryTerm = true;
@@ -596,6 +680,14 @@ namespace VevaciousPlusPlus
             // and return position of the char just after the parsed chars.
             polynomialTerm.RaiseFieldPower( fieldIndex,
                                             powerInt );
+
+            // debugging:
+            /**/std::cout << std::endl << "debugging:"
+            << std::endl
+            << "multiplied by field[ " << fieldIndex << "] = \""
+            << fieldNames[ fieldIndex ] << "\" to power of " << powerInt;
+            std::cout << std::endl;/**/
+
             return wordEnd;
           }
         }
@@ -606,6 +698,24 @@ namespace VevaciousPlusPlus
         polynomialTerm.MultiplyBy( runningParameters.GetFunctionoid(
                                                               variableString ),
                                    powerInt );
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "multiplied by functionoid ";
+        ParameterFunctionoid* multiplyingFunctionoid(
+                          runningParameters.GetFunctionoid( variableString ) );
+        if( multiplyingFunctionoid == NULL )
+        {
+          std::cout << "NULL";
+        }
+        else
+        {
+          std::cout << multiplyingFunctionoid->AsString();
+        }
+        std::cout << " to power of " << powerInt;
+        std::cout << std::endl;/**/
+
         return wordEnd;
       }
       else if( ( stringToParse[ wordStart ] == '+' )
@@ -664,6 +774,21 @@ namespace VevaciousPlusPlus
 
     runningParameters.UpdateRunningParameters(
                                          sqrt( renormalizationScaleSquared ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "DSB minimum is" << std::endl;
+    std::vector< double > fieldOrigin( numberOfFields,
+                                       0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      std::cout << fieldNames[ fieldIndex ] << ": "
+      << dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin ) << std::endl;
+    }
+    std::cout << std::endl;/**/
   }
 
   // This evaluates the sum of corrections for the real scalar degrees

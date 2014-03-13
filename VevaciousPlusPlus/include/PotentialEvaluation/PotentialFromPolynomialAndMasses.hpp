@@ -77,6 +77,7 @@ namespace VevaciousPlusPlus
     static double const thermalFactor;
 
     RunningParameterManager runningParameters;
+    std::vector< PolynomialSum > dsbFieldValuePolynomials;
     double renormalizationScaleSquared;
     double minimumRenormalizationScaleSquared;
     PolynomialSum treeLevelPotential;
@@ -179,6 +180,16 @@ namespace VevaciousPlusPlus
   {
     UpdateRenormalizationScale( fieldConfiguration,
                                 temperatureValue );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "treeLevelPotential = " << treeLevelPotential( fieldConfiguration )
+    << std::endl
+    << "polynomialLoopCorrections = "
+    << polynomialLoopCorrections( fieldConfiguration );
+    std::cout << std::endl;/**/
+
 
     return ( treeLevelPotential( fieldConfiguration )
              + polynomialLoopCorrections( fieldConfiguration )

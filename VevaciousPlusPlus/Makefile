@@ -28,6 +28,7 @@ CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/ComplexMassMatrix.cpp \
  source/PotentialEvaluation/ConstantFunctionoid.cpp \
+ source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/MassesSquaredFromPolynomials.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
@@ -37,6 +38,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/RealMassesSquaredMatrix.cpp \
+ source/PotentialEvaluation/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaFunctionoid.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \

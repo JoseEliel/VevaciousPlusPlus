@@ -26,6 +26,12 @@ namespace VevaciousPlusPlus
     static double const bosonZeroToMinusOne[ 101 ];
     static double const bosonZeroToPlusOne[ 101 ];
     static double const bosonPlusOneToPlusOneHundred[ 100 ];
+
+    // Since the fermion masses-squared are the eigenvalues of mass matrices
+    // that could be diagonalized by unitary transformations on the left and
+    // right, they must be positive semi-definite. However, numerical issues
+    // could easily lead to small but negative eigenvalues of the mass-squared
+    // matrix, so it's just easier to leave the interpolation in.
     static double const fermionMinusOneToMinusTwelve[ 111 ];
     static double const fermionZeroToMinusOne[ 101 ];
     static double const fermionZeroToPlusOne[ 101 ];
@@ -61,12 +67,6 @@ namespace VevaciousPlusPlus
 
   inline double ThermalFunctions::BosonicJ( double const squareRatio )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "ThermalFunctions::BosonicJ( " << squareRatio << " ) called.";
-    std::cout << std::endl;/**/
-
     if( squareRatio <= -12.0 )
     {
       return 0.0;
@@ -96,12 +96,6 @@ namespace VevaciousPlusPlus
   // -1 to -12 (element [0] is -1, [111] is -12), in steps of 0.1.
   inline double ThermalFunctions::FermionicJ( double const squareRatio )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "ThermalFunctions::FermionicJ( " << squareRatio << " ) called.";
-    std::cout << std::endl;/**/
-
     if( squareRatio <= -12.0 )
     {
       return 0.0;
@@ -116,12 +110,6 @@ namespace VevaciousPlusPlus
     }
     else if( squareRatio < 1.0 )
     {
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "( squareRatio < 1.0 )";
-      std::cout << std::endl;/**/
-
       return FermionZeroToPlusOne( squareRatio );
     }
     else if( squareRatio < 100.0 )
@@ -210,29 +198,8 @@ namespace VevaciousPlusPlus
   inline double
   ThermalFunctions::FermionZeroToPlusOne( double const squareRatio )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "ThermalFunctions::FermionZeroToPlusOne( " << squareRatio
-    << " ) called.";
-    std::cout << std::endl;/**/
-
     double scaledRatio( 100.0 * squareRatio );
     unsigned int floorIndex( scaledRatio );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "scaledRatio = " << scaledRatio << ", floorIndex = " << floorIndex;
-    std::cout << std::endl;/**/
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "fermionZeroToPlusOne[ " << floorIndex << " ] = "
-    << fermionZeroToPlusOne[ floorIndex ];
-    std::cout << std::endl;/**/
-
     return ( fermionZeroToPlusOne[ floorIndex ]
              + ( 0.01 * ( scaledRatio - (double)floorIndex )
                       * ( fermionZeroToPlusOne[ floorIndex + 1 ]

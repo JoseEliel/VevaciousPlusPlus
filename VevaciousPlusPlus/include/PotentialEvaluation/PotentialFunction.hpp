@@ -50,6 +50,11 @@ namespace VevaciousPlusPlus
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum ) = 0;
 
+    // This is for ease of getting the index of a field of a given name. It
+    // returns the largest possible unsigned int (-1 should tick over to that)
+    // if fieldName was not found.
+    unsigned int FieldIndex( std::string const& fieldName ) const;
+
 
   protected:
     std::vector< std::string > fieldNames;
@@ -70,6 +75,24 @@ namespace VevaciousPlusPlus
   {
     return (*this)( fieldConfiguration,
                     temperatureValue );
+  }
+
+  // This is for ease of getting the index of a field of a given name. It
+  // returns the largest possible unsigned int (-1 should tick over to that) if
+  // fieldName was not found.
+  inline unsigned int
+  PotentialFunction::FieldIndex( std::string const& fieldName ) const
+  {
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < fieldNames.size();
+         ++fieldIndex )
+    {
+      if( fieldName.compare( fieldNames[ fieldIndex ] ) == 0 )
+      {
+        return fieldIndex;
+      }
+    }
+    return -1;
   }
 
 } /* namespace VevaciousPlusPlus */

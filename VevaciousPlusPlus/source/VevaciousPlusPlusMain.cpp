@@ -82,6 +82,7 @@ int main( int argumentCount,
   << std::endl;
   std::vector< double > testConfiguration;
   testConfiguration.push_back( 0.0 );
+  testConfiguration.push_back( 0.0 );
   potentialFunction.UpdateParameters( slhaFile );
   std::cout << "potentialFunction(";
   for( std::vector< double >::iterator
@@ -97,7 +98,7 @@ int main( int argumentCount,
   std::cout << "at temperature " << testTemperature << ", potentialFunction = "
   << potentialFunction( testConfiguration,
                         testTemperature );
-  testConfiguration.back() = 300.0;
+  testConfiguration[ 0 ] = 300.0;
   potentialFunction.UpdateParameters( slhaFile );
   std::cout << "potentialFunction(";
   for( std::vector< double >::iterator
@@ -113,7 +114,8 @@ int main( int argumentCount,
   std::cout << "at temperature " << testTemperature << ", potentialFunction = "
   << potentialFunction( testConfiguration,
                         testTemperature );
-  testConfiguration.back() = 1000.0;
+  testConfiguration[ 0 ] = 1000.0;
+  testConfiguration[ 1 ] = 300.0;
   potentialFunction.UpdateParameters( slhaFile );
   std::cout << "potentialFunction(";
   for( std::vector< double >::iterator
