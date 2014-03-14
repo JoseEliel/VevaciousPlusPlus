@@ -161,7 +161,18 @@
        singlet_field=2.0*NMSSMRUN[1]*NMSSMRUN[3] + 1.0 - HMIX[4]
        x = 0.5 * muOverRootLambda (assuming muOverRootLambda was defined in
                                    DerivedParameters above)
-       -->
+       
+       Since the values can (and probably will, in general) reference
+       scale-dependent parameters, the attribute EvaluationScale can be given
+       in GeV with an explicit floating-point number. For example,
+       <DsbMinimum EvaluationScale="1.000E+003" >
+       as the opening tag will tell VevaciousPlusPlus to evaluate the
+       parameters at a scale of 1 TeV. If a scale is not explicitly given,
+       the value given by MinimumRenormalizationScale above is used. This only
+       affects RgeImprovedOneLoopPotential instances, as
+       FixedScaleOneLoopPotential instances consider all parameters to be
+       constant over all scales, so leaving EvaluationScale out will still give
+       the same values as putting it in (with any value). -->
   <DsbMinimum>
     phi = PHIFOURTHVEVS[ 1 ]
      sigma= 2.0* sbcbAlt * PHIFOURTHVEVS[2] + Sqrt2^2 * I^6 * oneThird
