@@ -18,6 +18,11 @@ namespace VevaciousPlusPlus
     PotentialMinimum();
     virtual
     ~PotentialMinimum();
+
+
+    // This returns the sum of the squares of the differences in the field
+    // values of this PotentialMinimum with comparisonMinimum.
+    double SquareDistanceTo( PotentialMinimum const& comparisonMinimum ) const;
   };
 
 } /* namespace VevaciousPlusPlus */

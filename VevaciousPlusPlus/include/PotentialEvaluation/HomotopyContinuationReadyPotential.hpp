@@ -25,14 +25,14 @@ namespace VevaciousPlusPlus
     // destinationVector.
     virtual void
     HomotopyContinuationSystemValues(
-                           std::vector< double > fieldConfigurationWithScale,
+                                   std::vector< double > solutionConfiguration,
                                 std::vector< double >& destinationVector ) = 0;
 
     // This should evaluate the derivatives of the target system and place the
     // values in destinationMatrix.
     virtual void
     HomotopyContinuationSystemGradients(
-                             std::vector< double > fieldConfigurationWithScale,
+                                   std::vector< double > solutionConfiguration,
                  std::vector< std::vector< double > >& destinationMatrix ) = 0;
   };
 

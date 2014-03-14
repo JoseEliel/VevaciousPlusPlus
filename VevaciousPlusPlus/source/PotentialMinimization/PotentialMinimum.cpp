@@ -12,13 +12,33 @@ namespace VevaciousPlusPlus
 
   PotentialMinimum::PotentialMinimum()
   {
-    // TODO Auto-generated constructor stub
-
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PotentialMinimum::PotentialMinimum()";
+    std::cout << std::endl;/**/
   }
 
   PotentialMinimum::~PotentialMinimum()
   {
-    // TODO Auto-generated destructor stub
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PotentialMinimum::~PotentialMinimum()";
+    std::cout << std::endl;/**/
+  }
+
+  // This returns the sum of the squares of the differences in the field
+  // values of this PotentialMinimum with comparisonMinimum.
+  double PotentialMinimum::SquareDistanceTo(
+                              PotentialMinimum const& comparisonMinimum ) const
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "PotentialMinimum::SquareDistanceTo( ... )";
+    std::cout << std::endl;
+    return 0.0;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

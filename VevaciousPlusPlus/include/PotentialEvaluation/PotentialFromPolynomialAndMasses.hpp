@@ -29,43 +29,10 @@ namespace VevaciousPlusPlus
     ~PotentialFromPolynomialAndMasses();
 
 
-    // This returns the energy density in GeV^4 of the potential for a state
-    // strongly peaked around expectation values (in GeV) for the fields given
-    // by the values of fieldConfiguration and temperature in GeV given by
-    // temperatureValue.
-    virtual double
-    operator()( std::vector< double > const& fieldConfiguration,
-                double const temperatureValue = 0.0 );
-
     // This updates all the parameters of the potential that are not field
     // values based on the values that appear in blocks in the SLHA format in
     // the file given by slhaFilename.
     virtual void UpdateParameters( std::string const& slhaFilename );
-
-    // This returns the tree-level potential energy density.
-    virtual double
-    QuickApproximation( std::vector< double > const& fieldConfiguration,
-                        double const temperatureValue = 0.0 );
-
-    // This returns the square of the scale (in GeV^2) relevant to tunneling
-    // between the given minima for this potential.
-    virtual double
-    ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum );
-
-    // This evaluates the target system and places the values in
-    // destinationVector.
-    virtual void
-    HomotopyContinuationSystemValues(
-                           std::vector< double > fieldConfigurationWithScale,
-                                    std::vector< double >& destinationVector );
-
-    // This evaluates the derivatives of the target system and places the
-    // values in destinationMatrix.
-    virtual void
-    HomotopyContinuationSystemGradients(
-                             std::vector< double > fieldConfigurationWithScale,
-                     std::vector< std::vector< double > >& destinationMatrix );
 
 
   protected:
@@ -78,6 +45,8 @@ namespace VevaciousPlusPlus
 
     RunningParameterManager runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
+    std::vector< double > dsbFieldValueInputs;
+    std::vector< double > fieldOrigin;
     double renormalizationScaleSquared;
     double minimumRenormalizationScaleSquared;
     PolynomialSum treeLevelPotential;
@@ -92,6 +61,16 @@ namespace VevaciousPlusPlus
 
 
     PotentialFromPolynomialAndMasses();
+
+
+    // This should set dsbFieldValueInputs based on the SLHA file just read in.
+    virtual void EvaluateDsbInputAndSetScale() = 0;
+
+    // This evaluates the one-loop potential with thermal corrections assuming
+    // that the scale has been set correctly.
+    inline double LoopAndThermallyCorrectedPotential(
+                               std::vector< double > const& fieldConfiguration,
+                                               double const temperatureValue );
 
     // This puts all index brackets into a consistent form.
     std::string FormatVariable( std::string const& unformattedVariable ) const;
@@ -117,35 +96,35 @@ namespace VevaciousPlusPlus
                                            PolynomialTerm& polynomialTerm,
                                            bool& imaginaryTerm );
 
-    // This sets the renormalization scale and broadcasts it to the running
-    // parameters.
-    void UpdateRenormalizationScale(
-                               std::vector< double > const& fieldConfiguration,
-                                     double const evaluationTemperature );
-
     // This evaluates the sum of corrections for the real scalar degrees
     // of freedom with masses-squared given by scalarSquareMasses evaluated for
-    // the field configuration given by fieldConfiguration at a temperature
-    // given by evaluationTemperature.
+    // the field configuration given by fieldConfiguration at a temperature T
+    // given by inverseTemperatureSquared for T^(-2) and temperatureFourthed
+    // for T^4.
     double
     ScalarBosonCorrections( std::vector< double > const& fieldConfiguration,
-                            double const evaluationTemperature );
+                            double const inverseTemperatureSquared,
+                            double const temperatureFourthed );
 
     // This evaluates the sum of corrections for a set of Weyl fermion degrees
     // of freedom with masses-squared given by fermionMasses evaluated for
-    // the field configuration given by fieldConfiguration at a temperature
-    // given by evaluationTemperature.
+    // the field configuration given by fieldConfiguration at a temperature T
+    // given by inverseTemperatureSquared for T^(-2) and temperatureFourthed
+    // for T^4.
     double
     WeylFermionCorrections( std::vector< double > const& fieldConfiguration,
-                            double const evaluationTemperature );
+                            double const inverseTemperatureSquared,
+                            double const temperatureFourthed );
 
     // This evaluates the sum of corrections for the real scalar degrees
     // of freedom with masses-squared given by vectorSquareMasses evaluated for
-    // the field configuration given by fieldConfiguration at a temperature
-    // given by evaluationTemperature.
+    // the field configuration given by fieldConfiguration at a temperature T
+    // given by inverseTemperatureSquared for T^(-2) and temperatureFourthed
+    // for T^4.
     double
     GaugeBosonCorrections( std::vector< double > const& fieldConfiguration,
-                           double const evaluationTemperature );
+                           double const inverseTemperatureSquared,
+                           double const temperatureFourthed );
 
     // This returns the J function thermal correction for a bosonic degree of
     // freedom based on a lookup table.
@@ -160,46 +139,13 @@ namespace VevaciousPlusPlus
     { return
       ThermalFunctions::FermionicJ( massSquaredOverTemperatureSquared ); }
 
-    // This prepares system of polynomials for the homotopy continuation as a
-    // set of polynomials in the field variables with coefficients from the
-    // polynomials of the tree-level potential and the polynomial loop
-    // corrections. The coefficient of each polynomial term is fitted to a
-    // polynomial of degree powerOfScale in the logarithm of the scale. After
-    // this, the differentials of the system are derived from these polynomials
-    // in the fields and the logarithm of the scale, and also for the
-    // constraint relating the scale to the field variables.
-    void PrepareHomotopyContinuationPolynomials( int const powerOfScale );
+    // This should prepare a system of polynomials for the homotopy
+    // continuation based on the current SLHA input data.
+    virtual void PrepareHomotopyContinuationPolynomials() = 0;
   };
 
 
 
-
-  inline double PotentialFromPolynomialAndMasses::operator()(
-                               std::vector< double > const& fieldConfiguration,
-                                                double const temperatureValue )
-  {
-    UpdateRenormalizationScale( fieldConfiguration,
-                                temperatureValue );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "treeLevelPotential = " << treeLevelPotential( fieldConfiguration )
-    << std::endl
-    << "polynomialLoopCorrections = "
-    << polynomialLoopCorrections( fieldConfiguration );
-    std::cout << std::endl;/**/
-
-
-    return ( treeLevelPotential( fieldConfiguration )
-             + polynomialLoopCorrections( fieldConfiguration )
-             + ScalarBosonCorrections( fieldConfiguration,
-                                       temperatureValue )
-             + WeylFermionCorrections( fieldConfiguration,
-                                       temperatureValue )
-             + GaugeBosonCorrections( fieldConfiguration,
-                                      temperatureValue ) );
-  }
 
   // This updates all the parameters of the potential that are not field
   // values based on the values that appear in blocks in the SLHA format in
@@ -208,15 +154,36 @@ namespace VevaciousPlusPlus
                                               std::string const& slhaFilename )
   {
     runningParameters.UpdateSlhaParameters( slhaFilename );
+    PrepareHomotopyContinuationPolynomials();
+    EvaluateDsbInputAndSetScale();
   }
 
-  inline double PotentialFromPolynomialAndMasses::QuickApproximation(
-                               std::vector< double > const& fieldConfiguration,
+  // This evaluates the one-loop potential with thermal corrections assuming
+  // that the scale has been set correctly.
+  inline double
+  PotentialFromPolynomialAndMasses::LoopAndThermallyCorrectedPotential(
+                             std::vector< double > const& fieldConfiguration,
                                                 double const temperatureValue )
   {
-    UpdateRenormalizationScale( fieldConfiguration,
-                                temperatureValue );
-    return treeLevelPotential( fieldConfiguration );
+    double inverseTemperatureSquared( 1.0 );
+    if( temperatureValue > 0.0 )
+    {
+      inverseTemperatureSquared
+      = ( 1.0 / ( temperatureValue * temperatureValue ) );
+    }
+    double const temperatureFourthed( temperatureValue * temperatureValue
+                                      * temperatureValue * temperatureValue );
+    return ( treeLevelPotential( fieldConfiguration )
+             + polynomialLoopCorrections( fieldConfiguration )
+             + ScalarBosonCorrections( fieldConfiguration,
+                                       inverseTemperatureSquared,
+                                       temperatureFourthed )
+             + WeylFermionCorrections( fieldConfiguration,
+                                       inverseTemperatureSquared,
+                                       temperatureFourthed )
+             + GaugeBosonCorrections( fieldConfiguration,
+                                      inverseTemperatureSquared,
+                                      temperatureFourthed ) );
   }
 
   // This puts all index brackets into a consistent form.

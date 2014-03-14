@@ -51,9 +51,12 @@ namespace VevaciousPlusPlus
     // scale.
     void UpdateRunningParameters( double const renormalizationScale );
 
+    // This returns the lowest Q found among the SLHA blocks. It returns 0.0
+    // if no block had a scale greater than 0.0 GeV.
+    double LowestBlockScale();
+
 
   protected:
-
     // This puts all index brackets into a consistent form.
     static std::string
     FormatIndexBracketContent( std::string const& unformattedBracketContent );
@@ -162,6 +165,42 @@ namespace VevaciousPlusPlus
       << "after, (*(*whichParameter))() = " << (*(*whichParameter))();
       std::cout << std::endl;/**/
     }
+  }
+
+  // This returns the lowest Q found among the SLHA blocks. It returns 0.0 if
+  // no block had a scale greater than 0.0 GeV.
+  inline double RunningParameterManager::LowestBlockScale()
+  {
+    double returnValue( 0.0 );
+    for( std::vector< RestrictedSlhaBlock* >::iterator
+         whichBlock( slhaBlockPointers.begin() );
+         whichBlock < slhaBlockPointers.end();
+         ++whichBlock )
+    {
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << (*(*whichBlock)).getName() << " lowest scale is "
+      << (*(*whichBlock))[ 0 ].getScale();
+      std::cout << std::endl;/**/
+
+      if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
+      {
+        if( ( returnValue <= 0.0 )
+            ||
+            ( returnValue > (*(*whichBlock))[ 0 ].getScale() ) )
+        {
+          returnValue = (*(*whichBlock))[ 0 ].getScale();
+        }
+      }
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "returnValue = " << returnValue;
+      std::cout << std::endl;/**/
+    }
+    return returnValue;
   }
 
   // This puts all index brackets into a consistent form.

@@ -22,6 +22,8 @@ namespace VevaciousPlusPlus
 
 
     unsigned int NumberOfFieldVariables() const;
+    std::string const& FieldName( unsigned int const fieldIndex) const
+    { return fieldNames[ fieldIndex ]; }
 
     // This should return the energy density in GeV^4 of the potential for a
     // state strongly peaked around expectation values (in GeV) for the fields

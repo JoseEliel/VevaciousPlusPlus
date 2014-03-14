@@ -63,4 +63,8 @@ block LOOPPHIFOURTH Q=  1.0E+02  #
 block PHIFOURTHVEVS Q=  1.0E+02  #
  1  123.4
  2  -26
+ block FOO Q= 0.123
+  1 2 3.4
+ block MASS
+  1 1.23E+4
  

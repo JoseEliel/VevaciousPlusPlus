@@ -48,16 +48,21 @@ int main( int argumentCount,
 
   // The PotentialFromPolynomialAndMasses constructor takes a string with the
   // name of the model file (including the path):
-  VevaciousPlusPlus::PotentialFromPolynomialAndMasses
-  potentialFunction( argumentParser.fromTag( "model",
+  VevaciousPlusPlus::RgeImprovedOneLoopPotential
+  rgeImprovedPotential( argumentParser.fromTag( "model",
+                                             "./ModelFiles/SM.vin" ) );
+
+
+  VevaciousPlusPlus::FixedScaleOneLoopPotential
+  fixedScalePotential( argumentParser.fromTag( "model",
                                              "./ModelFiles/SM.vin" ) );
 
   // Now the HomotopyContinuationAndGradient object and the BounceWithSplines
   // object can be constructed:
   VevaciousPlusPlus::HomotopyContinuationAndGradient
-  potentialMinimizer( potentialFunction );
+  potentialMinimizer( rgeImprovedPotential );
   VevaciousPlusPlus::BounceWithSplines
-  tunnelingCalculator( potentialFunction );
+  tunnelingCalculator( rgeImprovedPotential );
 
   // Create the VevaciousTwo object, telling it where to find its settings,
   // such as the model to use and the way to calculate the tunneling time.
@@ -83,54 +88,90 @@ int main( int argumentCount,
   std::vector< double > testConfiguration;
   testConfiguration.push_back( 0.0 );
   testConfiguration.push_back( 0.0 );
-  potentialFunction.UpdateParameters( slhaFile );
-  std::cout << "potentialFunction(";
-  for( std::vector< double >::iterator
-       whichField( testConfiguration.begin() );
-       whichField < testConfiguration.end();
-       ++whichField )
+  rgeImprovedPotential.UpdateParameters( slhaFile );
+  fixedScalePotential.UpdateParameters( slhaFile );
+  std::cout << "For { ";
+  for( unsigned int fieldIndex( 0 );
+       fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
+       ++fieldIndex )
   {
-    std::cout << " " << *whichField;
+    if( fieldIndex > 0 )
+    {
+      std::cout << ", ";
+    }
+    std::cout << rgeImprovedPotential.FieldName( fieldIndex ) << " -> "
+    << testConfiguration[ fieldIndex ];
   }
-  std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout
+  << " }, rgeImprovedPotential => "
+  << rgeImprovedPotential( testConfiguration )
+  << ", fixedScalePotential => "
+  << fixedScalePotential( testConfiguration );
   std::cout << std::endl;
   double testTemperature( 10.0 );
-  std::cout << "at temperature " << testTemperature << ", potentialFunction = "
-  << potentialFunction( testConfiguration,
-                        testTemperature );
+  std::cout
+  << "at temperature " << testTemperature << ", rgeImprovedPotential = "
+  << rgeImprovedPotential( testConfiguration,
+                           testTemperature ) << ", fixedScalePotential = "
+  << fixedScalePotential( testConfiguration,
+                          testTemperature );
+  std::cout << std::endl;
   testConfiguration[ 0 ] = 300.0;
-  potentialFunction.UpdateParameters( slhaFile );
-  std::cout << "potentialFunction(";
-  for( std::vector< double >::iterator
-       whichField( testConfiguration.begin() );
-       whichField < testConfiguration.end();
-       ++whichField )
+  rgeImprovedPotential.UpdateParameters( slhaFile );
+  fixedScalePotential.UpdateParameters( slhaFile );
+  std::cout << "For { ";
+  for( unsigned int fieldIndex( 0 );
+       fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
+       ++fieldIndex )
   {
-    std::cout << " " << *whichField;
+    if( fieldIndex > 0 )
+    {
+      std::cout << ", ";
+    }
+    std::cout << rgeImprovedPotential.FieldName( fieldIndex ) << " -> "
+    << testConfiguration[ fieldIndex ];
   }
-  std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout
+  << " }, rgeImprovedPotential => "
+  << rgeImprovedPotential( testConfiguration )
+  << ", fixedScalePotential => "
+  << fixedScalePotential( testConfiguration );
   std::cout << std::endl;
   testTemperature = 145.0;
-  std::cout << "at temperature " << testTemperature << ", potentialFunction = "
-  << potentialFunction( testConfiguration,
-                        testTemperature );
-  testConfiguration[ 0 ] = 1000.0;
-  testConfiguration[ 1 ] = 300.0;
-  potentialFunction.UpdateParameters( slhaFile );
-  std::cout << "potentialFunction(";
-  for( std::vector< double >::iterator
-       whichField( testConfiguration.begin() );
-       whichField < testConfiguration.end();
-       ++whichField )
+  std::cout
+  << "at temperature " << testTemperature << ", rgeImprovedPotential = "
+  << rgeImprovedPotential( testConfiguration,
+                           testTemperature ) << ", fixedScalePotential = "
+  << fixedScalePotential( testConfiguration,
+                          testTemperature );
+  std::cout << std::endl;
+  rgeImprovedPotential.UpdateParameters( slhaFile );
+  fixedScalePotential.UpdateParameters( slhaFile );
+  std::cout << "For { ";
+  for( unsigned int fieldIndex( 0 );
+       fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
+       ++fieldIndex )
   {
-    std::cout << " " << *whichField;
+    if( fieldIndex > 0 )
+    {
+      std::cout << ", ";
+    }
+    std::cout << rgeImprovedPotential.FieldName( fieldIndex ) << " -> "
+    << testConfiguration[ fieldIndex ];
   }
-  std::cout << " ) = " << potentialFunction( testConfiguration );
+  std::cout
+  << " }, rgeImprovedPotential => "
+  << rgeImprovedPotential( testConfiguration )
+  << ", fixedScalePotential => "
+  << fixedScalePotential( testConfiguration );
   std::cout << std::endl;
   testTemperature = 205.0;
-  std::cout << "at temperature " << testTemperature << ", potentialFunction = "
-  << potentialFunction( testConfiguration,
-                        testTemperature );
+  std::cout
+  << "at temperature " << testTemperature << ", rgeImprovedPotential = "
+  << rgeImprovedPotential( testConfiguration,
+                           testTemperature ) << ", fixedScalePotential = "
+  << fixedScalePotential( testConfiguration,
+                          testTemperature );
   std::cout << std::endl;
   std::cout << std::endl;
 
