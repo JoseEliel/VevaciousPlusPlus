@@ -50,12 +50,12 @@ int main( int argumentCount,
   // name of the model file (including the path):
   VevaciousPlusPlus::RgeImprovedOneLoopPotential
   rgeImprovedPotential( argumentParser.fromTag( "model",
-                                             "./ModelFiles/SM.vin" ) );
+                                                "./ModelFiles/SM.vin" ) );
 
 
   VevaciousPlusPlus::FixedScaleOneLoopPotential
   fixedScalePotential( argumentParser.fromTag( "model",
-                                             "./ModelFiles/SM.vin" ) );
+                                               "./ModelFiles/SM.vin" ) );
 
   // Now the HomotopyContinuationAndGradient object and the BounceWithSplines
   // object can be constructed:
@@ -85,9 +85,14 @@ int main( int argumentCount,
   // debugging:
   /**/std::cout << std::endl << "debugging:"
   << std::endl;
-  std::vector< double > testConfiguration;
-  testConfiguration.push_back( 0.0 );
-  testConfiguration.push_back( 0.0 );
+  std::vector< double >
+  testConfiguration( rgeImprovedPotential.NumberOfFieldVariables(),
+                     0.0 );
+  if( testConfiguration.size() < 2 )
+  {
+    testConfiguration.resize( 2,
+                              0.0 );
+  }
   rgeImprovedPotential.UpdateParameters( slhaFile );
   fixedScalePotential.UpdateParameters( slhaFile );
   std::cout << "For { ";
@@ -116,6 +121,53 @@ int main( int argumentCount,
   << fixedScalePotential( testConfiguration,
                           testTemperature );
   std::cout << std::endl;
+
+  double subtractionConstant( fixedScalePotential(
+                                   fixedScalePotential.FieldValuesOrigin() ) );
+  std::cout
+  << std::endl
+  << "At field origin, fixedScalePotential = " << subtractionConstant;
+  std::cout << std::endl;
+
+
+  for( int vdStep( 0 );
+       vdStep < 13;
+       ++vdStep )
+  {
+    testConfiguration[ 0 ] = ( 0.1
+                               * (double)vdStep
+                               * fixedScalePotential.DsbFieldValues()[ 0 ] );
+    for( int vuStep( 0 );
+         vuStep < 13;
+         ++vuStep )
+    {
+      testConfiguration[ 1 ] = ( 0.1
+                                 * (double)vuStep
+                                 * fixedScalePotential.DsbFieldValues()[ 1 ] );
+      std::cout << "For { ";
+      for( unsigned int fieldIndex( 0 );
+           fieldIndex < fixedScalePotential.NumberOfFieldVariables();
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout
+        << fixedScalePotential.FieldName( fieldIndex ) << " -> "
+        << testConfiguration[ fieldIndex ];
+      }
+      std::cout
+      << ", fixedScalePotential => "
+      << fixedScalePotential( testConfiguration )
+      << " => " << ( fixedScalePotential( testConfiguration )
+                     - subtractionConstant )
+      << "; tree = "
+      << fixedScalePotential.QuickApproximation( testConfiguration );
+      std::cout << std::endl;
+    }
+  }
+
   testConfiguration[ 0 ] = 300.0;
   rgeImprovedPotential.UpdateParameters( slhaFile );
   fixedScalePotential.UpdateParameters( slhaFile );

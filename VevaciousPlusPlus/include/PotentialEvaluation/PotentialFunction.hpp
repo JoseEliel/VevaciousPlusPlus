@@ -57,10 +57,18 @@ namespace VevaciousPlusPlus
     // if fieldName was not found.
     unsigned int FieldIndex( std::string const& fieldName ) const;
 
+    std::vector< double > const& DsbFieldValues() const
+    { return dsbFieldValueInputs; }
+
+    std::vector< double > const& FieldValuesOrigin() const
+    { return fieldOrigin; }
+
 
   protected:
     std::vector< std::string > fieldNames;
     unsigned int numberOfFields;
+    std::vector< double > dsbFieldValueInputs;
+    std::vector< double > fieldOrigin;
   };
 
 

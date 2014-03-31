@@ -14,6 +14,7 @@
 #include "PolynomialSum.hpp"
 #include "RealMassesSquaredMatrix.hpp"
 #include "ComplexMassMatrix.hpp"
+#include "ComplexMassSquaredMatrix.hpp"
 #include "MassesSquaredFromPolynomials.hpp"
 #include "RunningParameterManager.hpp"
 #include "ThermalFunctions.hpp"
@@ -45,14 +46,13 @@ namespace VevaciousPlusPlus
 
     RunningParameterManager runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
-    std::vector< double > dsbFieldValueInputs;
-    std::vector< double > fieldOrigin;
     double renormalizationScaleSquared;
     double minimumRenormalizationScaleSquared;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
     std::vector< RealMassesSquaredMatrix > scalarSquareMasses;
     std::vector< ComplexMassMatrix > fermionMasses;
+    std::vector< ComplexMassSquaredMatrix > fermionMassSquareds;
     std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
     double vectorMassCorrectionConstant;
     std::vector< PolynomialSum > polynomialGradient;

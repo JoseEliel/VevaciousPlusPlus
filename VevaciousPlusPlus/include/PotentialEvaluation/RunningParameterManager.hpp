@@ -150,20 +150,20 @@ namespace VevaciousPlusPlus
          ++whichParameter )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "calling " << (*whichParameter)->AsString()
       << "->UpdateForNewLogarithmOfScale( " << logarithmOfScale
       << " ). before, (*(*whichParameter))() = " << (*(*whichParameter))();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       (*whichParameter)->UpdateForNewLogarithmOfScale( logarithmOfScale );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "after, (*(*whichParameter))() = " << (*(*whichParameter))();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
   }
 

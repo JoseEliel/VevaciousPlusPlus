@@ -81,12 +81,6 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                                 double const temperatureValue )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::operator()(...) called.";
-    std::cout << std::endl;/**/
-
     return LoopAndThermallyCorrectedPotential( fieldConfiguration,
                                                temperatureValue );
   }

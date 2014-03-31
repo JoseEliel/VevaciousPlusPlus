@@ -21,12 +21,14 @@ LHPCINCLUDEDIR=$(LHPCDIR)/include/
 LHPCLIBDIR=$(LHPCDIR)/lib/
 #EIGENDIR=./Eigen/
 EIGENDIR=../../../machine-specific/Eigen/
-CCFLAGS=-Wall -O3 -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
+DEBUGFLAGS=
+CCFLAGS=-Wall -O3 $(DEBUGFLAGS) -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
 #CCFLAGS=-Wall -O3 -g -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/ComplexMassMatrix.cpp \
+ source/PotentialEvaluation/ComplexMassSquaredMatrix.cpp \
  source/PotentialEvaluation/ConstantFunctionoid.cpp \
  source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \

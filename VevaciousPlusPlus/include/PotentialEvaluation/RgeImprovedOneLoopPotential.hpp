@@ -87,12 +87,6 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                                 double const temperatureValue )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "RgeImprovedOneLoopPotential::operator()(...) called.";
-    std::cout << std::endl;/**/
-
     UpdateRenormalizationScale( fieldConfiguration,
                                 temperatureValue );
     return LoopAndThermallyCorrectedPotential( fieldConfiguration,

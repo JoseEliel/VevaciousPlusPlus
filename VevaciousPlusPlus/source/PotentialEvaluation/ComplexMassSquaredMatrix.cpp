@@ -1,7 +1,7 @@
 /*
- * RealMassesSquaredMatrix.cpp
+ * ComplexMassSquaredMatrix.cpp
  *
- *  Created on: Mar 10, 2014
+ *  Created on: Mar 31, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
@@ -10,13 +10,14 @@
 namespace VevaciousPlusPlus
 {
 
-  RealMassesSquaredMatrix::RealMassesSquaredMatrix(
+  ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
                                                unsigned int const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
     MassesSquaredFromPolynomials( attributeMap ),
     numberOfRows( numberOfRows ),
     matrixElements( ( numberOfRows * numberOfRows ),
-                    PolynomialSum() ),
+                    std::pair< PolynomialSum, PolynomialSum >( PolynomialSum(),
+                                                           PolynomialSum() ) ),
     valuesMatrix( numberOfRows,
                   numberOfRows ),
     eigenvalueFinder( numberOfRows )
@@ -25,8 +26,8 @@ namespace VevaciousPlusPlus
                           NAN );
   }
 
-  RealMassesSquaredMatrix::RealMassesSquaredMatrix(
-                                  RealMassesSquaredMatrix const& copySource ) :
+  ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
+                                 ComplexMassSquaredMatrix const& copySource ) :
     MassesSquaredFromPolynomials( copySource ),
     numberOfRows( copySource.numberOfRows ),
     matrixElements( copySource.matrixElements ),
@@ -36,8 +37,7 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-
-  RealMassesSquaredMatrix::RealMassesSquaredMatrix() :
+  ComplexMassSquaredMatrix::ComplexMassSquaredMatrix() :
     MassesSquaredFromPolynomials(),
     numberOfRows( 0 ),
     matrixElements(),
@@ -47,15 +47,15 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  RealMassesSquaredMatrix::~RealMassesSquaredMatrix()
+  ComplexMassSquaredMatrix::~ComplexMassSquaredMatrix()
   {
     // This does nothing.
   }
 
 
-  // This returns the eigenvalues of the matrix.
+  // This returns the eigenvalues of the square of the matrix.
   std::vector< double > const&
-  RealMassesSquaredMatrix::MassesSquared(
+  ComplexMassSquaredMatrix::MassesSquared(
                               std::vector< double > const& fieldConfiguration )
   {
     unsigned int rowsTimesLength( 0 );
@@ -64,28 +64,39 @@ namespace VevaciousPlusPlus
          ++rowIndex )
     {
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex )
-      = matrixElements[ rowsTimesLength + rowIndex ]( fieldConfiguration );
+                             rowIndex ).real()
+      = matrixElements[ rowsTimesLength + rowIndex ].first(
+                                                          fieldConfiguration );
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).imag() = 0.0;
       for( unsigned int columnIndex( rowIndex + 1 );
            columnIndex < numberOfRows;
            ++columnIndex )
       {
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex )
-        = matrixElements[ rowsTimesLength + columnIndex ](
+                               columnIndex ).real()
+        = matrixElements[ rowsTimesLength + columnIndex ].first(
+                                                          fieldConfiguration );
+        valuesMatrix.coeffRef( rowIndex,
+                               columnIndex ).imag()
+        = matrixElements[ rowsTimesLength + columnIndex ].second(
                                                           fieldConfiguration );
         valuesMatrix.coeffRef( columnIndex,
-                               rowIndex ) = valuesMatrix.coeff( rowIndex,
-                                                                columnIndex );
+                               rowIndex ).real()
+        = valuesMatrix.coeff( rowIndex,
+                              columnIndex ).real();
+        valuesMatrix.coeffRef( columnIndex,
+                               rowIndex ).imag()
+        = -(valuesMatrix.coeff( rowIndex,
+                                columnIndex ).imag());
       }
       rowsTimesLength += numberOfRows;
     }
-
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
     << "valuesMatrix = " << std::endl
-    << valuesMatrix << std::endl;
+    << valuesMatrix;
     std::cout << std::endl;*/
 
     eigenvalueFinder.compute( valuesMatrix,

@@ -31,14 +31,13 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPotential(),
     runningParameters(),
     dsbFieldValuePolynomials(),
-    dsbFieldValueInputs(),
-    fieldOrigin(),
     renormalizationScaleSquared( NAN ),
     minimumRenormalizationScaleSquared( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
     fermionMasses(),
+    fermionMassSquareds(),
     vectorSquareMasses(),
     vectorMassCorrectionConstant( NAN ),
     polynomialGradient(),
@@ -259,7 +258,8 @@ namespace VevaciousPlusPlus
              lineIndex < elementLines.getSize();
              ++lineIndex )
         {
-          ParseSumOfPolynomialTerms( elementLines[ lineIndex ],
+          ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
+                                                   elementLines[ lineIndex ] ),
                                     massSquaredMatrix.ElementAt( lineIndex ) );
         }
         if( massSquaredMatrix.GetSpinType()
@@ -275,7 +275,7 @@ namespace VevaciousPlusPlus
       //   </RealBosonMassSquaredMatrix>
       //   <WeylFermionMassMatrix>
       else if( elementParser.currentElementNameMatches(
-                                                   "WeylFermionMassMatrix" ) )
+                                                    "WeylFermionMassMatrix" ) )
       {
         elementLines.clearEntries();
         BOL::StringParser::parseByChar(
@@ -294,8 +294,36 @@ namespace VevaciousPlusPlus
              lineIndex < elementLines.getSize();
              ++lineIndex )
         {
-          ParseSumOfPolynomialTerms( elementLines[ lineIndex ],
+          ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
+                                                   elementLines[ lineIndex ] ),
                                  fermionMasses.back().ElementAt( lineIndex ) );
+        }
+      }
+      //   </WeylFermionMassMatrix>
+      //   <ComplexWeylFermionMassSquaredMatrix>
+      else if( elementParser.currentElementNameMatches(
+                                      "ComplexWeylFermionMassSquaredMatrix" ) )
+      {
+        elementLines.clearEntries();
+        BOL::StringParser::parseByChar(
+                               elementParser.getTrimmedCurrentElementContent(),
+                                        elementLines,
+                                        '\n');
+        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
+        {
+          throw std::runtime_error( "Number of elements for"
+            " ComplexWeylFermionMassSquaredMatrix was not a square integer!" );
+        }
+        fermionMassSquareds.push_back( ComplexMassSquaredMatrix( numberOfRows,
+                               elementParser.getCurrentElementAttributes() ) );
+        for( int lineIndex( 0 );
+             lineIndex < elementLines.getSize();
+             ++lineIndex )
+        {
+          ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
+                                                   elementLines[ lineIndex ] ),
+                           fermionMassSquareds.back().ElementAt( lineIndex ) );
         }
       }
       //   </WeylFermionMassMatrix>
@@ -303,7 +331,7 @@ namespace VevaciousPlusPlus
     // </LoopCorrections>
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "end of PotentialFromPolynomialAndMasses::"
     << "PotentialFromPolynomialAndMasses( \"" << modelFilename << "\" )"
@@ -346,6 +374,16 @@ namespace VevaciousPlusPlus
     }
     std::cout << std::endl;
     std::cout << std::endl
+    << "fermionMassSquareds = " << std::endl;
+    for( std::vector< ComplexMassSquaredMatrix >::iterator
+         whichFermion( fermionMassSquareds.begin() );
+         whichFermion < fermionMassSquareds.end();
+         ++whichFermion )
+    {
+      std::cout << whichFermion->AsString();
+    }
+    std::cout << std::endl;
+    std::cout << std::endl
     << "vectorSquareMasses = " << std::endl;
     for( std::vector< RealMassesSquaredMatrix >::iterator
          whichVector( vectorSquareMasses.begin() );
@@ -354,7 +392,7 @@ namespace VevaciousPlusPlus
     {
       std::cout << whichVector->AsString();
     }
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
@@ -367,14 +405,13 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPotential(),
     runningParameters(),
     dsbFieldValuePolynomials(),
-    dsbFieldValueInputs(),
-    fieldOrigin(),
     renormalizationScaleSquared( NAN ),
     minimumRenormalizationScaleSquared( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
     fermionMasses(),
+    fermionMassSquareds(),
     vectorSquareMasses(),
     vectorMassCorrectionConstant( NAN ),
     polynomialGradient(),
@@ -393,6 +430,13 @@ namespace VevaciousPlusPlus
                                               std::string const& stringToParse,
                     std::pair< PolynomialSum, PolynomialSum >& polynomialSums )
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms( \""
+    << stringToParse << "\", ... ) called.";
+    std::cout << std::endl;*/
+
     polynomialSums.first.PolynomialTerms().clear();
     polynomialSums.second.PolynomialTerms().clear();
     if( stringToParse.empty() )
@@ -418,6 +462,15 @@ namespace VevaciousPlusPlus
     {
       polynomialTerm.MultiplyBy( -1.0 );
     }
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Just made initial polynomialTerm, =" << std::endl
+    << polynomialTerm.AsString();
+    std::cout << std::endl;*/
+
+
     bool imaginaryTerm( false );
     wordStart = PutNextNumberOrVariableIntoPolynomial( stringToParse,
                                                        wordStart,
@@ -436,12 +489,12 @@ namespace VevaciousPlusPlus
           ( stringToParse[ wordStart ] == '-' ) )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "imaginaryTerm = " << imaginaryTerm << std::endl
         << "polynomialTerm:"
         << std::endl << polynomialTerm.AsString();
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( polynomialTerm.IsValid() )
         {
@@ -469,12 +522,12 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "imaginaryTerm = " << imaginaryTerm << std::endl
     << "polynomialTerm:"
     << std::endl << polynomialTerm.AsString();
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     if( polynomialTerm.IsValid() )
     {
@@ -501,6 +554,15 @@ namespace VevaciousPlusPlus
                                                PolynomialTerm& polynomialTerm,
                                                           bool& imaginaryTerm )
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::"
+    << "PutNextNumberOrVariableIntoPolynomial( \"" << stringToParse << "\", "
+    << wordStart << ", ..., " << imaginaryTerm << " ) called. stringToParse[ "
+    << wordStart << " ] = \'" << stringToParse[ wordStart ] << "\'";
+    std::cout << std::endl;*/
+
     size_t wordEnd( 0 );
     while( wordStart < stringToParse.size() )
     {
@@ -551,11 +613,12 @@ namespace VevaciousPlusPlus
                                                  ( wordEnd - wordStart ) ) ) );
 
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "multiplied by number: " << stringToParse.substr( wordStart,
-                                                     ( wordEnd - wordStart ) );
-        std::cout << std::endl;/**/
+                                                      ( wordEnd - wordStart ) )
+        << ", returning " << wordEnd;
+        std::cout << std::endl;*/
 
         return wordEnd;
       }
@@ -619,10 +682,11 @@ namespace VevaciousPlusPlus
               ( variableString[ 0 ] == 'J' ) ) )
         {
           // debugging:
-          /**/std::cout << std::endl << "debugging:"
+          /*std::cout << std::endl << "debugging:"
           << std::endl
-          << "power of imaginary unit = " << powerInt;
-          std::cout << std::endl;/**/
+          << "power of imaginary unit = " << powerInt
+          << ", returning " << wordEnd;
+          std::cout << std::endl;*/
 
           if( ( powerInt % 2 ) == 1 )
           {
@@ -647,11 +711,12 @@ namespace VevaciousPlusPlus
                                             powerInt );
 
             // debugging:
-            /**/std::cout << std::endl << "debugging:"
+            /*std::cout << std::endl << "debugging:"
             << std::endl
-            << "multiplied by field[ " << fieldIndex << "] = \""
-            << fieldNames[ fieldIndex ] << "\" to power of " << powerInt;
-            std::cout << std::endl;/**/
+            << "multiplied by field[ " << fieldIndex << " ] = \""
+            << fieldNames[ fieldIndex ] << "\" to power of " << powerInt
+            << ", returning " << wordEnd;
+            std::cout << std::endl;*/
 
             return wordEnd;
           }
@@ -665,7 +730,7 @@ namespace VevaciousPlusPlus
                                    powerInt );
 
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "multiplied by functionoid ";
         ParameterFunctionoid* multiplyingFunctionoid(
@@ -678,8 +743,9 @@ namespace VevaciousPlusPlus
         {
           std::cout << multiplyingFunctionoid->AsString();
         }
-        std::cout << " to power of " << powerInt;
-        std::cout << std::endl;/**/
+        std::cout << " to power of " << powerInt
+        << ", returning " << wordEnd;
+        std::cout << std::endl;*/
 
         return wordEnd;
       }
@@ -711,6 +777,13 @@ namespace VevaciousPlusPlus
     double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
 
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::ScalarBosonCorrections(...)";
+    std::cout << std::endl;/**/
+
+
     for( std::vector< RealMassesSquaredMatrix >::iterator
          scalarSet( scalarSquareMasses.begin() );
          scalarSet < scalarSquareMasses.end();
@@ -720,16 +793,23 @@ namespace VevaciousPlusPlus
       currentThermalCorrection = 0.0;
       std::vector< double > const&
       massesSquared( scalarSet->MassesSquared( fieldConfiguration ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "massesSquared.size() =" << massesSquared.size();
+      std::cout << std::endl;/**/
+
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );
            massSquared < massesSquared.end();
            ++massSquared )
       {
         // debugging:
-        /*std::cout << std::endl << "debugging:"
+        /**/std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;*/
+        std::cout << std::endl;/**/
 
         if( abs( *massSquared ) > 1.0 )
         {
@@ -800,6 +880,12 @@ namespace VevaciousPlusPlus
     double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
 
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::WeylFermionCorrections(...)";
+    std::cout << std::endl;/**/
+
     for( std::vector< ComplexMassMatrix >::iterator
          fermionSet( fermionMasses.begin() );
          fermionSet < fermionMasses.end();
@@ -809,16 +895,85 @@ namespace VevaciousPlusPlus
       currentThermalCorrection = 0.0;
       std::vector< double > const&
       massesSquared( fermionSet->MassesSquared( fieldConfiguration ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "(ComplexMassMatrix) massesSquared.size() =" << massesSquared.size();
+      std::cout << std::endl;/**/
+
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );
            massSquared < massesSquared.end();
            ++massSquared )
       {
         // debugging:
-        /*std::cout << std::endl << "debugging:"
+        /**/std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;*/
+        std::cout << std::endl;/**/
+
+        if( abs( *massSquared ) > 1.0 )
+        {
+          currentQuantumCorrection += ( (*massSquared) * (*massSquared)
+                                        * ( log( abs( *massSquared )
+                                               / renormalizationScaleSquared )
+                                          - 1.5 ) );
+
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "currentQuantumCorrection = " << currentQuantumCorrection;
+          std::cout << std::endl;*/
+        }
+        if( inverseTemperatureSquared > 1.0 )
+        {
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "*massSquared = " << *massSquared << ", temperatureFourthed = "
+          << temperatureFourthed
+          << ", ( (*massSquared) * inverseTemperatureSquared ) = "
+          << ( (*massSquared) * inverseTemperatureSquared );
+          std::cout << std::endl;*/
+
+          currentThermalCorrection += fermionThermalFunction( (*massSquared)
+                                                 * inverseTemperatureSquared );
+        }
+      }
+      totalQuantumCorrection += ( fermionSet->MultiplicityFactor()
+                                  * currentQuantumCorrection );
+      totalThermalCorrection += ( fermionSet->MultiplicityFactor()
+                                  * currentThermalCorrection );
+    }
+
+    for( std::vector< ComplexMassSquaredMatrix >::iterator
+         fermionSet( fermionMassSquareds.begin() );
+         fermionSet < fermionMassSquareds.end();
+         ++fermionSet )
+    {
+      currentQuantumCorrection = 0.0;
+      currentThermalCorrection = 0.0;
+      std::vector< double > const&
+      massesSquared( fermionSet->MassesSquared( fieldConfiguration ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "(ComplexMassSquaredMatrix) massesSquared.size() ="
+      << massesSquared.size();
+      std::cout << std::endl;/**/
+
+      for( std::vector< double >::const_iterator
+           massSquared( massesSquared.begin() );
+           massSquared < massesSquared.end();
+           ++massSquared )
+      {
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "*massSquared = " << *massSquared;
+        std::cout << std::endl;/**/
 
         if( abs( *massSquared ) > 1.0 )
         {
@@ -899,6 +1054,12 @@ namespace VevaciousPlusPlus
     double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
 
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::GaugeBosonCorrections(...)";
+    std::cout << std::endl;/**/
+
     for( std::vector< RealMassesSquaredMatrix >::iterator
          vectorSet( vectorSquareMasses.begin() );
          vectorSet < vectorSquareMasses.end();
@@ -908,16 +1069,24 @@ namespace VevaciousPlusPlus
       currentThermalCorrection = 0.0;
       std::vector< double > const&
       massesSquared( vectorSet->MassesSquared( fieldConfiguration ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "massesSquared.size() ="
+      << massesSquared.size();
+      std::cout << std::endl;/**/
+
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );
            massSquared < massesSquared.end();
            ++massSquared )
       {
         // debugging:
-        /*std::cout << std::endl << "debugging:"
+        /**/std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;*/
+        std::cout << std::endl;/**/
 
         if( abs( *massSquared ) > 1.0 )
         {

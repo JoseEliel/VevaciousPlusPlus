@@ -108,13 +108,13 @@ namespace VevaciousPlusPlus
     valuesSquaredMatrix *= valuesMatrix;
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "valuesMatrix = " << std::endl
     << valuesMatrix << std::endl
     << "valuesSquaredMatrix = " << std::endl
     << valuesSquaredMatrix;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     eigenvalueFinder.compute( valuesSquaredMatrix,
                               Eigen::EigenvaluesOnly );
@@ -127,7 +127,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "massesSquared = {" << std::endl;
     for( unsigned int whichIndex( 0 );
@@ -136,7 +136,7 @@ namespace VevaciousPlusPlus
     {
       std::cout << " " << massesSquared[ whichIndex ];
     }
-    std::cout << " }" << std::endl;/**/
+    std::cout << " }" << std::endl;*/
 
     return massesSquared;
   }

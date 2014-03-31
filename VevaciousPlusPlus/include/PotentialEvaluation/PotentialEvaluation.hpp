@@ -10,6 +10,7 @@
 
 #include "BinaryOperationFunctionoid.hpp"
 #include "ComplexMassMatrix.hpp"
+#include "ComplexMassSquaredMatrix.hpp"
 #include "ConstantFunctionoid.hpp"
 #include "FixedScaleOneLoopPotential.hpp"
 #include "HomotopyContinuationReadyPotential.hpp"
