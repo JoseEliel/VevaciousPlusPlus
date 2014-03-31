@@ -173,6 +173,29 @@ namespace VevaciousPlusPlus
     }
     double const temperatureFourthed( temperatureValue * temperatureValue
                                       * temperatureValue * temperatureValue );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "tree = " << treeLevelPotential( fieldConfiguration )
+    << std::endl
+    << "polynomial corrections = "
+    << polynomialLoopCorrections( fieldConfiguration )
+    << std::endl
+    << "1-loop = " << ( treeLevelPotential( fieldConfiguration )
+        + polynomialLoopCorrections( fieldConfiguration )
+        + ScalarBosonCorrections( fieldConfiguration,
+                                  inverseTemperatureSquared,
+                                  temperatureFourthed )
+        + WeylFermionCorrections( fieldConfiguration,
+                                  inverseTemperatureSquared,
+                                  temperatureFourthed )
+        + GaugeBosonCorrections( fieldConfiguration,
+                                 inverseTemperatureSquared,
+                                 temperatureFourthed ) );
+    std::cout << std::endl;*/
+
+
     return ( treeLevelPotential( fieldConfiguration )
              + polynomialLoopCorrections( fieldConfiguration )
              + ScalarBosonCorrections( fieldConfiguration,

@@ -778,10 +778,10 @@ namespace VevaciousPlusPlus
     double currentThermalCorrection( 0.0 );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PotentialFromPolynomialAndMasses::ScalarBosonCorrections(...)";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
 
     for( std::vector< RealMassesSquaredMatrix >::iterator
@@ -795,10 +795,10 @@ namespace VevaciousPlusPlus
       massesSquared( scalarSet->MassesSquared( fieldConfiguration ) );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "massesSquared.size() =" << massesSquared.size();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );
@@ -806,17 +806,17 @@ namespace VevaciousPlusPlus
            ++massSquared )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( abs( *massSquared ) > 1.0 )
         {
           currentQuantumCorrection += ( (*massSquared) * (*massSquared)
-                                      * ( log( abs( *massSquared )
-                                               / renormalizationScaleSquared )
-                                          - 1.5 ) );
+                                        * ( log( abs( *massSquared )
+                                                / renormalizationScaleSquared )
+                                            - 1.5 ) );
 
           // debugging:
           /*std::cout << std::endl << "debugging:"
@@ -881,10 +881,10 @@ namespace VevaciousPlusPlus
     double currentThermalCorrection( 0.0 );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PotentialFromPolynomialAndMasses::WeylFermionCorrections(...)";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     for( std::vector< ComplexMassMatrix >::iterator
          fermionSet( fermionMasses.begin() );
@@ -897,10 +897,10 @@ namespace VevaciousPlusPlus
       massesSquared( fermionSet->MassesSquared( fieldConfiguration ) );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "(ComplexMassMatrix) massesSquared.size() =" << massesSquared.size();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );
@@ -908,16 +908,16 @@ namespace VevaciousPlusPlus
            ++massSquared )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( abs( *massSquared ) > 1.0 )
         {
           currentQuantumCorrection += ( (*massSquared) * (*massSquared)
                                         * ( log( abs( *massSquared )
-                                               / renormalizationScaleSquared )
+                                                / renormalizationScaleSquared )
                                           - 1.5 ) );
 
           // debugging:
@@ -958,11 +958,11 @@ namespace VevaciousPlusPlus
       massesSquared( fermionSet->MassesSquared( fieldConfiguration ) );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "(ComplexMassSquaredMatrix) massesSquared.size() ="
       << massesSquared.size();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );
@@ -970,17 +970,17 @@ namespace VevaciousPlusPlus
            ++massSquared )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( abs( *massSquared ) > 1.0 )
         {
           currentQuantumCorrection += ( (*massSquared) * (*massSquared)
                                         * ( log( abs( *massSquared )
-                                               / renormalizationScaleSquared )
-                                          - 1.5 ) );
+                                                / renormalizationScaleSquared )
+                                            - 1.5 ) );
 
           // debugging:
           /*std::cout << std::endl << "debugging:"
@@ -1055,10 +1055,10 @@ namespace VevaciousPlusPlus
     double currentThermalCorrection( 0.0 );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PotentialFromPolynomialAndMasses::GaugeBosonCorrections(...)";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     for( std::vector< RealMassesSquaredMatrix >::iterator
          vectorSet( vectorSquareMasses.begin() );
@@ -1071,7 +1071,7 @@ namespace VevaciousPlusPlus
       massesSquared( vectorSet->MassesSquared( fieldConfiguration ) );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "massesSquared.size() ="
       << massesSquared.size();
@@ -1083,10 +1083,10 @@ namespace VevaciousPlusPlus
            ++massSquared )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "*massSquared = " << *massSquared;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( abs( *massSquared ) > 1.0 )
         {

@@ -95,6 +95,22 @@ int main( int argumentCount,
   }
   rgeImprovedPotential.UpdateParameters( slhaFile );
   fixedScalePotential.UpdateParameters( slhaFile );
+
+  std::cout
+  << "Fixed-scale at origin = "
+  << fixedScalePotential( fixedScalePotential.FieldValuesOrigin() )
+  << std::endl;
+  std::cout
+  << "Fixed-scale at DSB = "
+  << fixedScalePotential( fixedScalePotential.DsbFieldValues() )
+  << std::endl;
+
+  std::cout
+  << std::endl
+  << "------" << std::endl << std::endl;
+  std::cout << std::endl;
+
+
   std::cout << "For { ";
   for( unsigned int fieldIndex( 0 );
        fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
