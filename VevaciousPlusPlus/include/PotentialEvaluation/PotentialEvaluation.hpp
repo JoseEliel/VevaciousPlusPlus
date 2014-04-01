@@ -9,7 +9,6 @@
 #define POTENTIALEVALUATION_HPP_
 
 #include "BinaryOperationFunctionoid.hpp"
-#include "ComplexMassMatrix.hpp"
 #include "ComplexMassSquaredMatrix.hpp"
 #include "ConstantFunctionoid.hpp"
 #include "FixedScaleOneLoopPotential.hpp"
@@ -23,6 +22,7 @@
 #include "RgeImprovedOneLoopPotential.hpp"
 #include "RunningParameterManager.hpp"
 #include "SlhaFunctionoid.hpp"
+#include "SymmetricComplexMassMatrix.hpp"
 #include "ThermalFunctions.hpp"
 #include "UnaryOperationFunctionoid.hpp"
 

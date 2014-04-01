@@ -296,6 +296,14 @@
     y[ 3, 3 ] * phi + J * IMYU[ 3, 3 ] * phi
     0.0
   </WeylFermionMassMatrix>
+
+  <ComplexWeylFermionMassSquaredMatrix
+   SpinType="WeylFermion" MultiplicityFactor="3" >
+    y[ 2, 2 ] * phi + i * IMYU[ 2, 2 ] * phi
+    y[ 2, 3 ] * phi + I * IMYU[ 2, 3 ] * phi
+    y[ 3, 2 ] * phi + j * IMYU[ 3, 2 ] * phi
+    y[ 3, 3 ] * phi + J * IMYU[ 3, 3 ] * phi
+  </ComplexWeylFermionMassSquaredMatrix>
   
   <RealBosonMassSquaredMatrix SpinType="GaugeBoson" MultiplicityFactor="1" >
     Sqrt2^2 * 0.25 * g[1]^2 * phi^2

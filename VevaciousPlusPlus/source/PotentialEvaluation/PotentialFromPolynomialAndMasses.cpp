@@ -288,7 +288,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                           " WeylFermionMassMatrix was not a square integer!" );
         }
-        fermionMasses.push_back( ComplexMassMatrix( numberOfRows,
+        fermionMasses.push_back( SymmetricComplexMassMatrix( numberOfRows,
                                elementParser.getCurrentElementAttributes() ) );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -365,7 +365,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
     std::cout << std::endl
     << "fermionMasses = " << std::endl;
-    for( std::vector< ComplexMassMatrix >::iterator
+    for( std::vector< SymmetricComplexMassMatrix >::iterator
          whichFermion( fermionMasses.begin() );
          whichFermion < fermionMasses.end();
          ++whichFermion )
@@ -886,7 +886,7 @@ namespace VevaciousPlusPlus
     << "PotentialFromPolynomialAndMasses::WeylFermionCorrections(...)";
     std::cout << std::endl;*/
 
-    for( std::vector< ComplexMassMatrix >::iterator
+    for( std::vector< SymmetricComplexMassMatrix >::iterator
          fermionSet( fermionMasses.begin() );
          fermionSet < fermionMasses.end();
          ++fermionSet )
@@ -899,7 +899,7 @@ namespace VevaciousPlusPlus
       // debugging:
       /*std::cout << std::endl << "debugging:"
       << std::endl
-      << "(ComplexMassMatrix) massesSquared.size() =" << massesSquared.size();
+      << "(SymmetricComplexMassMatrix) massesSquared.size() =" << massesSquared.size();
       std::cout << std::endl;*/
 
       for( std::vector< double >::const_iterator
@@ -1075,7 +1075,7 @@ namespace VevaciousPlusPlus
       << std::endl
       << "massesSquared.size() ="
       << massesSquared.size();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       for( std::vector< double >::const_iterator
            massSquared( massesSquared.begin() );

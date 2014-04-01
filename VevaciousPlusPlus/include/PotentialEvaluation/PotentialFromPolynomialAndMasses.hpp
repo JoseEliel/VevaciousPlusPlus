@@ -13,7 +13,7 @@
 #include "PolynomialTerm.hpp"
 #include "PolynomialSum.hpp"
 #include "RealMassesSquaredMatrix.hpp"
-#include "ComplexMassMatrix.hpp"
+#include "SymmetricComplexMassMatrix.hpp"
 #include "ComplexMassSquaredMatrix.hpp"
 #include "MassesSquaredFromPolynomials.hpp"
 #include "RunningParameterManager.hpp"
@@ -51,7 +51,7 @@ namespace VevaciousPlusPlus
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
     std::vector< RealMassesSquaredMatrix > scalarSquareMasses;
-    std::vector< ComplexMassMatrix > fermionMasses;
+    std::vector< SymmetricComplexMassMatrix > fermionMasses;
     std::vector< ComplexMassSquaredMatrix > fermionMassSquareds;
     std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
     double vectorMassCorrectionConstant;

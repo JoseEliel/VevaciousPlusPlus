@@ -27,7 +27,6 @@ CCFLAGS=-Wall -O3 $(DEBUGFLAGS) -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
- source/PotentialEvaluation/ComplexMassMatrix.cpp \
  source/PotentialEvaluation/ComplexMassSquaredMatrix.cpp \
  source/PotentialEvaluation/ConstantFunctionoid.cpp \
  source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
@@ -43,6 +42,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaFunctionoid.cpp \
+ source/PotentialEvaluation/SymmetricComplexMassMatrix.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \

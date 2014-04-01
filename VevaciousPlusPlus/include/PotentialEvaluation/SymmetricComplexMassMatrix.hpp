@@ -1,5 +1,5 @@
 /*
- * ComplexMassMatrix.hpp
+ * SymmetricComplexMassMatrix.hpp
  *
  *  Created on: Mar 10, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
@@ -17,15 +17,15 @@
 namespace VevaciousPlusPlus
 {
 
-  class ComplexMassMatrix : public MassesSquaredFromPolynomials
+  class SymmetricComplexMassMatrix : public MassesSquaredFromPolynomials
   {
   public:
-    ComplexMassMatrix( unsigned int const numberOfElements,
+    SymmetricComplexMassMatrix( unsigned int const numberOfElements,
                     std::map< std::string, std::string > const& attributeMap );
-    ComplexMassMatrix( ComplexMassMatrix const& copySource );
-    ComplexMassMatrix();
+    SymmetricComplexMassMatrix( SymmetricComplexMassMatrix const& copySource );
+    SymmetricComplexMassMatrix();
     virtual
-    ~ComplexMassMatrix();
+    ~SymmetricComplexMassMatrix();
 
 
     // This returns the eigenvalues of the square of the matrix.
@@ -52,7 +52,7 @@ namespace VevaciousPlusPlus
 
 
   // This is mainly for debugging:
-  inline std::string ComplexMassMatrix::AsString() const
+  inline std::string SymmetricComplexMassMatrix::AsString() const
   {
     std::stringstream returnStream;
     returnStream

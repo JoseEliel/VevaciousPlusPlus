@@ -63,14 +63,8 @@ namespace VevaciousPlusPlus
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).real()
-      = matrixElements[ rowsTimesLength + rowIndex ].first(
-                                                          fieldConfiguration );
-      valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).imag() = 0.0;
-      for( unsigned int columnIndex( rowIndex + 1 );
-           columnIndex < numberOfRows;
+      for( unsigned int columnIndex( 0 );
+           columnIndex < rowIndex;
            ++columnIndex )
       {
         valuesMatrix.coeffRef( rowIndex,
@@ -81,6 +75,10 @@ namespace VevaciousPlusPlus
                                columnIndex ).imag()
         = matrixElements[ rowsTimesLength + columnIndex ].second(
                                                           fieldConfiguration );
+        // The Eigen routines don't bother looking at elements of valuesMatrix
+        // where columnIndex > rowIndex, so we don't even bother filling them
+        // with the conjugates of the transpose.
+        /*
         valuesMatrix.coeffRef( columnIndex,
                                rowIndex ).real()
         = valuesMatrix.coeff( rowIndex,
@@ -89,15 +87,16 @@ namespace VevaciousPlusPlus
                                rowIndex ).imag()
         = -(valuesMatrix.coeff( rowIndex,
                                 columnIndex ).imag());
+        */
       }
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).real()
+      = matrixElements[ rowsTimesLength + rowIndex ].first(
+                                                          fieldConfiguration );
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).imag() = 0.0;
       rowsTimesLength += numberOfRows;
     }
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "valuesMatrix = " << std::endl
-    << valuesMatrix;
-    std::cout << std::endl;*/
 
     eigenvalueFinder.compute( valuesMatrix,
                               Eigen::EigenvaluesOnly );
@@ -112,14 +111,55 @@ namespace VevaciousPlusPlus
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
-    << "massesSquared = {" << std::endl;
-    for( unsigned int whichIndex( 0 );
-         whichIndex < numberOfRows;
-         ++whichIndex )
+    << "making extra matrices!";
+    std::cout << std::endl;
+    Eigen::MatrixXcd zeroRowLessThanColumn( valuesMatrix );
+    Eigen::MatrixXcd zeroColumnLessThanRow( valuesMatrix );
+    for( unsigned int rowIndex( 0 );
+         rowIndex < numberOfRows;
+         ++rowIndex )
     {
-      std::cout << " " << massesSquared[ whichIndex ];
+      for( unsigned int columnIndex( rowIndex + 1 );
+           columnIndex < numberOfRows;
+           ++columnIndex )
+      {
+        zeroRowLessThanColumn.coeffRef( rowIndex,
+                                        columnIndex ).real() = 0.0;
+        zeroRowLessThanColumn.coeffRef( rowIndex,
+                                        columnIndex ).imag() = 0.0;
+        zeroColumnLessThanRow.coeffRef( columnIndex,
+                                        rowIndex ).real() = 0.0;
+        zeroColumnLessThanRow.coeffRef( columnIndex,
+                                        rowIndex ).imag() = 0.0;
+      }
     }
-    std::cout << " }" << std::endl;*/
+    std::cout << std::endl;
+    std::cout
+    << "valuesMatrix = " << std::endl
+    << valuesMatrix << std::endl
+    << "zeroRowLessThanColumn = " << std::endl
+    << zeroRowLessThanColumn << std::endl
+    << "zeroColumnLessThanRow = " << std::endl
+    << zeroColumnLessThanRow << std::endl;
+    std::cout << std::endl;
+    std::cout
+    << "valuesMatrix = " << std::endl
+    << valuesMatrix << std::endl
+    << "valuesMatrix eigenvalues = " << std::endl
+    << eigenvalueFinder.eigenvalues() << std::endl;
+    eigenvalueFinder.compute( zeroRowLessThanColumn,
+                              Eigen::EigenvaluesOnly );
+    std::cout << std::endl;
+    std::cout
+    << "zeroRowLessThanColumn eigenvalues = " << std::endl
+    << eigenvalueFinder.eigenvalues() << std::endl;
+    eigenvalueFinder.compute( zeroColumnLessThanRow,
+                              Eigen::EigenvaluesOnly );
+    std::cout << std::endl;
+    std::cout
+    << "zeroColumnLessThanRow eigenvalues = " << std::endl
+    << eigenvalueFinder.eigenvalues() << std::endl;
+    std::cout << std::endl;*/
 
     return massesSquared;
   }
