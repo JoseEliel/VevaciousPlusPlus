@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/PotentialEvaluation/PotentialFunction.hpp"
+#include "../../include/VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {

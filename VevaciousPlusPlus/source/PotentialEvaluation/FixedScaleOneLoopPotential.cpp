@@ -66,7 +66,7 @@ namespace VevaciousPlusPlus
   // renormalization scale, and then also a polynomial relating the logarithm
   // of the renormalization scale to minimumRenormalizationScaleSquared and
   // the field values is also prepared.
-  void FixedScaleOneLoopPotential::PrepareHomotopyContinuationPolynomials()
+  void FixedScaleOneLoopPotential::PreparePolynomialHomotopyContinuation()
   {
     // placeholder:
     /**/std::cout << std::endl

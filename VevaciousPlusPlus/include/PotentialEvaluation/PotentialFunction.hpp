@@ -21,7 +21,9 @@ namespace VevaciousPlusPlus
     ~PotentialFunction();
 
 
-    unsigned int NumberOfFieldVariables() const;
+    unsigned int NumberOfFieldVariables() const
+    { return numberOfFields; }
+
     std::string const& FieldName( unsigned int const fieldIndex) const
     { return fieldNames[ fieldIndex ]; }
 
@@ -73,11 +75,6 @@ namespace VevaciousPlusPlus
 
 
 
-
-  inline unsigned int PotentialFunction::NumberOfFieldVariables() const
-  {
-    return numberOfFields;
-  }
 
   inline double PotentialFunction::QuickApproximation(
                                std::vector< double > const& fieldConfiguration,

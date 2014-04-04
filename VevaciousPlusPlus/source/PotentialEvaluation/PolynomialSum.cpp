@@ -16,6 +16,12 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
+  PolynomialSum::PolynomialSum( PolynomialSum const& copySource ) :
+    polynomialTerms( copySource.polynomialTerms )
+  {
+    // This constructor is just an initialization list.
+  }
+
   PolynomialSum::~PolynomialSum()
   {
     // This does nothing.

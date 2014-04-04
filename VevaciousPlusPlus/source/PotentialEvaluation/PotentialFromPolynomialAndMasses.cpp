@@ -28,7 +28,7 @@ namespace VevaciousPlusPlus
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                                            std::string const& modelFilename ) :
-    HomotopyContinuationReadyPotential(),
+    HomotopyContinuationReadyPolynomial(),
     runningParameters(),
     dsbFieldValuePolynomials(),
     renormalizationScaleSquared( NAN ),
@@ -39,10 +39,7 @@ namespace VevaciousPlusPlus
     fermionMasses(),
     fermionMassSquareds(),
     vectorSquareMasses(),
-    vectorMassCorrectionConstant( NAN ),
-    polynomialGradient(),
-    polynomialHessian(),
-    scaleSlopeOfGradient()
+    vectorMassCorrectionConstant( NAN )
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -83,12 +80,17 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                     elementLines,
                                     '\n');
+    std::string readFieldName( "" );
     for( int lineIndex( 0 );
          lineIndex < elementLines.getSize();
          ++lineIndex )
     {
-      fieldNames.push_back( BOL::StringParser::trimFromFrontAndBack(
+      readFieldName.assign( BOL::StringParser::trimFromFrontAndBack(
                                FormatVariable( elementLines[ lineIndex ] ) ) );
+      if( !(readFieldName.empty()) )
+      {
+        fieldNames.push_back( readFieldName );
+      }
     }
     numberOfFields = fieldNames.size();
     dsbFieldValuePolynomials.resize( numberOfFields );
@@ -402,7 +404,7 @@ namespace VevaciousPlusPlus
 
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses() :
-    HomotopyContinuationReadyPotential(),
+    HomotopyContinuationReadyPolynomial(),
     runningParameters(),
     dsbFieldValuePolynomials(),
     renormalizationScaleSquared( NAN ),
@@ -413,10 +415,7 @@ namespace VevaciousPlusPlus
     fermionMasses(),
     fermionMassSquareds(),
     vectorSquareMasses(),
-    vectorMassCorrectionConstant( NAN ),
-    polynomialGradient(),
-    polynomialHessian(),
-    scaleSlopeOfGradient()
+    vectorMassCorrectionConstant( NAN )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own

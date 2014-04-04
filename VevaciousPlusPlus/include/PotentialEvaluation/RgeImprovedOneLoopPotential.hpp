@@ -73,7 +73,11 @@ namespace VevaciousPlusPlus
     // renormalization scale, and then also a polynomial relating the logarithm
     // of the renormalization scale to minimumRenormalizationScaleSquared and
     // the field values is also prepared.
-    virtual void PrepareHomotopyContinuationPolynomials();
+    virtual void PreparePolynomialHomotopyContinuation();
+
+    // This should prepare homotopyContinuationPotentialPolynomial
+    // appropriately.
+    virtual void PrepareHomotopyContinuationPotentialPolynomial() = 0;
   };
 
 
@@ -158,6 +162,27 @@ namespace VevaciousPlusPlus
     }
     runningParameters.UpdateRunningParameters(
                                          sqrt( renormalizationScaleSquared ) );
+  }
+
+  // This fills polynomialGradient, homotopyContinuationStartSystem, and
+  // polynomialHessian appropriately.
+  inline void
+  RgeImprovedOneLoopPotential::PreparePolynomialHomotopyContinuation()
+  {
+    PrepareHomotopyContinuationPotentialPolynomial();
+    PrepareHomotopyContinuationGradient();
+    // Now we add in the constraint on the log of the renormalization scale.
+    PolynomialSum scaleConstraint;
+    std::vector< PolynomialTerm >&
+    constraintTerms( scaleConstraint.PolynomialTerms() );
+    PolynomialTerm constraintTerm;
+    constraintTerm.RaiseFieldPower( numberOfFields,
+                                    2 );
+    constraintTerms.push_back( constraintTerm );
+    polynomialGradient.push_back( scaleConstraint );
+    PrepareHomotopyContinuationHessian();
+    PrepareHomotopyContinuationStartSystem();
+    PrepareHomotopyContinuationStartValues();
   }
 
 } /* namespace VevaciousPlusPlus */

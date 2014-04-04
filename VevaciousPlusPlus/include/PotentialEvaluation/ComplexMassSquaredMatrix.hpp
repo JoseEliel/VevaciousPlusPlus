@@ -11,7 +11,6 @@
 #include "../StandardIncludes.hpp"
 #include "MassesSquaredFromPolynomials.hpp"
 #include "PolynomialSum.hpp"
-#include <complex>
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
@@ -63,8 +62,8 @@ namespace VevaciousPlusPlus
          ++whichPair )
     {
       returnStream
-      << std::endl << "real:" << std::endl << whichPair->first.AsString()
-      << std::endl << "imag:" << std::endl << whichPair->second.AsString()
+      << std::endl << "real:" << std::endl << whichPair->first.AsDebuggingString()
+      << std::endl << "imag:" << std::endl << whichPair->second.AsDebuggingString()
       << std::endl;
     }
     returnStream

@@ -9,7 +9,7 @@
 #define POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "HomotopyContinuationReadyPotential.hpp"
+#include "HomotopyContinuationReadyPolynomial.hpp"
 #include "PolynomialTerm.hpp"
 #include "PolynomialSum.hpp"
 #include "RealMassesSquaredMatrix.hpp"
@@ -22,7 +22,7 @@
 namespace VevaciousPlusPlus
 {
   class PotentialFromPolynomialAndMasses :
-                                      public HomotopyContinuationReadyPotential
+                                     public HomotopyContinuationReadyPolynomial
   {
   public:
     PotentialFromPolynomialAndMasses( std::string const& modelFilename );
@@ -55,9 +55,6 @@ namespace VevaciousPlusPlus
     std::vector< ComplexMassSquaredMatrix > fermionMassSquareds;
     std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
     double vectorMassCorrectionConstant;
-    std::vector< PolynomialSum > polynomialGradient;
-    std::vector< std::vector< PolynomialSum > > polynomialHessian;
-    std::vector< PolynomialSum > scaleSlopeOfGradient;
 
 
     PotentialFromPolynomialAndMasses();
@@ -139,9 +136,10 @@ namespace VevaciousPlusPlus
     { return
       ThermalFunctions::FermionicJ( massSquaredOverTemperatureSquared ); }
 
-    // This should prepare a system of polynomials for the homotopy
-    // continuation based on the current SLHA input data.
-    virtual void PrepareHomotopyContinuationPolynomials() = 0;
+    // This sets homotopyContinuationPotentialPolynomial to be a copy of
+    // treeLevelPotential.
+    virtual void PrepareHomotopyContinuationPotentialPolynomial()
+    { homotopyContinuationPotentialPolynomial = treeLevelPotential; }
   };
 
 
@@ -154,9 +152,10 @@ namespace VevaciousPlusPlus
                                               std::string const& slhaFilename )
   {
     runningParameters.UpdateSlhaParameters( slhaFilename );
-    PrepareHomotopyContinuationPolynomials();
+    PreparePolynomialHomotopyContinuation();
     EvaluateDsbInputAndSetScale();
   }
+
 
   // This evaluates the one-loop potential with thermal corrections assuming
   // that the scale has been set correctly.

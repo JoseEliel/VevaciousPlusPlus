@@ -30,6 +30,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/ComplexMassSquaredMatrix.cpp \
  source/PotentialEvaluation/ConstantFunctionoid.cpp \
  source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
+ source/PotentialEvaluation/HomotopyContinuationReadyPolynomial.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/MassesSquaredFromPolynomials.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
@@ -37,6 +38,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
+ source/PotentialEvaluation/ProductOfPolynomialSums.cpp \
  source/PotentialEvaluation/RealMassesSquaredMatrix.cpp \
  source/PotentialEvaluation/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \

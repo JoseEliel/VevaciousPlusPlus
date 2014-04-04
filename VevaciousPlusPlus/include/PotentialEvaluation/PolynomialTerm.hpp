@@ -27,6 +27,11 @@ namespace VevaciousPlusPlus
     // values from the functionoids.
     double operator()( std::vector< double > const& fieldConfiguration ) const;
 
+    // This multiplies the relevant field values with the coefficient and the
+    // values from the functionoids.
+    std::complex< double > operator()(
+       std::vector< std::complex< double > > const& fieldConfiguration ) const;
+
     // This returns a flag that can be false if the coefficient got multiplied
     // by a NULL functionoid.
     bool IsValid() const { return isValid; }
@@ -54,6 +59,9 @@ namespace VevaciousPlusPlus
     // This returns a PolynomialTerm that is the partial derivative with
     // respect to the field with index fieldIndex.
     PolynomialTerm PartialDerivative( unsigned int const fieldIndex ) const;
+
+    // This returns the sum of the powers of the fields.
+    unsigned int FieldPower() const{ return fieldProductByIndex.size(); }
 
     // This removes any scale dependence from this PolynomialTerm, so its
     // coefficient will remain fixed unless it is multiplied by more
@@ -88,6 +96,30 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnValue( coefficientConstant );
+    for( std::vector< unsigned int >::const_iterator
+         whichField( fieldProductByIndex.begin() );
+         whichField < fieldProductByIndex.end();
+         ++whichField )
+    {
+      returnValue *= fieldConfiguration[ *whichField ];
+    }
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         whichFunctionoid( functionoidProduct.begin() );
+         whichFunctionoid < functionoidProduct.end();
+         ++whichFunctionoid )
+    {
+      returnValue *= (*(*whichFunctionoid))();
+    }
+    return returnValue;
+  }
+
+  // This multiplies the relevant field values with the coefficient and the
+  // values from the functionoids.
+  inline std::complex< double > PolynomialTerm::operator()(
+        std::vector< std::complex< double > > const& fieldConfiguration ) const
+  {
+    std::complex< double > returnValue( coefficientConstant,
+                                        0.0 );
     for( std::vector< unsigned int >::const_iterator
          whichField( fieldProductByIndex.begin() );
          whichField < fieldProductByIndex.end();

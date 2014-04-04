@@ -17,6 +17,7 @@ namespace VevaciousPlusPlus
   {
   public:
     PolynomialSum();
+    PolynomialSum( PolynomialSum const& copySource );
     virtual
     ~PolynomialSum();
 
@@ -24,10 +25,18 @@ namespace VevaciousPlusPlus
     // This evaluates the sum of polynomial terms for the given field values.
     double operator()( std::vector< double > const& fieldConfiguration ) const;
 
+    // This evaluates the sum of polynomial terms for the given field values.
+    std::complex< double > operator()(
+       std::vector< std::complex< double > > const& fieldConfiguration ) const;
+
     std::vector< PolynomialTerm >& PolynomialTerms(){ return polynomialTerms; }
 
+    // This returns the highest sum of field exponents of all the terms in
+    // polynomialTerms.
+    unsigned int HighestFieldPower() const;
+
     // This is mainly for debugging:
-    std::string AsString() const;
+    std::string AsDebuggingString() const;
 
   protected:
     std::vector< PolynomialTerm > polynomialTerms;
@@ -51,8 +60,42 @@ namespace VevaciousPlusPlus
     return returnValue;
   }
 
+  // This evaluates the sum of polynomial terms for the given field values.
+  inline std::complex< double > PolynomialSum::operator()(
+        std::vector< std::complex< double > > const& fieldConfiguration ) const
+  {
+    std::complex< double > returnValue( 0.0,
+                                        0.0 );
+    for( std::vector< PolynomialTerm >::const_iterator
+         whichTerm( polynomialTerms.begin() );
+         whichTerm < polynomialTerms.end();
+         ++whichTerm )
+    {
+      returnValue += (*whichTerm)( fieldConfiguration );
+    }
+    return returnValue;
+  }
+
+  // This returns the highest sum of field exponents of all the terms in
+  // polynomialTerms.
+  inline unsigned int PolynomialSum::HighestFieldPower() const
+  {
+    unsigned int highestPower( 0 );
+    for( std::vector< PolynomialTerm >::const_iterator
+         whichTerm( polynomialTerms.begin() );
+         whichTerm < polynomialTerms.end();
+         ++whichTerm )
+    {
+      if( whichTerm->FieldPower() > highestPower )
+      {
+        highestPower = whichTerm->FieldPower();
+      }
+    }
+    return highestPower;
+  }
+
   // This is mainly for debugging:
-  inline std::string PolynomialSum::AsString() const
+  inline std::string PolynomialSum::AsDebuggingString() const
   {
     std::stringstream returnStream;
     returnStream << "PolynomialSum =" << std::endl;
