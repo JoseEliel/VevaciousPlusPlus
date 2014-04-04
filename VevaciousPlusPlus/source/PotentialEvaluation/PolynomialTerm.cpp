@@ -14,6 +14,7 @@ namespace VevaciousPlusPlus
     isValid( true ),
     coefficientConstant( 1.0 ),
     fieldProductByIndex(),
+    fieldPowersByIndex(),
     functionoidProduct()
   {
     // This constructor is just an initialization list.
@@ -23,6 +24,7 @@ namespace VevaciousPlusPlus
     isValid( copySource.isValid ),
     coefficientConstant( copySource.coefficientConstant ),
     fieldProductByIndex( copySource.fieldProductByIndex ),
+    fieldPowersByIndex( copySource.fieldPowersByIndex ),
     functionoidProduct( copySource.functionoidProduct )
   {
     // This constructor is just an initialization list.
@@ -34,24 +36,34 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This adds runningParameter to the set of functionoids which multiply
-  // coefficientConstant to form the scale-dependent coefficient.
-  void
-  PolynomialTerm::MultiplyBy( ParameterFunctionoid* const runningParameter,
-                              unsigned int const powerInt )
+  // This is mainly for debugging.
+  std::string PolynomialTerm::AsDebuggingString() const
   {
-    if( runningParameter == NULL )
+    std::stringstream returnStream;
+    returnStream
+    << "isValid = " << isValid << std::endl
+    << "coefficientConstant = " << coefficientConstant << std::endl
+    << "fieldProductByIndex = {";
+    for( std::vector< unsigned int >::const_iterator
+         fieldIndex( fieldProductByIndex.begin() );
+         fieldIndex < fieldProductByIndex.end();
+         ++fieldIndex )
     {
-      isValid = false;
+      returnStream << " " << *fieldIndex;
     }
-    else
+    returnStream
+    << " }" << std::endl
+    << "functionoidProduct = {";
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         functionoidPointer( functionoidProduct.begin() );
+         functionoidPointer < functionoidProduct.end();
+         ++functionoidPointer )
     {
-      for( unsigned int powerCount( 0 );
-           powerCount < powerInt;
-           ++powerCount )
-      {
-        functionoidProduct.push_back( runningParameter );
-      }
+      returnStream << " " << *functionoidPointer;
     }
+    returnStream
+    << " }" << std::endl;
+    return std::string( returnStream.str() );
   }
+
 } /* namespace VevaciousPlusPlus */

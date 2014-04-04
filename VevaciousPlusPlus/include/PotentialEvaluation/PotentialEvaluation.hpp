@@ -15,7 +15,6 @@
 #include "HomotopyContinuationReadyPotential.hpp"
 #include "MassesSquaredFromPolynomials.hpp"
 #include "ParameterFunctionoid.hpp"
-#include "PolynomialCoefficient.hpp"
 #include "PolynomialSum.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"
 #include "RealMassesSquaredMatrix.hpp"

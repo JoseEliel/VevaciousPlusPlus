@@ -61,7 +61,7 @@ namespace VevaciousPlusPlus
          whichTerm < polynomialTerms.end();
          ++whichTerm )
     {
-      returnStream << whichTerm->AsString() << std::endl;
+      returnStream << whichTerm->AsDebuggingString() << std::endl;
     }
     return std::string( returnStream.str() );
   }

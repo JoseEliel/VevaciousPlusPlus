@@ -33,7 +33,6 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/MassesSquaredFromPolynomials.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
- source/PotentialEvaluation/PolynomialCoefficient.cpp \
  source/PotentialEvaluation/PolynomialSum.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
