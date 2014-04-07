@@ -12,7 +12,7 @@ namespace VevaciousPlusPlus
 
   HomotopyContinuationAndGradient::HomotopyContinuationAndGradient(
                       HomotopyContinuationReadyPotential& potentialFunction ) :
-    PotentialMinimizer()
+    PotentialMinimizer( potentialFunction )
   {
     // placeholder:
     /**/std::cout << std::endl

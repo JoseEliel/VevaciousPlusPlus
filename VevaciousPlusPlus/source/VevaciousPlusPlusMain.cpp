@@ -59,10 +59,12 @@ int main( int argumentCount,
 
   // Now the HomotopyContinuationAndGradient object and the BounceWithSplines
   // object can be constructed:
-  VevaciousPlusPlus::HomotopyContinuationAndGradient
-  potentialMinimizer( rgeImprovedPotential );
+  VevaciousPlusPlus::Hom4ps2AndMinuit
+  potentialMinimizer( fixedScalePotential,
+                      argumentParser.fromTag( "Hom4ps2Path",
+                                              "./HOM4PS2/" ) );
   VevaciousPlusPlus::BounceWithSplines
-  tunnelingCalculator( rgeImprovedPotential );
+  tunnelingCalculator( fixedScalePotential );
 
   // Create the VevaciousTwo object, telling it where to find its settings,
   // such as the model to use and the way to calculate the tunneling time.

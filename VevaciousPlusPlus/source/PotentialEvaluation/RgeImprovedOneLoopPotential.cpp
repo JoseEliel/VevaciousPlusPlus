@@ -60,19 +60,38 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
-  // This prepares a system of polynomials for the homotopy continuation
-  // based on the current SLHA input data. Each polynomial term in the
-  // tree-level potential generates its derivatives in its fields with the
-  // coefficients fitted to a polynomial in the logarithm of the
-  // renormalization scale, and then also a polynomial relating the logarithm
-  // of the renormalization scale to minimumRenormalizationScaleSquared and
-  // the field values is also prepared.
-  void RgeImprovedOneLoopPotential::PreparePolynomialHomotopyContinuation()
+
+  // This should prepare homotopyContinuationPotentialPolynomial
+  // appropriately.
+  void
+  RgeImprovedOneLoopPotential::PrepareHomotopyContinuationPotentialPolynomial()
   {
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: RgeImprovedOneLoopPotential::"
-    << "PrepareHomotopyContinuationPolynomials()";
+    << "PrepareHomotopyContinuationPotentialPolynomial()";
+    std::cout << std::endl;/**/
+  }
+
+  // This should prepare homotopyContinuationStartSystem and
+  // startPolynomialHessian appropriately.
+  void RgeImprovedOneLoopPotential::PrepareHomotopyContinuationStartSystem()
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: RgeImprovedOneLoopPotential::"
+    << "PrepareHomotopyContinuationStartSystem()";
+    std::cout << std::endl;/**/
+  }
+
+  // This should prepare homotopyContinuationStartValues to be all the
+  // solutions of homotopyContinuationStartSystem.
+  void RgeImprovedOneLoopPotential::PrepareHomotopyContinuationStartValues()
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: RgeImprovedOneLoopPotential::"
+    << "PrepareHomotopyContinuationStartValues()";
     std::cout << std::endl;/**/
   }
 

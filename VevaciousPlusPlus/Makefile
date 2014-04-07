@@ -46,6 +46,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/SymmetricComplexMassMatrix.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \
+ source/PotentialMinimization/Hom4ps2AndMinuit.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \

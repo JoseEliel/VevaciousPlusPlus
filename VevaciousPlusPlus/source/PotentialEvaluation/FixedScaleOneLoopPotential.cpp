@@ -75,4 +75,38 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
+  // This should prepare homotopyContinuationPotentialPolynomial
+  // appropriately.
+  void
+  FixedScaleOneLoopPotential::PrepareHomotopyContinuationPotentialPolynomial()
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: FixedScaleOneLoopPotential::"
+    << "PrepareHomotopyContinuationPotentialPolynomial()";
+    std::cout << std::endl;/**/
+  }
+
+  // This should prepare homotopyContinuationStartSystem and
+  // startPolynomialHessian appropriately.
+  void FixedScaleOneLoopPotential::PrepareHomotopyContinuationStartSystem()
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: FixedScaleOneLoopPotential::"
+    << "PrepareHomotopyContinuationStartSystem()";
+    std::cout << std::endl;/**/
+  }
+
+  // This should prepare homotopyContinuationStartValues to be all the
+  // solutions of homotopyContinuationStartSystem.
+  void FixedScaleOneLoopPotential::PrepareHomotopyContinuationStartValues()
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: FixedScaleOneLoopPotential::"
+    << "PrepareHomotopyContinuationStartValues()";
+    std::cout << std::endl;/**/
+  }
+
 } /* namespace VevaciousPlusPlus */

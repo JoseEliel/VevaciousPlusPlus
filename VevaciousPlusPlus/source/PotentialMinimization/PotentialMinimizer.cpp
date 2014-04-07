@@ -10,7 +10,13 @@
 namespace VevaciousPlusPlus
 {
 
-  PotentialMinimizer::PotentialMinimizer()
+  PotentialMinimizer::PotentialMinimizer(
+                                       PotentialFunction& potentialFunction ) :
+    potentialFunction( potentialFunction ),
+    foundMinima(),
+    dsbVacuum(),
+    panicVacua(),
+    panicVacuum()
   {
     // placeholder:
     /**/std::cout << std::endl

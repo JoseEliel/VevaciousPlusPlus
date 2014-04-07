@@ -10,6 +10,7 @@
 
 #include "../StandardIncludes.hpp"
 #include "PotentialMinimizer.hpp"
+#include "../PotentialEvaluation/HomotopyContinuationReadyPotential.hpp"
 
 namespace VevaciousPlusPlus
 {

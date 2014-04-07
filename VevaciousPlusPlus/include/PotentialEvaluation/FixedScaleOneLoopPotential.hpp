@@ -68,6 +68,17 @@ namespace VevaciousPlusPlus
     // of the renormalization scale to minimumRenormalizationScaleSquared and
     // the field values is also prepared.
     virtual void PreparePolynomialHomotopyContinuation();
+
+    // This should prepare homotopyContinuationPotentialPolynomial
+    // appropriately.
+    virtual void PrepareHomotopyContinuationPotentialPolynomial();
+
+    // This should prepare homotopyContinuationStartSystem appropriately.
+    virtual void PrepareHomotopyContinuationStartSystem();
+
+    // This should prepare homotopyContinuationStartValues to be all the
+    // solutions of homotopyContinuationStartSystem.
+    virtual void PrepareHomotopyContinuationStartValues();
   };
 
 

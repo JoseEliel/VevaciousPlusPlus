@@ -77,7 +77,14 @@ namespace VevaciousPlusPlus
 
     // This should prepare homotopyContinuationPotentialPolynomial
     // appropriately.
-    virtual void PrepareHomotopyContinuationPotentialPolynomial() = 0;
+    virtual void PrepareHomotopyContinuationPotentialPolynomial();
+
+    // This should prepare homotopyContinuationStartSystem appropriately.
+    virtual void PrepareHomotopyContinuationStartSystem();
+
+    // This should prepare homotopyContinuationStartValues to be all the
+    // solutions of homotopyContinuationStartSystem.
+    virtual void PrepareHomotopyContinuationStartValues();
   };
 
 
@@ -164,13 +171,18 @@ namespace VevaciousPlusPlus
                                          sqrt( renormalizationScaleSquared ) );
   }
 
-  // This fills polynomialGradient, homotopyContinuationStartSystem, and
-  // polynomialHessian appropriately.
+  // This prepares a system of polynomials for the homotopy continuation
+  // based on the current SLHA input data. Each polynomial term in the
+  // tree-level potential generates its derivatives in its fields with the
+  // coefficients fitted to a polynomial in the logarithm of the
+  // renormalization scale, and then also a polynomial relating the logarithm
+  // of the renormalization scale to minimumRenormalizationScaleSquared and
+  // the field values is also prepared.
   inline void
   RgeImprovedOneLoopPotential::PreparePolynomialHomotopyContinuation()
   {
     PrepareHomotopyContinuationPotentialPolynomial();
-    PrepareHomotopyContinuationGradient();
+    PreparePolynomialGradient();
     // Now we add in the constraint on the log of the renormalization scale.
     PolynomialSum scaleConstraint;
     std::vector< PolynomialTerm >&
@@ -179,8 +191,8 @@ namespace VevaciousPlusPlus
     constraintTerm.RaiseFieldPower( numberOfFields,
                                     2 );
     constraintTerms.push_back( constraintTerm );
-    polynomialGradient.push_back( scaleConstraint );
-    PrepareHomotopyContinuationHessian();
+    targetPolynomialGradient.push_back( scaleConstraint );
+    PreparePolynomialHessian();
     PrepareHomotopyContinuationStartSystem();
     PrepareHomotopyContinuationStartValues();
   }

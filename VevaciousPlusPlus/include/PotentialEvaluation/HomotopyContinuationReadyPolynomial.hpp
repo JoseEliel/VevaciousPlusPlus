@@ -12,6 +12,7 @@
 #include "HomotopyContinuationReadyPotential.hpp"
 #include "PolynomialTerm.hpp"
 #include "PolynomialSum.hpp"
+#include "ProductOfPolynomialSums.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -25,15 +26,18 @@ namespace VevaciousPlusPlus
     ~HomotopyContinuationReadyPolynomial();
 
 
-    // This fills polynomialGradient, homotopyContinuationStartSystem, and
-    // polynomialHessian appropriately.
+    // This fills targetPolynomialGradient, homotopyContinuationStartSystem,
+    // targetPolynomialHessian, and startPolynomialHessian appropriately.
     virtual void
     PreparePolynomialHomotopyContinuation();
 
-    std::vector< PolynomialSum > const& PolynomialGradient() const
-    { return polynomialGradient; }
+    std::vector< PolynomialSum > const& TargetPolynomialGradient() const
+    { return targetPolynomialGradient; }
 
-    std::vector< PolynomialSum > const&
+    std::vector< std::vector< PolynomialSum > > const&
+    TargetPolynomialHessian() const{ return targetPolynomialHessian; }
+
+    std::vector< ProductOfPolynomialSums > const&
     HomotopyContinuationStartSystem() const
     { return homotopyContinuationStartSystem; }
 
@@ -41,30 +45,36 @@ namespace VevaciousPlusPlus
     HomotopyContinuationStartValues() const
     { return homotopyContinuationStartValues; }
 
-    std::vector< std::vector< PolynomialSum > > const&
-    PolynomialHessian() const{ return polynomialHessian; }
+    std::vector< std::vector< ProductOfPolynomialSums > > const&
+    HomotopyContinuationStartHessian() const
+    { return startPolynomialHessian; }
 
 
   protected:
     PolynomialSum homotopyContinuationPotentialPolynomial;
-    std::vector< PolynomialSum > polynomialGradient;
+    std::vector< PolynomialSum > targetPolynomialGradient;
     std::vector< ProductOfPolynomialSums > homotopyContinuationStartSystem;
     std::vector< std::vector< std::complex< double > > >
     homotopyContinuationStartValues;
-    std::vector< std::vector< ProductOfPolynomialSums > > polynomialHessian;
+    std::vector< std::vector< std::complex< double > > >
+    homotopyContinuationValidSolutions;
+    std::vector< std::vector< PolynomialSum > > targetPolynomialHessian;
+    std::vector< std::vector< ProductOfPolynomialSums > >
+    startPolynomialHessian;
 
     // This should prepare homotopyContinuationPotentialPolynomial
     // appropriately.
     virtual void PrepareHomotopyContinuationPotentialPolynomial() = 0;
 
-    // This fills polynomialGradient from
+    // This fills targetPolynomialGradient from
     // homotopyContinuationPotentialPolynomial.
-    virtual void PrepareHomotopyContinuationGradient();
+    virtual void PreparePolynomialGradient();
 
-    // This fills polynomialHessian from polynomialGradient.
-    virtual void PrepareHomotopyContinuationHessian();
+    // This fills targetPolynomialHessian from targetPolynomialGradient.
+    virtual void PreparePolynomialHessian();
 
-    // This should prepare homotopyContinuationStartSystem appropriately.
+    // This should prepare homotopyContinuationStartSystem and
+    // startPolynomialHessian appropriately.
     virtual void PrepareHomotopyContinuationStartSystem() = 0;
 
     // This should prepare homotopyContinuationStartValues to be all the
@@ -75,24 +85,24 @@ namespace VevaciousPlusPlus
 
 
 
-  // This fills polynomialGradient, homotopyContinuationStartSystem, and
-  // polynomialHessian appropriately.
+  // This fills targetPolynomialGradient, homotopyContinuationStartSystem,
+  // targetPolynomialHessian, and startPolynomialHessian appropriately.
   inline void
   HomotopyContinuationReadyPolynomial::PreparePolynomialHomotopyContinuation()
   {
     PrepareHomotopyContinuationPotentialPolynomial();
-    PrepareHomotopyContinuationGradient();
-    PrepareHomotopyContinuationHessian();
+    PreparePolynomialGradient();
+    PreparePolynomialHessian();
     PrepareHomotopyContinuationStartSystem();
     PrepareHomotopyContinuationStartValues();
   }
 
-  // This fills polynomialGradient from
+  // This fills targetPolynomialGradient from
   // homotopyContinuationPotentialPolynomial.
   inline void
-  HomotopyContinuationReadyPolynomial::PrepareHomotopyContinuationGradient()
+  HomotopyContinuationReadyPolynomial::PreparePolynomialGradient()
   {
-    polynomialGradient.assign( numberOfFields,
+    targetPolynomialGradient.assign( numberOfFields,
                                PolynomialSum() );
     std::vector< PolynomialTerm > const& polynomialForGradient(
                    homotopyContinuationPotentialPolynomial.PolynomialTerms() );
@@ -107,7 +117,7 @@ namespace VevaciousPlusPlus
       {
         if( whichTerm->NonZeroDerivative( fieldIndex ) )
         {
-          polynomialGradient[ fieldIndex ].PolynomialTerms().push_back(
+          targetPolynomialGradient[ fieldIndex ].PolynomialTerms().push_back(
                                   whichTerm->PartialDerivative( fieldIndex ) );
         }
       }

@@ -50,7 +50,8 @@ namespace VevaciousPlusPlus
   inline std::complex< double > ProductOfPolynomialSums::operator()(
         std::vector< std::complex< double > > const& fieldConfiguration ) const
   {
-    double returnValue( 1.0 );
+    std::complex< double > returnValue( 1.0,
+                                        1.0 );
     for( std::vector< PolynomialSum >::const_iterator
          whichProduct( productVector.begin() );
          whichProduct < productVector.end();

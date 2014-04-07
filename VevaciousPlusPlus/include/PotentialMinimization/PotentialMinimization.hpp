@@ -10,6 +10,7 @@
 
 #include "PotentialMinimum.hpp"
 #include "PotentialMinimizer.hpp"
+#include "Hom4ps2AndMinuit.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
 
 // This file is just to collect a lot of #include statements.

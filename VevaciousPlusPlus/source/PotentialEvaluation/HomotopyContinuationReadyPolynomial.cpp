@@ -13,10 +13,12 @@ namespace VevaciousPlusPlus
   HomotopyContinuationReadyPolynomial::HomotopyContinuationReadyPolynomial() :
     HomotopyContinuationReadyPotential(),
     homotopyContinuationPotentialPolynomial(),
-    polynomialGradient(),
+    targetPolynomialGradient(),
     homotopyContinuationStartSystem(),
     homotopyContinuationStartValues(),
-    polynomialHessian()
+    homotopyContinuationValidSolutions(),
+    targetPolynomialHessian(),
+    startPolynomialHessian()
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -32,18 +34,18 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This fills polynomialHessian from polynomialGradient.
+  // This fills targetPolynomialHessian from targetPolynomialGradient.
   void
-  HomotopyContinuationReadyPolynomial::PrepareHomotopyContinuationHessian()
+  HomotopyContinuationReadyPolynomial::PreparePolynomialHessian()
   {
-    polynomialHessian.resize( numberOfFields,
+    targetPolynomialHessian.resize( numberOfFields,
                               std::vector< PolynomialSum >( numberOfFields ) );
     for( unsigned int gradientIndex( 0 );
          gradientIndex < numberOfFields;
          ++gradientIndex )
     {
       std::vector< PolynomialTerm > const& gradientVector(
-                       polynomialGradient[ gradientIndex ].PolynomialTerms() );
+                 targetPolynomialGradient[ gradientIndex ].PolynomialTerms() );
       for( unsigned int fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
@@ -55,7 +57,8 @@ namespace VevaciousPlusPlus
         {
           if( whichTerm->NonZeroDerivative( fieldIndex ) )
           {
-            polynomialHessian[ gradientIndex ][ fieldIndex ].PolynomialTerms(
+            targetPolynomialHessian[ gradientIndex ][ fieldIndex
+                                                             ].PolynomialTerms(
                      ).push_back( whichTerm->PartialDerivative( fieldIndex ) );
           }
         }
