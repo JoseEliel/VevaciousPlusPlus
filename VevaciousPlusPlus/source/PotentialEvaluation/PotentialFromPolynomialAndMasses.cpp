@@ -27,9 +27,10 @@ namespace VevaciousPlusPlus
                                                      / ( 2.0 * M_PI * M_PI ) );
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
-                                           std::string const& modelFilename ) :
-    HomotopyContinuationReadyPolynomial(),
-    runningParameters(),
+                                              std::string const& modelFilename,
+                           RunningParameterManager& runningParameterManager ) :
+    HomotopyContinuationReadyPolynomial( runningParameterManager ),
+    runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     renormalizationScaleSquared( NAN ),
     minimumRenormalizationScaleSquared( NAN ),
@@ -132,8 +133,11 @@ namespace VevaciousPlusPlus
                      BOL::StringParser::firstWordOf( elementLines[ lineIndex ],
                                                      &aliasString,
                                                      "=" ) );
-      runningParameters.AddValidSlhaBlock( slhaString,
+      if( !(slhaString.empty()) )
+      {
+        runningParameters.AddValidSlhaBlock( slhaString,
                       BOL::StringParser::trimFromFrontAndBack( aliasString ) );
+      }
     }
     //   </SlhaBlocks>
     //   <DerivedParameters>
@@ -152,7 +156,12 @@ namespace VevaciousPlusPlus
          lineIndex < elementLines.getSize();
          ++lineIndex )
     {
-      runningParameters.CreateDerivedParameter( elementLines[ lineIndex ] );
+      aliasString
+      = BOL::StringParser::trimFromFrontAndBack( elementLines[ lineIndex ] );
+      if( !(aliasString.empty()) )
+      {
+        runningParameters.CreateDerivedParameter( aliasString );
+      }
     }
     //   </DerivedParameters>
     //   <DsbMinimum>
@@ -403,9 +412,11 @@ namespace VevaciousPlusPlus
   }
 
 
-  PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses() :
-    HomotopyContinuationReadyPolynomial(),
-    runningParameters(),
+  // This is just for derived classes.
+  PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
+                           RunningParameterManager& runningParameterManager ) :
+    HomotopyContinuationReadyPolynomial( runningParameterManager ),
+    runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     renormalizationScaleSquared( NAN ),
     minimumRenormalizationScaleSquared( NAN ),
@@ -420,6 +431,26 @@ namespace VevaciousPlusPlus
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
     // constructors.
+  }
+
+  // This is just for derived classes.
+  PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
+                               PotentialFromPolynomialAndMasses& copySource ) :
+    HomotopyContinuationReadyPolynomial( copySource.runningParameters ),
+    runningParameters( copySource.runningParameters ),
+    dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
+    renormalizationScaleSquared( copySource.renormalizationScaleSquared ),
+    minimumRenormalizationScaleSquared(
+                               copySource.minimumRenormalizationScaleSquared ),
+    treeLevelPotential( copySource.treeLevelPotential ),
+    polynomialLoopCorrections( copySource.polynomialLoopCorrections ),
+    scalarSquareMasses( copySource.scalarSquareMasses ),
+    fermionMasses( copySource.fermionMasses ),
+    fermionMassSquareds( copySource.fermionMassSquareds ),
+    vectorSquareMasses( copySource.vectorSquareMasses ),
+    vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant )
+  {
+    // This is just an initialization-list copy-constructor.
   }
 
 
@@ -775,6 +806,7 @@ namespace VevaciousPlusPlus
     double currentQuantumCorrection( 0.0 );
     double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
+    double absoluteMassSquared( 0.0 );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -799,21 +831,27 @@ namespace VevaciousPlusPlus
       << "massesSquared.size() =" << massesSquared.size();
       std::cout << std::endl;*/
 
-      for( std::vector< double >::const_iterator
-           massSquared( massesSquared.begin() );
-           massSquared < massesSquared.end();
-           ++massSquared )
+      for( unsigned int whichMass( 0 );
+           whichMass < massesSquared.size();
+           ++whichMass )
       {
+        absoluteMassSquared = massesSquared[ whichMass ];
+        if( absoluteMassSquared < 0.0 )
+        {
+          absoluteMassSquared = -absoluteMassSquared;
+        }
         // debugging:
         /*std::cout << std::endl << "debugging:"
         << std::endl
-        << "*massSquared = " << *massSquared;
+        << "massesSquared[ " << whichMass << " ] = "
+        << massesSquared[ whichMass ];
         std::cout << std::endl;*/
 
-        if( abs( *massSquared ) > 1.0 )
+        if( absoluteMassSquared > 1.0 )
         {
-          currentQuantumCorrection += ( (*massSquared) * (*massSquared)
-                                        * ( log( abs( *massSquared )
+          currentQuantumCorrection += ( absoluteMassSquared
+                                        * absoluteMassSquared
+                                        * ( log( absoluteMassSquared
                                                 / renormalizationScaleSquared )
                                             - 1.5 ) );
 
@@ -825,7 +863,7 @@ namespace VevaciousPlusPlus
         }
         if( inverseTemperatureSquared > 1.0 )
         {
-          currentThermalCorrection += bosonThermalFunction( (*massSquared)
+          currentThermalCorrection += bosonThermalFunction( absoluteMassSquared
                                                  * inverseTemperatureSquared );
         }
       }
@@ -878,6 +916,7 @@ namespace VevaciousPlusPlus
     double currentQuantumCorrection( 0.0 );
     double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
+    double absoluteMassSquared( 0.0 );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -901,21 +940,27 @@ namespace VevaciousPlusPlus
       << "(SymmetricComplexMassMatrix) massesSquared.size() =" << massesSquared.size();
       std::cout << std::endl;*/
 
-      for( std::vector< double >::const_iterator
-           massSquared( massesSquared.begin() );
-           massSquared < massesSquared.end();
-           ++massSquared )
+      for( unsigned int whichMass( 0 );
+           whichMass < massesSquared.size();
+           ++whichMass )
       {
+        absoluteMassSquared = massesSquared[ whichMass ];
+        if( absoluteMassSquared < 0.0 )
+        {
+          absoluteMassSquared = -absoluteMassSquared;
+        }
         // debugging:
         /*std::cout << std::endl << "debugging:"
         << std::endl
-        << "*massSquared = " << *massSquared;
+        << "massesSquared[ " << whichMass << " ] = "
+        << massesSquared[ whichMass ];
         std::cout << std::endl;*/
 
-        if( abs( *massSquared ) > 1.0 )
+        if( absoluteMassSquared > 1.0 )
         {
-          currentQuantumCorrection += ( (*massSquared) * (*massSquared)
-                                        * ( log( abs( *massSquared )
+          currentQuantumCorrection += ( absoluteMassSquared
+                                        * absoluteMassSquared
+                                        * ( log( absoluteMassSquared
                                                 / renormalizationScaleSquared )
                                           - 1.5 ) );
 
@@ -936,8 +981,9 @@ namespace VevaciousPlusPlus
           << ( (*massSquared) * inverseTemperatureSquared );
           std::cout << std::endl;*/
 
-          currentThermalCorrection += fermionThermalFunction( (*massSquared)
-                                                 * inverseTemperatureSquared );
+          currentThermalCorrection
+          += fermionThermalFunction( absoluteMassSquared
+                                     * inverseTemperatureSquared );
         }
       }
       totalQuantumCorrection += ( fermionSet->MultiplicityFactor()
@@ -963,21 +1009,27 @@ namespace VevaciousPlusPlus
       << massesSquared.size();
       std::cout << std::endl;*/
 
-      for( std::vector< double >::const_iterator
-           massSquared( massesSquared.begin() );
-           massSquared < massesSquared.end();
-           ++massSquared )
+      for( unsigned int whichMass( 0 );
+           whichMass < massesSquared.size();
+           ++whichMass )
       {
+        absoluteMassSquared = massesSquared[ whichMass ];
+        if( absoluteMassSquared < 0.0 )
+        {
+          absoluteMassSquared = -absoluteMassSquared;
+        }
         // debugging:
         /*std::cout << std::endl << "debugging:"
         << std::endl
-        << "*massSquared = " << *massSquared;
+        << "massesSquared[ " << whichMass << " ] = "
+        << massesSquared[ whichMass ];
         std::cout << std::endl;*/
 
-        if( abs( *massSquared ) > 1.0 )
+        if( absoluteMassSquared > 1.0 )
         {
-          currentQuantumCorrection += ( (*massSquared) * (*massSquared)
-                                        * ( log( abs( *massSquared )
+          currentQuantumCorrection += ( absoluteMassSquared
+                                        * absoluteMassSquared
+                                        * ( log( absoluteMassSquared
                                                 / renormalizationScaleSquared )
                                             - 1.5 ) );
 
@@ -998,8 +1050,9 @@ namespace VevaciousPlusPlus
           << ( (*massSquared) * inverseTemperatureSquared );
           std::cout << std::endl;*/
 
-          currentThermalCorrection += fermionThermalFunction( (*massSquared)
-                                                 * inverseTemperatureSquared );
+          currentThermalCorrection
+          += fermionThermalFunction( absoluteMassSquared
+                                     * inverseTemperatureSquared );
         }
       }
       totalQuantumCorrection += ( fermionSet->MultiplicityFactor()
@@ -1052,6 +1105,7 @@ namespace VevaciousPlusPlus
     double currentQuantumCorrection( 0.0 );
     double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
+    double absoluteMassSquared( 0.0 );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -1076,21 +1130,27 @@ namespace VevaciousPlusPlus
       << massesSquared.size();
       std::cout << std::endl;*/
 
-      for( std::vector< double >::const_iterator
-           massSquared( massesSquared.begin() );
-           massSquared < massesSquared.end();
-           ++massSquared )
+      for( unsigned int whichMass( 0 );
+           whichMass < massesSquared.size();
+           ++whichMass )
       {
+        absoluteMassSquared = massesSquared[ whichMass ];
+        if( absoluteMassSquared < 0.0 )
+        {
+          absoluteMassSquared = -absoluteMassSquared;
+        }
         // debugging:
         /*std::cout << std::endl << "debugging:"
         << std::endl
-        << "*massSquared = " << *massSquared;
+        << "massesSquared[ " << whichMass << " ] = "
+        << massesSquared[ whichMass ];
         std::cout << std::endl;*/
 
-        if( abs( *massSquared ) > 1.0 )
+        if( absoluteMassSquared > 1.0 )
         {
-          currentQuantumCorrection += ( (*massSquared) * (*massSquared)
-                                      * ( log( abs( *massSquared )
+          currentQuantumCorrection += ( absoluteMassSquared
+                                        * absoluteMassSquared
+                                        * ( log( absoluteMassSquared
                                                / renormalizationScaleSquared )
                                           - vectorMassCorrectionConstant ) );
 
@@ -1102,7 +1162,7 @@ namespace VevaciousPlusPlus
         }
         if( inverseTemperatureSquared > 0.0 )
         {
-          currentThermalCorrection += bosonThermalFunction( (*massSquared)
+          currentThermalCorrection += bosonThermalFunction( absoluteMassSquared
                                                  * inverseTemperatureSquared );
         }
       }

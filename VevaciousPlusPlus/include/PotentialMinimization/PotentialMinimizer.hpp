@@ -10,6 +10,7 @@
 
 #include "../StandardIncludes.hpp"
 #include "PotentialMinimum.hpp"
+#include "BOLlib/include/BasicObserver.hpp"
 
 namespace VevaciousPlusPlus
 {

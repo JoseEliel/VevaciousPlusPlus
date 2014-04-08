@@ -9,15 +9,20 @@
 #define TUNNELINGCALCULATOR_HPP_
 
 #include "../StandardIncludes.hpp"
+#include "../PotentialEvaluation/PotentialFunction.hpp"
 
 namespace VevaciousPlusPlus
 {
   class TunnelingCalculator
   {
   public:
-    TunnelingCalculator();
+    TunnelingCalculator( PotentialFunction& potentialFunction );
     virtual
     ~TunnelingCalculator();
+
+
+  protected:
+    PotentialFunction& potentialFunction;
   };
 
 } /* namespace VevaciousPlusPlus */

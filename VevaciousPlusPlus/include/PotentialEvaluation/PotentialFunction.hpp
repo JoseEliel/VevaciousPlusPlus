@@ -10,13 +10,15 @@
 
 #include "../StandardIncludes.hpp"
 #include "../PotentialMinimization/PotentialMinimum.hpp"
+#include "SlhaManager.hpp"
+#include "BOLlib/include/BasicObserver.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class PotentialFunction
+  class PotentialFunction : public BOL::BasicObserver
   {
   public:
-    PotentialFunction();
+    PotentialFunction( SlhaManager& slhaManager );
     virtual
     ~PotentialFunction();
 
@@ -37,8 +39,11 @@ namespace VevaciousPlusPlus
 
     // This should update all the parameters of the potential that are not
     // field values based on the values that appear in blocks in the SLHA
-    // format in the file given by slhaFilename.
-    virtual void UpdateParameters( std::string const& slhaFilename ) = 0;
+    // format in the file managed by slhaManager.
+    virtual void UpdateParameters() = 0;
+
+    // This gets called by slhaManager.
+    virtual void respondToObservedSignal(){ UpdateParameters(); }
 
     // This returns operator(), but could be over-ridden so that a partial
     // result from a derived class could be returned, such as say the

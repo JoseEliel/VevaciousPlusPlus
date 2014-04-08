@@ -13,9 +13,11 @@ namespace VevaciousPlusPlus
   std::string const VevaciousPlusPlus::citationString( "[none as yet]" );
 
   VevaciousPlusPlus::VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
+                                        SlhaManager& slhaManager,
                                         PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
     runTimer( 10.0 ),
+    slhaManager( slhaManager ),
     potentialMinimizer( potentialMinimizer ),
     thresholdDistanceSquaredFraction( pow( BOL::StringParser::stringToDouble(
                            argumentParser.fromTag( "MinimaSeparationThreshold",
@@ -57,6 +59,9 @@ namespace VevaciousPlusPlus
     << "Placeholder: "
     << "VevaciousPlusPlus::RunPoint( \"" << parameterFilename << "\" )";
     std::cout << std::endl;/**/
+
+    slhaManager.UpdateSlhaData( parameterFilename );
+    potentialMinimizer.FindMinima( 0.0 );
   }
 
   void VevaciousPlusPlus::WriteXmlResults( std::string const& xmlFilename )

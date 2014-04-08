@@ -23,6 +23,7 @@ namespace VevaciousPlusPlus
     << "Placeholder: "
     << "PotentialMinimizer::PotentialMinimizer()";
     std::cout << std::endl;/**/
+
   }
 
   PotentialMinimizer::~PotentialMinimizer()

@@ -19,13 +19,16 @@ namespace VevaciousPlusPlus
   {
   public:
     VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
+                       SlhaManager& slhaManager,
                        PotentialMinimizer& potentialMinimizer,
                        TunnelingCalculator& tunnelingCalculator );
     virtual
     ~VevaciousPlusPlus();
 
     void RunPoint( std::string const& parameterFilename );
+
     void WriteXmlResults( std::string const& xmlFilename );
+
     void WriteSlhaResults( std::string const& slhaFilename,
                            bool const writeWarnings = true );
 
@@ -35,6 +38,7 @@ namespace VevaciousPlusPlus
     static std::string const citationString;
 
     BOL::BasicTimer runTimer;
+    SlhaManager& slhaManager;
     PotentialMinimizer& potentialMinimizer;
     double thresholdDistanceSquaredFraction;
     double extremumSeparationSquaredThreshold;
@@ -52,6 +56,8 @@ namespace VevaciousPlusPlus
     // DSB minimum (or equal to dsbMinimum if there was no deeper minimum), and
     // globalMinimum to be the deepest minimum.
     void SortMinima();
+
+    // This writes the minimum as an empty XML element with attributes.
     std::string XmlMinimum( PotentialMinimum const& potentialMinimum ) const;
   };
 

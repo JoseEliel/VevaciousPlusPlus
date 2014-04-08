@@ -68,15 +68,16 @@ namespace VevaciousPlusPlus
     // ParameterFunctionoid pointers.
     void RemoveScaleDependence(){ functionoidProduct.clear(); }
 
-    // This is mainly for debugging.
-    std::string AsDebuggingString() const;
-
     // This prints the polynomial with the current value of coefficientConstant
     // and the powers of the fields with names given by fieldNames to a string
     // and returns it.
     std::string AsStringAtCurrentScale(
                                   std::vector< std::string > const& fieldNames,
-                              bool const prependPlusIfPositive = false ) const;
+                                        bool const followsOtherTerm = false,
+                                        bool const emptyIfZero = false ) const;
+
+    // This is mainly for debugging.
+    std::string AsDebuggingString() const;
 
 
   protected:
@@ -192,6 +193,19 @@ namespace VevaciousPlusPlus
   inline bool
   PolynomialTerm::NonZeroDerivative( unsigned int const fieldIndex ) const
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PolynomialTerm::NonZeroDerivative( " << fieldIndex
+    << " ) called. fieldPowersByIndex.size() = " << fieldPowersByIndex.size();
+    if( fieldPowersByIndex.size() > fieldIndex )
+    {
+      std::cout
+      << ", fieldPowersByIndex[ fieldIndex ] = "
+      << fieldPowersByIndex[ fieldIndex ] << std::endl;
+    }
+    std::cout << std::endl;/**/
+
     return ( ( fieldPowersByIndex.size() > fieldIndex )
              &&
              ( fieldPowersByIndex[ fieldIndex ] > 0 ) );
@@ -221,35 +235,6 @@ namespace VevaciousPlusPlus
                                                whichField );
     }
     return returnTerm;
-  }
-
-  // This prints the polynomial with the current value of coefficientConstant
-  // and the powers of the fields with names given by fieldNames to a string
-  // and returns it.
-  inline std::string PolynomialTerm::AsStringAtCurrentScale(
-                                  std::vector< std::string > const& fieldNames,
-                                       bool const prependPlusIfPositive ) const
-  {
-    if( fieldNames.size() < fieldPowersByIndex.size() )
-    {
-      throw std::out_of_range( "Not enough field names for PolynomialTerm!" );
-    }
-    std::stringstream returnStream;
-    if( prependPlusIfPositive
-        &&
-        ( coefficientConstant >= 0.0 ) )
-    {
-      returnStream << '+';
-    }
-    returnStream << coefficientConstant;
-    for( unsigned int whichField( 0 );
-         whichField < fieldPowersByIndex.size();
-         ++whichField )
-    {
-      returnStream << " * " << fieldNames[ whichField ] << "^"
-      << fieldPowersByIndex[ whichField ];
-    }
-    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

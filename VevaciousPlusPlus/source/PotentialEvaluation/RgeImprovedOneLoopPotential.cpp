@@ -11,8 +11,10 @@ namespace VevaciousPlusPlus
 {
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-                                           std::string const& modelFilename ) :
-    PotentialFromPolynomialAndMasses( modelFilename )
+                                              std::string const& modelFilename,
+                           RunningParameterManager& runningParameterManager ) :
+    PotentialFromPolynomialAndMasses( modelFilename,
+                                      runningParameterManager )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -20,7 +22,17 @@ namespace VevaciousPlusPlus
     << "RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential( \""
     << modelFilename << "\" )";
     std::cout << std::endl;/**/
+  }
 
+  RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
+         PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
+    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential( [copy] )";
+    std::cout << std::endl;/**/
   }
 
   RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()

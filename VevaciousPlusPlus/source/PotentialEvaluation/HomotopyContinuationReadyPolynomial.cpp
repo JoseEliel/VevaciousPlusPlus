@@ -10,8 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  HomotopyContinuationReadyPolynomial::HomotopyContinuationReadyPolynomial() :
-    HomotopyContinuationReadyPotential(),
+  HomotopyContinuationReadyPolynomial::HomotopyContinuationReadyPolynomial(
+                                                   SlhaManager& slhaManager ) :
+    HomotopyContinuationReadyPotential( slhaManager ),
     homotopyContinuationPotentialPolynomial(),
     targetPolynomialGradient(),
     homotopyContinuationStartSystem(),

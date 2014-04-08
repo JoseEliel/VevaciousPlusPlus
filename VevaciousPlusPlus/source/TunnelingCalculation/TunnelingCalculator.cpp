@@ -10,7 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  TunnelingCalculator::TunnelingCalculator()
+  TunnelingCalculator::TunnelingCalculator(
+                                       PotentialFunction& potentialFunction ) :
+    potentialFunction( potentialFunction )
   {
     // placeholder:
     /**/std::cout << std::endl

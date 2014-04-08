@@ -23,6 +23,7 @@
 #include "RgeImprovedOneLoopPotential.hpp"
 #include "RunningParameterManager.hpp"
 #include "SlhaFunctionoid.hpp"
+#include "SlhaManager.hpp"
 #include "SymmetricComplexMassMatrix.hpp"
 #include "ThermalFunctions.hpp"
 #include "UnaryOperationFunctionoid.hpp"

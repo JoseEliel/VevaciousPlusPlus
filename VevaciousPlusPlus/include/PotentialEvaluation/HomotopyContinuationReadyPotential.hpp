@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
   class HomotopyContinuationReadyPotential : public PotentialFunction
   {
   public:
-    HomotopyContinuationReadyPotential();
+    HomotopyContinuationReadyPotential( SlhaManager& slhaManager );
     virtual
     ~HomotopyContinuationReadyPotential();
 

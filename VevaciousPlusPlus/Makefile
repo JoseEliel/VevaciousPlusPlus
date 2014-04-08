@@ -43,6 +43,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaFunctionoid.cpp \
+ source/PotentialEvaluation/SlhaManager.cpp \
  source/PotentialEvaluation/SymmetricComplexMassMatrix.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \

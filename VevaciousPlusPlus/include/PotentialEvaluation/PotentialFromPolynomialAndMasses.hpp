@@ -25,15 +25,16 @@ namespace VevaciousPlusPlus
                                      public HomotopyContinuationReadyPolynomial
   {
   public:
-    PotentialFromPolynomialAndMasses( std::string const& modelFilename );
+    PotentialFromPolynomialAndMasses( std::string const& modelFilename,
+                            RunningParameterManager& runningParameterManager );
     virtual
     ~PotentialFromPolynomialAndMasses();
 
 
     // This updates all the parameters of the potential that are not field
     // values based on the values that appear in blocks in the SLHA format in
-    // the file given by slhaFilename.
-    virtual void UpdateParameters( std::string const& slhaFilename );
+    // the file managed by runningParameters.
+    virtual void UpdateParameters();
 
 
   protected:
@@ -44,7 +45,7 @@ namespace VevaciousPlusPlus
     static double const loopFactor;
     static double const thermalFactor;
 
-    RunningParameterManager runningParameters;
+    RunningParameterManager& runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
     double renormalizationScaleSquared;
     double minimumRenormalizationScaleSquared;
@@ -57,7 +58,13 @@ namespace VevaciousPlusPlus
     double vectorMassCorrectionConstant;
 
 
-    PotentialFromPolynomialAndMasses();
+    // This is just for derived classes.
+    PotentialFromPolynomialAndMasses(
+                            RunningParameterManager& runningParameterManager );
+
+    // This is just for derived classes.
+    PotentialFromPolynomialAndMasses(
+                                PotentialFromPolynomialAndMasses& copySource );
 
 
     // This should set dsbFieldValueInputs based on the SLHA file just read in.
@@ -147,13 +154,11 @@ namespace VevaciousPlusPlus
 
   // This updates all the parameters of the potential that are not field
   // values based on the values that appear in blocks in the SLHA format in
-  // the file given by slhaFilename.
-  inline void PotentialFromPolynomialAndMasses::UpdateParameters(
-                                              std::string const& slhaFilename )
+  // the file managed by runningParameters.
+  inline void PotentialFromPolynomialAndMasses::UpdateParameters()
   {
-    runningParameters.UpdateSlhaParameters( slhaFilename );
-    PreparePolynomialHomotopyContinuation();
     EvaluateDsbInputAndSetScale();
+    PreparePolynomialHomotopyContinuation();
   }
 
 

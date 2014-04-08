@@ -90,7 +90,10 @@
     HMIX
     TREEHMIX
     LOOPHMIX
+    EXTPAR
     MSOFT
+    TREEMSOFT
+    LOOPMSOFT
     MSQ2
     MSU2
     MSD2
@@ -123,6 +126,7 @@
        TIMES: multiplies the arguments
        DIVIDE: divides the 1st argument by the 2nd
        POW: raises the 1st argument to the power of the 2nd
+       IFNONZERO: the 1st argument unless it is 0.0, in which case the 2nd
        
        Unary operations: all these take 1 alias as the argument,
                          e.g. ATAN[ bar ] or SQRT[ 6 ]
@@ -140,12 +144,41 @@
        COSH: hyperbolic cosine
        TANH: hyperbolic tangent -->
   <DerivedParameters>
+  <!-- Almost all of this is to cover the renormalization scheme used by
+       SARAH4. -->
+    tanBetaSlha=SLHAELEMENT[HMIX, 2]
+    tanBetaSarah=SLHAELEMENT[EXTPAR, 25]
+    tanBeta=IFNONZERO[tanBetaSarah, tanBetaSlha]
+    betaSlha=ATAN[ tanBeta ]
+    sinBetaSlha=SIN[ betaSlha ]
+    cosBetaSlha=COS[ betaSlha ]
+    vSlha=SLHAELEMENT[HMIX, 3]
+    vdSlha=TIMES[ cosBetaSlha, vSlha ]
+    vuSlha=TIMES[ sinBetaSlha, vSlha ]
+    vdSarah=SLHAELEMENT[HMIX, 102]
+    vuSarah=SLHAELEMENT[HMIX, 103]
+    vd=IFNONZERO[vdSarah, vdSlha]
+    vu=IFNONZERO[vuSarah, vuSlha]
     mu=SLHAELEMENT[HMIX, 1]
-    muTree=SLHAELEMENT[TREEHMIX, 1]
-    muLoop=SLHAELEMENT[LOOPHMIX, 1]
+    muSarahTree=SLHAELEMENT[TREEHMIX, 1]
+    muTree=IFNONZERO[muSarahTree, mu]
+    muSarahLoop=SLHAELEMENT[LOOPHMIX, 1]
+    muLoop=IFNONZERO[muSarahLoop, mu]
     Bmu=SLHAELEMENT[HMIX, 101]
-    BmuTree=SLHAELEMENT[TREEHMIX, 101]
-    BmuLoop=SLHAELEMENT[LOOPHMIX, 101]
+    BmuSarahTree=SLHAELEMENT[TREEHMIX, 101]
+    BmuTree=IFNONZERO[BmuSarahTree, Bmu]
+    BmuSarahLoop=SLHAELEMENT[LOOPHMIX, 101]
+    BmuLoop=IFNONZERO[BmuSarahLoop, Bmu]
+    mHdSq=SLHAELEMENT[MSOFT, 21]
+    mHdSqSarahTree=SLHAELEMENT[TREEMSOFT, 21]
+    mHdSqTree=IFNONZERO[mHdSqSarahTree, mHdSq]
+    mHdSqSarahLoop=SLHAELEMENT[LOOPMSOFT, 21]
+    mHdSqLoop=IFNONZERO[mHdSqSarahLoop, mHdSq]
+    mHuSq=SLHAELEMENT[MSOFT, 22]
+    mHuSqSarahTree=SLHAELEMENT[TREEMSOFT, 22]
+    mHuSqTree=IFNONZERO[mHuSqSarahTree, mHuSq]
+    mHuSqSarahLoop=SLHAELEMENT[LOOPMSOFT, 22]
+    mHuSqLoop=IFNONZERO[mHuSqSarahLoop, mHuSq]
   </DerivedParameters>
   
   <!-- Non-zero values for fields from FieldVariables should be specified here
@@ -176,8 +209,8 @@
        constant over all scales, so leaving EvaluationScale out will still give
        the same values as putting it in (with any value). -->
   <DsbMinimum>
-    Hd = HMIX[102]
-    Hu = HMIX[103]
+    Hd = vd
+    Hu = vu
   </DsbMinimum>
 
 </AllowedNonZeroVariables>
@@ -246,8 +279,8 @@
  + 0.5*E[3]^2*MSE2[3., 3.] 
  + 0.5*L[+1,2]^2*MSL2[2., 2.] 
  + 0.5*L[-1,3]^2*MSL2[3., 3.] 
- + 0.5*Hd^2*MSOFT[21.] 
- + 0.5*Hu^2*MSOFT[22.] 
+ + 0.5*Hd^2*mHdSqTree 
+ + 0.5*Hu^2*mHuSqTree 
  + 0.5*Q[+1,3]^2*MSQ2[3., 3.] 
  + 0.5*U[3]^2*MSU2[3., 3.] 
  + 0.7071067811865475*Hd*E[3]*L[-1,3]*TE[3., 3.] 
@@ -305,6 +338,10 @@
  +1.*Hd*Hu*BmuTree
  +0.7071067811865475*E[3]*L[-1,3]*Hu*muTree*YE[3., 3.] 
  +0.7071067811865475*Hd*Q[+1,3]*U[3]*muTree*YU[3., 3.] 
+ + 0.5*Hd^2*mHdSqLoop
+ + 0.5*Hu^2*mHuSqLoop
+ - 0.5*Hd^2*mHdSqTree 
+ - 0.5*Hu^2*mHuSqTree 
   </ExtraPolynomialPart>
 
   <!-- Currently, bosonic degrees of freedom (real scalars and real vectors)
@@ -340,7 +377,7 @@
        through a RealBosonMassSquaredMatrix. -->
        
   <RealBosonMassSquaredMatrix SpinType="ScalarBoson" MultiplicityFactor="1" ParticleName="hh" >
- 0.375*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.375*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2-0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[21.]+0.5*L[-1,3]^2*YE[1.,3.]^2+0.5*L[-1,3]^2*YE[2.,3.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2+0.5*L[-1,3]^2*YE[3.,3.]^2  
+ 0.375*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.375*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2-0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHdSqTree+0.5*L[-1,3]^2*YE[1.,3.]^2+0.5*L[-1,3]^2*YE[2.,3.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2+0.5*L[-1,3]^2*YE[3.,3.]^2  
  -0.25*Hd*Hu*GAUGE[1.]^2-0.25*Hd*Hu*GAUGE[2.]^2-1.*BmuTree  
  0.7071067811865475*E[3]*TE[3.,1.]+Hd*L[-1,3]*YE[1.,1.]*YE[1.,3.]+Hd*L[-1,3]*YE[2.,1.]*YE[2.,3.]+Hd*L[-1,3]*YE[3.,1.]*YE[3.,3.]  
  0.7071067811865475*E[3]*TE[3.,2.]+Hd*L[-1,3]*YE[1.,2.]*YE[1.,3.]+Hd*L[-1,3]*YE[2.,2.]*YE[2.,3.]+Hd*L[-1,3]*YE[3.,2.]*YE[3.,3.]  
@@ -390,7 +427,7 @@
  0.  
  0.  
  -0.25*Hd*Hu*GAUGE[1.]^2-0.25*Hd*Hu*GAUGE[2.]^2-1.*BmuTree  
- -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.375*Hu^2*GAUGE[1.]^2-0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.375*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[22.]+0.5*Q[+1,3]^2*YU[1.,3.]^2+0.5*Q[+1,3]^2*YU[2.,3.]^2+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*Q[+1,3]^2*YU[3.,3.]^2+0.5*U[3]^2*YU[3.,3.]^2  
+ -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.375*Hu^2*GAUGE[1.]^2-0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.375*Hu^2*GAUGE[2.]^2+muTree^2+mHuSqTree+0.5*Q[+1,3]^2*YU[1.,3.]^2+0.5*Q[+1,3]^2*YU[2.,3.]^2+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*Q[+1,3]^2*YU[3.,3.]^2+0.5*U[3]^2*YU[3.,3.]^2  
  -0.7071067811865475*E[3]*muTree*YE[3.,1.]  
  -0.7071067811865475*E[3]*muTree*YE[3.,2.]  
  -0.25*L[-1,3]*Hu*GAUGE[1.]^2+0.25*L[-1,3]*Hu*GAUGE[2.]^2-0.7071067811865475*E[3]*muTree*YE[3.,3.]  
@@ -890,7 +927,7 @@
  -0.7071067811865475*E[3]*muTree*YE[3.,1.]  
  -0.7071067811865475*E[3]*muTree*YE[3.,2.]  
  0.25*L[-1,3]*Hu*GAUGE[2.]^2-0.7071067811865475*E[3]*muTree*YE[3.,3.]  
- -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[22.]+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*U[3]^2*YU[3.,3.]^2  
+ -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHuSqTree+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*U[3]^2*YU[3.,3.]^2  
  0.25*Hd*Hu*GAUGE[2.]^2+BmuTree  
  0.  
  0.  
@@ -940,7 +977,7 @@
  -0.7071067811865475*E[3]*TE[3.,2.]-0.5*Hd*L[-1,3]*YE[1.,2.]*YE[1.,3.]-0.5*Hd*L[-1,3]*YE[2.,2.]*YE[2.,3.]-0.5*Hd*L[-1,3]*YE[3.,2.]*YE[3.,3.]  
  0.25*Hd*L[-1,3]*GAUGE[2.]^2-0.7071067811865475*E[3]*TE[3.,3.]-0.5*Hd*L[-1,3]*YE[1.,3.]^2-0.5*Hd*L[-1,3]*YE[2.,3.]^2-0.5*Hd*L[-1,3]*YE[3.,3.]^2  
  0.25*Hd*Hu*GAUGE[2.]^2+BmuTree  
- 0.125*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[21.]+0.5*Q[+1,3]^2*YD[1.,3.]^2+0.5*Q[+1,3]^2*YD[2.,3.]^2+0.5*Q[+1,3]^2*YD[3.,3.]^2+0.5*L[+1,2]^2*YE[1.,2.]^2+0.5*L[+1,2]^2*YE[2.,2.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*L[+1,2]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2  
+ 0.125*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHdSqTree+0.5*Q[+1,3]^2*YD[1.,3.]^2+0.5*Q[+1,3]^2*YD[2.,3.]^2+0.5*Q[+1,3]^2*YD[3.,3.]^2+0.5*L[+1,2]^2*YE[1.,2.]^2+0.5*L[+1,2]^2*YE[2.,2.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*L[+1,2]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2  
  0.  
  0.  
  0.  
@@ -2744,7 +2781,7 @@
   </RealBosonMassSquaredMatrix>
 
   <RealBosonMassSquaredMatrix SpinType="ScalarBoson" MultiplicityFactor="1" ParticleName="Ah" >
- 0.125*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2-0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[21.]+0.5*L[-1,3]^2*YE[1.,3.]^2+0.5*L[-1,3]^2*YE[2.,3.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2+0.5*L[-1,3]^2*YE[3.,3.]^2  
+ 0.125*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2-0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHdSqTree+0.5*L[-1,3]^2*YE[1.,3.]^2+0.5*L[-1,3]^2*YE[2.,3.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2+0.5*L[-1,3]^2*YE[3.,3.]^2  
  BmuTree  
  -0.7071067811865475*E[3]*TE[3.,1.]  
  -0.7071067811865475*E[3]*TE[3.,2.]  
@@ -2794,7 +2831,7 @@
  0.  
  0.  
  BmuTree  
- -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.125*Hu^2*GAUGE[1.]^2-0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[22.]+0.5*Q[+1,3]^2*YU[1.,3.]^2+0.5*Q[+1,3]^2*YU[2.,3.]^2+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*Q[+1,3]^2*YU[3.,3.]^2+0.5*U[3]^2*YU[3.,3.]^2  
+ -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.125*Hu^2*GAUGE[1.]^2-0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHuSqTree+0.5*Q[+1,3]^2*YU[1.,3.]^2+0.5*Q[+1,3]^2*YU[2.,3.]^2+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*Q[+1,3]^2*YU[3.,3.]^2+0.5*U[3]^2*YU[3.,3.]^2  
  -0.7071067811865475*E[3]*muTree*YE[3.,1.]  
  -0.7071067811865475*E[3]*muTree*YE[3.,2.]  
  -0.7071067811865475*E[3]*muTree*YE[3.,3.]  
@@ -3294,7 +3331,7 @@
  -0.7071067811865475*E[3]*muTree*YE[3.,1.]  
  -0.7071067811865475*E[3]*muTree*YE[3.,2.]  
  0.25*L[-1,3]*Hu*GAUGE[2.]^2-0.7071067811865475*E[3]*muTree*YE[3.,3.]  
- -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[22.]+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*U[3]^2*YU[3.,3.]^2  
+ -0.125*Hd^2*GAUGE[1.]^2+0.25*E[3]^2*GAUGE[1.]^2-0.125*L[-1,3]^2*GAUGE[1.]^2-0.125*L[+1,2]^2*GAUGE[1.]^2+0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2-0.16666666666666666*U[3]^2*GAUGE[1.]^2+0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2-0.125*L[-1,3]^2*GAUGE[2.]^2+0.125*L[+1,2]^2*GAUGE[2.]^2+0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHuSqTree+0.5*U[3]^2*YU[3.,1.]^2+0.5*U[3]^2*YU[3.,2.]^2+0.5*U[3]^2*YU[3.,3.]^2  
  -0.25*Hd*Hu*GAUGE[2.]^2-1.*BmuTree  
  0.  
  0.  
@@ -3344,7 +3381,7 @@
  0.7071067811865475*E[3]*TE[3.,2.]+0.5*Hd*L[-1,3]*YE[1.,2.]*YE[1.,3.]+0.5*Hd*L[-1,3]*YE[2.,2.]*YE[2.,3.]+0.5*Hd*L[-1,3]*YE[3.,2.]*YE[3.,3.]  
  -0.25*Hd*L[-1,3]*GAUGE[2.]^2+0.7071067811865475*E[3]*TE[3.,3.]+0.5*Hd*L[-1,3]*YE[1.,3.]^2+0.5*Hd*L[-1,3]*YE[2.,3.]^2+0.5*Hd*L[-1,3]*YE[3.,3.]^2  
  -0.25*Hd*Hu*GAUGE[2.]^2-1.*BmuTree  
- 0.125*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+MSOFT[21.]+0.5*Q[+1,3]^2*YD[1.,3.]^2+0.5*Q[+1,3]^2*YD[2.,3.]^2+0.5*Q[+1,3]^2*YD[3.,3.]^2+0.5*L[+1,2]^2*YE[1.,2.]^2+0.5*L[+1,2]^2*YE[2.,2.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*L[+1,2]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2  
+ 0.125*Hd^2*GAUGE[1.]^2-0.25*E[3]^2*GAUGE[1.]^2+0.125*L[-1,3]^2*GAUGE[1.]^2+0.125*L[+1,2]^2*GAUGE[1.]^2-0.041666666666666664*Q[+1,3]^2*GAUGE[1.]^2+0.16666666666666666*U[3]^2*GAUGE[1.]^2-0.125*Hu^2*GAUGE[1.]^2+0.125*Hd^2*GAUGE[2.]^2+0.125*L[-1,3]^2*GAUGE[2.]^2-0.125*L[+1,2]^2*GAUGE[2.]^2-0.125*Q[+1,3]^2*GAUGE[2.]^2+0.125*Hu^2*GAUGE[2.]^2+muTree^2+mHdSqTree+0.5*Q[+1,3]^2*YD[1.,3.]^2+0.5*Q[+1,3]^2*YD[2.,3.]^2+0.5*Q[+1,3]^2*YD[3.,3.]^2+0.5*L[+1,2]^2*YE[1.,2.]^2+0.5*L[+1,2]^2*YE[2.,2.]^2+0.5*E[3]^2*YE[3.,1.]^2+0.5*E[3]^2*YE[3.,2.]^2+0.5*L[+1,2]^2*YE[3.,2.]^2+0.5*E[3]^2*YE[3.,3.]^2  
  0.  
  0.  
  0.  

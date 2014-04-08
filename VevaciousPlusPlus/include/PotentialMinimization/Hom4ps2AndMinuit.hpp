@@ -11,6 +11,7 @@
 #include "../StandardIncludes.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
 #include "../PotentialEvaluation/HomotopyContinuationReadyPolynomial.hpp"
+#include "BOLlib/include/BOLlib.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -19,7 +20,8 @@ namespace VevaciousPlusPlus
   {
   public:
     Hom4ps2AndMinuit( HomotopyContinuationReadyPolynomial& polynomialPotential,
-                      std::string const pathToHom4ps2 );
+                      std::string const& pathToHom4ps2,
+                      std::string const homotopyType = "1" );
     virtual
     ~Hom4ps2AndMinuit();
 
@@ -43,7 +45,17 @@ namespace VevaciousPlusPlus
   protected:
     HomotopyContinuationReadyPolynomial& polynomialPotential;
     std::string const pathToHom4ps2;
+    std::string const homotopyType;
+    BOL::StringParser variableNamer;
+    std::vector< std::complex< long double > > complexSolutions;
+    std::vector< std::string > variableNames;
+    std::map< std::string, unsigned int > nameToIndexMap;
+    std::vector< std::vector< long double > > purelyRealSolutionSets;
     // MINUIT thing!
+
+    void WriteHom4p2Input( std::string const& hom4ps2InputFilename );
+
+    void ParseHom4ps2Output( std::string const& hom4ps2OutputFilename );
   };
 
 } /* namespace VevaciousPlusPlus */

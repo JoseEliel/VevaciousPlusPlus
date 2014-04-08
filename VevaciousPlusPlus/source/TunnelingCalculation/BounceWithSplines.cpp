@@ -12,7 +12,7 @@ namespace VevaciousPlusPlus
 
   BounceWithSplines::BounceWithSplines(
                                        PotentialFunction& potentialFunction ) :
-    TunnelingCalculator()
+    TunnelingCalculator( potentialFunction )
   {
     // placeholder:
     /**/std::cout << std::endl

@@ -10,8 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  HomotopyContinuationReadyPotential::HomotopyContinuationReadyPotential() :
-    PotentialFunction()
+  HomotopyContinuationReadyPotential::HomotopyContinuationReadyPotential(
+                                                   SlhaManager& slhaManager ) :
+    PotentialFunction( slhaManager )
   {
     // placeholder:
     /**/std::cout << std::endl

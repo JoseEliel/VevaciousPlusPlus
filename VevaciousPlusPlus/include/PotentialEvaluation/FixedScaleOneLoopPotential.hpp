@@ -17,7 +17,10 @@ namespace VevaciousPlusPlus
   class FixedScaleOneLoopPotential : public PotentialFromPolynomialAndMasses
   {
   public:
-    FixedScaleOneLoopPotential( std::string const& modelFilename );
+    FixedScaleOneLoopPotential( std::string const& modelFilename,
+                            RunningParameterManager& runningParameterManager );
+    FixedScaleOneLoopPotential(
+          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
     virtual
     ~FixedScaleOneLoopPotential();
 
@@ -59,19 +62,6 @@ namespace VevaciousPlusPlus
   protected:
     // This sets dsbFieldValueInputs based on the SLHA file just read in.
     virtual void EvaluateDsbInputAndSetScale();
-
-    // This prepares a system of polynomials for the homotopy continuation
-    // based on the current SLHA input data. Each polynomial term in the
-    // tree-level potential generates its derivatives in its fields with the
-    // coefficients fitted to a polynomial in the logarithm of the
-    // renormalization scale, and then also a polynomial relating the logarithm
-    // of the renormalization scale to minimumRenormalizationScaleSquared and
-    // the field values is also prepared.
-    virtual void PreparePolynomialHomotopyContinuation();
-
-    // This should prepare homotopyContinuationPotentialPolynomial
-    // appropriately.
-    virtual void PrepareHomotopyContinuationPotentialPolynomial();
 
     // This should prepare homotopyContinuationStartSystem appropriately.
     virtual void PrepareHomotopyContinuationStartSystem();

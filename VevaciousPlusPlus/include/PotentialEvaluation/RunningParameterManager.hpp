@@ -12,12 +12,13 @@
 #include "ParameterFunctionoid.hpp"
 #include "SLHA.hpp"
 #include "SlhaFunctionoid.hpp"
+#include "SlhaManager.hpp"
 #include "ConstantFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class RunningParameterManager
+  class RunningParameterManager : public SlhaManager
   {
   public:
     typedef LHPC::SLHA::SparseManyIndexedBlock< double > RestrictedSlhaBlock;
@@ -45,7 +46,7 @@ namespace VevaciousPlusPlus
     ParameterFunctionoid* GetFunctionoid( std::string const& parameterString );
 
     // This updates all SlhaFunctionoids with data from a new SLHA file.
-    void UpdateSlhaParameters( std::string const& slhaFilename );
+    virtual void ReadFile( std::string const& slhaFilename );
 
     // This updates all functionoids in order based on the new renormalization
     // scale.
@@ -54,6 +55,10 @@ namespace VevaciousPlusPlus
     // This returns the lowest Q found among the SLHA blocks. It returns 0.0
     // if no block had a scale greater than 0.0 GeV.
     double LowestBlockScale();
+
+    // This returns the highest Q found among the SLHA blocks. It returns 0.0
+    // if no block had a scale greater than 0.0 GeV.
+    double HighestBlockScale();
 
 
   protected:
@@ -114,7 +119,7 @@ namespace VevaciousPlusPlus
   }
 
   // This updates all SlhaFunctionoids with data from a new SLHA file.
-  inline void RunningParameterManager::UpdateSlhaParameters(
+  inline void RunningParameterManager::ReadFile(
                                               std::string const& slhaFilename )
   {
     slhaParser.readFile( slhaFilename );
@@ -189,6 +194,42 @@ namespace VevaciousPlusPlus
         if( ( returnValue <= 0.0 )
             ||
             ( returnValue > (*(*whichBlock))[ 0 ].getScale() ) )
+        {
+          returnValue = (*(*whichBlock))[ 0 ].getScale();
+        }
+      }
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "returnValue = " << returnValue;
+      std::cout << std::endl;/**/
+    }
+    return returnValue;
+  }
+
+  // This returns the highest Q found among the SLHA blocks. It returns 0.0 if
+  // no block had a scale greater than 0.0 GeV.
+  inline double RunningParameterManager::HighestBlockScale()
+  {
+    double returnValue( 0.0 );
+    for( std::vector< RestrictedSlhaBlock* >::iterator
+         whichBlock( slhaBlockPointers.begin() );
+         whichBlock < slhaBlockPointers.end();
+         ++whichBlock )
+    {
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << (*(*whichBlock)).getName() << " highest scale is "
+      << (*(*whichBlock))[ 0 ].getScale();
+      std::cout << std::endl;/**/
+
+      if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
+      {
+        if( ( returnValue <= 0.0 )
+            ||
+            ( returnValue < (*(*whichBlock))[ 0 ].getScale() ) )
         {
           returnValue = (*(*whichBlock))[ 0 ].getScale();
         }

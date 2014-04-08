@@ -11,6 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   RunningParameterManager::RunningParameterManager() :
+    SlhaManager(),
     parameterFunctionoidPointers(),
     parameterFunctionoidMap(),
     parameterFinder(),
@@ -183,6 +184,21 @@ namespace VevaciousPlusPlus
                             "Derived POW parameter incorrect in model file!" );
       }
       createdFunctionoid = new BinaryOperationFunctionoid( &(pow),
+                                                           pointerPair.first,
+                                                          pointerPair.second );
+      parameterFunctionoidPointers.push_back( createdFunctionoid );
+    }
+    else if( typeString.compare( "IFNONZERO" ) == 0 )
+    {
+      std::pair< ParameterFunctionoid*, ParameterFunctionoid* >
+      pointerPair( FindFunctionoidPair( bracketedString ) );
+      if( pointerPair.second == NULL )
+      {
+        throw std::runtime_error(
+                      "Derived IFNONZERO parameter incorrect in model file!" );
+      }
+      createdFunctionoid = new BinaryOperationFunctionoid(
+                              &(BinaryOperationFunctionoid::IfNonZeroFunction),
                                                            pointerPair.first,
                                                           pointerPair.second );
       parameterFunctionoidPointers.push_back( createdFunctionoid );

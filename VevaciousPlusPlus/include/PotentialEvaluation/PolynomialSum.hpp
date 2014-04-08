@@ -35,8 +35,15 @@ namespace VevaciousPlusPlus
     // polynomialTerms.
     unsigned int HighestFieldPower() const;
 
+    // This prints the polynomial with the current values of the coefficients
+    // and the powers of the fields with names given by fieldNames to a string
+    // and returns it.
+    std::string AsStringAtCurrentScale(
+                          std::vector< std::string > const& fieldNames ) const;
+
     // This is mainly for debugging:
     std::string AsDebuggingString() const;
+
 
   protected:
     std::vector< PolynomialTerm > polynomialTerms;
@@ -92,6 +99,31 @@ namespace VevaciousPlusPlus
       }
     }
     return highestPower;
+  }
+
+  // This prints the polynomial with the current values of the coefficients
+  // and the powers of the fields with names given by fieldNames to a string
+  // and returns it.
+  inline std::string PolynomialSum::AsStringAtCurrentScale(
+                        std::vector< std::string > const& fieldNames ) const
+  {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PolynomialSum::AsStringAtCurrentScale( ... ) called.";
+    std::cout << std::endl;/**/
+
+    std::string returnString( "" );
+    for( std::vector< PolynomialTerm >::const_iterator
+         whichTerm( polynomialTerms.begin() );
+         whichTerm < polynomialTerms.end();
+         ++whichTerm )
+    {
+      returnString.append( whichTerm->AsStringAtCurrentScale( fieldNames,
+                                      ( whichTerm != polynomialTerms.begin() ),
+                                                              true ) );
+    }
+    return returnString;
   }
 
   // This is mainly for debugging:

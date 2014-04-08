@@ -11,8 +11,10 @@ namespace VevaciousPlusPlus
 {
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
-                                           std::string const& modelFilename ) :
-    PotentialFromPolynomialAndMasses( modelFilename )
+                                              std::string const& modelFilename,
+                           RunningParameterManager& runningParameterManager ) :
+    PotentialFromPolynomialAndMasses( modelFilename,
+                                      runningParameterManager )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -20,7 +22,17 @@ namespace VevaciousPlusPlus
     << "FixedScaleOneLoopPotential::FixedScaleOneLoopPotential( \""
     << modelFilename << "\" )";
     std::cout << std::endl;/**/
+  }
 
+  FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
+         PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
+    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "FixedScaleOneLoopPotential::FixedScaleOneLoopPotential( [copy] )";
+    std::cout << std::endl;/**/
   }
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
@@ -56,34 +68,6 @@ namespace VevaciousPlusPlus
     /**/std::cout << std::endl
     << "Placeholder: FixedScaleOneLoopPotential::"
     << "HomotopyContinuationSystemGradients( ... )";
-    std::cout << std::endl;/**/
-  }
-
-  // This prepares a system of polynomials for the homotopy continuation
-  // based on the current SLHA input data. Each polynomial term in the
-  // tree-level potential generates its derivatives in its fields with the
-  // coefficients fitted to a polynomial in the logarithm of the
-  // renormalization scale, and then also a polynomial relating the logarithm
-  // of the renormalization scale to minimumRenormalizationScaleSquared and
-  // the field values is also prepared.
-  void FixedScaleOneLoopPotential::PreparePolynomialHomotopyContinuation()
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: FixedScaleOneLoopPotential::"
-    << "PrepareHomotopyContinuationPolynomials()";
-    std::cout << std::endl;/**/
-  }
-
-  // This should prepare homotopyContinuationPotentialPolynomial
-  // appropriately.
-  void
-  FixedScaleOneLoopPotential::PrepareHomotopyContinuationPotentialPolynomial()
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: FixedScaleOneLoopPotential::"
-    << "PrepareHomotopyContinuationPotentialPolynomial()";
     std::cout << std::endl;/**/
   }
 

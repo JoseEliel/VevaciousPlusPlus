@@ -10,15 +10,12 @@
 namespace VevaciousPlusPlus
 {
 
-  PotentialFunction::PotentialFunction() :
+  PotentialFunction::PotentialFunction( SlhaManager& slhaManager ) :
+    BOL::BasicObserver(),
     fieldNames(),
     numberOfFields( 0 )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PotentialFunction::PotentialFunction()";
-    std::cout << std::endl;/**/
+    slhaManager.registerObserver( this );
   }
 
   PotentialFunction::~PotentialFunction()

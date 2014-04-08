@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
                                       public HomotopyContinuationReadyPotential
   {
   public:
-    HomotopyContinuationReadyPolynomial();
+    HomotopyContinuationReadyPolynomial( SlhaManager& slhaManager );
     virtual
     ~HomotopyContinuationReadyPolynomial();
 
@@ -103,9 +103,19 @@ namespace VevaciousPlusPlus
   HomotopyContinuationReadyPolynomial::PreparePolynomialGradient()
   {
     targetPolynomialGradient.assign( numberOfFields,
-                               PolynomialSum() );
+                                     PolynomialSum() );
     std::vector< PolynomialTerm > const& polynomialForGradient(
                    homotopyContinuationPotentialPolynomial.PolynomialTerms() );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "HomotopyContinuationReadyPolynomial::PreparePolynomialGradient()"
+    <<  " called. targetPolynomialGradient.size() set to "
+    << targetPolynomialGradient.size()
+    <<  ", polynomialForGradient.size() = " << polynomialForGradient.size();
+    std::cout << std::endl;/**/
+
     for( unsigned int fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -115,6 +125,14 @@ namespace VevaciousPlusPlus
            whichTerm < polynomialForGradient.end();
            ++whichTerm )
       {
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "trying to differentiate [" << whichTerm->AsDebuggingString()
+        << "] with respect to fieldNames[ " << fieldIndex << " ] = \""
+        << fieldNames[ fieldIndex ] << "\".";
+        std::cout << std::endl;/**/
+
         if( whichTerm->NonZeroDerivative( fieldIndex ) )
         {
           targetPolynomialGradient[ fieldIndex ].PolynomialTerms().push_back(
@@ -122,6 +140,21 @@ namespace VevaciousPlusPlus
         }
       }
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "targetPolynomialGradient =" << std::endl;
+    for( std::vector< PolynomialSum >::iterator
+         whichTadpole( targetPolynomialGradient.begin() );
+         whichTadpole < targetPolynomialGradient.end();
+         ++whichTadpole )
+    {
+      std::cout << std::endl << whichTadpole->AsDebuggingString();
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;/**/
+
   }
 
 } /* namespace VevaciousPlusPlus */

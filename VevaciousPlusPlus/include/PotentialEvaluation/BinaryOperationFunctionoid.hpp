@@ -30,6 +30,9 @@ namespace VevaciousPlusPlus
     static double DivideFunction( double firstValue,
                                   double secondValue )
     { return ( firstValue / secondValue ); }
+    static double IfNonZeroFunction( double firstValue,
+                                     double secondValue )
+    { return ( ( firstValue != 0.0 ) ? firstValue : secondValue ); }
 
     BinaryOperationFunctionoid( double (*binaryOperation)( double,
                                                            double ),

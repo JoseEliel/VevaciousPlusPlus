@@ -25,9 +25,11 @@ int main( int argumentCount,
   // of classes derived from abstract base classes to the VevaciousPlusPlus
   // constructor. Since constructing such instances requires one to provide the
   // code enabling them to perform their tasks, one has to start with an
-  // instance of a class derived from the PotentialFunction abstract base class
-  // and then pass that to the classes derived from the PotentialMinimizer and
-  // TunnelingCalculator abstract base classes, unless one wants to out in some
+  // instance of a class derived from the SlhaManager anstract base class (so
+  // that SLHA data is shared properly), then pass that on to an instance of a
+  // class derived from the PotentialFunction abstract base class, and then
+  // pass both to the classes derived from the PotentialMinimizer and
+  // TunnelingCalculator abstract base classes, unless one wants to put in some
   // hacking effort.
 
   // The default strategies are:
@@ -40,22 +42,34 @@ int main( int argumentCount,
   //   between the vacua parameterized by splines, as implemented in the
   //   BounceWithSplines class, which requires an instance of a class derived
   //   from the PotentialFunction abstract base clases.
-  // Hence creating an instance of the PotentialFromPolynomialAndMasses class,
-  // which inherits from both HomotopyContinuationReadyPotential and
-  // PotentialFunction (through HomotopyContinuationReadyPotential itself
-  // already being derived from PotentialFunction), forms the basis of the
-  // components of the VevaciousPlusPlus object.
+  // Hence creating an instance of the FixedScaleOneLoopPotential class,
+  // which inherits from both HomotopyContinuationReadyPolynomial and
+  // PotentialFunction (through HomotopyContinuationReadyPolynomial itself
+  // already being derived from PotentialFunction through
+  // HomotopyContinuationReadyPotential), with an instance of the
+  // RunningParameterManager class, forms the basis of the components of the
+  // VevaciousPlusPlus object.
 
-  // The PotentialFromPolynomialAndMasses constructor takes a string with the
-  // name of the model file (including the path):
-  VevaciousPlusPlus::RgeImprovedOneLoopPotential
-  rgeImprovedPotential( argumentParser.fromTag( "model",
-                                                "./ModelFiles/SM.vin" ) );
+  // The RunningParameterManager class handles SLHA data and interpolates to
+  // the scale dependence as given in the SLHA file.
+  VevaciousPlusPlus::RunningParameterManager runningParameterManager;
 
-
+  // The FixedScaleOneLoopPotential constructor takes a string with the name of
+  // the model file (including the path) and a reference to a
+  // RunningParameterManager instance:
   VevaciousPlusPlus::FixedScaleOneLoopPotential
   fixedScalePotential( argumentParser.fromTag( "model",
-                                               "./ModelFiles/SM.vin" ) );
+                                               "./ModelFiles/SM.vin" ),
+                       runningParameterManager );
+
+  // Both the FixedScaleOneLoopPotential and the RgeImprovedOneLoopPotential
+  // classes can take a reference to a PotentialFromPolynomialAndMasses
+  // instance to make a copy constructor, and since they are both derived from
+  // PotentialFromPolynomialAndMasses, we can make an instance of 1 of them
+  // from an instance of the other.
+  VevaciousPlusPlus::RgeImprovedOneLoopPotential
+  rgeImprovedPotential( fixedScalePotential );
+
 
   // Now the HomotopyContinuationAndGradient object and the BounceWithSplines
   // object can be constructed:
@@ -69,6 +83,7 @@ int main( int argumentCount,
   // Create the VevaciousTwo object, telling it where to find its settings,
   // such as the model to use and the way to calculate the tunneling time.
   VevaciousPlusPlus::VevaciousPlusPlus vevaciousPlusPlus( argumentParser,
+                                                       runningParameterManager,
                                                           potentialMinimizer,
                                                          tunnelingCalculator );
 
@@ -95,8 +110,9 @@ int main( int argumentCount,
     testConfiguration.resize( 2,
                               0.0 );
   }
-  rgeImprovedPotential.UpdateParameters( slhaFile );
-  fixedScalePotential.UpdateParameters( slhaFile );
+  runningParameterManager.UpdateSlhaData( slhaFile );
+  rgeImprovedPotential.UpdateParameters();
+  fixedScalePotential.UpdateParameters();
 
   std::cout
   << "Fixed-scale at origin = "
@@ -187,8 +203,9 @@ int main( int argumentCount,
   }
 
   testConfiguration[ 0 ] = 300.0;
-  rgeImprovedPotential.UpdateParameters( slhaFile );
-  fixedScalePotential.UpdateParameters( slhaFile );
+  runningParameterManager.UpdateSlhaData( slhaFile );
+  rgeImprovedPotential.UpdateParameters();
+  fixedScalePotential.UpdateParameters();
   std::cout << "For { ";
   for( unsigned int fieldIndex( 0 );
        fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
@@ -215,8 +232,9 @@ int main( int argumentCount,
   << fixedScalePotential( testConfiguration,
                           testTemperature );
   std::cout << std::endl;
-  rgeImprovedPotential.UpdateParameters( slhaFile );
-  fixedScalePotential.UpdateParameters( slhaFile );
+  runningParameterManager.UpdateSlhaData( slhaFile );
+  rgeImprovedPotential.UpdateParameters();
+  fixedScalePotential.UpdateParameters();
   std::cout << "For { ";
   for( unsigned int fieldIndex( 0 );
        fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
