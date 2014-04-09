@@ -38,12 +38,12 @@ namespace VevaciousPlusPlus
     scaleLogarithmPowerCoefficients.resize( numberOfScales );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "[" << this->AsString()
     << "].UpdateForNewSlhaParameters() called. numberOfScales = "
     << numberOfScales;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     if( numberOfScales > 1 )
     {
@@ -73,13 +73,13 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "scaleDependenceMatrix = " << std::endl
       << scaleDependenceMatrix << std::endl
       << "scaleDependenceVector = " << std::endl
       << scaleDependenceVector << std::endl;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       // Now we solve for the coefficients:
       Eigen::VectorXd
@@ -93,11 +93,11 @@ namespace VevaciousPlusPlus
         = solutionVector( whichScale );
 
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "scaleLogarithmPowerCoefficients[ " << whichScale << " ] = "
         << scaleLogarithmPowerCoefficients[ whichScale ];
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
       }
     }
     else

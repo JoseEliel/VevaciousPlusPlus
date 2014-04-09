@@ -21,9 +21,15 @@ LHPCINCLUDEDIR=$(LHPCDIR)/include/
 LHPCLIBDIR=$(LHPCDIR)/lib/
 #EIGENDIR=./Eigen/
 EIGENDIR=../../../machine-specific/Eigen/
+#MINUITLIBNAME=lcg_Minuit
+MINUITLIBNAME=Minuit2
+#MINUITINCLUDEDIR=./MINUIT/include/
+MINUITINCLUDEDIR=../../../machine-specific/Minuit2/include/
+#MINUITLIBDIR=./MINUIT/include/
+MINUITLIBDIR=../../../machine-specific/Minuit2/lib/
 DEBUGFLAGS=
-CCFLAGS=-Wall -O3 $(DEBUGFLAGS) -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
-#CCFLAGS=-Wall -O3 -g -I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR)
+INCLUDES=-I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(MINUITINCLUDEDIR)
+CCFLAGS=-Wall -O3 $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
@@ -49,6 +55,8 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \
  source/PotentialMinimization/Hom4ps2AndMinuit.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
+ source/PotentialMinimization/MinuitManager.cpp \
+ source/PotentialMinimization/PotentialForMinuit.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/TunnelingCalculation/BounceWithSplines.cpp \
@@ -58,9 +66,14 @@ OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/
 LIBNAME=VevaciousPlusPlus
 LIBDIR=./lib/
-LDFLAGS= -L$(LIBDIR) -l$(LIBNAME)
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
-LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) -L$(LHPCLIBDIR) -l$(LHPCLIBNAME)
+LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) -L$(LHPCLIBDIR) \
+ -l$(LHPCLIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
+# -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
+# There is some silly screwing around to force linking to the static Minuit2 
+# library.
+# Currently there's a problem with Minuit2 automatically using OPENMP with its
+# installation, which doesn't work on my Mac.
 MAINCPP=source/VevaciousPlusPlusMain.cpp
 EXEFILE=$(BINDIR)/VevaciousPlusPlus.exe
 

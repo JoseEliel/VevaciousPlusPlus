@@ -16,6 +16,7 @@ namespace VevaciousPlusPlus
                                       std::string const homotopyType ) :
     HomotopyContinuationAndGradient( polynomialPotential ),
     polynomialPotential( polynomialPotential ),
+    potentialForMinuit( polynomialPotential ),
     pathToHom4ps2( pathToHom4ps2 ),
     homotopyType( homotopyType ),
     variableNamer( 4,
@@ -198,7 +199,8 @@ namespace VevaciousPlusPlus
     // At this point, the line "The order of variables :" should have been
     // found. If it hasn't, the file is malformed, but we carry on regardless,
     // looking for the variables in order:
-    std::vector< unsigned int > indexOrder( variableNames.size() );
+    unsigned int numberOfVariables( variableNames.size() );
+    std::vector< unsigned int > indexOrder( numberOfVariables );
     unsigned int whichVariable( 0 );
     while( tadpoleSolutionsFile.readNextNonEmptyLineOfFileWithoutComment(
                                                                  lineString ) )
@@ -215,7 +217,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "indexOrder = ";
     for( std::vector< unsigned int >::iterator
@@ -225,14 +227,91 @@ namespace VevaciousPlusPlus
     {
       std::cout << std::endl << *whichIndex;
     }
-    std::cout << std::endl;
+    std::cout << std::endl
+    << "complexSolutions = { " << std::endl;
+    for( std::vector< std::complex< long double > >::iterator
+         complexValue( complexSolutions.begin() );
+         complexValue < complexSolutions.end();
+         ++complexValue )
+    {
+      std::cout << " ( " << complexValue->real() << ", "
+      << complexValue->imag() << " i )";
+    }
+    std::cout << "}" << std::endl;
+    std::cout << std::endl;*/
+
+    std::vector< std::complex< double > >
+    candidateRealSolution( numberOfVariables );
+    unsigned int solutionIndex;
+    for( unsigned int complexIndex( 0 );
+         complexIndex < complexSolutions.size();
+         ++complexIndex )
+    {
+      solutionIndex = ( complexIndex % numberOfVariables );
+      candidateRealSolution[ indexOrder[ solutionIndex ] ].real()
+      = (double)(complexSolutions[ complexIndex ].real());
+      candidateRealSolution[ indexOrder[ solutionIndex ] ].imag()
+      = (double)(complexSolutions[ complexIndex ].imag());
+      if( solutionIndex == ( numberOfVariables - 1 ) )
+      {
+        polynomialPotential.AppendPureRealSolutionAndValidSignFlips(
+                                                         candidateRealSolution,
+                                                      purelyRealSolutionSets,
+                                                                     2.0 );
+      }
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "purelyRealSolutionSets = {" << std::endl;
+    for( std::vector< std::vector< double > >::iterator
+         realSolution( purelyRealSolutionSets.begin() );
+         realSolution < purelyRealSolutionSets.end();
+         ++realSolution )
+    {
+      std::cout << "{";
+      for( std::vector< double >::iterator
+           realValue( realSolution->begin() );
+           realValue < realSolution->end();
+           ++realValue )
+      {
+        std::cout << " " << *realValue;
+      }
+      std::cout << " } with tree-level depth "
+      << polynomialPotential.QuickApproximation( *realSolution ) << std::endl;
+    }
+    std::cout << "}" << std::endl;
     std::cout << std::endl;/**/
 
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "still need to sort out purelyRealSolutionSets!";
+    << "still need to run MINUIT!";
     std::cout << std::endl;/**/
+
+    MinuitManager minuitManager( potentialForMinuit );
+    for( std::vector< std::vector< double > >::iterator
+         realSolution( purelyRealSolutionSets.begin() );
+         realSolution < purelyRealSolutionSets.end();
+         ++realSolution )
+    {
+      ROOT::Minuit2::FunctionMinimum
+      foundMinimum( minuitManager( *realSolution ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "foundMinimum = " << foundMinimum << std::endl;
+      std::cout << std::endl;/**/
+
+
+      // placeholder:
+      /**/std::cout << std::endl
+      << "Placeholder: "
+      << "still need to do something with ROOT::Minuit2::FunctionMinimum";
+      std::cout << std::endl;/**/
+    }
   }
 
 

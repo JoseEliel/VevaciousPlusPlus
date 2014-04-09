@@ -107,12 +107,6 @@ namespace VevaciousPlusPlus
   inline std::string PolynomialSum::AsStringAtCurrentScale(
                         std::vector< std::string > const& fieldNames ) const
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialSum::AsStringAtCurrentScale( ... ) called.";
-    std::cout << std::endl;/**/
-
     std::string returnString( "" );
     for( std::vector< PolynomialTerm >::const_iterator
          whichTerm( polynomialTerms.begin() );

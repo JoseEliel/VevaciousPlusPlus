@@ -44,19 +44,20 @@ namespace VevaciousPlusPlus
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum );
 
-    // This evaluates the target system and places the values in
-    // destinationVector.
-    virtual void
-    HomotopyContinuationSystemValues(
-                                   std::vector< double > solutionConfiguration,
-                                    std::vector< double >& destinationVector );
-
-    // This evaluates the derivatives of the target system and places the
-    // values in destinationMatrix.
-    virtual void
-    HomotopyContinuationSystemGradients(
-                                   std::vector< double > solutionConfiguration,
-                     std::vector< std::vector< double > >& destinationMatrix );
+    // This should return a vector of field values corresponding to the field
+    // configuration as it should be passed to operator() for evaluating the
+    // potential, given a vector of values that solve this instance's homotopy
+    // continuation system. It should return an empty vector if
+    // homotopyContinuatioConfiguration does not correspond to a valid field
+    // configuration. (For example, RgeImprovedOneLoopPotential uses the
+    // logarithm of the renormalization scale as an extra variable in the
+    // homotopy continuation, so homotopyContinuatioConfiguration actually has
+    // an extra entry compared to a valid field configuration. Also, it may
+    // be that homotopyContinuatioConfiguration did not correspond to a valid
+    // solution where the scale is close to the Euclidean length of the field
+    // configuration, so it would not correspond to a valid solution.)
+    virtual std::vector< double > ValidFieldsFromHomotopyContinuation(
+                std::vector< double > homotopyContinuatioConfiguration ) const;
 
 
   protected:
@@ -103,6 +104,15 @@ namespace VevaciousPlusPlus
     return renormalizationScaleSquared;
   }
 
+  // FixedScaleOneLoopPotential prepares the homotopy continuation polynomials
+  // in 1-to-1 correspondence with how they should be sent to operator().
+  inline std::vector< double >
+  FixedScaleOneLoopPotential::ValidFieldsFromHomotopyContinuation(
+                 std::vector< double > homotopyContinuatioConfiguration ) const
+  {
+    return homotopyContinuatioConfiguration;
+  }
+
   // This sets dsbFieldValueInputs based on the SLHA file just read in.
   inline void FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale()
   {
@@ -121,7 +131,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale() set"
     << " renormalizationScaleSquared to " << renormalizationScaleSquared
@@ -133,7 +143,7 @@ namespace VevaciousPlusPlus
       std::cout << fieldNames[ fieldIndex ] << " -> "
       << dsbFieldValueInputs[ fieldIndex ] << std::endl;
     }
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

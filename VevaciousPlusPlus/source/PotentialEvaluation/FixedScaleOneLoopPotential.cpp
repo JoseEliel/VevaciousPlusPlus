@@ -16,23 +16,14 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialAndMasses( modelFilename,
                                       runningParameterManager )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "FixedScaleOneLoopPotential::FixedScaleOneLoopPotential( \""
-    << modelFilename << "\" )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "FixedScaleOneLoopPotential::FixedScaleOneLoopPotential( [copy] )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
@@ -44,32 +35,6 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
-
-  // This evaluates the target system and places the values in
-  // destinationVector.
-  void FixedScaleOneLoopPotential::HomotopyContinuationSystemValues(
-                                   std::vector< double > solutionConfiguration,
-                                     std::vector< double >& destinationVector )
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "FixedScaleOneLoopPotential::HomotopyContinuationSystemValues( ... )";
-    std::cout << std::endl;/**/
-  }
-
-  // This evaluates the derivatives of the target system and places the
-  // values in destinationMatrix.
-  void FixedScaleOneLoopPotential::HomotopyContinuationSystemGradients(
-                                   std::vector< double > solutionConfiguration,
-                      std::vector< std::vector< double > >& destinationMatrix )
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: FixedScaleOneLoopPotential::"
-    << "HomotopyContinuationSystemGradients( ... )";
-    std::cout << std::endl;/**/
-  }
 
   // This should prepare homotopyContinuationStartSystem and
   // startPolynomialHessian appropriately.

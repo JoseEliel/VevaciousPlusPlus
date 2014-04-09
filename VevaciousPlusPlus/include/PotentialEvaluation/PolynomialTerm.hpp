@@ -194,7 +194,7 @@ namespace VevaciousPlusPlus
   PolynomialTerm::NonZeroDerivative( unsigned int const fieldIndex ) const
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PolynomialTerm::NonZeroDerivative( " << fieldIndex
     << " ) called. fieldPowersByIndex.size() = " << fieldPowersByIndex.size();
@@ -204,7 +204,7 @@ namespace VevaciousPlusPlus
       << ", fieldPowersByIndex[ fieldIndex ] = "
       << fieldPowersByIndex[ fieldIndex ] << std::endl;
     }
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     return ( ( fieldPowersByIndex.size() > fieldIndex )
              &&

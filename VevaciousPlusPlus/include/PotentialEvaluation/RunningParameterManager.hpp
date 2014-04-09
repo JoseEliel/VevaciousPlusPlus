@@ -141,12 +141,12 @@ namespace VevaciousPlusPlus
     double const logarithmOfScale( log( renormalizationScale ) );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "RunningParameterManager::UpdateRunningParameters( "
     << renormalizationScale << " ) called. logarithmOfScale = "
     << logarithmOfScale;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
 
     for( std::vector< ParameterFunctionoid* >::iterator
@@ -183,11 +183,11 @@ namespace VevaciousPlusPlus
          ++whichBlock )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << (*(*whichBlock)).getName() << " lowest scale is "
       << (*(*whichBlock))[ 0 ].getScale();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
       {
@@ -200,10 +200,10 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "returnValue = " << returnValue;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
     return returnValue;
   }
@@ -219,11 +219,11 @@ namespace VevaciousPlusPlus
          ++whichBlock )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << (*(*whichBlock)).getName() << " highest scale is "
       << (*(*whichBlock))[ 0 ].getScale();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
       {
@@ -236,10 +236,10 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "returnValue = " << returnValue;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
     return returnValue;
   }

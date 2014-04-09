@@ -436,7 +436,7 @@ namespace VevaciousPlusPlus
   // This is just for derived classes.
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                                PotentialFromPolynomialAndMasses& copySource ) :
-    HomotopyContinuationReadyPolynomial( copySource.runningParameters ),
+    HomotopyContinuationReadyPolynomial( copySource ),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
     renormalizationScaleSquared( copySource.renormalizationScaleSquared ),

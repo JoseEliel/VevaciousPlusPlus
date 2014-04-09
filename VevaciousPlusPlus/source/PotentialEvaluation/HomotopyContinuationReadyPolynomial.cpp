@@ -67,4 +67,30 @@ namespace VevaciousPlusPlus
     }
   }
 
+  // This evaluates the derivatives of the target system and places the
+  // values in destinationMatrix.
+  void
+  HomotopyContinuationReadyPolynomial::HomotopyContinuationSystemGradients(
+                   std::vector< std::complex< double > > solutionConfiguration,
+                                 std::vector< std::vector< std::complex< double
+                                                     > > >& destinationMatrix )
+  {
+    destinationMatrix.resize( targetPolynomialHessian.size() );
+    for( unsigned int constraintIndex( 0 );
+         constraintIndex < targetPolynomialHessian.size();
+         ++constraintIndex )
+    {
+      destinationMatrix[ constraintIndex ].resize(
+                           targetPolynomialHessian[ constraintIndex ].size() );
+      for( unsigned int variableIndex( 0 );
+           variableIndex < targetPolynomialHessian[ constraintIndex ].size();
+           ++variableIndex )
+      {
+        destinationMatrix[ constraintIndex ][ variableIndex ]
+        = targetPolynomialHessian[ constraintIndex ][ variableIndex ](
+                                                       solutionConfiguration );
+      }
+    }
+  }
+
 } /* namespace VevaciousPlusPlus */
