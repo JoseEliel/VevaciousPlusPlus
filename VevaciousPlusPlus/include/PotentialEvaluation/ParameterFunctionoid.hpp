@@ -24,6 +24,10 @@ namespace VevaciousPlusPlus
     // This returns the value of the functionoid based on the last update.
     double operator()() const{ return currentValue; }
 
+    // This should return the value of the functionoid for the given logarithm
+    // of the scale.
+    virtual double operator()( double const logarithmOfScale ) const = 0;
+
     // This should update currentValue based on logarithmOfScale and any other
     // functionoids that this functionoid is dependent on.
     virtual void

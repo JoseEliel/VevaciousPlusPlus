@@ -290,6 +290,13 @@ namespace VevaciousPlusPlus
     << "still need to run MINUIT!";
     std::cout << std::endl;/**/
 
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "still need to move this out of ParseHom4ps2Output!";
+    std::cout << std::endl;/**/
+
     MinuitManager minuitManager( potentialForMinuit );
     for( std::vector< std::vector< double > >::iterator
          realSolution( purelyRealSolutionSets.begin() );

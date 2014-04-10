@@ -24,11 +24,22 @@ namespace VevaciousPlusPlus
 
 
     // This multiplies the relevant field values with the coefficient and the
-    // values from the functionoids.
-    double operator()( std::vector< double > const& fieldConfiguration ) const;
+    // values from the functionoids at the scale last used to update them.
+    double operator()( std::vector< double > const& fieldConfiguration ) const
+    { return FunctionoidProduct( FieldProduct( coefficientConstant,
+                                               fieldConfiguration ) ); }
 
     // This multiplies the relevant field values with the coefficient and the
-    // values from the functionoids.
+    // values from the functionoids at the scale given by the natural exponent
+    // of logarithmOfScale.
+    double operator()( std::vector< double > const& fieldConfiguration,
+                       double const logarithmOfScale ) const
+    { return FunctionoidProduct( FieldProduct( coefficientConstant,
+                                               fieldConfiguration ),
+                                 logarithmOfScale ); }
+
+    // This multiplies the relevant field values with the coefficient and the
+    // values from the functionoids at the scale last used to update them.
     std::complex< double > operator()(
        std::vector< std::complex< double > > const& fieldConfiguration ) const;
 
@@ -86,33 +97,25 @@ namespace VevaciousPlusPlus
     std::vector< unsigned int > fieldProductByIndex;
     std::vector< unsigned int > fieldPowersByIndex;
     std::vector< ParameterFunctionoid* > functionoidProduct;
+
+    // This returns doubleToMultiply multiplied by the field product using the
+    // values in fieldConfiguration.
+    double const FieldProduct( double doubleToMultiply,
+                       std::vector< double > const& fieldConfiguration ) const;
+
+    // This returns doubleToMultiply multiplied by the funtionoids in
+    // functionoidProduct using the values from the last scale update.
+    double const FunctionoidProduct( double doubleToMultiply ) const;
+
+    // This returns doubleToMultiply multiplied by the funtionoids in
+    // functionoidProduct at the scale given by the natural exponent of
+    // logarithmOfScale.
+    double const FunctionoidProduct( double doubleToMultiply,
+                                     double const logarithmOfScale ) const;
   };
 
 
 
-
-  // This multiplies the relevant field values with the coefficient and the
-  // values from the functionoids.
-  inline double PolynomialTerm::operator()(
-                        std::vector< double > const& fieldConfiguration ) const
-  {
-    double returnValue( coefficientConstant );
-    for( std::vector< unsigned int >::const_iterator
-         whichField( fieldProductByIndex.begin() );
-         whichField < fieldProductByIndex.end();
-         ++whichField )
-    {
-      returnValue *= fieldConfiguration[ *whichField ];
-    }
-    for( std::vector< ParameterFunctionoid* >::const_iterator
-         whichFunctionoid( functionoidProduct.begin() );
-         whichFunctionoid < functionoidProduct.end();
-         ++whichFunctionoid )
-    {
-      returnValue *= (*(*whichFunctionoid))();
-    }
-    return returnValue;
-  }
 
   // This multiplies the relevant field values with the coefficient and the
   // values from the functionoids.
@@ -235,6 +238,53 @@ namespace VevaciousPlusPlus
                                                whichField );
     }
     return returnTerm;
+  }
+
+  // This returns doubleToMultiply multiplied by the field product using the
+  // values in fieldConfiguration.
+  inline double const PolynomialTerm::FieldProduct( double doubleToMultiply,
+                        std::vector< double > const& fieldConfiguration ) const
+  {
+    for( std::vector< unsigned int >::const_iterator
+         whichField( fieldProductByIndex.begin() );
+         whichField < fieldProductByIndex.end();
+         ++whichField )
+    {
+      doubleToMultiply *= fieldConfiguration[ *whichField ];
+    }
+    return doubleToMultiply;
+  }
+
+  // This returns doubleToMultiply multiplied by the funtionoids in
+  // functionoidProduct using the values from the last scale update.
+  inline double const
+  PolynomialTerm::FunctionoidProduct( double doubleToMultiply ) const
+  {
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         whichFunctionoid( functionoidProduct.begin() );
+         whichFunctionoid < functionoidProduct.end();
+         ++whichFunctionoid )
+    {
+      doubleToMultiply *= (*(*whichFunctionoid))();
+    }
+    return doubleToMultiply;
+  }
+
+  // This returns doubleToMultiply multiplied by the funtionoids in
+  // functionoidProduct at the scale given by the natural exponent of
+  // logarithmOfScale.
+  inline double const
+  PolynomialTerm::FunctionoidProduct( double doubleToMultiply,
+                                      double const logarithmOfScale ) const
+  {
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         whichFunctionoid( functionoidProduct.begin() );
+         whichFunctionoid < functionoidProduct.end();
+         ++whichFunctionoid )
+    {
+      doubleToMultiply *= (*(*whichFunctionoid))( logarithmOfScale );
+    }
+    return doubleToMultiply;
   }
 
 } /* namespace VevaciousPlusPlus */

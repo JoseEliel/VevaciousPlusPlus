@@ -22,6 +22,11 @@ namespace VevaciousPlusPlus
     ~ConstantFunctionoid();
 
 
+    // This returns the value of the functionoid for the given logarithm of the
+    // scale, which is just the value it always had.
+    virtual double operator()( double const logarithmOfScale ) const
+    { return currentValue; }
+
     // This does nothing, actually.
     virtual void
     UpdateForNewLogarithmOfScale( double const logarithmOfScale ){}

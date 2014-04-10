@@ -22,8 +22,15 @@ namespace VevaciousPlusPlus
     ~PolynomialSum();
 
 
-    // This evaluates the sum of polynomial terms for the given field values.
+    // This evaluates the sum of polynomial terms for the given field values,
+    // with the funtionoids at their values from their last scale update.
     double operator()( std::vector< double > const& fieldConfiguration ) const;
+
+    // This evaluates the sum of polynomial terms for the given field values,
+    // with the funtionoids evaluated at the natural exponent of
+    // logarithmOfScale.
+    double operator()( std::vector< double > const& fieldConfiguration,
+                       double const logarithmOfScale ) const;
 
     // This evaluates the sum of polynomial terms for the given field values.
     std::complex< double > operator()(
@@ -52,7 +59,8 @@ namespace VevaciousPlusPlus
 
 
 
-  // This evaluates the sum of polynomial terms for the given field values.
+  // This evaluates the sum of polynomial terms for the given field values,
+  // with the funtionoids at their values from their last scale update.
   inline double PolynomialSum::operator()(
                         std::vector< double > const& fieldConfiguration ) const
   {
@@ -63,6 +71,25 @@ namespace VevaciousPlusPlus
          ++whichTerm )
     {
       returnValue += (*whichTerm)( fieldConfiguration );
+    }
+    return returnValue;
+  }
+
+  // This evaluates the sum of polynomial terms for the given field values,
+  // with the funtionoids evaluated at the natural exponent of
+  // logarithmOfScale.
+  inline double PolynomialSum::operator()(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const logarithmOfScale ) const
+  {
+    double returnValue( 0.0 );
+    for( std::vector< PolynomialTerm >::const_iterator
+         whichTerm( polynomialTerms.begin() );
+         whichTerm < polynomialTerms.end();
+         ++whichTerm )
+    {
+      returnValue += (*whichTerm)( fieldConfiguration,
+                                   logarithmOfScale );
     }
     return returnValue;
   }

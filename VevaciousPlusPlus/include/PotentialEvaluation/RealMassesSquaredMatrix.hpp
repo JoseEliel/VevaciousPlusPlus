@@ -9,13 +9,14 @@
 #define REALMASSESSQUAREDMATRIX_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "MassesSquaredFromPolynomials.hpp"
+#include "MassesSquaredFromMatrix.hpp"
+#include "PolynomialSum.hpp"
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
 {
 
-  class RealMassesSquaredMatrix : public MassesSquaredFromPolynomials
+  class RealMassesSquaredMatrix : public MassesSquaredFromMatrix< double >
   {
   public:
     RealMassesSquaredMatrix( unsigned int const numberOfRows,
@@ -26,10 +27,6 @@ namespace VevaciousPlusPlus
     ~RealMassesSquaredMatrix();
 
 
-    // This returns the eigenvalues of the matrix.
-    virtual std::vector< double > const&
-    MassesSquared( std::vector< double > const& fieldConfiguration );
-
     // This allows access to the polynomial sum for a given index.
     PolynomialSum& ElementAt( unsigned int const elementIndex )
     { return matrixElements[ elementIndex ]; }
@@ -38,10 +35,20 @@ namespace VevaciousPlusPlus
     std::string AsString() const;
 
   protected:
-    unsigned int numberOfRows;
     std::vector< PolynomialSum > matrixElements;
-    Eigen::MatrixXd valuesMatrix;
-    Eigen::SelfAdjointEigenSolver< Eigen::MatrixXd > eigenvalueFinder;
+
+    // This returns a matrix of the values of the elements for a field
+    // configuration given by fieldConfiguration, with all functionoids
+    // evaluated at the last scale which was used to update them.
+    virtual Eigen::MatrixXd
+    CurrentValues( std::vector< double > const& fieldConfiguration ) const;
+
+    // This returns a matrix of the values of the elements for a field
+    // configuration given by fieldConfiguration, with all functionoids
+    // evaluated at the natural exponent of logarithmOfScale.
+    virtual Eigen::MatrixXd
+    CurrentValues( std::vector< double > const& fieldConfiguration,
+                   double const logarithmOfScale ) const;
   };
 
 
@@ -62,9 +69,6 @@ namespace VevaciousPlusPlus
       << std::endl << whichElement->AsDebuggingString()
       << std::endl;
     }
-    returnStream
-    << "valuesMatrix = " << std::endl << valuesMatrix << std::endl
-    << "eigenvalueFinder = ...";
     return std::string( returnStream.str() );
   }
 

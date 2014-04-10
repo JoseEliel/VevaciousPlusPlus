@@ -14,14 +14,16 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
-                                      runningParameterManager )
+                                      runningParameterManager ),
+    inverseRenormalizationScaleSquared( NAN )
   {
     // This constructor is just an initialization list.
   }
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
-    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses )
+    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
+    inverseRenormalizationScaleSquared( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -35,6 +37,39 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
+
+  // This returns the energy density in GeV^4 of the potential for a state
+  // strongly peaked around expectation values (in GeV) for the fields given
+  // by the values of fieldConfiguration and temperature in GeV given by
+  // temperatureValue.
+  double FixedScaleOneLoopPotential::operator()(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const temperatureValue ) const
+  {
+    std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      scalarSquareMasses,
+                                      scalarMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      fermionMasses,
+                                      fermionMassesSquaredWithFactors );
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      fermionMassSquareds,
+                                      fermionMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      vectorSquareMasses,
+                                      vectorMassesSquaredWithFactors );
+    return ( treeLevelPotential( fieldConfiguration )
+             + polynomialLoopCorrections( fieldConfiguration )
+             + LoopAndThermalCorrections( fieldConfiguration,
+                                          scalarMassesSquaredWithFactors,
+                                          fermionMassesSquaredWithFactors,
+                                          vectorMassesSquaredWithFactors,
+                                          inverseRenormalizationScaleSquared,
+                                          temperatureValue ) );
+  }
 
   // This should prepare homotopyContinuationStartSystem and
   // startPolynomialHessian appropriately.

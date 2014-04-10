@@ -9,14 +9,15 @@
 #define COMPLEXMASSMATRIX_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "MassesSquaredFromPolynomials.hpp"
+#include "MassesSquaredFromMatrix.hpp"
 #include "PolynomialSum.hpp"
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
 {
 
-  class SymmetricComplexMassMatrix : public MassesSquaredFromPolynomials
+  class SymmetricComplexMassMatrix :
+                       public MassesSquaredFromMatrix< std::complex< double > >
   {
   public:
     SymmetricComplexMassMatrix( unsigned int const numberOfElements,
@@ -27,10 +28,6 @@ namespace VevaciousPlusPlus
     ~SymmetricComplexMassMatrix();
 
 
-    // This returns the eigenvalues of the square of the matrix.
-    virtual std::vector< double > const&
-    MassesSquared( std::vector< double > const& fieldConfiguration );
-
     // This allows access to the pair of polynomial sums for a given index.
     std::pair< PolynomialSum, PolynomialSum >&
     ElementAt( unsigned int const elementIndex )
@@ -39,12 +36,44 @@ namespace VevaciousPlusPlus
     // This is mainly for debugging:
     std::string AsString() const;
 
+
   protected:
-    unsigned int numberOfRows;
     std::vector< std::pair< PolynomialSum, PolynomialSum > > matrixElements;
-    Eigen::MatrixXcd valuesMatrix;
-    Eigen::MatrixXcd valuesSquaredMatrix;
-    Eigen::SelfAdjointEigenSolver< Eigen::MatrixXcd > eigenvalueFinder;
+
+    // This returns a matrix of the values of the square of the matrix of
+    // elements for a field configuration given by fieldConfiguration, with all
+    // functionoids evaluated at the last scale which was used to update them.
+    virtual Eigen::MatrixXcd
+    CurrentValues( std::vector< double > const& fieldConfiguration ) const
+    { return
+      LowerTriangleOfSquareMatrix( MatrixToSquare( fieldConfiguration ) ); }
+
+    // This returns a matrix of the values of the square of the matrix of
+    // elements for a field configuration given by fieldConfiguration, with all
+    // functionoids evaluated at the natural exponent of logarithmOfScale.
+    virtual Eigen::MatrixXcd
+    CurrentValues( std::vector< double > const& fieldConfiguration,
+                   double const logarithmOfScale ) const
+    { return LowerTriangleOfSquareMatrix( MatrixToSquare( fieldConfiguration,
+                                                        logarithmOfScale ) ); }
+
+    // This returns a matrix of the values of the elements for a field
+    // configuration given by fieldConfiguration, with all functionoids
+    // evaluated at the last scale which was used to update them.
+    Eigen::MatrixXcd
+    MatrixToSquare( std::vector< double > const& fieldConfiguration ) const;
+
+    // This returns a matrix of the values of the elements for a field
+    // configuration given by fieldConfiguration, with all functionoids
+    // evaluated at the natural exponent of logarithmOfScale.
+    Eigen::MatrixXcd
+    MatrixToSquare( std::vector< double > const& fieldConfiguration,
+                    double const logarithmOfScale ) const;
+
+    // This returns a matrix that is the lower-triangular part (only column
+    // index <= row index) of the square of matrixToSquare.
+    Eigen::MatrixXcd LowerTriangleOfSquareMatrix(
+                                Eigen::MatrixXcd const& matrixToSquare ) const;
   };
 
 
@@ -63,14 +92,12 @@ namespace VevaciousPlusPlus
          ++whichPair )
     {
       returnStream
-      << std::endl << "real:" << std::endl << whichPair->first.AsDebuggingString()
-      << std::endl << "imag:" << std::endl << whichPair->second.AsDebuggingString()
+      << std::endl << "real:" << std::endl
+      << whichPair->first.AsDebuggingString()
+      << std::endl << "imag:" << std::endl
+      << whichPair->second.AsDebuggingString()
       << std::endl;
     }
-    returnStream
-    << "valuesMatrix = " << std::endl << valuesMatrix << std::endl
-    << "valuesSquaredMatrix = " << std::endl << valuesSquaredMatrix
-    << std::endl << "eigenvalueFinder = ...";
     return std::string( returnStream.str() );
   }
 

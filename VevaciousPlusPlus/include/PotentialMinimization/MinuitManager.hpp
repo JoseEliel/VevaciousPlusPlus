@@ -23,7 +23,7 @@ namespace VevaciousPlusPlus
     MinuitManager( ROOT::Minuit2::FCNBase& minimizationFunction,
                    double const errorFraction = 0.1,
                    double const errorMinimum = 1.0,
-                   unsigned int const minuitStrategy = 0 );
+                   unsigned int const minuitStrategy = 1 );
     virtual
     ~MinuitManager();
 

@@ -14,7 +14,11 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
-                                      runningParameterManager )
+                                      runningParameterManager ),
+    squareOfMinimumRenormalizationScale( NAN ),
+    logarithmOfMinimumRenormalizationScale( NAN ),
+    maximumRenormalizationScale( NAN ),
+    logarithmOfMaximumRenormalizationScale( NAN )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -25,8 +29,15 @@ namespace VevaciousPlusPlus
   }
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-         PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
-    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses )
+   PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses ) :
+    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
+    squareOfMinimumRenormalizationScale( minimumRenormalizationScale
+                                         * minimumRenormalizationScale ),
+    logarithmOfMinimumRenormalizationScale( log(
+                                               minimumRenormalizationScale ) ),
+    maximumRenormalizationScale( runningParameters.HighestBlockScale() ),
+    logarithmOfMaximumRenormalizationScale( log(
+                                                maximumRenormalizationScale ) )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -44,6 +55,49 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
+
+  // This returns the energy density in GeV^4 of the potential for a state
+  // strongly peaked around expectation values (in GeV) for the fields given
+  // by the values of fieldConfiguration and temperature in GeV given by
+  // temperatureValue.
+  double RgeImprovedOneLoopPotential::operator()(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const temperatureValue ) const
+  {
+    double renormalizationScaleSquared( RenormalizationScaleSquared(
+                                                            fieldConfiguration,
+                                                          temperatureValue ) );
+    double logarithmOfScale( 0.5 * log( renormalizationScaleSquared ) );
+    std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      scalarSquareMasses,
+                                      scalarMassesSquaredWithFactors,
+                                      logarithmOfScale );
+    std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      fermionMasses,
+                                      fermionMassesSquaredWithFactors,
+                                      logarithmOfScale );
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      fermionMassSquareds,
+                                      fermionMassesSquaredWithFactors,
+                                      logarithmOfScale );
+    std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      vectorSquareMasses,
+                                      vectorMassesSquaredWithFactors,
+                                      logarithmOfScale );
+    return ( treeLevelPotential( fieldConfiguration,
+                                 logarithmOfScale )
+             + polynomialLoopCorrections( fieldConfiguration,
+                                          logarithmOfScale )
+             + LoopAndThermalCorrections( fieldConfiguration,
+                                          scalarMassesSquaredWithFactors,
+                                          fermionMassesSquaredWithFactors,
+                                          vectorMassesSquaredWithFactors,
+                                         ( 1.0 / renormalizationScaleSquared ),
+                                          temperatureValue ) );
+  }
 
   // This should return a vector of field values corresponding to the field
   // configuration as it should be passed to operator() for evaluating the

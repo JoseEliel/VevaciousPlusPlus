@@ -24,6 +24,11 @@ namespace VevaciousPlusPlus
     ~UnaryOperationFunctionoid();
 
 
+    // This returns the value of the functionoid for the given logarithm of the
+    // scale.
+    virtual double operator()( double const logarithmOfScale ) const
+    { return (*unaryOperation)( (*functionoidPointer)( logarithmOfScale ) ); }
+
     // This re-calculates the coefficients of the polynomial of the logarithm
     // of the scale used in evaluating the functionoid.
     virtual void UpdateForNewLogarithmOfScale( double const logarithmOfScale );

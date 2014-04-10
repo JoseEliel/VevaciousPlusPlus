@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
     // temperatureValue.
     virtual double
     operator()( std::vector< double > const& fieldConfiguration,
-                double const temperatureValue = 0.0 );
+                double const temperatureValue = 0.0 ) const;
 
     // This returns the tree-level potential energy density evaluated at the
     // correct scale.
@@ -42,7 +42,7 @@ namespace VevaciousPlusPlus
     // This returns the square of the Euclidean distance between the two vacua.
     virtual double
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum );
+                                    PotentialMinimum const& trueVacuum ) const;
 
     // This should return a vector of field values corresponding to the field
     // configuration as it should be passed to operator() for evaluating the
@@ -61,6 +61,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    double inverseRenormalizationScaleSquared;
+
     // This sets dsbFieldValueInputs based on the SLHA file just read in.
     virtual void EvaluateDsbInputAndSetScale();
 
@@ -75,18 +77,6 @@ namespace VevaciousPlusPlus
 
 
 
-  // This returns the energy density in GeV^4 of the potential for a state
-  // strongly peaked around expectation values (in GeV) for the fields given
-  // by the values of fieldConfiguration and temperature in GeV given by
-  // temperatureValue.
-  inline double FixedScaleOneLoopPotential::operator()(
-                               std::vector< double > const& fieldConfiguration,
-                                                double const temperatureValue )
-  {
-    return LoopAndThermallyCorrectedPotential( fieldConfiguration,
-                                               temperatureValue );
-  }
-
   // This returns the tree-level potential energy density evaluated at the
   // correct scale.
   inline double FixedScaleOneLoopPotential::QuickApproximation(
@@ -96,12 +86,12 @@ namespace VevaciousPlusPlus
     return treeLevelPotential( fieldConfiguration );
   }
 
-  // This returns the square of the Euclidean distance between the two vacua.
+  // This returns the square of the renormalization scale.
   inline double FixedScaleOneLoopPotential::ScaleSquaredRelevantToTunneling(
                                            PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum )
+                                     PotentialMinimum const& trueVacuum ) const
   {
-    return renormalizationScaleSquared;
+    return ( 1.0 / inverseRenormalizationScaleSquared );
   }
 
   // FixedScaleOneLoopPotential prepares the homotopy continuation polynomials
@@ -116,12 +106,14 @@ namespace VevaciousPlusPlus
   // This sets dsbFieldValueInputs based on the SLHA file just read in.
   inline void FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale()
   {
-    renormalizationScaleSquared = runningParameters.LowestBlockScale();
-    renormalizationScaleSquared *= renormalizationScaleSquared;
-    renormalizationScaleSquared = std::max( renormalizationScaleSquared,
-                                          minimumRenormalizationScaleSquared );
-    runningParameters.UpdateRunningParameters(
-                                         sqrt( renormalizationScaleSquared ) );
+    double renormalizationScale( runningParameters.LowestBlockScale() );
+    if( renormalizationScale < minimumRenormalizationScale )
+    {
+      renormalizationScale = minimumRenormalizationScale;
+    }
+    inverseRenormalizationScaleSquared
+    = ( 1.0 / ( renormalizationScale * renormalizationScale ) );
+    runningParameters.UpdateRunningParameters( renormalizationScale );
     for( unsigned int fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )

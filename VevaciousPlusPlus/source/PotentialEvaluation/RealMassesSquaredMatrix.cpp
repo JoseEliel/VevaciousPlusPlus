@@ -13,36 +13,26 @@ namespace VevaciousPlusPlus
   RealMassesSquaredMatrix::RealMassesSquaredMatrix(
                                                unsigned int const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    MassesSquaredFromPolynomials( attributeMap ),
-    numberOfRows( numberOfRows ),
+    MassesSquaredFromMatrix< double >( numberOfRows,
+                                       attributeMap ),
     matrixElements( ( numberOfRows * numberOfRows ),
-                    PolynomialSum() ),
-    valuesMatrix( numberOfRows,
-                  numberOfRows ),
-    eigenvalueFinder( numberOfRows )
+                    PolynomialSum() )
   {
-    massesSquared.assign( numberOfRows,
-                          NAN );
+    // This constructor is just an initialization list.
   }
 
   RealMassesSquaredMatrix::RealMassesSquaredMatrix(
                                   RealMassesSquaredMatrix const& copySource ) :
-    MassesSquaredFromPolynomials( copySource ),
-    numberOfRows( copySource.numberOfRows ),
-    matrixElements( copySource.matrixElements ),
-    valuesMatrix( copySource.valuesMatrix ),
-    eigenvalueFinder( copySource.eigenvalueFinder )
+    MassesSquaredFromMatrix< double >( copySource ),
+    matrixElements( copySource.matrixElements )
   {
     // This constructor is just an initialization list.
   }
 
 
   RealMassesSquaredMatrix::RealMassesSquaredMatrix() :
-    MassesSquaredFromPolynomials(),
-    numberOfRows( 0 ),
-    matrixElements(),
-    valuesMatrix(),
-    eigenvalueFinder()
+    MassesSquaredFromMatrix< double >(),
+    matrixElements()
   {
     // This constructor is just an initialization list.
   }
@@ -53,12 +43,15 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This returns the eigenvalues of the matrix.
-  std::vector< double > const&
-  RealMassesSquaredMatrix::MassesSquared(
-                              std::vector< double > const& fieldConfiguration )
+  // This returns a matrix of the values of the elements for a field
+  // configuration given by fieldConfiguration, with all functionoids
+  // evaluated at the last scale which was used to update them.
+  Eigen::MatrixXd RealMassesSquaredMatrix::CurrentValues(
+                        std::vector< double > const& fieldConfiguration ) const
   {
     unsigned int rowsTimesLength( 0 );
+    Eigen::MatrixXd valuesMatrix( numberOfRows,
+                                  numberOfRows );
     for( unsigned int rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
@@ -80,37 +73,42 @@ namespace VevaciousPlusPlus
       }
       rowsTimesLength += numberOfRows;
     }
+    return valuesMatrix;
+  }
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "valuesMatrix = " << std::endl
-    << valuesMatrix << std::endl;
-    std::cout << std::endl;*/
-
-    eigenvalueFinder.compute( valuesMatrix,
-                              Eigen::EigenvaluesOnly );
-    for( unsigned int whichIndex( 0 );
-         whichIndex < numberOfRows;
-         ++whichIndex )
+  // This returns a matrix of the values of the elements for a field
+  // configuration given by fieldConfiguration, with all functionoids
+  // evaluated at the natural exponent of logarithmOfScale.
+  Eigen::MatrixXd RealMassesSquaredMatrix::CurrentValues(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const logarithmOfScale ) const
+  {
+    unsigned int rowsTimesLength( 0 );
+    Eigen::MatrixXd valuesMatrix( numberOfRows,
+                                  numberOfRows );
+    for( unsigned int rowIndex( 0 );
+         rowIndex < numberOfRows;
+         ++rowIndex )
     {
-      massesSquared[ whichIndex ]
-      = eigenvalueFinder.eigenvalues()( whichIndex );
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex )
+      = matrixElements[ rowsTimesLength + rowIndex ]( fieldConfiguration,
+                                                      logarithmOfScale );
+      for( unsigned int columnIndex( rowIndex + 1 );
+           columnIndex < numberOfRows;
+           ++columnIndex )
+      {
+        valuesMatrix.coeffRef( rowIndex,
+                               columnIndex )
+        = matrixElements[ rowsTimesLength + columnIndex ]( fieldConfiguration,
+                                                           logarithmOfScale );
+        valuesMatrix.coeffRef( columnIndex,
+                               rowIndex ) = valuesMatrix.coeff( rowIndex,
+                                                                columnIndex );
+      }
+      rowsTimesLength += numberOfRows;
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "massesSquared = {" << std::endl;
-    for( unsigned int whichIndex( 0 );
-         whichIndex < numberOfRows;
-         ++whichIndex )
-    {
-      std::cout << " " << massesSquared[ whichIndex ];
-    }
-    std::cout << " }" << std::endl;*/
-
-    return massesSquared;
+    return valuesMatrix;
   }
 
 } /* namespace VevaciousPlusPlus */

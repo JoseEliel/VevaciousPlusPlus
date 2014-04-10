@@ -31,9 +31,14 @@ namespace VevaciousPlusPlus
 
     unsigned int NumberOfIndices() const{ return indexVector.size(); }
 
+    // This returns the value of the functionoid for the given logarithm of the
+    // scale.
+    virtual double operator()( double const logarithmOfScale ) const;
+
     // This updates currentValue based on logarithmOfScale.
     virtual void
-    UpdateForNewLogarithmOfScale( double const logarithmOfScale );
+    UpdateForNewLogarithmOfScale( double const logarithmOfScale )
+    { currentValue = (*this)( logarithmOfScale ); }
 
     // This re-calculates the coefficients of the polynomial of the logarithm
     // of the scale used in evaluating the functionoid.
@@ -52,9 +57,10 @@ namespace VevaciousPlusPlus
 
 
 
-  // This updates currentValue based on logarithmOfScale.
-  inline void SlhaFunctionoid::UpdateForNewLogarithmOfScale(
-                                                double const logarithmOfScale )
+  // This returns the value of the functionoid for the given logarithm of the
+  // scale.
+  inline double
+  SlhaFunctionoid::operator()( double const logarithmOfScale ) const
   {
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -64,7 +70,7 @@ namespace VevaciousPlusPlus
     << " ) called. currentValue was " << currentValue;
     std::cout << std::endl;*/
 
-    currentValue = scaleLogarithmPowerCoefficients[ 0 ];
+    double returnValue( scaleLogarithmPowerCoefficients[ 0 ] );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -102,13 +108,14 @@ namespace VevaciousPlusPlus
         << "termContribution = " << termContribution;
         std::cout << std::endl;*/
       }
-      currentValue += termContribution;
+      returnValue += termContribution;
       // debugging:
       /*std::cout << std::endl << "debugging:"
       << std::endl
       << "currentValue = " << currentValue;
       std::cout << std::endl;*/
     }
+    return returnValue;
   }
 
   // This is mainly for debugging.

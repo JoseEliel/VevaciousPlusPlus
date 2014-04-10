@@ -29,7 +29,7 @@ MINUITINCLUDEDIR=../../../machine-specific/Minuit2/include/
 MINUITLIBDIR=../../../machine-specific/Minuit2/lib/
 DEBUGFLAGS=
 INCLUDES=-I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(MINUITINCLUDEDIR)
-CCFLAGS=-Wall -O3 $(DEBUGFLAGS) $(INCLUDES)
+CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
@@ -38,7 +38,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPolynomial.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
- source/PotentialEvaluation/MassesSquaredFromPolynomials.cpp \
+ source/PotentialEvaluation/MassesSquaredCalculator.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PolynomialSum.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
@@ -67,13 +67,12 @@ BINDIR=./bin/
 LIBNAME=VevaciousPlusPlus
 LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
-LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) -L$(LHPCLIBDIR) \
- -l$(LHPCLIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
+LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) \
+ -L$(LHPCLIBDIR) -l$(LHPCLIBNAME) \
+  $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 # -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
 # There is some silly screwing around to force linking to the static Minuit2 
 # library.
-# Currently there's a problem with Minuit2 automatically using OPENMP with its
-# installation, which doesn't work on my Mac.
 MAINCPP=source/VevaciousPlusPlusMain.cpp
 EXEFILE=$(BINDIR)/VevaciousPlusPlus.exe
 

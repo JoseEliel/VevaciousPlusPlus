@@ -13,40 +13,26 @@ namespace VevaciousPlusPlus
   SymmetricComplexMassMatrix::SymmetricComplexMassMatrix(
                                                unsigned int const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    MassesSquaredFromPolynomials( attributeMap ),
-    numberOfRows( numberOfRows ),
+    MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
+                                                       attributeMap ),
     matrixElements( ( numberOfRows * numberOfRows ),
                     std::pair< PolynomialSum, PolynomialSum >( PolynomialSum(),
-                                                           PolynomialSum() ) ),
-    valuesMatrix( numberOfRows,
-                  numberOfRows ),
-    valuesSquaredMatrix( numberOfRows,
-                         numberOfRows ),
-    eigenvalueFinder( numberOfRows )
+                                                            PolynomialSum() ) )
   {
-    massesSquared.assign( numberOfRows,
-                          NAN );
+    // This constructor is just an initialization list.
   }
 
   SymmetricComplexMassMatrix::SymmetricComplexMassMatrix(
                                SymmetricComplexMassMatrix const& copySource ) :
-    MassesSquaredFromPolynomials( copySource ),
-    numberOfRows( copySource.numberOfRows ),
-    matrixElements( copySource.matrixElements ),
-    valuesMatrix( copySource.valuesMatrix ),
-    valuesSquaredMatrix( copySource.valuesSquaredMatrix ),
-    eigenvalueFinder( copySource.eigenvalueFinder )
+    MassesSquaredFromMatrix( copySource ),
+    matrixElements( copySource.matrixElements )
   {
     // This constructor is just an initialization list.
   }
 
   SymmetricComplexMassMatrix::SymmetricComplexMassMatrix() :
-    MassesSquaredFromPolynomials(),
-    numberOfRows( 0 ),
-    matrixElements(),
-    valuesMatrix(),
-    valuesSquaredMatrix(),
-    eigenvalueFinder()
+    MassesSquaredFromMatrix(),
+    matrixElements()
   {
     // This constructor is just an initialization list.
   }
@@ -57,12 +43,15 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This returns the eigenvalues of the square of the matrix.
-  std::vector< double > const&
-  SymmetricComplexMassMatrix::MassesSquared(
-                              std::vector< double > const& fieldConfiguration )
+  // This returns a matrix of the values of the elements for a field
+  // configuration given by fieldConfiguration, with all functionoids
+  // evaluated at the last scale which was used to update them.
+  Eigen::MatrixXcd SymmetricComplexMassMatrix::MatrixToSquare(
+                       std::vector< double > const& fieldConfiguration ) const
   {
     unsigned int rowsTimesLength( 0 );
+    Eigen::MatrixXcd valuesMatrix( numberOfRows,
+                                   numberOfRows );
     for( unsigned int rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
@@ -95,6 +84,64 @@ namespace VevaciousPlusPlus
                                                           fieldConfiguration );
       rowsTimesLength += numberOfRows;
     }
+    return valuesMatrix;
+  }
+
+  // This returns a matrix of the values of the elements for a field
+  // configuration given by fieldConfiguration, with all functionoids
+  // evaluated at the natural exponent of logarithmOfScale.
+  Eigen::MatrixXcd SymmetricComplexMassMatrix::MatrixToSquare(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const logarithmOfScale ) const
+  {
+    unsigned int rowsTimesLength( 0 );
+    Eigen::MatrixXcd valuesMatrix( numberOfRows,
+                                   numberOfRows );
+    for( unsigned int rowIndex( 0 );
+         rowIndex < numberOfRows;
+         ++rowIndex )
+    {
+      for( unsigned int columnIndex( 0 );
+           columnIndex < rowIndex;
+           ++columnIndex )
+      {
+        valuesMatrix.coeffRef( rowIndex,
+                               columnIndex ).real()
+        = matrixElements[ rowsTimesLength + columnIndex ].first(
+                                                            fieldConfiguration,
+                                                            logarithmOfScale );
+        valuesMatrix.coeffRef( rowIndex,
+                               columnIndex ).imag()
+        = matrixElements[ rowsTimesLength + columnIndex ].second(
+                                                            fieldConfiguration,
+                                                            logarithmOfScale );
+        // We use the fact that the matrix is symmetric.
+        valuesMatrix.coeffRef( columnIndex,
+                               rowIndex )
+        = valuesMatrix.coeff( rowIndex,
+                              columnIndex );
+      }
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).real()
+      = matrixElements[ rowsTimesLength + rowIndex ].first( fieldConfiguration,
+                                                            logarithmOfScale );
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).imag()
+      = matrixElements[ rowsTimesLength + rowIndex ].second(
+                                                            fieldConfiguration,
+                                                            logarithmOfScale );
+      rowsTimesLength += numberOfRows;
+    }
+    return valuesMatrix;
+  }
+
+  // This returns a matrix that is the lower-triangular part (only column
+  // index <= row index) of the square of matrixToSquare.
+  Eigen::MatrixXcd SymmetricComplexMassMatrix::LowerTriangleOfSquareMatrix(
+                                 Eigen::MatrixXcd const& matrixToSquare ) const
+  {
+    Eigen::MatrixXcd valuesSquaredMatrix( numberOfRows,
+                                          numberOfRows );
     for( unsigned int rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
@@ -113,23 +160,23 @@ namespace VevaciousPlusPlus
         {
           valuesSquaredMatrix.coeffRef( rowIndex,
                                         columnIndex ).real()
-          += ( ( valuesMatrix.coeff( sumIndex,
+          += ( ( matrixToSquare.coeff( sumIndex,
                                      rowIndex ).real()
-                 * valuesMatrix.coeff( sumIndex,
+                 * matrixToSquare.coeff( sumIndex,
                                        columnIndex ).real() )
-               + ( valuesMatrix.coeff( sumIndex,
+               + ( matrixToSquare.coeff( sumIndex,
                                        rowIndex ).imag()
-                   * valuesMatrix.coeff( sumIndex,
+                   * matrixToSquare.coeff( sumIndex,
                                          columnIndex ).imag() ) );
           valuesSquaredMatrix.coeffRef( rowIndex,
                                         columnIndex ).imag()
-          += ( ( valuesMatrix.coeff( sumIndex,
+          += ( ( matrixToSquare.coeff( sumIndex,
                                      rowIndex ).real()
-                 * valuesMatrix.coeff( sumIndex,
+                 * matrixToSquare.coeff( sumIndex,
                                        columnIndex ).imag() )
-               - ( valuesMatrix.coeff( sumIndex,
+               - ( matrixToSquare.coeff( sumIndex,
                                        rowIndex ).imag()
-                   * valuesMatrix.coeff( sumIndex,
+                   * matrixToSquare.coeff( sumIndex,
                                          columnIndex ).real() ) );
           // The Eigen routines don't bother looking at elements of
           // valuesSquaredMatrix where columnIndex > rowIndex, so we don't even
@@ -137,52 +184,7 @@ namespace VevaciousPlusPlus
         }
       }
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "valuesMatrix = " << std::endl
-    << valuesMatrix << std::endl
-    << "valuesMatrix.adjoint() = " << std::endl
-    << valuesMatrix.adjoint() << std::endl
-    << "valuesSquaredMatrix = " << std::endl
-    << valuesSquaredMatrix << std::endl
-    << "valuesMatrix.adjoint() * valuesMatrix = " << std::endl;
-    Eigen::MatrixXcd productMatrix( valuesMatrix.adjoint() * valuesMatrix );
-    std::cout << productMatrix << std::endl;
-    std::cout << std::endl;*/
-
-    eigenvalueFinder.compute( valuesSquaredMatrix,
-                              Eigen::EigenvaluesOnly );
-    for( unsigned int whichIndex( 0 );
-         whichIndex < numberOfRows;
-         ++whichIndex )
-    {
-      massesSquared[ whichIndex ]
-      = eigenvalueFinder.eigenvalues()( whichIndex );
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "massesSquared = {" << std::endl;
-    for( unsigned int whichIndex( 0 );
-         whichIndex < numberOfRows;
-         ++whichIndex )
-    {
-      std::cout << " " << massesSquared[ whichIndex ];
-    }
-    std::cout
-    << " }" << std::endl << "eigenvalueFinder.eigenvalues() = " << std::endl
-    << eigenvalueFinder.eigenvalues() << std::endl;
-    eigenvalueFinder.compute( productMatrix,
-                              Eigen::EigenvaluesOnly );
-    std::cout
-    << "for productMatrix, eigenvalueFinder.eigenvalues() = " << std::endl
-    << eigenvalueFinder.eigenvalues() << std::endl;
-    std::cout << std::endl;*/
-
-    return massesSquared;
+    return valuesSquaredMatrix;
   }
 
 } /* namespace VevaciousPlusPlus */

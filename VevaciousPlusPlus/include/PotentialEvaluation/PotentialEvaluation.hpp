@@ -14,7 +14,7 @@
 #include "FixedScaleOneLoopPotential.hpp"
 #include "HomotopyContinuationReadyPolynomial.hpp"
 #include "HomotopyContinuationReadyPotential.hpp"
-#include "MassesSquaredFromPolynomials.hpp"
+#include "MassesSquaredFromMatrix.hpp"
 #include "ParameterFunctionoid.hpp"
 #include "PolynomialSum.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"

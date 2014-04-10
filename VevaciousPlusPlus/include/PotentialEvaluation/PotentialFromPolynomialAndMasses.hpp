@@ -15,7 +15,7 @@
 #include "RealMassesSquaredMatrix.hpp"
 #include "SymmetricComplexMassMatrix.hpp"
 #include "ComplexMassSquaredMatrix.hpp"
-#include "MassesSquaredFromPolynomials.hpp"
+#include "MassesSquaredFromMatrix.hpp"
 #include "RunningParameterManager.hpp"
 #include "ThermalFunctions.hpp"
 
@@ -38,6 +38,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    typedef std::pair< std::vector< double >, double > DoubleVectorWithDouble;
     static std::string const digitChars;
     static std::string const dotAndDigits;
     static std::string const allowedVariableInitials;
@@ -47,14 +48,17 @@ namespace VevaciousPlusPlus
 
     RunningParameterManager& runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
-    double renormalizationScaleSquared;
-    double minimumRenormalizationScaleSquared;
+    double minimumRenormalizationScale;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
-    std::vector< RealMassesSquaredMatrix > scalarSquareMasses;
-    std::vector< SymmetricComplexMassMatrix > fermionMasses;
-    std::vector< ComplexMassSquaredMatrix > fermionMassSquareds;
-    std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
+    std::vector< MassesSquaredCalculator* > scalarSquareMasses;
+    std::vector< MassesSquaredCalculator* > fermionMasses;
+    std::vector< MassesSquaredCalculator* > fermionMassSquareds;
+    std::vector< MassesSquaredCalculator* > vectorSquareMasses;
+    // std::vector< RealMassesSquaredMatrix > scalarSquareMasses;
+    // std::vector< SymmetricComplexMassMatrix > fermionMasses;
+    // std::vector< ComplexMassSquaredMatrix > fermionMassSquareds;
+    // std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
     double vectorMassCorrectionConstant;
 
 
@@ -64,7 +68,7 @@ namespace VevaciousPlusPlus
 
     // This is just for derived classes.
     PotentialFromPolynomialAndMasses(
-                                PotentialFromPolynomialAndMasses& copySource );
+                          PotentialFromPolynomialAndMasses const& copySource );
 
 
     // This should set dsbFieldValueInputs based on the SLHA file just read in.
@@ -72,9 +76,13 @@ namespace VevaciousPlusPlus
 
     // This evaluates the one-loop potential with thermal corrections assuming
     // that the scale has been set correctly.
-    inline double LoopAndThermallyCorrectedPotential(
-                               std::vector< double > const& fieldConfiguration,
-                                               double const temperatureValue );
+    double
+    LoopAndThermalCorrections( std::vector< double > const& fieldConfiguration,
+          std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
+         std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
+          std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
+                                              double const inverseScaleSquared,
+                                         double const temperatureValue ) const;
 
     // This puts all index brackets into a consistent form.
     std::string FormatVariable( std::string const& unformattedVariable ) const;
@@ -100,48 +108,30 @@ namespace VevaciousPlusPlus
                                            PolynomialTerm& polynomialTerm,
                                            bool& imaginaryTerm );
 
-    // This evaluates the sum of corrections for the real scalar degrees
-    // of freedom with masses-squared given by scalarSquareMasses evaluated for
-    // the field configuration given by fieldConfiguration at a temperature T
-    // given by inverseTemperatureSquared for T^(-2) and temperatureFourthed
-    // for T^4.
-    double
-    ScalarBosonCorrections( std::vector< double > const& fieldConfiguration,
-                            double const inverseTemperatureSquared,
-                            double const temperatureFourthed );
+    // This appends the masses-squared and multiplicity from each
+    // MassesSquaredFromMatrix in massSquaredMatrices to
+    // massSquaredMatrices, with all functionoids evaluated at the last scale
+    // which was used to update them.
+    void AddMassesSquaredWithMultiplicity(
+                               std::vector< double > const& fieldConfiguration,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+       std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const;
 
-    // This evaluates the sum of corrections for a set of Weyl fermion degrees
-    // of freedom with masses-squared given by fermionMasses evaluated for
-    // the field configuration given by fieldConfiguration at a temperature T
-    // given by inverseTemperatureSquared for T^(-2) and temperatureFourthed
-    // for T^4.
-    double
-    WeylFermionCorrections( std::vector< double > const& fieldConfiguration,
-                            double const inverseTemperatureSquared,
-                            double const temperatureFourthed );
-
-    // This evaluates the sum of corrections for the real scalar degrees
-    // of freedom with masses-squared given by vectorSquareMasses evaluated for
-    // the field configuration given by fieldConfiguration at a temperature T
-    // given by inverseTemperatureSquared for T^(-2) and temperatureFourthed
-    // for T^4.
-    double
-    GaugeBosonCorrections( std::vector< double > const& fieldConfiguration,
+    // This evaluates the sum of corrections for the degrees of freedom with
+    // masses-squared given by massesSquaredWithFactors with
+    // subtractFromLogarithm as the constant to subtract from the logarithm of
+    // the ratio of mass-squared to square of renormalization scale, at a
+    // temperature given by inverseTemperatureSquared^(-1/2) using a thermal
+    // correction function given by ThermalFunction, and adds them to
+    // cumulativeQuantumCorrection and cumulativeThermalCorrection.
+    void AddToCorrections(
+         std::vector< DoubleVectorWithDouble > const& massesSquaredWithFactors,
+                           double const inverseScaleSquared,
                            double const inverseTemperatureSquared,
-                           double const temperatureFourthed );
-
-    // This returns the J function thermal correction for a bosonic degree of
-    // freedom based on a lookup table.
-    double bosonThermalFunction(
-                         double const massSquaredOverTemperatureSquared ) const
-    { return ThermalFunctions::BosonicJ( massSquaredOverTemperatureSquared ); }
-
-    // This returns the J function thermal correction for a fermionic degree of
-    // freedom based on a lookup table.
-    double fermionThermalFunction(
-                         double const massSquaredOverTemperatureSquared ) const
-    { return
-      ThermalFunctions::FermionicJ( massSquaredOverTemperatureSquared ); }
+                           double const subtractFromLogarithm,
+                           double (*ThermalFunction)( double const ),
+                           double& cumulativeQuantumCorrection,
+                           double& cumulativeThermalCorrection ) const;
 
     // This sets homotopyContinuationPotentialPolynomial to be a copy of
     // treeLevelPotential.
@@ -162,56 +152,6 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This evaluates the one-loop potential with thermal corrections assuming
-  // that the scale has been set correctly.
-  inline double
-  PotentialFromPolynomialAndMasses::LoopAndThermallyCorrectedPotential(
-                             std::vector< double > const& fieldConfiguration,
-                                                double const temperatureValue )
-  {
-    double inverseTemperatureSquared( 1.0 );
-    if( temperatureValue > 0.0 )
-    {
-      inverseTemperatureSquared
-      = ( 1.0 / ( temperatureValue * temperatureValue ) );
-    }
-    double const temperatureFourthed( temperatureValue * temperatureValue
-                                      * temperatureValue * temperatureValue );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "tree = " << treeLevelPotential( fieldConfiguration )
-    << std::endl
-    << "polynomial corrections = "
-    << polynomialLoopCorrections( fieldConfiguration )
-    << std::endl
-    << "1-loop = " << ( treeLevelPotential( fieldConfiguration )
-        + polynomialLoopCorrections( fieldConfiguration )
-        + ScalarBosonCorrections( fieldConfiguration,
-                                  inverseTemperatureSquared,
-                                  temperatureFourthed )
-        + WeylFermionCorrections( fieldConfiguration,
-                                  inverseTemperatureSquared,
-                                  temperatureFourthed )
-        + GaugeBosonCorrections( fieldConfiguration,
-                                 inverseTemperatureSquared,
-                                 temperatureFourthed ) );
-    std::cout << std::endl;*/
-
-
-    return ( treeLevelPotential( fieldConfiguration )
-             + polynomialLoopCorrections( fieldConfiguration )
-             + ScalarBosonCorrections( fieldConfiguration,
-                                       inverseTemperatureSquared,
-                                       temperatureFourthed )
-             + WeylFermionCorrections( fieldConfiguration,
-                                       inverseTemperatureSquared,
-                                       temperatureFourthed )
-             + GaugeBosonCorrections( fieldConfiguration,
-                                      inverseTemperatureSquared,
-                                      temperatureFourthed ) );
-  }
 
   // This puts all index brackets into a consistent form.
   inline std::string PotentialFromPolynomialAndMasses::FormatVariable(
@@ -235,6 +175,27 @@ namespace VevaciousPlusPlus
                       "Polynomial that should be real has imaginary factor!" );
     }
     polynomialSum.PolynomialTerms() = complexSum.first.PolynomialTerms();
+  }
+
+  // This appends the masses-squared and multiplicity from each
+  // MassesSquaredFromMatrix in massSquaredMatrices to
+  // massSquaredMatrices, with all functionoids evaluated at the last scale
+  // which was used to update them.
+  inline void
+  PotentialFromPolynomialAndMasses::AddMassesSquaredWithMultiplicity(
+                               std::vector< double > const& fieldConfiguration,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+        std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const
+  {
+    for( std::vector< MassesSquaredCalculator* >::const_iterator
+         whichMatrix( massSquaredMatrices.begin() );
+         whichMatrix < massSquaredMatrices.end();
+         ++whichMatrix )
+    {
+      massesSquaredWithFactors.push_back(
+           std::make_pair( (*whichMatrix)->MassesSquared( fieldConfiguration ),
+                           (*whichMatrix)->MultiplicityFactor() ) );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

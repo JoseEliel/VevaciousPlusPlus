@@ -58,8 +58,8 @@ namespace VevaciousPlusPlus
     // resolutionSize centered on the existing entry.
     void AppendPureRealSolutionAndValidSignFlips(
             std::vector< std::complex< double > > const& solutionConfiguration,
-                         std::vector< std::vector< double > >& realSolutions,
-                                                double const resolutionSize );
+                           std::vector< std::vector< double > >& realSolutions,
+                                                 double const resolutionSize );
   };
 
 } /* namespace VevaciousPlusPlus */

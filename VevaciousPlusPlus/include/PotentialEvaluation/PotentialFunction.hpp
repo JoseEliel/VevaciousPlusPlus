@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
     // by temperatureValue.
     virtual double
     operator()( std::vector< double > const& fieldConfiguration,
-                double const temperatureValue = 0.0 ) = 0;
+                double const temperatureValue = 0.0 ) const = 0;
 
     // This should update all the parameters of the potential that are not
     // field values based on the values that appear in blocks in the SLHA
@@ -57,7 +57,7 @@ namespace VevaciousPlusPlus
     // tunneling between the given minima for this potential.
     virtual double
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum ) = 0;
+                                PotentialMinimum const& trueVacuum ) const = 0;
 
     // This is for ease of getting the index of a field of a given name. It
     // returns the largest possible unsigned int (-1 should tick over to that)

@@ -13,36 +13,26 @@ namespace VevaciousPlusPlus
   ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
                                                unsigned int const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    MassesSquaredFromPolynomials( attributeMap ),
-    numberOfRows( numberOfRows ),
+    MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
+                                                       attributeMap ),
     matrixElements( ( numberOfRows * numberOfRows ),
                     std::pair< PolynomialSum, PolynomialSum >( PolynomialSum(),
-                                                           PolynomialSum() ) ),
-    valuesMatrix( numberOfRows,
-                  numberOfRows ),
-    eigenvalueFinder( numberOfRows )
+                                                           PolynomialSum() ) )
   {
-    massesSquared.assign( numberOfRows,
-                          NAN );
+    // This constructor is just an initialization list.
   }
 
   ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
                                  ComplexMassSquaredMatrix const& copySource ) :
-    MassesSquaredFromPolynomials( copySource ),
-    numberOfRows( copySource.numberOfRows ),
-    matrixElements( copySource.matrixElements ),
-    valuesMatrix( copySource.valuesMatrix ),
-    eigenvalueFinder( copySource.eigenvalueFinder )
+    MassesSquaredFromMatrix< std::complex< double > >( copySource ),
+    matrixElements( copySource.matrixElements )
   {
     // This constructor is just an initialization list.
   }
 
   ComplexMassSquaredMatrix::ComplexMassSquaredMatrix() :
-    MassesSquaredFromPolynomials(),
-    numberOfRows( 0 ),
-    matrixElements(),
-    valuesMatrix(),
-    eigenvalueFinder()
+    MassesSquaredFromMatrix< std::complex< double > >(),
+    matrixElements()
   {
     // This constructor is just an initialization list.
   }
@@ -53,12 +43,15 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This returns the eigenvalues of the square of the matrix.
-  std::vector< double > const&
-  ComplexMassSquaredMatrix::MassesSquared(
-                              std::vector< double > const& fieldConfiguration )
+  // This returns a matrix of the values of the elements for a field
+  // configuration given by fieldConfiguration, with all functionoids
+  // evaluated at the last scale which was used to update them.
+  Eigen::MatrixXcd ComplexMassSquaredMatrix::CurrentValues(
+                        std::vector< double > const& fieldConfiguration ) const
   {
     unsigned int rowsTimesLength( 0 );
+    Eigen::MatrixXcd valuesMatrix( numberOfRows,
+                                   numberOfRows );
     for( unsigned int rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
@@ -78,16 +71,6 @@ namespace VevaciousPlusPlus
         // The Eigen routines don't bother looking at elements of valuesMatrix
         // where columnIndex > rowIndex, so we don't even bother filling them
         // with the conjugates of the transpose.
-        /*
-        valuesMatrix.coeffRef( columnIndex,
-                               rowIndex ).real()
-        = valuesMatrix.coeff( rowIndex,
-                              columnIndex ).real();
-        valuesMatrix.coeffRef( columnIndex,
-                               rowIndex ).imag()
-        = -(valuesMatrix.coeff( rowIndex,
-                                columnIndex ).imag());
-        */
       }
       valuesMatrix.coeffRef( rowIndex,
                              rowIndex ).real()
@@ -97,71 +80,50 @@ namespace VevaciousPlusPlus
                              rowIndex ).imag() = 0.0;
       rowsTimesLength += numberOfRows;
     }
+    return valuesMatrix;
+  }
 
-    eigenvalueFinder.compute( valuesMatrix,
-                              Eigen::EigenvaluesOnly );
-    for( unsigned int whichIndex( 0 );
-         whichIndex < numberOfRows;
-         ++whichIndex )
-    {
-      massesSquared[ whichIndex ]
-      = eigenvalueFinder.eigenvalues()( whichIndex );
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "making extra matrices!";
-    std::cout << std::endl;
-    Eigen::MatrixXcd zeroRowLessThanColumn( valuesMatrix );
-    Eigen::MatrixXcd zeroColumnLessThanRow( valuesMatrix );
+  // This returns a matrix of the values of the elements for a field
+  // configuration given by fieldConfiguration, with all functionoids
+  // evaluated at the natural exponent of logarithmOfScale.
+  Eigen::MatrixXcd ComplexMassSquaredMatrix::CurrentValues(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const logarithmOfScale ) const
+  {
+    unsigned int rowsTimesLength( 0 );
+    Eigen::MatrixXcd valuesMatrix( numberOfRows,
+                                   numberOfRows );
     for( unsigned int rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      for( unsigned int columnIndex( rowIndex + 1 );
-           columnIndex < numberOfRows;
+      for( unsigned int columnIndex( 0 );
+           columnIndex < rowIndex;
            ++columnIndex )
       {
-        zeroRowLessThanColumn.coeffRef( rowIndex,
-                                        columnIndex ).real() = 0.0;
-        zeroRowLessThanColumn.coeffRef( rowIndex,
-                                        columnIndex ).imag() = 0.0;
-        zeroColumnLessThanRow.coeffRef( columnIndex,
-                                        rowIndex ).real() = 0.0;
-        zeroColumnLessThanRow.coeffRef( columnIndex,
-                                        rowIndex ).imag() = 0.0;
+        valuesMatrix.coeffRef( rowIndex,
+                               columnIndex ).real()
+        = matrixElements[ rowsTimesLength + columnIndex ].first(
+                                                            fieldConfiguration,
+                                                            logarithmOfScale );
+        valuesMatrix.coeffRef( rowIndex,
+                               columnIndex ).imag()
+        = matrixElements[ rowsTimesLength + columnIndex ].second(
+                                                            fieldConfiguration,
+                                                            logarithmOfScale );
+        // The Eigen routines don't bother looking at elements of valuesMatrix
+        // where columnIndex > rowIndex, so we don't even bother filling them
+        // with the conjugates of the transpose.
       }
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).real()
+      = matrixElements[ rowsTimesLength + rowIndex ].first( fieldConfiguration,
+                                                            logarithmOfScale );
+      valuesMatrix.coeffRef( rowIndex,
+                             rowIndex ).imag() = 0.0;
+      rowsTimesLength += numberOfRows;
     }
-    std::cout << std::endl;
-    std::cout
-    << "valuesMatrix = " << std::endl
-    << valuesMatrix << std::endl
-    << "zeroRowLessThanColumn = " << std::endl
-    << zeroRowLessThanColumn << std::endl
-    << "zeroColumnLessThanRow = " << std::endl
-    << zeroColumnLessThanRow << std::endl;
-    std::cout << std::endl;
-    std::cout
-    << "valuesMatrix = " << std::endl
-    << valuesMatrix << std::endl
-    << "valuesMatrix eigenvalues = " << std::endl
-    << eigenvalueFinder.eigenvalues() << std::endl;
-    eigenvalueFinder.compute( zeroRowLessThanColumn,
-                              Eigen::EigenvaluesOnly );
-    std::cout << std::endl;
-    std::cout
-    << "zeroRowLessThanColumn eigenvalues = " << std::endl
-    << eigenvalueFinder.eigenvalues() << std::endl;
-    eigenvalueFinder.compute( zeroColumnLessThanRow,
-                              Eigen::EigenvaluesOnly );
-    std::cout << std::endl;
-    std::cout
-    << "zeroColumnLessThanRow eigenvalues = " << std::endl
-    << eigenvalueFinder.eigenvalues() << std::endl;
-    std::cout << std::endl;*/
-
-    return massesSquared;
+    return valuesMatrix;
   }
 
 } /* namespace VevaciousPlusPlus */

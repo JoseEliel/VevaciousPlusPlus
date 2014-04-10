@@ -32,8 +32,7 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    renormalizationScaleSquared( NAN ),
-    minimumRenormalizationScaleSquared( NAN ),
+    minimumRenormalizationScale( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -106,11 +105,8 @@ namespace VevaciousPlusPlus
       throw
       std::runtime_error( "Could not parse <MinimumRenormalizationScale>." );
     }
-    minimumRenormalizationScaleSquared = BOL::StringParser::stringToDouble(
+    minimumRenormalizationScale = BOL::StringParser::stringToDouble(
                              elementParser.getTrimmedCurrentElementContent() );
-    renormalizationScaleSquared = ( minimumRenormalizationScaleSquared
-                                    * minimumRenormalizationScaleSquared );
-    minimumRenormalizationScaleSquared = renormalizationScaleSquared;
     //   </MinimumRenormalizationScale>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
@@ -263,18 +259,19 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                      " RealBosonMassSquaredMatrix was not a square integer!" );
         }
-        RealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
-                                 elementParser.getCurrentElementAttributes() );
+        RealMassesSquaredMatrix*
+        massSquaredMatrix( new RealMassesSquaredMatrix( numberOfRows,
+                               elementParser.getCurrentElementAttributes() ) );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
              ++lineIndex )
         {
           ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
                                                    elementLines[ lineIndex ] ),
-                                    massSquaredMatrix.ElementAt( lineIndex ) );
+                                   massSquaredMatrix->ElementAt( lineIndex ) );
         }
-        if( massSquaredMatrix.GetSpinType()
-            == MassesSquaredFromPolynomials::gaugeBoson )
+        if( massSquaredMatrix->GetSpinType()
+            == MassesSquaredCalculator::gaugeBoson )
         {
           vectorSquareMasses.push_back( massSquaredMatrix );
         }
@@ -299,7 +296,8 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                           " WeylFermionMassMatrix was not a square integer!" );
         }
-        fermionMasses.push_back( SymmetricComplexMassMatrix( numberOfRows,
+        SymmetricComplexMassMatrix*
+        fermionMassMatrix( new SymmetricComplexMassMatrix( numberOfRows,
                                elementParser.getCurrentElementAttributes() ) );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -307,8 +305,9 @@ namespace VevaciousPlusPlus
         {
           ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
                                                    elementLines[ lineIndex ] ),
-                                 fermionMasses.back().ElementAt( lineIndex ) );
+                                   fermionMassMatrix->ElementAt( lineIndex ) );
         }
+        fermionMasses.push_back( fermionMassMatrix );
       }
       //   </WeylFermionMassMatrix>
       //   <ComplexWeylFermionMassSquaredMatrix>
@@ -326,7 +325,8 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
             " ComplexWeylFermionMassSquaredMatrix was not a square integer!" );
         }
-        fermionMassSquareds.push_back( ComplexMassSquaredMatrix( numberOfRows,
+        ComplexMassSquaredMatrix*
+        fermionMassSquaredMatrix( new ComplexMassSquaredMatrix( numberOfRows,
                                elementParser.getCurrentElementAttributes() ) );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -334,8 +334,9 @@ namespace VevaciousPlusPlus
         {
           ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
                                                    elementLines[ lineIndex ] ),
-                           fermionMassSquareds.back().ElementAt( lineIndex ) );
+                            fermionMassSquaredMatrix->ElementAt( lineIndex ) );
         }
+        fermionMassSquareds.push_back( fermionMassSquaredMatrix );
       }
       //   </WeylFermionMassMatrix>
     }
@@ -408,7 +409,30 @@ namespace VevaciousPlusPlus
 
   PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
   {
-    // This does nothing.
+    for( unsigned int deletionIndex( 0 );
+         deletionIndex < scalarSquareMasses.size();
+         ++deletionIndex )
+    {
+      delete scalarSquareMasses[ deletionIndex ];
+    }
+    for( unsigned int deletionIndex( 0 );
+         deletionIndex < fermionMasses.size();
+         ++deletionIndex )
+    {
+      delete fermionMasses[ deletionIndex ];
+    }
+    for( unsigned int deletionIndex( 0 );
+         deletionIndex < fermionMassSquareds.size();
+         ++deletionIndex )
+    {
+      delete fermionMassSquareds[ deletionIndex ];
+    }
+    for( unsigned int deletionIndex( 0 );
+         deletionIndex < vectorSquareMasses.size();
+         ++deletionIndex )
+    {
+      delete vectorSquareMasses[ deletionIndex ];
+    }
   }
 
 
@@ -418,8 +442,7 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    renormalizationScaleSquared( NAN ),
-    minimumRenormalizationScaleSquared( NAN ),
+    minimumRenormalizationScale( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -435,13 +458,11 @@ namespace VevaciousPlusPlus
 
   // This is just for derived classes.
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
-                               PotentialFromPolynomialAndMasses& copySource ) :
+                         PotentialFromPolynomialAndMasses const& copySource ) :
     HomotopyContinuationReadyPolynomial( copySource ),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
-    renormalizationScaleSquared( copySource.renormalizationScaleSquared ),
-    minimumRenormalizationScaleSquared(
-                               copySource.minimumRenormalizationScaleSquared ),
+    minimumRenormalizationScale( copySource.minimumRenormalizationScale ),
     treeLevelPotential( copySource.treeLevelPotential ),
     polynomialLoopCorrections( copySource.polynomialLoopCorrections ),
     scalarSquareMasses( copySource.scalarSquareMasses ),
@@ -453,6 +474,86 @@ namespace VevaciousPlusPlus
     // This is just an initialization-list copy-constructor.
   }
 
+
+  // This evaluates the one-loop potential with thermal corrections assuming
+  // that the scale has been set correctly.
+  double
+  PotentialFromPolynomialAndMasses::LoopAndThermalCorrections(
+                             std::vector< double > const& fieldConfiguration,
+          std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
+         std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
+          std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
+                                              double const inverseScaleSquared,
+                                          double const temperatureValue ) const
+  {
+    double inverseTemperatureSquared( 1.0 );
+    if( temperatureValue > 0.0 )
+    {
+      inverseTemperatureSquared
+      = ( 1.0 / ( temperatureValue * temperatureValue ) );
+    }
+    double totalQuantumCorrections( 0.0 );
+    double totalThermalCorrections( 0.0 );
+
+    double scalarQuantumCorrections( 0.0 );
+    double scalarThermalCorrections( 0.0 );
+    AddToCorrections( scalarMassesSquaredWithFactors,
+                      inverseScaleSquared,
+                      inverseTemperatureSquared,
+                      1.5,
+                      &(ThermalFunctions::BosonicJ),
+                      scalarQuantumCorrections,
+                      scalarThermalCorrections );
+
+    // Real scalar degrees of freedom add to both quantum and thermal
+    // corrections without any factors.
+    totalQuantumCorrections += scalarQuantumCorrections;
+    totalThermalCorrections += scalarThermalCorrections;
+
+    double fermionQuantumCorrections( 0.0 );
+    double fermionThermalCorrections( 0.0 );
+    AddToCorrections( scalarMassesSquaredWithFactors,
+                      inverseScaleSquared,
+                      inverseTemperatureSquared,
+                      1.5,
+                      &(ThermalFunctions::FermionicJ),
+                      fermionQuantumCorrections,
+                      fermionThermalCorrections );
+
+    // Weyl fermion degrees of freedom add to both quantum and thermal
+    // corrections with a factor of 2, though there is an additional minus sign
+    // for the quantum corrections. (The conventions used in Vevacious are that
+    // the thermal correction functions already have any minus signs for
+    // fermions.)
+    totalQuantumCorrections -= ( fermionQuantumCorrections
+                                 + fermionQuantumCorrections );
+    totalThermalCorrections += ( fermionThermalCorrections
+                                 + fermionThermalCorrections );
+
+    double vectorQuantumCorrections( 0.0 );
+    double vectorThermalCorrections( 0.0 );
+    AddToCorrections( scalarMassesSquaredWithFactors,
+                      inverseScaleSquared,
+                      inverseTemperatureSquared,
+                      vectorMassCorrectionConstant,
+                      &(ThermalFunctions::BosonicJ),
+                      vectorQuantumCorrections,
+                      vectorThermalCorrections );
+
+    // Vector boson degrees of freedom add to quantum corrections with a factor
+    // of 3 in dimensional regularization schemes, and to thermal corrections
+    // with a factor of 2.
+    totalQuantumCorrections += ( vectorQuantumCorrections
+                                 + vectorQuantumCorrections
+                                 + vectorQuantumCorrections );
+    totalThermalCorrections += ( vectorThermalCorrections
+                                 + vectorThermalCorrections );
+
+    return ( ( totalQuantumCorrections * loopFactor )
+             + ( totalThermalCorrections * thermalFactor
+                 * temperatureValue * temperatureValue
+                 * temperatureValue * temperatureValue ) );
+  }
 
   // This interprets stringToParse as a sum of polynomial terms and sets
   // polynomialSum accordingly.
@@ -793,413 +894,61 @@ namespace VevaciousPlusPlus
     return std::string::npos;
   }
 
-  // This evaluates the sum of corrections for the real scalar degrees
-  // of freedom with masses-squared given by scalarSquareMasses evaluated for
-  // the field configuration given by fieldConfiguration at a temperature
-  // given by evaluationTemperature.
-  double PotentialFromPolynomialAndMasses::ScalarBosonCorrections(
-                               std::vector< double > const& fieldConfiguration,
+
+  // This evaluates the sum of corrections for the degrees of freedom with
+  // masses-squared given by massesSquaredWithFactors with
+  // subtractFromLogarithm as the constant to subtract from the logarithm of
+  // the ratio of mass-squared to square of renormalization scale, at a
+  // temperature given by inverseTemperatureSquared^(-1/2) using a thermal
+  // correction function given by ThermalFunction, and adds them to
+  // cumulativeQuantumCorrection and cumulativeThermalCorrection.
+  void PotentialFromPolynomialAndMasses::AddToCorrections(
+         std::vector< DoubleVectorWithDouble > const& massesSquaredWithFactors,
+                                              double const inverseScaleSquared,
                                         double const inverseTemperatureSquared,
-                                             double const temperatureFourthed )
+                                           double const subtractFromLogarithm,
+                                    double (*ThermalFunction)( double const ),
+                                           double& cumulativeQuantumCorrection,
+                                    double& cumulativeThermalCorrection ) const
   {
-    double totalQuantumCorrection( 0.0 );
     double currentQuantumCorrection( 0.0 );
-    double totalThermalCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
-    double absoluteMassSquared( 0.0 );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::ScalarBosonCorrections(...)";
-    std::cout << std::endl;*/
-
-
-    for( std::vector< RealMassesSquaredMatrix >::iterator
-         scalarSet( scalarSquareMasses.begin() );
-         scalarSet < scalarSquareMasses.end();
-         ++scalarSet )
+    double massSquared( 0.0 );
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesSquared( massesSquaredWithFactors.begin() );
+         massesSquared < massesSquaredWithFactors.end();
+         ++massesSquared )
     {
       currentQuantumCorrection = 0.0;
       currentThermalCorrection = 0.0;
-      std::vector< double > const&
-      massesSquared( scalarSet->MassesSquared( fieldConfiguration ) );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "massesSquared.size() =" << massesSquared.size();
-      std::cout << std::endl;*/
-
-      for( unsigned int whichMass( 0 );
-           whichMass < massesSquared.size();
-           ++whichMass )
+      for( std::vector< double >::const_iterator
+           massSquaredIterator( massesSquared->first.begin() );
+           massSquaredIterator < massesSquared->first.end();
+           ++massSquaredIterator )
       {
-        absoluteMassSquared = massesSquared[ whichMass ];
-        if( absoluteMassSquared < 0.0 )
+        massSquared = *massSquaredIterator;
+        if( massSquared < 0.0 )
         {
-          absoluteMassSquared = -absoluteMassSquared;
+          massSquared = -massSquared;
         }
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "massesSquared[ " << whichMass << " ] = "
-        << massesSquared[ whichMass ];
-        std::cout << std::endl;*/
-
-        if( absoluteMassSquared > 1.0 )
+        if( massSquared > 1.0 )
         {
-          currentQuantumCorrection += ( absoluteMassSquared
-                                        * absoluteMassSquared
-                                        * ( log( absoluteMassSquared
-                                                / renormalizationScaleSquared )
-                                            - 1.5 ) );
-
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "currentQuantumCorrection = " << currentQuantumCorrection;
-          std::cout << std::endl;*/
+          currentQuantumCorrection += ( massSquared * massSquared
+                                        * ( log( massSquared
+                                                 * inverseScaleSquared )
+                                            - subtractFromLogarithm ) );
         }
         if( inverseTemperatureSquared > 1.0 )
         {
-          currentThermalCorrection += bosonThermalFunction( absoluteMassSquared
+          currentThermalCorrection += (*ThermalFunction)( massSquared
                                                  * inverseTemperatureSquared );
         }
       }
-      totalQuantumCorrection
-      += ( scalarSet->MultiplicityFactor() * currentQuantumCorrection );
-      totalThermalCorrection
-      += ( scalarSet->MultiplicityFactor() * currentThermalCorrection );
+      cumulativeQuantumCorrection
+      += ( massesSquared->second * currentQuantumCorrection );
+      cumulativeThermalCorrection
+      += ( massesSquared->second * currentThermalCorrection );
     }
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::ScalarBosonCorrections( {";
-    for( std::vector< double >::const_iterator
-         whichField( fieldConfiguration.begin() );
-         whichField < fieldConfiguration.end();
-         ++whichField )
-    {
-      std::cout << " " << *whichField;
-    }
-    std::cout << " } ) finishing." << std::endl
-    << "totalQuantumCorrection = " << totalQuantumCorrection << std::endl
-    << "( loopFactor * totalQuantumCorrection ) = "
-    << ( loopFactor * totalQuantumCorrection ) << std::endl
-    << "totalThermalCorrection = " << totalThermalCorrection << std::endl
-    << "( thermalFactor * totalThermalCorrection * evaluationTemperature"
-    << " * evaluationTemperature * evaluationTemperature"
-    << " * evaluationTemperature ) = "
-    << ( thermalFactor * totalThermalCorrection
-         * temperatureFourthed ) << std::endl
-    << "returning = " << ( ( loopFactor * totalQuantumCorrection )
-                           + ( thermalFactor * totalThermalCorrection
-                               * temperatureFourthed ) ) << std::endl;
-    std::cout << std::endl;*/
-
-    return ( ( loopFactor * totalQuantumCorrection )
-             + ( thermalFactor * totalThermalCorrection
-                 * temperatureFourthed ) );
-  }
-
-  // This evaluates the sum of corrections for a set of Weyl fermion degrees
-  // of freedom with masses-squared given by fermionMasses evaluated for
-  // the field configuration given by fieldConfiguration at a temperature
-  // given by evaluationTemperature.
-  double PotentialFromPolynomialAndMasses::WeylFermionCorrections(
-                               std::vector< double > const& fieldConfiguration,
-                                        double const inverseTemperatureSquared,
-                                             double const temperatureFourthed )
-  {
-    double totalQuantumCorrection( 0.0 );
-    double currentQuantumCorrection( 0.0 );
-    double totalThermalCorrection( 0.0 );
-    double currentThermalCorrection( 0.0 );
-    double absoluteMassSquared( 0.0 );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::WeylFermionCorrections(...)";
-    std::cout << std::endl;*/
-
-    for( std::vector< SymmetricComplexMassMatrix >::iterator
-         fermionSet( fermionMasses.begin() );
-         fermionSet < fermionMasses.end();
-         ++fermionSet )
-    {
-      currentQuantumCorrection = 0.0;
-      currentThermalCorrection = 0.0;
-      std::vector< double > const&
-      massesSquared( fermionSet->MassesSquared( fieldConfiguration ) );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "(SymmetricComplexMassMatrix) massesSquared.size() =" << massesSquared.size();
-      std::cout << std::endl;*/
-
-      for( unsigned int whichMass( 0 );
-           whichMass < massesSquared.size();
-           ++whichMass )
-      {
-        absoluteMassSquared = massesSquared[ whichMass ];
-        if( absoluteMassSquared < 0.0 )
-        {
-          absoluteMassSquared = -absoluteMassSquared;
-        }
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "massesSquared[ " << whichMass << " ] = "
-        << massesSquared[ whichMass ];
-        std::cout << std::endl;*/
-
-        if( absoluteMassSquared > 1.0 )
-        {
-          currentQuantumCorrection += ( absoluteMassSquared
-                                        * absoluteMassSquared
-                                        * ( log( absoluteMassSquared
-                                                / renormalizationScaleSquared )
-                                          - 1.5 ) );
-
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "currentQuantumCorrection = " << currentQuantumCorrection;
-          std::cout << std::endl;*/
-        }
-        if( inverseTemperatureSquared > 1.0 )
-        {
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "*massSquared = " << *massSquared << ", temperatureFourthed = "
-          << temperatureFourthed
-          << ", ( (*massSquared) * inverseTemperatureSquared ) = "
-          << ( (*massSquared) * inverseTemperatureSquared );
-          std::cout << std::endl;*/
-
-          currentThermalCorrection
-          += fermionThermalFunction( absoluteMassSquared
-                                     * inverseTemperatureSquared );
-        }
-      }
-      totalQuantumCorrection += ( fermionSet->MultiplicityFactor()
-                                  * currentQuantumCorrection );
-      totalThermalCorrection += ( fermionSet->MultiplicityFactor()
-                                  * currentThermalCorrection );
-    }
-
-    for( std::vector< ComplexMassSquaredMatrix >::iterator
-         fermionSet( fermionMassSquareds.begin() );
-         fermionSet < fermionMassSquareds.end();
-         ++fermionSet )
-    {
-      currentQuantumCorrection = 0.0;
-      currentThermalCorrection = 0.0;
-      std::vector< double > const&
-      massesSquared( fermionSet->MassesSquared( fieldConfiguration ) );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "(ComplexMassSquaredMatrix) massesSquared.size() ="
-      << massesSquared.size();
-      std::cout << std::endl;*/
-
-      for( unsigned int whichMass( 0 );
-           whichMass < massesSquared.size();
-           ++whichMass )
-      {
-        absoluteMassSquared = massesSquared[ whichMass ];
-        if( absoluteMassSquared < 0.0 )
-        {
-          absoluteMassSquared = -absoluteMassSquared;
-        }
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "massesSquared[ " << whichMass << " ] = "
-        << massesSquared[ whichMass ];
-        std::cout << std::endl;*/
-
-        if( absoluteMassSquared > 1.0 )
-        {
-          currentQuantumCorrection += ( absoluteMassSquared
-                                        * absoluteMassSquared
-                                        * ( log( absoluteMassSquared
-                                                / renormalizationScaleSquared )
-                                            - 1.5 ) );
-
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "currentQuantumCorrection = " << currentQuantumCorrection;
-          std::cout << std::endl;*/
-        }
-        if( inverseTemperatureSquared > 1.0 )
-        {
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "*massSquared = " << *massSquared << ", temperatureFourthed = "
-          << temperatureFourthed
-          << ", ( (*massSquared) * inverseTemperatureSquared ) = "
-          << ( (*massSquared) * inverseTemperatureSquared );
-          std::cout << std::endl;*/
-
-          currentThermalCorrection
-          += fermionThermalFunction( absoluteMassSquared
-                                     * inverseTemperatureSquared );
-        }
-      }
-      totalQuantumCorrection += ( fermionSet->MultiplicityFactor()
-                                  * currentQuantumCorrection );
-      totalThermalCorrection += ( fermionSet->MultiplicityFactor()
-                                  * currentThermalCorrection );
-    }
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::WeylFermionCorrections( {";
-    for( std::vector< double >::const_iterator
-         whichField( fieldConfiguration.begin() );
-         whichField < fieldConfiguration.end();
-         ++whichField )
-    {
-      std::cout << " " << *whichField;
-    }
-    std::cout << " } ) finishing." << std::endl
-    << "totalQuantumCorrection = " << totalQuantumCorrection << std::endl
-    << "( loopFactor * totalQuantumCorrection ) = "
-    << ( loopFactor * totalQuantumCorrection ) << std::endl
-    << "totalThermalCorrection = " << totalThermalCorrection << std::endl
-    << "( thermalFactor * totalThermalCorrection * temperatureFourthed ) = "
-    << ( thermalFactor * totalThermalCorrection
-         * temperatureFourthed ) << std::endl
-    << "returning = " << ( 2.0 * ( ( thermalFactor * totalThermalCorrection
-        * temperatureFourthed )
-      - ( loopFactor * totalQuantumCorrection ) ) ) << std::endl;
-    std::cout << std::endl;*/
-
-    // The thermal corrections already account for the sign of fermionic
-    // contributions, while the zero-temperature corrections need to be
-    // subtracted.
-    return ( 2.0 * ( ( thermalFactor * totalThermalCorrection
-                       * temperatureFourthed )
-                     - ( loopFactor * totalQuantumCorrection ) ) );
-  }
-
-  // This evaluates the sum of corrections for the real scalar degrees
-  // of freedom with masses-squared given by vectorSquareMasses evaluated for
-  // the field configuration given by fieldConfiguration at a temperature
-  // given by evaluationTemperature.
-  double PotentialFromPolynomialAndMasses::GaugeBosonCorrections(
-                               std::vector< double > const& fieldConfiguration,
-                                        double const inverseTemperatureSquared,
-                                             double const temperatureFourthed )
-  {
-    double totalQuantumCorrection( 0.0 );
-    double currentQuantumCorrection( 0.0 );
-    double totalThermalCorrection( 0.0 );
-    double currentThermalCorrection( 0.0 );
-    double absoluteMassSquared( 0.0 );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::GaugeBosonCorrections(...)";
-    std::cout << std::endl;*/
-
-    for( std::vector< RealMassesSquaredMatrix >::iterator
-         vectorSet( vectorSquareMasses.begin() );
-         vectorSet < vectorSquareMasses.end();
-         ++vectorSet )
-    {
-      currentQuantumCorrection = 0.0;
-      currentThermalCorrection = 0.0;
-      std::vector< double > const&
-      massesSquared( vectorSet->MassesSquared( fieldConfiguration ) );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "massesSquared.size() ="
-      << massesSquared.size();
-      std::cout << std::endl;*/
-
-      for( unsigned int whichMass( 0 );
-           whichMass < massesSquared.size();
-           ++whichMass )
-      {
-        absoluteMassSquared = massesSquared[ whichMass ];
-        if( absoluteMassSquared < 0.0 )
-        {
-          absoluteMassSquared = -absoluteMassSquared;
-        }
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "massesSquared[ " << whichMass << " ] = "
-        << massesSquared[ whichMass ];
-        std::cout << std::endl;*/
-
-        if( absoluteMassSquared > 1.0 )
-        {
-          currentQuantumCorrection += ( absoluteMassSquared
-                                        * absoluteMassSquared
-                                        * ( log( absoluteMassSquared
-                                               / renormalizationScaleSquared )
-                                          - vectorMassCorrectionConstant ) );
-
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "currentQuantumCorrection = " << currentQuantumCorrection;
-          std::cout << std::endl;*/
-        }
-        if( inverseTemperatureSquared > 0.0 )
-        {
-          currentThermalCorrection += bosonThermalFunction( absoluteMassSquared
-                                                 * inverseTemperatureSquared );
-        }
-      }
-      totalQuantumCorrection
-      += ( vectorSet->MultiplicityFactor() * currentQuantumCorrection );
-      totalThermalCorrection
-      += ( vectorSet->MultiplicityFactor() * currentThermalCorrection );
-    }
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::GaugeBosonCorrections( {";
-    for( std::vector< double >::const_iterator
-         whichField( fieldConfiguration.begin() );
-         whichField < fieldConfiguration.end();
-         ++whichField )
-    {
-      std::cout << " " << *whichField;
-    }
-    std::cout << " } ) finishing." << std::endl
-    << "totalQuantumCorrection = " << totalQuantumCorrection << std::endl
-    << "( loopFactor * totalQuantumCorrection ) = "
-    << ( loopFactor * totalQuantumCorrection ) << std::endl
-    << "totalThermalCorrection = " << totalThermalCorrection << std::endl
-    << "( thermalFactor * totalThermalCorrection * temperatureFourthed ) = "
-    << ( thermalFactor * totalThermalCorrection
-         * temperatureFourthed ) << std::endl
-    << "returning = " << ( ( 3.0 * loopFactor * totalQuantumCorrection )
-        + ( 2.0 * thermalFactor * totalThermalCorrection
-            * temperatureFourthed ) ) << std::endl;
-    std::cout << std::endl;*/
-
-    // Note that vectors have different degrees of freedom for the zero-
-    // and non-zero-temperature corrections!
-    return ( ( 3.0 * loopFactor * totalQuantumCorrection )
-             + ( 2.0 * thermalFactor * totalThermalCorrection
-                 * temperatureFourthed ) );
   }
 
 } /* namespace VevaciousPlusPlus */
