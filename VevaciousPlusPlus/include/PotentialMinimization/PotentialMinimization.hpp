@@ -11,6 +11,7 @@
 #include "Hom4ps2AndMinuit.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
 #include "MinuitManager.hpp"
+#include "MinuitMinimum.hpp"
 #include "PotentialForMinuit.hpp"
 #include "PotentialMinimizer.hpp"
 #include "PotentialMinimum.hpp"

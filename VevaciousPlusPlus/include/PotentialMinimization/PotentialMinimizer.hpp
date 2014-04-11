@@ -24,10 +24,16 @@ namespace VevaciousPlusPlus
 
     // This should find all the minima of the potential evaluated at a
     // temperature given by temperatureInGev, and record them in foundMinima.
-    // It should also set dsbVacuum, and record the minima lower than dsbVacuum
-    // in panicVacua, and of those, it should set panicVacuum to be the prime
-    // candidate for tunneling out of dsbVacuum (by default, taken to be the
-    // minimum in panicVacua closest to dsbVacuum).
+    // It should also set dsbVacuum (which is assumed to not have been updated
+    // directly by the SLHA manager yet; also it may be that the SLHA data only
+    // gives the approximate position of the DSB minimum for potentialFunction
+    // which may not be as high an order approximation as the calculation that
+    // created the SLHA data, so the DSB input has to be taken as a starting
+    // point for MINUIT, for example; furthermore, in general the DSB minimum
+    // will change with temperature), and record the minima lower than
+    // dsbVacuum in panicVacua, and of those, it should set panicVacuum to be
+    // the prime candidate for tunneling out of dsbVacuum (by default, taken to
+    // be the minimum in panicVacua closest to dsbVacuum).
     virtual void FindMinima( double const temperatureInGev = 0.0 ) = 0;
 
     // This should find the minimum at temperature temperatureInGev nearest to
@@ -54,6 +60,10 @@ namespace VevaciousPlusPlus
     // minimum from panicVacua which is closest to dsbVacuum.
     PotentialMinimum const& PanicVacuum() const { return panicVacuum; }
 
+    bool DsbVacuumIsStable() const{ return panicVacua.empty(); }
+
+    bool DsbVacuumIsMetaStable() const{ return !(panicVacua.empty()); }
+
 
   protected:
     PotentialFunction& potentialFunction;
@@ -61,7 +71,38 @@ namespace VevaciousPlusPlus
     PotentialMinimum dsbVacuum;
     std::vector< PotentialMinimum > panicVacua;
     PotentialMinimum panicVacuum;
+
+    // This returns false if the vector of the absolute values of the fields of
+    // comparisonMinimum lies within a hypercube of side thresholdDistance
+    // centered on dsbVacuum.
+    bool IsNotPhaseRotationOfDsbVacuum(
+                                     PotentialMinimum const& comparisonMinimum,
+                                        double const thresholdDistance ) const;
   };
+
+
+
+
+  // This returns false if the vector of the absolute values of the fields of
+  // comparisonMinimum lies within a hypercube of side thresholdDistance
+  // centered on dsbVacuum.
+  inline bool PotentialMinimizer::IsNotPhaseRotationOfDsbVacuum(
+                                     PotentialMinimum const& comparisonMinimum,
+                                         double const thresholdDistance ) const
+  {
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < dsbVacuum.FieldConfiguration().size();
+         ++fieldIndex )
+    {
+      if( fabs( fabs( dsbVacuum.FieldConfiguration()[ fieldIndex ] )
+               - fabs( comparisonMinimum.FieldConfiguration()[ fieldIndex ] ) )
+          > thresholdDistance )
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* POTENTIALMINIMIZER_HPP_ */

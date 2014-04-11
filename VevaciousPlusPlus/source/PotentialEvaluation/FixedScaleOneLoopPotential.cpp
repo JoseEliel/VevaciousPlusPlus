@@ -25,7 +25,11 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
     inverseRenormalizationScaleSquared( NAN )
   {
-    // This constructor is just an initialization list.
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "FixedScaleOneLoopPotential::FixedScaleOneLoopPotential( [copy] )";
+    std::cout << std::endl;/**/
   }
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
@@ -46,17 +50,50 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const temperatureValue ) const
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "FixedScaleOneLoopPotential::operator()( {";
+    for( std::vector< double >::const_iterator
+         fieldValue( fieldConfiguration.begin() );
+         fieldValue < fieldConfiguration.end();
+         ++fieldValue )
+    {
+      std::cout << "  " << *fieldValue;
+    }
+    std::cout << "  }, " << temperatureValue
+    << " ) called. treeLevelPotential( fieldConfiguration ) = "
+    << treeLevelPotential( fieldConfiguration );
+    std::cout << std::endl;*/
+
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << " scalarSquareMasses";
+    std::cout << std::endl;*/
     AddMassesSquaredWithMultiplicity( fieldConfiguration,
                                       scalarSquareMasses,
                                       scalarMassesSquaredWithFactors );
     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "FixedScaleOneLoopPotential::operator():"
+    << " fermionMasses";
+    std::cout << std::endl;*/
     AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      fermionMasses,
+                                      fermionSquareMasses,
                                       fermionMassesSquaredWithFactors );
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      fermionMassSquareds,
-                                      fermionMassesSquaredWithFactors );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "FixedScaleOneLoopPotential::operator():"
+    << " vectorSquareMasses";
+    std::cout << std::endl;*/
     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( fieldConfiguration,
                                       vectorSquareMasses,
@@ -69,6 +106,54 @@ namespace VevaciousPlusPlus
                                           vectorMassesSquaredWithFactors,
                                           inverseRenormalizationScaleSquared,
                                           temperatureValue ) );
+  }
+
+  // This sets dsbFieldValueInputs based on the SLHA file just read in.
+  void FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale()
+  {
+    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
+    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
+    if( currentMinimumRenormalizationScale < modelMinimumRenormalizationScale )
+    {
+      currentMinimumRenormalizationScale = modelMinimumRenormalizationScale;
+    }
+    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
+                                        * currentMinimumRenormalizationScale );
+    inverseRenormalizationScaleSquared
+    = ( 1.0 / squareOfMinimumRenormalizationScale );
+    runningParameters.UpdateRunningParameters(
+                                          currentMinimumRenormalizationScale );
+    std::vector< double > fieldOrigin( numberOfFields,
+                                       0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      dsbFieldValueInputs[ fieldIndex ]
+      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale() set"
+    << " currentMaximumRenormalizationScale to "
+    << currentMaximumRenormalizationScale
+    << ", currentMinimumRenormalizationScale to "
+    << currentMinimumRenormalizationScale
+    << ", squareOfMinimumRenormalizationScale to "
+    << squareOfMinimumRenormalizationScale
+    << ", inverseRenormalizationScaleSquared to "
+    << inverseRenormalizationScaleSquared
+    << ", and DSB field values to:" << std::endl;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      std::cout << fieldNames[ fieldIndex ] << " -> "
+      << dsbFieldValueInputs[ fieldIndex ] << std::endl;
+    }
+    std::cout << std::endl;/**/
   }
 
   // This should prepare homotopyContinuationStartSystem and

@@ -56,6 +56,7 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialMinimization/Hom4ps2AndMinuit.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/MinuitManager.cpp \
+ source/PotentialMinimization/MinuitMinimum.cpp \
  source/PotentialMinimization/PotentialForMinuit.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \

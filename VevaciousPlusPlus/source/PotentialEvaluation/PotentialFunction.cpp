@@ -13,7 +13,8 @@ namespace VevaciousPlusPlus
   PotentialFunction::PotentialFunction( SlhaManager& slhaManager ) :
     BOL::BasicObserver(),
     fieldNames(),
-    numberOfFields( 0 )
+    numberOfFields( 0 ),
+    dsbFieldValueInputs()
   {
     slhaManager.registerObserver( this );
   }

@@ -1,0 +1,32 @@
+<VevaciousPlusPlusInitialization>
+
+<!--
+#  VevaciousPlusPlusInitialization.xml
+#
+#  Created on: Apr 10, 2014
+#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+#      Copyright 2014 Ben O'Leary
+#
+#      This file is part of VevaciousPlusPlus, released under the
+#      GNU General Public License. Please see the accompanying
+#      README.VevaciousPlusPlus.txt file for a full list of files, brief
+#      documentation on how to use these classes, and further details on the
+#      license.
+#
+ -->
+ 
+  <model>
+  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
+  </model>
+  <Hom4ps2Path>
+  <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
+  /Users/oleary/BOL/machine-specific/HOM4PS2/
+  </Hom4ps2Path>
+  <slha>
+  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/StopVevsTest.slha -->
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest.slha
+  </slha>
+
+</VevaciousPlusPlusInitialization>
+

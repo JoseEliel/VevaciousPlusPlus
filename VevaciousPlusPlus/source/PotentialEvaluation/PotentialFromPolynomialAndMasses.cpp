@@ -32,13 +32,19 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    minimumRenormalizationScale( NAN ),
+    modelMinimumRenormalizationScale( NAN ),
+    currentMinimumRenormalizationScale( NAN ),
+    squareOfMinimumRenormalizationScale( NAN ),
+    currentMaximumRenormalizationScale( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
-    fermionMasses(),
-    fermionMassSquareds(),
+    fermionSquareMasses(),
     vectorSquareMasses(),
+    scalarMassSquaredMatrices(),
+    fermionMassMatrices(),
+    fermionMassSquaredMatrices(),
+    vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN )
   {
     BOL::AsciiXmlParser fileParser( false );
@@ -95,8 +101,6 @@ namespace VevaciousPlusPlus
     numberOfFields = fieldNames.size();
     dsbFieldValuePolynomials.resize( numberOfFields );
     dsbFieldValueInputs.resize( numberOfFields );
-    fieldOrigin = std::vector< double >( numberOfFields,
-                                         0.0 );
     //   </FieldVariables>
     //   <MinimumRenormalizationScale>
     successfullyReadElement = elementParser.readNextElement();
@@ -105,8 +109,10 @@ namespace VevaciousPlusPlus
       throw
       std::runtime_error( "Could not parse <MinimumRenormalizationScale>." );
     }
-    minimumRenormalizationScale = BOL::StringParser::stringToDouble(
+    modelMinimumRenormalizationScale = BOL::StringParser::stringToDouble(
                              elementParser.getTrimmedCurrentElementContent() );
+    squareOfMinimumRenormalizationScale = ( modelMinimumRenormalizationScale
+                                          * modelMinimumRenormalizationScale );
     //   </MinimumRenormalizationScale>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
@@ -259,25 +265,24 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                      " RealBosonMassSquaredMatrix was not a square integer!" );
         }
-        RealMassesSquaredMatrix*
-        massSquaredMatrix( new RealMassesSquaredMatrix( numberOfRows,
-                               elementParser.getCurrentElementAttributes() ) );
+        RealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
+                                 elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
              ++lineIndex )
         {
           ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
                                                    elementLines[ lineIndex ] ),
-                                   massSquaredMatrix->ElementAt( lineIndex ) );
+                                    massSquaredMatrix.ElementAt( lineIndex ) );
         }
-        if( massSquaredMatrix->GetSpinType()
+        if( massSquaredMatrix.GetSpinType()
             == MassesSquaredCalculator::gaugeBoson )
         {
-          vectorSquareMasses.push_back( massSquaredMatrix );
+          vectorMassSquaredMatrices.push_back( massSquaredMatrix );
         }
         else
         {
-          scalarSquareMasses.push_back( massSquaredMatrix );
+          scalarMassSquaredMatrices.push_back( massSquaredMatrix );
         }
       }
       //   </RealBosonMassSquaredMatrix>
@@ -296,18 +301,17 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                           " WeylFermionMassMatrix was not a square integer!" );
         }
-        SymmetricComplexMassMatrix*
-        fermionMassMatrix( new SymmetricComplexMassMatrix( numberOfRows,
-                               elementParser.getCurrentElementAttributes() ) );
+        SymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
+                                 elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
              ++lineIndex )
         {
           ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
                                                    elementLines[ lineIndex ] ),
-                                   fermionMassMatrix->ElementAt( lineIndex ) );
+                                    fermionMassMatrix.ElementAt( lineIndex ) );
         }
-        fermionMasses.push_back( fermionMassMatrix );
+        fermionMassMatrices.push_back( fermionMassMatrix );
       }
       //   </WeylFermionMassMatrix>
       //   <ComplexWeylFermionMassSquaredMatrix>
@@ -325,22 +329,52 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
             " ComplexWeylFermionMassSquaredMatrix was not a square integer!" );
         }
-        ComplexMassSquaredMatrix*
-        fermionMassSquaredMatrix( new ComplexMassSquaredMatrix( numberOfRows,
-                               elementParser.getCurrentElementAttributes() ) );
+        ComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
+                                 elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
              ++lineIndex )
         {
           ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
                                                    elementLines[ lineIndex ] ),
-                            fermionMassSquaredMatrix->ElementAt( lineIndex ) );
+                             fermionMassSquaredMatrix.ElementAt( lineIndex ) );
         }
-        fermionMassSquareds.push_back( fermionMassSquaredMatrix );
+        fermionMassSquaredMatrices.push_back( fermionMassSquaredMatrix );
       }
       //   </WeylFermionMassMatrix>
     }
     // </LoopCorrections>
+
+    // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
+    // should remain valid as the other vectors do not change size any more
+    // after the constructor.
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < scalarMassSquaredMatrices.size();
+         ++pointerIndex )
+    {
+      scalarSquareMasses.push_back(
+                                &(scalarMassSquaredMatrices[ pointerIndex ]) );
+    }
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < fermionMassMatrices.size();
+         ++pointerIndex )
+    {
+      fermionSquareMasses.push_back( &(fermionMassMatrices[ pointerIndex ]) );
+    }
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < fermionMassSquaredMatrices.size();
+         ++pointerIndex )
+    {
+      fermionSquareMasses.push_back(
+                               &(fermionMassSquaredMatrices[ pointerIndex ]) );
+    }
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < vectorMassSquaredMatrices.size();
+         ++pointerIndex )
+    {
+      vectorSquareMasses.push_back(
+                                &(vectorMassSquaredMatrices[ pointerIndex ]) );
+    }
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -409,30 +443,7 @@ namespace VevaciousPlusPlus
 
   PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
   {
-    for( unsigned int deletionIndex( 0 );
-         deletionIndex < scalarSquareMasses.size();
-         ++deletionIndex )
-    {
-      delete scalarSquareMasses[ deletionIndex ];
-    }
-    for( unsigned int deletionIndex( 0 );
-         deletionIndex < fermionMasses.size();
-         ++deletionIndex )
-    {
-      delete fermionMasses[ deletionIndex ];
-    }
-    for( unsigned int deletionIndex( 0 );
-         deletionIndex < fermionMassSquareds.size();
-         ++deletionIndex )
-    {
-      delete fermionMassSquareds[ deletionIndex ];
-    }
-    for( unsigned int deletionIndex( 0 );
-         deletionIndex < vectorSquareMasses.size();
-         ++deletionIndex )
-    {
-      delete vectorSquareMasses[ deletionIndex ];
-    }
+    // This does nothing.
   }
 
 
@@ -442,13 +453,19 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    minimumRenormalizationScale( NAN ),
+    modelMinimumRenormalizationScale( NAN ),
+    currentMinimumRenormalizationScale( NAN ),
+    squareOfMinimumRenormalizationScale( NAN ),
+    currentMaximumRenormalizationScale( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
-    fermionMasses(),
-    fermionMassSquareds(),
+    fermionSquareMasses(),
     vectorSquareMasses(),
+    scalarMassSquaredMatrices(),
+    fermionMassMatrices(),
+    fermionMassSquaredMatrices(),
+    vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN )
   {
     // This protected constructor is just an initialization list only used by
@@ -462,16 +479,55 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( copySource ),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
-    minimumRenormalizationScale( copySource.minimumRenormalizationScale ),
+    modelMinimumRenormalizationScale(
+                                 copySource.modelMinimumRenormalizationScale ),
+    currentMinimumRenormalizationScale(
+                               copySource.currentMinimumRenormalizationScale ),
+    squareOfMinimumRenormalizationScale(
+                              copySource.squareOfMinimumRenormalizationScale ),
+    currentMaximumRenormalizationScale(
+                               copySource.currentMaximumRenormalizationScale ),
     treeLevelPotential( copySource.treeLevelPotential ),
     polynomialLoopCorrections( copySource.polynomialLoopCorrections ),
-    scalarSquareMasses( copySource.scalarSquareMasses ),
-    fermionMasses( copySource.fermionMasses ),
-    fermionMassSquareds( copySource.fermionMassSquareds ),
-    vectorSquareMasses( copySource.vectorSquareMasses ),
-    vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant )
+    scalarSquareMasses(),
+    fermionSquareMasses(),
+    vectorSquareMasses(),
+    scalarMassSquaredMatrices( copySource.scalarMassSquaredMatrices ),
+    fermionMassMatrices( copySource.fermionMassMatrices ),
+    fermionMassSquaredMatrices( copySource.fermionMassSquaredMatrices ),
+    vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
+    vectorMassCorrectionConstant()
   {
-    // This is just an initialization-list copy-constructor.
+    // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
+    // should remain valid as the other vectors do not change size any more
+    // after the constructor.
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < scalarMassSquaredMatrices.size();
+         ++pointerIndex )
+    {
+      scalarSquareMasses.push_back(
+                                &(scalarMassSquaredMatrices[ pointerIndex ]) );
+    }
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < fermionMassMatrices.size();
+         ++pointerIndex )
+    {
+      fermionSquareMasses.push_back( &(fermionMassMatrices[ pointerIndex ]) );
+    }
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < fermionMassSquaredMatrices.size();
+         ++pointerIndex )
+    {
+      fermionSquareMasses.push_back(
+                               &(fermionMassSquaredMatrices[ pointerIndex ]) );
+    }
+    for( unsigned int pointerIndex( 0 );
+         pointerIndex < vectorMassSquaredMatrices.size();
+         ++pointerIndex )
+    {
+      vectorSquareMasses.push_back(
+                                &(vectorMassSquaredMatrices[ pointerIndex ]) );
+    }
   }
 
 
@@ -486,6 +542,28 @@ namespace VevaciousPlusPlus
                                               double const inverseScaleSquared,
                                           double const temperatureValue ) const
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses::LoopAndThermalCorrections( {";
+    for( std::vector< double >::const_iterator
+         fieldValue( fieldConfiguration.begin() );
+         fieldValue < fieldConfiguration.end();
+         ++fieldValue )
+    {
+      std::cout << "  " << *fieldValue;
+    }
+    std::cout
+    << "  }, [scalarMassesSquaredWithFactors, size = "
+    << scalarMassesSquaredWithFactors.size()
+    << "], [fermionMassesSquaredWithFactors, size = "
+    << fermionMassesSquaredWithFactors.size()
+    << "], [vectorMassesSquaredWithFactors, size = "
+    << vectorMassesSquaredWithFactors.size() << "], inverseScaleSquared = "
+    << inverseScaleSquared << ", temperatureValue = " << temperatureValue
+    << " ) called.";
+    std::cout << std::endl;*/
+
     double inverseTemperatureSquared( 1.0 );
     if( temperatureValue > 0.0 )
     {
@@ -505,6 +583,13 @@ namespace VevaciousPlusPlus
                       scalarQuantumCorrections,
                       scalarThermalCorrections );
 
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "scalarQuantumCorrections = " << scalarQuantumCorrections;
+    std::cout << std::endl;*/
+
+
     // Real scalar degrees of freedom add to both quantum and thermal
     // corrections without any factors.
     totalQuantumCorrections += scalarQuantumCorrections;
@@ -512,7 +597,7 @@ namespace VevaciousPlusPlus
 
     double fermionQuantumCorrections( 0.0 );
     double fermionThermalCorrections( 0.0 );
-    AddToCorrections( scalarMassesSquaredWithFactors,
+    AddToCorrections( fermionMassesSquaredWithFactors,
                       inverseScaleSquared,
                       inverseTemperatureSquared,
                       1.5,
@@ -520,19 +605,26 @@ namespace VevaciousPlusPlus
                       fermionQuantumCorrections,
                       fermionThermalCorrections );
 
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "-2.0 * fermionQuantumCorrections = "
+    << ( -2.0 * fermionQuantumCorrections );
+    std::cout << std::endl;*/
+
     // Weyl fermion degrees of freedom add to both quantum and thermal
     // corrections with a factor of 2, though there is an additional minus sign
     // for the quantum corrections. (The conventions used in Vevacious are that
     // the thermal correction functions already have any minus signs for
     // fermions.)
-    totalQuantumCorrections -= ( fermionQuantumCorrections
-                                 + fermionQuantumCorrections );
-    totalThermalCorrections += ( fermionThermalCorrections
-                                 + fermionThermalCorrections );
+    totalQuantumCorrections -= fermionQuantumCorrections;
+    totalQuantumCorrections -= fermionQuantumCorrections;
+    totalThermalCorrections += fermionThermalCorrections;
+    totalThermalCorrections += fermionThermalCorrections;
 
     double vectorQuantumCorrections( 0.0 );
     double vectorThermalCorrections( 0.0 );
-    AddToCorrections( scalarMassesSquaredWithFactors,
+    AddToCorrections( vectorMassesSquaredWithFactors,
                       inverseScaleSquared,
                       inverseTemperatureSquared,
                       vectorMassCorrectionConstant,
@@ -540,14 +632,21 @@ namespace VevaciousPlusPlus
                       vectorQuantumCorrections,
                       vectorThermalCorrections );
 
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "3.0 * vectorQuantumCorrections = "
+    << ( 3.0 * vectorQuantumCorrections );
+    std::cout << std::endl;*/
+
     // Vector boson degrees of freedom add to quantum corrections with a factor
     // of 3 in dimensional regularization schemes, and to thermal corrections
     // with a factor of 2.
-    totalQuantumCorrections += ( vectorQuantumCorrections
-                                 + vectorQuantumCorrections
-                                 + vectorQuantumCorrections );
-    totalThermalCorrections += ( vectorThermalCorrections
-                                 + vectorThermalCorrections );
+    totalQuantumCorrections += vectorQuantumCorrections;
+    totalQuantumCorrections += vectorQuantumCorrections;
+    totalQuantumCorrections += vectorQuantumCorrections;
+    totalThermalCorrections += vectorThermalCorrections;
+    totalThermalCorrections += vectorThermalCorrections;
 
     return ( ( totalQuantumCorrections * loopFactor )
              + ( totalThermalCorrections * thermalFactor
@@ -894,7 +993,6 @@ namespace VevaciousPlusPlus
     return std::string::npos;
   }
 
-
   // This evaluates the sum of corrections for the degrees of freedom with
   // masses-squared given by massesSquaredWithFactors with
   // subtractFromLogarithm as the constant to subtract from the logarithm of
@@ -938,7 +1036,7 @@ namespace VevaciousPlusPlus
                                                  * inverseScaleSquared )
                                             - subtractFromLogarithm ) );
         }
-        if( inverseTemperatureSquared > 1.0 )
+        if( inverseTemperatureSquared > 0.0 )
         {
           currentThermalCorrection += (*ThermalFunction)( massSquared
                                                  * inverseTemperatureSquared );

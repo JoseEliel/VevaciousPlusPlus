@@ -61,9 +61,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    double squareOfMinimumRenormalizationScale;
     double logarithmOfMinimumRenormalizationScale;
-    double maximumRenormalizationScale;
     double logarithmOfMaximumRenormalizationScale;
 
     // This sets dsbFieldValueInputs based on the SLHA file just read in.
@@ -166,40 +164,6 @@ namespace VevaciousPlusPlus
                                      PotentialMinimum const& trueVacuum ) const
   {
     return falseVacuum.SquareDistanceTo( trueVacuum );
-  }
-
-  // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  inline void RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale()
-  {
-    squareOfMinimumRenormalizationScale
-    = ( minimumRenormalizationScale * minimumRenormalizationScale );
-    logarithmOfMinimumRenormalizationScale
-    = log( minimumRenormalizationScale );
-    maximumRenormalizationScale = runningParameters.HighestBlockScale();
-    logarithmOfMaximumRenormalizationScale
-    = log( maximumRenormalizationScale + minimumRenormalizationScale );
-    runningParameters.UpdateRunningParameters( minimumRenormalizationScale );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      dsbFieldValueInputs[ fieldIndex ]
-      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale() set DSB"
-    << " field values to:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::cout << fieldNames[ fieldIndex ] << " -> "
-      << dsbFieldValueInputs[ fieldIndex ] << std::endl;
-    }
-    std::cout << std::endl;*/
   }
 
   // This prepares a system of polynomials for the homotopy continuation

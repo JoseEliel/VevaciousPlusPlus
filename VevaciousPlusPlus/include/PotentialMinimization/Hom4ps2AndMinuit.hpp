@@ -30,12 +30,14 @@ namespace VevaciousPlusPlus
     ~Hom4ps2AndMinuit();
 
 
-    // This should find all the minima of the potential evaluated at a
-    // temperature given by temperatureInGev, and record them in foundMinima.
-    // It should also set dsbVacuum, and record the minima lower than dsbVacuum
-    // in panicVacua, and of those, it should set panicVacuum to be the prime
-    // candidate for tunneling out of dsbVacuum (by default, taken to be the
-    // minimum in panicVacua closest to dsbVacuum).
+    // This finds all the extrema of polynomialPotential with HOM4PS2, then
+    // uses them as starting points for Minuit2 to minimize potentialForMinuit,
+    // evaluated at a temperature given by temperatureInGev, and records the
+    // found minima in foundMinima. It also sets dsbVacuum (using
+    // polynomialPotential.DsbFieldValues() as a starting point for Minuit2),
+    // and records the minima lower than dsbVacuum in panicVacua, and of those,
+    // it sets panicVacuum to be the minimum in panicVacua closest to
+    // dsbVacuum.
     virtual void FindMinima( double const temperatureInGev = 0.0 );
 
     // This should find the minimum at temperature temperatureInGev nearest to
@@ -56,12 +58,38 @@ namespace VevaciousPlusPlus
     std::vector< std::string > variableNames;
     std::map< std::string, unsigned int > nameToIndexMap;
     std::vector< std::vector< double > > purelyRealSolutionSets;
+    MinuitManager minuitManager;
     // MINUIT thing!
+
+    // This uses HOM4PS2 to fill purelyRealSolutionSets with all the extrema
+    // of polynomialPotential.TargetPolynomialGradient().
+    void FindTreeLevelExtrema();
 
     void WriteHom4p2Input( std::string const& hom4ps2InputFilename );
 
     void ParseHom4ps2Output( std::string const& hom4ps2OutputFilename );
+
+    // This uses Minuit2 to minimize potentialForMinuit starting from the
+    // values in purelyRealSolutionSets.
+    void RollAndSortExtrema();
   };
 
+
+
+
+  // This finds all the extrema of polynomialPotential with HOM4PS2, then uses
+  // them as starting points for Minuit2 to minimize potentialForMinuit,
+  // evaluated at a temperature given by temperatureInGev, and records the
+  // found minima in foundMinima. It also sets dsbVacuum (using
+  // polynomialPotential.DsbFieldValues() as a starting point for Minuit2), and
+  // records the minima lower than dsbVacuum in panicVacua, and of those, it
+  // sets panicVacuum to be the minimum in panicVacua closest to dsbVacuum.
+  inline void Hom4ps2AndMinuit::FindMinima( double const temperatureInGev )
+  {
+    FindTreeLevelExtrema();
+    potentialForMinuit.SetTemperature( temperatureInGev );
+    dsbVacuum = minuitManager( polynomialPotential.DsbFieldValues() );
+    RollAndSortExtrema();
+  }
 } /* namespace VevaciousPlusPlus */
 #endif /* HOM4PS2ANDMINUIT_HPP_ */

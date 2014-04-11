@@ -39,10 +39,12 @@ namespace VevaciousPlusPlus
     QuickApproximation( std::vector< double > const& fieldConfiguration,
                         double const temperatureValue = 0.0 );
 
-    // This returns the square of the Euclidean distance between the two vacua.
+    // This returns the square of the renormalization scale.
     virtual double
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
-                                    PotentialMinimum const& trueVacuum ) const;
+                                     PotentialMinimum const& trueVacuum ) const
+    { return ( currentMinimumRenormalizationScale
+               * currentMinimumRenormalizationScale ); }
 
     // This should return a vector of field values corresponding to the field
     // configuration as it should be passed to operator() for evaluating the
@@ -86,14 +88,6 @@ namespace VevaciousPlusPlus
     return treeLevelPotential( fieldConfiguration );
   }
 
-  // This returns the square of the renormalization scale.
-  inline double FixedScaleOneLoopPotential::ScaleSquaredRelevantToTunneling(
-                                           PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum ) const
-  {
-    return ( 1.0 / inverseRenormalizationScaleSquared );
-  }
-
   // FixedScaleOneLoopPotential prepares the homotopy continuation polynomials
   // in 1-to-1 correspondence with how they should be sent to operator().
   inline std::vector< double >
@@ -101,41 +95,6 @@ namespace VevaciousPlusPlus
                  std::vector< double > homotopyContinuatioConfiguration ) const
   {
     return homotopyContinuatioConfiguration;
-  }
-
-  // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  inline void FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale()
-  {
-    double renormalizationScale( runningParameters.LowestBlockScale() );
-    if( renormalizationScale < minimumRenormalizationScale )
-    {
-      renormalizationScale = minimumRenormalizationScale;
-    }
-    inverseRenormalizationScaleSquared
-    = ( 1.0 / ( renormalizationScale * renormalizationScale ) );
-    runningParameters.UpdateRunningParameters( renormalizationScale );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      dsbFieldValueInputs[ fieldIndex ]
-      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale() set"
-    << " renormalizationScaleSquared to " << renormalizationScaleSquared
-    << " and DSB field values to:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::cout << fieldNames[ fieldIndex ] << " -> "
-      << dsbFieldValueInputs[ fieldIndex ] << std::endl;
-    }
-    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

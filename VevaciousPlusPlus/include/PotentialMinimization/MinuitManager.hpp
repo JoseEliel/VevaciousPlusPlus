@@ -12,6 +12,7 @@
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/FunctionMinimum.h"
+#include "PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -28,12 +29,23 @@ namespace VevaciousPlusPlus
     ~MinuitManager();
 
 
+    // This performs a Minuit2 MIGRAD minimization but puts the result in the
+    // less cumbersome class MinuitMinimum instead of returning just a
+    // ROOT::Minuit2::FunctionMinimum.
+    MinuitMinimum
+    operator()( std::vector< double > const& startingPoint,
+                double givenTolerance = -1.0 ) const
+    { return MinuitMinimum( startingPoint.size(),
+                            RunMigrad( startingPoint,
+                                       givenTolerance ) ); }
+
     // This sets up a ROOT::Minuit2::MnMigrad instance and runs its operator().
     // The initial step sizes are set to be the values of startingPoint
     // multiplied by errorFraction, absolute values taken. Any step size less
     // than errorMinimum is set to errorMinimum.
     ROOT::Minuit2::FunctionMinimum
-    operator()( std::vector< double > const& startingPoint );
+    RunMigrad( std::vector< double > const& startingPoint,
+               double givenTolerance = -1.0 ) const;
 
 
   protected:
@@ -41,8 +53,6 @@ namespace VevaciousPlusPlus
     double const errorFraction;
     double const errorMinimum;
     unsigned int const minuitStrategy;
-    std::vector< double > initialStepSizes;
-    double stepSize;
   };
 
 } /* namespace VevaciousPlusPlus */

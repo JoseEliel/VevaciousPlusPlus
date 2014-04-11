@@ -15,9 +15,7 @@ namespace VevaciousPlusPlus
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
                                       runningParameterManager ),
-    squareOfMinimumRenormalizationScale( NAN ),
     logarithmOfMinimumRenormalizationScale( NAN ),
-    maximumRenormalizationScale( NAN ),
     logarithmOfMaximumRenormalizationScale( NAN )
   {
     // placeholder:
@@ -31,13 +29,10 @@ namespace VevaciousPlusPlus
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
    PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses ) :
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
-    squareOfMinimumRenormalizationScale( minimumRenormalizationScale
-                                         * minimumRenormalizationScale ),
     logarithmOfMinimumRenormalizationScale( log(
-                                               minimumRenormalizationScale ) ),
-    maximumRenormalizationScale( runningParameters.HighestBlockScale() ),
+                                        currentMinimumRenormalizationScale ) ),
     logarithmOfMaximumRenormalizationScale( log(
-                                                maximumRenormalizationScale ) )
+                                         currentMaximumRenormalizationScale ) )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -75,11 +70,7 @@ namespace VevaciousPlusPlus
                                       logarithmOfScale );
     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      fermionMasses,
-                                      fermionMassesSquaredWithFactors,
-                                      logarithmOfScale );
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      fermionMassSquareds,
+                                      fermionSquareMasses,
                                       fermionMassesSquaredWithFactors,
                                       logarithmOfScale );
     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
@@ -124,6 +115,47 @@ namespace VevaciousPlusPlus
     return std::vector< double >();/**/
   }
 
+  // This sets dsbFieldValueInputs based on the SLHA file just read in.
+  void RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale()
+  {
+    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
+    if( currentMinimumRenormalizationScale < modelMinimumRenormalizationScale )
+    {
+      currentMinimumRenormalizationScale = modelMinimumRenormalizationScale;
+    }
+    squareOfMinimumRenormalizationScale
+    = ( modelMinimumRenormalizationScale * modelMinimumRenormalizationScale );
+    logarithmOfMinimumRenormalizationScale
+    = log( modelMinimumRenormalizationScale );
+    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
+    logarithmOfMaximumRenormalizationScale
+    = log( currentMaximumRenormalizationScale );
+    runningParameters.UpdateRunningParameters(
+                                            modelMinimumRenormalizationScale );
+    std::vector< double > fieldOrigin( numberOfFields,
+                                       0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      dsbFieldValueInputs[ fieldIndex ]
+      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
+    }
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale() set DSB"
+    << " field values to:" << std::endl;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      std::cout << fieldNames[ fieldIndex ] << " -> "
+      << dsbFieldValueInputs[ fieldIndex ] << std::endl;
+    }
+    std::cout << std::endl;*/
+  }
 
   // This should prepare homotopyContinuationPotentialPolynomial
   // appropriately.

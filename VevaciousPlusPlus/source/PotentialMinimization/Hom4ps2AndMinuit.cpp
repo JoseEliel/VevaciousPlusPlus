@@ -26,7 +26,8 @@ namespace VevaciousPlusPlus
                    "v" ),
     complexSolutions(),
     variableNames(),
-    purelyRealSolutionSets()
+    purelyRealSolutionSets(),
+    minuitManager( potentialForMinuit )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -46,21 +47,10 @@ namespace VevaciousPlusPlus
   }
 
 
-
-  // This should find all the minima of the potential evaluated at a
-  // temperature given by temperatureInGev, and record them in foundMinima.
-  // It should also set dsbVacuum, and record the minima lower than dsbVacuum
-  // in panicVacua, and of those, it should set panicVacuum to be the prime
-  // candidate for tunneling out of dsbVacuum (by default, taken to be the
-  // minimum in panicVacua closest to dsbVacuum).
-  void Hom4ps2AndMinuit::FindMinima( double const temperatureInGev )
+  // This uses HOM4PS2 to fill purelyRealSolutionSets with all the extrema
+  // of polynomialPotential.TargetPolynomialGradient().
+  void Hom4ps2AndMinuit::FindTreeLevelExtrema()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "Hom4ps2AndMinuit::FindMinima( " << temperatureInGev << " )";
-    std::cout << std::endl;/**/
-
     char originalWorkingDirectory[ PATH_MAX ];
     if( NULL == getcwd( originalWorkingDirectory,
                         PATH_MAX ) )
@@ -95,9 +85,12 @@ namespace VevaciousPlusPlus
     systemCommand.append( "\"" );
     BOL::UsefulStuff::runSystemCommand( systemCommand );
 
-    // at this point, we are in the directory with hom4ps2 & data.roots.
+    // At this point, we are in the directory with hom4ps2 & data.roots, so
+    // now we fill purelyRealSolutionSets.
     ParseHom4ps2Output( "./data.roots" );
 
+    // Now we return to the original working directory so as to avoid confusing
+    // the user.
     directoryChangeSuccess = chdir( originalWorkingDirectory );
     if( 0 != directoryChangeSuccess )
     {
@@ -113,15 +106,10 @@ namespace VevaciousPlusPlus
                                        PotentialMinimum const& minimumToAdjust,
                                                 double const temperatureInGev )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "Hom4ps2AndMinuit::AdjustMinimumForTemperature( ..., "
-    << temperatureInGev << " )";
-    std::cout << std::endl;
-    return PotentialMinimum( minimumToAdjust );/**/
+    potentialForMinuit.SetTemperature( temperatureInGev );
+    return
+    PotentialMinimum( minuitManager( minimumToAdjust.FieldConfiguration() ) );
   }
-
 
   void Hom4ps2AndMinuit::WriteHom4p2Input(
                                       std::string const& hom4ps2InputFilename )
@@ -303,14 +291,14 @@ namespace VevaciousPlusPlus
          realSolution < purelyRealSolutionSets.end();
          ++realSolution )
     {
-      ROOT::Minuit2::FunctionMinimum
-      foundMinimum( minuitManager( *realSolution ) );
+      /*ROOT::Minuit2::FunctionMinimum
+      foundMinimum( minuitManager( *realSolution ) );*/
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "foundMinimum = " << foundMinimum << std::endl;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
 
       // placeholder:
@@ -321,5 +309,66 @@ namespace VevaciousPlusPlus
     }
   }
 
+  // This uses Minuit2 to minimize potentialForMinuit starting from the
+  // values in purelyRealSolutionSets.
+  void Hom4ps2AndMinuit::RollAndSortExtrema( )
+  {
+    double const
+    thresholdSepartionSquared( ( 0.01 * dsbVacuum.LengthSquared() ) + 1.0 );
+    double const thresholdSepartion( sqrt( thresholdSepartionSquared ) );
+    PotentialMinimum foundMinimum;
+    for( std::vector< std::vector< double > >::iterator
+         realSolution( purelyRealSolutionSets.begin() );
+         realSolution < purelyRealSolutionSets.end();
+         ++realSolution )
+    {
+      foundMinimum = minuitManager( *realSolution );
+      foundMinima.push_back( foundMinimum );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "found [" << foundMinimum.AsDebuggingString() << "]"
+      << std::endl;
+      std::cout << std::endl;/**/
+
+      if( ( ( foundMinimum.FunctionValue() + foundMinimum.FunctionError() )
+            < dsbVacuum.FunctionValue() )
+          &&
+          ( foundMinimum.SquareDistanceTo( dsbVacuum )
+            > thresholdSepartionSquared )
+          &&
+          ( IsNotPhaseRotationOfDsbVacuum( foundMinimum,
+                                           thresholdSepartion ) ) )
+      {
+        if( panicVacua.empty()
+            ||
+            ( foundMinimum.SquareDistanceTo( dsbVacuum )
+              < panicVacuum.SquareDistanceTo( dsbVacuum ) ) )
+        {
+          panicVacuum = foundMinimum;
+        }
+        panicVacua.push_back( foundMinimum );
+      }
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "dsbVacuum = " << dsbVacuum.AsDebuggingString()
+    << std::endl
+    << "panicVacuum = " << panicVacuum.AsDebuggingString()
+    << std::endl
+    << "panicVacua.size() = " << panicVacua.size();
+    for( unsigned int panicIndex( 0 );
+         panicIndex < panicVacua.size();
+         ++panicIndex )
+    {
+      std::cout << std::endl << "panicVacua[ " << panicIndex << " ] = "
+      << panicVacua[ panicIndex ].AsDebuggingString();
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;/**/
+  }
 
 } /* namespace VevaciousPlusPlus */

@@ -17,9 +17,7 @@ namespace VevaciousPlusPlus
     minimizationFunction( minimizationFunction ),
     errorFraction( errorFraction ),
     errorMinimum( errorMinimum ),
-    minuitStrategy( minuitStrategy ),
-    initialStepSizes(),
-    stepSize( 0.0 )
+    minuitStrategy( minuitStrategy )
   {
     // This constructor is just an initialization list.
   }
@@ -35,9 +33,11 @@ namespace VevaciousPlusPlus
   // multiplied by errorFraction, absolute values taken. Any step size less
   // than errorMinimum is set to errorMinimum.
   ROOT::Minuit2::FunctionMinimum
-  MinuitManager::operator()( std::vector< double > const& startingPoint )
+  MinuitManager::RunMigrad( std::vector< double > const& startingPoint,
+                             double givenTolerance ) const
   {
-    initialStepSizes.resize( startingPoint.size() );
+    std::vector< double > initialStepSizes( startingPoint.size() );
+    double stepSize( 0.0 );
     for( unsigned int vectorIndex( 0 );
          vectorIndex < startingPoint.size();
          ++vectorIndex )
@@ -53,12 +53,21 @@ namespace VevaciousPlusPlus
       }
       initialStepSizes[ vectorIndex ] = stepSize;
     }
+    if( givenTolerance <= 0.0 )
+    {
+      givenTolerance
+      = ( errorFraction * minimizationFunction( startingPoint ) );
+    }
+    if( givenTolerance <= 0.0 )
+    {
+      givenTolerance = errorMinimum;
+    }
     ROOT::Minuit2::MnMigrad mnMigrad( minimizationFunction,
                                       startingPoint,
                                       initialStepSizes,
                                       minuitStrategy );
     return mnMigrad( 0,
-                   ( errorFraction * minimizationFunction( startingPoint ) ) );
+                     givenTolerance );
   }
 
 } /* namespace VevaciousPlusPlus */

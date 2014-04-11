@@ -67,15 +67,15 @@ namespace VevaciousPlusPlus
     std::vector< double > const& DsbFieldValues() const
     { return dsbFieldValueInputs; }
 
-    std::vector< double > const& FieldValuesOrigin() const
-    { return fieldOrigin; }
+    std::vector< double > FieldValuesOrigin() const
+    { return std::vector< double >( numberOfFields,
+                                    0.0 ); }
 
 
   protected:
     std::vector< std::string > fieldNames;
     unsigned int numberOfFields;
     std::vector< double > dsbFieldValueInputs;
-    std::vector< double > fieldOrigin;
   };
 
 

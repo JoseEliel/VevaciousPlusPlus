@@ -48,17 +48,19 @@ namespace VevaciousPlusPlus
 
     RunningParameterManager& runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
-    double minimumRenormalizationScale;
+    double modelMinimumRenormalizationScale;
+    double currentMinimumRenormalizationScale;
+    double squareOfMinimumRenormalizationScale;
+    double currentMaximumRenormalizationScale;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
     std::vector< MassesSquaredCalculator* > scalarSquareMasses;
-    std::vector< MassesSquaredCalculator* > fermionMasses;
-    std::vector< MassesSquaredCalculator* > fermionMassSquareds;
+    std::vector< MassesSquaredCalculator* > fermionSquareMasses;
     std::vector< MassesSquaredCalculator* > vectorSquareMasses;
-    // std::vector< RealMassesSquaredMatrix > scalarSquareMasses;
-    // std::vector< SymmetricComplexMassMatrix > fermionMasses;
-    // std::vector< ComplexMassSquaredMatrix > fermionMassSquareds;
-    // std::vector< RealMassesSquaredMatrix > vectorSquareMasses;
+    std::vector< RealMassesSquaredMatrix > scalarMassSquaredMatrices;
+    std::vector< SymmetricComplexMassMatrix > fermionMassMatrices;
+    std::vector< ComplexMassSquaredMatrix > fermionMassSquaredMatrices;
+    std::vector< RealMassesSquaredMatrix > vectorMassSquaredMatrices;
     double vectorMassCorrectionConstant;
 
 
