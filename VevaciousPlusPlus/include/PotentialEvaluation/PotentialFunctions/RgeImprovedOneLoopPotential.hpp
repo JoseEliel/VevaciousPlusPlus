@@ -8,7 +8,7 @@
 #ifndef RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 #define RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"
 
 namespace VevaciousPlusPlus

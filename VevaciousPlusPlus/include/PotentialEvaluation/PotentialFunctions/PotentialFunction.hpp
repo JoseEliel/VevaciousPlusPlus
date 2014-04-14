@@ -8,9 +8,9 @@
 #ifndef POTENTIALFUNCTION_HPP_
 #define POTENTIALFUNCTION_HPP_
 
-#include "../StandardIncludes.hpp"
-#include "../PotentialMinimization/PotentialMinimum.hpp"
-#include "SlhaManager.hpp"
+#include "../../StandardIncludes.hpp"
+#include "../../PotentialMinimization/PotentialMinimum.hpp"
+#include "../SlhaManager.hpp"
 #include "BOLlib/include/BasicObserver.hpp"
 
 namespace VevaciousPlusPlus

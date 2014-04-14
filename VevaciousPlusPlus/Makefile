@@ -32,30 +32,35 @@ INCLUDES=-I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(MINUITINCLUDEDIR)
 CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
+MASSESSQUAREDCALCULATORS=source/PotentialEvaluation/MassesSquaredCalculators/
 PARAMETERFUNCTIONOIDS=source/PotentialEvaluation/ParameterFunctionoids/
-SOURCES=$(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
+POTENTIALFUNCTIONS=source/PotentialEvaluation/PotentialFunctions/
+SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/MassesSquaredCalculator.cpp \
+ $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
+ $(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ParameterFunctionoid.cpp \
- source/PotentialEvaluation/ComplexMassSquaredMatrix.cpp \
- source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
- source/PotentialEvaluation/HomotopyContinuationReadyPolynomial.cpp \
- source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
- source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
+ $(POTENTIALFUNCTIONS)/HomotopyContinuationReadyPolynomial.cpp \
+ $(POTENTIALFUNCTIONS)/HomotopyContinuationReadyPotential.cpp \
+ $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
+ $(POTENTIALFUNCTIONS)/PotentialFunction.cpp \
+ $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/PolynomialSum.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
- source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
- source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ProductOfPolynomialSums.cpp \
- source/PotentialEvaluation/RealMassesSquaredMatrix.cpp \
- source/PotentialEvaluation/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SlhaManager.cpp \
- source/PotentialEvaluation/SymmetricComplexMassMatrix.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- source/PotentialMinimization/Hom4ps2AndMinuit.cpp \
+ source/PotentialMinimization/BasicPolynomialHomotopyContinuation.cpp \
+ source/PotentialMinimization/Hom4ps2Runner.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
+ source/PotentialMinimization/HomotopyContinuationAndMinuit.cpp \
+ source/PotentialMinimization/HomotopyContinuationSolver.cpp \
  source/PotentialMinimization/MinuitManager.cpp \
  source/PotentialMinimization/MinuitMinimum.cpp \
  source/PotentialMinimization/PotentialForMinuit.cpp \

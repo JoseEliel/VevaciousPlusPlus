@@ -54,31 +54,118 @@ int main( int argumentCount,
   // the scale dependence as given in the SLHA file.
   VevaciousPlusPlus::RunningParameterManager runningParameterManager;
 
-  // The FixedScaleOneLoopPotential constructor takes a string with the name of
-  // the model file (including the path) and a reference to a
-  // RunningParameterManager instance:
-  VevaciousPlusPlus::FixedScaleOneLoopPotential
-  fixedScalePotential( argumentParser.fromTag( "model",
-                                               "./ModelFiles/SM.vin" ),
-                       runningParameterManager );
+  // This file assumes that the default homotopy continuation followed by
+  // gradient minimization followed by tunneling using the various provided
+  // classes will be used. If you make custom calculators, you're probably fine
+  // with modifying this file to use them.
 
-  // Both the FixedScaleOneLoopPotential and the RgeImprovedOneLoopPotential
-  // classes can take a reference to a PotentialFromPolynomialAndMasses
-  // instance to make a copy constructor, and since they are both derived from
-  // PotentialFromPolynomialAndMasses, we can make an instance of 1 of them
-  // from an instance of the other.
-  VevaciousPlusPlus::RgeImprovedOneLoopPotential
-  rgeImprovedPotential( fixedScalePotential );
+  // The hierarchy of classes is:
+  // VevaciousPlusPlus needs
+  // a PotentialMinimizer and
+  // a TunnelingCalculator.
+  // The only provided strategy for a
+  // PotentialMinimizer is the
+  // HomotopyContinuationAndGradient class, which needs
+  // a HomotopyContinuationSolver and
+  // a GradientBasedMinimizer.
+  // There are 2 choices for the HomotopyContinuationSolver:
+  // 1) BasicPolynomialHomotopyContinuation: a direct implementation written by
+  //                                         BOL (not yet ready!)
+  // or 2) Hom4ps2Runner: a class that runs the external binary HOM4PS2 (by
+  //                      Tsung-Lin Lee, Tien-Yien Li, and Chih-Hsiung Tsai).
+  // Both choices for HomotopyContinuationSolver require a
+  // HomotopyContinuationReadyPolynomial as the PotentialFunction.
+  // There is only 1 choice for GradientBasedMinimizer:
+  // 1) MinuitPotentialMinimizer, which uses the Minuit2 library by Fred James.
+  // The only provided strategy for a
+  // TunnelingCalculator is the
+  // BounceWithSplines class.
+  // There are 2 choices for the BounceWithSplines:
+  // 1) MinuitBounceActionMinimizer: a class which uses Minuit2 to minimize the
+  //                                 bounce action directly (not yet ready!)
+  // or 2) CosmoTransitionsRunner: a class writes and runs an external Python
+  //                               program to use the CosmoTransitions library
+  //                               to calculate the minimal bounce action.
+  // Both choices for HomotopyContinuationSolver require a PotentialFunction.
+  // Hence a HomotopyContinuationReadyPolynomial must be chosen, so that the
+  // HomotopyContinuationSolver and BounceWithSplines instances can be
+  // constructed, which can then themselves be used to construct the
+  // PotentialMinimizer and the TunnelingCalculator, and thus the
+  // VevaciousPlusPlus instance.
+
+  VevaciousPlusPlus::HomotopyContinuationReadyPolynomial*
+  potentialFunction( NULL );
+
+  std::string potentialType( argumentParser.fromTag( "PotentialType",
+                                              "FixedScaleOneLoopPotential" ) );
+  if( potentialType.compare( "FixedScaleOneLoopPotential" ) == 0 )
+  {
+    potentialFunction = new VevaciousPlusPlus::FixedScaleOneLoopPotential(
+                                               argumentParser.fromTag( "model",
+                                                       "./ModelFiles/SM.vin" ),
+                                                     runningParameterManager );
+  }
+  else if( potentialType.compare( "RgeImprovedOneLoopPotential" ) == 0 )
+  {
+    potentialFunction = new VevaciousPlusPlus::RgeImprovedOneLoopPotential(
+                                               argumentParser.fromTag( "model",
+                                                       "./ModelFiles/SM.vin" ),
+                                                     runningParameterManager );
+  }
+  else
+  {
+    std::cout
+    << std::endl
+    << "PotentialType was not a recognized form! The only currently-valid"
+    << " types are \"FixedScaleOneLoopPotential\" and"
+    << " \"RgeImprovedOneLoopPotential\".";
+    std::cout << std::endl;
+
+    return EXIT_FAILURE;
+  }
 
 
-  // Now the HomotopyContinuationAndGradient object and the BounceWithSplines
-  // object can be constructed:
-  VevaciousPlusPlus::Hom4ps2AndMinuit
-  potentialMinimizer( fixedScalePotential,
-                      argumentParser.fromTag( "Hom4ps2Path",
-                                              "./HOM4PS2/" ) );
+  VevaciousPlusPlus::HomotopyContinuationSolver*
+  homotopyContinuationSolver( NULL );
+
+  std::string
+  homotopyContinuationType( argumentParser.fromTag( "HomotopyContinuation",
+                                     "BasicPolynomialHomotopyContinuation" ) );
+  if( homotopyContinuationType.compare( "FixedScaleOneLoopPotential" ) == 0 )
+  {
+    homotopyContinuationSolver
+    = new VevaciousPlusPlus::BasicPolynomialHomotopyContinuation(
+                                                          *potentialFunction );
+  }
+  else if( homotopyContinuationType.compare( "Hom4ps2Runner" ) == 0 )
+  {
+    homotopyContinuationSolver
+    = new VevaciousPlusPlus::Hom4ps2Runner( *potentialFunction,
+                                       argumentParser.fromTag( "PathToHom4ps2",
+                                                              "./HOM4PS2/" ) );
+  }
+  else
+  {
+    std::cout
+    << std::endl
+    << "HomotopyContinuation was not a recognized form! The only"
+    << " currently-valid types are \"BasicPolynomialHomotopyContinuation\" and"
+    << " \"Hom4ps2Runner\".";
+    std::cout << std::endl;
+
+    return EXIT_FAILURE;
+  }
+
+  // Now the HomotopyContinuationAndGradient object can be constructed:
+  VevaciousPlusPlus::HomotopyContinuationAndMinuit
+  potentialMinimizer( *potentialFunction,
+                      *homotopyContinuationSolver,
+                      0.1 );
+
+
+  // Also the BounceWithSplines object can now be constructed:
   VevaciousPlusPlus::BounceWithSplines
-  tunnelingCalculator( fixedScalePotential );
+  tunnelingCalculator( *potentialFunction );
 
   // Create the VevaciousTwo object, telling it where to find its settings,
   // such as the model to use and the way to calculate the tunneling time.
@@ -98,6 +185,23 @@ int main( int argumentCount,
   << "Ran vevaciousPlusPlus.RunPoint( \"" << slhaFile << "\" )";
   std::cout << std::endl;/**/
 
+
+
+  // The FixedScaleOneLoopPotential constructor takes a string with the name of
+  // the model file (including the path) and a reference to a
+  // RunningParameterManager instance:
+  VevaciousPlusPlus::FixedScaleOneLoopPotential
+  fixedScalePotential( argumentParser.fromTag( "model",
+                                               "./ModelFiles/SM.vin" ),
+                       runningParameterManager );
+
+  // Both the FixedScaleOneLoopPotential and the RgeImprovedOneLoopPotential
+  // classes can take a reference to a PotentialFromPolynomialAndMasses
+  // instance to make a copy constructor, and since they are both derived from
+  // PotentialFromPolynomialAndMasses, we can make an instance of 1 of them
+  // from an instance of the other.
+  VevaciousPlusPlus::RgeImprovedOneLoopPotential
+  rgeImprovedPotential( fixedScalePotential );
 
   // debugging:
   /**/std::cout << std::endl << "debugging:"
@@ -268,6 +372,8 @@ int main( int argumentCount,
                                                     ( slhaFile + ".vout" ) ) );
   vevaciousPlusPlus.WriteSlhaResults( slhaFile );
 
+  delete potentialFunction;
+  delete homotopyContinuationSolver;
   // this was a triumph! I'm making a note here:
   return EXIT_SUCCESS;
 }

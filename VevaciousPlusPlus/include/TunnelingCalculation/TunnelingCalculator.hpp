@@ -9,7 +9,7 @@
 #define TUNNELINGCALCULATOR_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "../PotentialEvaluation/PotentialFunction.hpp"
+#include "../PotentialEvaluation/PotentialFunctions/PotentialFunctions.hpp"
 
 namespace VevaciousPlusPlus
 {

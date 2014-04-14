@@ -8,7 +8,7 @@
 #ifndef HOMOTOPYCONTINUATIONREADYPOTENTIAL_HPP_
 #define HOMOTOPYCONTINUATIONREADYPOTENTIAL_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "PotentialFunction.hpp"
 
 namespace VevaciousPlusPlus

@@ -8,8 +8,10 @@
 #ifndef POTENTIALMINIMIZATION_HPP_
 #define POTENTIALMINIMIZATION_HPP_
 
-#include "Hom4ps2AndMinuit.hpp"
+#include "BasicPolynomialHomotopyContinuation.hpp"
+#include "Hom4ps2Runner.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
+#include "HomotopyContinuationAndMinuit.hpp"
 #include "MinuitManager.hpp"
 #include "MinuitMinimum.hpp"
 #include "PotentialForMinuit.hpp"

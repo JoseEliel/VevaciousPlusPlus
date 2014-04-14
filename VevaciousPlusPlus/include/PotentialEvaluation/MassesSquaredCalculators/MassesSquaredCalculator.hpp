@@ -8,7 +8,7 @@
 #ifndef MASSESSQUAREDCALCULATOR_HPP_
 #define MASSESSQUAREDCALCULATOR_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {

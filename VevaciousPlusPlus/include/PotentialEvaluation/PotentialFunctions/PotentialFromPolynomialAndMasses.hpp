@@ -8,16 +8,13 @@
 #ifndef POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "HomotopyContinuationReadyPolynomial.hpp"
-#include "PolynomialTerm.hpp"
-#include "PolynomialSum.hpp"
-#include "RealMassesSquaredMatrix.hpp"
-#include "SymmetricComplexMassMatrix.hpp"
-#include "ComplexMassSquaredMatrix.hpp"
-#include "MassesSquaredFromMatrix.hpp"
-#include "RunningParameterManager.hpp"
-#include "ThermalFunctions.hpp"
+#include "../PolynomialTerm.hpp"
+#include "../PolynomialSum.hpp"
+#include "../MassesSquaredCalculators/MassesSquaredCalculators.hpp"
+#include "../RunningParameterManager.hpp"
+#include "../ThermalFunctions.hpp"
 
 namespace VevaciousPlusPlus
 {

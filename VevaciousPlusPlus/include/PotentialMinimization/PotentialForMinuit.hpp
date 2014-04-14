@@ -11,7 +11,7 @@
 #include "../StandardIncludes.hpp"
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
-#include "../PotentialEvaluation/PotentialFunction.hpp"
+#include "../PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
 
 namespace VevaciousPlusPlus
 {

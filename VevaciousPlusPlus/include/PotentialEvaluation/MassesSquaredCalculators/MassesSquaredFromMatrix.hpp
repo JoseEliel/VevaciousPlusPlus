@@ -8,7 +8,7 @@
 #ifndef MASSESSQUAREDFROMMATRIX_HPP_
 #define MASSESSQUAREDFROMMATRIX_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "MassesSquaredCalculator.hpp"
 #include "Eigen/Dense"
 

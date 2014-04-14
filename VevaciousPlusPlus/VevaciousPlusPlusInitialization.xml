@@ -15,14 +15,22 @@
 #
  -->
  
+  <PotentialType>
+  FixedScaleOneLoopPotential
+  </PotentialType>
   <model>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
   /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
   </model>
-  <Hom4ps2Path>
+  
+  <HomotopyContinuation>
+  Hom4ps2Runner
+  </HomotopyContinuation>
+  <PathToHom4ps2>
   <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
   /Users/oleary/BOL/machine-specific/HOM4PS2/
-  </Hom4ps2Path>
+  </PathToHom4ps2>
+  
   <slha>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/StopVevsTest.slha -->
   /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest.slha

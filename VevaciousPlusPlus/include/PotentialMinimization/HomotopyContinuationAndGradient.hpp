@@ -10,17 +10,22 @@
 
 #include "../StandardIncludes.hpp"
 #include "PotentialMinimizer.hpp"
-#include "../PotentialEvaluation/HomotopyContinuationReadyPotential.hpp"
+#include "../PotentialEvaluation/PotentialFunctions/PotentialFunctions.hpp"
 
 namespace VevaciousPlusPlus
 {
   class HomotopyContinuationAndGradient : public PotentialMinimizer
   {
   public:
-    HomotopyContinuationAndGradient(
-                       HomotopyContinuationReadyPotential& potentialFunction );
+    HomotopyContinuationAndGradient( PotentialFunction& potentialFunction,
+                      HomotopyContinuationSolver& homotopyContinuationSolver );
     virtual
     ~HomotopyContinuationAndGradient();
+
+
+  protected:
+    HomotopyContinuationSolver& homotopyContinuationSolver;
+    std::vector< std::vector< double > > purelyRealSolutionSets;
   };
 
 } /* namespace VevaciousPlusPlus */

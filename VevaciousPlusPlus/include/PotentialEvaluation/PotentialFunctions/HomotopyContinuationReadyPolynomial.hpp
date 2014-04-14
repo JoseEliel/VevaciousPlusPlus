@@ -8,11 +8,11 @@
 #ifndef HOMOTOPYCONTINUATIONREADYPOLYNOMIAL_HPP_
 #define HOMOTOPYCONTINUATIONREADYPOLYNOMIAL_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "HomotopyContinuationReadyPotential.hpp"
-#include "PolynomialTerm.hpp"
-#include "PolynomialSum.hpp"
-#include "ProductOfPolynomialSums.hpp"
+#include "../PolynomialTerm.hpp"
+#include "../PolynomialSum.hpp"
+#include "../ProductOfPolynomialSums.hpp"
 
 namespace VevaciousPlusPlus
 {

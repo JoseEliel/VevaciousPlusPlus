@@ -1,7 +1,7 @@
 /*
- * PotentialEvaluation.hpp
+ * ParameterFunctionoids.hpp
  *
- *  Created on: Feb 25, 2014
+ *  Created on: Apr 14, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 

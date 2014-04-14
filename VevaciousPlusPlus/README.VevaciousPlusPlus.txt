@@ -79,6 +79,14 @@
           should also have the correct path to the header files from Eigen.
 
 
+TODO:
+ * Implementing CosmoTransitionsRunner class
+ * Nudging off saddles
+ * TakenPositive for PotentialFromPolynomialAndMasses
+ * Implementing BasicPolynomialHomotopyContinuation class
+ * Implementing MinuitBounceActionMinimizer class
+
+
 CHANGELOG:
  * 25th February 2014: version prealpha0001
  - Not even released!

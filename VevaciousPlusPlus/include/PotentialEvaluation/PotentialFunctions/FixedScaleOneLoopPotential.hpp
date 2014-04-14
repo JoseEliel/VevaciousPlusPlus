@@ -8,7 +8,7 @@
 #ifndef FIXEDSCALEONELOOPPOTENTIAL_HPP_
 #define FIXEDSCALEONELOOPPOTENTIAL_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"
 
 namespace VevaciousPlusPlus
