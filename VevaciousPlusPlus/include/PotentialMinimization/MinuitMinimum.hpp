@@ -64,7 +64,7 @@ namespace VevaciousPlusPlus
       << variableIndex << " ] = " << variableErrors[ variableIndex ]
       << std::endl;
     }
-    return std::string( stringBuilder.str() );
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

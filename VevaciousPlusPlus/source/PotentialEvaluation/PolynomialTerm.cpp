@@ -122,7 +122,7 @@ namespace VevaciousPlusPlus
     }
     returnStream
     << " }" << std::endl;
-    return std::string( returnStream.str() );
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

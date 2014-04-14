@@ -32,14 +32,17 @@ INCLUDES=-I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(MINUITINCLUDEDIR)
 CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
-SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
+PARAMETERFUNCTIONOIDS=source/PotentialEvaluation/ParameterFunctionoids/
+SOURCES=$(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
+ $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
+ $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
+ $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
+ $(PARAMETERFUNCTIONOIDS)/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/ComplexMassSquaredMatrix.cpp \
- source/PotentialEvaluation/ConstantFunctionoid.cpp \
  source/PotentialEvaluation/FixedScaleOneLoopPotential.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPolynomial.cpp \
  source/PotentialEvaluation/HomotopyContinuationReadyPotential.cpp \
  source/PotentialEvaluation/MassesSquaredCalculator.cpp \
- source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PolynomialSum.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
  source/PotentialEvaluation/PotentialFromPolynomialAndMasses.cpp \
@@ -48,11 +51,9 @@ SOURCES=source/PotentialEvaluation/BinaryOperationFunctionoid.cpp \
  source/PotentialEvaluation/RealMassesSquaredMatrix.cpp \
  source/PotentialEvaluation/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
- source/PotentialEvaluation/SlhaFunctionoid.cpp \
  source/PotentialEvaluation/SlhaManager.cpp \
  source/PotentialEvaluation/SymmetricComplexMassMatrix.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- source/PotentialEvaluation/UnaryOperationFunctionoid.cpp \
  source/PotentialMinimization/Hom4ps2AndMinuit.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/MinuitManager.cpp \

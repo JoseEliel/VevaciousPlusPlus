@@ -5,10 +5,10 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef RUNNINGPARAMETER_HPP_
-#define RUNNINGPARAMETER_HPP_
+#ifndef PARAMETERFUNCTIONOID_HPP_
+#define PARAMETERFUNCTIONOID_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -16,7 +16,9 @@ namespace VevaciousPlusPlus
   class ParameterFunctionoid
   {
   public:
-    ParameterFunctionoid( double const currentValue = 0.0 );
+    ParameterFunctionoid( std::string const& creationString,
+                          std::string const& pythonParameterName,
+                          double const currentValue = 0.0 );
     virtual
     ~ParameterFunctionoid();
 
@@ -36,10 +38,21 @@ namespace VevaciousPlusPlus
     // This is mainly for debugging.
     virtual std::string AsString() = 0;
 
+    // This is mainly for debugging.
+    std::string const& CreationString(){ return creationString; }
+
+    // This is for creating a Python version of the potential.
+    std::string const& PythonParameterName(){ return pythonParameterName; }
+
+    // This is for creating a Python version of the potential.
+    virtual std::string PythonParameterEvaluation() const = 0;
+
 
   protected:
     double currentValue;
+    std::string const creationString;
+    std::string const pythonParameterName;
   };
 
 } /* namespace VevaciousPlusPlus */
-#endif /* RUNNINGPARAMETER_HPP_ */
+#endif /* PARAMETERFUNCTIONOID_HPP_ */

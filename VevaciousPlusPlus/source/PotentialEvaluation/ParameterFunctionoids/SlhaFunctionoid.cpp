@@ -5,13 +5,16 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "../../../include/VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  SlhaFunctionoid::SlhaFunctionoid( std::string const& indexString ) :
-    ParameterFunctionoid(),
+  SlhaFunctionoid::SlhaFunctionoid( std::string const& indexString,
+                                    std::string const& creationString,
+                                    std::string const& pythonParameterName ) :
+    ParameterFunctionoid( creationString,
+                          pythonParameterName ),
     slhaBlock( NULL ),
     indexVector( BOL::StringParser::stringToIntVector( indexString ) ),
     scaleLogarithmPowerCoefficients( 1,

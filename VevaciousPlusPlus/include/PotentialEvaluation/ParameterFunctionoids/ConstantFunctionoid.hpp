@@ -8,7 +8,7 @@
 #ifndef CONSTANTFUNCTIONOID_HPP_
 #define CONSTANTFUNCTIONOID_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "ParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
@@ -17,7 +17,9 @@ namespace VevaciousPlusPlus
   class ConstantFunctionoid : public ParameterFunctionoid
   {
   public:
-    ConstantFunctionoid( double const constantValue );
+    ConstantFunctionoid( double const constantValue,
+                         std::string const& creationString,
+                         std::string const& pythonParameterName );
     virtual
     ~ConstantFunctionoid();
 
@@ -33,6 +35,9 @@ namespace VevaciousPlusPlus
 
     // This is mainly for debugging.
     virtual std::string AsString();
+
+    // This is for creating a Python version of the potential.
+    virtual std::string PythonParameterEvaluation() const;
   };
 
 
@@ -43,7 +48,15 @@ namespace VevaciousPlusPlus
   {
     std::stringstream returnStream;
     returnStream << "[CONSTANT " << currentValue << "]";
-    return std::string( returnStream.str() );
+    return returnStream.str();
+  }
+
+  // This is for creating a Python version of the potential.
+  inline std::string ConstantFunctionoid::PythonParameterEvaluation() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << pythonParameterName << " = " << currentValue;
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

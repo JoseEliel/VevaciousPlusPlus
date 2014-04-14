@@ -9,7 +9,7 @@
 #define POLYNOMIALTERM_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "ParameterFunctionoids/ParameterFunctionoids.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -8,25 +8,21 @@
 #ifndef POTENTIALEVALUATION_HPP_
 #define POTENTIALEVALUATION_HPP_
 
-#include "BinaryOperationFunctionoid.hpp"
+#include "ParameterFunctionoids/ParameterFunctionoids.hpp"
 #include "ComplexMassSquaredMatrix.hpp"
-#include "ConstantFunctionoid.hpp"
 #include "FixedScaleOneLoopPotential.hpp"
 #include "HomotopyContinuationReadyPolynomial.hpp"
 #include "HomotopyContinuationReadyPotential.hpp"
 #include "MassesSquaredFromMatrix.hpp"
-#include "ParameterFunctionoid.hpp"
 #include "PolynomialSum.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"
 #include "ProductOfPolynomialSums.hpp"
 #include "RealMassesSquaredMatrix.hpp"
 #include "RgeImprovedOneLoopPotential.hpp"
 #include "RunningParameterManager.hpp"
-#include "SlhaFunctionoid.hpp"
 #include "SlhaManager.hpp"
 #include "SymmetricComplexMassMatrix.hpp"
 #include "ThermalFunctions.hpp"
-#include "UnaryOperationFunctionoid.hpp"
 
 // This file is just to collect a lot of #include statements.
 

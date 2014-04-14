@@ -107,7 +107,8 @@ namespace VevaciousPlusPlus
       = GetSlhaFunctionoid( BOL::StringParser::trimFromFrontAndBack(
                                                      bracketedString.substr( 0,
                                                                    wordEnd ) ),
-              FormatIndexBracketContent( bracketedString.substr( wordEnd ) ) );
+              FormatIndexBracketContent( bracketedString.substr( wordEnd ) ),
+                            parameterString );
       if( createdFunctionoid == NULL )
       {
         throw std::runtime_error( "Derived SLHAELEMENT parameter referenced"
@@ -126,7 +127,9 @@ namespace VevaciousPlusPlus
       createdFunctionoid = new BinaryOperationFunctionoid(
                                    &(BinaryOperationFunctionoid::PlusFunction),
                                                            pointerPair.first,
-                                                          pointerPair.second );
+                                                           pointerPair.second,
+                                                           parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "MINUS" ) == 0 )
@@ -141,7 +144,9 @@ namespace VevaciousPlusPlus
       createdFunctionoid = new BinaryOperationFunctionoid(
                                   &(BinaryOperationFunctionoid::MinusFunction),
                                                            pointerPair.first,
-                                                          pointerPair.second );
+                                                           pointerPair.second,
+                                                           parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "TIMES" ) == 0 )
@@ -156,7 +161,9 @@ namespace VevaciousPlusPlus
       createdFunctionoid = new BinaryOperationFunctionoid(
                                &(BinaryOperationFunctionoid::MultiplyFunction),
                                                            pointerPair.first,
-                                                          pointerPair.second );
+                                                           pointerPair.second,
+                                                           parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "DIVIDE" ) == 0 )
@@ -171,7 +178,9 @@ namespace VevaciousPlusPlus
       createdFunctionoid = new BinaryOperationFunctionoid(
                                  &(BinaryOperationFunctionoid::DivideFunction),
                                                            pointerPair.first,
-                                                          pointerPair.second );
+                                                           pointerPair.second,
+                                                           parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "POW" ) == 0 )
@@ -183,9 +192,11 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                             "Derived POW parameter incorrect in model file!" );
       }
-      createdFunctionoid = new BinaryOperationFunctionoid( &(pow),
+      createdFunctionoid = new BinaryOperationFunctionoid( &pow,
                                                            pointerPair.first,
-                                                          pointerPair.second );
+                                                           pointerPair.second,
+                                                           parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "IFNONZERO" ) == 0 )
@@ -200,7 +211,9 @@ namespace VevaciousPlusPlus
       createdFunctionoid = new BinaryOperationFunctionoid(
                               &(BinaryOperationFunctionoid::IfNonZeroFunction),
                                                            pointerPair.first,
-                                                          pointerPair.second );
+                                                           pointerPair.second,
+                                                           parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "SQRT" ) == 0 )
@@ -213,8 +226,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived SQRT parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(sqrt),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &sqrt,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "EXP" ) == 0 )
@@ -227,8 +242,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                             "Derived EXP parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(exp),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &exp,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "LOG" ) == 0 )
@@ -241,8 +258,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                             "Derived LOG parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(log),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &log,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "SIN" ) == 0 )
@@ -255,8 +274,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                             "Derived SIN parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(sin),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &sin,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "COS" ) == 0 )
@@ -269,8 +290,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                             "Derived COS parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(cos),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &cos,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "TAN" ) == 0 )
@@ -283,8 +306,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                             "Derived TAN parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(tan),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &tan,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "ASIN" ) == 0 )
@@ -297,8 +322,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived ASIN parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(asin),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &asin,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "ACOS" ) == 0 )
@@ -311,8 +338,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived ACOS parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(acos),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &acos,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "ATAN" ) == 0 )
@@ -325,8 +354,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived ATAN parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(atan),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &atan,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "SINH" ) == 0 )
@@ -339,8 +370,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived SINH parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(sinh),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &sinh,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "COSH" ) == 0 )
@@ -353,8 +386,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived COSH parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(cosh),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &cosh,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     else if( typeString.compare( "TANH" ) == 0 )
@@ -367,8 +402,10 @@ namespace VevaciousPlusPlus
         throw std::runtime_error(
                            "Derived TANH parameter incorrect in model file!" );
       }
-      createdFunctionoid = new UnaryOperationFunctionoid( &(tanh),
-                                                          foundPointer );
+      createdFunctionoid = new UnaryOperationFunctionoid( &tanh,
+                                                          foundPointer,
+                                                          parameterString,
+                                                          FunctionoidName() );
       parameterFunctionoidPointers.push_back( createdFunctionoid );
     }
     notAlreadyDeclared = parameterFunctionoidMap.insert(
@@ -401,7 +438,9 @@ namespace VevaciousPlusPlus
         return constantFinder->second;
       }
       parameterFunctionoidPointers.push_back( new ConstantFunctionoid(
-                                                             constantValue ) );
+                                                                 constantValue,
+                                                               parameterString,
+                                                         FunctionoidName() ) );
       constantFunctionoidMap.insert(
                      std::pair< double, ParameterFunctionoid* >( constantValue,
                                        parameterFunctionoidPointers.back() ) );
@@ -413,7 +452,8 @@ namespace VevaciousPlusPlus
       return GetSlhaFunctionoid( parameterString.substr( 0,
                                                          bracketPosition ),
                                parameterString.substr( ( bracketPosition + 1 ),
-                          ( parameterString.size() - bracketPosition - 2 ) ) );
+                            ( parameterString.size() - bracketPosition - 2 ) ),
+                                 parameterString );
     }
     return NULL;
   }
@@ -424,7 +464,8 @@ namespace VevaciousPlusPlus
   // and NULL is returned.
   ParameterFunctionoid*
   RunningParameterManager::GetSlhaFunctionoid( std::string const& blockName,
-                                               std::string const& indexString )
+                                               std::string const& indexString,
+                                           std::string const& parameterString )
   {
     ParameterFunctionoid* returnPointer( NULL );
 
@@ -465,7 +506,9 @@ namespace VevaciousPlusPlus
       // Otherwise we need to make a new functionoid. We make the functionoid
       // before its SLHA block because it sets up the number of indices which
       // is needed for the block constructor.
-      SlhaFunctionoid* slhaFunctionoid = new SlhaFunctionoid( indexString );
+      SlhaFunctionoid* slhaFunctionoid = new SlhaFunctionoid( indexString,
+                                                             parameterString,
+                                                           FunctionoidName() );
       parameterFunctionoidPointers.push_back( slhaFunctionoid );
       parameterFunctionoidMap.insert(
                  std::pair< std::string, ParameterFunctionoid* >( lookupString,

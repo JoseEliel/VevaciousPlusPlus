@@ -159,7 +159,7 @@ namespace VevaciousPlusPlus
     {
       returnStream << whichTerm->AsDebuggingString() << std::endl;
     }
-    return std::string( returnStream.str() );
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

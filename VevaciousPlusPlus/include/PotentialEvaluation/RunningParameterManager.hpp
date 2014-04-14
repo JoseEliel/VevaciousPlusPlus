@@ -9,11 +9,9 @@
 #define RUNNINGPARAMETERMANAGER_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "ParameterFunctionoids/ParameterFunctionoids.hpp"
 #include "SLHA.hpp"
-#include "SlhaFunctionoid.hpp"
 #include "SlhaManager.hpp"
-#include "ConstantFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -84,12 +82,17 @@ namespace VevaciousPlusPlus
     // is none already. If the block name was invalid though, nothing is made
     // and NULL is returned.
     ParameterFunctionoid* GetSlhaFunctionoid( std::string const& blockName,
-                                              std::string const& indexString );
+                                              std::string const& indexString,
+                                          std::string const& parameterString );
 
     // This returns a pair of functionoid pointers which match the arguments
     // in commaSeparatedAliases.
     std::pair< ParameterFunctionoid*, ParameterFunctionoid* >
     FindFunctionoidPair( std::string const& commaSeparatedAliases );
+
+    // This makes a name based on how many functionoids are already in
+    // parameterFunctionoidPointers.
+    std::string FunctionoidName() const;
   };
 
 
@@ -115,7 +118,7 @@ namespace VevaciousPlusPlus
     << FormatIndexBracketContent( unformattedVariable.substr(
                                                            ( openBracket + 1 ),
                    ( unformattedVariable.size() - openBracket - 2 ) ) ) << ']';
-    return std::string( formattedStream.str() );
+    return formattedStream.str();
   }
 
   // This updates all SlhaFunctionoids with data from a new SLHA file.
@@ -157,7 +160,8 @@ namespace VevaciousPlusPlus
       // debugging:
       /*std::cout << std::endl << "debugging:"
       << std::endl
-      << "calling " << (*whichParameter)->AsString()
+      << "calling [" << (*whichParameter)->AsString() << " from \""
+      << (*whichParameter)->CreationString() << "\"]"
       << "->UpdateForNewLogarithmOfScale( " << logarithmOfScale
       << " ). before, (*(*whichParameter))() = " << (*(*whichParameter))();
       std::cout << std::endl;*/
@@ -168,6 +172,12 @@ namespace VevaciousPlusPlus
       /*std::cout << std::endl << "debugging:"
       << std::endl
       << "after, (*(*whichParameter))() = " << (*(*whichParameter))();
+      std::cout
+      << std::endl << "PythonParameterName() = \""
+      <<  (*whichParameter)->PythonParameterName() << "\""
+      << std::endl << "PythonParameterEvaluation() = \""
+      <<  (*whichParameter)->PythonParameterEvaluation() << "\"";
+      std::cout << std::endl;
       std::cout << std::endl;*/
     }
   }
@@ -262,8 +272,16 @@ namespace VevaciousPlusPlus
       }
       indicesStream << *whichIndex;
     }
-    return std::string( indicesStream.str() );
+    return indicesStream.str();
   }
 
+  // This makes a name based on how many functionoids are already in
+  // parameterFunctionoidPointers.
+  inline std::string RunningParameterManager::FunctionoidName() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "rp" << parameterFunctionoidPointers.size();
+    return stringBuilder.str();
+  }
 } /* namespace VevaciousPlusPlus */
 #endif /* RUNNINGPARAMETERMANAGER_HPP_ */

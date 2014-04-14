@@ -8,7 +8,7 @@
 #ifndef SLHAFUNCTIONOID_HPP_
 #define SLHAFUNCTIONOID_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "ParameterFunctionoid.hpp"
 #include "SLHA.hpp"
 #include "Eigen/Dense"
@@ -20,7 +20,9 @@ namespace VevaciousPlusPlus
   class SlhaFunctionoid : public ParameterFunctionoid
   {
   public:
-    SlhaFunctionoid( std::string const& indexString );
+    SlhaFunctionoid( std::string const& indexString,
+                     std::string const& creationString,
+                     std::string const& pythonParameterName );
     virtual
     ~SlhaFunctionoid();
 
@@ -46,6 +48,9 @@ namespace VevaciousPlusPlus
 
     // This is mainly for debugging.
     virtual std::string AsString();
+
+    // This is for creating a Python version of the potential.
+    virtual std::string PythonParameterEvaluation() const;
 
 
   protected:
@@ -131,7 +136,24 @@ namespace VevaciousPlusPlus
       returnStream << ' ' << *whichIndex;
     }
     returnStream << " ]";
-    return std::string( returnStream.str() );
+    return returnStream.str();
+  }
+
+  // This is for creating a Python version of the potential.
+  inline std::string SlhaFunctionoid::PythonParameterEvaluation() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << pythonParameterName << " = ( "
+    << scaleLogarithmPowerCoefficients[ 0 ];
+    for( unsigned int whichPower( 1 );
+         whichPower < scaleLogarithmPowerCoefficients.size();
+         ++whichPower )
+    {
+      stringBuilder << " + ( " << scaleLogarithmPowerCoefficients[ whichPower ]
+      << " ) * lnQ**" << whichPower;
+    }
+    stringBuilder << " )";
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

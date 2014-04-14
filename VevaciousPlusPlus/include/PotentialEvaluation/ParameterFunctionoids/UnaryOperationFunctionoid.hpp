@@ -8,7 +8,7 @@
 #ifndef UNARYOPERATIONFUNCTIONOID_HPP_
 #define UNARYOPERATIONFUNCTIONOID_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "ParameterFunctionoid.hpp"
 
 
@@ -19,7 +19,9 @@ namespace VevaciousPlusPlus
   {
   public:
     UnaryOperationFunctionoid( double (*unaryOperation)( double ),
-                              ParameterFunctionoid* const functionoidPointer );
+                              ParameterFunctionoid* const functionoidPointer,
+                              std::string const& creationString,
+                              std::string const& pythonParameterName );
     virtual
     ~UnaryOperationFunctionoid();
 
@@ -35,6 +37,9 @@ namespace VevaciousPlusPlus
 
     // This is mainly for debugging.
     virtual std::string AsString();
+
+    // This is for creating a Python version of the potential.
+    virtual std::string PythonParameterEvaluation() const;
 
 
   protected:
@@ -66,7 +71,7 @@ namespace VevaciousPlusPlus
     std::stringstream returnStream;
     returnStream << "[UNARYOPERATION " << this << ": "
     << functionoidPointer->AsString() << "]";
-    return std::string( returnStream.str() );
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

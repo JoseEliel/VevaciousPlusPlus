@@ -8,7 +8,7 @@
 #ifndef PLUSMINUSFUNCTIONOID_HPP_
 #define PLUSMINUSFUNCTIONOID_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../../StandardIncludes.hpp"
 #include "ParameterFunctionoid.hpp"
 
 
@@ -37,7 +37,9 @@ namespace VevaciousPlusPlus
     BinaryOperationFunctionoid( double (*binaryOperation)( double,
                                                            double ),
                                 ParameterFunctionoid* const firstFunctionoid,
-                               ParameterFunctionoid* const secondFunctionoid );
+                                ParameterFunctionoid* const secondFunctionoid,
+                                std::string const& creationString,
+                                std::string const& pythonParameterName );
     virtual
     ~BinaryOperationFunctionoid();
 
@@ -54,6 +56,9 @@ namespace VevaciousPlusPlus
 
     // This is mainly for debugging.
     virtual std::string AsString();
+
+    // This is for creating a Python version of the potential.
+    virtual std::string PythonParameterEvaluation() const;
 
 
   protected:
@@ -89,7 +94,7 @@ namespace VevaciousPlusPlus
     returnStream
     << "[BINARYOPERATION " << this << ": " << firstFunctionoid->AsString()
     << ", " << secondFunctionoid->AsString() << "]";
-    return std::string( returnStream.str() );
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */
