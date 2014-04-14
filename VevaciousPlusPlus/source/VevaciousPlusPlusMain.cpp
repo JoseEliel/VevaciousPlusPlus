@@ -93,7 +93,9 @@ int main( int argumentCount,
   // PotentialMinimizer and the TunnelingCalculator, and thus the
   // VevaciousPlusPlus instance.
 
-  VevaciousPlusPlus::HomotopyContinuationReadyPolynomial*
+  // The only HomotopyContinuationReadyPolynomial classes provided so far are
+  // both derived from PotentialFromPolynomialAndMasses.
+  VevaciousPlusPlus::PotentialFromPolynomialAndMasses*
   potentialFunction( NULL );
 
   std::string potentialType( argumentParser.fromTag( "PotentialType",
