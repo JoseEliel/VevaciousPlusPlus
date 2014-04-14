@@ -191,9 +191,7 @@ int main( int argumentCount,
   // the model file (including the path) and a reference to a
   // RunningParameterManager instance:
   VevaciousPlusPlus::FixedScaleOneLoopPotential
-  fixedScalePotential( argumentParser.fromTag( "model",
-                                               "./ModelFiles/SM.vin" ),
-                       runningParameterManager );
+  fixedScalePotential( *potentialFunction );
 
   // Both the FixedScaleOneLoopPotential and the RgeImprovedOneLoopPotential
   // classes can take a reference to a PotentialFromPolynomialAndMasses
@@ -201,7 +199,7 @@ int main( int argumentCount,
   // PotentialFromPolynomialAndMasses, we can make an instance of 1 of them
   // from an instance of the other.
   VevaciousPlusPlus::RgeImprovedOneLoopPotential
-  rgeImprovedPotential( fixedScalePotential );
+  rgeImprovedPotential( *potentialFunction );
 
   // debugging:
   /**/std::cout << std::endl << "debugging:"
