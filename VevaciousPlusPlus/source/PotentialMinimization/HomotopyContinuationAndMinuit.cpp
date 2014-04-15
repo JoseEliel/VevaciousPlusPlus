@@ -44,8 +44,21 @@ namespace VevaciousPlusPlus
          realSolution < purelyRealSolutionSets.end();
          ++realSolution )
     {
+      std::cout
+      << std::endl
+      << "Minuit2 starting point: "
+      << potentialFunction.FieldConfigurationAsMathematica( *realSolution );
+      std::cout << std::endl;
+
       foundMinimum = minuitManager( *realSolution );
       foundMinima.push_back( foundMinimum );
+
+      std::cout
+      << std::endl
+      << "Rolled to "
+      << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
+      std::cout << std::endl;
+
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
@@ -81,6 +94,17 @@ namespace VevaciousPlusPlus
         std::cout << std::endl;/**/
       }
     }
+
+    std::cout
+    << std::endl
+    << "DSB vacuum = "
+    << dsbVacuum.AsMathematica( potentialFunction.FieldNames() )
+    << std::endl
+    << "Panic vacuum = "
+    << panicVacuum.AsMathematica( potentialFunction.FieldNames() );
+    std::cout << std::endl;
+    std::cout << std::endl;
+
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"

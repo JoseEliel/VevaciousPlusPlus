@@ -26,8 +26,10 @@ namespace VevaciousPlusPlus
     unsigned int NumberOfFieldVariables() const
     { return numberOfFields; }
 
-    std::string const& FieldName( unsigned int const fieldIndex) const
-    { return fieldNames[ fieldIndex ]; }
+    std::vector< std::string > const& FieldNames() const{ return fieldNames; }
+
+    std::string FieldConfigurationAsMathematica(
+                       std::vector< double > const& fieldConfiguration ) const;
 
     // This should return the energy density in GeV^4 of the potential for a
     // state strongly peaked around expectation values (in GeV) for the fields
@@ -80,6 +82,26 @@ namespace VevaciousPlusPlus
 
 
 
+
+  inline std::string PotentialFunction::FieldConfigurationAsMathematica(
+                        std::vector< double > const& fieldConfiguration ) const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "{ ";
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < fieldConfiguration.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex != 0 )
+      {
+        stringBuilder << ",";
+      }
+      stringBuilder << " " << fieldNames[ fieldIndex ] << " -> "
+      << fieldConfiguration[ fieldIndex ];
+    }
+    stringBuilder << " }";
+    return stringBuilder.str();
+  }
 
   inline double PotentialFunction::QuickApproximation(
                                std::vector< double > const& fieldConfiguration,

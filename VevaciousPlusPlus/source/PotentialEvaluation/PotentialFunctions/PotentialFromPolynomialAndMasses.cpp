@@ -496,7 +496,7 @@ namespace VevaciousPlusPlus
     fermionMassMatrices( copySource.fermionMassMatrices ),
     fermionMassSquaredMatrices( copySource.fermionMassSquaredMatrices ),
     vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
-    vectorMassCorrectionConstant()
+    vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
@@ -1009,6 +1009,12 @@ namespace VevaciousPlusPlus
                                            double& cumulativeQuantumCorrection,
                                     double& cumulativeThermalCorrection ) const
   {
+    // debugging:
+    /*std::cout << std::setprecision( 12 ) << std::endl << "debugging:"
+    << std::endl
+    << "inverseScaleSquared = " << inverseScaleSquared;
+    std::cout << std::endl;*/
+
     double currentQuantumCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
     double massSquared( 0.0 );
@@ -1035,17 +1041,53 @@ namespace VevaciousPlusPlus
                                         * ( log( massSquared
                                                  * inverseScaleSquared )
                                             - subtractFromLogarithm ) );
+
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "massSquared = " << massSquared
+          << std::endl
+          << "massSquared * inverseScaleSquared = "
+          << ( massSquared * inverseScaleSquared )
+          << std::endl
+          << "log(massSquared * inverseScaleSquared ) = "
+          << log( massSquared * inverseScaleSquared )
+          << std::endl
+          << "log(massSquared * inverseScaleSquared )"
+          <<  " - subtractFromLogarithm = "
+          << ( log( massSquared * inverseScaleSquared )
+               - subtractFromLogarithm )
+          << std::endl
+          << "total correction = "
+          << ( massSquared * massSquared
+              * ( log( massSquared
+                       * inverseScaleSquared )
+                  - subtractFromLogarithm ) );
+          std::cout << std::endl;*/
         }
         if( inverseTemperatureSquared > 0.0 )
         {
           currentThermalCorrection += (*ThermalFunction)( massSquared
                                                  * inverseTemperatureSquared );
         }
+
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "*massSquaredIterator = " << *massSquaredIterator
+        << ", currentQuantumCorrection = " << currentQuantumCorrection;
+        std::cout << std::endl;*/
       }
       cumulativeQuantumCorrection
       += ( massesSquared->second * currentQuantumCorrection );
       cumulativeThermalCorrection
       += ( massesSquared->second * currentThermalCorrection );
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "cumulativeQuantumCorrection = " << cumulativeQuantumCorrection;
+      std::cout << std::endl;*/
     }
   }
 

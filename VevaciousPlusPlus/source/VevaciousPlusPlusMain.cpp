@@ -181,13 +181,6 @@ int main( int argumentCount,
                                                 "slha.out" ) );
   vevaciousPlusPlus.RunPoint( slhaFile );
 
-  // debugging:
-  /**/std::cout << std::endl << "debugging:"
-  << std::endl
-  << "Ran vevaciousPlusPlus.RunPoint( \"" << slhaFile << "\" )";
-  std::cout << std::endl;/**/
-
-
 
   // The FixedScaleOneLoopPotential constructor takes a string with the name of
   // the model file (including the path) and a reference to a
@@ -206,14 +199,6 @@ int main( int argumentCount,
   // debugging:
   /**/std::cout << std::endl << "debugging:"
   << std::endl;
-  std::vector< double >
-  testConfiguration( rgeImprovedPotential.NumberOfFieldVariables(),
-                     0.0 );
-  if( testConfiguration.size() < 2 )
-  {
-    testConfiguration.resize( 2,
-                              0.0 );
-  }
   runningParameterManager.UpdateSlhaData( slhaFile );
   rgeImprovedPotential.UpdateParameters();
   fixedScalePotential.UpdateParameters();
@@ -227,37 +212,10 @@ int main( int argumentCount,
   << fixedScalePotential( fixedScalePotential.DsbFieldValues() )
   << std::endl;
 
+  /**/
   std::cout
   << std::endl
   << "------" << std::endl << std::endl;
-  std::cout << std::endl;
-
-
-  std::cout << "For { ";
-  for( unsigned int fieldIndex( 0 );
-       fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
-       ++fieldIndex )
-  {
-    if( fieldIndex > 0 )
-    {
-      std::cout << ", ";
-    }
-    std::cout << rgeImprovedPotential.FieldName( fieldIndex ) << " -> "
-    << testConfiguration[ fieldIndex ];
-  }
-  std::cout
-  << " }, rgeImprovedPotential => "
-  << rgeImprovedPotential( testConfiguration )
-  << ", fixedScalePotential => "
-  << fixedScalePotential( testConfiguration );
-  std::cout << std::endl;
-  double testTemperature( 10.0 );
-  std::cout
-  << "at temperature " << testTemperature << ", rgeImprovedPotential = "
-  << rgeImprovedPotential( testConfiguration,
-                           testTemperature ) << ", fixedScalePotential = "
-  << fixedScalePotential( testConfiguration,
-                          testTemperature );
   std::cout << std::endl;
 
   double subtractionConstant( fixedScalePotential(
@@ -268,6 +226,8 @@ int main( int argumentCount,
   std::cout << std::endl;
 
 
+  std::vector< double >
+  testConfiguration( fixedScalePotential.FieldValuesOrigin() );
   for( int vdStep( 0 );
        vdStep < 13;
        ++vdStep )
@@ -282,20 +242,9 @@ int main( int argumentCount,
       testConfiguration[ 1 ] = ( 0.1
                                  * (double)vuStep
                                  * fixedScalePotential.DsbFieldValues()[ 1 ] );
-      std::cout << "For { ";
-      for( unsigned int fieldIndex( 0 );
-           fieldIndex < fixedScalePotential.NumberOfFieldVariables();
-           ++fieldIndex )
-      {
-        if( fieldIndex > 0 )
-        {
-          std::cout << ", ";
-        }
-        std::cout
-        << fixedScalePotential.FieldName( fieldIndex ) << " -> "
-        << testConfiguration[ fieldIndex ];
-      }
-      std::cout
+      std::cout << "For "
+      << fixedScalePotential.FieldConfigurationAsMathematica(
+                                                            testConfiguration )
       << ", fixedScalePotential => "
       << fixedScalePotential( testConfiguration )
       << " => " << ( fixedScalePotential( testConfiguration )
@@ -304,66 +253,8 @@ int main( int argumentCount,
       << fixedScalePotential.QuickApproximation( testConfiguration );
       std::cout << std::endl;
     }
-  }
+  }/**/
 
-  testConfiguration[ 0 ] = 300.0;
-  runningParameterManager.UpdateSlhaData( slhaFile );
-  rgeImprovedPotential.UpdateParameters();
-  fixedScalePotential.UpdateParameters();
-  std::cout << "For { ";
-  for( unsigned int fieldIndex( 0 );
-       fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
-       ++fieldIndex )
-  {
-    if( fieldIndex > 0 )
-    {
-      std::cout << ", ";
-    }
-    std::cout << rgeImprovedPotential.FieldName( fieldIndex ) << " -> "
-    << testConfiguration[ fieldIndex ];
-  }
-  std::cout
-  << " }, rgeImprovedPotential => "
-  << rgeImprovedPotential( testConfiguration )
-  << ", fixedScalePotential => "
-  << fixedScalePotential( testConfiguration );
-  std::cout << std::endl;
-  testTemperature = 145.0;
-  std::cout
-  << "at temperature " << testTemperature << ", rgeImprovedPotential = "
-  << rgeImprovedPotential( testConfiguration,
-                           testTemperature ) << ", fixedScalePotential = "
-  << fixedScalePotential( testConfiguration,
-                          testTemperature );
-  std::cout << std::endl;
-  runningParameterManager.UpdateSlhaData( slhaFile );
-  rgeImprovedPotential.UpdateParameters();
-  fixedScalePotential.UpdateParameters();
-  std::cout << "For { ";
-  for( unsigned int fieldIndex( 0 );
-       fieldIndex < rgeImprovedPotential.NumberOfFieldVariables();
-       ++fieldIndex )
-  {
-    if( fieldIndex > 0 )
-    {
-      std::cout << ", ";
-    }
-    std::cout << rgeImprovedPotential.FieldName( fieldIndex ) << " -> "
-    << testConfiguration[ fieldIndex ];
-  }
-  std::cout
-  << " }, rgeImprovedPotential => "
-  << rgeImprovedPotential( testConfiguration )
-  << ", fixedScalePotential => "
-  << fixedScalePotential( testConfiguration );
-  std::cout << std::endl;
-  testTemperature = 205.0;
-  std::cout
-  << "at temperature " << testTemperature << ", rgeImprovedPotential = "
-  << rgeImprovedPotential( testConfiguration,
-                           testTemperature ) << ", fixedScalePotential = "
-  << fixedScalePotential( testConfiguration,
-                          testTemperature );
   std::cout << std::endl;
   std::cout << std::endl;
 

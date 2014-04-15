@@ -35,6 +35,15 @@ namespace VevaciousPlusPlus
     { return variableValues; }
 
     double PotentialValue() const{ return functionValue; }
+
+
+    // This prints the minimum as an empty XML element.
+    std::string AsXml( std::string const& elementName,
+                       std::vector< std::string > const& fieldNames ) const;
+
+    // This prints the minimum in a form that Mathematica can understand.
+    std::string
+    AsMathematica( std::vector< std::string > const& fieldNames ) const;
   };
 
 
@@ -70,6 +79,45 @@ namespace VevaciousPlusPlus
                        * variableValues[ fieldIndex ] );
     }
     return returnDouble;
+  }
+
+
+  // This prints the minimum as an empty XML element.
+  inline std::string PotentialMinimum::AsXml( std::string const& elementName,
+                           std::vector< std::string > const& fieldNames ) const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "<" << elementName;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < variableValues.size();
+         ++fieldIndex )
+    {
+      stringBuilder << " " << fieldNames[ fieldIndex ] << "=\""
+      << variableValues[ fieldIndex ] << "\"";
+    }
+    stringBuilder << " PotentialDepth=\"" << functionValue << "\" />";
+    return stringBuilder.str();
+  }
+
+  // This prints the minimum in a form that Mathematica can understand.
+  inline std::string PotentialMinimum::AsMathematica(
+                           std::vector< std::string > const& fieldNames ) const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "{ {";
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < variableValues.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex != 0 )
+      {
+        stringBuilder << ",";
+      }
+      stringBuilder << " " << fieldNames[ fieldIndex ] << " -> "
+      << variableValues[ fieldIndex ];
+    }
+    stringBuilder << " }, PotentialDepth ->" << functionValue << " }";
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */
