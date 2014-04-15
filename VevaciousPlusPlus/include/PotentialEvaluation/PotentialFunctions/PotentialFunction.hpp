@@ -87,7 +87,7 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     std::stringstream stringBuilder;
-    stringBuilder << "{ ";
+    stringBuilder << "{";
     for( unsigned int fieldIndex( 0 );
          fieldIndex < fieldConfiguration.size();
          ++fieldIndex )

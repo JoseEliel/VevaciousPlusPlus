@@ -116,7 +116,7 @@ namespace VevaciousPlusPlus
       stringBuilder << " " << fieldNames[ fieldIndex ] << " -> "
       << variableValues[ fieldIndex ];
     }
-    stringBuilder << " }, PotentialDepth ->" << functionValue << " }";
+    stringBuilder << " }, PotentialDepth -> " << functionValue << " }";
     return stringBuilder.str();
   }
 

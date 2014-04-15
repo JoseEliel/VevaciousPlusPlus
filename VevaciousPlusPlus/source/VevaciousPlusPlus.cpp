@@ -16,28 +16,10 @@ namespace VevaciousPlusPlus
                                         SlhaManager& slhaManager,
                                         PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
-    runTimer( 10.0 ),
+    // runTimer( 600.0 ),
     slhaManager( slhaManager ),
     potentialMinimizer( potentialMinimizer ),
-    thresholdDistanceSquaredFraction( pow( BOL::StringParser::stringToDouble(
-                           argumentParser.fromTag( "MinimaSeparationThreshold",
-                                                   "0.05" ) ),
-                                           2 ) ),
-    extremumSeparationSquaredThreshold( 100.0 ),
-    dsbMinimum(),
-    globalMinimum(),
-    panicMinimum(),
-    dsbIsMetastable( false ),
-    numberOfNudges( BOL::StringParser::stringToInt( argumentParser.fromTag(
-                                                                "SaddleNudges",
-                                                                     "1" ) ) ),
-    tunnelingCalculator( tunnelingCalculator ),
-    quantumLifetimeThreshold( BOL::StringParser::stringToDouble(
-                            argumentParser.fromTag( "QuantumLifetimeThreshold",
-                                                    "0.217" ) ) ),
-    thermalSurvivalThreshold( BOL::StringParser::stringToDouble(
-                            argumentParser.fromTag( "ThermalSurvivalThreshold",
-                                                    "0.01" ) ) )
+    tunnelingCalculator( tunnelingCalculator )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -62,6 +44,11 @@ namespace VevaciousPlusPlus
 
     slhaManager.UpdateSlhaData( parameterFilename );
     potentialMinimizer.FindMinima( 0.0 );
+    if( potentialMinimizer.DsbVacuumIsMetaStable() )
+    {
+      tunnelingCalculator.CalculateTunneling( potentialMinimizer.DsbVacuum(),
+                                            potentialMinimizer.PanicVacuum() );
+    }
   }
 
   void VevaciousPlusPlus::WriteXmlResults( std::string const& xmlFilename )

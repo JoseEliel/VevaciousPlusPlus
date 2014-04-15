@@ -8,8 +8,10 @@
 #ifndef TUNNELINGCALCULATION_HPP_
 #define TUNNELINGCALCULATION_HPP_
 
-#include "TunnelingCalculator.hpp"
 #include "BounceWithSplines.hpp"
+#include "CosmoTransitionsRunner.hpp"
+#include "MinuitBounceActionMinimizer.hpp"
+#include "TunnelingCalculator.hpp"
 
 // This file is just to collect a lot of #include statements.
 

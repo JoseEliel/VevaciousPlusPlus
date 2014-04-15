@@ -44,29 +44,6 @@
     Q[+1,3]
     U[3]
   </FieldVariables>
-
-  <!-- The number given here is taken to be an energy in GeV, refered to as
-       Qmin for the rest of this comment.
-  
-       It is used by instances of the RgeImprovedOneLoopPotential class as a
-       component in choosing the appropriate renormalization scale Qr for a
-       given field configuration:
-       Qr^2 = Qmin^2 + sum of squares of field values.
-       
-       It is used by instances of the FixedScaleOneLoopPotential class as well.
-       The lowest scale given by any of the blocks in the SLHA input file (by
-       "Q=" declarations after block names) is found, and we call it Qlow here.
-       The renormalization scale is taken to be the larger of Qmin and Qlow.
-       (So if say all the blocks were given at Q= 1.0E+16, 1.0E+08, and 1.0E+03
-       while Qmin was 91.1876, then 1.0E+03 will be used as the renormalization
-       scale. If Q= 5.0E+01 was also given, then 91.1876 will be used as the
-       renormalization scale. If even only 1 of the blocks was given at
-       Q= 5.0E+01, this still means that 91.1876 would be used.)
-       
-       The default is the mass of the Z boson. -->
-  <MinimumRenormalizationScale>
-    91.1876
-  </MinimumRenormalizationScale>
   
   <!-- Every block that will be read in from an SLHA file should be enumerated
        here in a newline-separated list. Block names are NOT case-sensitive

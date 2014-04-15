@@ -37,28 +37,14 @@ namespace VevaciousPlusPlus
     static std::string const versionString;
     static std::string const citationString;
 
-    BOL::BasicTimer runTimer;
+    // BOL::BasicTimer runTimer;
+    // It's too much effort to put in a "try to quit as soon as possible after
+    // this many seconds per point" functionality - too much chance of a
+    // prematurely-ended calculation being misinterpreted by the user as a
+    // final result.
     SlhaManager& slhaManager;
     PotentialMinimizer& potentialMinimizer;
-    double thresholdDistanceSquaredFraction;
-    double extremumSeparationSquaredThreshold;
-    PotentialMinimum dsbMinimum;
-    PotentialMinimum globalMinimum;
-    PotentialMinimum panicMinimum;
-    bool dsbIsMetastable;
-    int numberOfNudges;
     TunnelingCalculator& tunnelingCalculator;
-    double quantumLifetimeThreshold;
-    double thermalSurvivalThreshold;
-
-    // SortMinima sets dsbMinimum to be the DSB minimum, panicMinimum to be the
-    // minimum nearest the DSB minimum from the set of minima deeper than the
-    // DSB minimum (or equal to dsbMinimum if there was no deeper minimum), and
-    // globalMinimum to be the deepest minimum.
-    void SortMinima();
-
-    // This writes the minimum as an empty XML element with attributes.
-    std::string XmlMinimum( PotentialMinimum const& potentialMinimum ) const;
   };
 
 } /* namespace VevaciousPlusPlus */

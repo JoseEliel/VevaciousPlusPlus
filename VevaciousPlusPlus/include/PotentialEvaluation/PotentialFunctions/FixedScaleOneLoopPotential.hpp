@@ -97,5 +97,27 @@ namespace VevaciousPlusPlus
     return homotopyContinuatioConfiguration;
   }
 
+  // This sets dsbFieldValueInputs based on the SLHA file just read in.
+  inline void FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale()
+  {
+    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
+    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
+    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
+                                        * currentMinimumRenormalizationScale );
+    inverseRenormalizationScaleSquared
+    = ( 1.0 / squareOfMinimumRenormalizationScale );
+    runningParameters.UpdateRunningParameters(
+                                          currentMinimumRenormalizationScale );
+    std::vector< double > fieldOrigin( numberOfFields,
+                                       0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      dsbFieldValueInputs[ fieldIndex ]
+      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
+    }
+  }
+
 } /* namespace VevaciousPlusPlus */
 #endif /* FIXEDSCALEONELOOPPOTENTIAL_HPP_ */

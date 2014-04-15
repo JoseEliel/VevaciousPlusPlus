@@ -18,12 +18,7 @@ namespace VevaciousPlusPlus
     logarithmOfMinimumRenormalizationScale( NAN ),
     logarithmOfMaximumRenormalizationScale( NAN )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential( \""
-    << modelFilename << "\" )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
@@ -34,11 +29,7 @@ namespace VevaciousPlusPlus
     logarithmOfMaximumRenormalizationScale( log(
                                          currentMaximumRenormalizationScale ) )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential( [copy] )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()
@@ -113,48 +104,6 @@ namespace VevaciousPlusPlus
     << " )";
     std::cout << std::endl;
     return std::vector< double >();/**/
-  }
-
-  // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  void RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale()
-  {
-    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
-    if( currentMinimumRenormalizationScale < modelMinimumRenormalizationScale )
-    {
-      currentMinimumRenormalizationScale = modelMinimumRenormalizationScale;
-    }
-    squareOfMinimumRenormalizationScale
-    = ( modelMinimumRenormalizationScale * modelMinimumRenormalizationScale );
-    logarithmOfMinimumRenormalizationScale
-    = log( modelMinimumRenormalizationScale );
-    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
-    logarithmOfMaximumRenormalizationScale
-    = log( currentMaximumRenormalizationScale );
-    runningParameters.UpdateRunningParameters(
-                                            modelMinimumRenormalizationScale );
-    std::vector< double > fieldOrigin( numberOfFields,
-                                       0.0 );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      dsbFieldValueInputs[ fieldIndex ]
-      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale() set DSB"
-    << " field values to:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::cout << fieldNames[ fieldIndex ] << " -> "
-      << dsbFieldValueInputs[ fieldIndex ] << std::endl;
-    }
-    std::cout << std::endl;*/
   }
 
   // This should prepare homotopyContinuationPotentialPolynomial

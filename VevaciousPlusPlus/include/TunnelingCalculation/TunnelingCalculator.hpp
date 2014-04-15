@@ -10,19 +10,50 @@
 
 #include "../StandardIncludes.hpp"
 #include "../PotentialEvaluation/PotentialFunctions/PotentialFunctions.hpp"
+#include "../PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
   class TunnelingCalculator
   {
   public:
-    TunnelingCalculator( PotentialFunction& potentialFunction );
+    enum TunnelingStrategy
+    {
+      NoTunneling,
+      JustQuantum,
+      JustThermal,
+      QuantumThenThermal,
+      ThermalThenQuantum,
+      NotSet
+    };
+
+    TunnelingCalculator( PotentialFunction& potentialFunction,
+                         TunnelingStrategy const tunnelingStrategy,
+                         double const survivalProbabilityThreshold );
     virtual
     ~TunnelingCalculator();
 
 
+    // This should try to find the most accurate survival probability for
+    // falseVacuum to have survived as long as the age of the known Universe
+    // including the time at non-negligible temperatures, depending on
+    // tunnelingStrategy. It should set quantumSurvivalProbability,
+    // quantumLifetimeInSeconds, thermalSurvivalProbability, and
+    // dominantTemperatureInGigaElectronVolts appropriately. Each of these
+    // which is not calculated by the strategy should be left with negative
+    // values.
+    virtual void CalculateTunneling( PotentialMinimum const& falseVacuum,
+                                     PotentialMinimum const& trueVacuum ) = 0;
+
+
   protected:
     PotentialFunction& potentialFunction;
+    TunnelingStrategy const tunnelingStrategy;
+    double quantumSurvivalProbability;
+    double quantumLifetimeInSeconds;
+    double thermalSurvivalProbability;
+    double dominantTemperatureInGigaElectronVolts;
+    double const survivalProbabilityThreshold;
   };
 
 } /* namespace VevaciousPlusPlus */

@@ -98,21 +98,32 @@ int main( int argumentCount,
   VevaciousPlusPlus::PotentialFromPolynomialAndMasses*
   potentialFunction( NULL );
 
-  std::string potentialType( argumentParser.fromTag( "PotentialType",
+  std::string potentialClass( argumentParser.fromTag( "PotentialClass",
                                               "FixedScaleOneLoopPotential" ) );
-  if( potentialType.compare( "FixedScaleOneLoopPotential" ) == 0 )
+  std::string modelFile( argumentParser.fromTag( "model",
+                                                 "./ModelFiles/SM.vin" ) );
+
+  if( potentialClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
   {
-    potentialFunction = new VevaciousPlusPlus::FixedScaleOneLoopPotential(
-                                               argumentParser.fromTag( "model",
-                                                       "./ModelFiles/SM.vin" ),
+    potentialFunction
+    = new VevaciousPlusPlus::FixedScaleOneLoopPotential( modelFile,
                                                      runningParameterManager );
+
+    std::cout
+    << std::endl
+    << "Created FixedScaleOneLoopPotential from " << modelFile;
+    std::cout << std::endl;
   }
-  else if( potentialType.compare( "RgeImprovedOneLoopPotential" ) == 0 )
+  else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
   {
-    potentialFunction = new VevaciousPlusPlus::RgeImprovedOneLoopPotential(
-                                               argumentParser.fromTag( "model",
-                                                       "./ModelFiles/SM.vin" ),
+    potentialFunction
+    = new VevaciousPlusPlus::RgeImprovedOneLoopPotential( modelFile,
                                                      runningParameterManager );
+
+    std::cout
+    << std::endl
+    << "Created RgeImprovedOneLoopPotential from " << modelFile;
+    std::cout << std::endl;
   }
   else
   {
@@ -120,7 +131,7 @@ int main( int argumentCount,
     << std::endl
     << "PotentialType was not a recognized form! The only currently-valid"
     << " types are \"FixedScaleOneLoopPotential\" and"
-    << " \"RgeImprovedOneLoopPotential\".";
+    << " \"RgeImprovedOneLoopPotential\". Aborting!";
     std::cout << std::endl;
 
     return EXIT_FAILURE;
@@ -130,29 +141,41 @@ int main( int argumentCount,
   VevaciousPlusPlus::HomotopyContinuationSolver*
   homotopyContinuationSolver( NULL );
 
-  std::string
-  homotopyContinuationType( argumentParser.fromTag( "HomotopyContinuation",
+  std::string homotopyContinuationClass(
+                           argumentParser.fromTag( "HomotopyContinuationClass",
                                      "BasicPolynomialHomotopyContinuation" ) );
-  if( homotopyContinuationType.compare( "FixedScaleOneLoopPotential" ) == 0 )
+  if( homotopyContinuationClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
   {
     homotopyContinuationSolver
     = new VevaciousPlusPlus::BasicPolynomialHomotopyContinuation(
                                                           *potentialFunction );
+
+    std::cout
+    << std::endl
+    << "Created BasicPolynomialHomotopyContinuation, but this does not yet"
+    << " work...";
+    std::cout << std::endl;
   }
-  else if( homotopyContinuationType.compare( "Hom4ps2Runner" ) == 0 )
+  else if( homotopyContinuationClass.compare( "Hom4ps2Runner" ) == 0 )
   {
+    std::string pathToHom4ps2( argumentParser.fromTag( "PathToHom4ps2",
+                                                              "./HOM4PS2/" ) );
     homotopyContinuationSolver
     = new VevaciousPlusPlus::Hom4ps2Runner( *potentialFunction,
-                                       argumentParser.fromTag( "PathToHom4ps2",
-                                                              "./HOM4PS2/" ) );
+                                            pathToHom4ps2 );
+
+    std::cout
+    << std::endl
+    << "Created Hom4ps2Runner to run " << pathToHom4ps2 << "/hom4ps2";
+    std::cout << std::endl;
   }
   else
   {
     std::cout
     << std::endl
-    << "HomotopyContinuation was not a recognized form! The only"
-    << " currently-valid types are \"BasicPolynomialHomotopyContinuation\" and"
-    << " \"Hom4ps2Runner\".";
+    << "HomotopyContinuationClass was not a recognized form! The only"
+    << " currently-valid types are \"BasicPolynomialHomotopyContinuation\""
+    << " (not yet implemented, sorry!) and \"Hom4ps2Runner\". Aborting!";
     std::cout << std::endl;
 
     return EXIT_FAILURE;
@@ -162,19 +185,142 @@ int main( int argumentCount,
   VevaciousPlusPlus::HomotopyContinuationAndMinuit
   potentialMinimizer( *potentialFunction,
                       *homotopyContinuationSolver,
-                      0.1 );
+                     BOL::StringParser::stringToDouble( argumentParser.fromTag(
+                                                   "MinimaSeparationThreshold",
+                                                                   "0.1" ) ) );
 
 
-  // Also the BounceWithSplines object can now be constructed:
-  VevaciousPlusPlus::BounceWithSplines
-  tunnelingCalculator( *potentialFunction );
+  std::string
+  tunnelingStrategyAsString( argumentParser.fromTag( "TunnelingStrategy",
+                                                     "DefaultTunneling" ) );
+  VevaciousPlusPlus::TunnelingCalculator::TunnelingStrategy
+  tunnelingStrategy( VevaciousPlusPlus::TunnelingCalculator::NotSet );
+  if( ( tunnelingStrategyAsString.compare( "DefaultTunneling" ) == 0 )
+      ||
+      ( tunnelingStrategyAsString.compare( "ThermalThenQuantum" ) == 0 ) )
+  {
+    tunnelingStrategy
+    = VevaciousPlusPlus::TunnelingCalculator::ThermalThenQuantum;
+  }
+  else if( tunnelingStrategyAsString.compare( "QuantumThenThermal" ) == 0 )
+  {
+    tunnelingStrategy
+    = VevaciousPlusPlus::TunnelingCalculator::QuantumThenThermal;
+  }
+  else if( tunnelingStrategyAsString.compare( "JustThermal" ) == 0 )
+  {
+    tunnelingStrategy
+    = VevaciousPlusPlus::TunnelingCalculator::JustThermal;
+  }
+  else if( tunnelingStrategyAsString.compare( "JustQuantum" ) == 0 )
+  {
+    tunnelingStrategy
+    = VevaciousPlusPlus::TunnelingCalculator::JustQuantum;
+  }
+  else if( ( tunnelingStrategyAsString.compare( "NoTunneling" ) == 0 )
+           ||
+           ( tunnelingStrategyAsString.compare( "None" ) == 0 ) )
+  {
+    tunnelingStrategy
+    = VevaciousPlusPlus::TunnelingCalculator::NoTunneling;
+  }
+  else
+  {
+    std::cout
+    << std::endl
+    << "TunnelingStrategy was not a recognized form! The only currently-valid"
+    << " types are \"DefaultTunneling\" (=\"ThermalThenQuantum\"),"
+    << " \"ThermalThenQuantum\", \"QuantumThenThermal\", \"JustThermal\","
+    << " \"JustQuantum\", \"NoTunneling\", and \"None\" ( =\"NoTunneling\")."
+    << " Aborting!";
+    std::cout << std::endl;
+
+    return EXIT_FAILURE;
+  }
+  std::cout
+  << std::endl
+  << "Tunneling strategy is " << tunnelingStrategyAsString;
+  std::cout << std::endl;
+
+  std::string survivalProbabilityThresholdAsString(
+                        argumentParser.fromTag( "SurvivalProbabilityThreshold",
+                                                "0.01" ) );
+  double survivalProbabilityThreshold( -1.0 );
+  bool validInput( BOL::StringParser::stringIsDouble(
+                                          survivalProbabilityThresholdAsString,
+                                              survivalProbabilityThreshold ) );
+  if( !validInput
+      ||
+      ( survivalProbabilityThreshold <= 0.0 )
+      ||
+      ( survivalProbabilityThreshold >= 1.0 ) )
+  {
+    std::cout
+    << std::endl
+    << "SurvivalProbabilityThreshold was not a number between 0.0 and 1.0 but"
+    << " was " << survivalProbabilityThresholdAsString << "."
+    << " Aborting!";
+    std::cout << std::endl;
+
+    return EXIT_FAILURE;
+  }
+
+
+  VevaciousPlusPlus::TunnelingCalculator*
+  tunnelingCalculator( NULL );
+
+  std::string tunnelingClass( argumentParser.fromTag( "TunnelingClass",
+                                             "MinuitBounceActionMinimizer" ) );
+
+  if( tunnelingClass.compare( "MinuitBounceActionMinimizer" ) == 0 )
+  {
+    tunnelingCalculator
+    = new VevaciousPlusPlus::MinuitBounceActionMinimizer( *potentialFunction,
+                                                          tunnelingStrategy,
+                                                survivalProbabilityThreshold );
+
+    std::cout
+    << std::endl
+    << "Created MinuitBounceActionMinimizer, but this does not yet"
+    << " work...";
+    std::cout << std::endl;
+    std::cout << std::endl;
+  }
+  else if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
+  {
+    std::string
+    pathToCosmotransitions( argumentParser.fromTag( "PathToCosmotransitions",
+                                               "./CosmoTransitions-1.0.2/" ) );
+    tunnelingCalculator
+    = new VevaciousPlusPlus::CosmoTransitionsRunner( *potentialFunction,
+                                                     tunnelingStrategy,
+                                                  survivalProbabilityThreshold,
+                                                     pathToCosmotransitions );
+
+    std::cout
+    << std::endl
+    << "Created CosmoTransitionsRunner from " << modelFile;
+    std::cout << std::endl;
+  }
+  else
+  {
+    std::cout
+    << std::endl
+    << "TunnelingClass was not a recognized form! The only currently-valid"
+    << " types are \"MinuitBounceActionMinimizer\" (not yet implemented,"
+    << " sorry!)  and \"CosmoTransitionsRunner\". Aborting!";
+    std::cout << std::endl;
+
+    return EXIT_FAILURE;
+  }
+
 
   // Create the VevaciousTwo object, telling it where to find its settings,
   // such as the model to use and the way to calculate the tunneling time.
   VevaciousPlusPlus::VevaciousPlusPlus vevaciousPlusPlus( argumentParser,
                                                        runningParameterManager,
                                                           potentialMinimizer,
-                                                         tunnelingCalculator );
+                                                        *tunnelingCalculator );
 
   // Solve a parameter point:
   std::string slhaFile( argumentParser.fromTag( "slha",
@@ -263,8 +409,9 @@ int main( int argumentCount,
                                                     ( slhaFile + ".vout" ) ) );
   vevaciousPlusPlus.WriteSlhaResults( slhaFile );
 
-  delete potentialFunction;
+  delete tunnelingCalculator;
   delete homotopyContinuationSolver;
+  delete potentialFunction;
   // this was a triumph! I'm making a note here:
   return EXIT_SUCCESS;
 }

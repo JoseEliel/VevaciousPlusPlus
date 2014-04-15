@@ -15,21 +15,34 @@
 #
  -->
  
-  <PotentialType>
+  <PotentialClass>
   FixedScaleOneLoopPotential
-  </PotentialType>
+  </PotentialClass>
   <model>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
   /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
   </model>
   
-  <HomotopyContinuation>
+  <HomotopyContinuationClass>
   Hom4ps2Runner
-  </HomotopyContinuation>
+  </HomotopyContinuationClass>
   <PathToHom4ps2>
   <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
   /Users/oleary/BOL/machine-specific/HOM4PS2/
   </PathToHom4ps2>
+  
+  <TunnelingStrategy>
+  ThermalThenQuantum
+  </TunnelingStrategy>
+  <SurvivalProbabilityThreshold>
+  0.05
+  </SurvivalProbabilityThreshold>
+  <TunnelingClass>
+  CosmoTransitionsRunner
+  </TunnelingClass>
+  <PathToCosmotransitions>
+  /Users/oleary/BOL/machine-specific/build_directories/CosmoTransitions_vBOL/
+  </PathToCosmotransitions>
   
   <slha>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/StopVevsTest.slha -->

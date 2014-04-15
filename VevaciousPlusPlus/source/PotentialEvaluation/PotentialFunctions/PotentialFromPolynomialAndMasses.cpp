@@ -32,7 +32,6 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    modelMinimumRenormalizationScale( NAN ),
     currentMinimumRenormalizationScale( NAN ),
     squareOfMinimumRenormalizationScale( NAN ),
     currentMaximumRenormalizationScale( NAN ),
@@ -102,18 +101,6 @@ namespace VevaciousPlusPlus
     dsbFieldValuePolynomials.resize( numberOfFields );
     dsbFieldValueInputs.resize( numberOfFields );
     //   </FieldVariables>
-    //   <MinimumRenormalizationScale>
-    successfullyReadElement = elementParser.readNextElement();
-    if( !successfullyReadElement )
-    {
-      throw
-      std::runtime_error( "Could not parse <MinimumRenormalizationScale>." );
-    }
-    modelMinimumRenormalizationScale = BOL::StringParser::stringToDouble(
-                             elementParser.getTrimmedCurrentElementContent() );
-    squareOfMinimumRenormalizationScale = ( modelMinimumRenormalizationScale
-                                          * modelMinimumRenormalizationScale );
-    //   </MinimumRenormalizationScale>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
     if( !successfullyReadElement )
@@ -453,7 +440,6 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    modelMinimumRenormalizationScale( NAN ),
     currentMinimumRenormalizationScale( NAN ),
     squareOfMinimumRenormalizationScale( NAN ),
     currentMaximumRenormalizationScale( NAN ),
@@ -479,8 +465,6 @@ namespace VevaciousPlusPlus
     HomotopyContinuationReadyPolynomial( copySource ),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
-    modelMinimumRenormalizationScale(
-                                 copySource.modelMinimumRenormalizationScale ),
     currentMinimumRenormalizationScale(
                                copySource.currentMinimumRenormalizationScale ),
     squareOfMinimumRenormalizationScale(

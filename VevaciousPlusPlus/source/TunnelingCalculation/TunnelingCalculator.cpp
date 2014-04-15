@@ -11,8 +11,16 @@ namespace VevaciousPlusPlus
 {
 
   TunnelingCalculator::TunnelingCalculator(
-                                       PotentialFunction& potentialFunction ) :
-    potentialFunction( potentialFunction )
+                                          PotentialFunction& potentialFunction,
+                                     TunnelingStrategy const tunnelingStrategy,
+                                  double const survivalProbabilityThreshold ) :
+    potentialFunction( potentialFunction ),
+    tunnelingStrategy( tunnelingStrategy ),
+    quantumSurvivalProbability( -1.0 ),
+    quantumLifetimeInSeconds( -1.0 ),
+    thermalSurvivalProbability( -1.0 ),
+    dominantTemperatureInGigaElectronVolts( -1.0 ),
+    survivalProbabilityThreshold( survivalProbabilityThreshold )
   {
     // placeholder:
     /**/std::cout << std::endl

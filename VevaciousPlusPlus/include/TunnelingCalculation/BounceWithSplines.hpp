@@ -17,7 +17,9 @@ namespace VevaciousPlusPlus
   class BounceWithSplines : public TunnelingCalculator
   {
   public:
-    BounceWithSplines( PotentialFunction& potentialFunction );
+    BounceWithSplines( PotentialFunction& potentialFunction,
+                       TunnelingStrategy const tunnelingStrategy,
+                       double const survivalProbabilityThreshold );
     virtual
     ~BounceWithSplines();
   };

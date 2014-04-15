@@ -45,7 +45,6 @@ namespace VevaciousPlusPlus
 
     RunningParameterManager& runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
-    double modelMinimumRenormalizationScale;
     double currentMinimumRenormalizationScale;
     double squareOfMinimumRenormalizationScale;
     double currentMaximumRenormalizationScale;

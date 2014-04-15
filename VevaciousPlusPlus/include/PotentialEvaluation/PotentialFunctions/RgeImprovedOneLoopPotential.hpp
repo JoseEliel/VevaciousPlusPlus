@@ -106,6 +106,30 @@ namespace VevaciousPlusPlus
 
 
 
+  // This sets dsbFieldValueInputs based on the SLHA file just read in.
+  inline void RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale()
+  {
+    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
+    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
+                                        * currentMinimumRenormalizationScale );
+    logarithmOfMinimumRenormalizationScale
+    = log( currentMinimumRenormalizationScale );
+    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
+    logarithmOfMaximumRenormalizationScale
+    = log( currentMaximumRenormalizationScale );
+    runningParameters.UpdateRunningParameters(
+                                          currentMinimumRenormalizationScale );
+    std::vector< double > fieldOrigin( numberOfFields,
+                                       0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      dsbFieldValueInputs[ fieldIndex ]
+      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
+    }
+  }
+
   // This returns the square of an appropriate renormalization scale.
   inline double RgeImprovedOneLoopPotential::RenormalizationScaleSquared(
                                std::vector< double > const& fieldConfiguration,

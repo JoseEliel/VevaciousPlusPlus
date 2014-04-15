@@ -25,11 +25,7 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
     inverseRenormalizationScaleSquared( NAN )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "FixedScaleOneLoopPotential::FixedScaleOneLoopPotential( [copy] )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
@@ -106,54 +102,6 @@ namespace VevaciousPlusPlus
                                           vectorMassesSquaredWithFactors,
                                           inverseRenormalizationScaleSquared,
                                           temperatureValue ) );
-  }
-
-  // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  void FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale()
-  {
-    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
-    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
-    if( currentMinimumRenormalizationScale < modelMinimumRenormalizationScale )
-    {
-      currentMinimumRenormalizationScale = modelMinimumRenormalizationScale;
-    }
-    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
-                                        * currentMinimumRenormalizationScale );
-    inverseRenormalizationScaleSquared
-    = ( 1.0 / squareOfMinimumRenormalizationScale );
-    runningParameters.UpdateRunningParameters(
-                                          currentMinimumRenormalizationScale );
-    std::vector< double > fieldOrigin( numberOfFields,
-                                       0.0 );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      dsbFieldValueInputs[ fieldIndex ]
-      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
-    }
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::EvaluateDsbInputAndSetScale() set"
-    << " currentMaximumRenormalizationScale to "
-    << currentMaximumRenormalizationScale
-    << ", currentMinimumRenormalizationScale to "
-    << currentMinimumRenormalizationScale
-    << ", squareOfMinimumRenormalizationScale to "
-    << squareOfMinimumRenormalizationScale
-    << ", inverseRenormalizationScaleSquared to "
-    << inverseRenormalizationScaleSquared
-    << ", and DSB field values to:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::cout << fieldNames[ fieldIndex ] << " -> "
-      << dsbFieldValueInputs[ fieldIndex ] << std::endl;
-    }
-    std::cout << std::endl;/**/
   }
 
   // This should prepare homotopyContinuationStartSystem and

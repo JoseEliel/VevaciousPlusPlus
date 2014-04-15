@@ -10,9 +10,12 @@
 namespace VevaciousPlusPlus
 {
 
-  BounceWithSplines::BounceWithSplines(
-                                       PotentialFunction& potentialFunction ) :
-    TunnelingCalculator( potentialFunction )
+  BounceWithSplines::BounceWithSplines( PotentialFunction& potentialFunction,
+                                     TunnelingStrategy const tunnelingStrategy,
+                                  double const survivalProbabilityThreshold ) :
+    TunnelingCalculator( potentialFunction,
+                         tunnelingStrategy,
+                         survivalProbabilityThreshold )
   {
     // placeholder:
     /**/std::cout << std::endl
