@@ -9,7 +9,8 @@
 #define BOUNCEWITHSPLINES_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "../PotentialEvaluation/PotentialEvaluation.hpp"
+#include "../PotentialEvaluation.hpp"
+#include "../PotentialMinimization.hpp"
 #include "TunnelingCalculator.hpp"
 
 namespace VevaciousPlusPlus
@@ -17,8 +18,7 @@ namespace VevaciousPlusPlus
   class BounceWithSplines : public TunnelingCalculator
   {
   public:
-    BounceWithSplines( PotentialFunction& potentialFunction,
-                       TunnelingStrategy const tunnelingStrategy,
+    BounceWithSplines( TunnelingStrategy const tunnelingStrategy,
                        double const survivalProbabilityThreshold );
     virtual
     ~BounceWithSplines();

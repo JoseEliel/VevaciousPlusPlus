@@ -9,7 +9,7 @@
 #define RUNNINGPARAMETERMANAGER_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "ParameterFunctionoids/ParameterFunctionoids.hpp"
+#include "ParameterFunctionoids.hpp"
 #include "SLHA.hpp"
 #include "SlhaManager.hpp"
 

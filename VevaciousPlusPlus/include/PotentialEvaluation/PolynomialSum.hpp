@@ -36,6 +36,9 @@ namespace VevaciousPlusPlus
     std::complex< double > operator()(
        std::vector< std::complex< double > > const& fieldConfiguration ) const;
 
+    std::vector< PolynomialTerm > const& PolynomialTerms() const
+    { return polynomialTerms; }
+
     std::vector< PolynomialTerm >& PolynomialTerms(){ return polynomialTerms; }
 
     // This returns the highest sum of field exponents of all the terms in

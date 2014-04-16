@@ -9,7 +9,6 @@
 #define TUNNELINGCALCULATOR_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "../PotentialEvaluation/PotentialFunctions/PotentialFunctions.hpp"
 #include "../PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
@@ -27,8 +26,7 @@ namespace VevaciousPlusPlus
       NotSet
     };
 
-    TunnelingCalculator( PotentialFunction& potentialFunction,
-                         TunnelingStrategy const tunnelingStrategy,
+    TunnelingCalculator( TunnelingStrategy const tunnelingStrategy,
                          double const survivalProbabilityThreshold );
     virtual
     ~TunnelingCalculator();
@@ -47,7 +45,6 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    PotentialFunction& potentialFunction;
     TunnelingStrategy const tunnelingStrategy;
     double quantumSurvivalProbability;
     double quantumLifetimeInSeconds;

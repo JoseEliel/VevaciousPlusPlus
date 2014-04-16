@@ -9,7 +9,8 @@
 #define COSMOTRANSITIONSRUNNER_HPP_
 
 #include "../StandardIncludes.hpp"
-#include "../PotentialEvaluation/PotentialEvaluation.hpp"
+#include "../PotentialEvaluation.hpp"
+#include "../PotentialMinimization.hpp"
 #include "BounceWithSplines.hpp"
 
 
@@ -19,7 +20,7 @@ namespace VevaciousPlusPlus
   class CosmoTransitionsRunner : public BounceWithSplines
   {
   public:
-    CosmoTransitionsRunner( PotentialFunction& potentialFunction,
+    CosmoTransitionsRunner( PythonConvertiblePotential& potentialFunction,
                             TunnelingStrategy const tunnelingStrategy,
                             double const survivalProbabilityThreshold,
                             std::string const& pathToCosmotransitions );

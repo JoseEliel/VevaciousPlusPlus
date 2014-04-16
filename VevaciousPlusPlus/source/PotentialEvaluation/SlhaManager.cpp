@@ -10,7 +10,8 @@
 namespace VevaciousPlusPlus
 {
 
-  SlhaManager::SlhaManager()
+  SlhaManager::SlhaManager() :
+    BOL::BasicObserved()
   {
     // This does nothing.
   }

@@ -16,6 +16,13 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
+  ProductOfPolynomialSums::ProductOfPolynomialSums(
+                                  ProductOfPolynomialSums const& copySource ) :
+    productVector( copySource.productVector )
+  {
+    // This constructor is just an initialization list.
+  }
+
   ProductOfPolynomialSums::~ProductOfPolynomialSums()
   {
     // This does nothing.

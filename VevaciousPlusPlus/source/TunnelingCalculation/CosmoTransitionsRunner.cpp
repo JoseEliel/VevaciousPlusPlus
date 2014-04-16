@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   CosmoTransitionsRunner::CosmoTransitionsRunner(
-                                          PotentialFunction& potentialFunction,
+                                 PythonConvertiblePotential& potentialFunction,
                                      TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
                                   std::string const& pathToCosmotransitions ) :
@@ -48,6 +48,21 @@ namespace VevaciousPlusPlus
     << "Placeholder: "
     << "CosmoTransitionsRunner::CalculateTunneling( ... )";
     std::cout << std::endl;/**/
+
+    if( ( tunnelingStrategy == NoTunneling )
+        ||
+        ( tunnelingStrategy == NotSet ) )
+    {
+      quantumSurvivalProbability = -1.0;
+      quantumLifetimeInSeconds = -1.0;
+      thermalSurvivalProbability = -1.0;
+      dominantTemperatureInGigaElectronVolts = -1.0;
+      return;
+    }
+
+    // If we should tunnel, we should write the potential in Python:
+
+
 
     // if quantum:
     // 1) C++: write Py potential

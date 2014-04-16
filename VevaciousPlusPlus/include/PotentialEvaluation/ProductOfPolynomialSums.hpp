@@ -18,12 +18,13 @@ namespace VevaciousPlusPlus
   {
   public:
     ProductOfPolynomialSums();
+    ProductOfPolynomialSums( ProductOfPolynomialSums const& copySource );
     virtual
     ~ProductOfPolynomialSums();
 
 
     // This returns the product of operator() on each of the PolynomialSums in
-    // PolynomialSum.
+    // productVector.
     std::complex< double > operator()(
        std::vector< std::complex< double > > const& fieldConfiguration ) const;
 
@@ -37,6 +38,9 @@ namespace VevaciousPlusPlus
                      unsigned int const fieldPower,
                      double const startValue );
 
+    // This is mainly for debugging.
+    std::string AsString( std::vector< std::string > const& fieldNames ) const;
+
 
   protected:
     std::vector< PolynomialSum > productVector;
@@ -46,7 +50,7 @@ namespace VevaciousPlusPlus
 
 
   // This returns the product of operator() on each of the PolynomialSums in
-  // PolynomialSum.
+  // productVector.
   inline std::complex< double > ProductOfPolynomialSums::operator()(
         std::vector< std::complex< double > > const& fieldConfiguration ) const
   {
@@ -79,6 +83,28 @@ namespace VevaciousPlusPlus
     constructedSum.PolynomialTerms().push_back( fieldTerm );
     constructedSum.PolynomialTerms().push_back( constantTerm );
     productVector.push_back( constructedSum );
+  }
+
+  // This is mainly for debugging.
+  inline std::string ProductOfPolynomialSums::AsString(
+                           std::vector< std::string > const& fieldNames ) const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "[";
+    for( std::vector< PolynomialSum >::const_iterator
+         whichProduct( productVector.begin() );
+         whichProduct < productVector.end();
+         ++whichProduct )
+    {
+      if( whichProduct != productVector.begin() )
+      {
+        stringBuilder << "*";
+      }
+      stringBuilder << " ("
+      << whichProduct->AsStringAtCurrentScale( fieldNames ) << ")";
+    }
+    stringBuilder << " ]";
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

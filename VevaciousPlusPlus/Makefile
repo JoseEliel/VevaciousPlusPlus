@@ -35,6 +35,8 @@ CCEXEFLAGS=
 MASSESSQUAREDCALCULATORS=source/PotentialEvaluation/MassesSquaredCalculators/
 PARAMETERFUNCTIONOIDS=source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS=source/PotentialEvaluation/PotentialFunctions/
+HOMOTOPYCONTINUATION=source/PotentialMinimization/HomotopyContinuation/
+MINUITMINIMIZATION=source/PotentialMinimization/MinuitMinimization/
 SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/MassesSquaredCalculator.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
@@ -45,8 +47,6 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ParameterFunctionoid.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
- $(POTENTIALFUNCTIONS)/HomotopyContinuationReadyPolynomial.cpp \
- $(POTENTIALFUNCTIONS)/HomotopyContinuationReadyPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFunction.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
@@ -54,16 +54,19 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
  source/PotentialEvaluation/ProductOfPolynomialSums.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
+ source/PotentialEvaluation/SumOfProductOfPolynomialSums.cpp \
  source/PotentialEvaluation/SlhaManager.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- source/PotentialMinimization/BasicPolynomialHomotopyContinuation.cpp \
- source/PotentialMinimization/Hom4ps2Runner.cpp \
+ $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
+ $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
+ $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
+ $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \
+ $(HOMOTOPYCONTINUATION)/PolynomialGradientTargetSystem.cpp \
+ $(MINUITMINIMIZATION)/MinuitManager.cpp \
+ $(MINUITMINIMIZATION)/MinuitMinimum.cpp \
+ $(MINUITMINIMIZATION)/PotentialForMinuit.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/HomotopyContinuationAndMinuit.cpp \
- source/PotentialMinimization/HomotopyContinuationSolver.cpp \
- source/PotentialMinimization/MinuitManager.cpp \
- source/PotentialMinimization/MinuitMinimum.cpp \
- source/PotentialMinimization/PotentialForMinuit.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/TunnelingCalculation/BounceWithSplines.cpp \

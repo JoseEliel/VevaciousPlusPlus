@@ -10,12 +10,9 @@
 
 #include "../StandardIncludes.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
-#include "../PotentialEvaluation/PotentialFunctions/PotentialFunctions.hpp"
+#include "../PotentialEvaluation.hpp"
 #include "BOLlib/include/BOLlib.hpp"
-#include "PotentialForMinuit.hpp"
-#include "MinuitManager.hpp"
-#include "Minuit2/FunctionMinimum.h"
-#include "Minuit2/MnPrint.h"
+#include "MinuitMinimization.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -11,10 +11,8 @@ namespace VevaciousPlusPlus
 {
 
   TunnelingCalculator::TunnelingCalculator(
-                                          PotentialFunction& potentialFunction,
                                      TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold ) :
-    potentialFunction( potentialFunction ),
     tunnelingStrategy( tunnelingStrategy ),
     quantumSurvivalProbability( -1.0 ),
     quantumLifetimeInSeconds( -1.0 ),

@@ -29,7 +29,8 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                                               std::string const& modelFilename,
                            RunningParameterManager& runningParameterManager ) :
-    HomotopyContinuationReadyPolynomial( runningParameterManager ),
+    PotentialFunction( runningParameterManager ),
+    PythonConvertiblePotential(),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( NAN ),
@@ -44,7 +45,8 @@ namespace VevaciousPlusPlus
     fermionMassMatrices(),
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
-    vectorMassCorrectionConstant( NAN )
+    vectorMassCorrectionConstant( NAN ),
+    needToUpdateHomotopyContinuation( false )
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -434,10 +436,24 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This writes the potential as
+  // def PotentialFunction( fv ): return ...
+  // in pythonFilename for fv being an array of floating-point numbers in the
+  // same order as they are for the field configurations as internal to this
+  // C++ code. It uses the purely virtual function SetScaleInPythonFunction.
+  void PotentialFromPolynomialAndMasses::WriteAsPython(
+                                       std::string const pythonFilename ) const
+  {
+    std::ofstream pythonFile( pythonFilename );
+    pythonFile << std::setprecision( 12 );
+    pythonFile.close();
+  }
+
   // This is just for derived classes.
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                            RunningParameterManager& runningParameterManager ) :
-    HomotopyContinuationReadyPolynomial( runningParameterManager ),
+    PotentialFunction( runningParameterManager ),
+    PythonConvertiblePotential(),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( NAN ),
@@ -452,7 +468,8 @@ namespace VevaciousPlusPlus
     fermionMassMatrices(),
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
-    vectorMassCorrectionConstant( NAN )
+    vectorMassCorrectionConstant( NAN ),
+    needToUpdateHomotopyContinuation( false )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -462,7 +479,8 @@ namespace VevaciousPlusPlus
   // This is just for derived classes.
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                          PotentialFromPolynomialAndMasses const& copySource ) :
-    HomotopyContinuationReadyPolynomial( copySource ),
+    PotentialFunction( copySource ),
+    PythonConvertiblePotential(),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
     currentMinimumRenormalizationScale(
@@ -480,7 +498,9 @@ namespace VevaciousPlusPlus
     fermionMassMatrices( copySource.fermionMassMatrices ),
     fermionMassSquaredMatrices( copySource.fermionMassSquaredMatrices ),
     vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
-    vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant )
+    vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant ),
+    needToUpdateHomotopyContinuation(
+                                  copySource.needToUpdateHomotopyContinuation )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more

@@ -9,6 +9,7 @@
 #define POTENTIALMINIMIZER_HPP_
 
 #include "../StandardIncludes.hpp"
+#include "../PotentialEvaluation.hpp"
 #include "PotentialMinimum.hpp"
 #include "BOLlib/include/BasicObserver.hpp"
 

@@ -8,6 +8,10 @@
 #ifndef MINUITBOUNCEACTIONMINIMIZER_HPP_
 #define MINUITBOUNCEACTIONMINIMIZER_HPP_
 
+#include "BounceWithSplines.hpp"
+#include "../PotentialEvaluation.hpp"
+#include "../PotentialMinimization.hpp"
+
 namespace VevaciousPlusPlus
 {
 

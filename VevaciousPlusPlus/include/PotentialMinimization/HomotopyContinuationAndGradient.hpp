@@ -10,7 +10,7 @@
 
 #include "../StandardIncludes.hpp"
 #include "PotentialMinimizer.hpp"
-#include "../PotentialEvaluation/PotentialFunctions/PotentialFunctions.hpp"
+#include "../PotentialEvaluation.hpp"
 
 namespace VevaciousPlusPlus
 {
