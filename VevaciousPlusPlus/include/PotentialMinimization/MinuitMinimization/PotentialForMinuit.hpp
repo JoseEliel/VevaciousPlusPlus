@@ -8,7 +8,7 @@
 #ifndef POTENTIALFORMINUIT_HPP_
 #define POTENTIALFORMINUIT_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "../../PotentialEvaluation.hpp"

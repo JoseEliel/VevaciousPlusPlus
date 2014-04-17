@@ -11,7 +11,7 @@
 #include "PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
 #include "PotentialFunctions/PotentialFunction.hpp"
-#include "PotentialFunctions/PythonConvertiblePotential.hpp"
+#include "PotentialFunctions/IWritesPythonPotential.hpp"
 #include "PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 
 // This file is just to collect a lot of #include statements.

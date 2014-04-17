@@ -8,7 +8,7 @@
 #ifndef FIELDPOLYNOMIALSWITHSCALE_HPP_
 #define FIELDPOLYNOMIALSWITHSCALE_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "PolynomialGradientTargetSystem.hpp"
 
 namespace VevaciousPlusPlus
@@ -17,7 +17,9 @@ namespace VevaciousPlusPlus
   class FieldPolynomialsWithScale : public PolynomialGradientTargetSystem
   {
   public:
-    FieldPolynomialsWithScale( unsigned int const numberOfFields );
+    FieldPolynomialsWithScale( PolynomialSum const& potentialPolynomial,
+                               unsigned int const numberOfVariables,
+                               SlhaUpdatePropagator& previousPropagator );
     virtual
     ~FieldPolynomialsWithScale();
 
@@ -43,16 +45,11 @@ namespace VevaciousPlusPlus
     // for the field configuration f[]. The minimum renormalization scale
     // should be given by lowerEndOfStartValues, and upperEndOfStartValues
     // should give the maximum renormalization scale.
-    virtual void
-    PrepareForHomotopyContinuation( PolynomialSum const& potentialPolynomial,
-                                    double const lowerEndOfStartValues,
-                                    double const upperEndOfStartValues );
+    void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
 
 
   protected:
     unsigned int const numberOfFields;
-    double const minimumScale;
-    double const maximumScale;
   };
 
 

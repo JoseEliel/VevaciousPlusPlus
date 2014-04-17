@@ -8,7 +8,7 @@
 #ifndef RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 #define RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "PotentialFromPolynomialAndMasses.hpp"
 
 namespace VevaciousPlusPlus
@@ -37,12 +37,19 @@ namespace VevaciousPlusPlus
     // correct scale.
     virtual double
     QuickApproximation( std::vector< double > const& fieldConfiguration,
-                        double const temperatureValue = 0.0 );
+                        double const temperatureValue = 0.0 )
+    { return treeLevelPotential( fieldConfiguration,
+                  ( 0.5 * log( RenormalizationScaleSquared( fieldConfiguration,
+                                                    temperatureValue ) ) ) ); }
 
     // This returns the square of the Euclidean distance between the two vacua.
     virtual double
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
                                     PotentialMinimum const& trueVacuum ) const;
+
+    // This performs all relevant updates for the new SLHA data except for
+    // propagating the push to the set of dependent SlhaUpdatePropagators.
+    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
 
 
   protected:
@@ -50,8 +57,6 @@ namespace VevaciousPlusPlus
     double logarithmOfMaximumRenormalizationScale;
     FieldPolynomialsWithScale homotopyContinuationTargetSystem;
 
-    // This sets dsbFieldValueInputs based on the SLHA file just read in.
-    virtual void EvaluateDsbInputAndSetScale();
 
     // This returns the square of an appropriate renormalization scale.
     double RenormalizationScaleSquared(
@@ -73,23 +78,17 @@ namespace VevaciousPlusPlus
     // above, in the PotentialFunction function.
     virtual std::string SetScaleInPythonFunction() const;
 
-    virtual PolynomialGradientTargetSystem const&
+    virtual PolynomialGradientTargetSystem&
     GetHomotopyContinuationTargetSystem()
     { return homotopyContinuationTargetSystem; }
-
-    // This updates polynomialGradientTargetSystem.
-    virtual void UpdateHomotopyContinuation()
-    { homotopyContinuationTargetSystem.PrepareForHomotopyContinuation(
-                                                            treeLevelPotential,
-                                            currentMinimumRenormalizationScale,
-                                        currentMaximumRenormalizationScale ); }
   };
 
 
 
 
   // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  inline void RgeImprovedOneLoopPotential::EvaluateDsbInputAndSetScale()
+  inline void RgeImprovedOneLoopPotential::UpdateSelfForNewSlha(
+                                               SlhaManager const& slhaManager )
   {
     currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
     squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
@@ -99,8 +98,6 @@ namespace VevaciousPlusPlus
     currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
     logarithmOfMaximumRenormalizationScale
     = log( currentMaximumRenormalizationScale );
-    runningParameters.UpdateRunningParameters(
-                                          currentMinimumRenormalizationScale );
     std::vector< double > fieldOrigin( numberOfFields,
                                        0.0 );
     for( unsigned int fieldIndex( 0 );
@@ -150,18 +147,6 @@ namespace VevaciousPlusPlus
                                                             logarithmOfScale ),
                                       (*whichMatrix)->MultiplicityFactor() ) );
     }
-  }
-
-  // This returns the tree-level potential energy density evaluated at the
-  // correct scale.
-  inline double RgeImprovedOneLoopPotential::QuickApproximation(
-                               std::vector< double > const& fieldConfiguration,
-                                                double const temperatureValue )
-  {
-    runningParameters.UpdateRunningParameters( sqrt(
-                               RenormalizationScaleSquared( fieldConfiguration,
-                                                        temperatureValue ) ) );
-    return treeLevelPotential( fieldConfiguration );
   }
 
   // This returns the square of the Euclidean distance between the two vacua.

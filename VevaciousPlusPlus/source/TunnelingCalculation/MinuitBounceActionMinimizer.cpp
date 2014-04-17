@@ -14,8 +14,7 @@ namespace VevaciousPlusPlus
                                           PotentialFunction& potentialFunction,
                                      TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold ) :
-    BounceWithSplines( potentialFunction,
-                       tunnelingStrategy,
+    BounceWithSplines( tunnelingStrategy,
                        survivalProbabilityThreshold )
   {
     // placeholder:

@@ -30,7 +30,7 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
-    PythonConvertiblePotential(),
+    IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( NAN ),
@@ -444,7 +444,7 @@ namespace VevaciousPlusPlus
   void PotentialFromPolynomialAndMasses::WriteAsPython(
                                        std::string const pythonFilename ) const
   {
-    std::ofstream pythonFile( pythonFilename );
+    std::ofstream pythonFile( pythonFilename.c_str() );
     pythonFile << std::setprecision( 12 );
     pythonFile.close();
   }
@@ -453,7 +453,7 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
-    PythonConvertiblePotential(),
+    IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( NAN ),
@@ -480,7 +480,7 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                          PotentialFromPolynomialAndMasses const& copySource ) :
     PotentialFunction( copySource ),
-    PythonConvertiblePotential(),
+    IWritesPythonPotential(),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
     currentMinimumRenormalizationScale(

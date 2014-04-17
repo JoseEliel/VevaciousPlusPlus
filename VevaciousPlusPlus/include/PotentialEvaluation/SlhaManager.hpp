@@ -8,8 +8,7 @@
 #ifndef SLHAMANAGER_HPP_
 #define SLHAMANAGER_HPP_
 
-#include "../StandardIncludes.hpp"
-#include "BOLlib/include/BasicObserved.hpp"
+#include "../CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -26,6 +25,14 @@ namespace VevaciousPlusPlus
 
     void UpdateSlhaData( std::string const& slhaFilename );
 
+    // This should return the lowest Q found among the SLHA blocks, returning
+    // 0.0 if no block had a scale greater than 0.0 GeV.
+    virtual double LowestBlockScale() const = 0;
+
+    // This should return the highest Q found among the SLHA blocks, returning
+    // 0.0 if no block had a scale greater than 0.0 GeV.
+    virtual double HighestBlockScale() const = 0;
+
 
   protected:
     virtual void ReadFile( std::string const& slhaFilename ) = 0;
@@ -39,5 +46,6 @@ namespace VevaciousPlusPlus
     ReadFile( slhaFilename );
     updateObservers();
   }
+
 } /* namespace VevaciousPlusPlus */
 #endif /* SLHAMANAGER_HPP_ */

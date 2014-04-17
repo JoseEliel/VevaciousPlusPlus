@@ -11,10 +11,13 @@ namespace VevaciousPlusPlus
 {
 
   FieldPolynomialsWithScale::FieldPolynomialsWithScale(
-                                          unsigned int const numberOfFields ) :
-    PolynomialGradientTargetSystem( numberOfFields + 1 ),
-    minimumScale( NAN ),
-    maximumScale( NAN )
+                                      PolynomialSum const& potentialPolynomial,
+                                             unsigned int const numberOfFields,
+                                   SlhaUpdatePropagator& previousPropagator ) :
+    PolynomialGradientTargetSystem( potentialPolynomial,
+                                    ( numberOfFields + 1 ),
+                                    previousPropagator ),
+    numberOfFields( numberOfFields )
   {
     // This constructor is just an initialization list.
   }
@@ -35,17 +38,12 @@ namespace VevaciousPlusPlus
   // for the field configuration f[]. The minimum renormalization scale should
   // be given by lowerEndOfStartValues, and upperEndOfStartValues should give
   // the maximum renormalization scale.
-  virtual void FieldPolynomialsWithScale::PrepareForHomotopyContinuation(
-                                      PolynomialSum const& potentialPolynomial,
-                                            double const lowerEndOfStartValues,
-                                           double const upperEndOfStartValues )
+  void FieldPolynomialsWithScale::UpdateSelfForNewSlha(
+                                               SlhaManager const& slhaManager )
   {
-    minimumScale = lowerEndOfStartValues;
-    maximumScale = upperEndOfStartValues;
-    PolynomialGradientTargetSystem::PrepareForHomotopyContinuation(
-                                                           potentialPolynomial,
-                                                         lowerEndOfStartValues,
-                                                       upperEndOfStartValues );
+    minimumScale = slhaManager.LowestBlockScale();
+    maximumScale = slhaManager.HighestBlockScale();
+    PolynomialGradientTargetSystem::UpdateSelfForNewSlha( slhaManager );
 
     // We approximate exp( 2 * l ) as
     // ( L - l )^(-1) * ( L + b * l + ( c / L ) * l^2 )

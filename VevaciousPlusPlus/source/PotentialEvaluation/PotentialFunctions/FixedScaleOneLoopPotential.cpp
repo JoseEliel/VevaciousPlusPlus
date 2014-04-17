@@ -16,7 +16,9 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialAndMasses( modelFilename,
                                       runningParameterManager ),
     inverseRenormalizationScaleSquared( NAN ),
-    homotopyContinuationTargetSystem( numberOfFields )
+    homotopyContinuationTargetSystem( treeLevelPotential,
+                                      numberOfFields,
+                                      *this )
   {
     // This constructor is just an initialization list.
   }
@@ -25,7 +27,9 @@ namespace VevaciousPlusPlus
          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
     inverseRenormalizationScaleSquared( NAN ),
-    homotopyContinuationTargetSystem( numberOfFields )
+    homotopyContinuationTargetSystem( treeLevelPotential,
+                                      numberOfFields,
+                                      *this )
   {
     // This constructor is just an initialization list.
   }

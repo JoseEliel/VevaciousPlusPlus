@@ -8,7 +8,7 @@
 #ifndef HOM4PS2RUNNER_HPP_
 #define HOM4PS2RUNNER_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "HomotopyContinuationSolver.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
 

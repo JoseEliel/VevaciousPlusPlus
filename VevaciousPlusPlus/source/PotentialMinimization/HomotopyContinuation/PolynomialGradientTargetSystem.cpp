@@ -11,11 +11,16 @@ namespace VevaciousPlusPlus
 {
 
   PolynomialGradientTargetSystem::PolynomialGradientTargetSystem(
-                                          unsigned int const numberOfFields ) :
-    HomotopyContinuationTargetSystem(),
+                                      PolynomialSum const& potentialPolynomial,
+                                             unsigned int const numberOfFields,
+                                   SlhaUpdatePropagator& previousPropagator ) :
+    HomotopyContinuationTargetSystem( previousPropagator ),
+    potentialPolynomial( potentialPolynomial ),
     numberOfVariables( numberOfFields ),
-    highestDegreeOfTargetSystem( 0 ),
     targetSystem(),
+    highestDegreeOfTargetSystem( 0 ),
+    minimumScale( NAN ),
+    maximumScale( NAN ),
     startSystem(),
     startValues(),
     validSolutions(),
@@ -144,6 +149,44 @@ namespace VevaciousPlusPlus
       }
     }
     SetStartHessian( variableIndex );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "startValues = {";
+    for( unsigned int outerIndex( 0 );
+         outerIndex < startValues.size();
+         ++outerIndex )
+    {
+      std::cout << std::endl << "{  ";
+      for( unsigned int innerIndex( 0 );
+           innerIndex < startValues[ outerIndex ].size();
+           ++innerIndex )
+      {
+        std::cout << "  " << startValues[ outerIndex ][ innerIndex ];
+      }
+      std::cout << "  }";
+    }
+    std::cout << std::endl << "}";
+    std::cout << std::endl << "startSystem = {";
+    std::vector< std::string > fieldNames;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfVariables;
+         ++fieldIndex )
+    {
+      std::stringstream stringBuilder;
+      stringBuilder << "fv[" << fieldIndex << "]";
+      fieldNames.push_back( stringBuilder.str() );
+    }
+    for( unsigned int valueIndex( 0 );
+         valueIndex < startSystem.size();
+         ++valueIndex )
+    {
+      std::cout
+      << std::endl << startSystem[ valueIndex ].AsString( fieldNames );
+    }
+    std::cout << std::endl << "}";
+    std::cout << std::endl;/**/
   }
 
   // This fills startHessian[ variableIndex ] from
@@ -151,13 +194,8 @@ namespace VevaciousPlusPlus
   void PolynomialGradientTargetSystem::SetStartHessian(
                                              unsigned int const variableIndex )
   {
-    for( unsigned int secondDerivativeIndex( 0 );
-         secondDerivativeIndex < numberOfVariables;
-         ++secondDerivativeIndex )
-    {
-      startHessian[ variableIndex ][ secondDerivativeIndex ]
-      = SumOfProductOfPolynomialSums();
-    }
+    startHessian[ variableIndex ]
+    = std::vector< SumOfProductOfPolynomialSums >( numberOfVariables );
     unsigned int const indexOfFirstNonZero( highestDegreeOfTargetSystem % 2 );
     unsigned int const
     numberOfNonZeroStartValues( startValues[ variableIndex ].size() );
@@ -215,12 +253,12 @@ namespace VevaciousPlusPlus
     << " ) set startHessian[ " << variableIndex << " ] to be ";
     std::cout << std::endl;
     std::vector< std::string > fieldNames;
-    for( unsigned int variableIndex( 0 );
-         variableIndex < numberOfVariables;
-         ++variableIndex )
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfVariables;
+         ++fieldIndex )
     {
       std::stringstream stringBuilder;
-      stringBuilder << "fv[" << variableIndex << "]";
+      stringBuilder << "fv[" << fieldIndex << "]";
       fieldNames.push_back( stringBuilder.str() );
     }
     for( unsigned int fieldIndex( 0 );

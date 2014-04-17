@@ -8,9 +8,8 @@
 #ifndef SLHAFUNCTIONOID_HPP_
 #define SLHAFUNCTIONOID_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "ParameterFunctionoid.hpp"
-#include "SLHA.hpp"
 #include "Eigen/Dense"
 
 

@@ -8,7 +8,7 @@
 #ifndef PARAMETERFUNCTIONOID_HPP_
 #define PARAMETERFUNCTIONOID_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {

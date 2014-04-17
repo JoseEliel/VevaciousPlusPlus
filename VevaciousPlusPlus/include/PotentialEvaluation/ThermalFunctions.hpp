@@ -8,6 +8,8 @@
 #ifndef THERMALFUNCTIONS_HPP_
 #define THERMALFUNCTIONS_HPP_
 
+#include "../CommonIncludes.hpp"
+
 namespace VevaciousPlusPlus
 {
 

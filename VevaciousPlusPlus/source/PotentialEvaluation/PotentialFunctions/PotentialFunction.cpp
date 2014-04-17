@@ -11,12 +11,21 @@ namespace VevaciousPlusPlus
 {
 
   PotentialFunction::PotentialFunction( SlhaManager& slhaManager ) :
-    BOL::BasicObserver(),
+    SlhaUpdatePropagator( slhaManager ),
     fieldNames(),
     numberOfFields( 0 ),
     dsbFieldValueInputs()
   {
-    slhaManager.registerObserver( this );
+    // This constructor is just an initialization list.
+  }
+
+  PotentialFunction::PotentialFunction( PotentialFunction const& copySource ) :
+    SlhaUpdatePropagator( copySource.slhaManager ),
+    fieldNames( copySource.fieldNames ),
+    numberOfFields( copySource.numberOfFields ),
+    dsbFieldValueInputs( copySource.dsbFieldValueInputs )
+  {
+    // This constructor is just an initialization list.
   }
 
   PotentialFunction::~PotentialFunction()

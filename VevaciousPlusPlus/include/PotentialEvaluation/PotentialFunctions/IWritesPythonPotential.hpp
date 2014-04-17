@@ -1,5 +1,5 @@
 /*
- * PythonConvertiblePotential.hpp
+ * IWritesPythonPotential.hpp
  *
  *  Created on: Apr 16, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
@@ -8,18 +8,18 @@
 #ifndef PYTHONCONVERTIBLEPOTENTIAL_HPP_
 #define PYTHONCONVERTIBLEPOTENTIAL_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   // This is just an abstract base class that is performing the role of an
   // interface.
-  class PythonConvertiblePotential
+  class IWritesPythonPotential
   {
   public:
-    PythonConvertiblePotential(){}
-    virtual ~PythonConvertiblePotential(){}
+    IWritesPythonPotential(){}
+    virtual ~IWritesPythonPotential(){}
 
 
     // This should write the potential as

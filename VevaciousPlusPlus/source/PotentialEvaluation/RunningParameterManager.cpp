@@ -22,7 +22,9 @@ namespace VevaciousPlusPlus
     slhaBlockMap(),
     slhaBlockFinder(),
     slhaAliasMap(),
-    slhaAliasFinder()
+    slhaAliasFinder(),
+    lowestBlockScale( NAN ),
+    highestBlockScale( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -456,6 +458,50 @@ namespace VevaciousPlusPlus
                                  parameterString );
     }
     return NULL;
+  }
+
+  // This updates all SlhaFunctionoids with data from a new SLHA file.
+  void RunningParameterManager::ReadFile( std::string const& slhaFilename )
+  {
+    slhaParser.readFile( slhaFilename );
+    lowestBlockScale = 0.0;
+    highestBlockScale = 0.0;
+    for( std::vector< RestrictedSlhaBlock* >::iterator
+         whichBlock( slhaBlockPointers.begin() );
+         whichBlock < slhaBlockPointers.end();
+         ++whichBlock )
+    {
+      if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
+      {
+        if( ( lowestBlockScale <= 0.0 )
+            ||
+            ( lowestBlockScale > (*(*whichBlock))[ 0 ].getScale() ) )
+        {
+          lowestBlockScale = (*(*whichBlock))[ 0 ].getScale();
+        }
+        if( ( highestBlockScale <= 0.0 )
+            ||
+            ( highestBlockScale < (*(*whichBlock))[ 0 ].getScale() ) )
+        {
+          highestBlockScale = (*(*whichBlock))[ 0 ].getScale();
+        }
+      }
+    }
+    for( std::vector< SlhaFunctionoid* >::iterator
+         whichParameter( slhaFunctionoidPointers.begin() );
+         whichParameter < slhaFunctionoidPointers.end();
+         ++whichParameter )
+    {
+      (*whichParameter)->UpdateForNewSlhaParameters();
+    }
+    double const logarithmOfScale( log( lowestBlockScale ) );
+    for( std::vector< ParameterFunctionoid* >::iterator
+         whichParameter( parameterFunctionoidPointers.begin() );
+         whichParameter < parameterFunctionoidPointers.end();
+         ++whichParameter )
+    {
+      (*whichParameter)->UpdateForNewLogarithmOfScale( logarithmOfScale );
+    }
   }
 
   // This returns a pointer to the ParameterFunctionoid for the block named

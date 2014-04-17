@@ -8,10 +8,9 @@
 #ifndef POTENTIALMINIMIZER_HPP_
 #define POTENTIALMINIMIZER_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "../PotentialEvaluation.hpp"
 #include "PotentialMinimum.hpp"
-#include "BOLlib/include/BasicObserver.hpp"
 
 namespace VevaciousPlusPlus
 {

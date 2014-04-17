@@ -8,7 +8,7 @@
 #ifndef HOMOTOPYCONTINUATIONANDGRADIENT_HPP_
 #define HOMOTOPYCONTINUATIONANDGRADIENT_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "PotentialMinimizer.hpp"
 #include "../PotentialEvaluation.hpp"
 

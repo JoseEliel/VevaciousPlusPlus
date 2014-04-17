@@ -11,12 +11,11 @@ namespace VevaciousPlusPlus
 {
 
   CosmoTransitionsRunner::CosmoTransitionsRunner(
-                                 PythonConvertiblePotential& potentialFunction,
+                                 IWritesPythonPotential& potentialFunction,
                                      TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
                                   std::string const& pathToCosmotransitions ) :
-    BounceWithSplines( potentialFunction,
-                       tunnelingStrategy,
+    BounceWithSplines( tunnelingStrategy,
                        survivalProbabilityThreshold ),
     pathToCosmotransitions( pathToCosmotransitions )
   {

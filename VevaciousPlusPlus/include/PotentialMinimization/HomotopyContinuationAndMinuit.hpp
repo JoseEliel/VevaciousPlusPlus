@@ -8,10 +8,9 @@
 #ifndef HOMOTOPYCONTINUATIONANDMINUIT_HPP_
 #define HOMOTOPYCONTINUATIONANDMINUIT_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
 #include "../PotentialEvaluation.hpp"
-#include "BOLlib/include/BOLlib.hpp"
 #include "MinuitMinimization.hpp"
 
 namespace VevaciousPlusPlus

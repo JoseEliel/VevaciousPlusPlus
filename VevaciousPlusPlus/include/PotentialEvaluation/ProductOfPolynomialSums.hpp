@@ -8,7 +8,7 @@
 #ifndef PRODUCTOFPOLYNOMIALSUMS_HPP_
 #define PRODUCTOFPOLYNOMIALSUMS_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "PolynomialSum.hpp"
 
 namespace VevaciousPlusPlus
@@ -98,7 +98,7 @@ namespace VevaciousPlusPlus
     {
       if( whichProduct != productVector.begin() )
       {
-        stringBuilder << "*";
+        stringBuilder << " *";
       }
       stringBuilder << " ("
       << whichProduct->AsStringAtCurrentScale( fieldNames ) << ")";

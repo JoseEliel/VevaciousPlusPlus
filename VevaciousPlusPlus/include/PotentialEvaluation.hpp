@@ -16,6 +16,7 @@
 #include "PotentialEvaluation/ProductOfPolynomialSums.hpp"
 #include "PotentialEvaluation/RunningParameterManager.hpp"
 #include "PotentialEvaluation/SlhaManager.hpp"
+#include "PotentialEvaluation/SlhaUpdatePropagator.hpp"
 #include "PotentialEvaluation/SumOfProductOfPolynomialSums.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
 

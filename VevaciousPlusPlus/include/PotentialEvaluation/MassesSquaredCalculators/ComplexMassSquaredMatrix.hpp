@@ -8,7 +8,7 @@
 #ifndef COMPLEXMASSSQUAREDMATRIX_HPP_
 #define COMPLEXMASSSQUAREDMATRIX_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "MassesSquaredFromMatrix.hpp"
 #include "../PolynomialSum.hpp"
 #include "Eigen/Dense"

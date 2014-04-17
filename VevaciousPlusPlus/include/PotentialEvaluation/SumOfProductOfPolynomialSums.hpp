@@ -8,7 +8,7 @@
 #ifndef SUMOFPRODUCTOFPOLYNOMIALSUMS_HPP_
 #define SUMOFPRODUCTOFPOLYNOMIALSUMS_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "ProductOfPolynomialSums.hpp"
 
 namespace VevaciousPlusPlus

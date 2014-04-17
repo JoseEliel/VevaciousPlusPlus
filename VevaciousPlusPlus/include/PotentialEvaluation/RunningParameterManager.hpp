@@ -8,9 +8,8 @@
 #ifndef RUNNINGPARAMETERMANAGER_HPP_
 #define RUNNINGPARAMETERMANAGER_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "ParameterFunctionoids.hpp"
-#include "SLHA.hpp"
 #include "SlhaManager.hpp"
 
 namespace VevaciousPlusPlus
@@ -43,20 +42,18 @@ namespace VevaciousPlusPlus
     // parameterString, returning NULL if there is none.
     ParameterFunctionoid* GetFunctionoid( std::string const& parameterString );
 
-    // This updates all SlhaFunctionoids with data from a new SLHA file.
+    // This updates all SlhaFunctionoids with data from a new SLHA file, sets
+    // lowestBlockScale and highestBlockScale, then updates the functionoids in
+    // parameterFunctionoidPointers to take their values at lowestBlockScale.
     virtual void ReadFile( std::string const& slhaFilename );
-
-    // This updates all functionoids in order based on the new renormalization
-    // scale.
-    void UpdateRunningParameters( double const renormalizationScale );
 
     // This returns the lowest Q found among the SLHA blocks. It returns 0.0
     // if no block had a scale greater than 0.0 GeV.
-    double LowestBlockScale();
+    double LowestBlockScale() const{ return lowestBlockScale; }
 
     // This returns the highest Q found among the SLHA blocks. It returns 0.0
     // if no block had a scale greater than 0.0 GeV.
-    double HighestBlockScale();
+    double HighestBlockScale() const{ return highestBlockScale; }
 
 
   protected:
@@ -76,6 +73,8 @@ namespace VevaciousPlusPlus
     std::map< std::string, RestrictedSlhaBlock* >::iterator slhaBlockFinder;
     std::map< std::string, std::string > slhaAliasMap;
     std::map< std::string, std::string >::iterator slhaAliasFinder;
+    double lowestBlockScale;
+    double highestBlockScale;
 
     // This returns a pointer to the ParameterFunctionoid for the block named
     // blockName with indices given by indexString, making a new one if there
@@ -119,139 +118,6 @@ namespace VevaciousPlusPlus
                                                            ( openBracket + 1 ),
                    ( unformattedVariable.size() - openBracket - 2 ) ) ) << ']';
     return formattedStream.str();
-  }
-
-  // This updates all SlhaFunctionoids with data from a new SLHA file.
-  inline void RunningParameterManager::ReadFile(
-                                              std::string const& slhaFilename )
-  {
-    slhaParser.readFile( slhaFilename );
-
-    for( std::vector< SlhaFunctionoid* >::iterator
-         whichParameter( slhaFunctionoidPointers.begin() );
-         whichParameter < slhaFunctionoidPointers.end();
-         ++whichParameter )
-    {
-      (*whichParameter)->UpdateForNewSlhaParameters();
-    }
-  }
-
-  // This updates all functionoids in order based on the new renormalization
-  // scale.
-  inline void RunningParameterManager::UpdateRunningParameters(
-                                            double const renormalizationScale )
-  {
-    double const logarithmOfScale( log( renormalizationScale ) );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "RunningParameterManager::UpdateRunningParameters( "
-    << renormalizationScale << " ) called. logarithmOfScale = "
-    << logarithmOfScale;
-    std::cout << std::endl;*/
-
-
-    for( std::vector< ParameterFunctionoid* >::iterator
-         whichParameter( parameterFunctionoidPointers.begin() );
-         whichParameter < parameterFunctionoidPointers.end();
-         ++whichParameter )
-    {
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "calling [" << (*whichParameter)->AsString() << " from \""
-      << (*whichParameter)->CreationString() << "\"]"
-      << "->UpdateForNewLogarithmOfScale( " << logarithmOfScale
-      << " ). before, (*(*whichParameter))() = " << (*(*whichParameter))();
-      std::cout << std::endl;*/
-
-      (*whichParameter)->UpdateForNewLogarithmOfScale( logarithmOfScale );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "after, (*(*whichParameter))() = " << (*(*whichParameter))();
-      std::cout
-      << std::endl << "PythonParameterName() = \""
-      <<  (*whichParameter)->PythonParameterName() << "\""
-      << std::endl << "PythonParameterEvaluation() = \""
-      <<  (*whichParameter)->PythonParameterEvaluation() << "\"";
-      std::cout << std::endl;
-      std::cout << std::endl;*/
-    }
-  }
-
-  // This returns the lowest Q found among the SLHA blocks. It returns 0.0 if
-  // no block had a scale greater than 0.0 GeV.
-  inline double RunningParameterManager::LowestBlockScale()
-  {
-    double returnValue( 0.0 );
-    for( std::vector< RestrictedSlhaBlock* >::iterator
-         whichBlock( slhaBlockPointers.begin() );
-         whichBlock < slhaBlockPointers.end();
-         ++whichBlock )
-    {
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << (*(*whichBlock)).getName() << " lowest scale is "
-      << (*(*whichBlock))[ 0 ].getScale();
-      std::cout << std::endl;*/
-
-      if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
-      {
-        if( ( returnValue <= 0.0 )
-            ||
-            ( returnValue > (*(*whichBlock))[ 0 ].getScale() ) )
-        {
-          returnValue = (*(*whichBlock))[ 0 ].getScale();
-        }
-      }
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "returnValue = " << returnValue;
-      std::cout << std::endl;*/
-    }
-    return returnValue;
-  }
-
-  // This returns the highest Q found among the SLHA blocks. It returns 0.0 if
-  // no block had a scale greater than 0.0 GeV.
-  inline double RunningParameterManager::HighestBlockScale()
-  {
-    double returnValue( 0.0 );
-    for( std::vector< RestrictedSlhaBlock* >::iterator
-         whichBlock( slhaBlockPointers.begin() );
-         whichBlock < slhaBlockPointers.end();
-         ++whichBlock )
-    {
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << (*(*whichBlock)).getName() << " highest scale is "
-      << (*(*whichBlock))[ 0 ].getScale();
-      std::cout << std::endl;*/
-
-      if( (*(*whichBlock))[ 0 ].getScale() > 0.0 )
-      {
-        if( ( returnValue <= 0.0 )
-            ||
-            ( returnValue < (*(*whichBlock))[ 0 ].getScale() ) )
-        {
-          returnValue = (*(*whichBlock))[ 0 ].getScale();
-        }
-      }
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "returnValue = " << returnValue;
-      std::cout << std::endl;*/
-    }
-    return returnValue;
   }
 
   // This puts all index brackets into a consistent form.

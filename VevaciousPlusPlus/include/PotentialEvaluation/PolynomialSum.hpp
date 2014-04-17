@@ -8,7 +8,7 @@
 #ifndef POLYNOMIALSUM_HPP_
 #define POLYNOMIALSUM_HPP_
 
-#include  "../StandardIncludes.hpp"
+#include  "../CommonIncludes.hpp"
 #include "PolynomialTerm.hpp"
 
 namespace VevaciousPlusPlus

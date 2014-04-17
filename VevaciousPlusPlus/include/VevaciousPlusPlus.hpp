@@ -8,7 +8,7 @@
 #ifndef VEVACIOUSPLUSPLUS_HPP_
 #define VEVACIOUSPLUSPLUS_HPP_
 
-#include "StandardIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "PotentialEvaluation.hpp"
 #include "PotentialMinimization.hpp"
 #include "TunnelingCalculation.hpp"

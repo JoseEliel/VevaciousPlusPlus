@@ -8,17 +8,17 @@
 #ifndef POTENTIALFUNCTION_HPP_
 #define POTENTIALFUNCTION_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "../../PotentialMinimization/PotentialMinimum.hpp"
-#include "../SlhaManager.hpp"
-#include "BOLlib/include/BasicObserver.hpp"
+#include "../SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class PotentialFunction : public BOL::BasicObserver
+  class PotentialFunction : public SlhaUpdatePropagator
   {
   public:
     PotentialFunction( SlhaManager& slhaManager );
+    PotentialFunction( PotentialFunction const& copySource );
     virtual
     ~PotentialFunction();
 
@@ -38,14 +38,6 @@ namespace VevaciousPlusPlus
     virtual double
     operator()( std::vector< double > const& fieldConfiguration,
                 double const temperatureValue = 0.0 ) const = 0;
-
-    // This should update all the parameters of the potential that are not
-    // field values based on the values that appear in blocks in the SLHA
-    // format in the file managed by slhaManager.
-    virtual void UpdateParameters() = 0;
-
-    // This gets called by slhaManager.
-    virtual void respondToObservedSignal(){ UpdateParameters(); }
 
     // This returns operator(), but could be over-ridden so that a partial
     // result from a derived class could be returned, such as say the

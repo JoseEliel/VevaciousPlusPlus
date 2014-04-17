@@ -8,7 +8,7 @@
 #ifndef BOUNCEWITHSPLINES_HPP_
 #define BOUNCEWITHSPLINES_HPP_
 
-#include "../StandardIncludes.hpp"
+#include "../CommonIncludes.hpp"
 #include "../PotentialEvaluation.hpp"
 #include "../PotentialMinimization.hpp"
 #include "TunnelingCalculator.hpp"

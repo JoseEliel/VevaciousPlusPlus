@@ -8,7 +8,7 @@
 #ifndef HOMOTOPYCONTINUATIONSOLVER_HPP_
 #define HOMOTOPYCONTINUATIONSOLVER_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
 
 

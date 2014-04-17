@@ -56,8 +56,10 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
  source/PotentialEvaluation/SumOfProductOfPolynomialSums.cpp \
  source/PotentialEvaluation/SlhaManager.cpp \
+ source/PotentialEvaluation/SlhaUpdatePropagator.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
+ $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \

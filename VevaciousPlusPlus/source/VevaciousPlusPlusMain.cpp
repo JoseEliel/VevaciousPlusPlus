@@ -6,7 +6,7 @@
  */
 
 
-#include "../include/StandardIncludes.hpp"
+#include "../include/CommonIncludes.hpp"
 #include "../include/VevaciousPlusPlus.hpp"
 
 int main( int argumentCount,
@@ -148,7 +148,7 @@ int main( int argumentCount,
   {
     homotopyContinuationSolver
     = new VevaciousPlusPlus::BasicPolynomialHomotopyContinuation(
-                                                          *potentialFunction );
+                       potentialFunction->HomotopyContinuationTargetSystem() );
 
     std::cout
     << std::endl
@@ -161,8 +161,11 @@ int main( int argumentCount,
     std::string pathToHom4ps2( argumentParser.fromTag( "PathToHom4ps2",
                                                               "./HOM4PS2/" ) );
     homotopyContinuationSolver
-    = new VevaciousPlusPlus::Hom4ps2Runner( *potentialFunction,
-                                            pathToHom4ps2 );
+    = new VevaciousPlusPlus::Hom4ps2Runner(
+                         potentialFunction->HomotopyContinuationTargetSystem(),
+                                            pathToHom4ps2,
+                                     argumentParser.fromTag( "Hom4ps2Argument",
+                                                               "1" ) );
 
     std::cout
     << std::endl
@@ -346,8 +349,6 @@ int main( int argumentCount,
   /**/std::cout << std::endl << "debugging:"
   << std::endl;
   runningParameterManager.UpdateSlhaData( slhaFile );
-  rgeImprovedPotential.UpdateParameters();
-  fixedScalePotential.UpdateParameters();
 
   std::cout
   << "Fixed-scale at origin = "

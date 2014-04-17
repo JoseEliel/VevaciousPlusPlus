@@ -8,11 +8,8 @@
 #ifndef POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 #define POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
-#include "../../PotentialEvaluation/PolynomialTerm.hpp"
-#include "../../PotentialEvaluation/PolynomialSum.hpp"
-#include "../../PotentialEvaluation/ProductOfPolynomialSums.hpp"
 #include "../../PotentialEvaluation/SumOfProductOfPolynomialSums.hpp"
 
 namespace VevaciousPlusPlus
@@ -22,7 +19,9 @@ namespace VevaciousPlusPlus
                                         public HomotopyContinuationTargetSystem
   {
   public:
-    PolynomialGradientTargetSystem( unsigned int const numberOfVariables );
+    PolynomialGradientTargetSystem( PolynomialSum const& potentialPolynomial,
+                                    unsigned int const numberOfVariables,
+                                    SlhaUpdatePropagator& previousPropagator );
     virtual
     ~PolynomialGradientTargetSystem();
 
@@ -30,15 +29,13 @@ namespace VevaciousPlusPlus
     // This fills targetSystem, startSystem, targetHessian, and startHessian
     // appropriately. The starting system is set with
     // SetStartSystem( variableIndex,
-    //                      lowerEndOfStartValues,
-    //                      upperEndOfStartValues )
+    //                 slhaManager.LowestBlockScale(),
+    //                 slhaManager.HighestBlockScale() )
     // for variableIndex from 0 to ( numberOfVariables - 1 ). SetStartSystem
     // is public, so special ranges for particular variables can be given to
     // over-write the values given by this function.
     virtual void
-    PrepareForHomotopyContinuation( PolynomialSum const& potentialPolynomial,
-                                    double const lowerEndOfStartValues,
-                                    double const upperEndOfStartValues );
+    UpdateSelfForNewSlha( SlhaManager const& slhaManager );
 
     std::vector< PolynomialSum > const& TargetSystem() const
     { return targetSystem; }
@@ -54,7 +51,7 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< std::complex< double > > > const&
     StartValues() const{ return startValues; }
 
-    std::vector< std::vector< ProductOfPolynomialSums > > const&
+    std::vector< std::vector< SumOfProductOfPolynomialSums > > const&
     StartHessian() const{ return startHessian; }
 
     // This evaluates the target system and places the values in
@@ -109,9 +106,12 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    PolynomialSum const& potentialPolynomial;
     unsigned int const numberOfVariables;
     std::vector< PolynomialSum > targetSystem;
     unsigned int highestDegreeOfTargetSystem;
+    double minimumScale;
+    double maximumScale;
     std::vector< ProductOfPolynomialSums > startSystem;
     std::vector< std::vector< std::complex< double > > > startValues;
     std::vector< std::vector< std::complex< double > > > validSolutions;
@@ -136,13 +136,11 @@ namespace VevaciousPlusPlus
   // This fills targetSystem, startSystem, targetHessian, and startHessian
   // appropriately. The starting system is set with
   // SetStartSystem( variableIndex,
-  //                 lowerEndOfStartValues,
-  //                 upperEndOfStartValues )
+  //                 slhaManager.LowestBlockScale(),
+  //                 slhaManager.HighestBlockScale() )
   // for variableIndex from 0 to ( numberOfVariables - 1 ).
-  inline void PolynomialGradientTargetSystem::PrepareForHomotopyContinuation(
-                                      PolynomialSum const& potentialPolynomial,
-                                            double const lowerEndOfStartValues,
-                                          double const upperEndOfStartValues )
+  inline void PolynomialGradientTargetSystem::UpdateSelfForNewSlha(
+                                               SlhaManager const& slhaManager )
   {
     highestDegreeOfTargetSystem
     = ( potentialPolynomial.HighestFieldPower() - 1 );
@@ -150,13 +148,16 @@ namespace VevaciousPlusPlus
     PreparePolynomialHessian();
     startSystem.resize( numberOfVariables );
     startValues.resize( numberOfVariables );
+    startHessian.resize( numberOfVariables );
+    minimumScale = slhaManager.LowestBlockScale();
+    maximumScale = slhaManager.HighestBlockScale();
     for( unsigned int whichIndex( 0 );
          whichIndex < numberOfVariables;
          ++whichIndex )
     {
       SetStartSystem( whichIndex,
-                      lowerEndOfStartValues,
-                      upperEndOfStartValues );
+                      minimumScale,
+                      minimumScale );
     }
   }
 
@@ -230,7 +231,7 @@ namespace VevaciousPlusPlus
                                      PolynomialSum const& potentialPolynomial )
   {
     targetSystem.assign( numberOfVariables,
-                                     PolynomialSum() );
+                         PolynomialSum() );
     std::vector< PolynomialTerm > const& polynomialForGradient(
                                        potentialPolynomial.PolynomialTerms() );
 

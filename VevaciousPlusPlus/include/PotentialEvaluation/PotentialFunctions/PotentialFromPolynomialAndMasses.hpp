@@ -8,19 +8,19 @@
 #ifndef POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
-#include "../../StandardIncludes.hpp"
+#include "../../CommonIncludes.hpp"
+#include "PotentialFunction.hpp"
 #include "../RunningParameterManager.hpp"
-#include "../PolynomialTerm.hpp"
 #include "../PolynomialSum.hpp"
 #include "../MassesSquaredCalculators.hpp"
 #include "../ThermalFunctions.hpp"
 #include "../../PotentialMinimization/HomotopyContinuation.hpp"
-#include "PythonConvertiblePotential.hpp"
+#include "IWritesPythonPotential.hpp"
 
 namespace VevaciousPlusPlus
 {
   class PotentialFromPolynomialAndMasses : public PotentialFunction,
-                                           public PythonConvertiblePotential
+                                           public IWritesPythonPotential
   {
   public:
     PotentialFromPolynomialAndMasses( std::string const& modelFilename,
@@ -28,11 +28,6 @@ namespace VevaciousPlusPlus
     virtual
     ~PotentialFromPolynomialAndMasses();
 
-
-    // This updates all the parameters of the potential that are not field
-    // values based on the values that appear in blocks in the SLHA format in
-    // the file managed by runningParameters.
-    virtual void UpdateParameters();
 
     // This writes the potential as
     // def PotentialFunction( fv ): return ...
@@ -43,7 +38,7 @@ namespace VevaciousPlusPlus
 
     // This gives out a PolynomialGradientTargetSystem reference while setting
     // needToUpdateHomotopyContinuation to true.
-    PolynomialGradientTargetSystem const& HomotopyContinuationTargetSystem();
+    PolynomialGradientTargetSystem& HomotopyContinuationTargetSystem();
 
 
   protected:
@@ -80,10 +75,6 @@ namespace VevaciousPlusPlus
     // This is just for derived classes.
     PotentialFromPolynomialAndMasses(
                           PotentialFromPolynomialAndMasses const& copySource );
-
-
-    // This should set dsbFieldValueInputs based on the SLHA file just read in.
-    virtual void EvaluateDsbInputAndSetScale() = 0;
 
     // This evaluates the one-loop potential with thermal corrections assuming
     // that the scale has been set correctly.
@@ -151,38 +142,21 @@ namespace VevaciousPlusPlus
 
     // This should give out a PolynomialGradientTargetSystem reference
     // appropriate to this potential.
-    virtual PolynomialGradientTargetSystem const&
+    virtual PolynomialGradientTargetSystem&
     GetHomotopyContinuationTargetSystem() = 0;
-
-    // This should update the PolynomialGradientTargetSystem that is given out
-    // by GetHomotopyContinuationTargetSystem.
-    virtual void UpdateHomotopyContinuation() = 0;
   };
 
 
 
 
-  // This updates all the parameters of the potential that are not field
-  // values based on the values that appear in blocks in the SLHA format in
-  // the file managed by runningParameters.
-  inline void PotentialFromPolynomialAndMasses::UpdateParameters()
-  {
-    EvaluateDsbInputAndSetScale();
-    if( needToUpdateHomotopyContinuation )
-    {
-      UpdateHomotopyContinuation();
-    }
-  }
-
   // This gives out a PolynomialGradientTargetSystem reference while setting
   // needToUpdateHomotopyContinuation to true.
-  PolynomialGradientTargetSystem const&
+  inline PolynomialGradientTargetSystem&
   PotentialFromPolynomialAndMasses::HomotopyContinuationTargetSystem()
   {
     needToUpdateHomotopyContinuation = true;
     return GetHomotopyContinuationTargetSystem();
   }
-
 
   // This puts all index brackets into a consistent form.
   inline std::string PotentialFromPolynomialAndMasses::FormatVariable(
