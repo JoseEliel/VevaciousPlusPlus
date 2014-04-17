@@ -446,6 +446,44 @@ namespace VevaciousPlusPlus
   {
     std::ofstream pythonFile( pythonFilename.c_str() );
     pythonFile << std::setprecision( 12 );
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "need to write thermal functions in .py";
+    std::cout << std::endl;/**/
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "need to write running parameters in .py";
+    std::cout << std::endl;/**/
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "need to write mass correction function in .py";
+    std::cout << std::endl;/**/
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "need to write tree-level and loop polynomials in .py";
+    std::cout << std::endl;/**/
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "need to write mass-squared arrays of arrays: scalarSquareMasses,"
+    << " fermionSquareMasses, vectorSquareMasses, in .py";
+    std::cout << std::endl;/**/
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "need to write CT functions in .py";
+    std::cout << std::endl;/**/
+
     pythonFile.close();
   }
 

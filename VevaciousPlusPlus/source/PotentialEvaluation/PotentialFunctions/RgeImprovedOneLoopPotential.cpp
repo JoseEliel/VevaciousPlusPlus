@@ -40,11 +40,7 @@ namespace VevaciousPlusPlus
 
   RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()";
-    std::cout << std::endl;/**/
+    // This does nothing.
   }
 
 

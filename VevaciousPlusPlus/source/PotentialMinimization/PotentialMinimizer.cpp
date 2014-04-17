@@ -18,12 +18,7 @@ namespace VevaciousPlusPlus
     panicVacua(),
     panicVacuum()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "PotentialMinimizer::PotentialMinimizer()";
-    std::cout << std::endl;/**/
-
+    // This constructor is just an initialization list.
   }
 
   PotentialMinimizer::~PotentialMinimizer()

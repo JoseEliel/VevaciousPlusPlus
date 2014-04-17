@@ -17,6 +17,7 @@ namespace VevaciousPlusPlus
                                   std::string const& pathToCosmotransitions ) :
     BounceWithSplines( tunnelingStrategy,
                        survivalProbabilityThreshold ),
+    potentialFunction( potentialFunction ),
     pathToCosmotransitions( pathToCosmotransitions )
   {
     // placeholder:
@@ -60,7 +61,8 @@ namespace VevaciousPlusPlus
     }
 
     // If we should tunnel, we should write the potential in Python:
-
+    std::string pythonPotentialFile( "VevaciousPotential.py" );
+    potentialFunction.WriteAsPython( pythonPotentialFile );
 
 
     // if quantum:

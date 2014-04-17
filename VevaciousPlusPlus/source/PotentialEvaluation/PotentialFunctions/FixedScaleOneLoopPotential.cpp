@@ -36,11 +36,7 @@ namespace VevaciousPlusPlus
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()";
-    std::cout << std::endl;/**/
+    // This does nothing.
   }
 
 

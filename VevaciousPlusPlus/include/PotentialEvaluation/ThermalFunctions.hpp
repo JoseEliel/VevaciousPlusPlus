@@ -19,6 +19,7 @@ namespace VevaciousPlusPlus
     static double BosonicJ( double const squareRatio );
     static double FermionicJ( double const squareRatio );
 
+    static std::string JFunctionsAsPython();
 
   private:
     // LOTS OF DANGER HERE! Unfortunately we cannot rely on the user having a

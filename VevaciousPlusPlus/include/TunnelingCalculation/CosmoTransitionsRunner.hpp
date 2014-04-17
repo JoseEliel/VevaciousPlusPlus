@@ -35,6 +35,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    IWritesPythonPotential& potentialFunction;
     std::string const pathToCosmotransitions;
   };
 

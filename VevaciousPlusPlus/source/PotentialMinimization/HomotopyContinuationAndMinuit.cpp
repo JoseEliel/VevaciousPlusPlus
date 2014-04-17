@@ -59,14 +59,6 @@ namespace VevaciousPlusPlus
       << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
       std::cout << std::endl;
 
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "found [" << foundMinimum.AsDebuggingString() << "]"
-      << std::endl;
-      std::cout << std::endl;/**/
-
       if( ( ( foundMinimum.FunctionValue() + foundMinimum.FunctionError() )
             < dsbVacuum.FunctionValue() )
           &&
@@ -98,16 +90,24 @@ namespace VevaciousPlusPlus
     std::cout
     << std::endl
     << "DSB vacuum = "
-    << dsbVacuum.AsMathematica( potentialFunction.FieldNames() )
-    << std::endl
-    << "Panic vacuum = "
-    << panicVacuum.AsMathematica( potentialFunction.FieldNames() );
+    << dsbVacuum.AsMathematica( potentialFunction.FieldNames() ) << std::endl;
+    if( panicVacua.empty() )
+    {
+      std::cout
+      << "DSB vacuum is stable as far as the model file allows." << std::endl;
+    }
+    else
+    {
+      std::cout << "Panic vacuum = "
+      << panicVacuum.AsMathematica( potentialFunction.FieldNames() )
+      << std::endl;
+    }
     std::cout << std::endl;
     std::cout << std::endl;
 
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "dsbVacuum = " << dsbVacuum.AsDebuggingString()
     << std::endl
@@ -122,6 +122,6 @@ namespace VevaciousPlusPlus
       << panicVacua[ panicIndex ].AsDebuggingString();
     }
     std::cout << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 } /* namespace VevaciousPlusPlus */

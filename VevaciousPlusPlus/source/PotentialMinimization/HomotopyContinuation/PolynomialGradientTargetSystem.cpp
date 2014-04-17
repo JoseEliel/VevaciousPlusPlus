@@ -151,7 +151,7 @@ namespace VevaciousPlusPlus
     SetStartHessian( variableIndex );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "startValues = {";
     for( unsigned int outerIndex( 0 );
@@ -186,7 +186,7 @@ namespace VevaciousPlusPlus
       << std::endl << startSystem[ valueIndex ].AsString( fieldNames );
     }
     std::cout << std::endl << "}";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   // This fills startHessian[ variableIndex ] from
@@ -230,7 +230,7 @@ namespace VevaciousPlusPlus
     {
       ProductOfPolynomialSums constructedProductOfSums;
       constructedProductOfSums.MultiplyBy( zeroConstantQuadratic );
-      for( unsigned int valueIndex( 0 );
+      for( unsigned int valueIndex( indexOfFirstNonZero );
            valueIndex < numberOfNonZeroStartValues;
            ++valueIndex )
       {
@@ -247,7 +247,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PolynomialGradientTargetSystem::SetStartHessian( " << variableIndex
     << " ) set startHessian[ " << variableIndex << " ] to be ";
@@ -268,7 +268,7 @@ namespace VevaciousPlusPlus
       std::cout
       << startHessian[ variableIndex ][ fieldIndex ].AsString( fieldNames )
       << std::endl;
-    }/**/
+    }*/
   }
 
 } /* namespace VevaciousPlusPlus */

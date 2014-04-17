@@ -9,6 +9,156 @@
 
 namespace VevaciousPlusPlus
 {
+  std::string ThermalFunctions::JFunctionsAsPython()
+  {
+    // There are many terrible uses of numbers that are meant to be the sizes
+    // of the arrays, all because we cannot be sure of C++11 compliant
+    // compilers, so we cannot use nice static vector< double > const objects.
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "bosonMinusOneToMinusTwelve = [ " << bosonMinusOneToMinusTwelve[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 111;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << bosonMinusOneToMinusTwelve[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "bosonZeroToMinusOne = [ " << bosonZeroToMinusOne[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 101;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << bosonZeroToMinusOne[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "bosonZeroToPlusOne = [ " << bosonZeroToPlusOne[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 101;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << bosonZeroToPlusOne[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "bosonPlusOneToPlusOneHundred = [ "
+    << bosonPlusOneToPlusOneHundred[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 100;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << bosonPlusOneToPlusOneHundred[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "fermionMinusOneToMinusTwelve = [ "
+    << fermionMinusOneToMinusTwelve[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 111;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << fermionMinusOneToMinusTwelve[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "fermionZeroToMinusOne = [ " << fermionZeroToMinusOne[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 101;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << fermionZeroToMinusOne[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "fermionZeroToPlusOne = [ " << fermionZeroToPlusOne[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 101;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << fermionZeroToPlusOne[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "fermionPlusOneToPlusOneHundred = [ "
+    << fermionPlusOneToPlusOneHundred[ 0 ];
+    for( unsigned int arrayIndex( 1 );
+         arrayIndex < 100;
+         ++arrayIndex )
+    {
+      stringBuilder
+      << ", \n" << fermionPlusOneToPlusOneHundred[ arrayIndex ];
+    }
+    stringBuilder << " ]\n"
+    << "# In these functions, r is the ratio of m^2/T^2.\n"
+    "def BosonMinusOneToMinusTwelve( r ):\n"
+    "    s = ( -10.0 * ( r + 1.0 ) )\n"
+    "    n = int(s)\n"
+    "    return ( bosonMinusOneToMinusTwelve[ n ]\n"
+    "             + ( 0.1 * ( s - float( n ) )\n"
+    "                     * ( bosonMinusOneToMinusTwelve[ n + 1 ]\n"
+    "                         - bosonMinusOneToMinusTwelve[ n ] ) ) )\n"
+    "def BosonZeroToMinusOne( r ):\n"
+    "    s = ( -100.0 * r )\n"
+    "    n = int(s)\n"
+    "    return ( bosonZeroToMinusOne[ n ]\n"
+    "             + ( 0.01 * ( s - float( n ) )\n"
+    "                      * ( bosonZeroToMinusOne[ n + 1 ]\n"
+    "                          - bosonZeroToMinusOne[ n ] ) ) )\n"
+    "def BosonZeroToPlusOne( r ):\n"
+    "    s = ( 100.0 * r )\n"
+    "    n = int(s)\n"
+    "    return ( bosonZeroToPlusOne[ n ]\n"
+    "             + ( 0.01 * ( s - float( n ) )\n"
+    "                      * ( bosonZeroToPlusOne[ n + 1 ]\n"
+    "                          - bosonZeroToPlusOne[ n ] ) ) )\n"
+    "def BosonPlusOneToPlusOneHundred( r ):\n"
+    "    s = ( r - 1.0 )\n"
+    "    n = int(s)\n"
+    "    return ( bosonPlusOneToPlusOneHundred[ n ]\n"
+    "             + ( ( s - float( n ) )\n"
+    "                 * ( bosonPlusOneToPlusOneHundred[ n + 1 ]\n"
+    "                     - bosonPlusOneToPlusOneHundred[ n ] ) ) )\n"
+    "def FermionMinusOneToMinusTwelve( r ):\n"
+    "    s = ( -10.0 * ( r + 1.0 ) )\n"
+    "    n = int(s)\n"
+    "    return ( fermionMinusOneToMinusTwelve[ n ]\n"
+    "             + ( 0.1 * ( s - float( n ) )\n"
+    "                     * ( fermionMinusOneToMinusTwelve[ n + 1 ]\n"
+    "                         - fermionMinusOneToMinusTwelve[ n ] ) ) )\n"
+    "def FermionZeroToMinusOne( r ):\n"
+    "    s = ( -100.0 * r )\n"
+    "    n = int(s)\n"
+    "    return ( fermionZeroToMinusOne[ n ]\n"
+    "             + ( 0.01 * ( s - float( n ) )\n"
+    "                      * ( fermionZeroToMinusOne[ n + 1 ]\n"
+    "                          - fermionZeroToMinusOne[ n ] ) ) )\n"
+    "def FermionZeroToPlusOne( r ):\n"
+    "    s = ( 100.0 * r )\n"
+    "    n = int(s)\n"
+    "    return ( fermionZeroToPlusOne[ n ]\n"
+    "             + ( 0.01 * ( s - float( n ) )\n"
+    "                      * ( fermionZeroToPlusOne[ n + 1 ]\n"
+    "                          - fermionZeroToPlusOne[ n ] ) ) )\n"
+    "def FermionPlusOneToPlusOneHundred( r ):\n"
+    "    s = ( r - 1.0 )\n"
+    "    n = int(s)\n"
+    "    return ( fermionPlusOneToPlusOneHundred[ n ]\n"
+    "             + ( ( s - float( n ) )\n"
+    "                 * ( fermionPlusOneToPlusOneHundred[ n + 1 ]\n"
+    "                     - fermionPlusOneToPlusOneHundred[ n ] ) ) )\n"
+    "# End of thermal functions.\n\n\n";
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "NOT FINISHED THERMAL PYTHON!";
+    std::cout << std::endl;/**/
+
+    return stringBuilder.str();
+  }
+
   double const ThermalFunctions::bosonMinusOneToMinusTwelve[ 111 ]
   = {-2.81842, -2.86878, -2.91708, -2.96442, -3.00669, -3.04769,
      -3.08684, -3.12507, -3.15996, -3.19119, -3.22226, -3.25209, -3.27792,

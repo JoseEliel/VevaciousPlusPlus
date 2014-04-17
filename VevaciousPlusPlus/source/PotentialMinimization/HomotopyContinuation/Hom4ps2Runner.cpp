@@ -65,6 +65,11 @@ namespace VevaciousPlusPlus
 
     WriteHom4p2Input( hom4ps2InputFilename );
 
+    std::cout
+    << std::endl
+    << "Running HOM4PS2!" << std::endl << "-----------------" << std::endl;
+    std::cout << std::endl;
+
     std::string systemCommand( "rm ./bin/input.num" );
     BOL::UsefulStuff::runSystemCommand( systemCommand );
     systemCommand.assign( "/bin/bash -c \"./hom4ps2 " );
@@ -120,6 +125,12 @@ namespace VevaciousPlusPlus
   Hom4ps2Runner::ParseHom4ps2Output( std::string const& hom4ps2OutputFilename,
                  std::vector< std::vector< double > >& purelyRealSolutionSets )
   {
+    std::cout
+    << std::endl
+    << "-----------------" << std::endl << "Parsing output from HOM4PS2."
+    << std::endl ;
+    std::cout << std::endl;
+
     complexSolutions.clear();
     purelyRealSolutionSets.clear();
     BOL::CommentedTextParser tadpoleSolutionsFile( "###",
