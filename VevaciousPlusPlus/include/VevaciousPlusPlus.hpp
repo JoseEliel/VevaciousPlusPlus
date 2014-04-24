@@ -18,6 +18,9 @@ namespace VevaciousPlusPlus
   class VevaciousPlusPlus
   {
   public:
+    static std::string const versionString;
+    static std::string const citationString;
+
     VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
                        SlhaManager& slhaManager,
                        PotentialMinimizer& potentialMinimizer,
@@ -34,9 +37,6 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    static std::string const versionString;
-    static std::string const citationString;
-
     // BOL::BasicTimer runTimer;
     // It's too much effort to put in a "try to quit as soon as possible after
     // this many seconds per point" functionality - too much chance of a

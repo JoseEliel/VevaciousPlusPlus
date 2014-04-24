@@ -601,4 +601,37 @@ namespace VevaciousPlusPlus
     return returnPair;
   }
 
+  // This returns a string that should be valid Python to set the running
+  // parameters in order for a given renormalization scale.
+  std::string RunningParameterManager::RunningParametersAsPython() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "# Running parameters, rp0, rp1, ...:\n";
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         runningParameter( parameterFunctionoidPointers.begin() );
+         runningParameter < parameterFunctionoidPointers.end();
+         ++runningParameter )
+    {
+      stringBuilder
+      << (*runningParameter)->PythonParameterName() << " = 0.0\n";
+    }
+    stringBuilder << "\n"
+    "# This function updates the running parameters for a new scale, through\n"
+    "# the natural logarithm of the scale, lnQ:\n"
+    "def UpdateRunningParameters( lnQ ):\n";
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         runningParameter( parameterFunctionoidPointers.begin() );
+         runningParameter < parameterFunctionoidPointers.end();
+         ++runningParameter )
+    {
+      stringBuilder
+      << "    global " << (*runningParameter)->PythonParameterName() << "\n"
+      << "    " << (*runningParameter)->PythonParameterEvaluation() << "\n";
+    }
+    stringBuilder << "\n"
+    "# End of running parameters.\n";
+
+    return stringBuilder.str();
+  }
+
 } /* namespace VevaciousPlusPlus */

@@ -15,8 +15,8 @@ namespace VevaciousPlusPlus
     // of the arrays, all because we cannot be sure of C++11 compliant
     // compilers, so we cannot use nice static vector< double > const objects.
     std::stringstream stringBuilder;
-    stringBuilder
-    << "bosonMinusOneToMinusTwelve = [ " << bosonMinusOneToMinusTwelve[ 0 ];
+    stringBuilder << std::setprecision( 12 ) << "# Thermal functions:\n"
+    "bosonMinusOneToMinusTwelve = [ " << bosonMinusOneToMinusTwelve[ 0 ];
     for( unsigned int arrayIndex( 1 );
          arrayIndex < 111;
          ++arrayIndex )
@@ -91,6 +91,7 @@ namespace VevaciousPlusPlus
       << ", \n" << fermionPlusOneToPlusOneHundred[ arrayIndex ];
     }
     stringBuilder << " ]\n"
+    "\n"
     << "# In these functions, r is the ratio of m^2/T^2.\n"
     "def BosonMinusOneToMinusTwelve( r ):\n"
     "    s = ( -10.0 * ( r + 1.0 ) )\n"
@@ -99,6 +100,7 @@ namespace VevaciousPlusPlus
     "             + ( 0.1 * ( s - float( n ) )\n"
     "                     * ( bosonMinusOneToMinusTwelve[ n + 1 ]\n"
     "                         - bosonMinusOneToMinusTwelve[ n ] ) ) )\n"
+    "\n"
     "def BosonZeroToMinusOne( r ):\n"
     "    s = ( -100.0 * r )\n"
     "    n = int(s)\n"
@@ -106,6 +108,7 @@ namespace VevaciousPlusPlus
     "             + ( 0.01 * ( s - float( n ) )\n"
     "                      * ( bosonZeroToMinusOne[ n + 1 ]\n"
     "                          - bosonZeroToMinusOne[ n ] ) ) )\n"
+    "\n"
     "def BosonZeroToPlusOne( r ):\n"
     "    s = ( 100.0 * r )\n"
     "    n = int(s)\n"
@@ -113,6 +116,7 @@ namespace VevaciousPlusPlus
     "             + ( 0.01 * ( s - float( n ) )\n"
     "                      * ( bosonZeroToPlusOne[ n + 1 ]\n"
     "                          - bosonZeroToPlusOne[ n ] ) ) )\n"
+    "\n"
     "def BosonPlusOneToPlusOneHundred( r ):\n"
     "    s = ( r - 1.0 )\n"
     "    n = int(s)\n"
@@ -120,6 +124,7 @@ namespace VevaciousPlusPlus
     "             + ( ( s - float( n ) )\n"
     "                 * ( bosonPlusOneToPlusOneHundred[ n + 1 ]\n"
     "                     - bosonPlusOneToPlusOneHundred[ n ] ) ) )\n"
+    "\n"
     "def FermionMinusOneToMinusTwelve( r ):\n"
     "    s = ( -10.0 * ( r + 1.0 ) )\n"
     "    n = int(s)\n"
@@ -127,6 +132,7 @@ namespace VevaciousPlusPlus
     "             + ( 0.1 * ( s - float( n ) )\n"
     "                     * ( fermionMinusOneToMinusTwelve[ n + 1 ]\n"
     "                         - fermionMinusOneToMinusTwelve[ n ] ) ) )\n"
+    "\n"
     "def FermionZeroToMinusOne( r ):\n"
     "    s = ( -100.0 * r )\n"
     "    n = int(s)\n"
@@ -134,6 +140,7 @@ namespace VevaciousPlusPlus
     "             + ( 0.01 * ( s - float( n ) )\n"
     "                      * ( fermionZeroToMinusOne[ n + 1 ]\n"
     "                          - fermionZeroToMinusOne[ n ] ) ) )\n"
+    "\n"
     "def FermionZeroToPlusOne( r ):\n"
     "    s = ( 100.0 * r )\n"
     "    n = int(s)\n"
@@ -141,6 +148,7 @@ namespace VevaciousPlusPlus
     "             + ( 0.01 * ( s - float( n ) )\n"
     "                      * ( fermionZeroToPlusOne[ n + 1 ]\n"
     "                          - fermionZeroToPlusOne[ n ] ) ) )\n"
+    "\n"
     "def FermionPlusOneToPlusOneHundred( r ):\n"
     "    s = ( r - 1.0 )\n"
     "    n = int(s)\n"
@@ -148,13 +156,36 @@ namespace VevaciousPlusPlus
     "             + ( ( s - float( n ) )\n"
     "                 * ( fermionPlusOneToPlusOneHundred[ n + 1 ]\n"
     "                     - fermionPlusOneToPlusOneHundred[ n ] ) ) )\n"
-    "# End of thermal functions.\n\n\n";
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "NOT FINISHED THERMAL PYTHON!";
-    std::cout << std::endl;/**/
+    "\n"
+    "def BosonicJ( r ):\n"
+    "    if ( r <= -12.0 ):\n"
+    "        return 0.0\n"
+    "    elif ( r <= -1.0 ):\n"
+    "        return BosonMinusOneToMinusTwelve( r )\n"
+    "    elif ( r < 0.0 ):\n"
+    "        return BosonZeroToMinusOne( r )\n"
+    "    elif ( r < 1.0 ):\n"
+    "        return BosonZeroToPlusOne( r )\n"
+    "    elif ( r < 100.0 ):\n"
+    "        return BosonPlusOneToPlusOneHundred( r )\n"
+    "    else:\n"
+    "        return 0.0\n"
+    "\n"
+    "def FermionicJ( r ):\n"
+    "    if ( r <= -12.0 ):\n"
+    "        return 0.0\n"
+    "    elif ( r <= -1.0 ):\n"
+    "        return FermionMinusOneToMinusTwelve( r )\n"
+    "    elif ( r < 0.0 ):\n"
+    "        return FermionZeroToMinusOne( r )\n"
+    "    elif ( r < 1.0 ):\n"
+    "        return FermionZeroToPlusOne( r )\n"
+    "    elif ( r < 100.0 ):\n"
+    "        return FermionPlusOneToPlusOneHundred( r )\n"
+    "    else:\n"
+    "        return 0.0\n"
+    "\n"
+    "# End of thermal functions.\n";
 
     return stringBuilder.str();
   }

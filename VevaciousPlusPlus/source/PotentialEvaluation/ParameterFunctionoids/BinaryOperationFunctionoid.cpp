@@ -36,7 +36,7 @@ namespace VevaciousPlusPlus
   std::string BinaryOperationFunctionoid::PythonParameterEvaluation() const
   {
     std::stringstream stringBuilder;
-    stringBuilder << pythonParameterName << " = ( "
+    stringBuilder << std::setprecision( 12 ) << pythonParameterName << " = ( "
     << firstFunctionoid->PythonParameterName();
     if( binaryOperation == &PlusFunction )
     {

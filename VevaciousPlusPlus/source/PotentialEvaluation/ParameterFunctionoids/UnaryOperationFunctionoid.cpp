@@ -33,7 +33,7 @@ namespace VevaciousPlusPlus
   std::string UnaryOperationFunctionoid::PythonParameterEvaluation() const
   {
     std::stringstream stringBuilder;
-    stringBuilder << pythonParameterName << " = ";
+    stringBuilder << std::setprecision( 12 ) << pythonParameterName << " = ";
     if( unaryOperation == &sqrt )
     {
       stringBuilder << "math.sqrt( ";

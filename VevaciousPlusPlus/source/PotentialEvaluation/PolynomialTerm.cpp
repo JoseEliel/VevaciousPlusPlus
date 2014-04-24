@@ -125,4 +125,36 @@ namespace VevaciousPlusPlus
     return returnStream.str();
   }
 
+  // This returns a string that should be valid Python assuming that the
+  // field configuration is given as an array called "fv".
+  std::string PolynomialTerm::AsPython() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << std::setprecision( 12 ) << "( " << coefficientConstant;
+    for( std::vector< ParameterFunctionoid* >::const_iterator
+         runningParameter( functionoidProduct.begin() );
+         runningParameter < functionoidProduct.end();
+         ++runningParameter )
+    {
+      stringBuilder << " * " << (*runningParameter)->PythonParameterName();
+    }
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < fieldPowersByIndex.size();
+         ++fieldIndex )
+    {
+      if( fieldPowersByIndex[ fieldIndex ] == 1 )
+      {
+        stringBuilder << " * fv[ " << fieldIndex << " ]";
+      }
+      if( fieldPowersByIndex[ fieldIndex ] > 1 )
+      {
+        stringBuilder << " * (fv[ " << fieldIndex << " ])**"
+        << fieldPowersByIndex[ fieldIndex ];
+      }
+    }
+    stringBuilder << " )";
+
+    return stringBuilder.str();
+  }
+
 } /* namespace VevaciousPlusPlus */

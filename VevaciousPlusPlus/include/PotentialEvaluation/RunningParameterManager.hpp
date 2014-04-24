@@ -55,6 +55,10 @@ namespace VevaciousPlusPlus
     // if no block had a scale greater than 0.0 GeV.
     double HighestBlockScale() const{ return highestBlockScale; }
 
+    // This returns a string that should be valid Python to set the running
+    // parameters in order for a given renormalization scale.
+    std::string RunningParametersAsPython() const;
+
 
   protected:
     // This puts all index brackets into a consistent form.

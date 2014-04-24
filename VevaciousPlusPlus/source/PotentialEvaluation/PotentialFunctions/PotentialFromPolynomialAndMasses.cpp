@@ -446,37 +446,201 @@ namespace VevaciousPlusPlus
   {
     std::ofstream pythonFile( pythonFilename.c_str() );
     pythonFile << std::setprecision( 12 );
+    pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
+    "# This file was created by Vevacious version "
+    << VevaciousPlusPlus::versionString << "\n"
+    "from __future__ import division\n"
+    "import math\n"
+    "import numpy\n"
+    "\n"
+    "# Global variables:\n"
+    "# Temperature, T:\n"
+    "T = 0.0\n"
+    "# T^(-2):\n"
+    "invTSq = -1.0\n"
+    "# Renormalization scale, Q:\n"
+    "Q = -1.0\n"
+    "# Q^(-2):\n"
+    "invQSq = -1.0\n"
+    "# Q is set later, and may be set for each evaluation of the potential.\n"
+    "\n" << ThermalFunctions::JFunctionsAsPython()
+    << "\n"
+    "\n" << runningParameters.RunningParametersAsPython()
+    << "\n"
+    "def TreeLevelPotential( fv ):\n"
+    "    return ( " << treeLevelPotential.AsPython() << " )\n"
+    "\n"
+    "def PolynomialLoopCorrections( fv ):\n"
+    "    return ( " << polynomialLoopCorrections.AsPython() << " )\n"
+    "\n"
+    "def LoopAndThermalCorrection( massesSquaredWithFactors,\n"
+    "                              subtractionConstant,\n"
+    "                              JFunction ):\n"
+    "    cumulativeQuantumCorrection = 0.0\n"
+    "    cumulativeThermalCorrection = 0.0\n"
+    "    for massSquaredWithFactor in massesSquaredWithFactors:\n"
+    "        currentQuantumCorrection = 0.0\n"
+    "        currentThermalCorrection = 0.0\n"
+    "        for MSq in massSquaredWithFactor[ 0 ]:\n"
+    "            MM = abs( MSq )\n"
+    "            if ( MM > 1.0 ):\n"
+    "                currentQuantumCorrection += ( MM**2\n"
+    "                                       * ( math.log( MM * invQSq )\n"
+    "                                           - subtractionConstant ) )\n"
+    "            currentThermalCorrection += JFunction( MM * invTSq )\n"
+    "        cumulativeQuantumCorrection += ( massSquaredWithFactor[ 1 ]\n"
+    "                                         * currentQuantumCorrection )\n"
+    "        cumulativeThermalCorrection += ( massSquaredWithFactor[ 1 ]\n"
+    "                                         * currentThermalCorrection )\n"
+    "    return [ cumulativeQuantumCorrection, cumulativeThermalCorrection ]\n"
+    "\n"
+    "def ScalarMassesSquaredWithFactors( fv ):\n"
+    "    massesSquaredWithFactors = []\n";
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+         whichMatrix( scalarMassSquaredMatrices.begin() );
+         whichMatrix < scalarMassSquaredMatrices.end();
+         ++whichMatrix )
+    {
+      pythonFile << "    massSquaredMatrix = numpy.array( [ ";
+      for( std::vector< PolynomialSum >::const_iterator
+           matrixElement( whichMatrix->MatrixElements().begin() );
+           matrixElement < whichMatrix->MatrixElements().end();
+           ++matrixElement )
+      {
+        if( matrixElement != whichMatrix->MatrixElements().begin() )
+        {
+          pythonFile << ",\n";
+        }
+        pythonFile << matrixElement->AsPython();
+      }
+      pythonFile << " ] )\n"
+      "    M = numpy.reshape( massSquaredMatrix, ( "
+                                 << whichMatrix->NumberOfRows() << ", -1 ) )\n"
+      "    massesSquaredWithFactors.append( [ numpy.linalg.eigvalsh( M ),\n"
+      "                     " << whichMatrix->MultiplicityFactor() << " ] )\n";
+    }
+    pythonFile << "    return massesSquaredWithFactors\n"
+    "\n"
+    "def FermionMassesSquaredWithFactors( fv ):\n"
+    "    massesSquaredWithFactors = []\n";
+    for( std::vector< ComplexMassSquaredMatrix >::const_iterator
+         whichMatrix( fermionMassSquaredMatrices.begin() );
+         whichMatrix < fermionMassSquaredMatrices.end();
+         ++whichMatrix )
+    {
+      pythonFile << "    massSquaredMatrix = numpy.array( [ ";
+      for( std::vector< std::pair< PolynomialSum,
+                                   PolynomialSum > >::const_iterator
+           matrixElement( whichMatrix->MatrixElements().begin() );
+           matrixElement < whichMatrix->MatrixElements().end();
+           ++matrixElement )
+      {
+        if( matrixElement != whichMatrix->MatrixElements().begin() )
+        {
+          pythonFile << ",\n";
+        }
+        pythonFile << "( " << matrixElement->first.AsPython()
+        << " + ( 1j * " << matrixElement->second.AsPython() << " ) )";
+      }
+      pythonFile << " ] )\n"
+      "    M = numpy.reshape( massSquaredMatrix, ( "
+                                 << whichMatrix->NumberOfRows() << ", -1 ) )\n"
+      "    massesSquaredWithFactors.append( [ numpy.linalg.eigvalsh( M ),\n"
+      "                     " << whichMatrix->MultiplicityFactor() << " ] )\n";
+    }
+    for( std::vector< SymmetricComplexMassMatrix >::const_iterator
+         whichMatrix( fermionMassMatrices.begin() );
+         whichMatrix < fermionMassMatrices.end();
+         ++whichMatrix )
+    {
+      pythonFile << "    massMatrix = numpy.array( [ ";
+      for( std::vector< std::pair< PolynomialSum,
+                                   PolynomialSum > >::const_iterator
+           matrixElement( whichMatrix->MatrixElements().begin() );
+           matrixElement < whichMatrix->MatrixElements().end();
+           ++matrixElement )
+      {
+        if( matrixElement != whichMatrix->MatrixElements().begin() )
+        {
+          pythonFile << ",\n";
+        }
+        pythonFile << "( " << matrixElement->first.AsPython()
+        << " + ( 1j * " << matrixElement->second.AsPython() << " ) )";
+      }
+      pythonFile << " ] )\n"
+      "    M = numpy.reshape( massMatrix, ( " << whichMatrix->NumberOfRows()
+                                                                << ", -1 ) )\n"
+      "    MM = M.dot( numpy.transpose( numpy.conjugate( M ) ) )\n"
+      "    massesSquaredWithFactors.append( [ numpy.linalg.eigvalsh( MM ),\n"
+                              << whichMatrix->MultiplicityFactor() << " ] )\n";
+    }
+    pythonFile << "    return massesSquaredWithFactors\n"
+    "\n"
+    "def VectorMassesSquaredWithFactors( fv ):\n"
+    "    massesSquaredWithFactors = []\n";
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+         whichMatrix( vectorMassSquaredMatrices.begin() );
+         whichMatrix < vectorMassSquaredMatrices.end();
+         ++whichMatrix )
+    {
+      pythonFile << "    massSquaredMatrix = numpy.array( [ ";
+      for( std::vector< PolynomialSum >::const_iterator
+           matrixElement( whichMatrix->MatrixElements().begin() );
+           matrixElement < whichMatrix->MatrixElements().end();
+           ++matrixElement )
+      {
+        if( matrixElement != whichMatrix->MatrixElements().begin() )
+        {
+          pythonFile << ",\n";
+        }
+        pythonFile << matrixElement->AsPython();
+      }
+      pythonFile << " ] )\n"
+      "    M = numpy.reshape( massSquaredMatrix, ( "
+                                 << whichMatrix->NumberOfRows() << ", -1 ) )\n"
+      "    massesSquaredWithFactors.append( [ numpy.linalg.eigvalsh( M ),\n"
+      "                     " << whichMatrix->MultiplicityFactor() << " ] )\n";
+    }
+    pythonFile << "    return massesSquaredWithFactors\n"
+    "\n"
+    "\n"
+    "loopFactor = ( 1.0 / ( 64.0 * math.pi * math.pi ) )\n"
+    "thermalFactor = ( 1.0 / ( 2.0 * math.pi * math.pi ) )\n"
+    "\n"
+    "def LoopAndThermalCorrections( fv ):\n"
+    "    totalQuantumCorrections = 0.0\n"
+    "    totalThermalCorrections = 0.0\n"
+    "    currentCorrections = LoopAndThermalCorrection(\n"
+    "                                  ScalarMassesSquaredWithFactors( fv ),\n"
+    "                                                  1.5,\n"
+    "                                                  BosonicJ )\n"
+    "# Real scalar degrees of freedom add to both quantum and thermal\n"
+    "# corrections without any factors.\n"
+    "    totalQuantumCorrections += currentCorrections[ 0 ]\n"
+    "    totalThermalCorrections += currentCorrections[ 1 ]\n"
+    "    currentCorrections = LoopAndThermalCorrection(\n"
+    "                                 FermionMassesSquaredWithFactors( fv ),\n"
+    "                                           1.5,\n"
+    "                                           FermionicJ )\n"
+    "# Weyl fermion degrees of freedom add to both quantum and thermal\n"
+    "# corrections with a factor of 2, though there is an additional minus\n"
+    "# sign for the quantum corrections. (The conventions used in Vevacious\n"
+    "# are that the thermal correction functions already have any minus\n"
+    "# signs for fermions.)\n"
+    "    totalQuantumCorrections -= ( 2.0 * currentCorrections[ 0 ] )\n"
+    "    totalThermalCorrections += ( 2.0 * currentCorrections[ 1 ] )\n"
+    "    currentCorrections= LoopAndThermalCorrection(\n"
+    "                                  VectorMassesSquaredWithFactors( fv ),\n"
+    "                                " << vectorMassCorrectionConstant << ",\n"
+    "                                          BosonicJ )\n"
+    "# Vector boson degrees of freedom add to quantum corrections with a\n"
+    "# factor of 3 in dimensional regularization schemes, and to thermal\n"
+    "# corrections with a factor of 2.\n"
+    "    totalQuantumCorrections += ( 3.0 * currentCorrections[ 0 ] )\n"
+    "    totalThermalCorrections += ( 2.0 * currentCorrections[ 1 ] )\n"
+    "    return ( ( totalQuantumCorrections * loopFactor )\n"
+    "             + ( totalThermalCorrections * thermalFactor * T**4 ) )\n";
 
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "need to write thermal functions in .py";
-    std::cout << std::endl;/**/
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "need to write running parameters in .py";
-    std::cout << std::endl;/**/
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "need to write mass correction function in .py";
-    std::cout << std::endl;/**/
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "need to write tree-level and loop polynomials in .py";
-    std::cout << std::endl;/**/
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "need to write mass-squared arrays of arrays: scalarSquareMasses,"
-    << " fermionSquareMasses, vectorSquareMasses, in .py";
-    std::cout << std::endl;/**/
 
     // placeholder:
     /**/std::cout << std::endl

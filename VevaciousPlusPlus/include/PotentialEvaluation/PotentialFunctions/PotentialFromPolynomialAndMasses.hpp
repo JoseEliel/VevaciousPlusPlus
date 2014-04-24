@@ -144,6 +144,18 @@ namespace VevaciousPlusPlus
     // appropriate to this potential.
     virtual PolynomialGradientTargetSystem&
     GetHomotopyContinuationTargetSystem() = 0;
+
+    // This should return a string that is valid Python to evaluate the
+    // potential at zero temperature assuming that the field configuration is
+    // given as an array called "fv", given the rest of the Python code written
+    // by WriteAsPython.
+    virtual std::string ZeroTemperaturePotentialInPython() const = 0;
+
+    // This should return a string that is valid Python to evaluate the
+    // potential at temperature T assuming that the field configuration is
+    // given as an array called "fv", given the rest of the Python code written
+    // by WriteAsPython.
+    virtual std::string NonZeroTemperaturePotentialInPython() const = 0;
   };
 
 

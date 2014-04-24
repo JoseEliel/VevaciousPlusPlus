@@ -142,7 +142,7 @@ namespace VevaciousPlusPlus
   inline std::string SlhaFunctionoid::PythonParameterEvaluation() const
   {
     std::stringstream stringBuilder;
-    stringBuilder << pythonParameterName << " = ( "
+    stringBuilder << std::setprecision( 12 ) << pythonParameterName << " = ( "
     << scaleLogarithmPowerCoefficients[ 0 ];
     for( unsigned int whichPower( 1 );
          whichPower < scaleLogarithmPowerCoefficients.size();

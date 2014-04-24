@@ -90,6 +90,10 @@ namespace VevaciousPlusPlus
     // This is mainly for debugging.
     std::string AsDebuggingString() const;
 
+    // This returns a string that should be valid Python assuming that the
+    // field configuration is given as an array called "fv".
+    std::string AsPython() const;
+
 
   protected:
     bool isValid;

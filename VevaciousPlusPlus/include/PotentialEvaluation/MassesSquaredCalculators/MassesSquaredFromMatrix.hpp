@@ -40,6 +40,8 @@ namespace VevaciousPlusPlus
     MassesSquared( std::vector< double > const& fieldConfiguration,
                    double const logarithmOfScale ) const;
 
+    unsigned int NumberOfRows() const{ return numberOfRows; }
+
 
   protected:
     unsigned int numberOfRows;
@@ -55,7 +57,7 @@ namespace VevaciousPlusPlus
     // evaluated at the natural exponent of logarithmOfScale.
     virtual EigenMatrix
     CurrentValues( std::vector< double > const& fieldConfiguration,
-                               double const logarithmOfScale ) const = 0;
+                   double const logarithmOfScale ) const = 0;
   };
 
 

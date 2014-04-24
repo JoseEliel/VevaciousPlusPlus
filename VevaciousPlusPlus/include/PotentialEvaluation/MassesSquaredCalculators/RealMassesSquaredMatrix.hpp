@@ -31,8 +31,13 @@ namespace VevaciousPlusPlus
     PolynomialSum& ElementAt( unsigned int const elementIndex )
     { return matrixElements[ elementIndex ]; }
 
+    std::vector< PolynomialSum > const& MatrixElements() const
+    { return matrixElements; }
+
+
     // This is mainly for debugging:
     std::string AsString() const;
+
 
   protected:
     std::vector< PolynomialSum > matrixElements;

@@ -55,7 +55,8 @@ namespace VevaciousPlusPlus
   inline std::string ConstantFunctionoid::PythonParameterEvaluation() const
   {
     std::stringstream stringBuilder;
-    stringBuilder << pythonParameterName << " = " << currentValue;
+    stringBuilder
+    << std::setprecision( 12 ) << pythonParameterName << " = " << currentValue;
     return stringBuilder.str();
   }
 

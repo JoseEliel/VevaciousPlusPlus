@@ -65,6 +65,17 @@ namespace VevaciousPlusPlus
     GetHomotopyContinuationTargetSystem()
     { return homotopyContinuationTargetSystem; }
 
+    // This should return a string that is valid Python to evaluate the
+    // potential at zero temperature assuming that the field configuration is
+    // given as an array called "fv", given the rest of the Python code written
+    // by WriteAsPython.
+    virtual std::string ZeroTemperaturePotentialInPython() const;
+
+    // This should return a string that is valid Python to evaluate the
+    // potential at temperature T assuming that the field configuration is
+    // given as an array called "fv", given the rest of the Python code written
+    // by WriteAsPython.
+    virtual std::string NonZeroTemperaturePotentialInPython() const;
   };
 
 
@@ -112,6 +123,43 @@ namespace VevaciousPlusPlus
     << "FixedScaleOneLoopPotential::SetScaleInPythonFunction()";
     std::cout << std::endl;
     return std::string();/**/
+  }
+
+
+  // This should return a string that is valid Python to evaluate the
+  // potential at zero temperature assuming that the field configuration is
+  // given as an array called "fv", given the rest of the Python code written
+  // by WriteAsPython.
+  inline std::string
+  FixedScaleOneLoopPotential::ZeroTemperaturePotentialInPython() const
+  {
+    std::stringstream stringBuilder;
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "FixedScaleOneLoopPotential::ZeroTemperaturePotentialInPython()";
+    std::cout << std::endl;/**/
+
+    return stringBuilder.str();
+  }
+
+  // This should return a string that is valid Python to evaluate the
+  // potential at temperature T assuming that the field configuration is
+  // given as an array called "fv", given the rest of the Python code written
+  // by WriteAsPython.
+  inline std::string
+  FixedScaleOneLoopPotential::NonZeroTemperaturePotentialInPython() const
+  {
+    std::stringstream stringBuilder;
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "FixedScaleOneLoopPotential::NonZeroTemperaturePotentialInPython()";
+    std::cout << std::endl;/**/
+
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

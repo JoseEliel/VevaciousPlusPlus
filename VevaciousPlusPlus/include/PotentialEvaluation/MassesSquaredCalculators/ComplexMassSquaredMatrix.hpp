@@ -36,6 +36,9 @@ namespace VevaciousPlusPlus
     // This is mainly for debugging:
     std::string AsString() const;
 
+    std::vector< std::pair< PolynomialSum, PolynomialSum > > const&
+    MatrixElements() const{ return matrixElements; }
+
 
   protected:
     std::vector< std::pair< PolynomialSum, PolynomialSum > > matrixElements;

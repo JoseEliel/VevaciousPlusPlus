@@ -54,6 +54,10 @@ namespace VevaciousPlusPlus
     // This is mainly for debugging:
     std::string AsDebuggingString() const;
 
+    // This returns a string that should be valid Python assuming that the
+    // field configuration is given as an array called "fv".
+    std::string AsPython() const;
+
 
   protected:
     std::vector< PolynomialTerm > polynomialTerms;
@@ -163,6 +167,32 @@ namespace VevaciousPlusPlus
       returnStream << whichTerm->AsDebuggingString() << std::endl;
     }
     return returnStream.str();
+  }
+
+  // This returns a string that should be valid Python assuming that the
+  // field configuration is given as an array called "fv".
+  inline std::string PolynomialSum::AsPython() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "( ";
+    if( polynomialTerms.empty() )
+    {
+      stringBuilder << "0.0";
+    }
+    for( std::vector< PolynomialTerm >::const_iterator
+         polynomialTerm( polynomialTerms.begin() );
+         polynomialTerm < polynomialTerms.end();
+         ++polynomialTerm )
+    {
+      if( polynomialTerm != polynomialTerms.begin() )
+      {
+        stringBuilder << " + ";
+      }
+      stringBuilder << polynomialTerm->AsPython();
+    }
+    stringBuilder << " )";
+
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */
