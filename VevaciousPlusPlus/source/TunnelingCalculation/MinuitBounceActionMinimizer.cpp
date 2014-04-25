@@ -14,7 +14,8 @@ namespace VevaciousPlusPlus
                                           PotentialFunction& potentialFunction,
                                      TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold ) :
-    BounceWithSplines( tunnelingStrategy,
+    BounceWithSplines( potentialFunction,
+                       tunnelingStrategy,
                        survivalProbabilityThreshold )
   {
     // placeholder:
@@ -53,4 +54,41 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
+
+  // This doesn't do anything here.
+  void MinuitBounceActionMinimizer::UpdateSelfForNewSlha(
+                                               SlhaManager const& slhaManager )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "MinuitBounceActionMinimizer::UpdateSelfForNewSlha(...)";
+    std::cout << std::endl;/**/
+  }
+
+  // This should set quantumSurvivalProbability and quantumLifetimeInSeconds
+  // appropriately.
+  void MinuitBounceActionMinimizer::CalculateQuantumTunneling(
+                                           PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "MinuitBounceActionMinimizer::CalculateQuantumTunneling(...)";
+    std::cout << std::endl;/**/
+  }
+
+  // This should set thermalSurvivalProbability and
+  // dominantTemperatureInGigaElectronVolts appropriately.
+  void MinuitBounceActionMinimizer::CalculateThermalTunneling(
+                                           PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "MinuitBounceActionMinimizer::CalculateThermalTunneling(...)";
+    std::cout << std::endl;/**/
+  }
 } /* namespace VevaciousPlusPlus */

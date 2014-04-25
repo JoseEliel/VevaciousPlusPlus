@@ -629,6 +629,10 @@ namespace VevaciousPlusPlus
       << "    " << (*runningParameter)->PythonParameterEvaluation() << "\n";
     }
     stringBuilder << "\n"
+    "# The running parameters are initially set for the lowest scale found\n"
+    "# for the blocks in the SLHA file.\n"
+    "UpdateRunningParameters( math.log( " << lowestBlockScale << " ) )\n"
+    "invQSq = ( 1.0 / ( " << lowestBlockScale << " )**2 )\n"
     "# End of running parameters.\n";
 
     return stringBuilder.str();

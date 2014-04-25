@@ -35,6 +35,26 @@ namespace VevaciousPlusPlus
     // values.
     virtual void CalculateTunneling( PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum );
+
+
+    // This should perform all relevant updates for the new SLHA data except
+    // for propagating the push to the set of dependent SlhaUpdatePropagators.
+    virtual void
+    UpdateSelfForNewSlha( SlhaManager const& slhaManager );
+
+
+  protected:
+    // This should set quantumSurvivalProbability and quantumLifetimeInSeconds
+    // appropriately.
+    virtual void
+    CalculateQuantumTunneling( PotentialMinimum const& falseVacuum,
+                               PotentialMinimum const& trueVacuum );
+
+    // This should set thermalSurvivalProbability and
+    // dominantTemperatureInGigaElectronVolts appropriately.
+    virtual void
+    CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
+                               PotentialMinimum const& trueVacuum );
   };
 
 } /* namespace VevaciousPlusPlus */

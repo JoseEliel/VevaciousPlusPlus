@@ -10,10 +10,11 @@
 
 #include "../CommonIncludes.hpp"
 #include "../PotentialMinimization/PotentialMinimum.hpp"
+#include "../PotentialEvaluation/SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class TunnelingCalculator
+  class TunnelingCalculator : public SlhaUpdatePropagator
   {
   public:
     enum TunnelingStrategy
@@ -26,7 +27,8 @@ namespace VevaciousPlusPlus
       NotSet
     };
 
-    TunnelingCalculator( TunnelingStrategy const tunnelingStrategy,
+    TunnelingCalculator( SlhaUpdatePropagator& slhaUpdatePropagator,
+                         TunnelingStrategy const tunnelingStrategy,
                          double const survivalProbabilityThreshold );
     virtual
     ~TunnelingCalculator();

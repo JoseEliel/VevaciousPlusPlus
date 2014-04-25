@@ -145,17 +145,14 @@ namespace VevaciousPlusPlus
     virtual PolynomialGradientTargetSystem&
     GetHomotopyContinuationTargetSystem() = 0;
 
-    // This should return a string that is valid Python to evaluate the
-    // potential at zero temperature assuming that the field configuration is
-    // given as an array called "fv", given the rest of the Python code written
-    // by WriteAsPython.
-    virtual std::string ZeroTemperaturePotentialInPython() const = 0;
-
-    // This should return a string that is valid Python to evaluate the
-    // potential at temperature T assuming that the field configuration is
-    // given as an array called "fv", given the rest of the Python code written
-    // by WriteAsPython.
-    virtual std::string NonZeroTemperaturePotentialInPython() const = 0;
+    // This should return a string that is valid Python indented by 4 spaces to
+    // set the scale Q, given by Q^(-2) called invQSq, for an evaluation of the
+    // potential assuming that the field configuration is given as an array
+    // called "fv" and the temperature by T, given by T^(-2) called invTSq, given
+    // the rest of the Python code written by WriteAsPython. By default Q is left
+    // as the lowest scale given by the blocks of the SLHA file.
+    virtual std::string SetScaleForPythonPotentialCall() const
+    { return std::string( "" ); }
   };
 
 

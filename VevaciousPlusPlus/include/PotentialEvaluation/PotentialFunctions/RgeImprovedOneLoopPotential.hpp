@@ -82,17 +82,13 @@ namespace VevaciousPlusPlus
     GetHomotopyContinuationTargetSystem()
     { return homotopyContinuationTargetSystem; }
 
-    // This should return a string that is valid Python to evaluate the
-    // potential at zero temperature assuming that the field configuration is
-    // given as an array called "fv", given the rest of the Python code written
-    // by WriteAsPython.
-    virtual std::string ZeroTemperaturePotentialInPython() const;
-
-    // This should return a string that is valid Python to evaluate the
-    // potential at temperature T assuming that the field configuration is
-    // given as an array called "fv", given the rest of the Python code written
-    // by WriteAsPython.
-    virtual std::string NonZeroTemperaturePotentialInPython() const;
+    // This should return a string that is valid Python indented by 4 spaces to
+    // set the scale Q, given by Q^(-2) called invQSq, for an evaluation of the
+    // potential assuming that the field configuration is given as an array
+    // called "fv" and the temperature by T, given by T^(-2) called invTSq, given
+    // the rest of the Python code written by WriteAsPython. By default Q is left
+    // as the lowest scale given by the blocks of the SLHA file.
+    virtual std::string SetScaleForPythonPotentialCall() const;
   };
 
 
@@ -183,40 +179,28 @@ namespace VevaciousPlusPlus
     return std::string();/**/
   }
 
-
-  // This should return a string that is valid Python to evaluate the
-  // potential at zero temperature assuming that the field configuration is
-  // given as an array called "fv", given the rest of the Python code written
-  // by WriteAsPython.
+  // This should return a string that is valid Python indented by 4 spaces to
+  // set the scale Q, given by Q^(-2) called invQSq, for an evaluation of the
+  // potential assuming that the field configuration is given as an array
+  // called "fv" and the temperature by T, given by T^(-2) called invTSq, given
+  // the rest of the Python code written by WriteAsPython. By default Q is left
+  // as the lowest scale given by the blocks of the SLHA file.
   inline std::string
-  RgeImprovedOneLoopPotential::ZeroTemperaturePotentialInPython() const
+  RgeImprovedOneLoopPotential::SetScaleForPythonPotentialCall() const
   {
     std::stringstream stringBuilder;
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RgeImprovedOneLoopPotential::ZeroTemperaturePotential()";
-    std::cout << std::endl;/**/
-
-    return stringBuilder.str();
-  }
-
-  // This should return a string that is valid Python to evaluate the
-  // potential at temperature T assuming that the field configuration is
-  // given as an array called "fv", given the rest of the Python code written
-  // by WriteAsPython.
-  inline std::string
-  RgeImprovedOneLoopPotential::NonZeroTemperaturePotentialInPython() const
-  {
-    std::stringstream stringBuilder;
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "RgeImprovedOneLoopPotential::NonZeroTemperaturePotentialInPython()";
-    std::cout << std::endl;/**/
-
+    stringBuilder
+    << "# We use the square of lowest scale of the SLHA blocks plus the sum\n"
+    "# of the squares of the fields plus the square of the temperature as\n"
+    "# the square of the scale.\n"
+    "    QQ = (" << currentMinimumRenormalizationScale << ")**2\n"
+    "    for f in fv:\n"
+    "        QQ += f**2\n"
+    "    if ( invTSq > 0.0 ):\n"
+    "        QQ += ( 1.0 / invTSq )\n"
+    "    global invQSq"
+    "    invQSq = ( 1.0 / QQ )\n"
+    "    UpdateRunningParameters( 0.5 * math.log( QQ ) )\n";
     return stringBuilder.str();
   }
 

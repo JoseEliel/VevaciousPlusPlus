@@ -296,6 +296,7 @@ int main( int argumentCount,
                                                "./CosmoTransitions-1.0.2/" ) );
     tunnelingCalculator
     = new VevaciousPlusPlus::CosmoTransitionsRunner( *potentialFunction,
+                                                     *potentialFunction,
                                                      tunnelingStrategy,
                                                   survivalProbabilityThreshold,
                                                      pathToCosmotransitions );
