@@ -60,6 +60,10 @@ namespace VevaciousPlusPlus
     virtual void
     CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
                                PotentialMinimum const& trueVacuum );
+
+    double const DeformedPathAction( PotentialMinimum const& falseVacuum,
+                                     PotentialMinimum const& trueVacuum,
+                                     double const tunnelingTemperature ) const;
   };
 
 } /* namespace VevaciousPlusPlus */

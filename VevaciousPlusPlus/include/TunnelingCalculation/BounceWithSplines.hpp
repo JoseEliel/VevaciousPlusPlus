@@ -35,6 +35,7 @@ namespace VevaciousPlusPlus
     static double const maximumPowerOfNaturalExponent;
     static double const hBarInGigaElectronVoltSeconds;
     static double const ageOfKnownUniverseInSeconds;
+    static double const lnOfThermalIntegrationFactor;
     PotentialFunction const& potentialFunction;
 
     // This is a hook to allow for derived classes to prepare things common to
