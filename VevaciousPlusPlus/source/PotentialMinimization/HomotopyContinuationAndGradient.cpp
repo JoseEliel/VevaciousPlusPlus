@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   HomotopyContinuationAndGradient::HomotopyContinuationAndGradient(
-                                          PotentialFunction& potentialFunction,
+                                    PotentialFunction const& potentialFunction,
                      HomotopyContinuationSolver& homotopyContinuationSolver ) :
     PotentialMinimizer( potentialFunction ),
     homotopyContinuationSolver( homotopyContinuationSolver ),

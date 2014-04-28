@@ -17,7 +17,7 @@ namespace VevaciousPlusPlus
   class PotentialMinimizer
   {
   public:
-    PotentialMinimizer( PotentialFunction& potentialFunction );
+    PotentialMinimizer( PotentialFunction const& potentialFunction );
     virtual
     ~PotentialMinimizer();
 
@@ -66,7 +66,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    PotentialFunction& potentialFunction;
+    PotentialFunction const& potentialFunction;
     std::vector< PotentialMinimum > foundMinima;
     PotentialMinimum dsbVacuum;
     std::vector< PotentialMinimum > panicVacua;

@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
   class PotentialForMinuit : public ROOT::Minuit2::FCNBase
   {
   public:
-    PotentialForMinuit( PotentialFunction& minimizationFunction );
+    PotentialForMinuit( PotentialFunction const& minimizationFunction );
     virtual
     ~PotentialForMinuit();
 
@@ -40,8 +40,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    PotentialFunction& minimizationFunction;
-    std::vector< double > fieldOrigin;
+    PotentialFunction const& minimizationFunction;
+    std::vector< double > const fieldOrigin;
     double functionAtOrigin;
     double currentTemperature;
   };

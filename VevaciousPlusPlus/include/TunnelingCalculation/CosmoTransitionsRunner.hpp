@@ -12,7 +12,7 @@
 #include "../PotentialEvaluation.hpp"
 #include "../PotentialMinimization.hpp"
 #include "BounceWithSplines.hpp"
-#include "MinuitMinimization.hpp"
+#include "../PotentialMinimization/MinuitMinimization.hpp"
 #include "ThermalActionFitter.hpp"
 
 

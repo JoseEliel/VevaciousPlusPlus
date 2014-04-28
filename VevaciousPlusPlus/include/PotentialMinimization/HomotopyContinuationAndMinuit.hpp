@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
   class HomotopyContinuationAndMinuit : public HomotopyContinuationAndGradient
   {
   public:
-    HomotopyContinuationAndMinuit( PotentialFunction& potentialFunction,
+    HomotopyContinuationAndMinuit( PotentialFunction const& potentialFunction,
                         HomotopyContinuationSolver& homotopyContinuationSolver,
                             double const extremumSeparationThresholdFraction );
     virtual

@@ -40,9 +40,9 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
-    double const quantumAction( DeformedPathAction( falseVacuum,
-                                                    trueVacuum,
-                                                    0.0 ) );
+    double quantumAction( DeformedPathAction( falseVacuum,
+                                              trueVacuum,
+                                              0.0 ) );
     if( quantumAction >= maximumPowerOfNaturalExponent )
     {
       std::cout
@@ -379,8 +379,8 @@ namespace VevaciousPlusPlus
 
     // Finally we allow CosmoTransitions to calculate the action at our best
     // guess of the optimal tunneling temperature with full path deformation.
-    double const thermalAction( DeformedPathAction( falseVacuum,
-                                                    trueVacuum,
+    double thermalAction( DeformedPathAction( falseVacuum,
+                                              trueVacuum,
                                     dominantTemperatureInGigaElectronVolts ) );
     if( thermalAction >= maximumPowerOfNaturalExponent )
     {

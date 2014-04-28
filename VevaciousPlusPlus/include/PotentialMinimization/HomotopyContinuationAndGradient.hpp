@@ -17,7 +17,8 @@ namespace VevaciousPlusPlus
   class HomotopyContinuationAndGradient : public PotentialMinimizer
   {
   public:
-    HomotopyContinuationAndGradient( PotentialFunction& potentialFunction,
+    HomotopyContinuationAndGradient(
+                                   PotentialFunction const& potentialFunction,
                       HomotopyContinuationSolver& homotopyContinuationSolver );
     virtual
     ~HomotopyContinuationAndGradient();

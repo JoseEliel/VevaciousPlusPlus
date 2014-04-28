@@ -12,7 +12,7 @@ namespace VevaciousPlusPlus
 {
 
   PotentialForMinuit::PotentialForMinuit(
-                                    PotentialFunction& minimizationFunction ) :
+                              PotentialFunction const& minimizationFunction ) :
     ROOT::Minuit2::FCNBase(),
     minimizationFunction( minimizationFunction ),
     fieldOrigin( minimizationFunction.NumberOfFieldVariables(),
