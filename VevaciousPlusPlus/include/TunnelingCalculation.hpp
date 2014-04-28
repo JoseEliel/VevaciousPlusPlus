@@ -11,6 +11,7 @@
 #include "TunnelingCalculation/BounceWithSplines.hpp"
 #include "TunnelingCalculation/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/MinuitBounceActionMinimizer.hpp"
+#include "TunnelingCalculation/ThermalActionFitter.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
 
 // This file is just to collect a lot of #include statements.

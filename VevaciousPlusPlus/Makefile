@@ -74,6 +74,7 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/TunnelingCalculation/BounceWithSplines.cpp \
  source/TunnelingCalculation/CosmoTransitionsRunner.cpp \
  source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
+ source/TunnelingCalculation/ThermalActionFitter.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)

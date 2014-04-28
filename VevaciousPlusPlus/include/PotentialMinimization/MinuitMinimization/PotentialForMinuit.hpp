@@ -58,5 +58,6 @@ namespace VevaciousPlusPlus
     functionAtOrigin = minimizationFunction( fieldOrigin,
                                              currentTemperature );
   }
+
 } /* namespace VevaciousPlusPlus */
 #endif /* POTENTIALFORMINUIT_HPP_ */
