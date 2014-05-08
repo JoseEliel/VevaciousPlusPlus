@@ -536,8 +536,8 @@ namespace VevaciousPlusPlus
                                                 resolutionOfDsbVacuum ) << "\n"
     "\n"
     "# CosmoTransitions nests a loop within a loop to do its deformations:\n"
-    "innerLoopMaxDeformations = 10\n"
-    "outerLoopMaxDeformations = 10\n";
+    "innerLoopMaxDeformations = 7\n"
+    "outerLoopMaxDeformations = 7\n";
     int tunnelingSymmetryDimensionMinusOne( 3 );
     std::string underlyingPotential( "JustLoopCorrectedPotential" );
     if( tunnelingTemperature > 0.0 )
