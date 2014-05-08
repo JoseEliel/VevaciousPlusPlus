@@ -323,6 +323,10 @@ namespace VevaciousPlusPlus
     std::cout
     << std::endl
     << "About to run custom Python program calling CosmoTransitions!"
+    << std::endl << "Unfortunately it is likely to take quite some time (at"
+    << " least 10 minutes for 4 fields at 1-loop order, probably at least an"
+    << " hour for 6 fields) and the output to the terminal can lag a lot (it"
+    << " might only show up after the Python has finished even)."
     << std::endl << "Calling system( \" " << systemCommand << " \")..."
     << std::endl << "-----------------";
     std::cout << std::endl;
@@ -583,6 +587,10 @@ namespace VevaciousPlusPlus
     std::cout
     << std::endl
     << "About to run custom Python program calling CosmoTransitions!"
+    << std::endl << "Unfortunately it is likely to take quite some time (at"
+    << " least 10 minutes for 4 fields at 1-loop order, probably at least an"
+    << " hour for 6 fields) and the output to the terminal can lag a lot (it"
+    << " might only show up after the Python has finished even)."
     << std::endl << "Calling system( \" " << systemCommand << " \")..."
     << std::endl << "-----------------";
     std::cout << std::endl;

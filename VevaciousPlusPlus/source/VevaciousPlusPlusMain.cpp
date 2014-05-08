@@ -414,6 +414,19 @@ int main( int argumentCount,
   delete tunnelingCalculator;
   delete homotopyContinuationSolver;
   delete potentialFunction;
+
+  std::cout
+  << std::endl
+  << "Still to do:" << std::endl
+  << "scale out non-DSB starting points which roll to DSB" << std::endl
+  << "write out XML results" << std::endl
+  << "write out SLHA results" << std::endl
+  << "fix RealMssm.vin" << std::endl
+  << "write MinuitBounceActionMinimizer" << std::endl
+  << "write BasicPolynomialHomotopyContinuation" << std::endl;
+  std::cout << std::endl;
+
+
   // this was a triumph! I'm making a note here:
   return EXIT_SUCCESS;
 }
