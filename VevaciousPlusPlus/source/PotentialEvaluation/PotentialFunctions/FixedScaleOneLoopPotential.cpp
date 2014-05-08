@@ -64,6 +64,10 @@ namespace VevaciousPlusPlus
     << treeLevelPotential( fieldConfiguration );
     std::cout << std::endl;*/
 
+    std::vector< double > cappedFieldConfiguration( fieldConfiguration );
+    double const squaredLengthBeyondCap( CapFieldConfiguration(
+                                                  cappedFieldConfiguration ) );
+
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
 
     // debugging:
@@ -71,7 +75,7 @@ namespace VevaciousPlusPlus
     << std::endl
     << " scalarSquareMasses";
     std::cout << std::endl;*/
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       scalarSquareMasses,
                                       scalarMassesSquaredWithFactors );
     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
@@ -82,7 +86,7 @@ namespace VevaciousPlusPlus
     << "FixedScaleOneLoopPotential::operator():"
     << " fermionMasses";
     std::cout << std::endl;*/
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       fermionSquareMasses,
                                       fermionMassesSquaredWithFactors );
 
@@ -93,12 +97,13 @@ namespace VevaciousPlusPlus
     << " vectorSquareMasses";
     std::cout << std::endl;*/
     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       vectorSquareMasses,
                                       vectorMassesSquaredWithFactors );
-    return ( treeLevelPotential( fieldConfiguration )
-             + polynomialLoopCorrections( fieldConfiguration )
-             + LoopAndThermalCorrections( fieldConfiguration,
+    return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
+             + treeLevelPotential( cappedFieldConfiguration )
+             + polynomialLoopCorrections( cappedFieldConfiguration )
+             + LoopAndThermalCorrections( cappedFieldConfiguration,
                                           scalarMassesSquaredWithFactors,
                                           fermionMassesSquaredWithFactors,
                                           vectorMassesSquaredWithFactors,

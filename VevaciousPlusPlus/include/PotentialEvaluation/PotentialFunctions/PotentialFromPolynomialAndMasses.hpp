@@ -55,6 +55,7 @@ namespace VevaciousPlusPlus
     double currentMinimumRenormalizationScale;
     double squareOfMinimumRenormalizationScale;
     double currentMaximumRenormalizationScale;
+    double squareOfMaximumRenormalizationScale;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
     std::vector< MassesSquaredCalculator* > scalarSquareMasses;
@@ -153,6 +154,14 @@ namespace VevaciousPlusPlus
     // as the lowest scale given by the blocks of the SLHA file.
     virtual std::string SetScaleForPythonPotentialCall() const
     { return std::string( "" ); }
+
+    // This scales down the values of cappedFieldConfiguration if the sum of
+    // the squares of the elements is larger than
+    // squareOfMaximumRenormalizationScale so that the sum is equal to it, and
+    // returns the difference of the original sum of squares from
+    // squareOfMaximumRenormalizationScale.
+    double CapFieldConfiguration(
+                       std::vector< double >& cappedFieldConfiguration ) const;
   };
 
 
@@ -210,6 +219,37 @@ namespace VevaciousPlusPlus
            std::make_pair( (*whichMatrix)->MassesSquared( fieldConfiguration ),
                            (*whichMatrix)->MultiplicityFactor() ) );
     }
+  }
+
+  // This scales down the values of cappedFieldConfiguration if the sum of
+  // the squares of the elements is larger than
+  // squareOfMaximumRenormalizationScale so that the sum is equal to it, and
+  // returns the difference of the original sum of squares from
+  // squareOfMaximumRenormalizationScale.
+  inline double PotentialFromPolynomialAndMasses::CapFieldConfiguration(
+                        std::vector< double >& cappedFieldConfiguration ) const
+  {
+    double lengthSquared( 0.0 );
+    for( std::vector< double >::const_iterator
+         fieldValue( cappedFieldConfiguration.begin() );
+         fieldValue < cappedFieldConfiguration.end();
+         ++fieldValue )
+    {
+      lengthSquared += ( (*fieldValue) * (*fieldValue) );
+    }
+    if( lengthSquared <= squareOfMaximumRenormalizationScale )
+    {
+      return 0.0;
+    }
+    double const
+    scaleFactor( sqrt( squareOfMaximumRenormalizationScale / lengthSquared ) );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < cappedFieldConfiguration.size();
+         ++fieldIndex )
+    {
+      cappedFieldConfiguration[ fieldIndex ] *= scaleFactor;
+    }
+    return ( lengthSquared - squareOfMaximumRenormalizationScale );
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -52,35 +52,70 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const temperatureValue ) const
   {
+    std::vector< double > cappedFieldConfiguration( fieldConfiguration );
+    double const squaredLengthBeyondCap( CapFieldConfiguration(
+                                                  cappedFieldConfiguration ) );
     double renormalizationScaleSquared( RenormalizationScaleSquared(
-                                                            fieldConfiguration,
+                                                      cappedFieldConfiguration,
                                                           temperatureValue ) );
     double logarithmOfScale( 0.5 * log( renormalizationScaleSquared ) );
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       scalarSquareMasses,
                                       scalarMassesSquaredWithFactors,
                                       logarithmOfScale );
     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       fermionSquareMasses,
                                       fermionMassesSquaredWithFactors,
                                       logarithmOfScale );
     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       vectorSquareMasses,
                                       vectorMassesSquaredWithFactors,
                                       logarithmOfScale );
-    return ( treeLevelPotential( fieldConfiguration,
+    return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
+             + treeLevelPotential( cappedFieldConfiguration,
                                  logarithmOfScale )
-             + polynomialLoopCorrections( fieldConfiguration,
+             + polynomialLoopCorrections( cappedFieldConfiguration,
                                           logarithmOfScale )
-             + LoopAndThermalCorrections( fieldConfiguration,
+             + LoopAndThermalCorrections( cappedFieldConfiguration,
                                           scalarMassesSquaredWithFactors,
                                           fermionMassesSquaredWithFactors,
                                           vectorMassesSquaredWithFactors,
                                          ( 1.0 / renormalizationScaleSquared ),
                                           temperatureValue ) );
+  }
+
+  // This sets dsbFieldValueInputs based on the SLHA file just read in.
+  void RgeImprovedOneLoopPotential::UpdateSelfForNewSlha(
+                                               SlhaManager const& slhaManager )
+  {
+    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
+    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
+                                        * currentMinimumRenormalizationScale );
+    logarithmOfMinimumRenormalizationScale
+    = log( currentMinimumRenormalizationScale );
+    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
+    if( currentMaximumRenormalizationScale
+        < ( 10.0 * currentMinimumRenormalizationScale ) )
+    {
+      currentMaximumRenormalizationScale
+      = ( 10.0 * currentMinimumRenormalizationScale );
+    }
+    squareOfMaximumRenormalizationScale = ( currentMaximumRenormalizationScale
+                                        * currentMaximumRenormalizationScale );
+    logarithmOfMaximumRenormalizationScale
+    = log( currentMaximumRenormalizationScale );
+    std::vector< double > fieldOrigin( numberOfFields,
+                                       0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      dsbFieldValueInputs[ fieldIndex ]
+      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

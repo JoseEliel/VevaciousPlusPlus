@@ -17,12 +17,7 @@ namespace VevaciousPlusPlus
     homotopyContinuationSolver( homotopyContinuationSolver ),
     purelyRealSolutionSets()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "HomotopyContinuationAndGradient::HomotopyContinuationAndGradient("
-    << " ... )";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   HomotopyContinuationAndGradient::~HomotopyContinuationAndGradient()

@@ -77,14 +77,6 @@ namespace VevaciousPlusPlus
         }
         panicVacua.push_back( foundMinimum );
       }
-      else
-      {
-        // placeholder:
-        /**/std::cout << std::endl
-        << "Placeholder: "
-        << "Should nudge this extremum if it's a saddle point.";
-        std::cout << std::endl;/**/
-      }
     }
 
     std::cout
@@ -124,4 +116,5 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
     std::cout << std::endl;*/
   }
+
 } /* namespace VevaciousPlusPlus */

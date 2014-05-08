@@ -36,6 +36,7 @@ namespace VevaciousPlusPlus
     currentMinimumRenormalizationScale( NAN ),
     squareOfMinimumRenormalizationScale( NAN ),
     currentMaximumRenormalizationScale( NAN ),
+    squareOfMaximumRenormalizationScale( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -706,10 +707,10 @@ namespace VevaciousPlusPlus
     "    return gradientArray\n"
     "\n"
     "def PotentialForCosmotransitions( arrayOfArrays ):\n"
-    "    if ( " << numberOfFields << ", ) == arrayOfArrays.shape ):\n"
+    "    if ( arrayOfArrays.shape == ( " << numberOfFields << ", ) ):\n"
     "        return UnderlyingPotential( arrayOfArrays )\n"
-    "    elif ( ( len( arrayOfArrays ), " << numberOfFields << " )\n"
-    "           == arrayOfArrays.shape ):\n"
+    "    elif ( arrayOfArrays.shape == ( len( arrayOfArrays ), "
+                                                 << numberOfFields << " ) ):\n"
     "        returnArray = numpy.zeros( len( arrayOfArrays ) )\n"
     "        for whichIndex in range( len( arrayOfArrays ) ):\n"
     "            returnArray[ whichIndex ] = UnderlyingPotential(\n"
@@ -719,13 +720,13 @@ namespace VevaciousPlusPlus
     "        return None\n"
     "\n"
     "def GradientForCosmotransitions( arrayOfArrays ):\n"
-    "    if ( " << numberOfFields << ", ) == arrayOfArrays.shape ):\n"
+    "    if ( arrayOfArrays.shape == ( " << numberOfFields << ", ) ):\n"
     "        return UnderlyingGradient( arrayOfArrays )\n"
-    "    elif ( ( len( arrayOfArrays ), " << numberOfFields << " )\n"
-    "           == arrayOfArrays.shape ):\n"
-    "    returnMatrix = arrayOfArrays.copy()\n"
-    "    for whichIndex in range( len( arrayOfArrays ) ):\n"
-    "        returnMatrix[ whichIndex ] = UnderlyingGradient(\n"
+    "    elif ( arrayOfArrays.shape == ( len( arrayOfArrays ), "
+                                                 << numberOfFields << " ) ):\n"
+    "        returnMatrix = arrayOfArrays.copy()\n"
+    "        for whichIndex in range( len( arrayOfArrays ) ):\n"
+    "            returnMatrix[ whichIndex ] = UnderlyingGradient(\n"
     "                                          arrayOfArrays[ whichIndex ] )\n"
     "        return returnMatrix\n"
     "    else:\n"
@@ -745,6 +746,7 @@ namespace VevaciousPlusPlus
     currentMinimumRenormalizationScale( NAN ),
     squareOfMinimumRenormalizationScale( NAN ),
     currentMaximumRenormalizationScale( NAN ),
+    squareOfMaximumRenormalizationScale( NAN ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -775,6 +777,8 @@ namespace VevaciousPlusPlus
                               copySource.squareOfMinimumRenormalizationScale ),
     currentMaximumRenormalizationScale(
                                copySource.currentMaximumRenormalizationScale ),
+    squareOfMaximumRenormalizationScale(
+                               copySource.squareOfMaximumRenormalizationScale ),
     treeLevelPotential( copySource.treeLevelPotential ),
     polynomialLoopCorrections( copySource.polynomialLoopCorrections ),
     scalarSquareMasses(),

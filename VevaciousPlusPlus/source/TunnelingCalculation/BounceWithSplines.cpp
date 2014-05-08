@@ -67,7 +67,13 @@ namespace VevaciousPlusPlus
     TunnelingCalculator( potentialFunction,
                          tunnelingStrategy,
                          survivalProbabilityThreshold ),
-    potentialFunction( potentialFunction )
+    potentialFunction( potentialFunction ),
+    potentialForMinuit( potentialFunction ),
+    thermalMinimumMinuit( potentialForMinuit ),
+    evaporationMinimum(),
+    criticalMinimum(),
+    criticalRatherThanEvaporation( true ),
+    thresholdSeparationSquared( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -78,7 +84,8 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This does something.
+  // This decides what virtual tunneling calculation functions to call based
+  // on tunnelingStrategy.
   void BounceWithSplines::CalculateTunneling(
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
@@ -138,5 +145,144 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;
     }
   }
+
+  // This calculates the temperature at which either tunneling from
+  // givenVacuum to the field origin becomes impossible if
+  // criticalRatherThanEvaporation is true or the temperature at which
+  // givenVacuum evaporates if false.
+  double BounceWithSplines::CriticalOrEvaporationTemperature(
+                                               double const potentialAtOrigin )
+  {
+    PotentialMinimum* minimumPointer( NULL );
+    std::cout
+    << std::endl
+    << "Looking for temperature ";
+    if( criticalRatherThanEvaporation )
+    {
+      std::cout <<  "at which tunneling from the field origin to "
+      << criticalMinimum.AsMathematica( potentialFunction.FieldNames() )
+      << " becomes impossible.";
+      minimumPointer = &criticalMinimum;
+    }
+    else
+    {
+      std::cout <<  "at which "
+      << evaporationMinimum.AsMathematica( potentialFunction.FieldNames() )
+      << " evaporates.";
+      minimumPointer = &evaporationMinimum;
+    }
+    std::cout << std::endl;
+
+    // The corrections are ( T^4 / ( 2 pi^2 ) ) * sum of J functions, and the
+    // values of the J functions are about 2 for massless bosonic & fermionic
+    // degrees of freedom, & there are ~100 degrees of freedom in the SM. Hence
+    // we take the coefficient of T^4 to be 100 / ( 2 pi^2 ) ~= 5.
+    double temperatureGuess( pow( ( 0.2 * ( potentialAtOrigin
+               - potentialFunction( minimumPointer->FieldConfiguration() ) ) ),
+                                              0.25 ) );
+    // We aim to have a pair of temperatures, one above the sought temperature,
+    // the other below. If the initial guess was below the sought temperature,
+    // we start doubling the temperature, recording the previous temperature
+    // each time. If it was above, we start halving the temperature, recording
+    // the previous temperature each time.
+    std::cout << "Trying " << temperatureGuess << " GeV.";
+    std::cout << std::endl;
+
+    while( BelowCriticalOrEvaporation( temperatureGuess ) )
+    {
+      temperatureGuess += temperatureGuess;
+      std::cout << "... too low. Trying " << temperatureGuess << " GeV.";
+      std::cout << std::endl;
+    }
+    // Now temperatureGuess is definitely about the sought temperature, so we
+    // halve temperatureGuess and see if it is still too high, & if so, keep
+    // halving.
+    temperatureGuess = ( 0.5 * temperatureGuess );
+    while( !(BelowCriticalOrEvaporation( temperatureGuess )) )
+    {
+      temperatureGuess = ( 0.5 * temperatureGuess );
+      std::cout << "... too high. Trying " << temperatureGuess << " GeV.";
+      std::cout << std::endl;
+    }
+    // At this point, temperatureGuess should be between 0.5 and 1.0 times the
+    // value which we should return.
+    double justBelowTemperature( temperatureGuess );
+    double justAboveTemperature( temperatureGuess + temperatureGuess );
+    // We aim to be within a factor of 2^( -7 ) of the critical temperature,
+    // hence 7 iterations of this loop.
+    for( unsigned int narrowingStep( 0 );
+         narrowingStep < 7;
+         ++narrowingStep )
+    {
+      temperatureGuess = sqrt( justBelowTemperature * justAboveTemperature );
+      std::cout << "Trying " << temperatureGuess << " GeV.";
+      std::cout << std::endl;
+      if( BelowCriticalOrEvaporation( temperatureGuess ) )
+      {
+        justBelowTemperature = temperatureGuess;
+      }
+      else
+      {
+        justAboveTemperature = temperatureGuess;
+      }
+    }
+    std::cout << "Temperature lies between " << justBelowTemperature
+    << " GeV and " << justAboveTemperature << " GeV.";
+    std::cout << std::endl;
+    return sqrt( justBelowTemperature * justAboveTemperature );
+  }
+
+  // This returns true if the temperature is below that at which
+  // evaporationMinimum is no longer separated from the field origin by an
+  // energy barrier.
+  bool BounceWithSplines::BelowEvaporationTemperature(
+                                                double const temperatureGuess )
+  {
+    unsigned int const numberOfSteps( 3 );
+    double const stepFraction( 1.0 / (double)( numberOfSteps ) );
+    std::vector< double >
+    fieldConfiguration( potentialFunction.FieldValuesOrigin() );
+    double lastPotentialValue( potentialFunction( fieldConfiguration,
+                                                  temperatureGuess ) );
+    double currentPotentialValue( lastPotentialValue );
+    // We compare the potential at a series of points from the field origin
+    // to evaporationMinimum. If the potential ever goes down on the way, there
+    // is an energy barrier, so we note that we are below the evaporation
+    // temperature.
+    for( unsigned int whichStep( 1 );
+         whichStep <= numberOfSteps;
+         ++whichStep )
+    {
+      for( unsigned int fieldIndex( 0 );
+           fieldIndex < fieldConfiguration.size();
+           ++fieldIndex )
+      {
+        fieldConfiguration[ fieldIndex ]
+        = ( (double)whichStep * stepFraction
+            * evaporationMinimum.FieldConfiguration()[ fieldIndex ] );
+      }
+      currentPotentialValue = potentialFunction( fieldConfiguration,
+                                                 temperatureGuess );
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "step " << whichStep << ", fieldConfiguration = "
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+      << ", lastPotentialValue = " << lastPotentialValue
+      << ", currentPotentialValue = " << currentPotentialValue;
+      std::cout << std::endl;*/
+
+      if( currentPotentialValue < lastPotentialValue )
+      {
+        return true;
+      }
+      lastPotentialValue = currentPotentialValue;
+    }
+    // If the loop ends without returning, there was no energy barrier.
+    return false;
+  }
+
 
 } /* namespace VevaciousPlusPlus */

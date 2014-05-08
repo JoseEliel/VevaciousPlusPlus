@@ -75,9 +75,9 @@ namespace VevaciousPlusPlus
     // This returns false if the vector of the absolute values of the fields of
     // comparisonMinimum lies within a hypercube of side thresholdDistance
     // centered on dsbVacuum.
-    bool IsNotPhaseRotationOfDsbVacuum(
-                                     PotentialMinimum const& comparisonMinimum,
-                                        double const thresholdDistance ) const;
+    bool
+    IsNotPhaseRotationOfDsbVacuum( PotentialMinimum const& comparisonMinimum,
+                                   double const thresholdDistance ) const;
   };
 
 

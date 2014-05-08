@@ -22,11 +22,7 @@ namespace VevaciousPlusPlus
     dominantTemperatureInGigaElectronVolts( -1.0 ),
     survivalProbabilityThreshold( survivalProbabilityThreshold )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "TunnelingCalculator::TunnelingCalculator()";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   TunnelingCalculator::~TunnelingCalculator()

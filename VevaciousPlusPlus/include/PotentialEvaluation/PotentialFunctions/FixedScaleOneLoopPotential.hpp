@@ -82,12 +82,20 @@ namespace VevaciousPlusPlus
   inline void FixedScaleOneLoopPotential::UpdateSelfForNewSlha(
                                                SlhaManager const& slhaManager )
   {
-    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
     currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
     squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
                                         * currentMinimumRenormalizationScale );
     inverseRenormalizationScaleSquared
     = ( 1.0 / squareOfMinimumRenormalizationScale );
+    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
+    if( currentMaximumRenormalizationScale
+        < ( 10.0 * currentMinimumRenormalizationScale ) )
+    {
+      currentMaximumRenormalizationScale
+      = ( 10.0 * currentMinimumRenormalizationScale );
+    }
+    squareOfMaximumRenormalizationScale = ( currentMaximumRenormalizationScale
+                                        * currentMaximumRenormalizationScale );
     std::vector< double > fieldOrigin( numberOfFields,
                                        0.0 );
     for( unsigned int fieldIndex( 0 );

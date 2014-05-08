@@ -26,7 +26,8 @@ namespace VevaciousPlusPlus
                             PotentialFunction& potentialFunction,
                             TunnelingStrategy const tunnelingStrategy,
                             double const survivalProbabilityThreshold,
-                            std::string const& pathToCosmotransitions );
+                            std::string const& pathToCosmotransitions,
+                            unsigned int const resolutionOfDsbVacuum = 10 );
     virtual
     ~CosmoTransitionsRunner();
 
@@ -38,8 +39,11 @@ namespace VevaciousPlusPlus
 
   protected:
     static std::string pythonPotentialFilenameBase;
+
     IWritesPythonPotential& pythonPotential;
     std::string const pathToCosmotransitions;
+    unsigned int const resolutionOfDsbVacuum;
+
 
     // This creates a Python file with the potential in a form that can be used
     // by CosmoTransitions.
@@ -66,42 +70,7 @@ namespace VevaciousPlusPlus
     double const DeformedPathAction( PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum,
                                      double const tunnelingTemperature ) const;
-
-    // This calculates the temperature at which either tunneling from
-    // givenVacuum to the field origin becomes impossible if
-    // criticalRatherThanEvaporation is true or the temperature at which
-    // givenVacuum evaporates if false.
-    double const CriticalTemperature( PotentialMinimum const& givenVacuum,
-                                      bool const criticalRatherThanEvaporation,
-                                      double const potentialAtOrigin ) const;
-
-    // This returns true if the temperature is above the temperature that
-    // is calculated by CriticalTemperature above.
-    bool const BelowCritical( bool const criticalRatherThanEvaporation,
-                              PotentialMinimum const& thermalMinimum,
-                              double const thresholdSeparationSquared,
-                              double const temperatureGuess ) const;
   };
-
-
-
-  // This returns true if the temperature is above the temperature that
-  // is calculated by CriticalTemperature above.
-  inline bool const CosmoTransitionsRunner::BelowCritical(
-                                      bool const criticalRatherThanEvaporation,
-                                        PotentialMinimum const& thermalMinimum,
-                                       double const thresholdSeparationSquared,
-                                          double const temperatureGuess ) const
-  {
-    if( criticalRatherThanEvaporation )
-    {
-      return ( potentialFunction( thermalMinimum.FieldConfiguration(),
-                                  temperatureGuess )
-               < potentialFunction( potentialFunction.FieldValuesOrigin(),
-                                    temperatureGuess ) );
-    }
-    return ( thermalMinimum.LengthSquared() > thresholdSeparationSquared );
-  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* COSMOTRANSITIONSRUNNER_HPP_ */
