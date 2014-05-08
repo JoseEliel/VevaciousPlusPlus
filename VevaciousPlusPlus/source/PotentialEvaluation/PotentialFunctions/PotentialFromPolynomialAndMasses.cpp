@@ -28,7 +28,8 @@ namespace VevaciousPlusPlus
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                                               std::string const& modelFilename,
-                           RunningParameterManager& runningParameterManager ) :
+                              RunningParameterManager& runningParameterManager,
+                                       double const scaleRangeMinimumFactor ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
@@ -47,7 +48,8 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
-    needToUpdateHomotopyContinuation( false )
+    needToUpdateHomotopyContinuation( false ),
+    scaleRangeMinimumFactor( scaleRangeMinimumFactor )
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -757,7 +759,8 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
-    needToUpdateHomotopyContinuation( false )
+    needToUpdateHomotopyContinuation( false ),
+    scaleRangeMinimumFactor( NAN )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -790,7 +793,8 @@ namespace VevaciousPlusPlus
     vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
     vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant ),
     needToUpdateHomotopyContinuation(
-                                  copySource.needToUpdateHomotopyContinuation )
+                                 copySource.needToUpdateHomotopyContinuation ),
+    scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more

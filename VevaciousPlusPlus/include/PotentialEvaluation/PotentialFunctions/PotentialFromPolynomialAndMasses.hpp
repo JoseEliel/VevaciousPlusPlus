@@ -24,7 +24,8 @@ namespace VevaciousPlusPlus
   {
   public:
     PotentialFromPolynomialAndMasses( std::string const& modelFilename,
-                            RunningParameterManager& runningParameterManager );
+                              RunningParameterManager& runningParameterManager,
+                                 double const scaleRangeMinimumFactor = 10.0 );
     virtual
     ~PotentialFromPolynomialAndMasses();
 
@@ -67,6 +68,7 @@ namespace VevaciousPlusPlus
     std::vector< RealMassesSquaredMatrix > vectorMassSquaredMatrices;
     double vectorMassCorrectionConstant;
     bool needToUpdateHomotopyContinuation;
+    double const scaleRangeMinimumFactor;
 
 
     // This is just for derived classes.

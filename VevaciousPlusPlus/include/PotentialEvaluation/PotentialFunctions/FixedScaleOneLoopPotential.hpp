@@ -89,10 +89,10 @@ namespace VevaciousPlusPlus
     = ( 1.0 / squareOfMinimumRenormalizationScale );
     currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
     if( currentMaximumRenormalizationScale
-        < ( 10.0 * currentMinimumRenormalizationScale ) )
+        < ( scaleRangeMinimumFactor * currentMinimumRenormalizationScale ) )
     {
       currentMaximumRenormalizationScale
-      = ( 10.0 * currentMinimumRenormalizationScale );
+      = ( scaleRangeMinimumFactor * currentMinimumRenormalizationScale );
     }
     squareOfMaximumRenormalizationScale = ( currentMaximumRenormalizationScale
                                         * currentMaximumRenormalizationScale );
