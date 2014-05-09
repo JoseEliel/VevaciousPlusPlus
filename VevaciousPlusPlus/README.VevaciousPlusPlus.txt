@@ -80,14 +80,17 @@
 
 
 TODO:
- * Implementing CosmoTransitionsRunner class
- * Nudging off saddles
+ * Decent bundled model files
  * TakenPositive for PotentialFromPolynomialAndMasses
  * Implementing BasicPolynomialHomotopyContinuation class
  * Implementing MinuitBounceActionMinimizer class
 
 
 CHANGELOG:
+ * 9th May 2014: version 1.0.00.alpha.001
+ - Seems to work on the test case.
+ - Needs HOM4PS2 and CosmoTransitions (1 or 2).
+ 
  * 25th February 2014: version prealpha0001
  - Not even released!
  - Overhaul and rename of VevaciousTwo, which had not been released.

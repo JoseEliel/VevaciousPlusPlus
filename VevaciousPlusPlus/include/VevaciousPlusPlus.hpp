@@ -12,6 +12,7 @@
 #include "PotentialEvaluation.hpp"
 #include "PotentialMinimization.hpp"
 #include "TunnelingCalculation.hpp"
+#include <ctime>
 
 namespace VevaciousPlusPlus
 {
@@ -37,14 +38,11 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    // BOL::BasicTimer runTimer;
-    // It's too much effort to put in a "try to quit as soon as possible after
-    // this many seconds per point" functionality - too much chance of a
-    // prematurely-ended calculation being misinterpreted by the user as a
-    // final result.
     SlhaManager& slhaManager;
     PotentialMinimizer& potentialMinimizer;
     TunnelingCalculator& tunnelingCalculator;
+    time_t currentTime;
+    BOL::BasicTimer runTimer;
   };
 
 } /* namespace VevaciousPlusPlus */

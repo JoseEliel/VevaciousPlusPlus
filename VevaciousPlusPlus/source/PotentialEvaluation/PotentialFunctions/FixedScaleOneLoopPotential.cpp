@@ -49,19 +49,9 @@ namespace VevaciousPlusPlus
                                           double const temperatureValue ) const
   {
     // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::operator()( {";
-    for( std::vector< double >::const_iterator
-         fieldValue( fieldConfiguration.begin() );
-         fieldValue < fieldConfiguration.end();
-         ++fieldValue )
-    {
-      std::cout << "  " << *fieldValue;
-    }
-    std::cout << "  }, " << temperatureValue
-    << " ) called. treeLevelPotential( fieldConfiguration ) = "
-    << treeLevelPotential( fieldConfiguration );
+    /*std::cout << "debugging: FixedScaleOneLoopPotential( "
+    << FieldConfigurationAsMathematica( fieldConfiguration ) << ", T = "
+    << temperatureValue << " ) called.";
     std::cout << std::endl;*/
 
     std::vector< double > cappedFieldConfiguration( fieldConfiguration );

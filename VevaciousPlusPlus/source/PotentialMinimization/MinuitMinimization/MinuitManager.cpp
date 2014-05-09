@@ -34,7 +34,7 @@ namespace VevaciousPlusPlus
   // than errorMinimum is set to errorMinimum.
   ROOT::Minuit2::FunctionMinimum
   MinuitManager::RunMigrad( std::vector< double > const& startingPoint,
-                             double givenTolerance ) const
+                            double givenTolerance ) const
   {
     std::vector< double > initialStepSizes( startingPoint.size() );
     double stepSize( 0.0 );

@@ -32,6 +32,8 @@
   </PathToHom4ps2>
   
   <TunnelingStrategy>
+  <!-- Valid options: NoTunneling, JustQuantum, JustThermal,
+                      ThermalThenQuantum, QuantumThenThermal -->
   ThermalThenQuantum
   </TunnelingStrategy>
   <SurvivalProbabilityThreshold>

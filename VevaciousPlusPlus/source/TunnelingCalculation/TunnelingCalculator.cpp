@@ -17,8 +17,10 @@ namespace VevaciousPlusPlus
     SlhaUpdatePropagator( slhaUpdatePropagator ),
     tunnelingStrategy( tunnelingStrategy ),
     quantumSurvivalProbability( -1.0 ),
+    logOfMinusLogOfQuantumProbability( -1.0E+100 ),
     quantumLifetimeInSeconds( -1.0 ),
     thermalSurvivalProbability( -1.0 ),
+    logOfMinusLogOfThermalProbability( -1.0E+100 ),
     dominantTemperatureInGigaElectronVolts( -1.0 ),
     survivalProbabilityThreshold( survivalProbabilityThreshold )
   {

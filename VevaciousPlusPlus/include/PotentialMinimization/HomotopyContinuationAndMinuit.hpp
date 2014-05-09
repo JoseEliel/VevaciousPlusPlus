@@ -21,7 +21,8 @@ namespace VevaciousPlusPlus
   public:
     HomotopyContinuationAndMinuit( PotentialFunction const& potentialFunction,
                         HomotopyContinuationSolver& homotopyContinuationSolver,
-                            double const extremumSeparationThresholdFraction );
+                              double const extremumSeparationThresholdFraction,
+                         double const nonDsbRollingToDsbScalingFactor = 10.0 );
     virtual
     ~HomotopyContinuationAndMinuit();
 
@@ -48,6 +49,7 @@ namespace VevaciousPlusPlus
     PotentialForMinuit potentialForMinuit;
     MinuitManager minuitManager;
     double const extremumSeparationThresholdFraction;
+    double const nonDsbRollingToDsbScalingFactor;
 
     // This uses Minuit2 to minimize potentialForMinuit starting from the
     // values in purelyRealSolutionSets.

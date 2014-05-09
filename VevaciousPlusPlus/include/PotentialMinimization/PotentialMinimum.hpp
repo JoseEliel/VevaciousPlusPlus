@@ -25,8 +25,14 @@ namespace VevaciousPlusPlus
 
 
     // This returns the sum of the squares of the differences in the field
+    // values of this PotentialMinimum with comparisonFields.
+    double
+    SquareDistanceTo( std::vector< double > const& comparisonFields ) const;
+
+    // This returns the sum of the squares of the differences in the field
     // values of this PotentialMinimum with comparisonMinimum.
-    double SquareDistanceTo( PotentialMinimum const& comparisonMinimum ) const;
+    double SquareDistanceTo( PotentialMinimum const& comparisonMinimum ) const
+    { return SquareDistanceTo( comparisonMinimum.FieldConfiguration() ); }
 
     // This returns the sum of the squares of the field values.
     double LengthSquared() const;
@@ -38,8 +44,13 @@ namespace VevaciousPlusPlus
 
 
     // This prints the minimum as an empty XML element.
-    std::string AsXml( std::string const& elementName,
-                       std::vector< std::string > const& fieldNames ) const;
+    std::string AsEmptyXmlElement( std::string const& elementName,
+                          std::vector< std::string > const& fieldNames ) const;
+
+    // This prints the minimum as an XML element in the style chosen for
+    // Vevacious output.
+    std::string AsVevaciousXmlElement( std::string const& elementName,
+                          std::vector< std::string > const& fieldNames ) const;
 
     // This prints the minimum in a form that Mathematica can understand.
     std::string
@@ -49,10 +60,10 @@ namespace VevaciousPlusPlus
 
 
 
-  // This returns the sum of the squares of the differences in the field values
-  // of this PotentialMinimum with comparisonMinimum.
+  // This returns the sum of the squares of the differences in the field
+  // values of this PotentialMinimum with comparisonFields.
   inline double PotentialMinimum::SquareDistanceTo(
-                              PotentialMinimum const& comparisonMinimum ) const
+                          std::vector< double > const& comparisonFields ) const
   {
     double returnDouble( 0.0 );
     double fieldDifference( 0.0 );
@@ -60,8 +71,8 @@ namespace VevaciousPlusPlus
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
-      fieldDifference = ( variableValues[ fieldIndex ]
-                          - comparisonMinimum.VariableValues()[ fieldIndex ] );
+      fieldDifference
+      = ( variableValues[ fieldIndex ] - comparisonFields[ fieldIndex ] );
       returnDouble += ( fieldDifference * fieldDifference );
     }
     return returnDouble;
@@ -83,7 +94,8 @@ namespace VevaciousPlusPlus
 
 
   // This prints the minimum as an empty XML element.
-  inline std::string PotentialMinimum::AsXml( std::string const& elementName,
+  inline std::string
+  PotentialMinimum::AsEmptyXmlElement( std::string const& elementName,
                            std::vector< std::string > const& fieldNames ) const
   {
     std::stringstream stringBuilder;
@@ -96,6 +108,31 @@ namespace VevaciousPlusPlus
       << variableValues[ fieldIndex ] << "\"";
     }
     stringBuilder << " PotentialDepth=\"" << functionValue << "\" />";
+    return stringBuilder.str();
+  }
+
+  // This prints the minimum as an XML element in the style chosen for
+  // Vevacious output.
+  inline std::string
+  PotentialMinimum::AsVevaciousXmlElement( std::string const& elementName,
+                           std::vector< std::string > const& fieldNames ) const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "  <" << elementName << ">\n"
+    "    <FieldValues>\n";
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < variableValues.size();
+         ++fieldIndex )
+    {
+      stringBuilder << "      " << variableValues[ fieldIndex ] << " <!-- "
+      << fieldNames[ fieldIndex ] << " -->\n";
+    }
+    stringBuilder << "    </FieldValues>\n"
+    "    <RelativeDepth>\n"
+    "      " << functionValue
+    << " <!-- Potential in GeV^4 minus value for all fields = 0 -->\n"
+    "    </RelativeDepth>\n"
+    "  </" << elementName << ">\n";
     return stringBuilder.str();
   }
 

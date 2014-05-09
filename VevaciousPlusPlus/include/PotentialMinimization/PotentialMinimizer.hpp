@@ -62,7 +62,10 @@ namespace VevaciousPlusPlus
 
     bool DsbVacuumIsStable() const{ return panicVacua.empty(); }
 
-    bool DsbVacuumIsMetaStable() const{ return !(panicVacua.empty()); }
+    bool DsbVacuumIsMetastable() const{ return !(panicVacua.empty()); }
+
+    std::vector< std::string > const& FieldNames() const
+    { return potentialFunction.FieldNames(); }
 
 
   protected:

@@ -38,19 +38,43 @@ namespace VevaciousPlusPlus
     // falseVacuum to have survived as long as the age of the known Universe
     // including the time at non-negligible temperatures, depending on
     // tunnelingStrategy. It should set quantumSurvivalProbability,
-    // quantumLifetimeInSeconds, thermalSurvivalProbability, and
+    // logOfMinusLogOfQuantumProbability, quantumLifetimeInSeconds,
+    // thermalSurvivalProbability, logOfMinusLogOfThermalProbability, and
     // dominantTemperatureInGigaElectronVolts appropriately. Each of these
     // which is not calculated by the strategy should be left with negative
     // values.
     virtual void CalculateTunneling( PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum ) = 0;
 
+    double QuantumSurvivalProbability() const
+    { return quantumSurvivalProbability; }
+
+    double LogOfMinusLogOfQuantumProbability() const
+    { return logOfMinusLogOfQuantumProbability; }
+
+    double QuantumLifetimeInSeconds() const
+    { return quantumLifetimeInSeconds; }
+
+    double ThermalSurvivalProbability() const
+    { return thermalSurvivalProbability; }
+
+    double LogOfMinusLogOfThermalProbability() const
+    { return logOfMinusLogOfThermalProbability; }
+
+    double DominantTemperatureInGigaElectronVolts() const
+    { return dominantTemperatureInGigaElectronVolts; }
+
+    double SurvivalProbabilityThreshold() const
+    { return survivalProbabilityThreshold; }
+
 
   protected:
     TunnelingStrategy const tunnelingStrategy;
     double quantumSurvivalProbability;
+    double logOfMinusLogOfQuantumProbability;
     double quantumLifetimeInSeconds;
     double thermalSurvivalProbability;
+    double logOfMinusLogOfThermalProbability;
     double dominantTemperatureInGigaElectronVolts;
     double const survivalProbabilityThreshold;
   };

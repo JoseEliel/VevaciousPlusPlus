@@ -45,31 +45,42 @@ namespace VevaciousPlusPlus
     double quantumAction( DeformedPathAction( falseVacuum,
                                               trueVacuum,
                                               0.0 ) );
+    double const fourthRootOfSolitonicFactor( sqrt(
+                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
+                                                              trueVacuum ) ) );
+    logOfMinusLogOfQuantumProbability
+    = ( log( ( ageOfKnownUniverseInSeconds * hBarInGigaElectronVoltSeconds )
+             / fourthRootOfSolitonicFactor ) - ( 0.25 * quantumAction ) );
     if( quantumAction >= maximumPowerOfNaturalExponent )
     {
+      quantumLifetimeInSeconds = 1.0;
+      quantumSurvivalProbability = 0.0;
       std::cout
       << std::endl
-      << "Warning! The calculated bounce action was so large that"
-      << " exponentiating it would result in an overflow error, so capping it"
-      << " at " << maximumPowerOfNaturalExponent;
+      << "Warning! The calculated bounce action was so large and positive that"
+      << " exponentiating it would result in an overflow error, so capping the"
+      << " lifetime at " << quantumLifetimeInSeconds
+      << " and the survival probability at " << quantumSurvivalProbability;
       std::cout << std::endl;
-      quantumAction = maximumPowerOfNaturalExponent;
+      return;
     }
     else if( quantumAction <= -maximumPowerOfNaturalExponent )
     {
+      quantumLifetimeInSeconds = 1.0E+100;
+      quantumSurvivalProbability = 1.0;
       std::cout
       << std::endl
       << "Warning! The calculated bounce action was so large and negative that"
-      << " exponentiating it would result in an overflow error, so capping it"
-      << " at " << -maximumPowerOfNaturalExponent;
+      << " exponentiating it would result in an overflow error, so capping the"
+      << " lifetime at " << quantumLifetimeInSeconds
+      << " and the survival probability at " << quantumSurvivalProbability;
       std::cout << std::endl;
-      quantumAction = -maximumPowerOfNaturalExponent;
+      return;
     }
     quantumLifetimeInSeconds
     = ( ( exp( 0.25 * quantumAction )
           * hBarInGigaElectronVoltSeconds )
-        / sqrt( potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
-                                                              trueVacuum ) ) );
+        / fourthRootOfSolitonicFactor );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -327,7 +338,7 @@ namespace VevaciousPlusPlus
     << " least 10 minutes for 4 fields at 1-loop order, probably at least an"
     << " hour for 6 fields) and the output to the terminal can lag a lot (it"
     << " might only show up after the Python has finished even)."
-    << std::endl << "Calling system( \" " << systemCommand << " \")..."
+    << std::endl << "Calling system( \"" << systemCommand << "\" )..."
     << std::endl << "-----------------";
     std::cout << std::endl;
     BOL::UsefulStuff::runSystemCommand( systemCommand );
@@ -396,7 +407,7 @@ namespace VevaciousPlusPlus
 
     std::cout
     << std::endl
-    << "Optimal temperature for tunneling estimated to be "
+    << "Dominant temperature for tunneling estimated to be "
     << dominantTemperatureInGigaElectronVolts << " GeV.";
     std::cout << std::endl;
 
@@ -405,35 +416,22 @@ namespace VevaciousPlusPlus
     double thermalAction( DeformedPathAction( falseVacuum,
                                               trueVacuum,
                                     dominantTemperatureInGigaElectronVolts ) );
-    if( thermalAction >= ( maximumPowerOfNaturalExponent
-                           * dominantTemperatureInGigaElectronVolts ) )
+    logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor
+                                          - ( thermalAction
+                                     / dominantTemperatureInGigaElectronVolts )
+                                          - log( thermalAction ) );
+    if( logOfMinusLogOfThermalProbability >= maximumPowerOfNaturalExponent )
     {
       std::cout
       << std::endl
-      << "Warning! The calculated bounce action was so large that"
-      << " exponentiating it would result in an overflow error, so capping it"
-      << " at " << maximumPowerOfNaturalExponent;
+      << "Warning! The calculated bounce action was so large and positive that"
+      << " exponentiating it would result in an overflow error, so setting the"
+      << " survival probability to 0.";
       std::cout << std::endl;
-      thermalAction = ( maximumPowerOfNaturalExponent
-                        * dominantTemperatureInGigaElectronVolts );
+      thermalSurvivalProbability = 0.0;
     }
-    else if( thermalAction <= -( maximumPowerOfNaturalExponent
-                                 * dominantTemperatureInGigaElectronVolts ) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and negative that"
-      << " exponentiating it would result in an overflow error, so capping it"
-      << " at " << -maximumPowerOfNaturalExponent;
-      std::cout << std::endl;
-      thermalAction = -( maximumPowerOfNaturalExponent
-                         * dominantTemperatureInGigaElectronVolts );
-    }
-
-    double survivalExponent( lnOfThermalIntegrationFactor
-                             - ( thermalAction
-                                 / dominantTemperatureInGigaElectronVolts ) );
-    if( survivalExponent <= -maximumPowerOfNaturalExponent )
+    else if( logOfMinusLogOfThermalProbability
+             <= -maximumPowerOfNaturalExponent )
     {
       std::cout
       << std::endl
@@ -442,30 +440,23 @@ namespace VevaciousPlusPlus
       << " survival probability to 1.";
       std::cout << std::endl;
       thermalSurvivalProbability = 1.0;
-      return;
     }
-    // We don't need to consider
-    // survivalExponent > maximumPowerOfNaturalExponent as thermalAction and
-    // dominantTemperatureInGigaElectronVolts should both be positive, and
-    // lnOfThermalIntegrationFactor < maximumPowerOfNaturalExponent.
-    double const integratedDecayWidth( exp( thermalAction ) / thermalAction );
-    if( integratedDecayWidth > maximumPowerOfNaturalExponent )
+    else if( exp( logOfMinusLogOfThermalProbability )
+             >= maximumPowerOfNaturalExponent )
     {
       std::cout
       << std::endl
-      << "Warning! The calculated integrated thermal decay width was so"
-      << " large that exponentiating it would result in an overflow error,"
+      << "Warning! The calculated integrated decay width was so large and"
+      << " positive that exponentiating it would result in an overflow error,"
       << " so setting the survival probability to 0.";
       std::cout << std::endl;
       thermalSurvivalProbability = 0.0;
-      return;
     }
-    // We don't need to consider
-    // integratedDecayWidth < -maximumPowerOfNaturalExponent as
-    // exp( survivalExponent ) must be positive, and thermalAction should
-    // be positive.
-    thermalSurvivalProbability = exp( -integratedDecayWidth );
-
+    else
+    {
+      thermalSurvivalProbability
+      = exp( -exp( logOfMinusLogOfThermalProbability ) );
+    }
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
@@ -591,7 +582,7 @@ namespace VevaciousPlusPlus
     << " least 10 minutes for 4 fields at 1-loop order, probably at least an"
     << " hour for 6 fields) and the output to the terminal can lag a lot (it"
     << " might only show up after the Python has finished even)."
-    << std::endl << "Calling system( \" " << systemCommand << " \")..."
+    << std::endl << "Calling system( \"" << systemCommand << "\" )..."
     << std::endl << "-----------------";
     std::cout << std::endl;
     BOL::UsefulStuff::runSystemCommand( systemCommand );

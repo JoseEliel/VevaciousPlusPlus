@@ -418,12 +418,10 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "scale out non-DSB starting points which roll to DSB" << std::endl
-  << "write out XML results" << std::endl
-  << "write out SLHA results" << std::endl
   << "fix RealMssm.vin" << std::endl
   << "write MinuitBounceActionMinimizer" << std::endl
-  << "write BasicPolynomialHomotopyContinuation" << std::endl;
+  << "write BasicPolynomialHomotopyContinuation" << std::endl
+  << "think about uncertainties" << std::endl;
   std::cout << std::endl;
 
 
