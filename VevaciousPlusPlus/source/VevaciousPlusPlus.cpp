@@ -9,7 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
-  std::string const VevaciousPlusPlus::versionString( "1.0.00.alpha.001" );
+  std::string const VevaciousPlusPlus::versionString( "1.0.00.alpha.002" );
   std::string const VevaciousPlusPlus::citationString( "[none as yet]" );
 
   VevaciousPlusPlus::VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
@@ -217,13 +217,13 @@ namespace VevaciousPlusPlus
     {
       outputFile << "  1  " << slhaDoubleMaker.doubleToString(
           tunnelingCalculator.QuantumSurvivalProbability() )
-      << "  # Not calculated: ignored this number\n"
+      << "  # Not calculated: ignore this number\n"
       "  2  " << slhaDoubleMaker.doubleToString(
                                tunnelingCalculator.QuantumLifetimeInSeconds() )
-      << "  # Not calculated: ignored this number\n"
+      << "  # Not calculated: ignore this number\n"
       "  3  " << slhaDoubleMaker.doubleToString(
                       tunnelingCalculator.LogOfMinusLogOfQuantumProbability() )
-      << "  # Not calculated: ignored this number\n";
+      << "  # Not calculated: ignore this number\n";
     }
     outputFile << "BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0\n"
     "# [index] [verdict float]\n";
@@ -243,13 +243,13 @@ namespace VevaciousPlusPlus
     {
       outputFile << "  1  " << slhaDoubleMaker.doubleToString(
           tunnelingCalculator.ThermalSurvivalProbability() )
-      << "  # Not calculated: ignored this number\n"
+      << "  # Not calculated: ignore this number\n"
       "  2  " << slhaDoubleMaker.doubleToString(
                  tunnelingCalculator.DominantTemperatureInGigaElectronVolts() )
-      << "  # Not calculated: ignored this number\n"
+      << "  # Not calculated: ignore this number\n"
       "  3  " << slhaDoubleMaker.doubleToString(
                       tunnelingCalculator.LogOfMinusLogOfThermalProbability() )
-      << "  # Not calculated: ignored this number\n";
+      << "  # Not calculated: ignore this number\n";
     }
     outputFile
     << "BLOCK VEVACIOUSFIELDNAMES # Field names for each index\n"

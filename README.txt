@@ -87,6 +87,11 @@ TODO:
 
 
 CHANGELOG:
+ * 11th May 2014: version 1.0.00.alpha.002
+ - Fixed bundled full MSSM (restricted to real values for the scalar fields and
+   real values for the Lagrangian parameters).
+ - Fixed stupid typo in SLHA output from VevaciousPlusPlus class.
+
  * 9th May 2014: version 1.0.00.alpha.001
  - Seems to work on the test case.
  - Needs HOM4PS2 and CosmoTransitions (1 or 2).

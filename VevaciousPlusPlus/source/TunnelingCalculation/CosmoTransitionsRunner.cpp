@@ -164,7 +164,7 @@ namespace VevaciousPlusPlus
     // close to the divergence.
     double const highestFitTemperature( 0.9 * criticalTunnelingTemperature );
 
-    unsigned int const nodesForFit( 5 );
+    unsigned int const nodesForFit( 3 );
     std::vector< std::vector< double > > fitFalseVacua( nodesForFit );
     std::vector< std::vector< double > > fitTrueVacua( nodesForFit );
     std::vector< double > fitTemperatures( nodesForFit );

@@ -20,7 +20,7 @@
   </PotentialClass>
   <model>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin
   </model>
   
   <HomotopyContinuationClass>
@@ -37,13 +37,13 @@
   ThermalThenQuantum
   </TunnelingStrategy>
   <SurvivalProbabilityThreshold>
-  0.05
+  0.01
   </SurvivalProbabilityThreshold>
   <TunnelingClass>
   CosmoTransitionsRunner
   </TunnelingClass>
   <PathToCosmotransitions>
-  /Users/oleary/BOL/machine-specific/CosmoTransitions1/
+  /Users/oleary/BOL/machine-specific/CosmoTransitions2/
   </PathToCosmotransitions>
   
   <slha>
