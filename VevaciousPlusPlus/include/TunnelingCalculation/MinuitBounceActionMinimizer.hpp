@@ -44,6 +44,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    BounceActionForMinuit bounceActionForMinuit;
+
     // This should set quantumSurvivalProbability and quantumLifetimeInSeconds
     // appropriately.
     virtual void
