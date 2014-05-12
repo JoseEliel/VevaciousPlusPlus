@@ -272,6 +272,8 @@ namespace VevaciousPlusPlus
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
+    << "potentialPolynomial =" << std::endl
+    << potentialPolynomial.AsDebuggingString() << std::endl
     << "targetSystem =" << std::endl;
     for( std::vector< PolynomialSum >::iterator
          whichTadpole( targetSystem.begin() );

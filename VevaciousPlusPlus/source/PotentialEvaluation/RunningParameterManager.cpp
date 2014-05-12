@@ -501,6 +501,7 @@ namespace VevaciousPlusPlus
          ++whichParameter )
     {
       (*whichParameter)->UpdateForNewLogarithmOfScale( logarithmOfScale );
+      (*whichParameter)->updateObservers();
     }
   }
 

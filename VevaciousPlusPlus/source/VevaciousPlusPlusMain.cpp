@@ -326,10 +326,72 @@ int main( int argumentCount,
                                                           potentialMinimizer,
                                                         *tunnelingCalculator );
 
-  // Solve a parameter point:
+  // Solve a parameter point, if one was given directly with the <slha> tag:
   std::string slhaFile( argumentParser.fromTag( "slha",
-                                                "slha.out" ) );
-  vevaciousPlusPlus.RunPoint( slhaFile );
+                                                "" ) );
+  if( !(slhaFile.empty()) )
+  {
+    vevaciousPlusPlus.RunPoint( slhaFile );
+    vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "output",
+                                                      ( slhaFile + ".vout" ) ) );
+    vevaciousPlusPlus.WriteSlhaResults( slhaFile );
+  }
+
+  // Solve a directory full of parameter points, if one was given with the
+  // <InputFolder> tag.
+  std::string inputFolder(  argumentParser.fromTag( "InputFolder",
+                                                       "" ) );
+  std::string outputFolder(  argumentParser.fromTag( "OutputFolder",
+                                                        "" ) );
+  // debugging:
+  /**/std::cout << std::endl << "debugging:"
+  << std::endl
+  << "inputFolder = \"" << inputFolder << "\", inputFolder.empty() = "
+  << inputFolder.empty();
+  std::cout << std::endl;/**/
+
+  if( !(inputFolder.empty()) )
+  {
+    if( outputFolder.empty() )
+    {
+      std::cout
+      << std::endl
+      << "OutputFolder string must not be empty string! Use \"./\" for the"
+      << " current working folder.";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+    if( outputFolder.compare( inputFolder ) == 0 )
+    {
+      std::cout
+      << std::endl
+      << "Input folder and output folder must be different, as the filenames"
+      << " do not change!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+    BOL::FilePlaceholderManager placeholderManager( "",
+                                                    ".placeholder",
+                                                    "" );
+    placeholderManager.prepareFilenames( inputFolder,
+                                         outputFolder,
+                                         outputFolder );
+
+    while( placeholderManager.holdNextPlace() )
+    {
+      vevaciousPlusPlus.RunPoint( placeholderManager.getInput() );
+      vevaciousPlusPlus.WriteXmlResults( placeholderManager.getOutput()
+                                         + ".vout" );
+      std::string copyCommand( "cp " );
+      copyCommand.append( placeholderManager.getInput() );
+      copyCommand.append( " " );
+      copyCommand.append( placeholderManager.getOutput() );
+      BOL::UsefulStuff::runSystemCommand( copyCommand );
+      vevaciousPlusPlus.WriteSlhaResults( placeholderManager.getOutput() );
+    }
+  }
 
 
   // The FixedScaleOneLoopPotential constructor takes a string with the name of
@@ -406,11 +468,6 @@ int main( int argumentCount,
   std::cout << std::endl;
   std::cout << std::endl;
 
-  // Write the results:
-  vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "output",
-                                                    ( slhaFile + ".vout" ) ) );
-  vevaciousPlusPlus.WriteSlhaResults( slhaFile );
-
   delete tunnelingCalculator;
   delete homotopyContinuationSolver;
   delete potentialFunction;
@@ -418,7 +475,6 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "fix RealMssm.vin" << std::endl
   << "write MinuitBounceActionMinimizer" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;

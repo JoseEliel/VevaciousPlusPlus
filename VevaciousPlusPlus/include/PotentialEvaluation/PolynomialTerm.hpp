@@ -14,7 +14,7 @@
 namespace VevaciousPlusPlus
 {
 
-  class PolynomialTerm
+  class PolynomialTerm : public BOL::BasicObserver
   {
   public:
     PolynomialTerm();
@@ -24,10 +24,11 @@ namespace VevaciousPlusPlus
 
 
     // This multiplies the relevant field values with the coefficient and the
-    // values from the functionoids at the scale last used to update them.
+    // values from the functionoids at the scale of the last call of
+    // UpdateForUpdatedFunctionoids.
     double operator()( std::vector< double > const& fieldConfiguration ) const
-    { return FunctionoidProduct( FieldProduct( coefficientConstant,
-                                               fieldConfiguration ) ); }
+    { return FieldProduct( currentScaleTotalCoefficient,
+                           fieldConfiguration ); }
 
     // This multiplies the relevant field values with the coefficient and the
     // values from the functionoids at the scale given by the natural exponent
@@ -39,9 +40,16 @@ namespace VevaciousPlusPlus
                                  logarithmOfScale ); }
 
     // This multiplies the relevant field values with the coefficient and the
-    // values from the functionoids at the scale last used to update them.
+    // values from the functionoids at the scale of the last call of
+    // UpdateForUpdatedFunctionoids.
     std::complex< double > operator()(
        std::vector< std::complex< double > > const& fieldConfiguration ) const;
+
+    // This updates currentScaleTotalCoefficient to be coefficientConstant
+    // multiplied by the product of the operator() values from
+    // functionoidProduct.
+    void respondToObservedSignal(){ currentScaleTotalCoefficient
+                                 = FunctionoidProduct( coefficientConstant ); }
 
     // This returns a flag that can be false if the coefficient got multiplied
     // by a NULL functionoid.
@@ -101,6 +109,7 @@ namespace VevaciousPlusPlus
     std::vector< unsigned int > fieldProductByIndex;
     std::vector< unsigned int > fieldPowersByIndex;
     std::vector< ParameterFunctionoid* > functionoidProduct;
+    double currentScaleTotalCoefficient;
 
     // This returns doubleToMultiply multiplied by the field product using the
     // values in fieldConfiguration.
@@ -122,11 +131,12 @@ namespace VevaciousPlusPlus
 
 
   // This multiplies the relevant field values with the coefficient and the
-  // values from the functionoids.
+  // values from the functionoids at the scale of the last call of
+  // UpdateForUpdatedFunctionoids.
   inline std::complex< double > PolynomialTerm::operator()(
         std::vector< std::complex< double > > const& fieldConfiguration ) const
   {
-    std::complex< double > returnValue( coefficientConstant,
+    std::complex< double > returnValue( currentScaleTotalCoefficient,
                                         0.0 );
     for( std::vector< unsigned int >::const_iterator
          whichField( fieldProductByIndex.begin() );
@@ -134,13 +144,6 @@ namespace VevaciousPlusPlus
          ++whichField )
     {
       returnValue *= fieldConfiguration[ *whichField ];
-    }
-    for( std::vector< ParameterFunctionoid* >::const_iterator
-         whichFunctionoid( functionoidProduct.begin() );
-         whichFunctionoid < functionoidProduct.end();
-         ++whichFunctionoid )
-    {
-      returnValue *= (*(*whichFunctionoid))();
     }
     return returnValue;
   }
@@ -166,6 +169,7 @@ namespace VevaciousPlusPlus
       functionoidProduct.insert( functionoidProduct.end(),
                                  powerInt,
                                  runningParameter );
+      runningParameter->registerObserver( this );
     }
   }
 
@@ -189,10 +193,11 @@ namespace VevaciousPlusPlus
   inline void PolynomialTerm::ResetValues()
   {
     isValid = true;
-    coefficientConstant =  1.0;
+    coefficientConstant = 1.0;
     fieldProductByIndex.clear();
     fieldPowersByIndex.clear();
     functionoidProduct.clear();
+    currentScaleTotalCoefficient = 1.0;
   }
 
   // This returns true if the field with index fieldIndex has a non-zero
@@ -241,6 +246,7 @@ namespace VevaciousPlusPlus
                                    returnTerm.fieldPowersByIndex[ whichField ],
                                                whichField );
     }
+    returnTerm.respondToObservedSignal();
     return returnTerm;
   }
 

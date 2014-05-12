@@ -43,6 +43,22 @@ namespace VevaciousPlusPlus
                            std::vector< std::vector< double > >& realSolutions,
                                                   double const resolutionSize )
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "HomotopyContinuationTargetSystem::"
+    << "AppendPureRealSolutionAndValidSignFlips( {";
+    for( std::vector< std::complex< double > >::const_iterator
+         fieldValue( solutionConfiguration.begin() );
+         fieldValue < solutionConfiguration.end();
+         ++fieldValue )
+    {
+      std::cout << " ( " << fieldValue->real() << ", " << fieldValue->imag()
+          << " )";
+    }
+    std::cout << " }, ... ) called.";
+    std::cout << std::endl;*/
+
     // First we return from the function having done nothing if the solution is
     // not purely real.
     for( std::vector< std::complex< double > >::const_iterator
@@ -118,6 +134,21 @@ namespace VevaciousPlusPlus
         // to realSolutions if it doesn't solve the target system.
         if( !validSolution )
         {
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "signFlip {";
+          for( std::vector< std::complex< double > >::const_iterator
+               fieldValue( signFlip->begin() );
+               fieldValue < signFlip->end();
+               ++fieldValue )
+          {
+            std::cout << " ( " << fieldValue->real() << ", "
+            << fieldValue->imag() << " )";
+          }
+          std::cout << " } failed to solve target system.";
+          std::cout << std::endl;*/
+
           break;
         }
       }

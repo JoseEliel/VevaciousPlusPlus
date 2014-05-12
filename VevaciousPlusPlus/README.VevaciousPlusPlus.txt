@@ -87,6 +87,12 @@ TODO:
 
 
 CHANGELOG:
+ * 12th May 2014: version 1.0.00.alpha.003
+ - Added batch functionality to VevaciousPlusPlus.exe
+ - Re-worked PolynomialTerm class a bit to try to increase cache hits by
+   caching the coefficient times functionoid product for a fixed scale through
+   making it derive from BOL::BasicObserver.
+
  * 11th May 2014: version 1.0.00.alpha.002
  - Fixed bundled full MSSM (restricted to real values for the scalar fields and
    real values for the Lagrangian parameters).

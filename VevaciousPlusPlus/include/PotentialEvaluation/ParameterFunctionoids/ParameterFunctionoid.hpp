@@ -13,7 +13,7 @@
 namespace VevaciousPlusPlus
 {
 
-  class ParameterFunctionoid
+  class ParameterFunctionoid : public BOL::BasicObserved
   {
   public:
     ParameterFunctionoid( std::string const& creationString,

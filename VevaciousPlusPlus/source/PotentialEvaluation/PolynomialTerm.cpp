@@ -11,23 +11,33 @@ namespace VevaciousPlusPlus
 {
 
   PolynomialTerm::PolynomialTerm() :
+    BOL::BasicObserver(),
     isValid( true ),
     coefficientConstant( 1.0 ),
     fieldProductByIndex(),
     fieldPowersByIndex(),
-    functionoidProduct()
+    functionoidProduct(),
+    currentScaleTotalCoefficient( 0.0 )
   {
     // This constructor is just an initialization list.
   }
 
   PolynomialTerm::PolynomialTerm( PolynomialTerm const& copySource ) :
+    BOL::BasicObserver(),
     isValid( copySource.isValid ),
     coefficientConstant( copySource.coefficientConstant ),
     fieldProductByIndex( copySource.fieldProductByIndex ),
     fieldPowersByIndex( copySource.fieldPowersByIndex ),
-    functionoidProduct( copySource.functionoidProduct )
+    functionoidProduct( copySource.functionoidProduct ),
+    currentScaleTotalCoefficient( copySource.currentScaleTotalCoefficient )
   {
-    // This constructor is just an initialization list.
+    for( std::vector< ParameterFunctionoid* >::iterator
+         parameterFunctionoid( functionoidProduct.begin() );
+         parameterFunctionoid < functionoidProduct.end();
+         ++parameterFunctionoid )
+    {
+      (*parameterFunctionoid)->registerObserver( this );
+    }
   }
 
   PolynomialTerm::~PolynomialTerm()
@@ -121,7 +131,9 @@ namespace VevaciousPlusPlus
       << (*(*functionoidPointer))();
     }
     returnStream
-    << " }" << std::endl;
+    << " }" << std::endl
+    << "currentScaleTotalCoefficient = " << currentScaleTotalCoefficient
+    << std::endl;
     return returnStream.str();
   }
 
