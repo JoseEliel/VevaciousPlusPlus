@@ -1,13 +1,13 @@
 <VevaciousResults>
   <ReferenceData>
      <VevaciousVersion>
-       1.0.00.alpha.001
+       1.0.00.alpha.003
      </VevaciousVersion>
      <CitationArticle>
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-       Sun May 11 17:30:25 2014
+       Tue May 13 17:51:42 2014
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
@@ -28,23 +28,13 @@
     <FieldValues>
       2204.71 <!-- vHd0 -->
       2316.11 <!-- vHu0 -->
-      2220.74 <!-- vUr3 -->
-      2097.8 <!-- vQur3 -->
+      -2220.74 <!-- vUr3 -->
+      -2097.8 <!-- vQur3 -->
     </FieldValues>
     <RelativeDepth>
       -1.87194e+12 <!-- Potential in GeV^4 minus value for all fields = 0 -->
     </RelativeDepth>
   </PanicVacuum>
   <!-- Survival probability at zero temperature not calculated. -->
-  <NonZeroTemperatureDsbSurvival>
-    <DsbSurvivalProbability>
-      0
-    </DsbSurvivalProbability>
-    <LogOfMinusLogOfDsbSurvival>
-      28.7695 <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> 
-    </LogOfMinusLogOfDsbSurvival>
-    <DominantTunnelingTemperature>
-      477.8 <!-- in GeV -->
-    </DominantTunnelingTemperature>
-  </NonZeroTemperatureDsbSurvival>
+  <!-- Survival probability at non-zero temperatures not calculated. -->
 </VevaciousResults>

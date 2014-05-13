@@ -681,4 +681,102 @@ BLOCK VEVACIOUSPANICVACUUM # VEVs for panic vacuum in GeV
   1  +2.31611405E+003  # vHu0
   2  +2.22073715E+003  # vUr3
   3  +2.09779946E+003  # vQur3
-
+BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus
+# version 1.0.00.alpha.003, documented in [none as yet]
+# Results written Tue May 13 17:27:17 2014
+# [index] [verdict int]
+  1  0  # Metastable DSB vacuum
+BLOCK VEVACIOUSZEROTEMPERATURE # Results at T = 0
+# [index] [verdict float]
+  1  -1.00000000E+000  # Not calculated: ignore this number
+  2  -1.00000000E+000  # Not calculated: ignore this number
+  3  -1.00000000E+100  # Not calculated: ignore this number
+BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0
+# [index] [verdict float]
+  1  -1.00000000E+000  # Not calculated: ignore this number
+  2  -1.00000000E+000  # Not calculated: ignore this number
+  3  -1.00000000E+100  # Not calculated: ignore this number
+BLOCK VEVACIOUSFIELDNAMES # Field names for each index
+# [index] [field name in ""]
+  0  "vHd0"
+  1  "vHu0"
+  2  "vUr3"
+  3  "vQur3"
+BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV
+# [index] [field VEV in GeV]
+  0  +5.19291019E+000  # vHd0
+  1  +2.32924531E+002  # vHu0
+  2  +0.00000000E+000  # vUr3
+  3  +0.00000000E+000  # vQur3
+BLOCK VEVACIOUSPANICVACUUM # VEVs for panic vacuum in GeV
+# [index] [field VEV in GeV]
+  0  +2.20470785E+003  # vHd0
+  1  +2.31611405E+003  # vHu0
+  2  -2.22073715E+003  # vUr3
+  3  -2.09779946E+003  # vQur3
+BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus
+# version 1.0.00.alpha.003, documented in [none as yet]
+# Results written Tue May 13 17:42:57 2014
+# [index] [verdict int]
+  1  0  # Metastable DSB vacuum
+BLOCK VEVACIOUSZEROTEMPERATURE # Results at T = 0
+# [index] [verdict float]
+  1  -1.00000000E+000  # Not calculated: ignore this number
+  2  -1.00000000E+000  # Not calculated: ignore this number
+  3  -1.00000000E+100  # Not calculated: ignore this number
+BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0
+# [index] [verdict float]
+  1  -1.00000000E+000  # Not calculated: ignore this number
+  2  -1.00000000E+000  # Not calculated: ignore this number
+  3  -1.00000000E+100  # Not calculated: ignore this number
+BLOCK VEVACIOUSFIELDNAMES # Field names for each index
+# [index] [field name in ""]
+  0  "vHd0"
+  1  "vHu0"
+  2  "vUr3"
+  3  "vQur3"
+BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV
+# [index] [field VEV in GeV]
+  0  +5.19291019E+000  # vHd0
+  1  +2.32924531E+002  # vHu0
+  2  +0.00000000E+000  # vUr3
+  3  +0.00000000E+000  # vQur3
+BLOCK VEVACIOUSPANICVACUUM # VEVs for panic vacuum in GeV
+# [index] [field VEV in GeV]
+  0  +2.20470785E+003  # vHd0
+  1  +2.31611405E+003  # vHu0
+  2  +2.22073715E+003  # vUr3
+  3  +2.09779946E+003  # vQur3
+BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus
+# version 1.0.00.alpha.003, documented in [none as yet]
+# Results written Tue May 13 17:51:42 2014
+# [index] [verdict int]
+  1  0  # Metastable DSB vacuum
+BLOCK VEVACIOUSZEROTEMPERATURE # Results at T = 0
+# [index] [verdict float]
+  1  -1.00000000E+000  # Not calculated: ignore this number
+  2  -1.00000000E+000  # Not calculated: ignore this number
+  3  -1.00000000E+100  # Not calculated: ignore this number
+BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0
+# [index] [verdict float]
+  1  -1.00000000E+000  # Not calculated: ignore this number
+  2  -1.00000000E+000  # Not calculated: ignore this number
+  3  -1.00000000E+100  # Not calculated: ignore this number
+BLOCK VEVACIOUSFIELDNAMES # Field names for each index
+# [index] [field name in ""]
+  0  "vHd0"
+  1  "vHu0"
+  2  "vUr3"
+  3  "vQur3"
+BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV
+# [index] [field VEV in GeV]
+  0  +5.19291019E+000  # vHd0
+  1  +2.32924531E+002  # vHu0
+  2  +0.00000000E+000  # vUr3
+  3  +0.00000000E+000  # vQur3
+BLOCK VEVACIOUSPANICVACUUM # VEVs for panic vacuum in GeV
+# [index] [field VEV in GeV]
+  0  +2.20470785E+003  # vHd0
+  1  +2.31611405E+003  # vHu0
+  2  -2.22073715E+003  # vUr3
+  3  -2.09779946E+003  # vQur3

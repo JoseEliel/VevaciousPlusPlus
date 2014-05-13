@@ -71,10 +71,11 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/PotentialMinimization/HomotopyContinuationAndMinuit.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
- source/TunnelingCalculation/BounceActionForMinuit.cpp \
  source/TunnelingCalculation/BounceWithSplines.cpp \
+ source/TunnelingCalculation/BubbleRadiusFromAuxiliary.cpp \
  source/TunnelingCalculation/CosmoTransitionsRunner.cpp \
  source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
+ source/TunnelingCalculation/ModifiedBounceForMinuit.cpp \
  source/TunnelingCalculation/ThermalActionFitter.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
  source/VevaciousPlusPlus.cpp

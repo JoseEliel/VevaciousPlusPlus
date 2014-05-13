@@ -239,7 +239,7 @@ namespace VevaciousPlusPlus
                                                 double const temperatureGuess )
   {
     unsigned int const numberOfSteps( 3 );
-    double const stepFraction( 1.0 / (double)( numberOfSteps ) );
+    double const stepFraction( 1.0 / (double)numberOfSteps );
     std::vector< double >
     fieldConfiguration( potentialFunction.FieldValuesOrigin() );
     double lastPotentialValue( potentialFunction( fieldConfiguration,

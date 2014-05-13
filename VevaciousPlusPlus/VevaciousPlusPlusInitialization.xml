@@ -34,17 +34,20 @@
   <TunnelingStrategy>
   <!-- Valid options: NoTunneling, JustQuantum, JustThermal,
                       ThermalThenQuantum, QuantumThenThermal -->
-  ThermalThenQuantum
+  JustQuantum
   </TunnelingStrategy>
   <SurvivalProbabilityThreshold>
   0.01
   </SurvivalProbabilityThreshold>
   <TunnelingClass>
+  MinuitBounceActionMinimizer
+  </TunnelingClass>
+  <!-- <TunnelingClass>
   CosmoTransitionsRunner
   </TunnelingClass>
   <PathToCosmotransitions>
   /Users/oleary/BOL/machine-specific/CosmoTransitions2/
-  </PathToCosmotransitions>
+  </PathToCosmotransitions> -->
   
   <slha>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest.slha -->

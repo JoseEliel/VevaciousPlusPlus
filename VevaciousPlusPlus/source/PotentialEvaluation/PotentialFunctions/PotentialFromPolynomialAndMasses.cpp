@@ -915,10 +915,8 @@ namespace VevaciousPlusPlus
     // for the quantum corrections. (The conventions used in Vevacious are that
     // the thermal correction functions already have any minus signs for
     // fermions.)
-    totalQuantumCorrections -= fermionQuantumCorrections;
-    totalQuantumCorrections -= fermionQuantumCorrections;
-    totalThermalCorrections += fermionThermalCorrections;
-    totalThermalCorrections += fermionThermalCorrections;
+    totalQuantumCorrections -= ( 2.0 * fermionQuantumCorrections );
+    totalThermalCorrections += ( 2.0 * fermionThermalCorrections );
 
     double vectorQuantumCorrections( 0.0 );
     double vectorThermalCorrections( 0.0 );
@@ -940,11 +938,8 @@ namespace VevaciousPlusPlus
     // Vector boson degrees of freedom add to quantum corrections with a factor
     // of 3 in dimensional regularization schemes, and to thermal corrections
     // with a factor of 2.
-    totalQuantumCorrections += vectorQuantumCorrections;
-    totalQuantumCorrections += vectorQuantumCorrections;
-    totalQuantumCorrections += vectorQuantumCorrections;
-    totalThermalCorrections += vectorThermalCorrections;
-    totalThermalCorrections += vectorThermalCorrections;
+    totalQuantumCorrections += ( 3.0 * vectorQuantumCorrections );
+    totalThermalCorrections += ( 2.0 * vectorThermalCorrections );
 
     return ( ( totalQuantumCorrections * loopFactor )
              + ( totalThermalCorrections * thermalFactor

@@ -35,26 +35,6 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This should try to find the most accurate survival probability for
-  // falseVacuum to have survived as long as the age of the known Universe
-  // including the time at non-negligible temperatures, depending on
-  // tunnelingStrategy. It should set quantumSurvivalProbability,
-  // quantumLifetimeInSeconds, thermalSurvivalProbability, and
-  // dominantTemperatureInGigaElectronVolts appropriately. Each of these
-  // which is not calculated by the strategy should be left with negative
-  // values.
-  void MinuitBounceActionMinimizer::CalculateTunneling(
-                                           PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum )
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "MinuitBounceActionMinimizer::CalculateTunneling()";
-    std::cout << std::endl;/**/
-  }
-
-
   // This doesn't do anything here.
   void MinuitBounceActionMinimizer::UpdateSelfForNewSlha(
                                                SlhaManager const& slhaManager )
@@ -76,6 +56,42 @@ namespace VevaciousPlusPlus
     /**/std::cout << std::endl
     << "Placeholder: "
     << "MinuitBounceActionMinimizer::CalculateQuantumTunneling(...)";
+    std::cout << std::endl;/**/
+
+    criticalRatherThanEvaporation = false;
+    evaporationMinimum = falseVacuum;
+    double evaporationTemperature( CriticalOrEvaporationTemperature(
+                potentialFunction( potentialFunction.FieldValuesOrigin() ) ) );
+    double
+    appropriateScale( sqrt( potentialFunction.ScaleSquaredRelevantToTunneling(
+                                                                   falseVacuum,
+                                                              trueVacuum ) ) );
+    BubbleRadiusFromAuxiliary bubbleRadiusFromAuxiliary( appropriateScale );
+    ModifiedBounceForMinuit modifiedBounceForMinuit( potentialFunction,
+                                             TunnelPathResolution( falseVacuum,
+                                                                   trueVacuum,
+                                                                   10 ),
+                                                     falseVacuum,
+                                                     evaporationTemperature,
+                                                   bubbleRadiusFromAuxiliary );
+    unsigned int const
+    numberOfFields( potentialFunction.NumberOfFieldVariables() );
+    std::vector< double > splineCoefficients( ( ( 2 * numberOfFields ) + 1 ),
+                                              0.0 );
+    for( unsigned int splineIndex( 0 );
+         splineIndex < numberOfFields;
+         ++splineIndex )
+    {
+      splineCoefficients[ splineIndex + numberOfFields ]
+      = ( trueVacuum.FieldConfiguration()[ splineIndex  ]
+          - falseVacuum.FieldConfiguration()[ splineIndex ] );
+    }
+    double straightPathBounce( modifiedBounceForMinuit( splineCoefficients ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "straightPathBounce = " << straightPathBounce;
     std::cout << std::endl;/**/
   }
 

@@ -1,0 +1,179 @@
+/*
+ * ModifiedBounceForMinuit.cpp
+ *
+ *  Created on: May 13, 2014
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ */
+
+#include "../../include/VevaciousPlusPlus.hpp"
+
+namespace VevaciousPlusPlus
+{
+
+  ModifiedBounceForMinuit::ModifiedBounceForMinuit(
+                                    PotentialFunction const& potentialFunction,
+                                          unsigned int const numberOfPathNodes,
+                                           PotentialMinimum const& falseVacuum,
+                                double const falseVacuumEvaporationTemperature,
+                 BubbleRadiusFromAuxiliary const& bubbleRadiusFromAuxiliary ) :
+    ROOT::Minuit2::FCNBase(),
+    potentialFunction( potentialFunction ),
+    numberOfFields( potentialFunction.NumberOfFieldVariables() ),
+    numberOfPathIntervals( numberOfPathNodes ),
+    falseVacuum( falseVacuum ),
+    falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature ),
+    bubbleRadiusFromAuxiliary( bubbleRadiusFromAuxiliary )
+  {
+    // This constructor is just an initialization list.
+  }
+
+  ModifiedBounceForMinuit::~ModifiedBounceForMinuit()
+  {
+    // This does nothing.
+  }
+
+
+  // This implements operator() for FCNBase, the function that MINUIT will
+  // minimize. The values of splineCoefficients should be sets of n
+  // coefficients for polynomials for each of the n fields, plus the final
+  // element of splineCoefficients should be the temperature.
+  double ModifiedBounceForMinuit::operator()(
+                        std::vector< double > const& splineCoefficients ) const
+  {
+    double const givenTemperature( splineCoefficients.back() );
+    bool const nonZeroTemperature( givenTemperature > 0.0 );
+
+    double solidAngle( 4.0 * M_PI );
+    if( nonZeroTemperature )
+    {
+      solidAngle = ( 2.0 * M_PI * M_PI );
+    }
+
+    double fieldGradient( 0.0 );
+    double gradientDotGradient( 0.0 );
+
+    double const auxiliaryStep( 1.0 / (double)numberOfPathIntervals );
+    double auxiliaryValue( auxiliaryStep );
+    double radiusValue( 0.0 );
+    double minusRadiusDerivative( 0.0 );
+    double factorTimesVolume( 0.0 );
+
+    std::vector< double > falseConfiguration( numberOfFields,
+                                              0.0 );
+    if( givenTemperature < falseVacuumEvaporationTemperature )
+    {
+      PotentialForMinuit potentialForMinuit( potentialFunction );
+      MinuitManager thermalDsbFinder( potentialForMinuit );
+      falseConfiguration
+      = thermalDsbFinder( falseVacuum.FieldConfiguration() ).VariableValues();
+    }
+    double const falsePotential( potentialFunction( falseConfiguration,
+                                                    givenTemperature ) );
+    std::vector< double > previousFieldConfiguration( falseConfiguration );
+    std::vector< double >
+    currentFieldConfiguration( previousFieldConfiguration );
+    std::vector< double > nextFieldConfiguration( falseConfiguration );
+    ConfigurationFromSplines( currentFieldConfiguration,
+                              splineCoefficients,
+                              auxiliaryValue );
+
+    // The action is evaluated with the composite Simpson's rule, using an
+    // auxiliary variable that goes from 0 at the false vacuum at a radius of
+    // infinity to 1 at the vacuum at the center of the bubble.
+
+    // The contribution to the bounce action at bubble radius of infinity
+    // ( corresponding to the auxiliary variable being zero) should be zero.
+    double bounceAction( 0.0 );
+    for( unsigned int whichStep( 1 );
+         whichStep < numberOfPathIntervals;
+         ++whichStep )
+    {
+      previousFieldConfiguration = currentFieldConfiguration;
+      currentFieldConfiguration = nextFieldConfiguration;
+      radiusValue = bubbleRadiusFromAuxiliary.RadiusValue( auxiliaryValue );
+      minusRadiusDerivative
+      = -bubbleRadiusFromAuxiliary.RadiusDerivative( auxiliaryValue );
+      // Since the radius should go from infinity to 0 as auxiliaryValue goes
+      // from 0 to 1, the derivative is negative.
+      factorTimesVolume = ( (double)( 1 + ( whichStep % 2 ) )
+                            * solidAngle * radiusValue * radiusValue
+                            * minusRadiusDerivative );
+      if( !nonZeroTemperature )
+      {
+        factorTimesVolume *= radiusValue;
+      }
+
+      auxiliaryValue += auxiliaryStep;
+      // We advance the field configuration to the end of the next interval so
+      // that we can take the average derivative of the fields.
+      nextFieldConfiguration = falseConfiguration;
+      ConfigurationFromSplines( nextFieldConfiguration,
+                                splineCoefficients,
+                                auxiliaryValue );
+      gradientDotGradient = 0.0;
+      for( unsigned int fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        fieldGradient = ( ( nextFieldConfiguration[ fieldIndex ]
+                            - previousFieldConfiguration[ fieldIndex ] )
+                          / ( 2.0 * auxiliaryStep ) );
+        gradientDotGradient += ( fieldGradient * fieldGradient );
+      }
+
+      bounceAction
+      += ( factorTimesVolume
+           * ( ( 0.5 * gradientDotGradient )
+               + potentialFunction( currentFieldConfiguration,
+                                    givenTemperature )
+               - falsePotential ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "step " << whichStep << ", currentFieldConfiguration = {";
+      for( std::vector< double >::const_iterator
+           fieldValue( currentFieldConfiguration.begin() );
+           fieldValue < currentFieldConfiguration.end();
+           ++fieldValue )
+      {
+        std::cout << " " << *fieldValue;
+      }
+      std::cout << " }, 0.5 * gradientDotGradient = "
+      << ( 0.5 * gradientDotGradient ) << ", potential difference = "
+      << ( potentialFunction( currentFieldConfiguration,
+                              givenTemperature ) - falsePotential )
+      << ", factorTimesVolume = " << factorTimesVolume
+      << ", bounceAction = " << bounceAction;
+      std::cout << std::endl;/**/
+    }
+    // There was a common factor of 2.0 taken out of the above, so we account
+    // for it now:
+    bounceAction += bounceAction;
+
+    // The last value is special, as it corresponds to the middle of the
+    // bubble: we force the field derivative to zero.
+    factorTimesVolume = ( 0.5 * solidAngle * radiusValue * radiusValue );
+    if( !nonZeroTemperature )
+    {
+      factorTimesVolume *= radiusValue;
+    }
+    bounceAction += ( factorTimesVolume
+                      * ( potentialFunction( currentFieldConfiguration,
+                                             givenTemperature )
+                          - falsePotential ) );
+
+    // Now we multiply by the common factor:
+    bounceAction *= ( auxiliaryStep / 3.0 );
+
+    if( nonZeroTemperature )
+    {
+      return -( ( bounceAction / givenTemperature ) + log( bounceAction ) );
+    }
+    else
+    {
+      return -bounceAction;
+    }
+  }
+
+} /* namespace VevaciousPlusPlus */
