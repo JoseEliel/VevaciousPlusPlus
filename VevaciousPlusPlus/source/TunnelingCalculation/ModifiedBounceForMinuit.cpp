@@ -40,6 +40,14 @@ namespace VevaciousPlusPlus
   double ModifiedBounceForMinuit::operator()(
                         std::vector< double > const& splineCoefficients ) const
   {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "ModifiedBounceForMinuit::operator() doesn't work at all at the moment."
+    << " We need to think a lot harder about how to implement it.";
+    std::cout << std::endl;
+    return 0.0;/**/
+
     double const givenTemperature( splineCoefficients.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
@@ -168,11 +176,11 @@ namespace VevaciousPlusPlus
 
     if( nonZeroTemperature )
     {
-      return -( ( bounceAction / givenTemperature ) + log( bounceAction ) );
+      return ( ( bounceAction / givenTemperature ) + log( bounceAction ) );
     }
     else
     {
-      return -bounceAction;
+      return bounceAction;
     }
   }
 

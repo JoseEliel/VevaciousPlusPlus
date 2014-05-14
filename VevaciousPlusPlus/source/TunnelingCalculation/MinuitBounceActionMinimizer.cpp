@@ -82,11 +82,28 @@ namespace VevaciousPlusPlus
          splineIndex < numberOfFields;
          ++splineIndex )
     {
-      splineCoefficients[ splineIndex + numberOfFields ]
+      splineCoefficients[ splineIndex ]
       = ( trueVacuum.FieldConfiguration()[ splineIndex  ]
           - falseVacuum.FieldConfiguration()[ splineIndex ] );
     }
     double straightPathBounce( modifiedBounceForMinuit( splineCoefficients ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "straightPathBounce = " << straightPathBounce;
+    std::cout << std::endl;/**/
+
+    for( unsigned int splineIndex( 0 );
+         splineIndex < numberOfFields;
+         ++splineIndex )
+    {
+      splineCoefficients[ splineIndex ] = 0.0;
+      splineCoefficients[ splineIndex + numberOfFields ]
+      = ( trueVacuum.FieldConfiguration()[ splineIndex  ]
+          - falseVacuum.FieldConfiguration()[ splineIndex ] );
+    }
+    straightPathBounce = modifiedBounceForMinuit( splineCoefficients );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
