@@ -14,6 +14,8 @@ SHELL=/bin/sh
 CC=g++
 AR=ar
 ARFLAGS=rcs
+#BOOSTDIR=./Boost/
+BOOSTDIR=../../../machine-specific/Boost/
 #LHPCDIR=./LHPC/
 LHPCDIR=../../../machine-specific/LHPC/
 LHPCLIBNAME=LHPC
@@ -54,6 +56,7 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/PotentialEvaluation/PolynomialTerm.cpp \
  source/PotentialEvaluation/ProductOfPolynomialSums.cpp \
  source/PotentialEvaluation/RunningParameterManager.cpp \
+ source/PotentialEvaluation/SimplePolynomial.cpp \
  source/PotentialEvaluation/SumOfProductOfPolynomialSums.cpp \
  source/PotentialEvaluation/SlhaManager.cpp \
  source/PotentialEvaluation/SlhaUpdatePropagator.cpp \

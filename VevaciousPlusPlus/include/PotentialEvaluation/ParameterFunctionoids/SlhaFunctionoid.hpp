@@ -11,6 +11,7 @@
 #include "../../CommonIncludes.hpp"
 #include "ParameterFunctionoid.hpp"
 #include "Eigen/Dense"
+#include "../SimplePolynomial.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -34,7 +35,8 @@ namespace VevaciousPlusPlus
 
     // This returns the value of the functionoid for the given logarithm of the
     // scale.
-    virtual double operator()( double const logarithmOfScale ) const;
+    virtual double operator()( double const logarithmOfScale ) const
+    { return scaleLogarithmPowerCoefficients( logarithmOfScale ); }
 
     // This updates currentValue based on logarithmOfScale.
     virtual void
@@ -55,72 +57,11 @@ namespace VevaciousPlusPlus
   protected:
     LHPC::SLHA::SparseManyIndexedBlock< double >* slhaBlock;
     std::vector< int > const indexVector;
-    std::vector< double > scaleLogarithmPowerCoefficients;
+    SimplePolynomial scaleLogarithmPowerCoefficients;
   };
 
 
 
-
-  // This returns the value of the functionoid for the given logarithm of the
-  // scale.
-  inline double
-  SlhaFunctionoid::operator()( double const logarithmOfScale ) const
-  {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "[" << this->AsString()
-    << "].UpdateForNewLogarithmOfScale( " << logarithmOfScale
-    << " ) called. currentValue was " << currentValue;
-    std::cout << std::endl;*/
-
-    double returnValue( scaleLogarithmPowerCoefficients[ 0 ] );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "scaleLogarithmPowerCoefficients[ 0 ] = "
-    << scaleLogarithmPowerCoefficients[ 0 ] << ", currentValue = "
-    << currentValue;
-    std::cout << std::endl;*/
-
-    double termContribution( 0.0 );
-
-    for( unsigned int whichPower( 1 );
-         whichPower < scaleLogarithmPowerCoefficients.size();
-         ++whichPower )
-    {
-      termContribution = scaleLogarithmPowerCoefficients[ whichPower ];
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "scaleLogarithmPowerCoefficients[ " << whichPower << " ] = "
-      << scaleLogarithmPowerCoefficients[ whichPower ]
-      << ", termContribution = " << termContribution;
-      std::cout << std::endl;*/
-
-      for( unsigned int powerCount( 0 );
-           powerCount < whichPower;
-           ++powerCount )
-      {
-        termContribution *= logarithmOfScale;
-
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "termContribution = " << termContribution;
-        std::cout << std::endl;*/
-      }
-      returnValue += termContribution;
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "currentValue = " << currentValue;
-      std::cout << std::endl;*/
-    }
-    return returnValue;
-  }
 
   // This is mainly for debugging.
   inline std::string SlhaFunctionoid::AsString()
@@ -141,14 +82,16 @@ namespace VevaciousPlusPlus
   // This is for creating a Python version of the potential.
   inline std::string SlhaFunctionoid::PythonParameterEvaluation() const
   {
+    std::vector< double > const&
+    scaleCoefficients( scaleLogarithmPowerCoefficients.CoefficientVector() );
     std::stringstream stringBuilder;
     stringBuilder << std::setprecision( 12 ) << pythonParameterName << " = ( "
-    << scaleLogarithmPowerCoefficients[ 0 ];
+    << scaleCoefficients[ 0 ];
     for( unsigned int whichPower( 1 );
-         whichPower < scaleLogarithmPowerCoefficients.size();
+         whichPower < scaleCoefficients.size();
          ++whichPower )
     {
-      stringBuilder << " + ( " << scaleLogarithmPowerCoefficients[ whichPower ]
+      stringBuilder << " + ( " << scaleCoefficients[ whichPower ]
       << " ) * lnQ**" << whichPower;
     }
     stringBuilder << " )";

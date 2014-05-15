@@ -11,8 +11,9 @@
 #include "../CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
+#include "Eigen/Dense"
+#include "boost/numeric/odeint/integrate/integrate_adaptive.hpp"
 #include "../PotentialEvaluation.hpp"
-#include "BubbleRadiusFromAuxiliary.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -21,10 +22,9 @@ namespace VevaciousPlusPlus
   {
   public:
     ModifiedBounceForMinuit( PotentialFunction const& potentialFunction,
-                             unsigned int const numberOfPathNodes,
+                             unsigned int const potentialApproximationPower,
                              PotentialMinimum const& falseVacuum,
-                             double const dsbEvaporationTemperature,
-                  BubbleRadiusFromAuxiliary const& bubbleRadiusFromAuxiliary );
+                             double const dsbEvaporationTemperature );
     virtual
     ~ModifiedBounceForMinuit();
 
@@ -48,16 +48,20 @@ namespace VevaciousPlusPlus
   protected:
     PotentialFunction const& potentialFunction;
     unsigned int numberOfFields;
-    unsigned int numberOfPathIntervals;
+    unsigned int potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
     double const falseVacuumEvaporationTemperature;
-    BubbleRadiusFromAuxiliary const& bubbleRadiusFromAuxiliary;
 
     // This converts the spline coefficients into a field configuration and
     // puts it into fieldConfiguration.
     void ConfigurationFromSplines( std::vector< double >& fieldConfiguration,
                                std::vector< double > const& splineCoefficients,
                                    double const auxiliaryValue ) const;
+
+    // This
+    double PotentialFromApproximation(
+                           std::vector< double > const& potentialApproximation,
+                                       double const auxiliaryValue ) const;
   };
 
 

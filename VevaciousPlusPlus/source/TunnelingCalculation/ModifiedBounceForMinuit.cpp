@@ -12,17 +12,15 @@ namespace VevaciousPlusPlus
 
   ModifiedBounceForMinuit::ModifiedBounceForMinuit(
                                     PotentialFunction const& potentialFunction,
-                                          unsigned int const numberOfPathNodes,
+                                unsigned int const potentialApproximationPower,
                                            PotentialMinimum const& falseVacuum,
-                                double const falseVacuumEvaporationTemperature,
-                 BubbleRadiusFromAuxiliary const& bubbleRadiusFromAuxiliary ) :
+                             double const falseVacuumEvaporationTemperature ) :
     ROOT::Minuit2::FCNBase(),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
-    numberOfPathIntervals( numberOfPathNodes ),
+    potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
-    falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature ),
-    bubbleRadiusFromAuxiliary( bubbleRadiusFromAuxiliary )
+    falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature )
   {
     // This constructor is just an initialization list.
   }
@@ -51,16 +49,19 @@ namespace VevaciousPlusPlus
 
     // Current outline (code below doesn't do most of this yet):
     // 1) Take splineCoefficients as proposed dependence of field configuration
-    //    f on auxiliary variable a.
+    //    f on auxiliary variable a. An extra power of a is given with a
+    //    coefficient to bring f to the true vacuum at a = 1, as
+    //    splineCoefficients alone does not have a fixed endpoint at a = 1 for
+    //    different splineCoefficients input.
     // 2) Evaluate the potential at ( potentialApproximationPower + 1 ) values
     //    for a between a = 0 and a = 1 inclusive, giving V(a) as a polynomial
     //    in a (though V(a) is an approximation, f(a) is exact by
     //    construction).
     // 3) Find the 1-dimensional bubble profile by solving the radial bubble
-    //    equations of motion along the path from a = 0 to a = 1, by taking a
-    //    as a linear combination of basis functions in the radius r and
-    //    solving the coupled linear equations at bubbleSpatialResolution
-    //    values of the radius.
+    //    equations of motion along the path from a = 0 to a = a_crit, where
+    //    a_crit is the value of a for which the bubble is critical, and is
+    //    found by the undershoot/overshoot method (0.0 < a_crit < 1.0). This
+    //    probably will involve using the Boost library odeint.
     // 4) Combine f(a) (exact) and V(a) (approximate) with a(r) to numerically
     //    integrate the bounce action.
     // Note that this is only really the bounce action (within the validity of
@@ -81,6 +82,66 @@ namespace VevaciousPlusPlus
     double const givenTemperature( splineCoefficients.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
+    std::vector< double > falseConfiguration( numberOfFields,
+                                              0.0 );
+    if( givenTemperature < falseVacuumEvaporationTemperature )
+    {
+      PotentialForMinuit potentialForMinuit( potentialFunction );
+      MinuitManager thermalDsbFinder( potentialForMinuit );
+      falseConfiguration
+      = thermalDsbFinder( falseVacuum.FieldConfiguration() ).VariableValues();
+    }
+    double const falsePotential( potentialFunction( falseConfiguration,
+                                                    givenTemperature ) );
+    std::vector< double > fieldConfiguration( falseConfiguration );
+
+    // Here we set up the linear system to solve for the coefficients of the
+    // polynomial approximation of the potential:
+    double const auxiliaryStep( 1.0 / (double)potentialApproximationPower );
+    double auxiliaryValue( 0.0 );
+    Eigen::VectorXd potentialValues( potentialApproximationPower );
+    Eigen::MatrixXd coefficientMatrix( potentialApproximationPower,
+                                       potentialApproximationPower );
+    for( unsigned int whichStep( 0 );
+         whichStep < potentialApproximationPower;
+         ++whichStep )
+    {
+      auxiliaryValue += auxiliaryStep;
+      ConfigurationFromSplines( fieldConfiguration,
+                                splineCoefficients,
+                                auxiliaryValue );
+      potentialValues( whichStep ) = potentialFunction( fieldConfiguration );
+
+      for( unsigned int whichPower( 0 );
+           whichPower < potentialApproximationPower;
+           ++whichPower )
+      {
+        coefficientMatrix( whichStep, whichPower ) = pow( auxiliaryValue,
+                                                          ( whichPower + 1 ) );
+      }
+    }
+
+    SimplePolynomial potentialApproximationOverAuxiliary(
+                                 coefficientMatrix.colPivHouseholderQr().solve(
+                                                           potentialValues ) );
+    // Because the potential is approximated as a polynomial with zero
+    // coefficient which was ignored for inverting the matrix equation,
+    // potentialApproximationOverAuxiliary is the potential divided by the
+    // auxiliary variable, which is convenient for creating the derivative...
+    SimplePolynomial
+    potentialDerivative( potentialApproximationOverAuxiliary );
+    std::vector< double > const&
+    derivativeVector( potentialDerivative.CoefficientVector() );
+    for( unsigned int whichPower( 1 );
+         whichPower < potentialApproximationPower;
+         ++whichPower )
+    {
+      derivativeVector[ whichPower ] *= (double)( whichPower + 1 );
+    }
+
+
+
+
     double solidAngle( 4.0 * M_PI );
     if( nonZeroTemperature )
     {
@@ -90,8 +151,6 @@ namespace VevaciousPlusPlus
     double fieldGradient( 0.0 );
     double gradientDotGradient( 0.0 );
 
-    double const auxiliaryStep( 1.0 / (double)numberOfPathIntervals );
-    double auxiliaryValue( auxiliaryStep );
     double radiusValue( 0.0 );
     double minusRadiusDerivative( 0.0 );
     double factorTimesVolume( 0.0 );
