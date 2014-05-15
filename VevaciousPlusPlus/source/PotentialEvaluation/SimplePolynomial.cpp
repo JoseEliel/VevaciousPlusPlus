@@ -10,6 +10,12 @@
 namespace VevaciousPlusPlus
 {
 
+  SimplePolynomial::SimplePolynomial() :
+    coefficientVector()
+  {
+    // This constructor is just an initialization list.
+  }
+
   SimplePolynomial::SimplePolynomial(
                              std::vector< double > const& coefficientVector ) :
     coefficientVector( coefficientVector )

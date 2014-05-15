@@ -19,6 +19,7 @@ namespace VevaciousPlusPlus
   class SimplePolynomial
   {
   public:
+    SimplePolynomial();
     SimplePolynomial( std::vector< double > const& coefficientVector );
     SimplePolynomial( Eigen::VectorXd const& eigenVector );
     SimplePolynomial( SimplePolynomial const& copySource );

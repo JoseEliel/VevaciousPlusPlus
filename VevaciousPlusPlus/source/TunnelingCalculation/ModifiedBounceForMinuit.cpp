@@ -14,12 +14,14 @@ namespace VevaciousPlusPlus
                                     PotentialFunction const& potentialFunction,
                                 unsigned int const potentialApproximationPower,
                                            PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
                              double const falseVacuumEvaporationTemperature ) :
     ROOT::Minuit2::FCNBase(),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
+    trueVacuum( trueVacuum ),
     falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature )
   {
     // This constructor is just an initialization list.
@@ -270,6 +272,45 @@ namespace VevaciousPlusPlus
     else
     {
       return bounceAction;
+    }
+  }
+
+  void ModifiedBounceForMinuit::FieldsAsSimplePolynomials(
+                               std::vector< double > const& splineCoefficients,
+                   std::vector< SimplePolynomial >& fieldsAsPolynomials ) const
+  {
+    fieldsAsPolynomials.resize( ( splineCoefficients.size() - 1 )
+                                / numberOfFields );
+    // The last element of splineCoefficients is a temperature, so should not
+    // be used.
+    for( unsigned int splineIndex( 0 );
+         splineIndex < ( splineCoefficients.size() - 1 );
+         ++splineIndex )
+    {
+      fieldsAsPolynomials[ splineIndex
+                           % numberOfFields ].CoefficientVector()[ splineIndex
+                                                             / numberOfFields ]
+      = splineCoefficients[ splineIndex ];
+    }
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      double coefficientSum( 0.0 );
+      for( std::vector< double >::const_iterator coefficientValue(
+               fieldsAsPolynomials[ fieldIndex ].CoefficientVector().begin() );
+           coefficientValue
+           < fieldsAsPolynomials[ fieldIndex ].CoefficientVector().end();
+           ++coefficientValue )
+      {
+        coefficientSum += *coefficientValue;
+      }
+      fieldsAsPolynomials[ fieldIndex ].CoefficientVector().push_back(
+                                  trueVacuum.FieldConfiguration()[ fieldIndex ]
+                               - falseVacuum.FieldConfiguration()[ fieldIndex ]
+                                                            - coefficientSum );
+      // This ensures that the field configuration for auxiliary variable = 1.0
+      // goes to that of the true vacuum.
     }
   }
 

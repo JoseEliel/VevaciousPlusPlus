@@ -24,6 +24,7 @@ namespace VevaciousPlusPlus
     ModifiedBounceForMinuit( PotentialFunction const& potentialFunction,
                              unsigned int const potentialApproximationPower,
                              PotentialMinimum const& falseVacuum,
+                             PotentialMinimum const& trueVacuum,
                              double const dsbEvaporationTemperature );
     virtual
     ~ModifiedBounceForMinuit();
@@ -39,17 +40,13 @@ namespace VevaciousPlusPlus
     // This implements Up() for FCNBase just to stick to a basic value.
     virtual double Up() const { return 1.0; }
 
-    // This converts the spline coefficients into numberOfPathIntervals field
-    // configurations and returns them as a vector of vectors.
-    std::vector< std::vector< double > >
-    PathFromSplines( std::vector< double > const& splineCoefficients ) const;
-
 
   protected:
     PotentialFunction const& potentialFunction;
     unsigned int numberOfFields;
     unsigned int potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
+    PotentialMinimum const& trueVacuum;
     double const falseVacuumEvaporationTemperature;
 
     // This converts the spline coefficients into a field configuration and
@@ -58,10 +55,9 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& splineCoefficients,
                                    double const auxiliaryValue ) const;
 
-    // This
-    double PotentialFromApproximation(
-                           std::vector< double > const& potentialApproximation,
-                                       double const auxiliaryValue ) const;
+    void
+    FieldsAsSimplePolynomials( std::vector< double > const& splineCoefficients,
+                  std::vector< SimplePolynomial >& fieldsAsPolynomials ) const;
   };
 
 
@@ -82,7 +78,7 @@ namespace VevaciousPlusPlus
          ++splineIndex )
     {
       // This relies heavily on int division.
-      fieldConfiguration[ ( splineIndex % numberOfFields ) ]
+      fieldConfiguration[ splineIndex % numberOfFields ]
       += ( splineCoefficients[ splineIndex ]
            * pow( auxiliaryValue,
                   ( ( splineIndex / numberOfFields ) + 1 ) ) );
