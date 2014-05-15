@@ -48,6 +48,36 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
     return 0.0;/**/
 
+
+    // Current outline (code below doesn't do most of this yet):
+    // 1) Take splineCoefficients as proposed dependence of field configuration
+    //    f on auxiliary variable a.
+    // 2) Evaluate the potential at ( potentialApproximationPower + 1 ) values
+    //    for a between a = 0 and a = 1 inclusive, giving V(a) as a polynomial
+    //    in a (though V(a) is an approximation, f(a) is exact by
+    //    construction).
+    // 3) Find the 1-dimensional bubble profile by solving the radial bubble
+    //    equations of motion along the path from a = 0 to a = 1, by taking a
+    //    as a linear combination of basis functions in the radius r and
+    //    solving the coupled linear equations at bubbleSpatialResolution
+    //    values of the radius.
+    // 4) Combine f(a) (exact) and V(a) (approximate) with a(r) to numerically
+    //    integrate the bounce action.
+    // Note that this is only really the bounce action (within the validity of
+    // the approximations of truncated exapnsions) if the equations of motion
+    // perpendicular to f(a) are also satisfied. However, they would be
+    // satisfied for a modified potential which increases the energy barrier on
+    // the side of the path until the "force" on the path balances, and such a
+    // modified potential still has the same true and false vacua, and its
+    // decay width is given by this calculated bounce action. The unmodified
+    // potential with the possibility for a path with a lower energy barrier
+    // must necessarily have at least as large a decay width as the modified
+    // potential, hence the calculated bounce action here is an upper bound on
+    // the true bounce action, and minimizing this should lead one to the true
+    // minimal bounce action.
+
+
+
     double const givenTemperature( splineCoefficients.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
