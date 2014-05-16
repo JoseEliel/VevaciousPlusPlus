@@ -86,15 +86,21 @@ namespace VevaciousPlusPlus
 
     std::vector< double > falseConfiguration( numberOfFields,
                                               0.0 );
+    double falsePotentialValue( 0.0 );
     if( givenTemperature < falseVacuumEvaporationTemperature )
     {
       PotentialForMinuit potentialForMinuit( potentialFunction );
       MinuitManager thermalDsbFinder( potentialForMinuit );
-      falseConfiguration
-      = thermalDsbFinder( falseVacuum.FieldConfiguration() ).VariableValues();
+      MinuitMinimum thermalFalseVacuum
+      = thermalDsbFinder( falseVacuum.FieldConfiguration() );
+      falsePotentialValue = thermalFalseVacuum.FunctionValue();
+      falseConfiguration = thermalFalseVacuum.VariableValues();
     }
-    double const falsePotential( potentialFunction( falseConfiguration,
-                                                    givenTemperature ) );
+    else
+    {
+      falsePotentialValue = potentialFunction( falseConfiguration,
+                                               givenTemperature );
+    }
     std::vector< double > fieldConfiguration( falseConfiguration );
 
     // Here we set up the linear system to solve for the coefficients of the
@@ -105,42 +111,55 @@ namespace VevaciousPlusPlus
     Eigen::MatrixXd coefficientMatrix( potentialApproximationPower,
                                        potentialApproximationPower );
     for( unsigned int whichStep( 0 );
-         whichStep < potentialApproximationPower;
+         whichStep < ( potentialApproximationPower - 1 );
          ++whichStep )
     {
       auxiliaryValue += auxiliaryStep;
       ConfigurationFromSplines( fieldConfiguration,
                                 splineCoefficients,
                                 auxiliaryValue );
-      potentialValues( whichStep ) = potentialFunction( fieldConfiguration );
+      potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration )
+                                       - falsePotentialValue );
 
       for( unsigned int whichPower( 0 );
            whichPower < potentialApproximationPower;
            ++whichPower )
       {
-        coefficientMatrix( whichStep, whichPower ) = pow( auxiliaryValue,
-                                                          ( whichPower + 1 ) );
+        coefficientMatrix( whichStep,
+                           whichPower ) = pow( auxiliaryValue,
+                                               ( whichPower + 2 ) );
       }
     }
-
-    SimplePolynomial potentialApproximationOverAuxiliary(
-                                 coefficientMatrix.colPivHouseholderQr().solve(
-                                                           potentialValues ) );
-    // Because the potential is approximated as a polynomial with zero
-    // coefficient which was ignored for inverting the matrix equation,
-    // potentialApproximationOverAuxiliary is the potential divided by the
-    // auxiliary variable, which is convenient for creating the derivative...
-    SimplePolynomial
-    potentialDerivative( potentialApproximationOverAuxiliary );
-    std::vector< double > const&
-    derivativeVector( potentialDerivative.CoefficientVector() );
-    for( unsigned int whichPower( 1 );
+    potentialValues( potentialApproximationPower - 1 )
+    = trueVacuum.PotentialValue();
+    for( unsigned int whichPower( 0 );
          whichPower < potentialApproximationPower;
          ++whichPower )
     {
-      derivativeVector[ whichPower ] *= (double)( whichPower + 1 );
+      coefficientMatrix( ( potentialApproximationPower - 1 ),
+                         whichPower ) = 1.0;
     }
 
+    SimplePolynomial potentialOverAuxiliarySquared(
+                                 coefficientMatrix.colPivHouseholderQr().solve(
+                                                           potentialValues ) );
+    // Because the potential is approximated as a polynomial with zero
+    // coefficients (for a^0 and a^1, so that a = 0 is an extremum) which were
+    // ignored for inverting the matrix equation,
+    // potentialOverAuxiliarySquared is the potential divided by
+    // the square of the auxiliary variable, which is convenient for creating
+    // the derivative...
+    SimplePolynomial derivativeOverAuxiliary( potentialOverAuxiliarySquared );
+    std::vector< double >&
+    derivativeVector( derivativeOverAuxiliary.CoefficientVector() );
+    for( unsigned int whichPower( 0 );
+         whichPower < potentialApproximationPower;
+         ++whichPower )
+    {
+      derivativeVector[ whichPower ] *= (double)( whichPower + 2 );
+    }
+
+    // HERE!
 
 
 
