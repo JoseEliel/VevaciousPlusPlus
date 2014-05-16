@@ -11,26 +11,42 @@ namespace VevaciousPlusPlus
 {
 
   SimplePolynomial::SimplePolynomial() :
-    coefficientVector()
+    coefficientVector(),
+    leadingPower( 0 )
+  {
+    // This constructor is just an initialization list.
+  }
+
+  SimplePolynomial::SimplePolynomial( unsigned int const reserveSize,
+                                      unsigned int const leadingPower ) :
+    coefficientVector( reserveSize,
+                       0.0 ),
+    leadingPower( leadingPower )
   {
     // This constructor is just an initialization list.
   }
 
   SimplePolynomial::SimplePolynomial(
-                             std::vector< double > const& coefficientVector ) :
-    coefficientVector( coefficientVector )
+                                std::vector< double > const& coefficientVector,
+                                      unsigned int const leadingPower ) :
+    coefficientVector( coefficientVector ),
+    leadingPower( leadingPower )
   {
     // This constructor is just an initialization list.
   }
 
-  SimplePolynomial::SimplePolynomial( Eigen::VectorXd const& eigenVector ) :
-    coefficientVector()
+  SimplePolynomial::SimplePolynomial( Eigen::VectorXd const& eigenVector,
+                                      unsigned int const leadingPower ) :
+    coefficientVector(),
+    leadingPower( leadingPower )
   {
-    CopyFromEigen( eigenVector );
+    CopyFromEigen( eigenVector,
+                   leadingPower );
   }
 
   SimplePolynomial::SimplePolynomial( SimplePolynomial const& copySource ) :
-    coefficientVector( copySource.coefficientVector )
+    coefficientVector( copySource.coefficientVector ),
+    leadingPower( copySource.leadingPower )
   {
     // This constructor is just an initialization list.
   }

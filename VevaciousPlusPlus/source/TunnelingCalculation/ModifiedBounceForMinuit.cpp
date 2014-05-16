@@ -55,10 +55,17 @@ namespace VevaciousPlusPlus
     //    coefficient to bring f to the true vacuum at a = 1, as
     //    splineCoefficients alone does not have a fixed endpoint at a = 1 for
     //    different splineCoefficients input.
-    // 2) Evaluate the potential at ( potentialApproximationPower + 1 ) values
+    // 2) Evaluate the potential at ( potentialApproximationPower - 2 ) values
     //    for a between a = 0 and a = 1 inclusive, giving V(a) as a polynomial
     //    in a (though V(a) is an approximation, f(a) is exact by
-    //    construction).
+    //    construction). (The number of points to evaluate V(a) would be
+    //    potentialApproximationPower + 1 for potentialApproximationPower
+    //    coefficients of non-zero powers of a plus a constant coefficient, but
+    //    2 of the coefficients are fixed by the requirement that dV/da is 0 at
+    //    a = 0 and a = 1, and the constant coefficient by taking V(0) to be 0,
+    //    which also is convenient for evaluating the action. Hence V(a) is
+    //    actually a polynomial approximation of the potential difference from
+    //    the false vacuum along the path given by f(a).)
     // 3) Find the 1-dimensional bubble profile by solving the radial bubble
     //    equations of motion along the path from a = 0 to a = a_crit, where
     //    a_crit is the value of a for which the bubble is critical, and is
@@ -105,13 +112,29 @@ namespace VevaciousPlusPlus
 
     // Here we set up the linear system to solve for the coefficients of the
     // polynomial approximation of the potential:
-    double const auxiliaryStep( 1.0 / (double)potentialApproximationPower );
+    unsigned int const
+    numberOfNonZeroCoefficients( potentialApproximationPower - 2 );
+    // The potential is approximated as a polynomial with zero coefficients
+    // (for a^0 and a^1, so that a = 0 is an extremum) which will be ignored
+    // for inverting the matrix equation. Furthermore, the final coefficient is
+    // related to the other coefficients by the condition that the derivative
+    // is 0 for a = 1, so for n = potentialApproximationPower
+    // -n c_n = 2 c_2 + 3 c_3 + ...
+    // making the equation defining the potential approximation become
+    // V(a) = c_2 ( a^2 - (2/n) a^n ) + c_3 ( a^3 - (3/n) a^n ) + ...
+    // and c_n will be explicitly put into the approximation object afterwards.
+    double const
+    auxiliaryStep( 1.0 / (double)numberOfNonZeroCoefficients );
     double auxiliaryValue( 0.0 );
-    Eigen::VectorXd potentialValues( potentialApproximationPower );
-    Eigen::MatrixXd coefficientMatrix( potentialApproximationPower,
-                                       potentialApproximationPower );
+    Eigen::VectorXd potentialValues( numberOfNonZeroCoefficients );
+    Eigen::MatrixXd coefficientMatrix( numberOfNonZeroCoefficients,
+                                       numberOfNonZeroCoefficients );
+    double const
+    finalCoefficientPart( pow( auxiliaryValue,
+                               potentialApproximationPower )
+                          / (double)potentialApproximationPower );
     for( unsigned int whichStep( 0 );
-         whichStep < ( potentialApproximationPower - 1 );
+         whichStep < ( numberOfNonZeroCoefficients - 1 );
          ++whichStep )
     {
       auxiliaryValue += auxiliaryStep;
@@ -121,42 +144,55 @@ namespace VevaciousPlusPlus
       potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration )
                                        - falsePotentialValue );
 
-      for( unsigned int whichPower( 0 );
+      for( unsigned int whichPower( 2 );
            whichPower < potentialApproximationPower;
            ++whichPower )
       {
         coefficientMatrix( whichStep,
-                           whichPower ) = pow( auxiliaryValue,
-                                               ( whichPower + 2 ) );
+                           ( whichPower - 2 ) )
+        = ( pow( auxiliaryValue,
+                 whichPower )
+            - ( (double)whichPower * finalCoefficientPart ) );
       }
     }
-    potentialValues( potentialApproximationPower - 1 )
+    potentialValues( numberOfNonZeroCoefficients - 1 )
     = trueVacuum.PotentialValue();
     for( unsigned int whichPower( 0 );
-         whichPower < potentialApproximationPower;
+         whichPower < numberOfNonZeroCoefficients;
          ++whichPower )
     {
-      coefficientMatrix( ( potentialApproximationPower - 1 ),
+      coefficientMatrix( ( numberOfNonZeroCoefficients - 1 ),
                          whichPower ) = 1.0;
     }
 
-    SimplePolynomial potentialOverAuxiliarySquared(
-                                 coefficientMatrix.colPivHouseholderQr().solve(
-                                                           potentialValues ) );
-    // Because the potential is approximated as a polynomial with zero
-    // coefficients (for a^0 and a^1, so that a = 0 is an extremum) which were
-    // ignored for inverting the matrix equation,
-    // potentialOverAuxiliarySquared is the potential divided by
-    // the square of the auxiliary variable, which is convenient for creating
-    // the derivative...
-    SimplePolynomial derivativeOverAuxiliary( potentialOverAuxiliarySquared );
+    SimplePolynomial
+    potentialApproximation( coefficientMatrix.colPivHouseholderQr().solve(
+                                                             potentialValues ),
+                            2 );
     std::vector< double >&
-    derivativeVector( derivativeOverAuxiliary.CoefficientVector() );
-    for( unsigned int whichPower( 0 );
+    potentialVector( potentialApproximation.CoefficientVector() );
+    double finalCoefficientTimesMaxPower( 0.0 );
+    for( unsigned int whichPower( 2 );
          whichPower < potentialApproximationPower;
          ++whichPower )
     {
-      derivativeVector[ whichPower ] *= (double)( whichPower + 2 );
+      finalCoefficientTimesMaxPower
+      -= ( (double)whichPower * potentialVector[ whichPower ] );
+    }
+    potentialVector.push_back( finalCoefficientTimesMaxPower
+                               / (double)potentialApproximationPower );
+
+    SimplePolynomial potentialDerivative(
+                     ( potentialApproximation.CoefficientVector().size() - 1 ),
+                                          1 );
+    std::vector< double >&
+    derivativeVector( potentialDerivative.CoefficientVector() );
+    for( unsigned int whichPower( 1 );
+         whichPower < potentialApproximationPower;
+         ++whichPower )
+    {
+      derivativeVector[ whichPower ] = ( (double)( whichPower + 2 )
+                                         * potentialVector[ whichPower + 1 ] );
     }
 
     // HERE!

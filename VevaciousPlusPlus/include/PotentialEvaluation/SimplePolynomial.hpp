@@ -20,8 +20,12 @@ namespace VevaciousPlusPlus
   {
   public:
     SimplePolynomial();
-    SimplePolynomial( std::vector< double > const& coefficientVector );
-    SimplePolynomial( Eigen::VectorXd const& eigenVector );
+    SimplePolynomial( unsigned int const reserveSize,
+                      unsigned int const leadingPower = 0 );
+    SimplePolynomial( std::vector< double > const& coefficientVector,
+                      unsigned int const leadingPower = 0 );
+    SimplePolynomial( Eigen::VectorXd const& eigenVector,
+                      unsigned int const leadingPower = 0 );
     SimplePolynomial( SimplePolynomial const& copySource );
     virtual
     ~SimplePolynomial();
@@ -32,15 +36,18 @@ namespace VevaciousPlusPlus
 
     // This sets coefficientVector to have elements equal to those of
     // eigenVector.
-    void CopyFromEigen( Eigen::VectorXd const& eigenVector );
+    void CopyFromEigen( Eigen::VectorXd const& eigenVector,
+                        unsigned int const leadingPower = 0 );
 
     std::vector< double > const& CoefficientVector() const
     { return coefficientVector; }
     std::vector< double >& CoefficientVector(){ return coefficientVector; }
-
+    unsigned int const& LeadingPower() const{ return leadingPower; }
+    unsigned int& LeadingPower(){ return leadingPower; }
 
   protected:
     std::vector< double > coefficientVector;
+    unsigned int leadingPower;
   };
 
 
@@ -49,7 +56,7 @@ namespace VevaciousPlusPlus
   inline double SimplePolynomial::operator()( double const inputValue ) const
   {
     double returnValue( 0.0 );
-    for( unsigned int whichPower( 0 );
+    for( unsigned int whichPower( leadingPower );
          whichPower < coefficientVector.size();
          ++whichPower )
     {
@@ -62,10 +69,18 @@ namespace VevaciousPlusPlus
   // This sets coefficientVector to have elements equal to those of
   // eigenVector.
   inline void
-  SimplePolynomial::CopyFromEigen( Eigen::VectorXd const& eigenVector )
+  SimplePolynomial::CopyFromEigen( Eigen::VectorXd const& eigenVector,
+                                   unsigned int const leadingPower )
   {
-    coefficientVector.resize( eigenVector.rows() );
+    this->leadingPower = leadingPower;
+    coefficientVector.resize( eigenVector.rows() + leadingPower );
     for( unsigned int whichIndex( 0 );
+         whichIndex < leadingPower;
+         ++whichIndex )
+    {
+      coefficientVector[ whichIndex ] = 0.0;
+    }
+    for( unsigned int whichIndex( leadingPower );
          whichIndex < coefficientVector.size();
          ++whichIndex )
     {
