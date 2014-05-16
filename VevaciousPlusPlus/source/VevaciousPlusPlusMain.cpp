@@ -476,6 +476,8 @@ int main( int argumentCount,
   << std::endl
   << "Still to do:" << std::endl
   << "write MinuitBounceActionMinimizer" << std::endl
+  << "add in <TakenPositive>" << std::endl
+  << "add in <IgnoreTreeLevelNonMinima>" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
   std::cout << std::endl;
