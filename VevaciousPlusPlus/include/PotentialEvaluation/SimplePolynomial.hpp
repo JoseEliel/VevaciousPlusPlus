@@ -39,6 +39,10 @@ namespace VevaciousPlusPlus
     void CopyFromEigen( Eigen::VectorXd const& eigenVector,
                         unsigned int const leadingPower = 0 );
 
+    // This returns the first derivative of this SimplePolynomial with respect
+    // to its variable, as a SimplePolynomial.
+    SimplePolynomial FirstDerivative() const;
+
     std::vector< double > const& CoefficientVector() const
     { return coefficientVector; }
     std::vector< double >& CoefficientVector(){ return coefficientVector; }
@@ -86,6 +90,22 @@ namespace VevaciousPlusPlus
     {
       coefficientVector[ whichIndex ] = eigenVector( whichIndex );
     }
+  }
+
+  // This returns the first derivative of this SimplePolynomial with respect
+  // to its variable, as a SimplePolynomial.
+  inline SimplePolynomial SimplePolynomial::FirstDerivative() const
+  {
+    SimplePolynomial firstDerivative( ( coefficientVector.size() - 1 ),
+                                      ( leadingPower - 1 ) );
+    for( unsigned int whichPower( 1 );
+         whichPower < coefficientVector.size();
+         ++whichPower )
+    {
+      firstDerivative.coefficientVector[ whichPower - 1 ]
+      = ( (double)whichPower * coefficientVector[ whichPower ] );
+    }
+    return firstDerivative;
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -181,21 +181,30 @@ namespace VevaciousPlusPlus
     }
     potentialVector.push_back( finalCoefficientTimesMaxPower
                                / (double)potentialApproximationPower );
-
-    SimplePolynomial potentialDerivative(
-                     ( potentialApproximation.CoefficientVector().size() - 1 ),
-                                          1 );
-    std::vector< double >&
-    derivativeVector( potentialDerivative.CoefficientVector() );
-    for( unsigned int whichPower( 1 );
-         whichPower < potentialApproximationPower;
-         ++whichPower )
+    std::vector< SimplePolynomial > fieldDerivatives;
+    FieldDerivatives( splineCoefficients,
+                      fieldDerivatives );
+    unsigned int dampingFactor( 4 );
+    if( nonZeroTemperature )
     {
-      derivativeVector[ whichPower ] = ( (double)( whichPower + 2 )
-                                         * potentialVector[ whichPower + 1 ] );
+      dampingFactor = 3;
     }
+    BubbleProfiler bubbleProfiler( potentialApproximation,
+                                   fieldDerivatives,
+                                   dampingFactor );
+    OdeintBubbleObserver odeintBubbleObserver;
 
-    // HERE!
+    // Now we have to find the value of the auxiliary variable which is closest
+    // to the perfect value that neither undershoots nor overshoots as the
+    // radial variable goes to infinity. Unfortunately we have to cope with
+    // finite calculations though...
+    // The strategy is to start with definite undershoot a (largest a such that
+    // V(a) > 0.0, decided from potentialValues) and a definite overshoot
+    // (a = 1.0), and narrow the range with definite undershoots and overshoots
+    // for a given maximum radial value. The maximum radial value is increased
+    // and an undecided a is found each time until the a at maximum radial
+    // value is < 1.0E-3 or something.
+    // HERE! REMEMBER TO RESET odeintBubbleObserver IN LOOP!
 
 
 
@@ -334,10 +343,15 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& splineCoefficients,
                    std::vector< SimplePolynomial >& fieldsAsPolynomials ) const
   {
-    fieldsAsPolynomials.resize( ( splineCoefficients.size() - 1 )
-                                / numberOfFields );
+    unsigned int coefficientsPerField( ( ( splineCoefficients.size() - 2 )
+                                       / numberOfFields ) + 2 );
+    fieldsAsPolynomials.resize( numberOfFields,
+                                SimplePolynomial( coefficientsPerField ) );
     // The last element of splineCoefficients is a temperature, so should not
-    // be used.
+    // be used. The ( ( size - 2 / numberOfFields ) + 2 ) integer is to ensure
+    // that each SimplePolynomial has enough elements. The last coefficient of
+    // each field is implicit, and is fixed by the requirement that the field
+    // path goes to trueVacuum for a=1.
     for( unsigned int splineIndex( 0 );
          splineIndex < ( splineCoefficients.size() - 1 );
          ++splineIndex )
@@ -355,17 +369,67 @@ namespace VevaciousPlusPlus
       for( std::vector< double >::const_iterator coefficientValue(
                fieldsAsPolynomials[ fieldIndex ].CoefficientVector().begin() );
            coefficientValue
-           < fieldsAsPolynomials[ fieldIndex ].CoefficientVector().end();
+           < ( fieldsAsPolynomials[ fieldIndex ].CoefficientVector().end()
+               - 1 );
            ++coefficientValue )
       {
         coefficientSum += *coefficientValue;
       }
-      fieldsAsPolynomials[ fieldIndex ].CoefficientVector().push_back(
-                                  trueVacuum.FieldConfiguration()[ fieldIndex ]
-                               - falseVacuum.FieldConfiguration()[ fieldIndex ]
-                                                            - coefficientSum );
+      fieldsAsPolynomials[ fieldIndex ].CoefficientVector().back()
+      = ( trueVacuum.FieldConfiguration()[ fieldIndex ]
+          - falseVacuum.FieldConfiguration()[ fieldIndex ]
+          - coefficientSum );
       // This ensures that the field configuration for auxiliary variable = 1.0
       // goes to that of the true vacuum.
+    }
+  }
+
+  // This puts the derivatives of the fields directly into fieldDerivatives
+  // from splineCoefficients.
+  void ModifiedBounceForMinuit::FieldDerivatives(
+                               std::vector< double > const& splineCoefficients,
+                      std::vector< SimplePolynomial >& fieldDerivatives ) const
+  {
+    unsigned int coefficientsPerField( ( ( splineCoefficients.size() - 2 )
+                                       / numberOfFields ) + 1 );
+    fieldDerivatives.resize( numberOfFields,
+                             SimplePolynomial( coefficientsPerField ) );
+    // The last element of splineCoefficients is a temperature, so should not
+    // be used. The ( ( size - 2 / numberOfFields ) + 1 ) integer is to ensure
+    // that each SimplePolynomial has enough elements. The last coefficient of
+    // each field is implicit, and is fixed by the requirement that the field
+    // path goes to trueVacuum for a=1.
+    for( unsigned int splineIndex( 0 );
+         splineIndex < ( splineCoefficients.size() - 1 - numberOfFields );
+         ++splineIndex )
+    {
+      fieldDerivatives[ splineIndex
+                        % numberOfFields ].CoefficientVector()[ ( splineIndex
+                                                           / numberOfFields ) ]
+      = splineCoefficients[ splineIndex + numberOfFields ];
+    }
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      double coefficientSum( 0.0 );
+      unsigned int whichPower( 0 );
+      while( whichPower < ( coefficientsPerField - 1 ) )
+      {
+        coefficientSum
+        += fieldDerivatives[ fieldIndex ].CoefficientVector()[ whichPower ];
+        fieldDerivatives[ fieldIndex ].CoefficientVector()[ whichPower ]
+        *= (double)( ++whichPower );
+      }
+      fieldDerivatives[ fieldIndex ].CoefficientVector().back()
+      = ( trueVacuum.FieldConfiguration()[ fieldIndex ]
+          - falseVacuum.FieldConfiguration()[ fieldIndex ]
+          - coefficientSum
+          - splineCoefficients[ fieldIndex ] );
+      // This ensures that the field configuration for auxiliary variable = 1.0
+      // goes to that of the true vacuum.
+      fieldDerivatives[ fieldIndex ].CoefficientVector().back()
+       *= (double)coefficientsPerField;
     }
   }
 

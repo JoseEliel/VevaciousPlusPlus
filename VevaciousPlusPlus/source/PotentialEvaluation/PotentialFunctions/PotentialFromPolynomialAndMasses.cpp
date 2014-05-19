@@ -833,7 +833,7 @@ namespace VevaciousPlusPlus
   // that the scale has been set correctly.
   double
   PotentialFromPolynomialAndMasses::LoopAndThermalCorrections(
-                             std::vector< double > const& fieldConfiguration,
+                               std::vector< double > const& fieldConfiguration,
           std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
          std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
           std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,

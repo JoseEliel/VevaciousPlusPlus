@@ -75,7 +75,7 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/TunnelingCalculation/BounceWithSplines.cpp \
- source/TunnelingCalculation/BubbleRadiusFromAuxiliary.cpp \
+ source/TunnelingCalculation/BubbleProfiler.cpp \
  source/TunnelingCalculation/CosmoTransitionsRunner.cpp \
  source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
  source/TunnelingCalculation/ModifiedBounceForMinuit.cpp \

@@ -12,8 +12,10 @@
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Eigen/Dense"
+#include "boost/numeric/odeint/stepper/runge_kutta_cash_karp54.hpp"
 #include "boost/numeric/odeint/integrate/integrate_adaptive.hpp"
 #include "../PotentialEvaluation.hpp"
+#include "BubbleProfiler.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -58,6 +60,11 @@ namespace VevaciousPlusPlus
     void
     FieldsAsSimplePolynomials( std::vector< double > const& splineCoefficients,
                   std::vector< SimplePolynomial >& fieldsAsPolynomials ) const;
+
+    // This puts the derivatives of the fields directly into fieldDerivatives
+    // from splineCoefficients.
+    void FieldDerivatives( std::vector< double > const& splineCoefficients,
+                     std::vector< SimplePolynomial >& fieldDerivatives ) const;
   };
 
 
