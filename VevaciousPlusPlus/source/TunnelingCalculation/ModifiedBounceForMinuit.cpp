@@ -66,11 +66,12 @@ namespace VevaciousPlusPlus
     //    which also is convenient for evaluating the action. Hence V(a) is
     //    actually a polynomial approximation of the potential difference from
     //    the false vacuum along the path given by f(a).)
-    // 3) Find the 1-dimensional bubble profile by solving the radial bubble
-    //    equations of motion along the path from a = 0 to a = a_crit, where
-    //    a_crit is the value of a for which the bubble is critical, and is
-    //    found by the undershoot/overshoot method (0.0 < a_crit < 1.0). This
-    //    probably will involve using the Boost library odeint.
+    // 3a) Return early with a thin-wall result if appropriate.
+    // 3b) Find the 1-dimensional bubble profile by solving the radial bubble
+    //     equations of motion along the path from a = 0 to a = a_crit, where
+    //     a_crit is the value of a for which the bubble is critical, and is
+    //     found by the undershoot/overshoot method (0.0 < a_crit < 1.0). This
+    //     probably will involve using the Boost library odeint.
     // 4) Combine f(a) (exact) and V(a) (approximate) with a(r) to numerically
     //    integrate the bounce action.
     // Note that this is only really the bounce action (within the validity of
@@ -85,7 +86,6 @@ namespace VevaciousPlusPlus
     // potential, hence the calculated bounce action here is an upper bound on
     // the true bounce action, and minimizing this should lead one to the true
     // minimal bounce action.
-
 
 
     double const givenTemperature( splineCoefficients.back() );
@@ -181,9 +181,71 @@ namespace VevaciousPlusPlus
     }
     potentialVector.push_back( finalCoefficientTimesMaxPower
                                / (double)potentialApproximationPower );
+    double const
+    tunnelingScaleSquared( potentialFunction.ScaleSquaredRelevantToTunneling(
+                                                                   falseVacuum,
+                                                                trueVacuum ) );
     std::vector< SimplePolynomial > fieldDerivatives;
     FieldDerivatives( splineCoefficients,
                       fieldDerivatives );
+    // We return a thin-wall approximation if appropriate:
+    if( ( ( falseVacuum.PotentialValue() - trueVacuum.PotentialValue() )
+          / ( tunnelingScaleSquared * tunnelingScaleSquared ) ) < 1.0E-3 )
+    {
+      double const
+      oneOverPotentialDifference( 1.0 / ( falseVacuum.PotentialValue()
+                                          - trueVacuum.PotentialValue() ) );
+
+      // placeholder:
+      /**/std::cout << std::endl
+      << "Placeholder: "
+      << "Need to work out thin-wall bounce!";
+      std::cout << std::endl;/**/
+
+      // Following Coleman and adapting to thermal tunneling:
+      // Quantum:
+      // S_E = pi^2 * R^3 * S_1 - 0.5 * pi^2 * R^4 * epsilon
+      // R = 3 S_1 / epsilon
+      // S_E = -0.5 pi^2 R^3 S_1 = -13.5 pi^2 S_1^4 epsilon^-3
+      // Thermal:
+      // S_E = 2 * pi * R^2 * S_1 - 4/3 * pi * R^3 * epsilon
+      // R = S_1 / epsilon
+      // S_E = 2/3 pi R^2 S_1 = 2/3 S_1^3 epsilon^-2
+
+      double integratedAction( 0.0 );
+      double fieldDerivative( 0.0 );
+      double derivativeSquared( 0.0 );
+      for( double fieldAuxiliary( 0 );
+           fieldAuxiliary < 1.0;
+           fieldAuxiliary += 0.05 )
+      {
+        derivativeSquared = 0.0;
+        for( size_t fieldIndex( 0 );
+             fieldIndex < numberOfFields;
+             ++fieldIndex )
+        {
+          fieldDerivative = fieldDerivatives( fieldAuxiliary );
+          derivativeSquared += ( fieldDerivative * fieldDerivative );
+        }
+        integratedAction += sqrt( derivativeSquared
+                                  * potentialApproximation( fieldAuxiliary ) );
+      }
+      integratedAction *= M_SQRT2;
+
+      if( nonZeroTemperature )
+      {
+        return ( 2.0 * M_PI * integratedAction * integratedAction
+                 * integratedAction * oneOverPotentialDifference
+                 * oneOverPotentialDifference );
+      }
+      else
+      {
+        return ( -13.5 * M_PI * M_PI * integratedAction * integratedAction
+                 * integratedAction * integratedAction
+                 * oneOverPotentialDifference * oneOverPotentialDifference
+                 * oneOverPotentialDifference );
+      }
+    }
     unsigned int dampingFactor( 4 );
     if( nonZeroTemperature )
     {
