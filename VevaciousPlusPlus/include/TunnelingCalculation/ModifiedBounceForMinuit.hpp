@@ -12,8 +12,7 @@
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Eigen/Dense"
-#include "boost/numeric/odeint/stepper/runge_kutta_cash_karp54.hpp"
-#include "boost/numeric/odeint/integrate/integrate_adaptive.hpp"
+#include "boost/numeric/odeint/integrate/integrate.hpp"
 #include "../PotentialEvaluation.hpp"
 #include "BubbleProfiler.hpp"
 

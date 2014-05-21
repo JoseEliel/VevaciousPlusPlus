@@ -159,6 +159,58 @@ namespace VevaciousPlusPlus
     // and an undecided a is found each time until the a at maximum radial
     // value is < 1.0E-3 or something.
     // HERE! REMEMBER TO RESET odeintBubbleObserver IN LOOP!
+    double undershootAuxiliary( 0.0 );
+    double overshootAuxiliary( 1.0 );
+    // First we use conservation of energy to get a lower bound for the range
+    // for the auxiliary variable which definitely undershoots.
+    for( size_t undershootGuessStep( 0 );
+         undershootGuessStep < 5;
+         ++undershootGuessStep )
+    {
+      if( potentialApproximation( 0.5 * ( undershootAuxiliary
+                                          + overshootAuxiliary ) ) < 0.0 )
+      {
+        overshootAuxiliary
+        = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
+      }
+      else
+      {
+        undershootAuxiliary
+        = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
+      }
+    }
+    // At this point we reset overshootAuxiliary for the integration including
+    // damping.
+    overshootAuxiliary = 1.0;
+    size_t shootAttempts( 0 );
+    double integrationRadius( 10.0 / tunnelingScale );
+    size_t integrationSteps( 0 );
+    std::vector< double > initialConditions( 2,
+                                             0.0 );
+    // The unit for the radial variable is 1/GeV.
+    while( shootAttempts < 20 )
+    {
+      odeintBubbleObserver.ResetValues();
+      initialConditions[ 0 ]
+      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
+      integrationSteps = boost::numeric::odeint::integrate( bubbleProfiler,
+                                                            initialConditions,
+                                                            0.0,
+                                                            integrationRadius,
+                                                  ( 0.01 * integrationRadius ),
+                                                        odeintBubbleObserver );
+
+      // Now we have to decide if initialConditions[ 0 ] is the new
+      // undershootAuxiliary or overshootAuxiliary, or if we need to extend
+      // integrationRadius, or if the current guess overshoots with a
+      // negligible amount of kinetic energy.
+
+      // placeholder:
+      /**/std::cout << std::endl
+      << "Placeholder: "
+      << "decide about looping under-/over-shooting!";
+      std::cout << std::endl;/**/
+    }
 
 
 
