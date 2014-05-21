@@ -22,6 +22,13 @@ namespace VevaciousPlusPlus
     potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
     trueVacuum( trueVacuum ),
+    fieldOriginPotential( potentialFunction(
+                                         potentialFunction.FieldValuesOrigin(),
+                                             0.0 ) ),
+    falseVacuumPotential( potentialFunction( falseVacuum.FieldConfiguration(),
+                                             0.0 ) ),
+    trueVacuumPotential( potentialFunction( trueVacuum.FieldConfiguration(),
+                                            0.0 ) ),
     falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature )
   {
     // This constructor is just an initialization list.
@@ -91,177 +98,46 @@ namespace VevaciousPlusPlus
     double const givenTemperature( splineCoefficients.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
-    std::vector< double > falseConfiguration( numberOfFields,
-                                              0.0 );
-    double falsePotentialValue( 0.0 );
-    if( givenTemperature < falseVacuumEvaporationTemperature )
-    {
-      PotentialForMinuit potentialForMinuit( potentialFunction );
-      MinuitManager thermalDsbFinder( potentialForMinuit );
-      MinuitMinimum thermalFalseVacuum
-      = thermalDsbFinder( falseVacuum.FieldConfiguration() );
-      falsePotentialValue = thermalFalseVacuum.FunctionValue();
-      falseConfiguration = thermalFalseVacuum.VariableValues();
-    }
-    else
-    {
-      falsePotentialValue = potentialFunction( falseConfiguration,
-                                               givenTemperature );
-    }
-    std::vector< double > fieldConfiguration( falseConfiguration );
-
-    // Here we set up the linear system to solve for the coefficients of the
-    // polynomial approximation of the potential:
-    unsigned int const
-    numberOfNonZeroCoefficients( potentialApproximationPower - 2 );
-    // The potential is approximated as a polynomial with zero coefficients
-    // (for a^0 and a^1, so that a = 0 is an extremum) which will be ignored
-    // for inverting the matrix equation. Furthermore, the final coefficient is
-    // related to the other coefficients by the condition that the derivative
-    // is 0 for a = 1, so for n = potentialApproximationPower
-    // -n c_n = 2 c_2 + 3 c_3 + ...
-    // making the equation defining the potential approximation become
-    // V(a) = c_2 ( a^2 - (2/n) a^n ) + c_3 ( a^3 - (3/n) a^n ) + ...
-    // and c_n will be explicitly put into the approximation object afterwards.
-    double const
-    auxiliaryStep( 1.0 / (double)numberOfNonZeroCoefficients );
-    double auxiliaryValue( 0.0 );
-    Eigen::VectorXd potentialValues( numberOfNonZeroCoefficients );
-    Eigen::MatrixXd coefficientMatrix( numberOfNonZeroCoefficients,
-                                       numberOfNonZeroCoefficients );
-    double const
-    finalCoefficientPart( pow( auxiliaryValue,
-                               potentialApproximationPower )
-                          / (double)potentialApproximationPower );
-    for( unsigned int whichStep( 0 );
-         whichStep < ( numberOfNonZeroCoefficients - 1 );
-         ++whichStep )
-    {
-      auxiliaryValue += auxiliaryStep;
-      ConfigurationFromSplines( fieldConfiguration,
-                                splineCoefficients,
-                                auxiliaryValue );
-      potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration )
-                                       - falsePotentialValue );
-
-      for( unsigned int whichPower( 2 );
-           whichPower < potentialApproximationPower;
-           ++whichPower )
-      {
-        coefficientMatrix( whichStep,
-                           ( whichPower - 2 ) )
-        = ( pow( auxiliaryValue,
-                 whichPower )
-            - ( (double)whichPower * finalCoefficientPart ) );
-      }
-    }
-    potentialValues( numberOfNonZeroCoefficients - 1 )
-    = trueVacuum.PotentialValue();
-    for( unsigned int whichPower( 0 );
-         whichPower < numberOfNonZeroCoefficients;
-         ++whichPower )
-    {
-      coefficientMatrix( ( numberOfNonZeroCoefficients - 1 ),
-                         whichPower ) = 1.0;
-    }
+    std::vector< SimplePolynomial > fieldsAsPolynomials;
+    double falseVacuumRelativePotential( falseVacuumPotential );
+    double trueVacuumRelativePotential( trueVacuumPotential );
+    DecodeSplineVector( splineCoefficients,
+                        fieldsAsPolynomials,
+                        falseVacuumRelativePotential,
+                        trueVacuumRelativePotential );
 
     SimplePolynomial
-    potentialApproximation( coefficientMatrix.colPivHouseholderQr().solve(
-                                                             potentialValues ),
-                            2 );
-    std::vector< double >&
-    potentialVector( potentialApproximation.CoefficientVector() );
-    double finalCoefficientTimesMaxPower( 0.0 );
-    for( unsigned int whichPower( 2 );
-         whichPower < potentialApproximationPower;
-         ++whichPower )
-    {
-      finalCoefficientTimesMaxPower
-      -= ( (double)whichPower * potentialVector[ whichPower ] );
-    }
-    potentialVector.push_back( finalCoefficientTimesMaxPower
-                               / (double)potentialApproximationPower );
+    potentialApproximation( PotentialAlongPath( fieldsAsPolynomials,
+                                                falseVacuumRelativePotential,
+                                               trueVacuumRelativePotential ) );
     double const
-    tunnelingScaleSquared( potentialFunction.ScaleSquaredRelevantToTunneling(
+    tunnelingScale( sqrt( potentialFunction.ScaleSquaredRelevantToTunneling(
                                                                    falseVacuum,
-                                                                trueVacuum ) );
-    double const tunnelingScale( sqrt( tunnelingScaleSquared ) );
-    std::vector< SimplePolynomial > fieldDerivatives;
-    FieldDerivatives( splineCoefficients,
-                      fieldDerivatives );
-    // We return a thin-wall approximation if appropriate:
-    if( ( ( falseVacuum.PotentialValue() - trueVacuum.PotentialValue() )
-          / ( tunnelingScaleSquared * tunnelingScaleSquared ) ) < 1.0E-3 )
+                                                              trueVacuum ) ) );
+    std::vector< SimplePolynomial > fieldDerivatives( numberOfFields );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
     {
-      double const
-      oneOverPotentialDifference( 1.0 / ( falseVacuum.PotentialValue()
-                                          - trueVacuum.PotentialValue() ) );
-
-      // Following Coleman and adapting to thermal tunneling:
-      // Quantum:
-      // S_E = pi^2 * R^3 * S_1 - 0.5 * pi^2 * R^4 * epsilon
-      // R = 3 S_1 / epsilon
-      // S_E = -0.5 pi^2 R^3 S_1 = -13.5 pi^2 S_1^4 epsilon^-3
-      // Thermal:
-      // S_E = 2 * pi * R^2 * S_1 - 4/3 * pi * R^3 * epsilon
-      // R = S_1 / epsilon
-      // S_E = 2/3 pi R^2 S_1 = 2/3 S_1^3 epsilon^-2
-
-      double integratedAction( 0.0 );
-      double fieldDerivative( 0.0 );
-      double derivativeSquared( 0.0 );
-      double const thinWallStep( 0.05 );
-      // The start and end of the integral are neglected as they are
-      // proportional to the derivatives of the fields with respect to the
-      // auxiliary variable, which are zero at the ends of the integral.
-      for( double thinWallAuxiliary( thinWallStep );
-           thinWallAuxiliary < 1.0;
-           thinWallAuxiliary += thinWallStep )
-      {
-        derivativeSquared = 0.0;
-        for( size_t fieldIndex( 0 );
-             fieldIndex < numberOfFields;
-             ++fieldIndex )
-        {
-          fieldDerivative = fieldDerivatives( thinWallAuxiliary );
-          derivativeSquared += ( fieldDerivative * fieldDerivative );
-        }
-        integratedAction += sqrt( derivativeSquared
-                               * potentialApproximation( thinWallAuxiliary ) );
-      }
-      integratedAction *= ( M_SQRT2 * thinWallStep );
-
-      // We return the thin-wall approximation of the bounce action only if the
-      // bubble radius is sufficiently large compared to the tunneling scale,
-      // which is a good indicator for the validity of the approximation.
-      // (The comparison here is that the thermal bubble radius > 100 Q, or the
-      // T=0 radius > 300 Q.)
-      if( ( integratedAction * oneOverPotentialDifference * tunnelingScale )
-          > 1.0E+2 )
-      {
-        if( nonZeroTemperature )
-        {
-          return ( ( 2.0 * M_PI * integratedAction * integratedAction
-                     * integratedAction * oneOverPotentialDifference
-                     * oneOverPotentialDifference ) / givenTemperature );
-          // This is at least 10^4 * 2 pi * ( S_1 / ( Q^2 T ) ), so S_3(T)/T is
-          // likely to be at least 10^3, leading to a totally negligible
-          // tunneling probability...
-        }
-        else
-        {
-          return ( -13.5 * M_PI * M_PI * integratedAction * integratedAction
-                   * integratedAction * integratedAction
-                   * oneOverPotentialDifference * oneOverPotentialDifference
-                   * oneOverPotentialDifference );
-          // This is at least 3^4 * 10^4 * 13.5 pi^2 * ( S_1 / ( Q^3 ) ), so
-          // S_4 is likely to be at least 10^6, leading to a totally negligible
-          // tunneling probability...
-        }
-      }
-      // If the thin-wall radius wasn't large enough, nothing is returned yet,
-      // and we go on to try undershooting/overshooting.
+      fieldDerivatives[ fieldIndex ]
+      = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
     }
+
+    // We return a thin-wall approximation if appropriate:
+    double bounceAction( NAN );
+    if( ThinWallAppropriate( ( falseVacuumRelativePotential
+                               - trueVacuumRelativePotential ),
+                             tunnelingScale,
+                             givenTemperature,
+                             fieldDerivatives,
+                             potentialApproximation,
+                             bounceAction ) )
+    {
+      return bounceAction;
+    }
+    // If we didn't return bounceAction already, it means that the we go on to
+    // try undershooting/overshooting.
+
     unsigned int dampingFactor( 4 );
     if( nonZeroTemperature )
     {
@@ -417,98 +293,268 @@ namespace VevaciousPlusPlus
     }
   }
 
-  void ModifiedBounceForMinuit::FieldsAsSimplePolynomials(
+  // This turns a flattened matrix of coefficients from splineCoefficients
+  // and fills fieldsAsPolynomials appropriately. It also puts the value of the
+  // potential (minus the value at the field origin at zero temperature) into
+  // thermalFalseVacuumPotential and thermalTrueVacuumPotential for the false
+  // and true vacua at the temperature give by splineCoefficients.back() if and
+  // only if it is non-zero. Unfortunately it does not use "return value
+  // optimization" as we cannot be sure that the user will compile with C++11
+  // features enabled.
+  void ModifiedBounceForMinuit::DecodeSplineVector(
                                std::vector< double > const& splineCoefficients,
-                   std::vector< SimplePolynomial >& fieldsAsPolynomials ) const
+                          std::vector< SimplePolynomial >& fieldsAsPolynomials,
+                                           double& thermalFalseVacuumPotential,
+                                     double& thermalTrueVacuumPotential ) const
   {
+    double const givenTemperature( splineCoefficients.back() );
+    bool const nonZeroTemperature( givenTemperature > 0.0 );
+
+    std::vector< double >
+    falseVacuumConfiguration( falseVacuum.FieldConfiguration() );
+    std::vector< double >
+    trueVacuumConfiguration( trueVacuum.FieldConfiguration() );
+
+    if( nonZeroTemperature )
+    {
+      PotentialForMinuit potentialForMinuit( potentialFunction );
+      MinuitManager thermalDsbFinder( potentialForMinuit );
+      MinuitMinimum
+      thermalTrueVacuum( thermalDsbFinder( trueVacuumConfiguration ) );
+      trueVacuumConfiguration = thermalTrueVacuum.VariableValues();
+      thermalTrueVacuumPotential = ( thermalTrueVacuum.FunctionValue()
+                                     + potentialForMinuit.FunctionAtOrigin() );
+      // We undo the offset from potentialFromMinuit.
+      if( givenTemperature < falseVacuumEvaporationTemperature )
+      {
+        MinuitMinimum thermalFalseVacuum
+        = thermalDsbFinder( falseVacuum.FieldConfiguration() );
+        falseVacuumConfiguration = thermalFalseVacuum.VariableValues();
+        thermalFalseVacuumPotential = ( thermalFalseVacuum.FunctionValue()
+                                     + potentialForMinuit.FunctionAtOrigin() );
+        // We undo the offset from potentialFromMinuit.
+      }
+      else
+      {
+        falseVacuumConfiguration = std::vector< double >( numberOfFields,
+                                                          0.0 );
+        // We use potentialForMinuit for a consistent offset to the value of
+        // potentialFunction at the field origin at zero temperature.
+        thermalFalseVacuumPotential
+        = potentialFunction( falseVacuumConfiguration,
+                             givenTemperature );
+      }
+    }
     unsigned int coefficientsPerField( ( ( splineCoefficients.size() - 2 )
-                                       / numberOfFields ) + 2 );
+                                       / numberOfFields ) + 3 );
     fieldsAsPolynomials.resize( numberOfFields,
                                 SimplePolynomial( coefficientsPerField ) );
     // The last element of splineCoefficients is a temperature, so should not
     // be used. The ( ( size - 2 / numberOfFields ) + 2 ) integer is to ensure
-    // that each SimplePolynomial has enough elements. The last coefficient of
-    // each field is implicit, and is fixed by the requirement that the field
-    // path goes to trueVacuum for a=1.
+    // that each SimplePolynomial has enough elements. The first coefficient
+    // (the constant) is taken from falseVacuumConfiguration. The last
+    // coefficient of each field is implicit, and is fixed by the requirement
+    // that the field path goes to trueVacuumConfiguration for a=1.
     for( unsigned int splineIndex( 0 );
          splineIndex < ( splineCoefficients.size() - 1 );
          ++splineIndex )
     {
-      fieldsAsPolynomials[ splineIndex
-                           % numberOfFields ].CoefficientVector()[ splineIndex
-                                                             / numberOfFields ]
+      fieldsAsPolynomials[ splineIndex % numberOfFields ].CoefficientVector()[
+                                         ( splineIndex / numberOfFields ) + 1 ]
       = splineCoefficients[ splineIndex ];
     }
     for( unsigned int fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
+      std::vector< double >& coefficientVector(
+                       fieldsAsPolynomials[ fieldIndex ].CoefficientVector() );
+      coefficientVector.front() = falseVacuumConfiguration[ fieldIndex ];
       double coefficientSum( 0.0 );
-      for( std::vector< double >::const_iterator coefficientValue(
-               fieldsAsPolynomials[ fieldIndex ].CoefficientVector().begin() );
-           coefficientValue
-           < ( fieldsAsPolynomials[ fieldIndex ].CoefficientVector().end()
-               - 1 );
-           ++coefficientValue )
+      for( size_t coefficientIndex( 0 );
+           coefficientIndex < ( coefficientVector.size() - 1 );
+           ++coefficientIndex )
       {
-        coefficientSum += *coefficientValue;
+        coefficientSum += coefficientVector[ coefficientIndex ];
       }
-      fieldsAsPolynomials[ fieldIndex ].CoefficientVector().back()
-      = ( trueVacuum.FieldConfiguration()[ fieldIndex ]
-          - falseVacuum.FieldConfiguration()[ fieldIndex ]
-          - coefficientSum );
+      coefficientVector.back() = ( trueVacuumConfiguration[ fieldIndex ]
+                                   - coefficientSum );
       // This ensures that the field configuration for auxiliary variable = 1.0
       // goes to that of the true vacuum.
     }
   }
 
-  // This puts the derivatives of the fields directly into fieldDerivatives
-  // from splineCoefficients.
-  void ModifiedBounceForMinuit::FieldDerivatives(
-                               std::vector< double > const& splineCoefficients,
-                      std::vector< SimplePolynomial >& fieldDerivatives ) const
+  // This returns a polynomial approximation of the potential along the path
+  // given by splineCoefficients.
+  SimplePolynomial ModifiedBounceForMinuit::PotentialAlongPath(
+                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
+                                             double const falseVacuumPotential,
+                                       double const trueVacuumPotential ) const
   {
-    unsigned int coefficientsPerField( ( ( splineCoefficients.size() - 2 )
-                                       / numberOfFields ) + 1 );
-    fieldDerivatives.resize( numberOfFields,
-                             SimplePolynomial( coefficientsPerField ) );
-    // The last element of splineCoefficients is a temperature, so should not
-    // be used. The ( ( size - 2 / numberOfFields ) + 1 ) integer is to ensure
-    // that each SimplePolynomial has enough elements. The last coefficient of
-    // each field is implicit, and is fixed by the requirement that the field
-    // path goes to trueVacuum for a=1.
-    for( unsigned int splineIndex( 0 );
-         splineIndex < ( splineCoefficients.size() - 1 - numberOfFields );
-         ++splineIndex )
+    std::vector< double > fieldConfiguration( numberOfFields );
+    // Here we set up the linear system to solve for the coefficients of the
+    // polynomial approximation of the potential:
+    unsigned int const
+    numberOfNonZeroCoefficients( potentialApproximationPower - 2 );
+    // The potential is approximated as a polynomial with zero coefficients
+    // (for a^0 and a^1, so that a = 0 is an extremum) which will be ignored
+    // for inverting the matrix equation. Furthermore, the final coefficient is
+    // related to the other coefficients by the condition that the derivative
+    // is 0 for a = 1, so for n = potentialApproximationPower
+    // -n c_n = 2 c_2 + 3 c_3 + ...
+    // making the equation defining the potential approximation become
+    // V(a) = c_2 ( a^2 - (2/n) a^n ) + c_3 ( a^3 - (3/n) a^n ) + ...
+    // and c_n will be explicitly put into the approximation object afterwards.
+    double const
+    auxiliaryStep( 1.0 / (double)numberOfNonZeroCoefficients );
+    double auxiliaryValue( 0.0 );
+    Eigen::VectorXd potentialValues( numberOfNonZeroCoefficients );
+    Eigen::MatrixXd coefficientMatrix( numberOfNonZeroCoefficients,
+                                       numberOfNonZeroCoefficients );
+    double const
+    finalCoefficientPart( pow( auxiliaryValue,
+                               potentialApproximationPower )
+                          / (double)potentialApproximationPower );
+    for( unsigned int whichStep( 0 );
+         whichStep < ( numberOfNonZeroCoefficients - 1 );
+         ++whichStep )
     {
-      fieldDerivatives[ splineIndex
-                        % numberOfFields ].CoefficientVector()[ ( splineIndex
-                                                           / numberOfFields ) ]
-      = splineCoefficients[ splineIndex + numberOfFields ];
-    }
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      double coefficientSum( 0.0 );
-      unsigned int whichPower( 0 );
-      while( whichPower < ( coefficientsPerField - 1 ) )
+      auxiliaryValue += auxiliaryStep;
+      SetFieldConfiguration( fieldConfiguration,
+                             fieldsAsPolynomials,
+                             auxiliaryValue );
+      potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration )
+                                       - falseVacuumPotential );
+
+      for( unsigned int whichPower( 2 );
+           whichPower < potentialApproximationPower;
+           ++whichPower )
       {
-        coefficientSum
-        += fieldDerivatives[ fieldIndex ].CoefficientVector()[ whichPower ];
-        fieldDerivatives[ fieldIndex ].CoefficientVector()[ whichPower ]
-        *= (double)( ++whichPower );
+        coefficientMatrix( whichStep,
+                           ( whichPower - 2 ) )
+        = ( pow( auxiliaryValue,
+                 whichPower )
+            - ( (double)whichPower * finalCoefficientPart ) );
       }
-      fieldDerivatives[ fieldIndex ].CoefficientVector().back()
-      = ( trueVacuum.FieldConfiguration()[ fieldIndex ]
-          - falseVacuum.FieldConfiguration()[ fieldIndex ]
-          - coefficientSum
-          - splineCoefficients[ fieldIndex ] );
-      // This ensures that the field configuration for auxiliary variable = 1.0
-      // goes to that of the true vacuum.
-      fieldDerivatives[ fieldIndex ].CoefficientVector().back()
-       *= (double)coefficientsPerField;
     }
+    potentialValues( numberOfNonZeroCoefficients - 1 )
+    = ( trueVacuumPotential - falseVacuumPotential );
+    for( unsigned int whichPower( 0 );
+         whichPower < numberOfNonZeroCoefficients;
+         ++whichPower )
+    {
+      coefficientMatrix( ( numberOfNonZeroCoefficients - 1 ),
+                         whichPower ) = 1.0;
+    }
+
+    SimplePolynomial
+    potentialApproximation( coefficientMatrix.colPivHouseholderQr().solve(
+                                                             potentialValues ),
+                            2,
+                            1 );
+    std::vector< double >&
+    potentialVector( potentialApproximation.CoefficientVector() );
+    double finalCoefficientTimesMaxPower( 0.0 );
+    for( unsigned int whichPower( 2 );
+         whichPower < potentialApproximationPower;
+         ++whichPower )
+    {
+      finalCoefficientTimesMaxPower
+      -= ( (double)whichPower * potentialVector[ whichPower ] );
+    }
+    potentialVector.back() = ( finalCoefficientTimesMaxPower
+                               / (double)potentialApproximationPower );
+    return potentialApproximation;
   }
 
+  // This puts the bounce action in the thin-wall approximation into
+  // bounceAction and returns true if the thin-wall approximation is
+  // appropriate. Otherwise, bounceAction is left alone and false is
+  // returned.
+  bool
+  ModifiedBounceForMinuit::ThinWallAppropriate( double potentialDifference,
+                                                double const tunnelingScale,
+                                                double const givenTemperature,
+                       std::vector< SimplePolynomial > const& fieldDerivatives,
+                                SimplePolynomial const& potentialApproximation,
+                                                double& bounceAction ) const
+  {
+    if( potentialDifference < 0.0 )
+    {
+      potentialDifference = -potentialDifference;
+    }
+    if( potentialDifference > ( 1.0E-3 * tunnelingScale * tunnelingScale
+                                       * tunnelingScale * tunnelingScale ) )
+    {
+      return false;
+    }
+
+    double const oneOverPotentialDifference( 1.0 / potentialDifference );
+
+    // Following Coleman and adapting to thermal tunneling:
+    // Quantum:
+    // S_E = pi^2 * R^3 * S_1 - 0.5 * pi^2 * R^4 * epsilon
+    // R = 3 S_1 / epsilon
+    // S_E = -0.5 pi^2 R^3 S_1 = -13.5 pi^2 S_1^4 epsilon^-3
+    // Thermal:
+    // S_E = 2 * pi * R^2 * S_1 - 4/3 * pi * R^3 * epsilon
+    // R = S_1 / epsilon
+    // S_E = 2/3 pi R^2 S_1 = 2/3 S_1^3 epsilon^-2
+
+    double integratedAction( 0.0 );
+    double fieldDerivative( 0.0 );
+    double derivativeSquared( 0.0 );
+    double const thinWallStep( 0.05 );
+    // The start and end of the integral are neglected as they are proportional
+    // to the derivatives of the fields with respect to the auxiliary variable,
+    // which are zero at the ends of the integral.
+    for( double thinWallAuxiliary( thinWallStep );
+         thinWallAuxiliary < 1.0;
+         thinWallAuxiliary += thinWallStep )
+    {
+      derivativeSquared = 0.0;
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        fieldDerivative = fieldDerivatives( thinWallAuxiliary );
+        derivativeSquared += ( fieldDerivative * fieldDerivative );
+      }
+      integratedAction += sqrt( derivativeSquared
+                               * potentialApproximation( thinWallAuxiliary ) );
+    }
+    integratedAction *= ( M_SQRT2 * thinWallStep );
+
+    // We return the thin-wall approximation of the bounce action only if the
+    // bubble radius is sufficiently large compared to the tunneling scale,
+    // which is a good indicator for the validity of the approximation. (The
+    // comparison here is that the thermal bubble radius > 100 Q, or that the
+    // T=0 radius > 300 Q.)
+    if( ( integratedAction * oneOverPotentialDifference * tunnelingScale )
+        < 1.0E+2 )
+    {
+      return false;
+    }
+    if( givenTemperature > 0.0 )
+    {
+      bounceAction = ( ( 2.0 * M_PI * integratedAction * integratedAction
+                       * integratedAction * oneOverPotentialDifference
+                       * oneOverPotentialDifference ) / givenTemperature );
+      // This is at least 10^4 * 2 pi * ( S_1 / ( Q^2 T ) ), so S_3(T)/T is
+      // likely to be at least 10^3, leading to a totally negligible
+      // tunneling probability...
+    }
+    else
+    {
+      bounceAction = ( -13.5 * M_PI * M_PI * integratedAction
+                       * integratedAction * integratedAction * integratedAction
+                       * oneOverPotentialDifference
+                       * oneOverPotentialDifference
+                       * oneOverPotentialDifference );
+      // This is at least 3^4 * 10^4 * 13.5 pi^2 * ( S_1 / ( Q^3 ) ), so
+      // S_4 is likely to be at least 10^6, leading to a totally negligible
+      // tunneling probability...
+    }
+    return true;
+  }
 } /* namespace VevaciousPlusPlus */

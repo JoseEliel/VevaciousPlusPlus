@@ -12,7 +12,6 @@
 #include "../PotentialEvaluation.hpp"
 #include "../PotentialMinimization.hpp"
 #include "ModifiedBounceForMinuit.hpp"
-#include "BubbleRadiusFromAuxiliary.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -49,46 +49,61 @@ namespace VevaciousPlusPlus
     unsigned int potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
     PotentialMinimum const& trueVacuum;
+    double const fieldOriginPotential;
+    double const falseVacuumPotential;
+    double const trueVacuumPotential;
     double const falseVacuumEvaporationTemperature;
 
-    // This converts the spline coefficients into a field configuration and
-    // puts it into fieldConfiguration.
-    void ConfigurationFromSplines( std::vector< double >& fieldConfiguration,
-                               std::vector< double > const& splineCoefficients,
-                                   double const auxiliaryValue ) const;
+    // This turns a flattened matrix of coefficients from splineCoefficients
+    // and fills fieldsAsPolynomials appropriately. Unfortunately it does not
+    // use "return value optimization" as we cannot be sure that the user will
+    // compile with C++11 features enabled.
+    void DecodeSplineVector( std::vector< double > const& splineCoefficients,
+                          std::vector< SimplePolynomial >& fieldsAsPolynomials,
+                             double& thermalFalseVacuumPotential,
+                             double& thermalTrueVacuumPotential ) const;
 
-    void
-    FieldsAsSimplePolynomials( std::vector< double > const& splineCoefficients,
-                  std::vector< SimplePolynomial >& fieldsAsPolynomials ) const;
+    // This fills fieldConfiguration with the values from fieldsAsPolynomials
+    // at the auxiliary variable = auxiliaryValue.
+    void SetFieldConfiguration( std::vector< double >& fieldConfiguration,
+                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
+                                double const auxiliaryValue ) const;
 
-    // This puts the derivatives of the fields directly into fieldDerivatives
-    // from splineCoefficients.
-    void FieldDerivatives( std::vector< double > const& splineCoefficients,
-                     std::vector< SimplePolynomial >& fieldDerivatives ) const;
+    // This returns a polynomial approximation of the potential along the path
+    // given by splineCoefficients.
+    SimplePolynomial PotentialAlongPath(
+                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
+                                         double const falseVacuumPotential,
+                                      double const trueVacuumPotential ) const;
+
+    // This puts the bounce action in the thin-wall approximation into
+    // bounceAction and returns true if the thin-wall approximation is
+    // appropriate. Otherwise, bounceAction is left alone and false is
+    // returned.
+    bool ThinWallAppropriate( double potentialDifference,
+                              double const tunnelingScale,
+                              double const givenTemperature,
+                       std::vector< SimplePolynomial > const& fieldDerivatives,
+                              SimplePolynomial const& potentialApproximation,
+                              double& bounceAction ) const;
   };
 
 
 
 
-  // This converts the spline coefficients into differences from a starting
-  // configuration given by fieldConfiguration and adds them to the values of
-  // fieldConfiguration.
-  inline void ModifiedBounceForMinuit::ConfigurationFromSplines(
+  // This fills fieldConfiguration with the values from fieldsAsPolynomials
+  // at the auxiliary variable = auxiliaryValue.
+  inline void ModifiedBounceForMinuit::SetFieldConfiguration(
                                      std::vector< double >& fieldConfiguration,
-                               std::vector< double > const& splineCoefficients,
+                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
                                             double const auxiliaryValue ) const
   {
-    // The last element of splineCoefficients is a temperature, so should not
-    // be used.
-    for( unsigned int splineIndex( 0 );
-         splineIndex < ( splineCoefficients.size() - 1 );
-         ++splineIndex )
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
     {
-      // This relies heavily on int division.
-      fieldConfiguration[ splineIndex % numberOfFields ]
-      += ( splineCoefficients[ splineIndex ]
-           * pow( auxiliaryValue,
-                  ( ( splineIndex / numberOfFields ) + 1 ) ) );
+      fieldConfiguration[ fieldIndex ]
+      = fieldsAsPolynomials[ fieldIndex ]( auxiliaryValue );
     }
   }
 

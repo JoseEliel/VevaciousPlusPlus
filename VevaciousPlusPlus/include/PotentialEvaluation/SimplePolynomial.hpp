@@ -20,12 +20,13 @@ namespace VevaciousPlusPlus
   {
   public:
     SimplePolynomial();
-    SimplePolynomial( unsigned int const reserveSize,
-                      unsigned int const leadingPower = 0 );
+    SimplePolynomial( size_t const reserveSize,
+                      size_t const leadingPower = 0 );
     SimplePolynomial( std::vector< double > const& coefficientVector,
-                      unsigned int const leadingPower = 0 );
+                      size_t const leadingPower = 0 );
     SimplePolynomial( Eigen::VectorXd const& eigenVector,
-                      unsigned int const leadingPower = 0 );
+                      size_t const leadingPower = 0,
+                      size_t extraEmptyEntriesAtConstruction = 0 );
     SimplePolynomial( SimplePolynomial const& copySource );
     virtual
     ~SimplePolynomial();
@@ -37,7 +38,8 @@ namespace VevaciousPlusPlus
     // This sets coefficientVector to have elements equal to those of
     // eigenVector.
     void CopyFromEigen( Eigen::VectorXd const& eigenVector,
-                        unsigned int const leadingPower = 0 );
+                        size_t const leadingPower = 0,
+                        size_t extraEmptyEntriesAtConstruction = 0 );
 
     // This returns the first derivative of this SimplePolynomial with respect
     // to its variable, as a SimplePolynomial.
@@ -74,18 +76,16 @@ namespace VevaciousPlusPlus
   // eigenVector.
   inline void
   SimplePolynomial::CopyFromEigen( Eigen::VectorXd const& eigenVector,
-                                   unsigned int const leadingPower )
+                                   size_t const leadingPower,
+                                   size_t extraEmptyEntriesAtConstruction )
   {
     this->leadingPower = leadingPower;
-    coefficientVector.resize( eigenVector.rows() + leadingPower );
-    for( unsigned int whichIndex( 0 );
-         whichIndex < leadingPower;
-         ++whichIndex )
-    {
-      coefficientVector[ whichIndex ] = 0.0;
-    }
+    coefficientVector
+    = std::vector< double >( ( eigenVector.rows() + leadingPower
+                               + extraEmptyEntriesAtConstruction ),
+                             0.0 );
     for( unsigned int whichIndex( leadingPower );
-         whichIndex < coefficientVector.size();
+         whichIndex < ( eigenVector.rows() + leadingPower );
          ++whichIndex )
     {
       coefficientVector[ whichIndex ] = eigenVector( whichIndex );

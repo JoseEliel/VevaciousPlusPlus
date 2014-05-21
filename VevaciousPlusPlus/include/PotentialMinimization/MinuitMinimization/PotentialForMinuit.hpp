@@ -38,6 +38,8 @@ namespace VevaciousPlusPlus
     // temperature.
     void SetTemperature( double const currentTemperature );
 
+    double FunctionAtOrigin() const{ return functionAtOrigin; }
+
 
   protected:
     PotentialFunction const& minimizationFunction;
