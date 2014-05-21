@@ -185,6 +185,7 @@ namespace VevaciousPlusPlus
     tunnelingScaleSquared( potentialFunction.ScaleSquaredRelevantToTunneling(
                                                                    falseVacuum,
                                                                 trueVacuum ) );
+    double const tunnelingScale( sqrt( tunnelingScaleSquared ) );
     std::vector< SimplePolynomial > fieldDerivatives;
     FieldDerivatives( splineCoefficients,
                       fieldDerivatives );
@@ -195,12 +196,6 @@ namespace VevaciousPlusPlus
       double const
       oneOverPotentialDifference( 1.0 / ( falseVacuum.PotentialValue()
                                           - trueVacuum.PotentialValue() ) );
-
-      // placeholder:
-      /**/std::cout << std::endl
-      << "Placeholder: "
-      << "Need to work out thin-wall bounce!";
-      std::cout << std::endl;/**/
 
       // Following Coleman and adapting to thermal tunneling:
       // Quantum:
@@ -215,36 +210,57 @@ namespace VevaciousPlusPlus
       double integratedAction( 0.0 );
       double fieldDerivative( 0.0 );
       double derivativeSquared( 0.0 );
-      for( double fieldAuxiliary( 0 );
-           fieldAuxiliary < 1.0;
-           fieldAuxiliary += 0.05 )
+      double const thinWallStep( 0.05 );
+      // The start and end of the integral are neglected as they are
+      // proportional to the derivatives of the fields with respect to the
+      // auxiliary variable, which are zero at the ends of the integral.
+      for( double thinWallAuxiliary( thinWallStep );
+           thinWallAuxiliary < 1.0;
+           thinWallAuxiliary += thinWallStep )
       {
         derivativeSquared = 0.0;
         for( size_t fieldIndex( 0 );
              fieldIndex < numberOfFields;
              ++fieldIndex )
         {
-          fieldDerivative = fieldDerivatives( fieldAuxiliary );
+          fieldDerivative = fieldDerivatives( thinWallAuxiliary );
           derivativeSquared += ( fieldDerivative * fieldDerivative );
         }
         integratedAction += sqrt( derivativeSquared
-                                  * potentialApproximation( fieldAuxiliary ) );
+                               * potentialApproximation( thinWallAuxiliary ) );
       }
-      integratedAction *= M_SQRT2;
+      integratedAction *= ( M_SQRT2 * thinWallStep );
 
-      if( nonZeroTemperature )
+      // We return the thin-wall approximation of the bounce action only if the
+      // bubble radius is sufficiently large compared to the tunneling scale,
+      // which is a good indicator for the validity of the approximation.
+      // (The comparison here is that the thermal bubble radius > 100 Q, or the
+      // T=0 radius > 300 Q.)
+      if( ( integratedAction * oneOverPotentialDifference * tunnelingScale )
+          > 1.0E+2 )
       {
-        return ( 2.0 * M_PI * integratedAction * integratedAction
-                 * integratedAction * oneOverPotentialDifference
-                 * oneOverPotentialDifference );
+        if( nonZeroTemperature )
+        {
+          return ( ( 2.0 * M_PI * integratedAction * integratedAction
+                     * integratedAction * oneOverPotentialDifference
+                     * oneOverPotentialDifference ) / givenTemperature );
+          // This is at least 10^4 * 2 pi * ( S_1 / ( Q^2 T ) ), so S_3(T)/T is
+          // likely to be at least 10^3, leading to a totally negligible
+          // tunneling probability...
+        }
+        else
+        {
+          return ( -13.5 * M_PI * M_PI * integratedAction * integratedAction
+                   * integratedAction * integratedAction
+                   * oneOverPotentialDifference * oneOverPotentialDifference
+                   * oneOverPotentialDifference );
+          // This is at least 3^4 * 10^4 * 13.5 pi^2 * ( S_1 / ( Q^3 ) ), so
+          // S_4 is likely to be at least 10^6, leading to a totally negligible
+          // tunneling probability...
+        }
       }
-      else
-      {
-        return ( -13.5 * M_PI * M_PI * integratedAction * integratedAction
-                 * integratedAction * integratedAction
-                 * oneOverPotentialDifference * oneOverPotentialDifference
-                 * oneOverPotentialDifference );
-      }
+      // If the thin-wall radius wasn't large enough, nothing is returned yet,
+      // and we go on to try undershooting/overshooting.
     }
     unsigned int dampingFactor( 4 );
     if( nonZeroTemperature )
