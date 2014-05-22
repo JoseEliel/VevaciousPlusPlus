@@ -10,6 +10,7 @@
 
 #include "TunnelingCalculation/BounceWithSplines.hpp"
 #include "TunnelingCalculation/BubbleProfiler.hpp"
+#include "TunnelingCalculation/BubbleRadialValueDescription.hpp"
 #include "TunnelingCalculation/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/MinuitBounceActionMinimizer.hpp"
 #include "TunnelingCalculation/ModifiedBounceForMinuit.hpp"

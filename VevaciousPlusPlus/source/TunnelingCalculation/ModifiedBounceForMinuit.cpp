@@ -123,6 +123,14 @@ namespace VevaciousPlusPlus
       = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
     }
 
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Probably want to remove this check for thin-wall, as it is unlikely to"
+    << " bring any benefit. Left in for the moment to check that the code"
+    << " works.";
+    std::cout << std::endl;
+
     // We return a thin-wall approximation if appropriate:
     double bounceAction( NAN );
     if( ThinWallAppropriate( ( falseVacuumRelativePotential
@@ -137,6 +145,7 @@ namespace VevaciousPlusPlus
     }
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.
+    /**/
 
     unsigned int dampingFactor( 4 );
     if( nonZeroTemperature )
@@ -199,6 +208,7 @@ namespace VevaciousPlusPlus
                                                             integrationRadius,
                                                   ( 0.01 * integrationRadius ),
                                                         odeintBubbleObserver );
+      odeintBubbleObserver.SortByRadialValue();
 
       // Now we have to decide if initialConditions[ 0 ] is the new
       // undershootAuxiliary or overshootAuxiliary, or if we need to extend
