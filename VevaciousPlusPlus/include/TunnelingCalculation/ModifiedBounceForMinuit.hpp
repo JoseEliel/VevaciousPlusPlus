@@ -54,7 +54,7 @@ namespace VevaciousPlusPlus
     double const falseVacuumPotential;
     double const trueVacuumPotential;
     double const falseVacuumEvaporationTemperature;
-    double tunnelingScaleSquared;
+    double const tunnelingScaleSquared;
     double shortestLength;
     double longestLength;
 
