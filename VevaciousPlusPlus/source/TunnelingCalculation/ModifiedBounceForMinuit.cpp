@@ -19,6 +19,8 @@ namespace VevaciousPlusPlus
     ROOT::Minuit2::FCNBase(),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
+    referenceFieldIndex( 0 ),
+    numberOfSplineFields( numberOfFields - 1 ),
     potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
     trueVacuum( trueVacuum ),
@@ -29,9 +31,67 @@ namespace VevaciousPlusPlus
                                              0.0 ) ),
     trueVacuumPotential( potentialFunction( trueVacuum.FieldConfiguration(),
                                             0.0 ) ),
-    falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature )
+    falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature ),
+    tunnelingScaleSquared( std::max( 1.0,
+                            potentialFunction.ScaleSquaredRelevantToTunneling(
+                                                                   falseVacuum,
+                                                              trueVacuum ) ) ),
+    shortestLength( 1.0 ),
+    longestLength( 1.0 )
   {
-    // This constructor is just an initialization list.
+    // We pick the field that has the largest difference between the vacua as
+    // the reference field that goes linearly with the auxiliary variable.
+    std::vector< double > const&
+    falseFieldConfiguration( falseVacuum.FieldConfiguration() );
+    std::vector< double > const&
+    trueFieldConfiguration( trueVacuum.FieldConfiguration() );
+    double greatestFieldDifference( falseFieldConfiguration.front()
+                                    - trueFieldConfiguration.front() );
+    double currentFieldDifference( greatestFieldDifference );
+    if( greatestFieldDifference < 0.0 )
+    {
+      greatestFieldDifference = -greatestFieldDifference;
+    }
+    for( size_t fieldIndex( 1 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      currentFieldDifference = ( falseFieldConfiguration[ fieldIndex ]
+                                 - trueFieldConfiguration[ fieldIndex ] );
+      if( currentFieldDifference < 0.0 )
+      {
+        currentFieldDifference = -currentFieldDifference;
+      }
+      if( currentFieldDifference > greatestFieldDifference )
+      {
+        referenceFieldIndex = fieldIndex;
+        greatestFieldDifference = currentFieldDifference;
+      }
+    }
+    double lowestScaleSquared( tunnelingScaleSquared );
+    double highestScaleSquared( tunnelingScaleSquared );
+    double candidateScaleSquared( std::max( 1.0,
+                                            falseVacuum.LengthSquared() ) );
+    if( candidateScaleSquared < lowestScaleSquared )
+    {
+      lowestScaleSquared = candidateScaleSquared;
+    }
+    if( candidateScaleSquared > highestScaleSquared )
+    {
+      highestScaleSquared = candidateScaleSquared;
+    }
+    candidateScaleSquared = std::max( 1.0,
+                                      trueVacuum.LengthSquared() );
+    if( candidateScaleSquared < lowestScaleSquared )
+    {
+      lowestScaleSquared = candidateScaleSquared;
+    }
+    if( candidateScaleSquared > highestScaleSquared )
+    {
+      highestScaleSquared = candidateScaleSquared;
+    }
+    shortestLength = ( 1.0 / sqrt( highestScaleSquared ) );
+    longestLength = ( 1.0 / sqrt( lowestScaleSquared ) );
   }
 
   ModifiedBounceForMinuit::~ModifiedBounceForMinuit()
@@ -110,10 +170,6 @@ namespace VevaciousPlusPlus
     potentialApproximation( PotentialAlongPath( fieldsAsPolynomials,
                                                 falseVacuumRelativePotential,
                                                trueVacuumRelativePotential ) );
-    double const
-    tunnelingScale( sqrt( potentialFunction.ScaleSquaredRelevantToTunneling(
-                                                                   falseVacuum,
-                                                              trueVacuum ) ) );
     std::vector< SimplePolynomial > fieldDerivatives( numberOfFields );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
@@ -123,19 +179,10 @@ namespace VevaciousPlusPlus
       = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
     }
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Probably want to remove this check for thin-wall, as it is unlikely to"
-    << " bring any benefit. Left in for the moment to check that the code"
-    << " works.";
-    std::cout << std::endl;
-
     // We return a thin-wall approximation if appropriate:
     double bounceAction( NAN );
     if( ThinWallAppropriate( ( falseVacuumRelativePotential
                                - trueVacuumRelativePotential ),
-                             tunnelingScale,
                              givenTemperature,
                              fieldDerivatives,
                              potentialApproximation,
@@ -145,7 +192,6 @@ namespace VevaciousPlusPlus
     }
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.
-    /**/
 
     unsigned int dampingFactor( 4 );
     if( nonZeroTemperature )
@@ -192,7 +238,7 @@ namespace VevaciousPlusPlus
     // damping.
     overshootAuxiliary = 1.0;
     size_t shootAttempts( 0 );
-    double integrationRadius( 10.0 / tunnelingScale );
+    double integrationRadius( 5.0 * longestLength );
     size_t integrationSteps( 0 );
     std::vector< double > initialConditions( 2,
                                              0.0 );
@@ -206,7 +252,7 @@ namespace VevaciousPlusPlus
                                                             initialConditions,
                                                             0.0,
                                                             integrationRadius,
-                                                  ( 0.01 * integrationRadius ),
+                                                     ( 0.05 * shortestLength ),
                                                         odeintBubbleObserver );
       odeintBubbleObserver.SortByRadialValue();
 
@@ -356,13 +402,27 @@ namespace VevaciousPlusPlus
   }
 
   // This turns a flattened matrix of coefficients from splineCoefficients
-  // and fills fieldsAsPolynomials appropriately. It also puts the value of the
-  // potential (minus the value at the field origin at zero temperature) into
-  // thermalFalseVacuumPotential and thermalTrueVacuumPotential for the false
-  // and true vacua at the temperature give by splineCoefficients.back() if and
-  // only if it is non-zero. Unfortunately it does not use "return value
-  // optimization" as we cannot be sure that the user will compile with C++11
-  // features enabled.
+  // and fills fieldsAsPolynomials appropriately. The coefficients are taken to
+  // be in the order
+  // [ c_{1,0}, c_{1,1}, ..., c_{1, (referenceFieldIndex-1)},
+  //            c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
+  //   c_{2,0}, c_{2,1}, ..., c_{2, (referenceFieldIndex-1)},
+  //            c_{2, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
+  //   ...
+  //   c_{p,0}, c_{p,1}, ..., c_{p, (referenceFieldIndex-1)},
+  //            c_{p, (referenceFieldIndex+1)}, ..., c_{p,(numberOfFields-1)},
+  //   temperature ],
+  // where given field [j] is then the sum of c_{i,j} * a^i and p is the
+  // greatest power given implicitly by splineCoefficients. Note that the given
+  // fields do not map completely to the fields of potentialFunction:
+  // field [referenceFieldIndex] is skipped over by splineCoefficients, as it
+  // is set to be linear in a going from the false vacuum to the true vacuum.
+  // It also puts the value of the potential (minus the value at the field
+  // origin at zero temperature) into thermalFalseVacuumPotential and
+  // thermalTrueVacuumPotential for the false and true vacua at the temperature
+  // given by splineCoefficients.back() if and only if it is non-zero.
+  // Unfortunately it does not use "return value optimization" as we cannot be
+  // sure that the user will compile with C++11 features enabled.
   void ModifiedBounceForMinuit::DecodeSplineVector(
                                std::vector< double > const& splineCoefficients,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
@@ -407,22 +467,33 @@ namespace VevaciousPlusPlus
                              givenTemperature );
       }
     }
-    unsigned int coefficientsPerField( ( ( splineCoefficients.size() - 2 )
-                                       / numberOfFields ) + 3 );
+    size_t coefficientsPerField( ( ( splineCoefficients.size() - 2 )
+                                   / numberOfSplineFields ) + 3 );
     fieldsAsPolynomials.resize( numberOfFields,
                                 SimplePolynomial( coefficientsPerField ) );
+    fieldsAsPolynomials[ referenceFieldIndex ].CoefficientVector().resize( 2,
+                             falseVacuumConfiguration[ referenceFieldIndex ] );
+    fieldsAsPolynomials[ referenceFieldIndex ].CoefficientVector().back()
+    = ( trueVacuumConfiguration[ referenceFieldIndex ]
+        - falseVacuumConfiguration[ referenceFieldIndex ] );
     // The last element of splineCoefficients is a temperature, so should not
-    // be used. The ( ( size - 2 / numberOfFields ) + 2 ) integer is to ensure
-    // that each SimplePolynomial has enough elements. The first coefficient
-    // (the constant) is taken from falseVacuumConfiguration. The last
-    // coefficient of each field is implicit, and is fixed by the requirement
-    // that the field path goes to trueVacuumConfiguration for a=1.
-    for( unsigned int splineIndex( 0 );
+    // be used. The ( ( ( size - 2 ) / numberOfSplineFields ) + 3 ) integer is
+    // to ensure that each SimplePolynomial has enough elements. The first
+    // coefficient (the constant) is taken from falseVacuumConfiguration. The
+    // last coefficient of each field is implicit, and is fixed by the
+    // requirement that the field path goes to trueVacuumConfiguration for a=1.
+    size_t fieldIndexFromSplines( 0 );
+    for( size_t splineIndex( 0 );
          splineIndex < ( splineCoefficients.size() - 1 );
          ++splineIndex )
     {
-      fieldsAsPolynomials[ splineIndex % numberOfFields ].CoefficientVector()[
-                                         ( splineIndex / numberOfFields ) + 1 ]
+      fieldIndexFromSplines = ( splineIndex % numberOfSplineFields );
+      if( fieldIndexFromSplines >= referenceFieldIndex )
+      {
+        ++fieldIndexFromSplines;
+      }
+      fieldsAsPolynomials[ fieldIndexFromSplines ].CoefficientVector()[
+                                  ( splineIndex / numberOfSplineFields ) + 1 ]
       = splineCoefficients[ splineIndex ];
     }
     for( unsigned int fieldIndex( 0 );
@@ -535,7 +606,6 @@ namespace VevaciousPlusPlus
   // returned.
   bool
   ModifiedBounceForMinuit::ThinWallAppropriate( double potentialDifference,
-                                                double const tunnelingScale,
                                                 double const givenTemperature,
                        std::vector< SimplePolynomial > const& fieldDerivatives,
                                 SimplePolynomial const& potentialApproximation,
@@ -545,8 +615,8 @@ namespace VevaciousPlusPlus
     {
       potentialDifference = -potentialDifference;
     }
-    if( potentialDifference > ( 1.0E-3 * tunnelingScale * tunnelingScale
-                                       * tunnelingScale * tunnelingScale ) )
+    if( potentialDifference
+        > ( 1.0E-3 * tunnelingScaleSquared * tunnelingScaleSquared ) )
     {
       return false;
     }
@@ -564,36 +634,47 @@ namespace VevaciousPlusPlus
     // S_E = 2/3 pi R^2 S_1 = 2/3 S_1^3 epsilon^-2
 
     double integratedAction( 0.0 );
+    double potentialValue( 0.0 );
     double fieldDerivative( 0.0 );
     double derivativeSquared( 0.0 );
     double const thinWallStep( 0.05 );
     // The start and end of the integral are neglected as they are proportional
     // to the derivatives of the fields with respect to the auxiliary variable,
     // which are zero at the ends of the integral.
+    // We also integrate V(field[referenceFieldIndex])^(-1/2) over
+    // field[referenceFieldIndex] to estimate the wall thickness, which is then
+    // used for comparison to the bubble radius to validate the thin-wall
+    // approximation. Because it will be compared to R / 100, accuracy doesn't
+    // matter so much, so midpoint summation should suffice.
+    double wallThickness( 0.0 );
     for( double thinWallAuxiliary( thinWallStep );
          thinWallAuxiliary < 1.0;
          thinWallAuxiliary += thinWallStep )
     {
+      potentialValue = potentialApproximation( thinWallAuxiliary );
       derivativeSquared = 0.0;
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        fieldDerivative = fieldDerivatives( thinWallAuxiliary );
+        fieldDerivative = fieldDerivatives[ fieldIndex ]( thinWallAuxiliary );
         derivativeSquared += ( fieldDerivative * fieldDerivative );
       }
-      integratedAction += sqrt( derivativeSquared
-                               * potentialApproximation( thinWallAuxiliary ) );
+      integratedAction += sqrt( derivativeSquared * potentialValue );
+      wallThickness += ( thinWallStep / sqrt( potentialValue ) );
     }
     integratedAction *= ( M_SQRT2 * thinWallStep );
+    wallThickness
+    *= fieldDerivatives[ referenceFieldIndex ].CoefficientVector().front();
+    // This last *= accounts for the change in integration variable to the
+    // field linear in a.
+
 
     // We return the thin-wall approximation of the bounce action only if the
     // bubble radius is sufficiently large compared to the tunneling scale,
-    // which is a good indicator for the validity of the approximation. (The
-    // comparison here is that the thermal bubble radius > 100 Q, or that the
-    // T=0 radius > 300 Q.)
-    if( ( integratedAction * oneOverPotentialDifference * tunnelingScale )
-        < 1.0E+2 )
+    // which is a good indicator for the validity of the approximation.
+    if( ( integratedAction * oneOverPotentialDifference )
+        < ( 1.0E+2 * wallThickness ) )
     {
       return false;
     }
@@ -619,4 +700,5 @@ namespace VevaciousPlusPlus
     }
     return true;
   }
+
 } /* namespace VevaciousPlusPlus */

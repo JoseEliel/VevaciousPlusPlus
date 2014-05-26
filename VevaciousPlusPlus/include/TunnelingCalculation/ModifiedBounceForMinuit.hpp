@@ -44,19 +44,43 @@ namespace VevaciousPlusPlus
 
   protected:
     PotentialFunction const& potentialFunction;
-    unsigned int numberOfFields;
-    unsigned int potentialApproximationPower;
+    size_t const numberOfFields;
+    size_t referenceFieldIndex;
+    size_t const numberOfSplineFields;
+    size_t potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
     PotentialMinimum const& trueVacuum;
     double const fieldOriginPotential;
     double const falseVacuumPotential;
     double const trueVacuumPotential;
     double const falseVacuumEvaporationTemperature;
+    double tunnelingScaleSquared;
+    double shortestLength;
+    double longestLength;
 
     // This turns a flattened matrix of coefficients from splineCoefficients
-    // and fills fieldsAsPolynomials appropriately. Unfortunately it does not
-    // use "return value optimization" as we cannot be sure that the user will
-    // compile with C++11 features enabled.
+    // and fills fieldsAsPolynomials appropriately. The coefficients are taken to
+    // be in the order
+    // [ c_{1,0}, c_{1,1}, ..., c_{1, (referenceFieldIndex-1)},
+    //           c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
+    //   c_{2,0}, c_{2,1}, ..., c_{2, (referenceFieldIndex-1)},
+    //           c_{2, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
+    //   ...
+    //   c_{p,0}, c_{p,1}, ..., c_{p, (referenceFieldIndex-1)},
+    //           c_{p, (referenceFieldIndex+1)}, ..., c_{p,(numberOfFields-1)},
+    //   temperature ],
+    // where given field [j] is then the sum of c_{i,j} * a^i and p is the
+    // greatest power given implicitly by splineCoefficients. Note that the
+    // given fields do not map completely to the fields of potentialFunction:
+    // field [referenceFieldIndex] is skipped over by splineCoefficients, as it
+    // is set to be linear in a going from the false vacuum to the true vacuum.
+    // It also puts the value of the potential (minus the value at the field
+    // origin at zero temperature) into thermalFalseVacuumPotential and
+    // thermalTrueVacuumPotential for the false and true vacua at the
+    // temperature given by splineCoefficients.back() if and only if it is
+    // non-zero. Unfortunately it does not use "return value optimization" as
+    // we cannot be sure that the user will compile with C++11 features
+    // enabled.
     void DecodeSplineVector( std::vector< double > const& splineCoefficients,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
                              double& thermalFalseVacuumPotential,
@@ -80,7 +104,6 @@ namespace VevaciousPlusPlus
     // appropriate. Otherwise, bounceAction is left alone and false is
     // returned.
     bool ThinWallAppropriate( double potentialDifference,
-                              double const tunnelingScale,
                               double const givenTemperature,
                        std::vector< SimplePolynomial > const& fieldDerivatives,
                               SimplePolynomial const& potentialApproximation,
