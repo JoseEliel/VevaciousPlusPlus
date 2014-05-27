@@ -26,7 +26,13 @@ namespace VevaciousPlusPlus
                              unsigned int const potentialApproximationPower,
                              PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
-                             double const dsbEvaporationTemperature );
+                             double const dsbEvaporationTemperature,
+                            unsigned int const undershootOvershootAttempts = 8,
+                        unsigned int const maximumMultipleOfLongestLength = 16,
+                           double const initialFractionOfShortestLength = 0.05,
+                     unsigned int const energyConservingUndershootAttempts = 4,
+                            double const minimumScaleSquared = 1.0,
+                          double const thresholdAuxiliaryForShooting = 0.001 );
     virtual
     ~ModifiedBounceForMinuit();
 
@@ -54,13 +60,19 @@ namespace VevaciousPlusPlus
     double const falseVacuumPotential;
     double const trueVacuumPotential;
     double const falseVacuumEvaporationTemperature;
+    double const minimumScaleSquared;
     double const tunnelingScaleSquared;
     double shortestLength;
     double longestLength;
+    unsigned int const undershootOvershootAttempts;
+    unsigned int const energyConservingUndershootAttempts;
+    unsigned int const maximumMultipleOfLongestLength;
+    double const initialFractionOfShortestLength;
+    double const thresholdAuxiliaryForShooting;
 
     // This turns a flattened matrix of coefficients from splineCoefficients
-    // and fills fieldsAsPolynomials appropriately. The coefficients are taken to
-    // be in the order
+    // and fills fieldsAsPolynomials appropriately. The coefficients are taken
+    // to be in the order
     // [ c_{1,0}, c_{1,1}, ..., c_{1, (referenceFieldIndex-1)},
     //           c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
     //   c_{2,0}, c_{2,1}, ..., c_{2, (referenceFieldIndex-1)},

@@ -15,7 +15,13 @@ namespace VevaciousPlusPlus
                                 unsigned int const potentialApproximationPower,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
-                             double const falseVacuumEvaporationTemperature ) :
+                                double const falseVacuumEvaporationTemperature,
+                                unsigned int const undershootOvershootAttempts,
+                             unsigned int const maximumMultipleOfLongestLength,
+                                  double const initialFractionOfShortestLength,
+                         unsigned int const energyConservingUndershootAttempts,
+                                              double const minimumScaleSquared,
+                                 double const thresholdAuxiliaryForShooting ) :
     ROOT::Minuit2::FCNBase(),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
@@ -32,12 +38,18 @@ namespace VevaciousPlusPlus
     trueVacuumPotential( potentialFunction( trueVacuum.FieldConfiguration(),
                                             0.0 ) ),
     falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature ),
-    tunnelingScaleSquared( std::max( 1.0,
+    minimumScaleSquared( minimumScaleSquared ),
+    tunnelingScaleSquared( std::max( minimumScaleSquared,
                             potentialFunction.ScaleSquaredRelevantToTunneling(
                                                                    falseVacuum,
                                                               trueVacuum ) ) ),
     shortestLength( 1.0 ),
-    longestLength( 1.0 )
+    longestLength( 1.0 ),
+    undershootOvershootAttempts( undershootOvershootAttempts ),
+    energyConservingUndershootAttempts( energyConservingUndershootAttempts ),
+    maximumMultipleOfLongestLength( maximumMultipleOfLongestLength ),
+    initialFractionOfShortestLength( initialFractionOfShortestLength ),
+    thresholdAuxiliaryForShooting( thresholdAuxiliaryForShooting )
   {
     // We pick the field that has the largest difference between the vacua as
     // the reference field that goes linearly with the auxiliary variable.
@@ -70,7 +82,7 @@ namespace VevaciousPlusPlus
     }
     double lowestScaleSquared( tunnelingScaleSquared );
     double highestScaleSquared( tunnelingScaleSquared );
-    double candidateScaleSquared( std::max( 1.0,
+    double candidateScaleSquared( std::max( minimumScaleSquared,
                                             falseVacuum.LengthSquared() ) );
     if( candidateScaleSquared < lowestScaleSquared )
     {
@@ -80,7 +92,7 @@ namespace VevaciousPlusPlus
     {
       highestScaleSquared = candidateScaleSquared;
     }
-    candidateScaleSquared = std::max( 1.0,
+    candidateScaleSquared = std::max( minimumScaleSquared,
                                       trueVacuum.LengthSquared() );
     if( candidateScaleSquared < lowestScaleSquared )
     {
@@ -213,13 +225,12 @@ namespace VevaciousPlusPlus
     // for a given maximum radial value. The maximum radial value is increased
     // and an undecided a is found each time until the a at maximum radial
     // value is < 1.0E-3 or something.
-    // HERE! REMEMBER TO RESET odeintBubbleObserver IN LOOP!
     double undershootAuxiliary( 0.0 );
     double overshootAuxiliary( 1.0 );
     // First we use conservation of energy to get a lower bound for the range
     // for the auxiliary variable which definitely undershoots.
     for( size_t undershootGuessStep( 0 );
-         undershootGuessStep < 5;
+         undershootGuessStep < energyConservingUndershootAttempts;
          ++undershootGuessStep )
     {
       if( potentialApproximation( 0.5 * ( undershootAuxiliary
@@ -237,29 +248,81 @@ namespace VevaciousPlusPlus
     // At this point we reset overshootAuxiliary for the integration including
     // damping.
     overshootAuxiliary = 1.0;
+    double
+    currentAuxiliary( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
     size_t shootAttempts( 0 );
-    double integrationRadius( 5.0 * longestLength );
-    size_t integrationSteps( 0 );
+    double integrationRadius( longestLength );
+    double
+    initialIntegrationStep( initialFractionOfShortestLength * shortestLength );
+    // size_t integrationSteps( 0 );
     std::vector< double > initialConditions( 2,
                                              0.0 );
     // The unit for the radial variable is 1/GeV.
-    while( shootAttempts < 20 )
+    while( shootAttempts < undershootOvershootAttempts )
     {
       odeintBubbleObserver.ResetValues();
-      initialConditions[ 0 ]
-      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-      integrationSteps = boost::numeric::odeint::integrate( bubbleProfiler,
-                                                            initialConditions,
-                                                            0.0,
-                                                            integrationRadius,
-                                                     ( 0.05 * shortestLength ),
-                                                        odeintBubbleObserver );
+      bubbleProfiler.DoFirstStep( initialConditions,
+                                  currentAuxiliary,
+                                  initialIntegrationStep );
+      integrationRadius = longestLength;
+      initialIntegrationStep
+      = ( initialFractionOfShortestLength * shortestLength );
+      initialConditions[ 0 ] = currentAuxiliary;
+      // integrationSteps =
+      boost::numeric::odeint::integrate( bubbleProfiler,
+                                         initialConditions,
+                                         initialIntegrationStep,
+                                         integrationRadius,
+                                         initialIntegrationStep,
+                                         odeintBubbleObserver );
       odeintBubbleObserver.SortByRadialValue();
 
+      while( !(odeintBubbleObserver.DefinitelyUndershot())
+             &&
+             !(odeintBubbleObserver.DefinitelyOvershot())
+             &&
+             ( odeintBubbleObserver.BubbleDescription().back().auxiliaryValue
+               > thresholdAuxiliaryForShooting ) )
+      {
+        integrationRadius *= 2.0;
+        std::vector< BubbleRadialValueDescription >::reverse_iterator
+        bubbleDescriptionIterator(
+                           odeintBubbleObserver.BubbleDescription().rbegin() );
+        initialConditions[ 0 ] = bubbleDescriptionIterator->auxiliaryValue;
+        initialConditions[ 1 ] = bubbleDescriptionIterator->auxiliarySlope;
+        initialIntegrationStep = bubbleDescriptionIterator->radialValue;
+        initialIntegrationStep -= (++bubbleDescriptionIterator)->radialValue;
+        // integrationSteps =
+        boost::numeric::odeint::integrate( bubbleProfiler,
+                                           initialConditions,
+                                           ( 0.5 * integrationRadius ),
+                                           integrationRadius,
+                                           initialIntegrationStep,
+                                           odeintBubbleObserver );
+      }
       // Now we have to decide if initialConditions[ 0 ] is the new
       // undershootAuxiliary or overshootAuxiliary, or if we need to extend
       // integrationRadius, or if the current guess overshoots with a
       // negligible amount of kinetic energy.
+
+      if( odeintBubbleObserver.DefinitelyUndershot() )
+      {
+        undershootAuxiliary = currentAuxiliary;
+      }
+      else if( odeintBubbleObserver.DefinitelyOvershot() )
+      {
+        overshootAuxiliary = currentAuxiliary;
+      }
+      else
+      {
+        // placeholder:
+        /**/std::cout << std::endl
+        << "Placeholder: "
+        << "decide about not definite under-/over-shooting!";
+        std::cout << std::endl;/**/
+      }
+      currentAuxiliary
+      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
 
       // placeholder:
       /**/std::cout << std::endl
@@ -267,6 +330,12 @@ namespace VevaciousPlusPlus
       << "decide about looping under-/over-shooting!";
       std::cout << std::endl;/**/
     }
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "serious concerns about undershoot/overshoot EoM in a if d^2f_i/da^2 is"
+    << " not orthogonal to df_i/da!";
+    std::cout << std::endl;/**/
 
 
 
