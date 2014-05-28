@@ -49,8 +49,10 @@ namespace VevaciousPlusPlus
     // This gets set to true if a radius is inserted out of order.
     bool NeedsOrdering() const{ return needsOrdering; }
 
-    // This resets everything for a new integration.
-    void ResetValues();
+    // This resets everything for a new integration, including recording the
+    // values before the first Euclidean step performed before the
+    // odeint::integrate.
+    void ResetValues( double const initialAuxiliary );
 
     // This sorts the vectors by increasing radial value if needsOrdering is
     // true.
@@ -99,10 +101,16 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This resets everything for a new integration.
-  inline void OdeintBubbleObserver::ResetValues()
+  // This resets everything for a new integration, including recording the
+  // values before the first Euclidean step performed before the
+  // odeint::integrate.
+  inline void
+  OdeintBubbleObserver::ResetValues( double const initialAuxiliary )
   {
-    bubbleDescription.clear();
+    bubbleDescription.resize( 1,
+                              BubbleRadialValueDescription( 0.0,
+                                                            initialAuxiliary,
+                                                            0.0 ) );
     definitelyUndershot = false;
     definitelyOvershot = false;
     overshootIndex = 0;

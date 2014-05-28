@@ -33,7 +33,7 @@ namespace VevaciousPlusPlus
                            double const initialFractionOfShortestLength = 0.05,
                      unsigned int const energyConservingUndershootAttempts = 4,
                             double const minimumScaleSquared = 1.0,
-                          double const thresholdAuxiliaryForShooting = 0.001 );
+                            double const shootingCloseEnoughThreshold = 0.01 );
     virtual
     ~ModifiedBounceForMinuit();
 
@@ -106,7 +106,7 @@ namespace VevaciousPlusPlus
     unsigned int const energyConservingUndershootAttempts;
     unsigned int const maximumMultipleOfLongestLength;
     double const initialFractionOfShortestLength;
-    double const thresholdAuxiliaryForShooting;
+    double const shootingThresholdSquared;
 
     // This turns a flattened matrix of coefficients from pathParameterization
     // and fills fieldsAsPolynomials appropriately. The coefficients are taken
@@ -161,6 +161,15 @@ namespace VevaciousPlusPlus
                        std::vector< SimplePolynomial > const& fieldDerivatives,
                               SimplePolynomial const& potentialApproximation,
                               double& bounceAction ) const;
+
+    // This returns true if neither overshooting nor undershooting definitely
+    // happened and the distance in field space to the top of the false vacuum
+    // hill is still larger than shootingCloseEnoughThreshold times the
+    // distance between the initial field configuration and the false vacuum
+    // field configuration.
+    bool
+    WorthIntegratingFurther( OdeintBubbleObserver const& odeintBubbleObserver,
+             std::vector< SimplePolynomial >const& fieldsAsPolynomials ) const;
   };
 
 

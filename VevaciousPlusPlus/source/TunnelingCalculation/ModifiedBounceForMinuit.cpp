@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
                                   double const initialFractionOfShortestLength,
                          unsigned int const energyConservingUndershootAttempts,
                                               double const minimumScaleSquared,
-                                 double const thresholdAuxiliaryForShooting ) :
+                                  double const shootingCloseEnoughThreshold ) :
     ROOT::Minuit2::FCNBase(),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
@@ -49,7 +49,8 @@ namespace VevaciousPlusPlus
     energyConservingUndershootAttempts( energyConservingUndershootAttempts ),
     maximumMultipleOfLongestLength( maximumMultipleOfLongestLength ),
     initialFractionOfShortestLength( initialFractionOfShortestLength ),
-    thresholdAuxiliaryForShooting( thresholdAuxiliaryForShooting )
+    shootingThresholdSquared( shootingCloseEnoughThreshold
+                              * shootingCloseEnoughThreshold )
   {
     // We pick the field that has the largest difference between the vacua as
     // the reference field that goes linearly with the auxiliary variable.
@@ -155,15 +156,6 @@ namespace VevaciousPlusPlus
   double ModifiedBounceForMinuit::operator()(
                       std::vector< double > const& pathParameterization ) const
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "ModifiedBounceForMinuit::operator() doesn't work at all at the moment."
-    << " We need to think a lot harder about how to implement it.";
-    std::cout << std::endl;
-    return 0.0;/**/
-
-
     // Current outline (code below doesn't do most of this yet):
     // 1) Take pathParameterization as proposed dependence of field configuration
     //    f on auxiliary variable p. An extra power of p is given with a
@@ -202,7 +194,6 @@ namespace VevaciousPlusPlus
     // the true bounce action, and minimizing this should lead one to the true
     // minimal bounce action.
 
-
     double const givenTemperature( pathParameterization.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
@@ -210,9 +201,9 @@ namespace VevaciousPlusPlus
     double falseVacuumRelativePotential( falseVacuumPotential );
     double trueVacuumRelativePotential( trueVacuumPotential );
     DecodePathParameters( pathParameterization,
-                        fieldsAsPolynomials,
-                        falseVacuumRelativePotential,
-                        trueVacuumRelativePotential );
+                          fieldsAsPolynomials,
+                          falseVacuumRelativePotential,
+                          trueVacuumRelativePotential );
 
     SimplePolynomial
     potentialApproximation( PotentialAlongPath( fieldsAsPolynomials,
@@ -294,16 +285,21 @@ namespace VevaciousPlusPlus
     std::vector< double > initialConditions( 2,
                                              0.0 );
     // The unit for the radial variable is 1/GeV.
-    while( shootAttempts < undershootOvershootAttempts )
+
+    // This loop is broken out of if the shoot attempt seems to have been close
+    // enough that the integration would take too long to find an overshoot or
+    // undershoot, or that the shot was dead on.
+    while( (++shootAttempts) <= undershootOvershootAttempts )
     {
-      odeintBubbleObserver.ResetValues();
-      bubbleProfiler.DoFirstStep( initialConditions,
-                                  currentAuxiliary,
-                                  initialIntegrationStep );
+      initialConditions[ 0 ] = currentAuxiliary;
+      initialConditions[ 1 ] = 0.0;
       integrationRadius = longestLength;
       initialIntegrationStep
       = ( initialFractionOfShortestLength * shortestLength );
-      initialConditions[ 0 ] = currentAuxiliary;
+      bubbleProfiler.DoFirstStep( initialConditions,
+                                  currentAuxiliary,
+                                  initialIntegrationStep );
+      odeintBubbleObserver.ResetValues( currentAuxiliary );
       // integrationSteps =
       boost::numeric::odeint::integrate( bubbleProfiler,
                                          initialConditions,
@@ -313,12 +309,8 @@ namespace VevaciousPlusPlus
                                          odeintBubbleObserver );
       odeintBubbleObserver.SortByRadialValue();
 
-      while( !(odeintBubbleObserver.DefinitelyUndershot())
-             &&
-             !(odeintBubbleObserver.DefinitelyOvershot())
-             &&
-             ( odeintBubbleObserver.BubbleDescription().back().auxiliaryValue
-               > thresholdAuxiliaryForShooting ) )
+      while( WorthIntegratingFurther( odeintBubbleObserver,
+                                      fieldsAsPolynomials ) )
       {
         integrationRadius *= 2.0;
         std::vector< BubbleRadialValueDescription >::reverse_iterator
@@ -351,150 +343,74 @@ namespace VevaciousPlusPlus
       }
       else
       {
-        // placeholder:
-        /**/std::cout << std::endl
-        << "Placeholder: "
-        << "decide about not definite under-/over-shooting!";
-        std::cout << std::endl;/**/
+        // We break out of the loop leaving currentAuxiliary as it is if the
+        // shot was good enough.
+        break;
       }
       currentAuxiliary
       = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-
-      // placeholder:
-      /**/std::cout << std::endl
-      << "Placeholder: "
-      << "decide about looping under-/over-shooting!";
-      std::cout << std::endl;/**/
     }
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "serious concerns about undershoot/overshoot EoM in a if d^2f_i/da^2 is"
-    << " not orthogonal to df_i/da!";
-    std::cout << std::endl;/**/
-
-
-
-    double solidAngle( 4.0 * M_PI );
-    if( nonZeroTemperature )
-    {
-      solidAngle = ( 2.0 * M_PI * M_PI );
-    }
+    // At the end of the loop, currentAuxiliary is either within
+    // 2^(-undershootOvershootAttempts) of p_crit, or was close enough that the
+    // integration to decide if it was an undershot or overshot would take too
+    // long.
 
     double fieldGradient( 0.0 );
     double gradientDotGradient( 0.0 );
 
-    double radiusValue( 0.0 );
-    double minusRadiusDerivative( 0.0 );
-    double factorTimesVolume( 0.0 );
-
-    std::vector< double > falseConfiguration( numberOfFields,
-                                              0.0 );
-    if( givenTemperature < falseVacuumEvaporationTemperature )
+    bounceAction = 0.0;
+    double previousIntegrand( 0.0 );
+    // The bounce action density at r = 0 is 0 by merit of
+    // r_0^dampingFactor = 0,
+    // dp/dr = 0 at r = 0,
+    // and potentialApproximation(p(0)) = 0 by construction.
+    double currentIntegrand( 0.0 );
+    double previousRadius( 0.0 );
+    double currentRadius( 0.0 );
+    double currentAuxiliary( 0.0 );
+    double halfAuxiliarySlopeSquared( 0.0 );
+    double fieldDerivative( 0.0 );
+    double fieldDerivativeSquared( 0.0 );
+    std::vector< BubbleRadialValueDescription > const&
+    bubbleProfile( odeintBubbleObserver.BubbleDescription() );
+    for( unsigned int radiusIndex( 1 );
+         radiusIndex < bubbleProfile.size();
+         ++radiusIndex )
     {
-      PotentialForMinuit potentialForMinuit( potentialFunction );
-      MinuitManager thermalDsbFinder( potentialForMinuit );
-      falseConfiguration
-      = thermalDsbFinder( falseVacuum.FieldConfiguration() ).VariableValues();
+      previousRadius = currentRadius;
+      previousIntegrand = currentIntegrand;
+      currentRadius = bubbleProfile[ radiusIndex ].radialValue;
+      currentAuxiliary = bubbleProfile[ radiusIndex ].auxiliaryValue;
+      halfAuxiliarySlopeSquared = bubbleProfile[ radiusIndex ].auxiliarySlope;
+      halfAuxiliarySlopeSquared *= ( 0.5 * halfAuxiliarySlopeSquared );
+      fieldDerivativeSquared = 0.0;
+      for( std::vector< SimplePolynomial >::const_iterator
+           fieldDerivative( fieldDerivatives.begin() );
+           fieldDerivative < fieldDerivatives.end();
+           ++fieldDerivative )
+      {
+        fieldDerivative = (*fieldDerivative)( currentAuxiliary );
+        fieldDerivativeSquared += ( fieldDerivative * fieldDerivative );
+      }
+      currentIntegrand
+      = ( pow( currentRadius,
+               dampingFactor )
+          * ( halfAuxiliarySlopeSquared
+              + potentialApproximation( currentAuxiliary ) ) );
+      bounceAction += ( ( currentIntegrand + previousIntegrand )
+                        / ( currentRadius - previousRadius ) );
+      // A common factor of 1/2 is being left until after the loop.
     }
-    double const falsePotential( potentialFunction( falseConfiguration,
-                                                    givenTemperature ) );
-    std::vector< double > previousFieldConfiguration( falseConfiguration );
-    std::vector< double >
-    currentFieldConfiguration( previousFieldConfiguration );
-    std::vector< double > nextFieldConfiguration( falseConfiguration );
-    ConfigurationFromSplines( currentFieldConfiguration,
-                              pathParameterization,
-                              auxiliaryValue );
-
-    // The action is evaluated with the composite Simpson's rule, using an
-    // auxiliary variable that goes from 0 at the false vacuum at a radius of
-    // infinity to 1 at the vacuum at the center of the bubble.
-
-    // The contribution to the bounce action at bubble radius of infinity
-    // ( corresponding to the auxiliary variable being zero) should be zero.
-    double bounceAction( 0.0 );
-    for( unsigned int whichStep( 1 );
-         whichStep < numberOfPathIntervals;
-         ++whichStep )
+    // The common factor of 1/2 is combined with the solid angle of
+    // 2 pi^2 (quantum) or 4 pi (thermal):
+    if( nonZeroTemperature )
     {
-      previousFieldConfiguration = currentFieldConfiguration;
-      currentFieldConfiguration = nextFieldConfiguration;
-      radiusValue = bubbleRadiusFromAuxiliary.RadiusValue( auxiliaryValue );
-      minusRadiusDerivative
-      = -bubbleRadiusFromAuxiliary.RadiusDerivative( auxiliaryValue );
-      // Since the radius should go from infinity to 0 as auxiliaryValue goes
-      // from 0 to 1, the derivative is negative.
-      factorTimesVolume = ( (double)( 1 + ( whichStep % 2 ) )
-                            * solidAngle * radiusValue * radiusValue
-                            * minusRadiusDerivative );
-      if( !nonZeroTemperature )
-      {
-        factorTimesVolume *= radiusValue;
-      }
-
-      auxiliaryValue += auxiliaryStep;
-      // We advance the field configuration to the end of the next interval so
-      // that we can take the average derivative of the fields.
-      nextFieldConfiguration = falseConfiguration;
-      ConfigurationFromSplines( nextFieldConfiguration,
-                                pathParameterization,
-                                auxiliaryValue );
-      gradientDotGradient = 0.0;
-      for( unsigned int fieldIndex( 0 );
-           fieldIndex < numberOfFields;
-           ++fieldIndex )
-      {
-        fieldGradient = ( ( nextFieldConfiguration[ fieldIndex ]
-                            - previousFieldConfiguration[ fieldIndex ] )
-                          / ( 2.0 * auxiliaryStep ) );
-        gradientDotGradient += ( fieldGradient * fieldGradient );
-      }
-
-      bounceAction
-      += ( factorTimesVolume
-           * ( ( 0.5 * gradientDotGradient )
-               + potentialFunction( currentFieldConfiguration,
-                                    givenTemperature )
-               - falsePotential ) );
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "step " << whichStep << ", currentFieldConfiguration = {";
-      for( std::vector< double >::const_iterator
-           fieldValue( currentFieldConfiguration.begin() );
-           fieldValue < currentFieldConfiguration.end();
-           ++fieldValue )
-      {
-        std::cout << " " << *fieldValue;
-      }
-      std::cout << " }, 0.5 * gradientDotGradient = "
-      << ( 0.5 * gradientDotGradient ) << ", potential difference = "
-      << ( potentialFunction( currentFieldConfiguration,
-                              givenTemperature ) - falsePotential )
-      << ", factorTimesVolume = " << factorTimesVolume
-      << ", bounceAction = " << bounceAction;
-      std::cout << std::endl;/**/
+      bounceAction *= ( 2.0 * M_PI );
     }
-    // There was a common factor of 2.0 taken out of the above, so we account
-    // for it now:
-    bounceAction += bounceAction;
-
-    // The last value is special, as it corresponds to the middle of the
-    // bubble: we force the field derivative to zero.
-    factorTimesVolume = ( 0.5 * solidAngle * radiusValue * radiusValue );
-    if( !nonZeroTemperature )
+    else
     {
-      factorTimesVolume *= radiusValue;
+      bounceAction *= ( M_PI * M_PI );
     }
-    bounceAction += ( factorTimesVolume
-                      * ( potentialFunction( currentFieldConfiguration,
-                                             givenTemperature )
-                          - falsePotential ) );
-
-    // Now we multiply by the common factor:
-    bounceAction *= ( auxiliaryStep / 3.0 );
 
     if( nonZeroTemperature )
     {
@@ -807,6 +723,44 @@ namespace VevaciousPlusPlus
       // tunneling probability...
     }
     return true;
+  }
+
+  // This returns true if neither overshooting nor undershooting definitely
+  // happened and the distance in field space to the top of the false vacuum
+  // hill is still larger than shootingCloseEnoughThreshold times the
+  // distance between the initial field configuration and the false vacuum
+  // field configuration.
+  bool ModifiedBounceForMinuit::WorthIntegratingFurther(
+                              OdeintBubbleObserver const& odeintBubbleObserver,
+              std::vector< SimplePolynomial >const& fieldsAsPolynomials ) const
+  {
+    if( odeintBubbleObserver.DefinitelyUndershot()
+        ||
+        odeintBubbleObserver.DefinitelyOvershot() )
+    {
+      return false;
+    }
+    double totalDistanceSquared( 0.0 );
+    double nearDistanceSquared( 0.0 );
+    double fieldDifference( 0.0 );
+    double falseVacuumField( 0.0 );
+    double const nearAuxiliary(
+              odeintBubbleObserver.BubbleDescription().back().auxiliaryValue );
+    double const startAuxiliary(
+             odeintBubbleObserver.BubbleDescription().front().auxiliaryValue );
+    for( std::vector< SimplePolynomial >::const_iterator
+         fieldValue( fieldsAsPolynomials.begin() );
+         fieldValue < fieldsAsPolynomials.end();
+         ++fieldValue )
+    {
+      falseVacuumField = fieldValue->CoefficientVector().front();
+      fieldDifference = ( (*fieldValue)( nearAuxiliary ) - falseVacuumField );
+      nearDistanceSquared += ( fieldDifference * fieldDifference );
+      fieldDifference = ( (*fieldValue)( startAuxiliary ) - falseVacuumField );
+      totalDistanceSquared += ( fieldDifference * fieldDifference );
+    }
+    return ( nearDistanceSquared
+             > ( shootingThresholdSquared * totalDistanceSquared ) );
   }
 
 } /* namespace VevaciousPlusPlus */
