@@ -112,12 +112,48 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This implements operator() for FCNBase, the function that MINUIT will
-  // minimize. The values of splineCoefficients should be sets of n
-  // coefficients for polynomials for each of the n fields, plus the final
-  // element of splineCoefficients should be the temperature.
+  // The bounce action is calculated by the following process:
+  // 1) The path in field space from the false vacuum to the true vacuum is
+  //    decoded from pathParameterization to give the field configuration f
+  //    as a function of a path auxiliary variable p, giving f(p) and df/dp.
+  //    See the comment above DecodePathParameters for the format of
+  //    pathParameterization.
+  // 2) The potential is fitted as a polynomial in p of degree
+  //    potentialApproximationPower, giving V(p).
+  // 3) If the potential difference between the vacua is small enough, the
+  //    thin-wall approximation is tried, but only returned if the resulting
+  //    bubble radius turns out to be large enough compared to the wall
+  //    thickness.
+  // 4) If the thin-wall approximation is not returned, the one-dimensional
+  //    bubble equation of motion along p is integrated to get p as a
+  //    function of the radial variable r, which is the spatial radius for
+  //    three-dimensional actions, or the length of the four-dimensional
+  //    Euclidean vector. This gets the correct bubble profile only if the
+  //    transverse equations of motion in field space are also satisfied, or
+  //    for a modified potential which has additional terms that raise the
+  //    energy barrier on the side of the path that has a lower energy
+  //    barrier. Hence this bubble profile gives an upper bound on the bounce
+  //    action for the unmodified potential, as the modified potential (which
+  //    has the same true vacuum and false vacuum and is exactly the same
+  //    along the path) cannot have a lower bounce action.
+  //    [The p equation of motion has a strange term giving a force
+  //    proportional to (dp/dr)^2 which is not a friction term as the sign
+  //    is not proportional to dp/dr, rather to d^2f/dp^2. This is because p
+  //    is not linear in the distance in field space, so actually this term
+  //    behaves a bit like extra kinetic energy because it rolled further
+  //    "down the hill" from the true vacuum initially because there is more
+  //    field space distance covered by a small change in p if the derivative
+  //    is that way, or like extra friction because the approach to the
+  //    false vacuum is actually longer in field space distance than in p.
+  //    The alternative is to divide up the path into pathResolution segments
+  //    and take the path as a series of straight lines at a constant
+  //    "velocity" in field space, meaning that the weird pseudo-friction
+  //    force in the bubble wall equation of motion in p disappears. This
+  //    would require some contortions with linked lists (probably) of
+  //    segments to get f(p(r)) and df/dp.]
+  // 5) The bounce action along p(r) is numerically integrated and returned.
   double ModifiedBounceForMinuit::operator()(
-                        std::vector< double > const& splineCoefficients ) const
+                      std::vector< double > const& pathParameterization ) const
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -129,33 +165,33 @@ namespace VevaciousPlusPlus
 
 
     // Current outline (code below doesn't do most of this yet):
-    // 1) Take splineCoefficients as proposed dependence of field configuration
-    //    f on auxiliary variable a. An extra power of a is given with a
-    //    coefficient to bring f to the true vacuum at a = 1, as
-    //    splineCoefficients alone does not have a fixed endpoint at a = 1 for
-    //    different splineCoefficients input.
+    // 1) Take pathParameterization as proposed dependence of field configuration
+    //    f on auxiliary variable p. An extra power of p is given with a
+    //    coefficient to bring f to the true vacuum at p = 1, as
+    //    pathParameterization alone does not have a fixed endpoint at p = 1
+    //    for different pathParameterization input.
     // 2) Evaluate the potential at ( potentialApproximationPower - 2 ) values
-    //    for a between a = 0 and a = 1 inclusive, giving V(a) as a polynomial
-    //    in a (though V(a) is an approximation, f(a) is exact by
-    //    construction). (The number of points to evaluate V(a) would be
-    //    potentialApproximationPower + 1 for potentialApproximationPower
-    //    coefficients of non-zero powers of a plus a constant coefficient, but
-    //    2 of the coefficients are fixed by the requirement that dV/da is 0 at
-    //    a = 0 and a = 1, and the constant coefficient by taking V(0) to be 0,
-    //    which also is convenient for evaluating the action. Hence V(a) is
+    //    for p between p = 0 and p = 1 inclusive, giving V(p) as a polynomial
+    //    in p (though V(p) is an approximation, f(p) is exact by
+    //    construction). (The number of points to evaluate V(p) would be
+    //    ( potentialApproximationPower + 1 ) for potentialApproximationPower
+    //    coefficients of non-zero powers of p plus a constant coefficient, but
+    //    2 of the coefficients are fixed by the requirement that dV/dp is 0 at
+    //    p = 0 and p = 1, and the constant coefficient by taking V(0) to be 0,
+    //    which also is convenient for evaluating the action. Hence V(p) is
     //    actually a polynomial approximation of the potential difference from
-    //    the false vacuum along the path given by f(a).)
+    //    the false vacuum along the path given by f(p).)
     // 3a) Return early with a thin-wall result if appropriate.
     // 3b) Find the 1-dimensional bubble profile by solving the radial bubble
-    //     equations of motion along the path from a = 0 to a = a_crit, where
-    //     a_crit is the value of a for which the bubble is critical, and is
-    //     found by the undershoot/overshoot method (0.0 < a_crit < 1.0). This
+    //     equations of motion along the path from p = 0 to p = p_crit, where
+    //     p_crit is the value of p for which the bubble is critical, and is
+    //     found by the undershoot/overshoot method (0.0 < p_crit < 1.0). This
     //     probably will involve using the Boost library odeint.
-    // 4) Combine f(a) (exact) and V(a) (approximate) with a(r) to numerically
+    // 4) Combine f(p) (exact) and V(p) (approximate) with p(r) to numerically
     //    integrate the bounce action.
     // Note that this is only really the bounce action (within the validity of
-    // the approximations of truncated exapnsions) if the equations of motion
-    // perpendicular to f(a) are also satisfied. However, they would be
+    // the approximations of truncated expansions) if the equations of motion
+    // perpendicular to f(p) are also satisfied. However, they would be
     // satisfied for a modified potential which increases the energy barrier on
     // the side of the path until the "force" on the path balances, and such a
     // modified potential still has the same true and false vacua, and its
@@ -167,13 +203,13 @@ namespace VevaciousPlusPlus
     // minimal bounce action.
 
 
-    double const givenTemperature( splineCoefficients.back() );
+    double const givenTemperature( pathParameterization.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
     std::vector< SimplePolynomial > fieldsAsPolynomials;
     double falseVacuumRelativePotential( falseVacuumPotential );
     double trueVacuumRelativePotential( trueVacuumPotential );
-    DecodeSplineVector( splineCoefficients,
+    DecodePathParameters( pathParameterization,
                         fieldsAsPolynomials,
                         falseVacuumRelativePotential,
                         trueVacuumRelativePotential );
@@ -205,10 +241,10 @@ namespace VevaciousPlusPlus
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.
 
-    unsigned int dampingFactor( 4 );
+    unsigned int dampingFactor( 3 );
     if( nonZeroTemperature )
     {
-      dampingFactor = 3;
+      dampingFactor = 2;
     }
     BubbleProfiler bubbleProfiler( potentialApproximation,
                                    fieldDerivatives,
@@ -368,7 +404,7 @@ namespace VevaciousPlusPlus
     currentFieldConfiguration( previousFieldConfiguration );
     std::vector< double > nextFieldConfiguration( falseConfiguration );
     ConfigurationFromSplines( currentFieldConfiguration,
-                              splineCoefficients,
+                              pathParameterization,
                               auxiliaryValue );
 
     // The action is evaluated with the composite Simpson's rule, using an
@@ -402,7 +438,7 @@ namespace VevaciousPlusPlus
       // that we can take the average derivative of the fields.
       nextFieldConfiguration = falseConfiguration;
       ConfigurationFromSplines( nextFieldConfiguration,
-                                splineCoefficients,
+                                pathParameterization,
                                 auxiliaryValue );
       gradientDotGradient = 0.0;
       for( unsigned int fieldIndex( 0 );
@@ -470,35 +506,38 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This turns a flattened matrix of coefficients from splineCoefficients
-  // and fills fieldsAsPolynomials appropriately. The coefficients are taken to
-  // be in the order
+  // This turns a flattened matrix of coefficients from pathParameterization
+  // and fills fieldsAsPolynomials appropriately. The coefficients are taken
+  // to be in the order
   // [ c_{1,0}, c_{1,1}, ..., c_{1, (referenceFieldIndex-1)},
-  //            c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
+  //           c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
   //   c_{2,0}, c_{2,1}, ..., c_{2, (referenceFieldIndex-1)},
-  //            c_{2, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
+  //           c_{2, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
   //   ...
-  //   c_{p,0}, c_{p,1}, ..., c_{p, (referenceFieldIndex-1)},
-  //            c_{p, (referenceFieldIndex+1)}, ..., c_{p,(numberOfFields-1)},
+  //   c_{p,0}, c_{d,1}, ..., c_{d, (referenceFieldIndex-1)},
+  //           c_{d, (referenceFieldIndex+1)}, ..., c_{d,(numberOfFields-1)},
   //   temperature ],
-  // where given field [j] is then the sum of c_{i,j} * a^i and p is the
-  // greatest power given implicitly by splineCoefficients. Note that the given
-  // fields do not map completely to the fields of potentialFunction:
-  // field [referenceFieldIndex] is skipped over by splineCoefficients, as it
-  // is set to be linear in a going from the false vacuum to the true vacuum.
-  // It also puts the value of the potential (minus the value at the field
+  // where given field [j] is then the sum of c_{i,j} * p^i and d is the
+  // greatest power given implicitly by pathParameterization. A final
+  // coefficient for each polynomial is given so that the field takes its
+  // value at the true vacuum for p = 1. Note that the given fields do not
+  // map completely to the fields of potentialFunction: the field with index
+  // referenceFieldIndex is skipped over by pathParameterization, as it is
+  // set to be linear in a going from the false vacuum to the true vacuum. It
+  // also puts the value of the potential (minus the value at the field
   // origin at zero temperature) into thermalFalseVacuumPotential and
-  // thermalTrueVacuumPotential for the false and true vacua at the temperature
-  // given by splineCoefficients.back() if and only if it is non-zero.
-  // Unfortunately it does not use "return value optimization" as we cannot be
-  // sure that the user will compile with C++11 features enabled.
-  void ModifiedBounceForMinuit::DecodeSplineVector(
-                               std::vector< double > const& splineCoefficients,
+  // thermalTrueVacuumPotential for the false and true vacua at the
+  // temperature given by pathParameterization.back() if and only if it is
+  // non-zero. Unfortunately it does not use "return value optimization" as
+  // we cannot be sure that the user will compile with C++11 features
+  // enabled.
+  void ModifiedBounceForMinuit::DecodePathParameters(
+                             std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
                                            double& thermalFalseVacuumPotential,
                                      double& thermalTrueVacuumPotential ) const
   {
-    double const givenTemperature( splineCoefficients.back() );
+    double const givenTemperature( pathParameterization.back() );
     bool const nonZeroTemperature( givenTemperature > 0.0 );
 
     std::vector< double >
@@ -536,7 +575,7 @@ namespace VevaciousPlusPlus
                              givenTemperature );
       }
     }
-    size_t coefficientsPerField( ( ( splineCoefficients.size() - 2 )
+    size_t coefficientsPerField( ( ( pathParameterization.size() - 2 )
                                    / numberOfSplineFields ) + 3 );
     fieldsAsPolynomials.resize( numberOfFields,
                                 SimplePolynomial( coefficientsPerField ) );
@@ -545,7 +584,7 @@ namespace VevaciousPlusPlus
     fieldsAsPolynomials[ referenceFieldIndex ].CoefficientVector().back()
     = ( trueVacuumConfiguration[ referenceFieldIndex ]
         - falseVacuumConfiguration[ referenceFieldIndex ] );
-    // The last element of splineCoefficients is a temperature, so should not
+    // The last element of pathParameterization is a temperature, so should not
     // be used. The ( ( ( size - 2 ) / numberOfSplineFields ) + 3 ) integer is
     // to ensure that each SimplePolynomial has enough elements. The first
     // coefficient (the constant) is taken from falseVacuumConfiguration. The
@@ -553,7 +592,7 @@ namespace VevaciousPlusPlus
     // requirement that the field path goes to trueVacuumConfiguration for a=1.
     size_t fieldIndexFromSplines( 0 );
     for( size_t splineIndex( 0 );
-         splineIndex < ( splineCoefficients.size() - 1 );
+         splineIndex < ( pathParameterization.size() - 1 );
          ++splineIndex )
     {
       fieldIndexFromSplines = ( splineIndex % numberOfSplineFields );
@@ -563,7 +602,7 @@ namespace VevaciousPlusPlus
       }
       fieldsAsPolynomials[ fieldIndexFromSplines ].CoefficientVector()[
                                   ( splineIndex / numberOfSplineFields ) + 1 ]
-      = splineCoefficients[ splineIndex ];
+      = pathParameterization[ splineIndex ];
     }
     for( unsigned int fieldIndex( 0 );
          fieldIndex < numberOfFields;

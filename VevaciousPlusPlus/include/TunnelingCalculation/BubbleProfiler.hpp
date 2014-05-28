@@ -29,10 +29,10 @@ namespace VevaciousPlusPlus
                      std::vector< double >& firstAndSecondDerivatives,
                      double const radialValue );
 
-    // This sets initialConditions by a Euler step assuming that near r = 0, a
-    // goes as a_0 + a_2 r^2 (as the bubble should have smooth fields at its
-    // center); hence d^2a/dr^2 at r=0 is
-    // (dV/da)/((1+2*dampingFactor)|df/da|^2).
+    // This sets initialConditions by a Euler step assuming that near r = 0,
+    // p goes as p_0 + p_2 r^2 (as the bubble should have smooth fields at its
+    // center); hence d^2p/dr^2 at r=0 is
+    // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
     void DoFirstStep( std::vector< double >& initialConditions,
                       double const currentAuxiliary,
                       double const initialIntegrationStep );
@@ -79,9 +79,10 @@ namespace VevaciousPlusPlus
          - ( ( dampingFactor * auxiliaryDerivative ) / radialValue ) );
   }
 
-  // This sets initialConditions by a Euler step assuming that near r = 0, a
-  // goes as a_0 + a_2 r^2 (as the bubble should have smooth fields at its
-  // center); hence d^2a/dr^2 at r=0 is (dV/da)/((1+2*dampingFactor)|df/da|^2).
+  // This sets initialConditions by a Euler step assuming that near r = 0,
+  // p goes as p_0 + p_2 r^2 (as the bubble should have smooth fields at its
+  // center); hence d^2p/dr^2 at r = 0 is
+  // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
   inline void
   BubbleProfiler::DoFirstStep( std::vector< double >& initialConditions,
                                double const currentAuxiliary,
