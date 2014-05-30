@@ -12,6 +12,7 @@ namespace VevaciousPlusPlus
 
   ModifiedBounceForMinuit::ModifiedBounceForMinuit(
                                     PotentialFunction const& potentialFunction,
+                                         size_t const numberOfVaryingPathNodes,
                                 unsigned int const potentialApproximationPower,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
@@ -26,10 +27,15 @@ namespace VevaciousPlusPlus
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     referenceFieldIndex( 0 ),
+    numberOfVaryingPathNodes( numberOfVaryingPathNodes ),
     numberOfParameterizationFields( numberOfFields - 1 ),
     potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
     trueVacuum( trueVacuum ),
+    zeroTemperatureStraightPath( numberOfFields ),
+    zeroTemperatureStraightPathLengthSquared( 0.0 ),
+    pathStepMatrix( ( numberOfVaryingPathNodes + 2 ),
+                    numberOfFields ),
     fieldOriginPotential( potentialFunction(
                                          potentialFunction.FieldValuesOrigin(),
                                              0.0 ) ),
@@ -58,9 +64,10 @@ namespace VevaciousPlusPlus
     falseFieldConfiguration( falseVacuum.FieldConfiguration() );
     std::vector< double > const&
     trueFieldConfiguration( trueVacuum.FieldConfiguration() );
-    double greatestFieldDifference( falseFieldConfiguration.front()
-                                    - trueFieldConfiguration.front() );
+    double greatestFieldDifference( trueFieldConfiguration.front()
+                                    - falseFieldConfiguration.front() );
     double currentFieldDifference( greatestFieldDifference );
+    zeroTemperatureStraightPath.front() = currentFieldDifference;
     if( greatestFieldDifference < 0.0 )
     {
       greatestFieldDifference = -greatestFieldDifference;
@@ -69,8 +76,11 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      currentFieldDifference = ( falseFieldConfiguration[ fieldIndex ]
-                                 - trueFieldConfiguration[ fieldIndex ] );
+      currentFieldDifference = ( trueFieldConfiguration[ fieldIndex ]
+                                 - falseFieldConfiguration[ fieldIndex ] );
+      zeroTemperatureStraightPath[ fieldIndex ] = currentFieldDifference;
+      zeroTemperatureStraightPathLengthSquared
+      += ( currentFieldDifference * currentFieldDifference );
       if( currentFieldDifference < 0.0 )
       {
         currentFieldDifference = -currentFieldDifference;
@@ -105,6 +115,12 @@ namespace VevaciousPlusPlus
     }
     shortestLength = ( 1.0 / sqrt( highestScaleSquared ) );
     longestLength = ( 1.0 / sqrt( lowestScaleSquared ) );
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "NEED TO SORT OUT pathStepMatrix!";
+    std::cout << std::endl;/**/
   }
 
   ModifiedBounceForMinuit::~ModifiedBounceForMinuit()
@@ -492,12 +508,9 @@ namespace VevaciousPlusPlus
       }
     }
 
-    size_t coefficientsPerField( ( ( pathParameterization.size() - 2 )
-                                   / numberOfParameterizationFields ) + 3 );
-
     // At this point, we know that the path parameterization is a flattened
-    // coefficientsPerField * numberOfParameterizationFields matrix.
-
+    // numberOfPathNodes * numberOfParameterizationFields matrix (followed by a
+    // temperature).
 
     // Now we need to work out what we do!
     // Maybe this is best:
@@ -505,15 +518,73 @@ namespace VevaciousPlusPlus
     // pathParameterization has sets of vectors in plane perpendicular to
     // reference field axis each p of those is projected onto plane
     // perpendicular to v by p' = p - ( p.v v / v^2 ), then has
-    // v * index * numberOfParameterizationFields / pathParameterization.size()
-    // added to it.
-    // p'[i] = p + [ ( n * i / s ) - ( p.v * v^(-2) ) ] v
+    // v * i * numberOfParameterizationFields / pathParameterization.size()
+    // added to it, if p is the ith vector in pathParameterization.
+    // p' = p + [ ( n * i(p) / s ) - ( p.v * v^(-2) ) ] v
+
+    std::vector< double > straightPath( zeroTemperatureStraightPath );
+    double
+    straightPathLengthSquared( zeroTemperatureStraightPathLengthSquared );
+    if( nonZeroTemperature )
+    {
+      straightPathLengthSquared = 0.0;
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        straightPath[ fieldIndex ] = ( trueVacuumConfiguration[ fieldIndex ]
+                                    - falseVacuumConfiguration[ fieldIndex ] );
+        straightPathLengthSquared
+        += ( straightPath[ fieldIndex ] * straightPath[ fieldIndex ] );
+      }
+    }
+    Eigen::MatrixXd pathNodes( ( numberOfVaryingPathNodes + 2 ),
+                               numberOfFields );
+    // There are actually ( numberOfPathNodes + 2 ) nodes for the path: those
+    // given by pathParameterization + the start and end points.
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      pathNodes( 0,
+                 fieldIndex ) = falseVacuumConfiguration[ fieldIndex ];
+    }
+
+    size_t actualFieldIndex( 0 );
+    for( size_t parameterIndex( 0 );
+         parameterIndex < ( pathParameterization.size() - 1 );
+         parameterIndex += numberOfParameterizationFields )
+    {
+      for( size_t parameterizationFieldIndex( 0 );
+           parameterizationFieldIndex < numberOfPathNodes;
+           ++parameterizationFieldIndex )
+      {
+        actualFieldIndex = parameterizationFieldIndex;
+        if( parameterizationFieldIndex >= referenceFieldIndex )
+        {
+          ++actualFieldIndex;
+        }
+        // p' = p + [ ( n * i(p) / s ) - ( p.v * v^(-2) ) ] v
+
+      }
+      fieldIndexFromSplines = ( splineIndex % numberOfParameterizationFields );
+      if( fieldIndexFromSplines >= referenceFieldIndex )
+      {
+        ++fieldIndexFromSplines;
+      }
+      fieldsAsPolynomials[ fieldIndexFromSplines ].CoefficientVector()[
+                         ( splineIndex / numberOfParameterizationFields ) + 1 ]
+      = pathParameterization[ splineIndex ];
+    }
+
+
 
 
     // Once we have a set of nodes, we might want to project them from planes
     // perpendicular to v onto maybe hyperbolae? I dunno, something to maybe
     // allow the path to leave the endpoints in directions that initially
-    // increase the distance to the other endpoint...
+    // increase the distance to the other endpoint... This can be put in later,
+    // anyway.
 
     fieldsAsPolynomials.resize( numberOfFields,
                                 SimplePolynomial( coefficientsPerField ) );

@@ -23,6 +23,7 @@ namespace VevaciousPlusPlus
   {
   public:
     ModifiedBounceForMinuit( PotentialFunction const& potentialFunction,
+                             size_t const numberOfVaryingPathNodes,
                              unsigned int const potentialApproximationPower,
                              PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
@@ -89,11 +90,17 @@ namespace VevaciousPlusPlus
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     size_t referenceFieldIndex;
+    size_t const numberOfVaryingPathNodes;
     size_t const numberOfParameterizationFields;
     size_t const pathResolution;
     size_t potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
     PotentialMinimum const& trueVacuum;
+    // The vector in field space from falseVacuum to trueVacuum (which are
+    // zero-temperature vacua) is given by zeroTemperatureStraightPath.
+    std::vector< double > zeroTemperatureStraightPath;
+    double zeroTemperatureStraightPathLengthSquared;
+    Eigen::MatrixXd pathStepMatrix;
     double const fieldOriginPotential;
     double const falseVacuumPotential;
     double const trueVacuumPotential;
@@ -109,7 +116,14 @@ namespace VevaciousPlusPlus
     double const shootingThresholdSquared;
 
     // This turns a flattened matrix of numbers parameterizing the path from
-    // the false vacuum to the true vacuum through field space.
+    // the false vacuum to the true vacuum through field space. It assumes that
+    // pathParameterization.size() ==
+    // ( ( numberOfVaryingPathNodes * numberOfParameterizationFields ) + 1 ),
+    // and that pathParameterization.back() is a temperature in GeV at which
+    // the tunneling should be calculated. It also puts the value of the
+    // potential (minus the value at the field origin at zero temperature) into
+    // thermalFalseVacuumPotential and thermalTrueVacuumPotential for the false
+    // and true vacua at the given temperature if and only if it is non-zero.
     void
     DecodePathParameters( std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
@@ -117,11 +131,7 @@ namespace VevaciousPlusPlus
                           double& thermalTrueVacuumPotential ) const;
 
     // This fills fieldConfiguration with the values from fieldsAsPolynomials
-    // at the auxiliary variable = auxiliaryValue. It also puts the value of
-    // the potential (minus the value at the field origin at zero temperature)
-    // into thermalFalseVacuumPotential and thermalTrueVacuumPotential for the
-    // false and true vacua at the temperature given by
-    // pathParameterization.back() if and only if it is non-zero. Unfortunately
+    // at the auxiliary variable = auxiliaryValue. Unfortunately
     // it does not use "return value optimization" as we cannot be sure that
     // the user will compile with C++11 features enabled.
     void SetFieldConfiguration( std::vector< double >& fieldConfiguration,
