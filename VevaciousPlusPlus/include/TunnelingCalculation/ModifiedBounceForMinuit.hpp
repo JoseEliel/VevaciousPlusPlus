@@ -89,7 +89,7 @@ namespace VevaciousPlusPlus
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     size_t referenceFieldIndex;
-    size_t const numberOfSplineFields;
+    size_t const numberOfParameterizationFields;
     size_t const pathResolution;
     size_t potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
@@ -108,31 +108,8 @@ namespace VevaciousPlusPlus
     double const initialFractionOfShortestLength;
     double const shootingThresholdSquared;
 
-    // This turns a flattened matrix of coefficients from pathParameterization
-    // and fills fieldsAsPolynomials appropriately. The coefficients are taken
-    // to be in the order
-    // [ c_{1,0}, c_{1,1}, ..., c_{1, (referenceFieldIndex-1)},
-    //           c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
-    //   c_{2,0}, c_{2,1}, ..., c_{2, (referenceFieldIndex-1)},
-    //           c_{2, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
-    //   ...
-    //   c_{p,0}, c_{d,1}, ..., c_{d, (referenceFieldIndex-1)},
-    //           c_{d, (referenceFieldIndex+1)}, ..., c_{d,(numberOfFields-1)},
-    //   temperature ],
-    // where given field [j] is then the sum of c_{i,j} * p^i and d is the
-    // greatest power given implicitly by pathParameterization. A final
-    // coefficient for each polynomial is given so that the field takes its
-    // value at the true vacuum for p = 1. Note that the given fields do not
-    // map completely to the fields of potentialFunction: the field with index
-    // referenceFieldIndex is skipped over by pathParameterization, as it is
-    // set to be linear in a going from the false vacuum to the true vacuum. It
-    // also puts the value of the potential (minus the value at the field
-    // origin at zero temperature) into thermalFalseVacuumPotential and
-    // thermalTrueVacuumPotential for the false and true vacua at the
-    // temperature given by pathParameterization.back() if and only if it is
-    // non-zero. Unfortunately it does not use "return value optimization" as
-    // we cannot be sure that the user will compile with C++11 features
-    // enabled.
+    // This turns a flattened matrix of numbers parameterizing the path from
+    // the false vacuum to the true vacuum through field space.
     void
     DecodePathParameters( std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
@@ -140,7 +117,13 @@ namespace VevaciousPlusPlus
                           double& thermalTrueVacuumPotential ) const;
 
     // This fills fieldConfiguration with the values from fieldsAsPolynomials
-    // at the auxiliary variable = auxiliaryValue.
+    // at the auxiliary variable = auxiliaryValue. It also puts the value of
+    // the potential (minus the value at the field origin at zero temperature)
+    // into thermalFalseVacuumPotential and thermalTrueVacuumPotential for the
+    // false and true vacua at the temperature given by
+    // pathParameterization.back() if and only if it is non-zero. Unfortunately
+    // it does not use "return value optimization" as we cannot be sure that
+    // the user will compile with C++11 features enabled.
     void SetFieldConfiguration( std::vector< double >& fieldConfiguration,
                     std::vector< SimplePolynomial > const& fieldsAsPolynomials,
                                 double const auxiliaryValue ) const;

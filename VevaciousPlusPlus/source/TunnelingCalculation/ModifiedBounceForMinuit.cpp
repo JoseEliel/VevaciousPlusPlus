@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     referenceFieldIndex( 0 ),
-    numberOfSplineFields( numberOfFields - 1 ),
+    numberOfParameterizationFields( numberOfFields - 1 ),
     potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
     trueVacuum( trueVacuum ),
@@ -398,7 +398,7 @@ namespace VevaciousPlusPlus
           * ( halfAuxiliarySlopeSquared
               + potentialApproximation( currentAuxiliary ) ) );
       bounceAction += ( ( currentIntegrand + previousIntegrand )
-                        / ( currentRadius - previousRadius ) );
+                        * ( currentRadius - previousRadius ) );
       // A common factor of 1/2 is being left until after the loop.
     }
     // The common factor of 1/2 is combined with the solid angle of
@@ -491,8 +491,30 @@ namespace VevaciousPlusPlus
                              givenTemperature );
       }
     }
+
     size_t coefficientsPerField( ( ( pathParameterization.size() - 2 )
-                                   / numberOfSplineFields ) + 3 );
+                                   / numberOfParameterizationFields ) + 3 );
+
+    // At this point, we know that the path parameterization is a flattened
+    // coefficientsPerField * numberOfParameterizationFields matrix.
+
+
+    // Now we need to work out what we do!
+    // Maybe this is best:
+    // vector in field space from false to true is v
+    // pathParameterization has sets of vectors in plane perpendicular to
+    // reference field axis each p of those is projected onto plane
+    // perpendicular to v by p' = p - ( p.v v / v^2 ), then has
+    // v * index * numberOfParameterizationFields / pathParameterization.size()
+    // added to it.
+    // p'[i] = p + [ ( n * i / s ) - ( p.v * v^(-2) ) ] v
+
+
+    // Once we have a set of nodes, we might want to project them from planes
+    // perpendicular to v onto maybe hyperbolae? I dunno, something to maybe
+    // allow the path to leave the endpoints in directions that initially
+    // increase the distance to the other endpoint...
+
     fieldsAsPolynomials.resize( numberOfFields,
                                 SimplePolynomial( coefficientsPerField ) );
     fieldsAsPolynomials[ referenceFieldIndex ].CoefficientVector().resize( 2,
@@ -501,7 +523,7 @@ namespace VevaciousPlusPlus
     = ( trueVacuumConfiguration[ referenceFieldIndex ]
         - falseVacuumConfiguration[ referenceFieldIndex ] );
     // The last element of pathParameterization is a temperature, so should not
-    // be used. The ( ( ( size - 2 ) / numberOfSplineFields ) + 3 ) integer is
+    // be used. The ( ( ( size - 2 ) / numberOfParameterizationFields ) + 3 ) integer is
     // to ensure that each SimplePolynomial has enough elements. The first
     // coefficient (the constant) is taken from falseVacuumConfiguration. The
     // last coefficient of each field is implicit, and is fixed by the
@@ -511,13 +533,13 @@ namespace VevaciousPlusPlus
          splineIndex < ( pathParameterization.size() - 1 );
          ++splineIndex )
     {
-      fieldIndexFromSplines = ( splineIndex % numberOfSplineFields );
+      fieldIndexFromSplines = ( splineIndex % numberOfParameterizationFields );
       if( fieldIndexFromSplines >= referenceFieldIndex )
       {
         ++fieldIndexFromSplines;
       }
       fieldsAsPolynomials[ fieldIndexFromSplines ].CoefficientVector()[
-                                  ( splineIndex / numberOfSplineFields ) + 1 ]
+                         ( splineIndex / numberOfParameterizationFields ) + 1 ]
       = pathParameterization[ splineIndex ];
     }
     for( unsigned int fieldIndex( 0 );
