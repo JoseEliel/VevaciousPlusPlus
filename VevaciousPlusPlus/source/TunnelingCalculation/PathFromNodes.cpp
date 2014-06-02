@@ -121,8 +121,8 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      std::vector< double >&
-      coefficientVector( fieldsAsPolynomials[ fieldIndex ] );
+      std::vector< double >& coefficientVector(
+                       fieldsAsPolynomials[ fieldIndex ].CoefficientVector() );
       coefficientVector[ 0 ] = falseVacuumConfiguration[ fieldIndex ];
       for( unsigned int coefficientIndex( 0 );
            coefficientIndex <= numberOfVaryingPathNodes;

@@ -24,6 +24,8 @@ namespace VevaciousPlusPlus
     virtual
     ~MinuitMinimum();
 
+    std::vector< double >& VariableValues()
+    { return variableValues; }
     std::vector< double > const& VariableValues() const
     { return variableValues; }
 

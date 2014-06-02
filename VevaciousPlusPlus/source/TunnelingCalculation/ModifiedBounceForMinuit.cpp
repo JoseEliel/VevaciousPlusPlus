@@ -204,7 +204,7 @@ namespace VevaciousPlusPlus
     // minimal bounce action.
 
     std::vector< SimplePolynomial > fieldsAsPolynomials;
-    bool const nonZeroTemperature( pathParameterization.size()
+    bool nonZeroTemperature( pathParameterization.size()
                              == ( pathFromNodes.ParameterizationSize() + 1 ) );
     if( !nonZeroTemperature
         &&
@@ -358,7 +358,7 @@ namespace VevaciousPlusPlus
                                       fieldsAsPolynomials ) )
       {
         integrationRadius *= 2.0;
-        std::vector< BubbleRadialValueDescription >::reverse_iterator
+        std::vector< BubbleRadialValueDescription >::const_reverse_iterator
         bubbleDescriptionIterator(
                            odeintBubbleObserver.BubbleDescription().rbegin() );
         initialConditions[ 0 ] = bubbleDescriptionIterator->auxiliaryValue;
@@ -400,9 +400,6 @@ namespace VevaciousPlusPlus
     // integration to decide if it was an undershot or overshot would take too
     // long.
 
-    double fieldGradient( 0.0 );
-    double gradientDotGradient( 0.0 );
-
     bounceAction = 0.0;
     double previousIntegrand( 0.0 );
     // The bounce action density at r = 0 is 0 by merit of
@@ -412,9 +409,8 @@ namespace VevaciousPlusPlus
     double currentIntegrand( 0.0 );
     double previousRadius( 0.0 );
     double currentRadius( 0.0 );
-    double currentAuxiliary( 0.0 );
     double halfAuxiliarySlopeSquared( 0.0 );
-    double fieldDerivative( 0.0 );
+    double fieldDerivativeValue( 0.0 );
     double fieldDerivativeSquared( 0.0 );
     std::vector< BubbleRadialValueDescription > const&
     bubbleProfile( odeintBubbleObserver.BubbleDescription() );
@@ -434,8 +430,9 @@ namespace VevaciousPlusPlus
            fieldDerivative < fieldDerivatives.end();
            ++fieldDerivative )
       {
-        fieldDerivative = (*fieldDerivative)( currentAuxiliary );
-        fieldDerivativeSquared += ( fieldDerivative * fieldDerivative );
+        fieldDerivativeValue = (*fieldDerivative)( currentAuxiliary );
+        fieldDerivativeSquared
+        += ( fieldDerivativeValue * fieldDerivativeValue );
       }
       currentIntegrand
       = ( pow( currentRadius,

@@ -24,7 +24,7 @@ namespace VevaciousPlusPlus
          fieldIndex < fieldPathDerivatives.size();
          ++fieldIndex )
     {
-      secondDerivatives[ fieldPathDerivatives ]
+      secondDerivatives[ fieldIndex ]
       = fieldPathDerivatives[ fieldIndex ].FirstDerivative();
     }
   }
