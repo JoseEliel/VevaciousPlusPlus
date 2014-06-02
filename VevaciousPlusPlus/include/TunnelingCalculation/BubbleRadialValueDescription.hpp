@@ -20,6 +20,9 @@ namespace VevaciousPlusPlus
     { return ( firstReference.radialValue < secondReference.radialValue ); }
 
     BubbleRadialValueDescription();
+    BubbleRadialValueDescription( double const radialValue,
+                                  double const auxiliaryValue,
+                                  double const auxiliarySlope );
     BubbleRadialValueDescription(
                               BubbleRadialValueDescription const& copySource );
     virtual

@@ -14,7 +14,9 @@
 #include "Eigen/Dense"
 #include "boost/numeric/odeint/integrate/integrate.hpp"
 #include "../PotentialEvaluation.hpp"
+#include "PathFromNodes.hpp"
 #include "BubbleProfiler.hpp"
+#include "OdeintBubbleObserver.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -24,15 +26,14 @@ namespace VevaciousPlusPlus
   public:
     ModifiedBounceForMinuit( PotentialFunction const& potentialFunction,
                              size_t const numberOfVaryingPathNodes,
-                             unsigned int const potentialApproximationPower,
+                             size_t const potentialApproximationPower,
                              PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
                              double const dsbEvaporationTemperature,
-                             // size_t const pathResolution = 128,
-                            unsigned int const undershootOvershootAttempts = 8,
-                        unsigned int const maximumMultipleOfLongestLength = 16,
+                             size_t const undershootOvershootAttempts = 8,
+                             size_t const maximumMultipleOfLongestLength = 16,
                            double const initialFractionOfShortestLength = 0.05,
-                     unsigned int const energyConservingUndershootAttempts = 4,
+                           size_t const energyConservingUndershootAttempts = 4,
                             double const minimumScaleSquared = 1.0,
                             double const shootingCloseEnoughThreshold = 0.01 );
     virtual
@@ -43,8 +44,7 @@ namespace VevaciousPlusPlus
     // 1) The path in field space from the false vacuum to the true vacuum is
     //    decoded from pathParameterization to give the field configuration f
     //    as a function of a path auxiliary variable p, giving f(p) and df/dp.
-    //    See the comment above DecodePathParameters for the format of
-    //    pathParameterization.
+    //    This is obtained from pathFromNodes.
     // 2) The potential is fitted as a polynomial in p of degree
     //    potentialApproximationPower, giving V(p).
     // 3) If the potential difference between the vacua is small enough, the
@@ -85,22 +85,32 @@ namespace VevaciousPlusPlus
     // This implements Up() for FCNBase just to stick to a basic value.
     virtual double Up() const { return 1.0; }
 
+    // This sets up initialParameterization and initialStepSizes to be a
+    // straight path in field space with initial step sizes of stepSizeFraction
+    // times the differences in the fields between true vacuum and false
+    // vacuum. After the node parameters are added to initialParameterization,
+    // startingTemperature is appended if it is > 0.0. There is no return value
+    // optimization because we cannot be sure that poor physicist users will
+    // have access to a C++11-compliant compiler.
+    void
+    SetUpStraightPathForMinuit( std::vector< double >& initialParameterization,
+                                std::vector< double >& initialStepSizes,
+                                double const startingTemperature,
+                                double const stepSizeFraction = 0.2 ) const;
+
 
   protected:
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     size_t referenceFieldIndex;
-    size_t const numberOfVaryingPathNodes;
-    size_t const numberOfParameterizationFields;
-    size_t const pathResolution;
+    PathFromNodes pathFromNodes;
     size_t potentialApproximationPower;
     PotentialMinimum const& falseVacuum;
     PotentialMinimum const& trueVacuum;
     // The vector in field space from falseVacuum to trueVacuum (which are
     // zero-temperature vacua) is given by zeroTemperatureStraightPath.
     std::vector< double > zeroTemperatureStraightPath;
-    double zeroTemperatureStraightPathLengthSquared;
-    Eigen::MatrixXd pathStepMatrix;
+    double zeroTemperatureStraightPathInverseLengthSquared;
     double const fieldOriginPotential;
     double const falseVacuumPotential;
     double const trueVacuumPotential;
@@ -109,31 +119,29 @@ namespace VevaciousPlusPlus
     double const tunnelingScaleSquared;
     double shortestLength;
     double longestLength;
-    unsigned int const undershootOvershootAttempts;
-    unsigned int const energyConservingUndershootAttempts;
-    unsigned int const maximumMultipleOfLongestLength;
+    size_t const undershootOvershootAttempts;
+    size_t const energyConservingUndershootAttempts;
+    size_t const maximumMultipleOfLongestLength;
     double const initialFractionOfShortestLength;
     double const shootingThresholdSquared;
 
-    // This turns a flattened matrix of numbers parameterizing the path from
-    // the false vacuum to the true vacuum through field space. It assumes that
-    // pathParameterization.size() ==
-    // ( ( numberOfVaryingPathNodes * numberOfParameterizationFields ) + 1 ),
-    // and that pathParameterization.back() is a temperature in GeV at which
-    // the tunneling should be calculated. It also puts the value of the
-    // potential (minus the value at the field origin at zero temperature) into
-    // thermalFalseVacuumPotential and thermalTrueVacuumPotential for the false
-    // and true vacua at the given temperature if and only if it is non-zero.
-    void
-    DecodePathParameters( std::vector< double > const& pathParameterization,
+
+    // This sets fieldsAsPolynomials to be the parameterized path at the
+    // temperature given by pathParameterization.back(), as well as setting
+    // thermalFalseVacuumPotential, and thermalTrueVacuumPotential
+    // appropriately. There is no return value optimization because we cannot
+    // be sure that poor physicist users will have access to a C++11-compliant
+    // compiler.
+    void SetUpThermalPath( std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
-                          double& thermalFalseVacuumPotential,
-                          double& thermalTrueVacuumPotential ) const;
+                           double const givenTemperature,
+                           double& thermalFalseVacuumPotential,
+                           double& thermalTrueVacuumPotential ) const;
 
     // This fills fieldConfiguration with the values from fieldsAsPolynomials
-    // at the auxiliary variable = auxiliaryValue. Unfortunately
-    // it does not use "return value optimization" as we cannot be sure that
-    // the user will compile with C++11 features enabled.
+    // at the auxiliary variable = auxiliaryValue. There is no return value
+    // optimization because we cannot be sure that poor physicist users will
+    // have access to a C++11-compliant compiler.
     void SetFieldConfiguration( std::vector< double >& fieldConfiguration,
                     std::vector< SimplePolynomial > const& fieldsAsPolynomials,
                                 double const auxiliaryValue ) const;
@@ -143,7 +151,8 @@ namespace VevaciousPlusPlus
     SimplePolynomial PotentialAlongPath(
                     std::vector< SimplePolynomial > const& fieldsAsPolynomials,
                                          double const falseVacuumPotential,
-                                      double const trueVacuumPotential ) const;
+                                         double const trueVacuumPotential,
+                                         double const givenTemperature ) const;
 
     // This puts the bounce action in the thin-wall approximation into
     // bounceAction and returns true if the thin-wall approximation is
@@ -169,7 +178,9 @@ namespace VevaciousPlusPlus
 
 
   // This fills fieldConfiguration with the values from fieldsAsPolynomials
-  // at the auxiliary variable = auxiliaryValue.
+  // at the auxiliary variable = auxiliaryValue. There is no return value
+  // optimization because we cannot be sure that poor physicist users will
+  // have access to a C++11-compliant compiler.
   inline void ModifiedBounceForMinuit::SetFieldConfiguration(
                                      std::vector< double >& fieldConfiguration,
                     std::vector< SimplePolynomial > const& fieldsAsPolynomials,
@@ -182,6 +193,37 @@ namespace VevaciousPlusPlus
       fieldConfiguration[ fieldIndex ]
       = fieldsAsPolynomials[ fieldIndex ]( auxiliaryValue );
     }
+  }
+
+  // This sets up initialParameterization and initialStepSizes to be a
+  // straight path in field space with initial step sizes of stepSizeFraction
+  // times the differences in the fields between true vacuum and false
+  // vacuum. After the node parameters are added to initialParameterization,
+  // startingTemperature is appended if it is > 0.0. There is no return value
+  // optimization because we cannot be sure that poor physicist users will have
+  // access to a C++11-compliant compiler.
+  inline void ModifiedBounceForMinuit::SetUpStraightPathForMinuit(
+                                std::vector< double >& initialParameterization,
+                                       std::vector< double >& initialStepSizes,
+                                              double const startingTemperature,
+                                          double const stepSizeFraction ) const
+  {
+    size_t parameterizationSize( pathFromNodes.ParameterizationSize() );
+    if( startingTemperature > 0.0 )
+    {
+      ++parameterizationSize;
+    }
+    initialParameterization.assign( parameterizationSize,
+                                    0.0 );
+    initialStepSizes.resize( initialParameterization.size() );
+    if( startingTemperature > 0.0 )
+    {
+      initialParameterization.back() = startingTemperature;
+      initialStepSizes.back() = ( stepSizeFraction * startingTemperature );
+    }
+    pathFromNodes.InitialStepsForMinuit( initialStepSizes,
+                                         zeroTemperatureStraightPath,
+                                         stepSizeFraction );
   }
 
 } /* namespace VevaciousPlusPlus */

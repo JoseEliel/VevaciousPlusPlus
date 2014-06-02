@@ -13,29 +13,28 @@ namespace VevaciousPlusPlus
   ModifiedBounceForMinuit::ModifiedBounceForMinuit(
                                     PotentialFunction const& potentialFunction,
                                          size_t const numberOfVaryingPathNodes,
-                                unsigned int const potentialApproximationPower,
+                                      size_t const potentialApproximationPower,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                 double const falseVacuumEvaporationTemperature,
-                                unsigned int const undershootOvershootAttempts,
-                             unsigned int const maximumMultipleOfLongestLength,
+                                      size_t const undershootOvershootAttempts,
+                                   size_t const maximumMultipleOfLongestLength,
                                   double const initialFractionOfShortestLength,
-                         unsigned int const energyConservingUndershootAttempts,
+                               size_t const energyConservingUndershootAttempts,
                                               double const minimumScaleSquared,
                                   double const shootingCloseEnoughThreshold ) :
     ROOT::Minuit2::FCNBase(),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     referenceFieldIndex( 0 ),
-    numberOfVaryingPathNodes( numberOfVaryingPathNodes ),
-    numberOfParameterizationFields( numberOfFields - 1 ),
+    pathFromNodes( numberOfFields,
+                   referenceFieldIndex,
+                   numberOfVaryingPathNodes ),
     potentialApproximationPower( potentialApproximationPower ),
     falseVacuum( falseVacuum ),
     trueVacuum( trueVacuum ),
     zeroTemperatureStraightPath( numberOfFields ),
-    zeroTemperatureStraightPathLengthSquared( 0.0 ),
-    pathStepMatrix( ( numberOfVaryingPathNodes + 2 ),
-                    numberOfFields ),
+    zeroTemperatureStraightPathInverseLengthSquared( 0.0 ),
     fieldOriginPotential( potentialFunction(
                                          potentialFunction.FieldValuesOrigin(),
                                              0.0 ) ),
@@ -79,7 +78,7 @@ namespace VevaciousPlusPlus
       currentFieldDifference = ( trueFieldConfiguration[ fieldIndex ]
                                  - falseFieldConfiguration[ fieldIndex ] );
       zeroTemperatureStraightPath[ fieldIndex ] = currentFieldDifference;
-      zeroTemperatureStraightPathLengthSquared
+      zeroTemperatureStraightPathInverseLengthSquared
       += ( currentFieldDifference * currentFieldDifference );
       if( currentFieldDifference < 0.0 )
       {
@@ -91,6 +90,9 @@ namespace VevaciousPlusPlus
         greatestFieldDifference = currentFieldDifference;
       }
     }
+    zeroTemperatureStraightPathInverseLengthSquared
+    = ( 1.0 / zeroTemperatureStraightPathInverseLengthSquared );
+    pathFromNodes.SetReferenceField( referenceFieldIndex );
     double lowestScaleSquared( tunnelingScaleSquared );
     double highestScaleSquared( tunnelingScaleSquared );
     double candidateScaleSquared( std::max( minimumScaleSquared,
@@ -115,12 +117,6 @@ namespace VevaciousPlusPlus
     }
     shortestLength = ( 1.0 / sqrt( highestScaleSquared ) );
     longestLength = ( 1.0 / sqrt( lowestScaleSquared ) );
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "NEED TO SORT OUT pathStepMatrix!";
-    std::cout << std::endl;/**/
   }
 
   ModifiedBounceForMinuit::~ModifiedBounceForMinuit()
@@ -173,11 +169,8 @@ namespace VevaciousPlusPlus
                       std::vector< double > const& pathParameterization ) const
   {
     // Current outline (code below doesn't do most of this yet):
-    // 1) Take pathParameterization as proposed dependence of field configuration
-    //    f on auxiliary variable p. An extra power of p is given with a
-    //    coefficient to bring f to the true vacuum at p = 1, as
-    //    pathParameterization alone does not have a fixed endpoint at p = 1
-    //    for different pathParameterization input.
+    // 1) Take pathParameterization as proposed dependence of field
+    //    configuration f on auxiliary variable p, from DecodePathParameters.
     // 2) Evaluate the potential at ( potentialApproximationPower - 2 ) values
     //    for p between p = 0 and p = 1 inclusive, giving V(p) as a polynomial
     //    in p (though V(p) is an approximation, f(p) is exact by
@@ -194,7 +187,7 @@ namespace VevaciousPlusPlus
     //     equations of motion along the path from p = 0 to p = p_crit, where
     //     p_crit is the value of p for which the bubble is critical, and is
     //     found by the undershoot/overshoot method (0.0 < p_crit < 1.0). This
-    //     probably will involve using the Boost library odeint.
+    //     involves using the Boost library odeint.
     // 4) Combine f(p) (exact) and V(p) (approximate) with p(r) to numerically
     //    integrate the bounce action.
     // Note that this is only really the bounce action (within the validity of
@@ -210,21 +203,57 @@ namespace VevaciousPlusPlus
     // the true bounce action, and minimizing this should lead one to the true
     // minimal bounce action.
 
-    double const givenTemperature( pathParameterization.back() );
-    bool const nonZeroTemperature( givenTemperature > 0.0 );
-
     std::vector< SimplePolynomial > fieldsAsPolynomials;
+    bool const nonZeroTemperature( pathParameterization.size()
+                             == ( pathFromNodes.ParameterizationSize() + 1 ) );
+    if( !nonZeroTemperature
+        &&
+        pathParameterization.size() != pathFromNodes.ParameterizationSize() )
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "ModifiedBounceForMinuit::operator() was given a wrong"
+      << " number of parameters: " << pathParameterization.size()
+      << "; it should have been given "
+      << pathFromNodes.NumberOfVaryingPathNodes() << " nodes each of "
+      << pathFromNodes.NumberOfParameterizationFields()
+      << " fields, optionally 1 extra parameter for the temperature at the"
+      << " end, so "
+      << pathFromNodes.ParameterizationSize()
+      << " or "
+      << ( pathFromNodes.ParameterizationSize() + 1 )
+      << " parameters.";
+      throw std::out_of_range( errorStream.str() );
+    }
+    double givenTemperature( 0.0 );
+    if( nonZeroTemperature )
+    {
+      givenTemperature = pathParameterization.back();
+      nonZeroTemperature = ( givenTemperature != 0.0 );
+    }
     double falseVacuumRelativePotential( falseVacuumPotential );
     double trueVacuumRelativePotential( trueVacuumPotential );
-    DecodePathParameters( pathParameterization,
-                          fieldsAsPolynomials,
-                          falseVacuumRelativePotential,
-                          trueVacuumRelativePotential );
-
+    if( !nonZeroTemperature )
+    {
+      SetUpThermalPath( pathParameterization,
+                        fieldsAsPolynomials,
+                        givenTemperature,
+                        falseVacuumRelativePotential,
+                        trueVacuumRelativePotential );
+    }
+    else
+    {
+      pathFromNodes( pathParameterization,
+                     zeroTemperatureStraightPath,
+                     zeroTemperatureStraightPathInverseLengthSquared,
+                     falseVacuum.FieldConfiguration(),
+                     fieldsAsPolynomials );
+    }
     SimplePolynomial
     potentialApproximation( PotentialAlongPath( fieldsAsPolynomials,
                                                 falseVacuumRelativePotential,
-                                               trueVacuumRelativePotential ) );
+                                                trueVacuumRelativePotential,
+                                                givenTemperature ) );
     std::vector< SimplePolynomial > fieldDerivatives( numberOfFields );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
@@ -438,199 +467,78 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This turns a flattened matrix of coefficients from pathParameterization
-  // and fills fieldsAsPolynomials appropriately. The coefficients are taken
-  // to be in the order
-  // [ c_{1,0}, c_{1,1}, ..., c_{1, (referenceFieldIndex-1)},
-  //           c_{1, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
-  //   c_{2,0}, c_{2,1}, ..., c_{2, (referenceFieldIndex-1)},
-  //           c_{2, (referenceFieldIndex+1)}, ..., c_{1,(numberOfFields-1)},
-  //   ...
-  //   c_{p,0}, c_{d,1}, ..., c_{d, (referenceFieldIndex-1)},
-  //           c_{d, (referenceFieldIndex+1)}, ..., c_{d,(numberOfFields-1)},
-  //   temperature ],
-  // where given field [j] is then the sum of c_{i,j} * p^i and d is the
-  // greatest power given implicitly by pathParameterization. A final
-  // coefficient for each polynomial is given so that the field takes its
-  // value at the true vacuum for p = 1. Note that the given fields do not
-  // map completely to the fields of potentialFunction: the field with index
-  // referenceFieldIndex is skipped over by pathParameterization, as it is
-  // set to be linear in a going from the false vacuum to the true vacuum. It
-  // also puts the value of the potential (minus the value at the field
-  // origin at zero temperature) into thermalFalseVacuumPotential and
-  // thermalTrueVacuumPotential for the false and true vacua at the
-  // temperature given by pathParameterization.back() if and only if it is
-  // non-zero. Unfortunately it does not use "return value optimization" as
-  // we cannot be sure that the user will compile with C++11 features
-  // enabled.
-  void ModifiedBounceForMinuit::DecodePathParameters(
+
+  // This sets fieldsAsPolynomials to be the parameterized path at the
+  // temperature given by pathParameterization.back(), as well as setting
+  // thermalFalseVacuumPotential, and thermalTrueVacuumPotential
+  // appropriately. There is no return value optimization because we cannot
+  // be sure that poor physicist users will have access to a C++11-compliant
+  // compiler.
+  void ModifiedBounceForMinuit::SetUpThermalPath(
                              std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
+                                                 double const givenTemperature,
                                            double& thermalFalseVacuumPotential,
                                      double& thermalTrueVacuumPotential ) const
   {
-    double const givenTemperature( pathParameterization.back() );
-    bool const nonZeroTemperature( givenTemperature > 0.0 );
+    PotentialForMinuit potentialForMinuit( potentialFunction );
+    potentialForMinuit.SetTemperature( givenTemperature );
+    MinuitManager thermalDsbFinder( potentialForMinuit );
 
-    std::vector< double >
-    falseVacuumConfiguration( falseVacuum.FieldConfiguration() );
-    std::vector< double >
-    trueVacuumConfiguration( trueVacuum.FieldConfiguration() );
+    MinuitMinimum
+    thermalTrueVacuum( thermalDsbFinder( trueVacuum.FieldConfiguration() ) );
+    thermalTrueVacuumPotential = ( thermalTrueVacuum.FunctionValue()
+                                   + potentialForMinuit.FunctionAtOrigin() );
+    // We undo the offset from potentialFromMinuit.
 
-    if( nonZeroTemperature )
+    double straightPathLengthSquared( 0.0 );
+    double fieldDifference( 0.0 );
+
+    if( givenTemperature >= falseVacuumEvaporationTemperature )
     {
-      PotentialForMinuit potentialForMinuit( potentialFunction );
-      MinuitManager thermalDsbFinder( potentialForMinuit );
-      MinuitMinimum
-      thermalTrueVacuum( thermalDsbFinder( trueVacuumConfiguration ) );
-      trueVacuumConfiguration = thermalTrueVacuum.VariableValues();
-      thermalTrueVacuumPotential = ( thermalTrueVacuum.FunctionValue()
-                                     + potentialForMinuit.FunctionAtOrigin() );
-      // We undo the offset from potentialFromMinuit.
-      if( givenTemperature < falseVacuumEvaporationTemperature )
-      {
-        MinuitMinimum thermalFalseVacuum
-        = thermalDsbFinder( falseVacuum.FieldConfiguration() );
-        falseVacuumConfiguration = thermalFalseVacuum.VariableValues();
-        thermalFalseVacuumPotential = ( thermalFalseVacuum.FunctionValue()
-                                     + potentialForMinuit.FunctionAtOrigin() );
-        // We undo the offset from potentialFromMinuit.
-      }
-      else
-      {
-        falseVacuumConfiguration = std::vector< double >( numberOfFields,
-                                                          0.0 );
-        // We use potentialForMinuit for a consistent offset to the value of
-        // potentialFunction at the field origin at zero temperature.
-        thermalFalseVacuumPotential
-        = potentialFunction( falseVacuumConfiguration,
-                             givenTemperature );
-      }
-    }
+      thermalFalseVacuumPotential
+      = potentialFunction( potentialFunction.FieldValuesOrigin(),
+                           givenTemperature );
 
-    // At this point, we know that the path parameterization is a flattened
-    // numberOfPathNodes * numberOfParameterizationFields matrix (followed by a
-    // temperature).
-
-    // Now we need to work out what we do!
-    // Maybe this is best:
-    // vector in field space from false to true is v
-    // pathParameterization has sets of vectors in plane perpendicular to
-    // reference field axis each p of those is projected onto plane
-    // perpendicular to v by p' = p - ( p.v v / v^2 ), then has
-    // v * i * numberOfParameterizationFields / pathParameterization.size()
-    // added to it, if p is the ith vector in pathParameterization.
-    // p' = p + [ ( n * i(p) / s ) - ( p.v * v^(-2) ) ] v
-
-    std::vector< double > straightPath( zeroTemperatureStraightPath );
-    double
-    straightPathLengthSquared( zeroTemperatureStraightPathLengthSquared );
-    if( nonZeroTemperature )
-    {
-      straightPathLengthSquared = 0.0;
-      for( size_t fieldIndex( 0 );
+      for( unsigned int fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        straightPath[ fieldIndex ] = ( trueVacuumConfiguration[ fieldIndex ]
-                                    - falseVacuumConfiguration[ fieldIndex ] );
-        straightPathLengthSquared
-        += ( straightPath[ fieldIndex ] * straightPath[ fieldIndex ] );
+        fieldDifference = thermalTrueVacuum.VariableValues()[ fieldIndex ];
+        straightPathLengthSquared += ( fieldDifference * fieldDifference );
       }
+      pathFromNodes( pathParameterization,
+                     thermalTrueVacuum.VariableValues(),
+                     ( 1.0 / straightPathLengthSquared ),
+                     potentialFunction.FieldValuesOrigin(),
+                     fieldsAsPolynomials );
     }
-    Eigen::MatrixXd pathNodes( ( numberOfVaryingPathNodes + 2 ),
-                               numberOfFields );
-    // There are actually ( numberOfPathNodes + 2 ) nodes for the path: those
-    // given by pathParameterization + the start and end points.
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
+    else
     {
-      pathNodes( 0,
-                 fieldIndex ) = falseVacuumConfiguration[ fieldIndex ];
-    }
+      std::vector< double >&
+      straightPath( thermalTrueVacuum.VariableValues() );
+      // Might as well put stuff straight into
+      // thermalTrueVacuum.VariableValues() as it won't be used later anyway.
+      MinuitMinimum thermalFalseVacuum( thermalDsbFinder(
+                                          falseVacuum.FieldConfiguration() ) );
+      thermalFalseVacuumPotential = ( thermalFalseVacuum.FunctionValue()
+                                     + potentialForMinuit.FunctionAtOrigin() );
+      // We undo the offset from potentialFromMinuit.
 
-    size_t actualFieldIndex( 0 );
-    for( size_t parameterIndex( 0 );
-         parameterIndex < ( pathParameterization.size() - 1 );
-         parameterIndex += numberOfParameterizationFields )
-    {
-      for( size_t parameterizationFieldIndex( 0 );
-           parameterizationFieldIndex < numberOfPathNodes;
-           ++parameterizationFieldIndex )
+      for( unsigned int fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
       {
-        actualFieldIndex = parameterizationFieldIndex;
-        if( parameterizationFieldIndex >= referenceFieldIndex )
-        {
-          ++actualFieldIndex;
-        }
-        // p' = p + [ ( n * i(p) / s ) - ( p.v * v^(-2) ) ] v
-
+        fieldDifference = ( straightPath[ fieldIndex ]
+                         - thermalFalseVacuum.VariableValues()[ fieldIndex ] );
+        straightPathLengthSquared += ( fieldDifference * fieldDifference );
+        straightPath[ fieldIndex ] = fieldDifference;
       }
-      fieldIndexFromSplines = ( splineIndex % numberOfParameterizationFields );
-      if( fieldIndexFromSplines >= referenceFieldIndex )
-      {
-        ++fieldIndexFromSplines;
-      }
-      fieldsAsPolynomials[ fieldIndexFromSplines ].CoefficientVector()[
-                         ( splineIndex / numberOfParameterizationFields ) + 1 ]
-      = pathParameterization[ splineIndex ];
-    }
-
-
-
-
-    // Once we have a set of nodes, we might want to project them from planes
-    // perpendicular to v onto maybe hyperbolae? I dunno, something to maybe
-    // allow the path to leave the endpoints in directions that initially
-    // increase the distance to the other endpoint... This can be put in later,
-    // anyway.
-
-    fieldsAsPolynomials.resize( numberOfFields,
-                                SimplePolynomial( coefficientsPerField ) );
-    fieldsAsPolynomials[ referenceFieldIndex ].CoefficientVector().resize( 2,
-                             falseVacuumConfiguration[ referenceFieldIndex ] );
-    fieldsAsPolynomials[ referenceFieldIndex ].CoefficientVector().back()
-    = ( trueVacuumConfiguration[ referenceFieldIndex ]
-        - falseVacuumConfiguration[ referenceFieldIndex ] );
-    // The last element of pathParameterization is a temperature, so should not
-    // be used. The ( ( ( size - 2 ) / numberOfParameterizationFields ) + 3 ) integer is
-    // to ensure that each SimplePolynomial has enough elements. The first
-    // coefficient (the constant) is taken from falseVacuumConfiguration. The
-    // last coefficient of each field is implicit, and is fixed by the
-    // requirement that the field path goes to trueVacuumConfiguration for a=1.
-    size_t fieldIndexFromSplines( 0 );
-    for( size_t splineIndex( 0 );
-         splineIndex < ( pathParameterization.size() - 1 );
-         ++splineIndex )
-    {
-      fieldIndexFromSplines = ( splineIndex % numberOfParameterizationFields );
-      if( fieldIndexFromSplines >= referenceFieldIndex )
-      {
-        ++fieldIndexFromSplines;
-      }
-      fieldsAsPolynomials[ fieldIndexFromSplines ].CoefficientVector()[
-                         ( splineIndex / numberOfParameterizationFields ) + 1 ]
-      = pathParameterization[ splineIndex ];
-    }
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::vector< double >& coefficientVector(
-                       fieldsAsPolynomials[ fieldIndex ].CoefficientVector() );
-      coefficientVector.front() = falseVacuumConfiguration[ fieldIndex ];
-      double coefficientSum( 0.0 );
-      for( size_t coefficientIndex( 0 );
-           coefficientIndex < ( coefficientVector.size() - 1 );
-           ++coefficientIndex )
-      {
-        coefficientSum += coefficientVector[ coefficientIndex ];
-      }
-      coefficientVector.back() = ( trueVacuumConfiguration[ fieldIndex ]
-                                   - coefficientSum );
-      // This ensures that the field configuration for auxiliary variable = 1.0
-      // goes to that of the true vacuum.
+      pathFromNodes( pathParameterization,
+                     straightPath,
+                     ( 1.0 / straightPathLengthSquared ),
+                     thermalFalseVacuum.VariableValues(),
+                     fieldsAsPolynomials );
     }
   }
 
@@ -639,7 +547,8 @@ namespace VevaciousPlusPlus
   SimplePolynomial ModifiedBounceForMinuit::PotentialAlongPath(
                     std::vector< SimplePolynomial > const& fieldsAsPolynomials,
                                              double const falseVacuumPotential,
-                                       double const trueVacuumPotential ) const
+                                              double const trueVacuumPotential,
+                                          double const givenTemperature ) const
   {
     std::vector< double > fieldConfiguration( numberOfFields );
     // Here we set up the linear system to solve for the coefficients of the
@@ -673,7 +582,8 @@ namespace VevaciousPlusPlus
       SetFieldConfiguration( fieldConfiguration,
                              fieldsAsPolynomials,
                              auxiliaryValue );
-      potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration )
+      potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration,
+                                                          givenTemperature )
                                        - falseVacuumPotential );
 
       for( unsigned int whichPower( 2 );

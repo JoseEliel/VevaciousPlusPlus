@@ -62,53 +62,28 @@ namespace VevaciousPlusPlus
     evaporationMinimum = falseVacuum;
     double evaporationTemperature( CriticalOrEvaporationTemperature(
                 potentialFunction( potentialFunction.FieldValuesOrigin() ) ) );
-    double
-    appropriateScale( sqrt( potentialFunction.ScaleSquaredRelevantToTunneling(
-                                                                   falseVacuum,
-                                                              trueVacuum ) ) );
-    BubbleRadiusFromAuxiliary bubbleRadiusFromAuxiliary( appropriateScale );
     ModifiedBounceForMinuit modifiedBounceForMinuit( potentialFunction,
-                                             TunnelPathResolution( falseVacuum,
-                                                                   trueVacuum,
-                                                                   10 ),
+                                                     3,
+                                                     8,
                                                      falseVacuum,
-                                                     evaporationTemperature,
-                                                   bubbleRadiusFromAuxiliary );
-    unsigned int const
-    numberOfFields( potentialFunction.NumberOfFieldVariables() );
-    std::vector< double > splineCoefficients( ( ( 2 * numberOfFields ) + 1 ),
-                                              0.0 );
-    for( unsigned int splineIndex( 0 );
-         splineIndex < numberOfFields;
-         ++splineIndex )
-    {
-      splineCoefficients[ splineIndex ]
-      = ( trueVacuum.FieldConfiguration()[ splineIndex  ]
-          - falseVacuum.FieldConfiguration()[ splineIndex ] );
-    }
-    double straightPathBounce( modifiedBounceForMinuit( splineCoefficients ) );
+                                                     trueVacuum,
+                                                     evaporationTemperature );
+    std::vector< double > pathParameterization;
+    std::vector< double > initialStepSizes;
+    modifiedBounceForMinuit.SetUpStraightPathForMinuit( pathParameterization,
+                                                        initialStepSizes,
+                                                        0.0,
+                                                        0.5 );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "straightPathBounce = " << straightPathBounce;
-    std::cout << std::endl;/**/
-
-    for( unsigned int splineIndex( 0 );
-         splineIndex < numberOfFields;
-         ++splineIndex )
-    {
-      splineCoefficients[ splineIndex ] = 0.0;
-      splineCoefficients[ splineIndex + numberOfFields ]
-      = ( trueVacuum.FieldConfiguration()[ splineIndex  ]
-          - falseVacuum.FieldConfiguration()[ splineIndex ] );
-    }
-    straightPathBounce = modifiedBounceForMinuit( splineCoefficients );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "straightPathBounce = " << straightPathBounce;
+    << "straight path bounce = "
+    << modifiedBounceForMinuit( pathParameterization );
+    std::cout << std::endl;
+    initialStepSizes.back() = 0.0;
+    std::cout
+    << "test path bounce = " << modifiedBounceForMinuit( initialStepSizes );
     std::cout << std::endl;/**/
   }
 
@@ -124,4 +99,5 @@ namespace VevaciousPlusPlus
     << "MinuitBounceActionMinimizer::CalculateThermalTunneling(...)";
     std::cout << std::endl;/**/
   }
+
 } /* namespace VevaciousPlusPlus */

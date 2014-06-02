@@ -64,11 +64,12 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      firstDerivativeValue = firstDerivatives( auxiliaryValue );
+      firstDerivativeValue = firstDerivatives[ fieldIndex ]( auxiliaryValue );
       fieldDerivativeSquared
       += ( firstDerivativeValue * firstDerivativeValue );
       fieldFirstDotSecondDerivatives
-      += ( firstDerivativeValue * secondDerivatives( auxiliaryValue ) );
+      += ( firstDerivativeValue
+           * secondDerivatives[ fieldIndex ]( auxiliaryValue ) );
     }
     firstAndSecondDerivatives[ 0 ] = auxiliaryDerivative;
     firstAndSecondDerivatives[ 1 ]
@@ -95,7 +96,8 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      firstDerivativeValue = firstDerivatives( currentAuxiliary );
+      firstDerivativeValue
+      = firstDerivatives[ fieldIndex ]( currentAuxiliary );
       fieldDerivativeSquared
       += ( firstDerivativeValue * firstDerivativeValue );
     }

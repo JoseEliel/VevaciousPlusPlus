@@ -30,7 +30,8 @@ MINUITINCLUDEDIR=../../../machine-specific/Minuit2/include/
 #MINUITLIBDIR=./MINUIT/include/
 MINUITLIBDIR=../../../machine-specific/Minuit2/lib/
 DEBUGFLAGS=
-INCLUDES=-I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(MINUITINCLUDEDIR)
+INCLUDES=-I./include/ \
+ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
 CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
@@ -80,6 +81,8 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/TunnelingCalculation/CosmoTransitionsRunner.cpp \
  source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
  source/TunnelingCalculation/ModifiedBounceForMinuit.cpp \
+ source/TunnelingCalculation/OdeintBubbleObserver.cpp \
+ source/TunnelingCalculation/PathFromNodes.cpp \
  source/TunnelingCalculation/ThermalActionFitter.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
  source/VevaciousPlusPlus.cpp

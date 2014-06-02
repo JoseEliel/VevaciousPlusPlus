@@ -15,6 +15,7 @@
 #include "TunnelingCalculation/MinuitBounceActionMinimizer.hpp"
 #include "TunnelingCalculation/ModifiedBounceForMinuit.hpp"
 #include "TunnelingCalculation/OdeintBubbleObserver.hpp"
+#include "TunnelingCalculation/PathFromNodes.hpp"
 #include "TunnelingCalculation/ThermalActionFitter.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
 
