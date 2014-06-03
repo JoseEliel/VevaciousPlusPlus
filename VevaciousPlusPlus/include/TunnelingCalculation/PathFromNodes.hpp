@@ -25,12 +25,14 @@ namespace VevaciousPlusPlus
     // the false vacuum to the true vacuum through field space. It assumes that
     // numberOfVaryingPathNodes nodes of numberOfParameterizationFields field
     // values (in the plane where the reference field is 0) are given by
-    // pathParameterization, and sets fieldsAsPolynomials appropriately.
+    // pathParameterization, and sets fieldsAsPolynomials and
+    // fieldDerivativesAsPolynomials appropriately.
     void operator()( std::vector< double > const& pathParameterization,
                      std::vector< double > const& straightPath,
                      double const straightPathInverseLengthSquared,
                      std::vector< double > const& falseVacuumConfiguration,
-                  std::vector< SimplePolynomial >& fieldsAsPolynomials ) const;
+                     std::vector< SimplePolynomial >& fieldsAsPolynomials,
+        std::vector< SimplePolynomial >& fieldDerivativesAsPolynomials ) const;
 
     // This sets pathParameterization to be repeated nodes of stepSizeFraction
     // times straightPath, less the reference field. There is no return value
@@ -51,6 +53,7 @@ namespace VevaciousPlusPlus
 
     size_t ParameterizationSize() const
     { return ( numberOfParameterizationFields * numberOfVaryingPathNodes ); }
+
 
 
   protected:

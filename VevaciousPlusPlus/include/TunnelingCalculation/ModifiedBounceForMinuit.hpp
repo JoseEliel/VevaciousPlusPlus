@@ -134,6 +134,7 @@ namespace VevaciousPlusPlus
     // compiler.
     void SetUpThermalPath( std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
+                           std::vector< SimplePolynomial >& fieldDerivatives,
                            double const givenTemperature,
                            double& thermalFalseVacuumPotential,
                            double& thermalTrueVacuumPotential ) const;

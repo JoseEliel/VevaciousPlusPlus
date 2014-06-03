@@ -41,6 +41,11 @@ namespace VevaciousPlusPlus
                         size_t const leadingPower = 0,
                         size_t extraEmptyEntriesAtConstruction = 0 );
 
+    // This sets this SimplePolynomial to be the first derivative of
+    // polynomialToDifferentiate.
+    void BecomeFirstDerivativeOf(
+                           SimplePolynomial const& polynomialToDifferentiate );
+
     // This returns the first derivative of this SimplePolynomial with respect
     // to its variable, as a SimplePolynomial.
     SimplePolynomial FirstDerivative() const;
@@ -50,6 +55,10 @@ namespace VevaciousPlusPlus
     std::vector< double >& CoefficientVector(){ return coefficientVector; }
     unsigned int const& LeadingPower() const{ return leadingPower; }
     unsigned int& LeadingPower(){ return leadingPower; }
+
+    // This is for debugging.
+    std::string AsDebuggingString() const;
+
 
   protected:
     std::vector< double > coefficientVector;
@@ -84,11 +93,38 @@ namespace VevaciousPlusPlus
     = std::vector< double >( ( eigenVector.rows() + leadingPower
                                + extraEmptyEntriesAtConstruction ),
                              0.0 );
-    for( unsigned int whichIndex( leadingPower );
-         whichIndex < ( eigenVector.rows() + leadingPower );
+    for( unsigned int whichIndex( 0 );
+         whichIndex < eigenVector.rows();
          ++whichIndex )
     {
-      coefficientVector[ whichIndex ] = eigenVector( whichIndex );
+      coefficientVector[ whichIndex + leadingPower ]
+      = eigenVector( whichIndex );
+    }
+  }
+
+
+  // This sets this SimplePolynomial to be the first derivative of
+  // polynomialToDifferentiate.
+  inline void SimplePolynomial::BecomeFirstDerivativeOf(
+                            SimplePolynomial const& polynomialToDifferentiate )
+  {
+    std::vector< double > const&
+    integralCoefficients( polynomialToDifferentiate.CoefficientVector() );
+    coefficientVector.resize( integralCoefficients.size() - 1 );
+    if( polynomialToDifferentiate.leadingPower == 0 )
+    {
+      leadingPower = 0;
+    }
+    else
+    {
+      leadingPower = ( polynomialToDifferentiate.leadingPower - 1 );
+    }
+    for( unsigned int whichPower( 1 );
+         whichPower <= coefficientVector.size();
+         ++whichPower )
+    {
+      coefficientVector[ whichPower - 1 ]
+      = ( (double)whichPower * integralCoefficients[ whichPower ] );
     }
   }
 
@@ -96,16 +132,40 @@ namespace VevaciousPlusPlus
   // to its variable, as a SimplePolynomial.
   inline SimplePolynomial SimplePolynomial::FirstDerivative() const
   {
-    SimplePolynomial firstDerivative( ( coefficientVector.size() - 1 ),
-                                      ( leadingPower - 1 ) );
-    for( unsigned int whichPower( 1 );
+    SimplePolynomial firstDerivative;
+    firstDerivative.BecomeFirstDerivativeOf( *this );
+    return firstDerivative;
+  }
+
+  // This is for debugging.
+  inline std::string SimplePolynomial::AsDebuggingString() const
+  {
+    std::stringstream returnStream;
+    double coefficientMagnitude( 0.0 );
+    for( unsigned int whichPower( leadingPower );
          whichPower < coefficientVector.size();
          ++whichPower )
     {
-      firstDerivative.coefficientVector[ whichPower - 1 ]
-      = ( (double)whichPower * coefficientVector[ whichPower ] );
+      coefficientMagnitude = coefficientVector[ whichPower ];
+      if( whichPower == leadingPower )
+      {
+        returnStream << coefficientMagnitude;
+      }
+      else
+      {
+        if( coefficientMagnitude < 0.0 )
+        {
+          coefficientMagnitude = -coefficientMagnitude;
+          returnStream << " - " << coefficientMagnitude;
+        }
+        else
+        {
+          returnStream << " + " << coefficientMagnitude;
+        }
+      }
+      returnStream << " x^" << whichPower;
     }
-    return firstDerivative;
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

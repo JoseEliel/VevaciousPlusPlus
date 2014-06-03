@@ -10,8 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  OdeintBubbleObserver::OdeintBubbleObserver() :
-    bubbleDescription(),
+  OdeintBubbleObserver::OdeintBubbleObserver(
+      std::vector< BubbleRadialValueDescription >& bubbleDescription ) :
+    bubbleDescription( bubbleDescription ),
     definitelyUndershot( false ),
     definitelyOvershot( false ),
     overshootIndex( 0 ),

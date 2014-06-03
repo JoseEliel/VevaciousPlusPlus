@@ -55,6 +55,15 @@ namespace VevaciousPlusPlus
                               std::vector< double >& firstAndSecondDerivatives,
                                           double const radialValue )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "BubbleProfiler::operator()( { " << auxiliaryAndFirstDerivative[ 0 ]
+    << ", " << auxiliaryAndFirstDerivative[ 1 ] << " }, { "
+    << firstAndSecondDerivatives[ 0 ]
+    << ", " << firstAndSecondDerivatives[ 1 ] << " }, " << radialValue
+    << " ) called.";
+    std::cout << std::endl;/**/
     double const auxiliaryValue( auxiliaryAndFirstDerivative[ 0 ] );
     double const auxiliaryDerivative( auxiliaryAndFirstDerivative[ 1 ] );
     double firstDerivativeValue( 0.0 );
@@ -70,7 +79,21 @@ namespace VevaciousPlusPlus
       fieldFirstDotSecondDerivatives
       += ( firstDerivativeValue
            * secondDerivatives[ fieldIndex ]( auxiliaryValue ) );
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "1st derivative [" << fieldIndex << "] = " << firstDerivativeValue
+      << std::endl
+      << "2nd derivative [" << fieldIndex << "] = "
+      << secondDerivatives[ fieldIndex ]( auxiliaryValue );
+      std::cout << std::endl;/**/
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "fieldDerivativeSquared = " << fieldDerivativeSquared
+    << ", fieldFirstDotSecondDerivatives = " << fieldFirstDotSecondDerivatives;
+    std::cout << std::endl;/**/
     firstAndSecondDerivatives[ 0 ] = auxiliaryDerivative;
     firstAndSecondDerivatives[ 1 ]
      = ( ( ( potentialDerivative( auxiliaryValue )
@@ -78,6 +101,12 @@ namespace VevaciousPlusPlus
                  * auxiliaryDerivative * auxiliaryDerivative ) )
            / fieldDerivativeSquared )
          - ( ( dampingFactor * auxiliaryDerivative ) / radialValue ) );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "firstAndSecondDerivatives = { " << firstAndSecondDerivatives[ 0 ]
+    << ", " << firstAndSecondDerivatives[ 1 ] << " }";
+    std::cout << std::endl;/**/
   }
 
   // This sets initialConditions by a Euler step assuming that near r = 0,

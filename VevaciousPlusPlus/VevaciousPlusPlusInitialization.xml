@@ -20,7 +20,8 @@
   </PotentialClass>
   <model>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin
+  <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
   </model>
   
   <HomotopyContinuationClass>
@@ -39,12 +40,13 @@
   <SurvivalProbabilityThreshold>
   0.01
   </SurvivalProbabilityThreshold>
-  <!-- <TunnelingClass>
-  MinuitBounceActionMinimizer
-  </TunnelingClass> -->
+  
   <TunnelingClass>
-  CosmoTransitionsRunner
+  MinuitBounceActionMinimizer
+  <!-- MinuitBounceActionMinimizer -->
+  <!-- CosmoTransitionsRunner -->
   </TunnelingClass>
+  
   <PathToCosmotransitions>
   /Users/oleary/BOL/machine-specific/CosmoTransitions2/
   </PathToCosmotransitions>

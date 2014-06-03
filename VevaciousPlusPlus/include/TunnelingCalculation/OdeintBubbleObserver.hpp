@@ -17,7 +17,8 @@ namespace VevaciousPlusPlus
   class OdeintBubbleObserver
   {
   public:
-    OdeintBubbleObserver();
+    OdeintBubbleObserver(
+              std::vector< BubbleRadialValueDescription >& bubbleDescription );
     virtual
     ~OdeintBubbleObserver();
 
@@ -58,9 +59,12 @@ namespace VevaciousPlusPlus
     // true.
     void SortByRadialValue();
 
+    // This is for debugging.
+    std::string AsDebuggingString() const;
+
 
   protected:
-    std::vector< BubbleRadialValueDescription > bubbleDescription;
+    std::vector< BubbleRadialValueDescription >& bubbleDescription;
     bool definitelyUndershot;
     bool definitelyOvershot;
     size_t overshootIndex;
@@ -80,6 +84,14 @@ namespace VevaciousPlusPlus
                       std::vector< double > const& auxiliaryAndFirstDerivative,
                                                 double const radialValue )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "OdeintBubbleObserver::operator()( { "
+    << auxiliaryAndFirstDerivative[ 0 ] << ", "
+    << auxiliaryAndFirstDerivative[ 1 ] << " }, " << radialValue
+    << " ) called. bubbleDescription.size() = " << bubbleDescription.size();
+    std::cout << std::endl;/**/
     if( radialValue < bubbleDescription.back().radialValue )
     {
       needsOrdering = true;
@@ -87,6 +99,16 @@ namespace VevaciousPlusPlus
     bubbleDescription.push_back( BubbleRadialValueDescription( radialValue,
                                               auxiliaryAndFirstDerivative[ 0 ],
                                           auxiliaryAndFirstDerivative[ 1 ] ) );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "bubbleDescription.size() = " << bubbleDescription.size()
+    << std::endl
+    << "bubbleDescription.back() = { r = "
+    << bubbleDescription.back().radialValue << ", p = "
+    << bubbleDescription.back().auxiliaryValue << ", dp/dr = "
+    << bubbleDescription.back().auxiliarySlope << " }";
+    std::cout << std::endl;/**/
     if( !definitelyUndershot )
     {
       definitelyUndershot = ( auxiliaryAndFirstDerivative[ 1 ] > 0.0 );
@@ -107,6 +129,12 @@ namespace VevaciousPlusPlus
   inline void
   OdeintBubbleObserver::ResetValues( double const initialAuxiliary )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "OdeintBubbleObserver::ResetValues( " << initialAuxiliary
+    << " ) called.";
+    std::cout << std::endl;/**/
     bubbleDescription.resize( 1,
                               BubbleRadialValueDescription( 0.0,
                                                             initialAuxiliary,
@@ -131,6 +159,56 @@ namespace VevaciousPlusPlus
       bubbleDescription.assign( sortableBubble.begin(),
                                 sortableBubble.end() );
     }
+  }
+
+  // This is for debugging.
+  inline std::string OdeintBubbleObserver::AsDebuggingString() const
+  {
+    std::stringstream returnStream;
+    returnStream << "ordered properly: ";
+    if( needsOrdering )
+    {
+      returnStream << " no";
+    }
+    else
+    {
+      returnStream << " yes";
+    }
+    returnStream << ", undershot: ";
+    if( definitelyUndershot )
+    {
+      returnStream << " yes";
+    }
+    else
+    {
+      returnStream << " dunno";
+    }
+    returnStream << ", overshot: ";
+    if( definitelyOvershot )
+    {
+      returnStream << " yes [" << overshootIndex << "]";
+    }
+    else
+    {
+      returnStream << " dunno";
+    }
+    returnStream << std::endl << "profile (" << bubbleDescription.size()
+    << " elements): { ";
+    for( std::vector< BubbleRadialValueDescription >::const_iterator
+         bubbleBit( bubbleDescription.begin() );
+         bubbleBit < bubbleDescription.end();
+         ++bubbleBit )
+    {
+      if( bubbleBit != bubbleDescription.begin() )
+      {
+        returnStream << ", ";
+      }
+      returnStream << "[ r = " << bubbleBit->radialValue << ", p = "
+      << bubbleBit->auxiliaryValue << ", dp/dr = "
+      << bubbleBit->auxiliarySlope << " ]";
+    }
+    returnStream << " }";
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -24,8 +24,14 @@ namespace VevaciousPlusPlus
          fieldIndex < fieldPathDerivatives.size();
          ++fieldIndex )
     {
-      secondDerivatives[ fieldIndex ]
-      = fieldPathDerivatives[ fieldIndex ].FirstDerivative();
+      secondDerivatives[ fieldIndex ].BecomeFirstDerivativeOf(
+                                          fieldPathDerivatives[ fieldIndex ] );
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "secondDerivatives[ " << fieldIndex << " ] = "
+      << secondDerivatives[ fieldIndex ].AsDebuggingString();
+      std::cout << std::endl;/**/
     }
   }
 

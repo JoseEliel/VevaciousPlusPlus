@@ -203,7 +203,6 @@ namespace VevaciousPlusPlus
     // the true bounce action, and minimizing this should lead one to the true
     // minimal bounce action.
 
-    std::vector< SimplePolynomial > fieldsAsPolynomials;
     bool nonZeroTemperature( pathParameterization.size()
                              == ( pathFromNodes.ParameterizationSize() + 1 ) );
     if( !nonZeroTemperature
@@ -233,10 +232,21 @@ namespace VevaciousPlusPlus
     }
     double falseVacuumRelativePotential( falseVacuumPotential );
     double trueVacuumRelativePotential( trueVacuumPotential );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "nonZeroTemperature = " << nonZeroTemperature
+    << ", givenTemperature = " << givenTemperature;
+    std::cout << std::endl;/**/
+
+    std::vector< SimplePolynomial > fieldsAsPolynomials;
+    std::vector< SimplePolynomial > fieldDerivatives;
     if( !nonZeroTemperature )
     {
       SetUpThermalPath( pathParameterization,
                         fieldsAsPolynomials,
+                        fieldDerivatives,
                         givenTemperature,
                         falseVacuumRelativePotential,
                         trueVacuumRelativePotential );
@@ -247,14 +257,22 @@ namespace VevaciousPlusPlus
                      zeroTemperatureStraightPath,
                      zeroTemperatureStraightPathInverseLengthSquared,
                      falseVacuum.FieldConfiguration(),
-                     fieldsAsPolynomials );
+                     fieldsAsPolynomials,
+                     fieldDerivatives );
     }
     SimplePolynomial
     potentialApproximation( PotentialAlongPath( fieldsAsPolynomials,
                                                 falseVacuumRelativePotential,
                                                 trueVacuumRelativePotential,
                                                 givenTemperature ) );
-    std::vector< SimplePolynomial > fieldDerivatives( numberOfFields );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "potentialApproximation = "
+    << potentialApproximation.AsDebuggingString();
+    std::cout << std::endl;/**/
+
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -262,6 +280,23 @@ namespace VevaciousPlusPlus
       fieldDerivatives[ fieldIndex ]
       = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "fieldDerivatives = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << std::endl;
+      }
+      std::cout << fieldDerivatives[ fieldIndex ].AsDebuggingString();
+    }
+    std::cout << " }";
+    std::cout << std::endl;/**/
 
     // We return a thin-wall approximation if appropriate:
     double bounceAction( NAN );
@@ -282,10 +317,6 @@ namespace VevaciousPlusPlus
     {
       dampingFactor = 2;
     }
-    BubbleProfiler bubbleProfiler( potentialApproximation,
-                                   fieldDerivatives,
-                                   dampingFactor );
-    OdeintBubbleObserver odeintBubbleObserver;
 
     // Now we have to find the value of the auxiliary variable which is closest
     // to the perfect value that neither undershoots nor overshoots as the
@@ -301,6 +332,13 @@ namespace VevaciousPlusPlus
     double overshootAuxiliary( 1.0 );
     // First we use conservation of energy to get a lower bound for the range
     // for the auxiliary variable which definitely undershoots.
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Energy-conserving shooting:"
+    << std::endl << "undershootAuxiliary = " << undershootAuxiliary
+    << ", overshootAuxiliary = " << overshootAuxiliary;
+    std::cout << std::endl;/**/
     for( size_t undershootGuessStep( 0 );
          undershootGuessStep < energyConservingUndershootAttempts;
          ++undershootGuessStep )
@@ -316,6 +354,14 @@ namespace VevaciousPlusPlus
         undershootAuxiliary
         = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
       }
+      // debugging:
+      /**/std::cout << "tried p = "
+      << ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) )
+      << ", V(p) = " << potentialApproximation( 0.5 * ( undershootAuxiliary
+                                                       + overshootAuxiliary ) )
+      << ", now undershootAuxiliary = " << undershootAuxiliary
+      << ", overshootAuxiliary = " << overshootAuxiliary;
+      std::cout << std::endl;/**/
     }
     // At this point we reset overshootAuxiliary for the integration including
     // damping.
@@ -334,8 +380,27 @@ namespace VevaciousPlusPlus
     // This loop is broken out of if the shoot attempt seems to have been close
     // enough that the integration would take too long to find an overshoot or
     // undershoot, or that the shot was dead on.
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Damped shooting:";
+    std::cout << std::endl;
+    size_t integrationSteps( 0 );/**/
+    BubbleProfiler bubbleProfiler( potentialApproximation,
+                                   fieldDerivatives,
+                                   dampingFactor );
+    std::vector< BubbleRadialValueDescription > bubbleDescription;
     while( (++shootAttempts) <= undershootOvershootAttempts )
     {
+      bubbleDescription.resize( 1,
+                                BubbleRadialValueDescription( 0.0,
+                                                              0.0,
+                                                              0.0 ) );
+      // debugging:
+      /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
+      << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
+      << currentAuxiliary;
+      std::cout << std::endl;/**/
       initialConditions[ 0 ] = currentAuxiliary;
       initialConditions[ 1 ] = 0.0;
       integrationRadius = longestLength;
@@ -344,15 +409,33 @@ namespace VevaciousPlusPlus
       bubbleProfiler.DoFirstStep( initialConditions,
                                   currentAuxiliary,
                                   initialIntegrationStep );
-      odeintBubbleObserver.ResetValues( currentAuxiliary );
-      // integrationSteps =
+      // odeintBubbleObserver.ResetValues( currentAuxiliary );
+      OdeintBubbleObserver odeintBubbleObserver( bubbleDescription );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "after bubbleProfiler.DoFirstStep(...), initialConditions = { "
+      << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
+      << " }. initialIntegrationStep = " << initialIntegrationStep
+      << ", integrationRadius = " << integrationRadius;
+      std::cout << std::endl;/**/
+
+      // debugging:
+      /**/integrationSteps =/**/
       boost::numeric::odeint::integrate( bubbleProfiler,
                                          initialConditions,
                                          initialIntegrationStep,
                                          integrationRadius,
                                          initialIntegrationStep,
                                          odeintBubbleObserver );
-      odeintBubbleObserver.SortByRadialValue();
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "integrationSteps = " << integrationSteps << ", bubble profile:"
+      << std::endl << odeintBubbleObserver.AsDebuggingString() << std::endl;
+      std::cout << std::endl;/**/
 
       while( WorthIntegratingFurther( odeintBubbleObserver,
                                       fieldsAsPolynomials ) )
@@ -365,13 +448,30 @@ namespace VevaciousPlusPlus
         initialConditions[ 1 ] = bubbleDescriptionIterator->auxiliarySlope;
         initialIntegrationStep = bubbleDescriptionIterator->radialValue;
         initialIntegrationStep -= (++bubbleDescriptionIterator)->radialValue;
-        // integrationSteps =
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "after start of loop, initialConditions = { "
+        << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
+        << " }. initialIntegrationStep = " << initialIntegrationStep
+        << ", integrationRadius = " << integrationRadius;
+        std::cout << std::endl;/**/
+
+        /**/integrationSteps =/**/
         boost::numeric::odeint::integrate( bubbleProfiler,
                                            initialConditions,
                                            ( 0.5 * integrationRadius ),
                                            integrationRadius,
                                            initialIntegrationStep,
                                            odeintBubbleObserver );
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "integrationSteps = " << integrationSteps << ", bubble profile:"
+        << std::endl << odeintBubbleObserver.AsDebuggingString();
+        std::cout << std::endl;/**/
       }
       // Now we have to decide if initialConditions[ 0 ] is the new
       // undershootAuxiliary or overshootAuxiliary, or if we need to extend
@@ -399,6 +499,14 @@ namespace VevaciousPlusPlus
     // 2^(-undershootOvershootAttempts) of p_crit, or was close enough that the
     // integration to decide if it was an undershot or overshot would take too
     // long.
+
+    // debugging:
+    /**/OdeintBubbleObserver odeintBubbleObserver( bubbleDescription );
+    std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Final bubble profile:"
+    << std::endl << odeintBubbleObserver.AsDebuggingString();
+    std::cout << std::endl;/**/
 
     bounceAction = 0.0;
     double previousIntegrand( 0.0 );
@@ -474,6 +582,7 @@ namespace VevaciousPlusPlus
   void ModifiedBounceForMinuit::SetUpThermalPath(
                              std::vector< double > const& pathParameterization,
                           std::vector< SimplePolynomial >& fieldsAsPolynomials,
+                             std::vector< SimplePolynomial >& fieldDerivatives,
                                                  double const givenTemperature,
                                            double& thermalFalseVacuumPotential,
                                      double& thermalTrueVacuumPotential ) const
@@ -508,7 +617,8 @@ namespace VevaciousPlusPlus
                      thermalTrueVacuum.VariableValues(),
                      ( 1.0 / straightPathLengthSquared ),
                      potentialFunction.FieldValuesOrigin(),
-                     fieldsAsPolynomials );
+                     fieldsAsPolynomials,
+                     fieldDerivatives );
     }
     else
     {
@@ -535,7 +645,8 @@ namespace VevaciousPlusPlus
                      straightPath,
                      ( 1.0 / straightPathLengthSquared ),
                      thermalFalseVacuum.VariableValues(),
-                     fieldsAsPolynomials );
+                     fieldsAsPolynomials,
+                     fieldDerivatives );
     }
   }
 
@@ -552,6 +663,12 @@ namespace VevaciousPlusPlus
     // polynomial approximation of the potential:
     unsigned int const
     numberOfNonZeroCoefficients( potentialApproximationPower - 2 );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "ModifiedBounceForMinuit::PotentialAlongPath(...) called."
+    << " numberOfNonZeroCoefficients = " << numberOfNonZeroCoefficients;
+    std::cout << std::endl;/**/
     // The potential is approximated as a polynomial with zero coefficients
     // (for a^0 and a^1, so that a = 0 is an extremum) which will be ignored
     // for inverting the matrix equation. Furthermore, the final coefficient is
@@ -579,6 +696,26 @@ namespace VevaciousPlusPlus
       SetFieldConfiguration( fieldConfiguration,
                              fieldsAsPolynomials,
                              auxiliaryValue );
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "fieldConfiguration = { ";
+      for( std::vector< double >::const_iterator
+           fieldValue( fieldConfiguration.begin() );
+           fieldValue < fieldConfiguration.end();
+           ++fieldValue )
+      {
+        if( fieldValue != fieldConfiguration.begin() )
+        {
+          std::cout << ", ";
+        }
+        std::cout << *fieldValue;
+      }
+      std::cout << " }. Going to set potentialValues( " << whichStep
+      << " ) to be " << ( potentialFunction( fieldConfiguration,
+                                             givenTemperature )
+                          - falseVacuumPotential );
+      std::cout << std::endl;/**/
       potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration,
                                                           givenTemperature )
                                        - falseVacuumPotential );
@@ -596,6 +733,12 @@ namespace VevaciousPlusPlus
     }
     potentialValues( numberOfNonZeroCoefficients - 1 )
     = ( trueVacuumPotential - falseVacuumPotential );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl;
+    std::cout << "potentialValues =" << std::endl << potentialValues;
+    std::cout << std::endl;/**/
     for( unsigned int whichPower( 0 );
          whichPower < numberOfNonZeroCoefficients;
          ++whichPower )
@@ -603,6 +746,8 @@ namespace VevaciousPlusPlus
       coefficientMatrix( ( numberOfNonZeroCoefficients - 1 ),
                          whichPower ) = 1.0;
     }
+    std::cout << std::endl << "coefficientMatrix =" << std::endl
+    << coefficientMatrix;
 
     SimplePolynomial
     potentialApproximation( coefficientMatrix.colPivHouseholderQr().solve(
@@ -635,6 +780,12 @@ namespace VevaciousPlusPlus
                                 SimplePolynomial const& potentialApproximation,
                                                 double& bounceAction ) const
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Must remember to test thin-wall approximation!";
+    std::cout << std::endl;/**/
+
     if( potentialDifference < 0.0 )
     {
       potentialDifference = -potentialDifference;
