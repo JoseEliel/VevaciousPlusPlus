@@ -15,6 +15,7 @@
 #include "boost/numeric/odeint/integrate/integrate.hpp"
 #include "../PotentialEvaluation.hpp"
 #include "PathFromNodes.hpp"
+#include "PathFieldsAndPotential.hpp"
 #include "BubbleProfiler.hpp"
 #include "OdeintBubbleObserver.hpp"
 
@@ -125,6 +126,29 @@ namespace VevaciousPlusPlus
     double const initialFractionOfShortestLength;
     double const shootingThresholdSquared;
 
+    // This turns pathParameterization into a PathFieldsAndPotential, by first
+    // checking for a non-zero temperature, then setting up the straight path
+    // in field space, and projecting the nodes extracted from
+    // pathParameterization onto planes perpendicular to the straight path. A
+    // few extra bits of information to do with the temperature are also
+    // recorded in the PathFieldsAndPotential object returned.
+    PathFieldsAndPotential DecodePathParameters(
+                     std::vector< double > const& pathParameterization ) const;
+
+    // This returns the effective bounce action [S_4 or
+    // ((S_3(T)/T + ln(S_3(T)))] calculated under the thin-wall approximation.
+    // Before returning, it sets thinWallIsGoodApproximation to be true or
+    // false depending on whether the thin-wall approximation is a good
+    // approximation or not.
+    double
+    ThinWallApproximation( PathFieldsAndPotential const pathFieldsAndPotential,
+                           bool& thinWallIsGoodApproximation ) const;
+
+    // This numerically integrates the bounce action over bubbleProfile and
+    // then returns effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))].
+    double EffectiveBounceAction(
+                          PathFieldsAndPotential const& pathFieldsAndPotential,
+      std::vector< BubbleRadialValueDescription > const& bubbleProfile ) const;
 
     // This sets fieldsAsPolynomials to be the parameterized path at the
     // temperature given by pathParameterization.back(), as well as setting
@@ -155,16 +179,6 @@ namespace VevaciousPlusPlus
                                          double const trueVacuumPotential,
                                          double const givenTemperature ) const;
 
-    // This puts the bounce action in the thin-wall approximation into
-    // bounceAction and returns true if the thin-wall approximation is
-    // appropriate. Otherwise, bounceAction is left alone and false is
-    // returned.
-    bool ThinWallAppropriate( double potentialDifference,
-                              double const givenTemperature,
-                       std::vector< SimplePolynomial > const& fieldDerivatives,
-                              SimplePolynomial const& potentialApproximation,
-                              double& bounceAction ) const;
-
     // This returns true if neither overshooting nor undershooting definitely
     // happened and the distance in field space to the top of the false vacuum
     // hill is still larger than shootingCloseEnoughThreshold times the
@@ -177,6 +191,76 @@ namespace VevaciousPlusPlus
 
 
 
+
+  // This returns either S_4 or ( S_3(T)/T + ln(S_3(T)) ), where S_4 is the
+  // dimensionless four-dimensional bounce action and S_3(T) the
+  // three-dimensional bounce action in units of GeV for the given temperature
+  // T, also in GeV. S_4 is returned if T is 0, otherwise the effective bounce
+  // action ( S_3(T)/T + ln(S_3(T)) ) is returned. If no temperature is given,
+  // T is assumed to be 0.
+  // The bounce action is calculated by the following process:
+  // 1) The path in field space from the false vacuum to the true vacuum is
+  //    decoded from pathParameterization to give the field configuration f
+  //    as a function of a path auxiliary variable p, giving f(p) and df/dp.
+  //    See the comment above DecodePathParameters for the format of
+  //    pathParameterization.
+  // 2) The potential is fitted as a polynomial in p of degree
+  //    potentialApproximationPower, giving V(p).
+  // 3) If the potential difference between the vacua is small enough, the
+  //    thin-wall approximation is tried, but only returned if the resulting
+  //    bubble radius turns out to be large enough compared to the wall
+  //    thickness.
+  // 4) If the thin-wall approximation is not returned, the one-dimensional
+  //    bubble equation of motion along p is integrated to get p as a
+  //    function of the radial variable r, which is the spatial radius for
+  //    three-dimensional actions, or the length of the four-dimensional
+  //    Euclidean vector. This gets the correct bubble profile only if the
+  //    transverse equations of motion in field space are also satisfied, or
+  //    for a modified potential which has additional terms that raise the
+  //    energy barrier on the side of the path that has a lower energy
+  //    barrier. Hence this bubble profile gives an upper bound on the bounce
+  //    action for the unmodified potential, as the modified potential (which
+  //    has the same true vacuum and false vacuum and is exactly the same
+  //    along the path) cannot have a lower bounce action.
+  //    [The p equation of motion has a strange term giving a force
+  //    proportional to (dp/dr)^2 which is not a friction term as the sign
+  //    is not proportional to dp/dr, rather to d^2f/dp^2. This is because p
+  //    is not linear in the distance in field space, so actually this term
+  //    behaves a bit like extra kinetic energy because it rolled further
+  //    "down the hill" from the true vacuum initially because there is more
+  //    field space distance covered by a small change in p if the derivative
+  //    is that way, or like extra friction because the approach to the
+  //    false vacuum is actually longer in field space distance than in p.
+  //    The alternative is to divide up the path into pathResolution segments
+  //    and take the path as a series of straight lines at a constant
+  //    "velocity" in field space, meaning that the weird pseudo-friction
+  //    force in the bubble wall equation of motion in p disappears. This
+  //    would require some contortions with linked lists (probably) of
+  //    segments to get f(p(r)) and df/dp.]
+  // 5) The bounce action along p(r) is numerically integrated and returned.
+  inline double ModifiedBounceForMinuit::operator()(
+                      std::vector< double > const& pathParameterization ) const
+  {
+    PathFieldsAndPotential
+    pathFieldsAndPotential( DecodePathParameters( pathParameterization ) );
+    // We return a thin-wall approximation if appropriate:
+    bool thinWallIsGoodApproximation( false );
+    double bounceAction( ThinWallApproximation( pathFieldsAndPotential,
+                                               thinWallIsGoodApproximation ) );
+    if( thinWallIsGoodApproximation )
+    {
+      return bounceAction;
+    }
+    // If we didn't return bounceAction already, it means that the we go on to
+    // try undershooting/overshooting.
+    BubbleProfiler bubbleProfiler( pathFieldsAndPotential,
+                          ( initialFractionOfShortestLength * shortestLength ),
+                                   longestLength );
+    bubbleProfiler.UndampedUndershoot( energyConservingUndershootAttempts );
+    return EffectiveBounceAction( pathFieldsAndPotential,
+                     bubbleProfiler.DampedProfile( undershootOvershootAttempts,
+                                                  shootingThresholdSquared ) );
+  }
 
   // This fills fieldConfiguration with the values from fieldsAsPolynomials
   // at the auxiliary variable = auxiliaryValue. There is no return value

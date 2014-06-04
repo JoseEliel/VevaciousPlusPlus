@@ -57,16 +57,18 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // This sets up a ( numberOfVaryingPathNodes + 1 )-square matrix M where
+    // M_ij = (i * pathStepSize)^j, then returns its inverse.
+    static Eigen::MatrixXd
+    CreatePathStepPowersInverse( size_t const numberOfVaryingPathNodes,
+                                 double const pathStepSize );
+
     size_t const numberOfFields;
     size_t referenceFieldIndex;
     size_t const numberOfParameterizationFields;
     size_t const numberOfVaryingPathNodes;
     double const pathStepSize;
     Eigen::MatrixXd const pathStepInversion;
-
-    // This sets up a ( numberOfVaryingPathNodes + 1 )-square matrix M where
-    // M_ij = (i * pathStepSize)^j, then returns its inverse.
-    Eigen::MatrixXd CreatePathStepPowersInverse() const;
   };
 
 
@@ -103,8 +105,9 @@ namespace VevaciousPlusPlus
 
   // This sets up a ( numberOfVaryingPathNodes + 1 )-square matrix M where
   // M_ij = (i * pathStepSize)^j, then returns its inverse.
-  inline Eigen::MatrixXd
-  PathFromNodes::CreatePathStepPowersInverse() const
+  inline Eigen::MatrixXd PathFromNodes::CreatePathStepPowersInverse(
+                                         size_t const numberOfVaryingPathNodes,
+                                                    double const pathStepSize )
   {
     Eigen::MatrixXd pathStepPowers( ( numberOfVaryingPathNodes + 1 ),
                                     ( numberOfVaryingPathNodes + 1 ) );

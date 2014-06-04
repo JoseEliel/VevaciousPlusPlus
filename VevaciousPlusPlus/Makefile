@@ -82,6 +82,7 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
  source/TunnelingCalculation/ModifiedBounceForMinuit.cpp \
  source/TunnelingCalculation/OdeintBubbleObserver.cpp \
+ source/TunnelingCalculation/PathFieldsAndPotential.cpp \
  source/TunnelingCalculation/PathFromNodes.cpp \
  source/TunnelingCalculation/ThermalActionFitter.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \

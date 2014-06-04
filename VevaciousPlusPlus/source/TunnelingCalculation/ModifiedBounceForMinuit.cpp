@@ -769,16 +769,13 @@ namespace VevaciousPlusPlus
     return potentialApproximation;
   }
 
-  // This puts the bounce action in the thin-wall approximation into
-  // bounceAction and returns true if the thin-wall approximation is
-  // appropriate. Otherwise, bounceAction is left alone and false is
-  // returned.
-  bool
-  ModifiedBounceForMinuit::ThinWallAppropriate( double potentialDifference,
-                                                double const givenTemperature,
-                       std::vector< SimplePolynomial > const& fieldDerivatives,
-                                SimplePolynomial const& potentialApproximation,
-                                                double& bounceAction ) const
+  // This returns the effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))]
+  // calculated under the thin-wall approximation. Before returning, it sets
+  // thinWallIsGoodApproximation to be true or false depending on whether
+  // the thin-wall approximation is a good approximation or not.
+  double ModifiedBounceForMinuit::ThinWallApproximation(
+                           PathFieldsAndPotential const pathFieldsAndPotential,
+                                      bool& thinWallIsGoodApproximation ) const
   {
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -786,14 +783,13 @@ namespace VevaciousPlusPlus
     << "Must remember to test thin-wall approximation!";
     std::cout << std::endl;/**/
 
-    if( potentialDifference < 0.0 )
-    {
-      potentialDifference = -potentialDifference;
-    }
+    double const potentialDifference( pathFieldsAndPotential.FalsePotential()
+                                    - pathFieldsAndPotential.TruePotential() );
     if( potentialDifference
         > ( 1.0E-3 * tunnelingScaleSquared * tunnelingScaleSquared ) )
     {
-      return false;
+      thinWallIsGoodApproximation = false;
+      return NAN;
     }
 
     double const oneOverPotentialDifference( 1.0 / potentialDifference );
@@ -826,21 +822,23 @@ namespace VevaciousPlusPlus
          thinWallAuxiliary < 1.0;
          thinWallAuxiliary += thinWallStep )
     {
-      potentialValue = potentialApproximation( thinWallAuxiliary );
+      potentialValue
+      = pathFieldsAndPotential.PotentialApproximation( thinWallAuxiliary );
       derivativeSquared = 0.0;
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        fieldDerivative = fieldDerivatives[ fieldIndex ]( thinWallAuxiliary );
+        fieldDerivative = pathFieldsAndPotential.FieldDerivative( fieldIndex,
+                                                           thinWallAuxiliary );
         derivativeSquared += ( fieldDerivative * fieldDerivative );
       }
       integratedAction += sqrt( derivativeSquared * potentialValue );
       wallThickness += ( thinWallStep / sqrt( potentialValue ) );
     }
     integratedAction *= ( M_SQRT2 * thinWallStep );
-    wallThickness
-    *= fieldDerivatives[ referenceFieldIndex ].CoefficientVector().front();
+    wallThickness *= pathFieldsAndPotential.FieldDerivatives()[
+                             referenceFieldIndex ].CoefficientVector().front();
     // This last *= accounts for the change in integration variable to the
     // field linear in a.
 
@@ -851,29 +849,108 @@ namespace VevaciousPlusPlus
     if( ( integratedAction * oneOverPotentialDifference )
         < ( 1.0E+2 * wallThickness ) )
     {
-      return false;
+      thinWallIsGoodApproximation = false;
+      return NAN;
     }
-    if( givenTemperature > 0.0 )
+    thinWallIsGoodApproximation = false;
+    if( pathFieldsAndPotential.NonZeroTemperature() )
     {
-      bounceAction = ( ( 2.0 * M_PI * integratedAction * integratedAction
-                       * integratedAction * oneOverPotentialDifference
-                       * oneOverPotentialDifference ) / givenTemperature );
+      double const bounceAction( ( 2.0 * M_PI
+                       * integratedAction * integratedAction * integratedAction
+                    * oneOverPotentialDifference * oneOverPotentialDifference )
+                    / pathFieldsAndPotential.GivenTemperature() );
       // This is at least 10^4 * 2 pi * ( S_1 / ( Q^2 T ) ), so S_3(T)/T is
       // likely to be at least 10^3, leading to a totally negligible
       // tunneling probability...
+      return ( ( bounceAction / pathFieldsAndPotential.GivenTemperature() )
+               + log( bounceAction ) );
     }
     else
     {
-      bounceAction = ( -13.5 * M_PI * M_PI * integratedAction
-                       * integratedAction * integratedAction * integratedAction
-                       * oneOverPotentialDifference
-                       * oneOverPotentialDifference
-                       * oneOverPotentialDifference );
+      return ( -13.5 * M_PI * M_PI
+                     * integratedAction * integratedAction
+                     * integratedAction * integratedAction
+                     * oneOverPotentialDifference
+                     * oneOverPotentialDifference
+                     * oneOverPotentialDifference );
       // This is at least 3^4 * 10^4 * 13.5 pi^2 * ( S_1 / ( Q^3 ) ), so
       // S_4 is likely to be at least 10^6, leading to a totally negligible
       // tunneling probability...
     }
-    return true;
+  }
+
+  // This numerically integrates the bounce action over bubbleProfile and
+  // then returns effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))].
+  double ModifiedBounceForMinuit::EffectiveBounceAction(
+                          PathFieldsAndPotential const& pathFieldsAndPotential,
+       std::vector< BubbleRadialValueDescription > const& bubbleProfile ) const
+  {
+    double bounceAction( 0.0 );
+    double previousIntegrand( 0.0 );
+    // The bounce action density at r = 0 is 0 by merit of
+    // r_0^dampingFactor = 0,
+    // dp/dr = 0 at r = 0,
+    // and potentialApproximation(p(0)) = 0 by construction.
+    // The smallest r recorded by bubbleProfile is non-zero because of this.
+    double currentAuxiliary( NAN );
+    double currentIntegrand( 0.0 );
+    double previousRadius( 0.0 );
+    double currentRadius( 0.0 );
+    double halfAuxiliarySlopeSquared( NAN );
+    double fieldDerivativeValue( NAN );
+    double fieldDerivativeSquared( NAN );
+    for( unsigned int radiusIndex( 0 );
+         radiusIndex < bubbleProfile.size();
+         ++radiusIndex )
+    {
+      previousRadius = currentRadius;
+      previousIntegrand = currentIntegrand;
+      currentRadius = bubbleProfile[ radiusIndex ].radialValue;
+      currentAuxiliary = bubbleProfile[ radiusIndex ].auxiliaryValue;
+      halfAuxiliarySlopeSquared = bubbleProfile[ radiusIndex ].auxiliarySlope;
+      halfAuxiliarySlopeSquared *= ( 0.5 * halfAuxiliarySlopeSquared );
+      fieldDerivativeSquared = 0.0;
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        fieldDerivativeValue
+        = pathFieldsAndPotential.FieldDerivative( fieldIndex,
+                                                  currentAuxiliary );
+        fieldDerivativeSquared
+        += ( fieldDerivativeValue * fieldDerivativeValue );
+      }
+      currentIntegrand = ( ( halfAuxiliarySlopeSquared
+          + pathFieldsAndPotential.PotentialApproximation( currentAuxiliary ) )
+                           * currentRadius * currentRadius );
+      if( pathFieldsAndPotential.NonZeroTemperature() )
+      {
+        currentIntegrand *= currentRadius;
+      }
+      bounceAction += ( ( currentIntegrand + previousIntegrand )
+                        * ( currentRadius - previousRadius ) );
+      // A common factor of 1/2 is being left until after the loop.
+    }
+    // The common factor of 1/2 is combined with the solid angle of
+    // 2 pi^2 (quantum) or 4 pi (thermal):
+    if( pathFieldsAndPotential.NonZeroTemperature() )
+    {
+      bounceAction *= ( 2.0 * M_PI );
+    }
+    else
+    {
+      bounceAction *= ( M_PI * M_PI );
+    }
+
+    if( pathFieldsAndPotential.NonZeroTemperature() )
+    {
+      return ( ( bounceAction / pathFieldsAndPotential.GivenTemperature() )
+               + log( bounceAction ) );
+    }
+    else
+    {
+      return bounceAction;
+    }
   }
 
   // This returns true if neither overshooting nor undershooting definitely

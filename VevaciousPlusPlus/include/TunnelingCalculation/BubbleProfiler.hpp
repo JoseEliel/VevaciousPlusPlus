@@ -10,6 +10,7 @@
 
 #include "../CommonIncludes.hpp"
 #include "../PotentialEvaluation/SimplePolynomial.hpp"
+#include "BubbleRadialValueDescription.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -23,6 +24,14 @@ namespace VevaciousPlusPlus
     virtual
     ~BubbleProfiler();
 
+
+    //
+    void UndampedUndershoot( size_t const energyConservingUndershootAttempts );
+
+    //
+    std::vector< BubbleRadialValueDescription > const&
+    DampedProfile( size_t const undershootOvershootAttempts,
+                   size_t const shootingThresholdSquared );
 
     // This is in the form required for the Boost odeint package.
     void operator()( std::vector< double > const& auxiliaryAndFirstDerivative,

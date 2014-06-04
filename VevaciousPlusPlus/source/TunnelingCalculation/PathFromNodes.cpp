@@ -18,14 +18,10 @@ namespace VevaciousPlusPlus
      numberOfParameterizationFields( numberOfFields - 1 ),
      numberOfVaryingPathNodes( numberOfVaryingPathNodes ),
      pathStepSize( 1.0 / (double)( numberOfVaryingPathNodes + 1 ) ),
-     pathStepInversion( CreatePathStepPowersInverse() )
+     pathStepInversion( CreatePathStepPowersInverse( numberOfVaryingPathNodes,
+                                                     pathStepSize ) )
   {
     // This constructor is just an initialization list.
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "pathStepInversion = " << std::endl << pathStepInversion;
-    std::cout << std::endl;/**/
   }
 
   PathFromNodes::~PathFromNodes()
