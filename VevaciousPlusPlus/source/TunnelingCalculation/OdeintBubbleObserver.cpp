@@ -12,11 +12,7 @@ namespace VevaciousPlusPlus
 
   OdeintBubbleObserver::OdeintBubbleObserver(
       std::vector< BubbleRadialValueDescription >& bubbleDescription ) :
-    bubbleDescription( bubbleDescription ),
-    definitelyUndershot( false ),
-    definitelyOvershot( false ),
-    overshootIndex( 0 ),
-    needsOrdering( false )
+    bubbleDescription( bubbleDescription )
   {
     // This constructor is just an initialization list.
   }

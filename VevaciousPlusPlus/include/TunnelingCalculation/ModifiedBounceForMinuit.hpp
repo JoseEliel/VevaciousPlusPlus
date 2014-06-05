@@ -16,8 +16,7 @@
 #include "../PotentialEvaluation.hpp"
 #include "PathFromNodes.hpp"
 #include "PathFieldsAndPotential.hpp"
-#include "BubbleProfiler.hpp"
-#include "OdeintBubbleObserver.hpp"
+#include "BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -163,30 +162,10 @@ namespace VevaciousPlusPlus
                            double& thermalFalseVacuumPotential,
                            double& thermalTrueVacuumPotential ) const;
 
-    // This fills fieldConfiguration with the values from fieldsAsPolynomials
-    // at the auxiliary variable = auxiliaryValue. There is no return value
-    // optimization because we cannot be sure that poor physicist users will
-    // have access to a C++11-compliant compiler.
-    void SetFieldConfiguration( std::vector< double >& fieldConfiguration,
-                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
-                                double const auxiliaryValue ) const;
-
-    // This returns a polynomial approximation of the potential along the path
-    // given by splineCoefficients.
-    SimplePolynomial PotentialAlongPath(
-                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
-                                         double const falseVacuumPotential,
-                                         double const trueVacuumPotential,
-                                         double const givenTemperature ) const;
-
-    // This returns true if neither overshooting nor undershooting definitely
-    // happened and the distance in field space to the top of the false vacuum
-    // hill is still larger than shootingCloseEnoughThreshold times the
-    // distance between the initial field configuration and the false vacuum
-    // field configuration.
-    bool
-    WorthIntegratingFurther( OdeintBubbleObserver const& odeintBubbleObserver,
-             std::vector< SimplePolynomial >const& fieldsAsPolynomials ) const;
+    // This puts a polynomial approximation of the potential along the path
+    // given by pathFieldsAndPotential into pathFieldsAndPotential.
+    void
+    PotentialAlongPath( PathFieldsAndPotential& pathFieldsAndPotential ) const;
   };
 
 
@@ -254,24 +233,6 @@ namespace VevaciousPlusPlus
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.
     return EffectiveBounceAction( pathFieldsAndPotential );
-  }
-
-  // This fills fieldConfiguration with the values from fieldsAsPolynomials
-  // at the auxiliary variable = auxiliaryValue. There is no return value
-  // optimization because we cannot be sure that poor physicist users will
-  // have access to a C++11-compliant compiler.
-  inline void ModifiedBounceForMinuit::SetFieldConfiguration(
-                                     std::vector< double >& fieldConfiguration,
-                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
-                                            double const auxiliaryValue ) const
-  {
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      fieldConfiguration[ fieldIndex ]
-      = fieldsAsPolynomials[ fieldIndex ]( auxiliaryValue );
-    }
   }
 
   // This sets up initialParameterization and initialStepSizes to be a

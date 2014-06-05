@@ -34,15 +34,16 @@ namespace VevaciousPlusPlus
   // the false vacuum to the true vacuum through field space. It assumes that
   // numberOfVaryingPathNodes nodes of numberOfParameterizationFields field
   // values (in the plane where the reference field is 0) are given by
-  // pathParameterization, and sets fieldsAsPolynomials and
-  // fieldDerivativesAsPolynomials appropriately.
-  void
+  // pathParameterization, and returns a PathFieldsAndPotential constructed
+  // from the polynomial fits of the fields.
+  PathFieldsAndPotential
   PathFromNodes::operator()( std::vector< double > const& pathParameterization,
                              std::vector< double > const& straightPath,
                              double const straightPathInverseLengthSquared,
                          std::vector< double > const& falseVacuumConfiguration,
-                          std::vector< SimplePolynomial >& fieldsAsPolynomials,
-         std::vector< SimplePolynomial >& fieldDerivativesAsPolynomials ) const
+                             double const falseVacuumDepth,
+                             double const trueVacuumDepth,
+                             double const givenTemperature ) const
   {
 
     // debugging:
@@ -201,53 +202,10 @@ namespace VevaciousPlusPlus
 
     // Getting the polynomial coefficients from the nodes is as easy as a
     // simple matrix multiplication:
-    Eigen::MatrixXd pathCoefficients( pathStepInversion * pathNodes );
-    fieldsAsPolynomials.resize( numberOfFields,
-                            SimplePolynomial( numberOfVaryingPathNodes + 2 ) );
-    fieldDerivativesAsPolynomials = fieldsAsPolynomials;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::vector< double >& coefficientVector(
-                       fieldsAsPolynomials[ fieldIndex ].CoefficientVector() );
-      coefficientVector[ 0 ] = falseVacuumConfiguration[ fieldIndex ];
-      for( unsigned int coefficientIndex( 0 );
-           coefficientIndex <= numberOfVaryingPathNodes;
-           ++coefficientIndex )
-      {
-        coefficientVector[ coefficientIndex + 1 ]
-        = pathCoefficients( coefficientIndex,
-                            fieldIndex );
-      }
-      fieldDerivativesAsPolynomials[ fieldIndex ]
-      = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
-    }
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PathFromNodes::operator() finishing; fieldsAsPolynomials now is"
-    << std::endl;
-    for( std::vector< SimplePolynomial >::const_iterator
-         fieldAsPolynomial( fieldsAsPolynomials.begin() );
-         fieldAsPolynomial < fieldsAsPolynomials.end();
-         ++fieldAsPolynomial )
-    {
-      std::cout << fieldAsPolynomial->AsDebuggingString() << std::endl;
-    }
-    std::cout << "fieldDerivativesAsPolynomials now is"
-    << std::endl;
-    for( std::vector< SimplePolynomial >::const_iterator
-         fieldAsPolynomial( fieldDerivativesAsPolynomials.begin() );
-         fieldAsPolynomial < fieldDerivativesAsPolynomials.end();
-         ++fieldAsPolynomial )
-    {
-      std::cout << fieldAsPolynomial->AsDebuggingString() << std::endl;
-    }
-    std::cout << "(2 sets of " << fieldDerivativesAsPolynomials.size()
-    << " polynomials)";
-    std::cout << std::endl;/**/
+    return PathFieldsAndPotential( ( pathStepInversion * pathNodes ),
+                                   falseVacuumDepth,
+                                   trueVacuumDepth,
+                                   givenTemperature );
   }
 
 } /* namespace VevaciousPlusPlus */

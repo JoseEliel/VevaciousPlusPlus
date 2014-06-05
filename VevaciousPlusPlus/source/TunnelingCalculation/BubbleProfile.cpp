@@ -23,12 +23,14 @@ namespace VevaciousPlusPlus
     integrationEndRadius( initialIntegrationEndRadius ),
     undershootAuxiliary( 0.0 ),
     overshootAuxiliary( 1.0 ),
-    currentAuxiliary( NAN ),
+    initialAuxiliary( NAN ),
     initialConditions( 2 ),
     twiceDampingFactorPlusOne( ( 2.0 * pathFieldsAndPotential.DampingFactor() )
                                + 1.0 ),
     shootingThresholdSquared( NAN ),
-    worthIntegratingFurther( false )
+    shootAttemptsLeft( 0 ),
+    worthIntegratingFurther( false ),
+    currentShotGoodEnough( false )
   {
     // This constructor is just an initialization list.
   }
@@ -49,6 +51,7 @@ namespace VevaciousPlusPlus
   BubbleProfile::DampedProfile( size_t const undershootOvershootAttempts,
                                 double const shootingThreshold )
   {
+    shootAttemptsLeft = undershootOvershootAttempts;
     shootingThresholdSquared = ( shootingThreshold * shootingThreshold );
     size_t shootAttempts( 0 );
 
@@ -61,15 +64,17 @@ namespace VevaciousPlusPlus
     << "BubbleProfile::DampedProfile(" << undershootOvershootAttempts << ", "
     << shootingThreshold << " ) called:";
     std::cout << std::endl;/**/
-    while( StillSearching( ++shootAttempts ) )
+    while( !currentShotGoodEnough
+           &&
+           ( shootAttemptsLeft > 0 ) )
     {
       auxiliaryProfile.clear();
-      currentAuxiliary
+      initialAuxiliary
       = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
       // debugging:
       /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
       << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-      << currentAuxiliary;
+      << initialAuxiliary;
       std::cout << std::endl;/**/
 
       // We cannot start at r = 0, as the damping term is proportional to 1/r,
@@ -77,13 +82,13 @@ namespace VevaciousPlusPlus
       // r = 0, p goes as p_0 + p_2 r^2 (as the bubble should have smooth
       // fields at its center); hence d^2p/dr^2 at r = 0 is
       // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
-      initialConditions[ 0 ] = currentAuxiliary;
+      initialConditions[ 0 ] = initialAuxiliary;
       initialConditions[ 1 ]
-      = ( ( bubbleDerivatives.PotentialDerivative( currentAuxiliary )
+      = ( ( bubbleDerivatives.PotentialDerivative( initialAuxiliary )
             * integrationStepSize )
           / ( twiceDampingFactorPlusOne
               * pathFieldsAndPotential.FieldDerivativesSquared(
-                                                        currentAuxiliary ) ) );
+                                                        initialAuxiliary ) ) );
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
@@ -96,13 +101,12 @@ namespace VevaciousPlusPlus
 
       ShootFromInitialConditions();
 
-
       while( worthIntegratingFurther )
       {
         initialConditions[ 0 ] = auxiliaryProfile.back().radialValue;
         initialConditions[ 1 ] = auxiliaryProfile.back().auxiliaryValue;
-
         integrationEndRadius = ( 2.0 * initialConditions[ 0 ] );
+
         // debugging:
         /**/std::cout << std::endl << "debugging:"
         << std::endl
@@ -113,42 +117,97 @@ namespace VevaciousPlusPlus
 
         ShootFromInitialConditions();
       }
-      // Now we have to decide if initialConditions[ 0 ] is the new
-      // undershootAuxiliary or overshootAuxiliary, or if we need to extend
-      // integrationRadius, or if the current guess overshoots with a
-      // negligible amount of kinetic energy.
-
-      if( odeintBubbleObserver.DefinitelyUndershot() )
-      {
-        undershootAuxiliary = currentAuxiliary;
-      }
-      else if( odeintBubbleObserver.DefinitelyOvershot() )
-      {
-        overshootAuxiliary = currentAuxiliary;
-      }
-      else
-      {
-        // We break out of the loop leaving currentAuxiliary as it is if the
-        // shot was good enough.
-        break;
-      }
-      currentAuxiliary
-      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
+      --shootAttemptsLeft;
     }
-    // At the end of the loop, currentAuxiliary is either within
+    // At the end of the loop, initialAuxiliary is either within
     // 2^(-undershootOvershootAttempts) of p_crit, or was close enough that the
-    // integration to decide if it was an undershot or overshot would take too
-    // long.
+    // integration to decide if it was an undershoot or overshoot would take
+    // too long.
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "Final bubble profile:"
-    << std::endl << odeintBubbleObserver.AsDebuggingString();
+    << "Final bubble profile:";
+    for( std::vector< BubbleRadialValueDescription >::const_iterator
+         bubbleBit( auxiliaryProfile.begin() );
+         bubbleBit < auxiliaryProfile.end();
+         ++bubbleBit )
+    {
+      std::cout << "r = " << bubbleBit->radialValue << ", p = "
+      << bubbleBit->auxiliaryValue << ", dp/dr = "
+      << bubbleBit->auxiliarySlope << std::endl;
+    }
     std::cout << std::endl;/**/
 
-
     return auxiliaryProfile;
+  }
+
+  // This looks through odeintProfile to see if there was a definite
+  // undershoot or overshoot, setting undershootAuxiliary or
+  // overshootAuxiliary respectively, as well as setting
+  // worthIntegratingFurther. (It could sort odeintProfile based on radial
+  // value, but odeint should have filled it in order.) Then it appends
+  // odeintProfile to auxiliaryProfile.
+  void BubbleProfile::RecordFromOdeintProfile()
+  {
+    // We start from the beginning of odeintProfile so that we record only as
+    // much of the bubble profile as there is before the shot starts to roll
+    // backwards or overshoot.
+    size_t radialIndex( 0 );
+    while( radialIndex < odeintProfile.size() )
+    {
+      // If the shot is rolling backwards without having yet reached the false
+      // vacuum, it was definitely an undershoot.
+      if( odeintProfile[ radialIndex ].auxiliaryValue < 0.0 )
+      {
+        overshootAuxiliary = initialAuxiliary;
+        worthIntegratingFurther = false;
+        currentShotGoodEnough = false;
+        break;
+      }
+      // If the shot is rolling backwards without having yet reached the false
+      // vacuum, it was definitely an undershoot.
+      else if( odeintProfile[ radialIndex ].auxiliarySlope < 0.0 )
+      {
+        undershootAuxiliary = initialAuxiliary;
+        worthIntegratingFurther = false;
+        currentShotGoodEnough = false;
+        break;
+      }
+      ++radialIndex;
+    }
+    auxiliaryProfile.insert( auxiliaryProfile.end(),
+                             ( odeintProfile.begin() + 1 ),
+                             ( odeintProfile.begin() + radialIndex ) );
+    odeintProfile.clear();
+    // If there wasn't an undershoot or overshoot, currentShotGoodEnough
+    // has to be set based on whether the shot got close enough to the false
+    // vacuum.
+    if( worthIntegratingFurther )
+    {
+      double initialDistanceSquared( 0.0 );
+      double currentDistanceSquared( 0.0 );
+      double fieldDifference( 0.0 );
+      double falseVacuumField( 0.0 );
+      double const currentAuxiliary( auxiliaryProfile.back().auxiliaryValue );
+      for( std::vector< SimplePolynomial >::const_iterator
+           fieldValue( pathFieldsAndPotential.FieldPath().begin() );
+           fieldValue < pathFieldsAndPotential.FieldPath().end();
+           ++fieldValue )
+      {
+        falseVacuumField = fieldValue->CoefficientVector().front();
+        fieldDifference = ( (*fieldValue)( currentAuxiliary )
+                            - falseVacuumField );
+        currentDistanceSquared += ( fieldDifference * fieldDifference );
+        fieldDifference = ( (*fieldValue)( initialAuxiliary )
+                            - falseVacuumField );
+        initialDistanceSquared += ( fieldDifference * fieldDifference );
+      }
+      currentShotGoodEnough
+      = ( currentDistanceSquared
+          < ( shootingThresholdSquared * initialDistanceSquared ) );
+      worthIntegratingFurther = !currentShotGoodEnough;
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

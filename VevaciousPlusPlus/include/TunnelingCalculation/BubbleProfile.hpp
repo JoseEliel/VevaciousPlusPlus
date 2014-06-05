@@ -55,12 +55,21 @@ namespace VevaciousPlusPlus
     double integrationEndRadius;
     double undershootAuxiliary;
     double overshootAuxiliary;
-    double currentAuxiliary;
+    double initialAuxiliary;
     std::vector< double > initialConditions;
     double const twiceDampingFactorPlusOne;
     double shootingThresholdSquared;
-    bool still;
+    size_t shootAttemptsLeft;
     bool worthIntegratingFurther;
+    bool currentShotGoodEnough;
+
+    // This looks through odeintProfile to see if there was a definite
+    // undershoot or overshoot, setting undershootAuxiliary or
+    // overshootAuxiliary respectively, as well as setting
+    // worthIntegratingFurther. (It could sort odeintProfile based on radial
+    // value, but odeint should have filled it in order.) Then it appends
+    // odeintProfile to auxiliaryProfile.
+    void RecordFromOdeintProfile();
 
     // This performs the integration based on what is in initialConditions. It
     // also sets undershootAuxiliary, overshootAuxiliary, and
@@ -94,21 +103,21 @@ namespace VevaciousPlusPlus
          undershootGuessStep < energyConservingUndershootAttempts;
          ++undershootGuessStep )
     {
-      currentAuxiliary
+      initialAuxiliary
       = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-      if( pathFieldsAndPotential.PotentialApproximation( currentAuxiliary )
+      if( pathFieldsAndPotential.PotentialApproximation( initialAuxiliary )
           < 0.0 )
       {
-        overshootAuxiliary = currentAuxiliary;
+        overshootAuxiliary = initialAuxiliary;
       }
       else
       {
-        undershootAuxiliary = currentAuxiliary;
+        undershootAuxiliary = initialAuxiliary;
       }
       // debugging:
-      /**/std::cout << "tried currentAuxiliary = " << currentAuxiliary
+      /**/std::cout << "tried currentAuxiliary = " << initialAuxiliary
       << ", V(p) = "
-      << pathFieldsAndPotential.PotentialApproximation( currentAuxiliary )
+      << pathFieldsAndPotential.PotentialApproximation( initialAuxiliary )
       << ", now undershootAuxiliary = " << undershootAuxiliary
       << ", overshootAuxiliary = " << overshootAuxiliary;
       std::cout << std::endl;/**/
@@ -125,7 +134,7 @@ namespace VevaciousPlusPlus
   // there definitely was an undershoot, there definitely was an overshoot,
   // or that the auxiliary variable has not yet gotten within
   // shootingThresholdSquared^(1/2) of 0.
-  void BubbleProfile::ShootFromInitialConditions()
+  inline void BubbleProfile::ShootFromInitialConditions()
   {
     odeintProfile.clear();
 
@@ -142,11 +151,21 @@ namespace VevaciousPlusPlus
                                        integrationStepSize,
                                        bubbleObserver );
 
+    RecordFromOdeintProfile();
+
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "integrationSteps = " << integrationSteps << ", bubble profile:"
-    << std::endl << bubbleObserver.AsDebuggingString() << std::endl;
+    << "integrationSteps = " << integrationSteps << ", bubble profile:";
+    for( std::vector< BubbleRadialValueDescription >::const_iterator
+         bubbleBit( auxiliaryProfile.begin() );
+         bubbleBit < auxiliaryProfile.end();
+         ++bubbleBit )
+    {
+      std::cout << "r = " << bubbleBit->radialValue << ", p = "
+      << bubbleBit->auxiliaryValue << ", dp/dr = "
+      << bubbleBit->auxiliarySlope << std::endl;
+    }
     std::cout << std::endl;/**/
   }
 

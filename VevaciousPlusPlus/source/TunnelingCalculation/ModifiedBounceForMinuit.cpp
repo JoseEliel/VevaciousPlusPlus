@@ -651,16 +651,13 @@ namespace VevaciousPlusPlus
 
   // This returns a polynomial approximation of the potential along the path
   // given by splineCoefficients.
-  SimplePolynomial ModifiedBounceForMinuit::PotentialAlongPath(
-                    std::vector< SimplePolynomial > const& fieldsAsPolynomials,
-                                             double const falseVacuumPotential,
-                                              double const trueVacuumPotential,
-                                          double const givenTemperature ) const
+  void ModifiedBounceForMinuit::PotentialAlongPath(
+                         PathFieldsAndPotential& pathFieldsAndPotential ) const
   {
     std::vector< double > fieldConfiguration( numberOfFields );
     // Here we set up the linear system to solve for the coefficients of the
     // polynomial approximation of the potential:
-    unsigned int const
+    size_t const
     numberOfNonZeroCoefficients( potentialApproximationPower - 2 );
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -692,9 +689,9 @@ namespace VevaciousPlusPlus
          ++whichStep )
     {
       auxiliaryValue += auxiliaryStep;
-      SetFieldConfiguration( fieldConfiguration,
-                             fieldsAsPolynomials,
-                             auxiliaryValue );
+      std::vector< double > const&
+      fieldConfiguration( pathFieldsAndPotential.FieldConfiguration(
+                                                            auxiliaryValue ) );
       // debugging:
       /**/std::cout << std::endl << "debugging:"
       << std::endl
@@ -712,11 +709,11 @@ namespace VevaciousPlusPlus
       }
       std::cout << " }. Going to set potentialValues( " << whichStep
       << " ) to be " << ( potentialFunction( fieldConfiguration,
-                                             givenTemperature )
+                                    pathFieldsAndPotential.GivenTemperature() )
                           - falseVacuumPotential );
       std::cout << std::endl;/**/
       potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration,
-                                                          givenTemperature )
+                                    pathFieldsAndPotential.GivenTemperature() )
                                        - falseVacuumPotential );
 
       for( unsigned int whichPower( 2 );
@@ -748,24 +745,8 @@ namespace VevaciousPlusPlus
     std::cout << std::endl << "coefficientMatrix =" << std::endl
     << coefficientMatrix;
 
-    SimplePolynomial
-    potentialApproximation( coefficientMatrix.colPivHouseholderQr().solve(
-                                                             potentialValues ),
-                            2,
-                            1 );
-    std::vector< double >&
-    potentialVector( potentialApproximation.CoefficientVector() );
-    double finalCoefficientTimesMaxPower( 0.0 );
-    for( unsigned int whichPower( 2 );
-         whichPower < potentialApproximationPower;
-         ++whichPower )
-    {
-      finalCoefficientTimesMaxPower
-      -= ( (double)whichPower * potentialVector[ whichPower ] );
-    }
-    potentialVector.back() = ( finalCoefficientTimesMaxPower
-                               / (double)potentialApproximationPower );
-    return potentialApproximation;
+    pathFieldsAndPotential.SetPotential(
+            coefficientMatrix.colPivHouseholderQr().solve( potentialValues ) );
   }
 
   // This returns the effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))]
@@ -890,7 +871,7 @@ namespace VevaciousPlusPlus
     bubbleProfile.UndampedUndershoot( energyConservingUndershootAttempts );
     std::vector< BubbleRadialValueDescription > const&
     auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
-                                                  shootingThreshold ) );
+                                                   shootingThreshold ) );
     double bounceAction( 0.0 );
     double previousIntegrand( 0.0 );
     // The bounce action density at r = 0 is 0 by merit of
@@ -947,44 +928,6 @@ namespace VevaciousPlusPlus
     {
       return bounceAction;
     }
-  }
-
-  // This returns true if neither overshooting nor undershooting definitely
-  // happened and the distance in field space to the top of the false vacuum
-  // hill is still larger than shootingCloseEnoughThreshold times the
-  // distance between the initial field configuration and the false vacuum
-  // field configuration.
-  bool ModifiedBounceForMinuit::WorthIntegratingFurther(
-                              OdeintBubbleObserver const& odeintBubbleObserver,
-              std::vector< SimplePolynomial >const& fieldsAsPolynomials ) const
-  {
-    if( odeintBubbleObserver.DefinitelyUndershot()
-        ||
-        odeintBubbleObserver.DefinitelyOvershot() )
-    {
-      return false;
-    }
-    double totalDistanceSquared( 0.0 );
-    double nearDistanceSquared( 0.0 );
-    double fieldDifference( 0.0 );
-    double falseVacuumField( 0.0 );
-    double const nearAuxiliary(
-              odeintBubbleObserver.BubbleDescription().back().auxiliaryValue );
-    double const startAuxiliary(
-             odeintBubbleObserver.BubbleDescription().front().auxiliaryValue );
-    for( std::vector< SimplePolynomial >::const_iterator
-         fieldValue( fieldsAsPolynomials.begin() );
-         fieldValue < fieldsAsPolynomials.end();
-         ++fieldValue )
-    {
-      falseVacuumField = fieldValue->CoefficientVector().front();
-      fieldDifference = ( (*fieldValue)( nearAuxiliary ) - falseVacuumField );
-      nearDistanceSquared += ( fieldDifference * fieldDifference );
-      fieldDifference = ( (*fieldValue)( startAuxiliary ) - falseVacuumField );
-      totalDistanceSquared += ( fieldDifference * fieldDifference );
-    }
-    return ( nearDistanceSquared
-             > ( shootingThreshold * totalDistanceSquared ) );
   }
 
 } /* namespace VevaciousPlusPlus */

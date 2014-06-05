@@ -49,6 +49,11 @@ namespace VevaciousPlusPlus
     std::vector< SimplePolynomial > const& FieldPath() const
     { return fieldPath; }
 
+    // This evaluates fieldPath at auxiliaryValue, putting it in
+    // fieldConfiguration, and returns fieldConfiguration.
+    std::vector< double > const&
+    FieldConfiguration( double const auxiliaryValue );
+
     double FieldDerivative( size_t const fieldIndex,
                             double const auxiliaryValue ) const
     { return pathTangent[ fieldIndex ]( auxiliaryValue ); }
@@ -73,6 +78,7 @@ namespace VevaciousPlusPlus
     SimplePolynomial potentialApproximation;
     std::vector< SimplePolynomial > fieldPath;
     std::vector< SimplePolynomial > pathTangent;
+    std::vector< double > fieldConfiguration;
     double falseVacuumDepth;
     double trueVacuumDepth;
     bool nonZeroTemperature;
@@ -80,6 +86,50 @@ namespace VevaciousPlusPlus
   };
 
 
+
+
+  // This sets potentialApproximation to be a SimplePolynomial based on
+  // potentialCoefficients with a leading power of 2, also adding a final
+  // coefficient (for a term with power 1 higher than given by
+  // potentialCoefficients + 2 for the leading power, so its size + 2 (as it
+  // gives coefficients for powers 2 to its size + 1)) which makes the
+  // potential have a minimum when the auxiliary value is 1.0, which should
+  // have been taken into account already in creating potentialCoefficients.
+  inline void PathFieldsAndPotential::SetPotential(
+                                 Eigen::VectorXd const& potentialCoefficients )
+  {
+    potentialApproximation = SimplePolynomial( potentialCoefficients,
+                                               2,
+                                               1 );
+    std::vector< double >&
+    potentialVector( potentialApproximation.CoefficientVector() );
+    size_t const approximationDegree( potentialVector.size() - 1 );
+    double finalCoefficientTimesMaxPower( 0.0 );
+    for( size_t whichPower( 2 );
+         whichPower < approximationDegree;
+         ++whichPower )
+    {
+      finalCoefficientTimesMaxPower
+      -= ( (double)whichPower * potentialVector[ whichPower ] );
+    }
+    potentialVector.back() = ( finalCoefficientTimesMaxPower
+                               / (double)(approximationDegree) );
+  }
+
+  // This evaluates fieldPath at auxiliaryValue, putting it in
+  // fieldConfiguration, and returns fieldConfiguration.
+  inline std::vector< double > const&
+  PathFieldsAndPotential::FieldConfiguration( double const auxiliaryValue )
+  {
+    for( size_t fieldIndex( 0 );
+         fieldIndex < fieldPath.size();
+         ++fieldIndex )
+    {
+      fieldConfiguration[ fieldIndex ]
+      = fieldPath[ fieldIndex ]( auxiliaryValue );
+    }
+    return fieldConfiguration;
+  }
 
   // This returns the sum of the squares of the field derivatives evaluated
   // at auxiliaryValue.
