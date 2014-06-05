@@ -43,6 +43,9 @@ namespace VevaciousPlusPlus
     double PotentialApproximation( double const auxiliaryValue ) const
     { return potentialApproximation( auxiliaryValue ); }
 
+    SimplePolynomial const& PotentialApproximation() const
+    { return potentialApproximation; }
+
     std::vector< SimplePolynomial > const& FieldPath() const
     { return fieldPath; }
 
@@ -53,9 +56,17 @@ namespace VevaciousPlusPlus
     std::vector< SimplePolynomial > const& FieldDerivatives() const
     { return pathTangent; }
 
+    // This returns the sum of the squares of the field derivatives evaluated
+    // at auxiliaryValue.
+    double FieldDerivativesSquared( double const auxiliaryValue ) const;
+
     bool NonZeroTemperature() const{ return nonZeroTemperature; }
 
     double GivenTemperature() const{ return givenTemperature; }
+
+    // This returns the dimensionality of the radial integral: 2.0 for non-zero
+    // temperature, 3.0 for zero temperature.
+    double DampingFactor() const;
 
 
   protected:
@@ -67,6 +78,42 @@ namespace VevaciousPlusPlus
     bool nonZeroTemperature;
     double givenTemperature;
   };
+
+
+
+  // This returns the sum of the squares of the field derivatives evaluated
+  // at auxiliaryValue.
+  inline double PathFieldsAndPotential::FieldDerivativesSquared(
+                                            double const auxiliaryValue ) const
+  {
+    double returnValue( 0.0 );
+    double derivativeValue( NAN );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < pathTangent.size();
+         ++fieldIndex )
+    {
+      derivativeValue = pathTangent[ fieldIndex ]( auxiliaryValue );
+      returnValue += ( derivativeValue * derivativeValue );
+    }
+    return returnValue;
+  }
+
+  // This returns the dimensionality of the radial integral: 2.0 for non-zero
+  // temperature, 3.0 for zero temperature.
+  inline double PathFieldsAndPotential::DampingFactor() const
+  {
+    if( nonZeroTemperature )
+    {
+      return 2.0;
+    }
+    else
+    {
+      return 3.0;
+    }
+    // I could have written
+    // return ( nonZeroTemperature ? 2.0 : 3.0 );
+    // but I feel that it's nice to be verbose.
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* PATHFIELDSANDPOTENTIAL_HPP_ */

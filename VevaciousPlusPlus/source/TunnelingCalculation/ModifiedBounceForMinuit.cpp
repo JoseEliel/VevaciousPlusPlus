@@ -54,8 +54,7 @@ namespace VevaciousPlusPlus
     energyConservingUndershootAttempts( energyConservingUndershootAttempts ),
     maximumMultipleOfLongestLength( maximumMultipleOfLongestLength ),
     initialFractionOfShortestLength( initialFractionOfShortestLength ),
-    shootingThresholdSquared( shootingCloseEnoughThreshold
-                              * shootingCloseEnoughThreshold )
+    shootingThreshold( shootingCloseEnoughThreshold )
   {
     // We pick the field that has the largest difference between the vacua as
     // the reference field that goes linearly with the auxiliary variable.
@@ -386,7 +385,7 @@ namespace VevaciousPlusPlus
     << "Damped shooting:";
     std::cout << std::endl;
     size_t integrationSteps( 0 );/**/
-    BubbleProfiler bubbleProfiler( potentialApproximation,
+    BubbleProfile bubbleProfiler( potentialApproximation,
                                    fieldDerivatives,
                                    dampingFactor );
     std::vector< BubbleRadialValueDescription > bubbleDescription;
@@ -879,12 +878,19 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This numerically integrates the bounce action over bubbleProfile and
-  // then returns effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))].
+  // This sets up the bubble profile, numerically integrates the bounce action
+  // over it, and then returns effective bounce action
+  // [S_4 or ((S_3(T)/T + ln(S_3(T)))].
   double ModifiedBounceForMinuit::EffectiveBounceAction(
-                          PathFieldsAndPotential const& pathFieldsAndPotential,
-       std::vector< BubbleRadialValueDescription > const& bubbleProfile ) const
+                   PathFieldsAndPotential const& pathFieldsAndPotential ) const
   {
+    BubbleProfile bubbleProfile( pathFieldsAndPotential,
+                          ( initialFractionOfShortestLength * shortestLength ),
+                                 longestLength );
+    bubbleProfile.UndampedUndershoot( energyConservingUndershootAttempts );
+    std::vector< BubbleRadialValueDescription > const&
+    auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
+                                                  shootingThreshold ) );
     double bounceAction( 0.0 );
     double previousIntegrand( 0.0 );
     // The bounce action density at r = 0 is 0 by merit of
@@ -896,31 +902,21 @@ namespace VevaciousPlusPlus
     double currentIntegrand( 0.0 );
     double previousRadius( 0.0 );
     double currentRadius( 0.0 );
-    double halfAuxiliarySlopeSquared( NAN );
-    double fieldDerivativeValue( NAN );
-    double fieldDerivativeSquared( NAN );
+    double kineticTerm( NAN );
     for( unsigned int radiusIndex( 0 );
-         radiusIndex < bubbleProfile.size();
+         radiusIndex < auxiliaryProfile.size();
          ++radiusIndex )
     {
       previousRadius = currentRadius;
       previousIntegrand = currentIntegrand;
-      currentRadius = bubbleProfile[ radiusIndex ].radialValue;
-      currentAuxiliary = bubbleProfile[ radiusIndex ].auxiliaryValue;
-      halfAuxiliarySlopeSquared = bubbleProfile[ radiusIndex ].auxiliarySlope;
-      halfAuxiliarySlopeSquared *= ( 0.5 * halfAuxiliarySlopeSquared );
-      fieldDerivativeSquared = 0.0;
-      for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfFields;
-           ++fieldIndex )
-      {
-        fieldDerivativeValue
-        = pathFieldsAndPotential.FieldDerivative( fieldIndex,
-                                                  currentAuxiliary );
-        fieldDerivativeSquared
-        += ( fieldDerivativeValue * fieldDerivativeValue );
-      }
-      currentIntegrand = ( ( halfAuxiliarySlopeSquared
+      currentRadius = auxiliaryProfile[ radiusIndex ].radialValue;
+      currentAuxiliary = auxiliaryProfile[ radiusIndex ].auxiliaryValue;
+      kineticTerm = auxiliaryProfile[ radiusIndex ].auxiliarySlope;
+      kineticTerm
+      *= ( 0.5 * kineticTerm
+        * pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary ) );
+      currentIntegrand
+      = ( ( kineticTerm
           + pathFieldsAndPotential.PotentialApproximation( currentAuxiliary ) )
                            * currentRadius * currentRadius );
       if( pathFieldsAndPotential.NonZeroTemperature() )
@@ -988,7 +984,7 @@ namespace VevaciousPlusPlus
       totalDistanceSquared += ( fieldDifference * fieldDifference );
     }
     return ( nearDistanceSquared
-             > ( shootingThresholdSquared * totalDistanceSquared ) );
+             > ( shootingThreshold * totalDistanceSquared ) );
   }
 
 } /* namespace VevaciousPlusPlus */

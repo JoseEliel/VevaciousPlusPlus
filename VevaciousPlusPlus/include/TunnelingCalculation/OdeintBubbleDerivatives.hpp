@@ -1,12 +1,12 @@
 /*
- * BubbleProfiler.hpp
+ * OdeintBubbleDerivatives.hpp
  *
- *  Created on: May 19, 2014
+ *  Created on: Jun 5, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef BUBBLEPROFILER_HPP_
-#define BUBBLEPROFILER_HPP_
+#ifndef ODEINTBUBBLEDERIVATIVES_HPP_
+#define ODEINTBUBBLEDERIVATIVES_HPP_
 
 #include "../CommonIncludes.hpp"
 #include "../PotentialEvaluation/SimplePolynomial.hpp"
@@ -15,42 +15,31 @@
 namespace VevaciousPlusPlus
 {
 
-  class BubbleProfiler
+  class OdeintBubbleDerivatives
   {
   public:
-    BubbleProfiler( SimplePolynomial const& potentialApproximation,
-                   std::vector< SimplePolynomial > const& fieldPathDerivatives,
-                    unsigned int const dampingFactor );
+    OdeintBubbleDerivatives(
+                        PathFieldsAndPotential const& pathFieldsAndPotential );
     virtual
-    ~BubbleProfiler();
+    ~OdeintBubbleDerivatives();
 
-
-    //
-    void UndampedUndershoot( size_t const energyConservingUndershootAttempts );
-
-    //
-    std::vector< BubbleRadialValueDescription > const&
-    DampedProfile( size_t const undershootOvershootAttempts,
-                   size_t const shootingThresholdSquared );
-
-    // This is in the form required for the Boost odeint package.
+    // This puts the first and second derivatives based on
+    // auxiliaryAndFirstDerivative into firstAndSecondDerivatives, in the form
+    // required for the Boost odeint package.
     void operator()( std::vector< double > const& auxiliaryAndFirstDerivative,
                      std::vector< double >& firstAndSecondDerivatives,
                      double const radialValue );
 
-    // This sets initialConditions by a Euler step assuming that near r = 0,
-    // p goes as p_0 + p_2 r^2 (as the bubble should have smooth fields at its
-    // center); hence d^2p/dr^2 at r=0 is
-    // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
-    void DoFirstStep( std::vector< double >& initialConditions,
-                      double const currentAuxiliary,
-                      double const initialIntegrationStep );
+    // This returns the first derivative of the polynomial approximation of the
+    // potential function along the path with respect to the path auxiliary.
+    double PotentialDerivative( double const auxiliaryValue ) const
+    { return potentialDerivative( auxiliaryValue ); }
 
 
   protected:
     SimplePolynomial potentialDerivative;
-    unsigned int const numberOfFields;
     std::vector< SimplePolynomial > const& firstDerivatives;
+    size_t const numberOfFields;
     std::vector< SimplePolynomial > secondDerivatives;
     double const dampingFactor;
   };
@@ -59,7 +48,7 @@ namespace VevaciousPlusPlus
 
 
   // This is in the form required for the Boost odeint package.
-  inline void BubbleProfiler::operator()(
+  inline void OdeintBubbleDerivatives::operator()(
                       std::vector< double > const& auxiliaryAndFirstDerivative,
                               std::vector< double >& firstAndSecondDerivatives,
                                           double const radialValue )
@@ -67,7 +56,8 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "BubbleProfiler::operator()( { " << auxiliaryAndFirstDerivative[ 0 ]
+    << "OdeintBubbleDerivatives::operator()( { "
+    << auxiliaryAndFirstDerivative[ 0 ]
     << ", " << auxiliaryAndFirstDerivative[ 1 ] << " }, { "
     << firstAndSecondDerivatives[ 0 ]
     << ", " << firstAndSecondDerivatives[ 1 ] << " }, " << radialValue
@@ -118,32 +108,5 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
-  // This sets initialConditions by a Euler step assuming that near r = 0,
-  // p goes as p_0 + p_2 r^2 (as the bubble should have smooth fields at its
-  // center); hence d^2p/dr^2 at r = 0 is
-  // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
-  inline void
-  BubbleProfiler::DoFirstStep( std::vector< double >& initialConditions,
-                               double const currentAuxiliary,
-                               double const initialIntegrationStep )
-  {
-    initialConditions[ 0 ] = currentAuxiliary;
-    double firstDerivativeValue;
-    double fieldDerivativeSquared( 0.0 );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      firstDerivativeValue
-      = firstDerivatives[ fieldIndex ]( currentAuxiliary );
-      fieldDerivativeSquared
-      += ( firstDerivativeValue * firstDerivativeValue );
-    }
-    initialConditions[ 1 ] = ( ( potentialDerivative( currentAuxiliary )
-                                 * initialIntegrationStep )
-                               / ( ( 1.0 + dampingFactor + dampingFactor )
-                                   * fieldDerivativeSquared ) );
-  }
-
 } /* namespace VevaciousPlusPlus */
-#endif /* BUBBLEPROFILER_HPP_ */
+#endif /* ODEINTBUBBLEDERIVATIVES_HPP_ */

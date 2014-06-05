@@ -124,7 +124,7 @@ namespace VevaciousPlusPlus
     size_t const energyConservingUndershootAttempts;
     size_t const maximumMultipleOfLongestLength;
     double const initialFractionOfShortestLength;
-    double const shootingThresholdSquared;
+    double const shootingThreshold;
 
     // This turns pathParameterization into a PathFieldsAndPotential, by first
     // checking for a non-zero temperature, then setting up the straight path
@@ -144,11 +144,11 @@ namespace VevaciousPlusPlus
     ThinWallApproximation( PathFieldsAndPotential const pathFieldsAndPotential,
                            bool& thinWallIsGoodApproximation ) const;
 
-    // This numerically integrates the bounce action over bubbleProfile and
-    // then returns effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))].
+    // This sets up the bubble profile, numerically integrates the bounce
+    // action over it, and then returns effective bounce action
+    // [S_4 or ((S_3(T)/T + ln(S_3(T)))].
     double EffectiveBounceAction(
-                          PathFieldsAndPotential const& pathFieldsAndPotential,
-      std::vector< BubbleRadialValueDescription > const& bubbleProfile ) const;
+                  PathFieldsAndPotential const& pathFieldsAndPotential ) const;
 
     // This sets fieldsAsPolynomials to be the parameterized path at the
     // temperature given by pathParameterization.back(), as well as setting
@@ -253,13 +253,7 @@ namespace VevaciousPlusPlus
     }
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.
-    BubbleProfiler bubbleProfiler( pathFieldsAndPotential,
-                          ( initialFractionOfShortestLength * shortestLength ),
-                                   longestLength );
-    bubbleProfiler.UndampedUndershoot( energyConservingUndershootAttempts );
-    return EffectiveBounceAction( pathFieldsAndPotential,
-                     bubbleProfiler.DampedProfile( undershootOvershootAttempts,
-                                                  shootingThresholdSquared ) );
+    return EffectiveBounceAction( pathFieldsAndPotential );
   }
 
   // This fills fieldConfiguration with the values from fieldsAsPolynomials

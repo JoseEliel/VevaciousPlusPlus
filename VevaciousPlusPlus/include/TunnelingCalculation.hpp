@@ -9,11 +9,12 @@
 #define TUNNELINGCALCULATION_HPP_
 
 #include "TunnelingCalculation/BounceWithSplines.hpp"
-#include "TunnelingCalculation/BubbleProfiler.hpp"
+#include "TunnelingCalculation/BubbleProfile.hpp"
 #include "TunnelingCalculation/BubbleRadialValueDescription.hpp"
 #include "TunnelingCalculation/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/MinuitBounceActionMinimizer.hpp"
 #include "TunnelingCalculation/ModifiedBounceForMinuit.hpp"
+#include "TunnelingCalculation/OdeintBubbleDerivatives.hpp"
 #include "TunnelingCalculation/OdeintBubbleObserver.hpp"
 #include "TunnelingCalculation/PathFromNodes.hpp"
 #include "TunnelingCalculation/ThermalActionFitter.hpp"
