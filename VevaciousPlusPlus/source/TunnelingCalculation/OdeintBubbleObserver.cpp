@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   OdeintBubbleObserver::OdeintBubbleObserver(
-      std::vector< BubbleRadialValueDescription >& bubbleDescription ) :
+             std::vector< BubbleRadialValueDescription >& bubbleDescription ) :
     bubbleDescription( bubbleDescription )
   {
     // This constructor is just an initialization list.

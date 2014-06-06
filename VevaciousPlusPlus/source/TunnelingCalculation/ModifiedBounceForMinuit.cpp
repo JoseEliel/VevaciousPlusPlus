@@ -35,15 +35,11 @@ namespace VevaciousPlusPlus
     trueVacuum( trueVacuum ),
     zeroTemperatureStraightPath( numberOfFields ),
     zeroTemperatureStraightPathInverseLengthSquared( 0.0 ),
-    fieldOriginPotential( potentialFunction(
-                                         potentialFunction.FieldValuesOrigin(),
-                                             0.0 ) ),
     falseVacuumPotential( potentialFunction( falseVacuum.FieldConfiguration(),
                                              0.0 ) ),
     trueVacuumPotential( potentialFunction( trueVacuum.FieldConfiguration(),
                                             0.0 ) ),
     falseVacuumEvaporationTemperature( falseVacuumEvaporationTemperature ),
-    minimumScaleSquared( minimumScaleSquared ),
     tunnelingScaleSquared( std::max( minimumScaleSquared,
                             potentialFunction.ScaleSquaredRelevantToTunneling(
                                                                    falseVacuum,
@@ -52,7 +48,6 @@ namespace VevaciousPlusPlus
     longestLength( 1.0 ),
     undershootOvershootAttempts( undershootOvershootAttempts ),
     energyConservingUndershootAttempts( energyConservingUndershootAttempts ),
-    maximumMultipleOfLongestLength( maximumMultipleOfLongestLength ),
     initialFractionOfShortestLength( initialFractionOfShortestLength ),
     shootingThreshold( shootingCloseEnoughThreshold )
   {
@@ -124,528 +119,83 @@ namespace VevaciousPlusPlus
   }
 
 
-  // The bounce action is calculated by the following process:
-  // 1) The path in field space from the false vacuum to the true vacuum is
-  //    decoded from pathParameterization to give the field configuration f
-  //    as a function of a path auxiliary variable p, giving f(p) and df/dp.
-  //    See the comment above DecodePathParameters for the format of
-  //    pathParameterization.
-  // 2) The potential is fitted as a polynomial in p of degree
-  //    potentialApproximationPower, giving V(p).
-  // 3) If the potential difference between the vacua is small enough, the
-  //    thin-wall approximation is tried, but only returned if the resulting
-  //    bubble radius turns out to be large enough compared to the wall
-  //    thickness.
-  // 4) If the thin-wall approximation is not returned, the one-dimensional
-  //    bubble equation of motion along p is integrated to get p as a
-  //    function of the radial variable r, which is the spatial radius for
-  //    three-dimensional actions, or the length of the four-dimensional
-  //    Euclidean vector. This gets the correct bubble profile only if the
-  //    transverse equations of motion in field space are also satisfied, or
-  //    for a modified potential which has additional terms that raise the
-  //    energy barrier on the side of the path that has a lower energy
-  //    barrier. Hence this bubble profile gives an upper bound on the bounce
-  //    action for the unmodified potential, as the modified potential (which
-  //    has the same true vacuum and false vacuum and is exactly the same
-  //    along the path) cannot have a lower bounce action.
-  //    [The p equation of motion has a strange term giving a force
-  //    proportional to (dp/dr)^2 which is not a friction term as the sign
-  //    is not proportional to dp/dr, rather to d^2f/dp^2. This is because p
-  //    is not linear in the distance in field space, so actually this term
-  //    behaves a bit like extra kinetic energy because it rolled further
-  //    "down the hill" from the true vacuum initially because there is more
-  //    field space distance covered by a small change in p if the derivative
-  //    is that way, or like extra friction because the approach to the
-  //    false vacuum is actually longer in field space distance than in p.
-  //    The alternative is to divide up the path into pathResolution segments
-  //    and take the path as a series of straight lines at a constant
-  //    "velocity" in field space, meaning that the weird pseudo-friction
-  //    force in the bubble wall equation of motion in p disappears. This
-  //    would require some contortions with linked lists (probably) of
-  //    segments to get f(p(r)) and df/dp.]
-  // 5) The bounce action along p(r) is numerically integrated and returned.
-  double ModifiedBounceForMinuit::operator()(
+  // This turns pathParameterization into a PathFieldsAndPotential, by first
+  // checking for a non-zero temperature, then setting up the straight path
+  // in field space, and projecting the nodes extracted from
+  // pathParameterization onto planes perpendicular to the straight path. A
+  // few extra bits of information to do with the temperature are also
+  // recorded in the PathFieldsAndPotential object returned.
+  PathFieldsAndPotential ModifiedBounceForMinuit::DecodePathParameters(
                       std::vector< double > const& pathParameterization ) const
   {
-    // Current outline (code below doesn't do most of this yet):
-    // 1) Take pathParameterization as proposed dependence of field
-    //    configuration f on auxiliary variable p, from DecodePathParameters.
-    // 2) Evaluate the potential at ( potentialApproximationPower - 2 ) values
-    //    for p between p = 0 and p = 1 inclusive, giving V(p) as a polynomial
-    //    in p (though V(p) is an approximation, f(p) is exact by
-    //    construction). (The number of points to evaluate V(p) would be
-    //    ( potentialApproximationPower + 1 ) for potentialApproximationPower
-    //    coefficients of non-zero powers of p plus a constant coefficient, but
-    //    2 of the coefficients are fixed by the requirement that dV/dp is 0 at
-    //    p = 0 and p = 1, and the constant coefficient by taking V(0) to be 0,
-    //    which also is convenient for evaluating the action. Hence V(p) is
-    //    actually a polynomial approximation of the potential difference from
-    //    the false vacuum along the path given by f(p).)
-    // 3a) Return early with a thin-wall result if appropriate.
-    // 3b) Find the 1-dimensional bubble profile by solving the radial bubble
-    //     equations of motion along the path from p = 0 to p = p_crit, where
-    //     p_crit is the value of p for which the bubble is critical, and is
-    //     found by the undershoot/overshoot method (0.0 < p_crit < 1.0). This
-    //     involves using the Boost library odeint.
-    // 4) Combine f(p) (exact) and V(p) (approximate) with p(r) to numerically
-    //    integrate the bounce action.
-    // Note that this is only really the bounce action (within the validity of
-    // the approximations of truncated expansions) if the equations of motion
-    // perpendicular to f(p) are also satisfied. However, they would be
-    // satisfied for a modified potential which increases the energy barrier on
-    // the side of the path until the "force" on the path balances, and such a
-    // modified potential still has the same true and false vacua, and its
-    // decay width is given by this calculated bounce action. The unmodified
-    // potential with the possibility for a path with a lower energy barrier
-    // must necessarily have at least as large a decay width as the modified
-    // potential, hence the calculated bounce action here is an upper bound on
-    // the true bounce action, and minimizing this should lead one to the true
-    // minimal bounce action.
-
-    bool nonZeroTemperature( pathParameterization.size()
-                             == ( pathFromNodes.ParameterizationSize() + 1 ) );
-    if( !nonZeroTemperature
-        &&
-        pathParameterization.size() != pathFromNodes.ParameterizationSize() )
+    if( ZeroTemperatureParameterization( pathParameterization ) )
     {
-      std::stringstream errorStream;
-      errorStream
-      << "ModifiedBounceForMinuit::operator() was given a wrong"
-      << " number of parameters: " << pathParameterization.size()
-      << "; it should have been given "
-      << pathFromNodes.NumberOfVaryingPathNodes() << " nodes each of "
-      << pathFromNodes.NumberOfParameterizationFields()
-      << " fields, optionally 1 extra parameter for the temperature at the"
-      << " end, so "
-      << pathFromNodes.ParameterizationSize()
-      << " or "
-      << ( pathFromNodes.ParameterizationSize() + 1 )
-      << " parameters.";
-      throw std::out_of_range( errorStream.str() );
+      return pathFromNodes( pathParameterization,
+                            zeroTemperatureStraightPath,
+                            zeroTemperatureStraightPathInverseLengthSquared,
+                            falseVacuum.FieldConfiguration(),
+                            falseVacuumPotential,
+                            trueVacuumPotential,
+                            0.0 );
     }
-    double givenTemperature( 0.0 );
-    if( nonZeroTemperature )
-    {
-      givenTemperature = pathParameterization.back();
-      nonZeroTemperature = ( givenTemperature != 0.0 );
-    }
-    double falseVacuumRelativePotential( falseVacuumPotential );
-    double trueVacuumRelativePotential( trueVacuumPotential );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "nonZeroTemperature = " << nonZeroTemperature
-    << ", givenTemperature = " << givenTemperature;
-    std::cout << std::endl;/**/
-
-    std::vector< SimplePolynomial > fieldsAsPolynomials;
-    std::vector< SimplePolynomial > fieldDerivatives;
-    if( !nonZeroTemperature )
-    {
-      SetUpThermalPath( pathParameterization,
-                        fieldsAsPolynomials,
-                        fieldDerivatives,
-                        givenTemperature,
-                        falseVacuumRelativePotential,
-                        trueVacuumRelativePotential );
-    }
-    else
-    {
-      pathFromNodes( pathParameterization,
-                     zeroTemperatureStraightPath,
-                     zeroTemperatureStraightPathInverseLengthSquared,
-                     falseVacuum.FieldConfiguration(),
-                     fieldsAsPolynomials,
-                     fieldDerivatives );
-    }
-    SimplePolynomial
-    potentialApproximation( PotentialAlongPath( fieldsAsPolynomials,
-                                                falseVacuumRelativePotential,
-                                                trueVacuumRelativePotential,
-                                                givenTemperature ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "potentialApproximation = "
-    << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;/**/
-
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      fieldDerivatives[ fieldIndex ]
-      = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
-    }
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "fieldDerivatives = { ";
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      if( fieldIndex > 0 )
-      {
-        std::cout << std::endl;
-      }
-      std::cout << fieldDerivatives[ fieldIndex ].AsDebuggingString();
-    }
-    std::cout << " }";
-    std::cout << std::endl;/**/
-
-    // We return a thin-wall approximation if appropriate:
-    double bounceAction( NAN );
-    if( ThinWallAppropriate( ( falseVacuumRelativePotential
-                               - trueVacuumRelativePotential ),
-                             givenTemperature,
-                             fieldDerivatives,
-                             potentialApproximation,
-                             bounceAction ) )
-    {
-      return bounceAction;
-    }
-    // If we didn't return bounceAction already, it means that the we go on to
-    // try undershooting/overshooting.
-
-    unsigned int dampingFactor( 3 );
-    if( nonZeroTemperature )
-    {
-      dampingFactor = 2;
-    }
-
-    // Now we have to find the value of the auxiliary variable which is closest
-    // to the perfect value that neither undershoots nor overshoots as the
-    // radial variable goes to infinity. Unfortunately we have to cope with
-    // finite calculations though...
-    // The strategy is to start with definite undershoot a (largest a such that
-    // V(a) > 0.0, decided from potentialValues) and a definite overshoot
-    // (a = 1.0), and narrow the range with definite undershoots and overshoots
-    // for a given maximum radial value. The maximum radial value is increased
-    // and an undecided a is found each time until the a at maximum radial
-    // value is < 1.0E-3 or something.
-    double undershootAuxiliary( 0.0 );
-    double overshootAuxiliary( 1.0 );
-    // First we use conservation of energy to get a lower bound for the range
-    // for the auxiliary variable which definitely undershoots.
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Energy-conserving shooting:"
-    << std::endl << "undershootAuxiliary = " << undershootAuxiliary
-    << ", overshootAuxiliary = " << overshootAuxiliary;
-    std::cout << std::endl;/**/
-    for( size_t undershootGuessStep( 0 );
-         undershootGuessStep < energyConservingUndershootAttempts;
-         ++undershootGuessStep )
-    {
-      if( potentialApproximation( 0.5 * ( undershootAuxiliary
-                                          + overshootAuxiliary ) ) < 0.0 )
-      {
-        overshootAuxiliary
-        = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-      }
-      else
-      {
-        undershootAuxiliary
-        = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-      }
-      // debugging:
-      /**/std::cout << "tried p = "
-      << ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) )
-      << ", V(p) = " << potentialApproximation( 0.5 * ( undershootAuxiliary
-                                                       + overshootAuxiliary ) )
-      << ", now undershootAuxiliary = " << undershootAuxiliary
-      << ", overshootAuxiliary = " << overshootAuxiliary;
-      std::cout << std::endl;/**/
-    }
-    // At this point we reset overshootAuxiliary for the integration including
-    // damping.
-    overshootAuxiliary = 1.0;
-    double
-    currentAuxiliary( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-    size_t shootAttempts( 0 );
-    double integrationRadius( longestLength );
-    double
-    initialIntegrationStep( initialFractionOfShortestLength * shortestLength );
-    // size_t integrationSteps( 0 );
-    std::vector< double > initialConditions( 2,
-                                             0.0 );
-    // The unit for the radial variable is 1/GeV.
-
-    // This loop is broken out of if the shoot attempt seems to have been close
-    // enough that the integration would take too long to find an overshoot or
-    // undershoot, or that the shot was dead on.
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Damped shooting:";
-    std::cout << std::endl;
-    size_t integrationSteps( 0 );/**/
-    BubbleProfile bubbleProfiler( potentialApproximation,
-                                   fieldDerivatives,
-                                   dampingFactor );
-    std::vector< BubbleRadialValueDescription > bubbleDescription;
-    while( (++shootAttempts) <= undershootOvershootAttempts )
-    {
-      bubbleDescription.resize( 1,
-                                BubbleRadialValueDescription( 0.0,
-                                                              0.0,
-                                                              0.0 ) );
-      // debugging:
-      /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
-      << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-      << currentAuxiliary;
-      std::cout << std::endl;/**/
-      initialConditions[ 0 ] = currentAuxiliary;
-      initialConditions[ 1 ] = 0.0;
-      integrationRadius = longestLength;
-      initialIntegrationStep
-      = ( initialFractionOfShortestLength * shortestLength );
-      bubbleProfiler.DoFirstStep( initialConditions,
-                                  currentAuxiliary,
-                                  initialIntegrationStep );
-      // odeintBubbleObserver.ResetValues( currentAuxiliary );
-      OdeintBubbleObserver odeintBubbleObserver( bubbleDescription );
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "after bubbleProfiler.DoFirstStep(...), initialConditions = { "
-      << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
-      << " }. initialIntegrationStep = " << initialIntegrationStep
-      << ", integrationRadius = " << integrationRadius;
-      std::cout << std::endl;/**/
-
-      // debugging:
-      /**/integrationSteps =/**/
-      boost::numeric::odeint::integrate( bubbleProfiler,
-                                         initialConditions,
-                                         initialIntegrationStep,
-                                         integrationRadius,
-                                         initialIntegrationStep,
-                                         odeintBubbleObserver );
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "integrationSteps = " << integrationSteps << ", bubble profile:"
-      << std::endl << odeintBubbleObserver.AsDebuggingString() << std::endl;
-      std::cout << std::endl;/**/
-
-      while( WorthIntegratingFurther( odeintBubbleObserver,
-                                      fieldsAsPolynomials ) )
-      {
-        integrationRadius *= 2.0;
-        std::vector< BubbleRadialValueDescription >::const_reverse_iterator
-        bubbleDescriptionIterator(
-                           odeintBubbleObserver.BubbleDescription().rbegin() );
-        initialConditions[ 0 ] = bubbleDescriptionIterator->auxiliaryValue;
-        initialConditions[ 1 ] = bubbleDescriptionIterator->auxiliarySlope;
-        initialIntegrationStep = bubbleDescriptionIterator->radialValue;
-        initialIntegrationStep -= (++bubbleDescriptionIterator)->radialValue;
-
-        // debugging:
-        /**/std::cout << std::endl << "debugging:"
-        << std::endl
-        << "after start of loop, initialConditions = { "
-        << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
-        << " }. initialIntegrationStep = " << initialIntegrationStep
-        << ", integrationRadius = " << integrationRadius;
-        std::cout << std::endl;/**/
-
-        /**/integrationSteps =/**/
-        boost::numeric::odeint::integrate( bubbleProfiler,
-                                           initialConditions,
-                                           ( 0.5 * integrationRadius ),
-                                           integrationRadius,
-                                           initialIntegrationStep,
-                                           odeintBubbleObserver );
-
-        // debugging:
-        /**/std::cout << std::endl << "debugging:"
-        << std::endl
-        << "integrationSteps = " << integrationSteps << ", bubble profile:"
-        << std::endl << odeintBubbleObserver.AsDebuggingString();
-        std::cout << std::endl;/**/
-      }
-      // Now we have to decide if initialConditions[ 0 ] is the new
-      // undershootAuxiliary or overshootAuxiliary, or if we need to extend
-      // integrationRadius, or if the current guess overshoots with a
-      // negligible amount of kinetic energy.
-
-      if( odeintBubbleObserver.DefinitelyUndershot() )
-      {
-        undershootAuxiliary = currentAuxiliary;
-      }
-      else if( odeintBubbleObserver.DefinitelyOvershot() )
-      {
-        overshootAuxiliary = currentAuxiliary;
-      }
-      else
-      {
-        // We break out of the loop leaving currentAuxiliary as it is if the
-        // shot was good enough.
-        break;
-      }
-      currentAuxiliary
-      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-    }
-    // At the end of the loop, currentAuxiliary is either within
-    // 2^(-undershootOvershootAttempts) of p_crit, or was close enough that the
-    // integration to decide if it was an undershot or overshot would take too
-    // long.
-
-    // debugging:
-    /**/OdeintBubbleObserver odeintBubbleObserver( bubbleDescription );
-    std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Final bubble profile:"
-    << std::endl << odeintBubbleObserver.AsDebuggingString();
-    std::cout << std::endl;/**/
-
-    bounceAction = 0.0;
-    double previousIntegrand( 0.0 );
-    // The bounce action density at r = 0 is 0 by merit of
-    // r_0^dampingFactor = 0,
-    // dp/dr = 0 at r = 0,
-    // and potentialApproximation(p(0)) = 0 by construction.
-    double currentIntegrand( 0.0 );
-    double previousRadius( 0.0 );
-    double currentRadius( 0.0 );
-    double halfAuxiliarySlopeSquared( 0.0 );
-    double fieldDerivativeValue( 0.0 );
-    double fieldDerivativeSquared( 0.0 );
-    std::vector< BubbleRadialValueDescription > const&
-    bubbleProfile( odeintBubbleObserver.BubbleDescription() );
-    for( unsigned int radiusIndex( 1 );
-         radiusIndex < bubbleProfile.size();
-         ++radiusIndex )
-    {
-      previousRadius = currentRadius;
-      previousIntegrand = currentIntegrand;
-      currentRadius = bubbleProfile[ radiusIndex ].radialValue;
-      currentAuxiliary = bubbleProfile[ radiusIndex ].auxiliaryValue;
-      halfAuxiliarySlopeSquared = bubbleProfile[ radiusIndex ].auxiliarySlope;
-      halfAuxiliarySlopeSquared *= ( 0.5 * halfAuxiliarySlopeSquared );
-      fieldDerivativeSquared = 0.0;
-      for( std::vector< SimplePolynomial >::const_iterator
-           fieldDerivative( fieldDerivatives.begin() );
-           fieldDerivative < fieldDerivatives.end();
-           ++fieldDerivative )
-      {
-        fieldDerivativeValue = (*fieldDerivative)( currentAuxiliary );
-        fieldDerivativeSquared
-        += ( fieldDerivativeValue * fieldDerivativeValue );
-      }
-      currentIntegrand
-      = ( pow( currentRadius,
-               dampingFactor )
-          * ( halfAuxiliarySlopeSquared
-              + potentialApproximation( currentAuxiliary ) ) );
-      bounceAction += ( ( currentIntegrand + previousIntegrand )
-                        * ( currentRadius - previousRadius ) );
-      // A common factor of 1/2 is being left until after the loop.
-    }
-    // The common factor of 1/2 is combined with the solid angle of
-    // 2 pi^2 (quantum) or 4 pi (thermal):
-    if( nonZeroTemperature )
-    {
-      bounceAction *= ( 2.0 * M_PI );
-    }
-    else
-    {
-      bounceAction *= ( M_PI * M_PI );
-    }
-
-    if( nonZeroTemperature )
-    {
-      return ( ( bounceAction / givenTemperature ) + log( bounceAction ) );
-    }
-    else
-    {
-      return bounceAction;
-    }
-  }
-
-
-  // This sets fieldsAsPolynomials to be the parameterized path at the
-  // temperature given by pathParameterization.back(), as well as setting
-  // thermalFalseVacuumPotential, and thermalTrueVacuumPotential
-  // appropriately. There is no return value optimization because we cannot
-  // be sure that poor physicist users will have access to a C++11-compliant
-  // compiler.
-  void ModifiedBounceForMinuit::SetUpThermalPath(
-                             std::vector< double > const& pathParameterization,
-                          std::vector< SimplePolynomial >& fieldsAsPolynomials,
-                             std::vector< SimplePolynomial >& fieldDerivatives,
-                                                 double const givenTemperature,
-                                           double& thermalFalseVacuumPotential,
-                                     double& thermalTrueVacuumPotential ) const
-  {
+    double const givenTemperature( pathParameterization.back() );
     PotentialForMinuit potentialForMinuit( potentialFunction );
     potentialForMinuit.SetTemperature( givenTemperature );
     MinuitManager thermalDsbFinder( potentialForMinuit );
 
     MinuitMinimum
     thermalTrueVacuum( thermalDsbFinder( trueVacuum.FieldConfiguration() ) );
-    thermalTrueVacuumPotential = ( thermalTrueVacuum.FunctionValue()
-                                   + potentialForMinuit.FunctionAtOrigin() );
+    double const thermalTrueVacuumPotential( thermalTrueVacuum.FunctionValue()
+                                     + potentialForMinuit.FunctionAtOrigin() );
     // We undo the offset from potentialFromMinuit.
 
     double straightPathLengthSquared( 0.0 );
-    double fieldDifference( 0.0 );
-
-    if( givenTemperature >= falseVacuumEvaporationTemperature )
+    std::vector< double >&
+    straightPath( thermalTrueVacuum.VariableValues() );
+    // Might as well put stuff straight into
+    // thermalTrueVacuum.VariableValues() as it won't be used later anyway.
+    bool const falseMinimumNotEvaporated( givenTemperature
+                                         < falseVacuumEvaporationTemperature );
+    if( falseMinimumNotEvaporated )
     {
-      thermalFalseVacuumPotential
-      = potentialFunction( potentialFunction.FieldValuesOrigin(),
-                           givenTemperature );
-
+      MinuitMinimum thermalFalseVacuum( thermalDsbFinder(
+                                          falseVacuum.FieldConfiguration() ) );
+      // We undo the offset from potentialFromMinuit.
       for( unsigned int fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        fieldDifference = thermalTrueVacuum.VariableValues()[ fieldIndex ];
-        straightPathLengthSquared += ( fieldDifference * fieldDifference );
+        straightPath[ fieldIndex ]
+        -= thermalFalseVacuum.VariableValues()[ fieldIndex ];
+        straightPathLengthSquared += ( straightPath[ fieldIndex ]
+                                       * straightPath[ fieldIndex ] );
       }
-      pathFromNodes( pathParameterization,
-                     thermalTrueVacuum.VariableValues(),
-                     ( 1.0 / straightPathLengthSquared ),
-                     potentialFunction.FieldValuesOrigin(),
-                     fieldsAsPolynomials,
-                     fieldDerivatives );
+      return pathFromNodes( pathParameterization,
+                            straightPath,
+                            ( 1.0 / straightPathLengthSquared ),
+                            thermalFalseVacuum.VariableValues(),
+                            ( thermalFalseVacuum.FunctionValue()
+                              + potentialForMinuit.FunctionAtOrigin() ),
+                            thermalTrueVacuumPotential,
+                            givenTemperature );
     }
     else
     {
-      std::vector< double >&
-      straightPath( thermalTrueVacuum.VariableValues() );
-      // Might as well put stuff straight into
-      // thermalTrueVacuum.VariableValues() as it won't be used later anyway.
-      MinuitMinimum thermalFalseVacuum( thermalDsbFinder(
-                                          falseVacuum.FieldConfiguration() ) );
-      thermalFalseVacuumPotential = ( thermalFalseVacuum.FunctionValue()
-                                     + potentialForMinuit.FunctionAtOrigin() );
-      // We undo the offset from potentialFromMinuit.
-
       for( unsigned int fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        fieldDifference = ( straightPath[ fieldIndex ]
-                         - thermalFalseVacuum.VariableValues()[ fieldIndex ] );
-        straightPathLengthSquared += ( fieldDifference * fieldDifference );
-        straightPath[ fieldIndex ] = fieldDifference;
+        straightPathLengthSquared += ( straightPath[ fieldIndex ]
+                                       * straightPath[ fieldIndex ] );
       }
-      pathFromNodes( pathParameterization,
-                     straightPath,
-                     ( 1.0 / straightPathLengthSquared ),
-                     thermalFalseVacuum.VariableValues(),
-                     fieldsAsPolynomials,
-                     fieldDerivatives );
+      return pathFromNodes( pathParameterization,
+                            straightPath,
+                            ( 1.0 / straightPathLengthSquared ),
+                            potentialFunction.FieldValuesOrigin(),
+                      potentialFunction( potentialFunction.FieldValuesOrigin(),
+                                         givenTemperature ),
+                            thermalTrueVacuumPotential,
+                            givenTemperature );
     }
   }
 
@@ -680,15 +230,42 @@ namespace VevaciousPlusPlus
     Eigen::VectorXd potentialValues( numberOfNonZeroCoefficients );
     Eigen::MatrixXd coefficientMatrix( numberOfNonZeroCoefficients,
                                        numberOfNonZeroCoefficients );
-    double const
-    finalCoefficientPart( pow( auxiliaryValue,
-                               potentialApproximationPower )
-                          / (double)potentialApproximationPower );
+    // We want to solve coefficientMatrix * c = potentialValues for the
+    // coefficients c. Since the potential approximation begins with the
+    // quadratic term, coefficientMatrix, for n auxiliary values x_1 to x_n and
+    // potentialApproximationPower = d, looks like
+    // [ [ x_1^2, x_1^3, ..., x_1^d ],
+    //   [ x_2^2, x_2^3, ..., x_2^d ],
+    //   ...,
+    //   [ x_n^2, x_n^3, ..., x_n^d ] ], and is n * (d-1) in size. However, we
+    // also fix c_d = (-1/d) * (2 c_2 + 3 c_3 + ... + (d-1) c_(d-1)) so that
+    // V(1) is also a minimum (well, extremum, but we hope that the
+    // approximation works out so that it is a minimum). Hence we can just take
+    // coefficientMatrix to be n * (d-2) in size, noting that c_j multiplies
+    // ( x^j - (j/d) x^d ) having substituted in for c_d. Therefore,
+    // coefficientMatrix looks like
+    // [ [ ( x_1^2 - (2/d) x_1^d ), ( x_1^3- (3/d) x_1^d ), ...,
+    //                                        ( x_1^(d-1)- ((d-1)/d) x_1^d ) ],
+    //   ...,
+    //   [ ( x_n^2 - (2/d) x_n^d ), ( x_n^3- (3/d) x_n^d ), ...,
+    //                                       ( x_n^(d-1)- ((d-1)/d) x_n^d ) ] ]
+    // and also x_j is simply (j/n).
+
+    double finalCoefficientPart( NAN );
+    double const finalCoefficientDenominatorInverse( 1.0 /
+                                            ( pow( numberOfNonZeroCoefficients,
+                                                  potentialApproximationPower )
+                                             * potentialApproximationPower ) );
+    // This gives the recurring (1/d(n^d)) from (j/d) x_k^d = (j/d) (k/n)^d.
+    // It is multiplied by j k^d.
+    // This corresponds now to k = whichStep + 1, j = whichPower in the
+    // following nested loops.
     for( unsigned int whichStep( 0 );
          whichStep < ( numberOfNonZeroCoefficients - 1 );
          ++whichStep )
     {
       auxiliaryValue += auxiliaryStep;
+      // Now auxiliaryValue = x_k = k/n.
       std::vector< double > const&
       fieldConfiguration( pathFieldsAndPotential.FieldConfiguration(
                                                             auxiliaryValue ) );
@@ -716,6 +293,10 @@ namespace VevaciousPlusPlus
                                     pathFieldsAndPotential.GivenTemperature() )
                                        - falseVacuumPotential );
 
+      finalCoefficientPart = ( pow( ( whichStep + 1 ),
+                                    potentialApproximationPower )
+                               * finalCoefficientDenominatorInverse );
+      // Now finalCoefficientPart = (k^d)/(d(n^d)) = ( (j/d) x_k^d )/j.
       for( unsigned int whichPower( 2 );
            whichPower < potentialApproximationPower;
            ++whichPower )
@@ -725,6 +306,7 @@ namespace VevaciousPlusPlus
         = ( pow( auxiliaryValue,
                  whichPower )
             - ( (double)whichPower * finalCoefficientPart ) );
+        // Now coefficientMatrix( k, (j-2) ) = x_k^j - (j/d) x_k^d.
       }
     }
     potentialValues( numberOfNonZeroCoefficients - 1 )
@@ -735,12 +317,15 @@ namespace VevaciousPlusPlus
     << std::endl;
     std::cout << "potentialValues =" << std::endl << potentialValues;
     std::cout << std::endl;/**/
+    finalCoefficientPart = ( 1.0 / potentialApproximationPower );
     for( unsigned int whichPower( 0 );
          whichPower < numberOfNonZeroCoefficients;
          ++whichPower )
     {
       coefficientMatrix( ( numberOfNonZeroCoefficients - 1 ),
-                         whichPower ) = 1.0;
+                         whichPower )
+      = ( 1.0 - ( (double)( whichPower + 2 ) * finalCoefficientPart ) );
+      // Now coefficientMatrix( n, (j-2) ) = 1^j - (j/d) 1^d.
     }
     std::cout << std::endl << "coefficientMatrix =" << std::endl
     << coefficientMatrix;
@@ -865,6 +450,13 @@ namespace VevaciousPlusPlus
   double ModifiedBounceForMinuit::EffectiveBounceAction(
                    PathFieldsAndPotential const& pathFieldsAndPotential ) const
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "ModifiedBounceForMinuit::EffectiveBounceAction("
+    << " pathFieldsAndPotential =" << std::endl
+    << pathFieldsAndPotential.AsDebuggingString() << " ) called.";
+    std::cout << std::endl;/**/
     BubbleProfile bubbleProfile( pathFieldsAndPotential,
                           ( initialFractionOfShortestLength * shortestLength ),
                                  longestLength );

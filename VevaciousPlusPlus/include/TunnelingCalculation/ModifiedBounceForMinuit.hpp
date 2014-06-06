@@ -30,7 +30,7 @@ namespace VevaciousPlusPlus
                              PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
                              double const dsbEvaporationTemperature,
-                             size_t const undershootOvershootAttempts = 8,
+                             size_t const undershootOvershootAttempts = 16,
                              size_t const maximumMultipleOfLongestLength = 16,
                            double const initialFractionOfShortestLength = 0.05,
                            size_t const energyConservingUndershootAttempts = 4,
@@ -111,19 +111,24 @@ namespace VevaciousPlusPlus
     // zero-temperature vacua) is given by zeroTemperatureStraightPath.
     std::vector< double > zeroTemperatureStraightPath;
     double zeroTemperatureStraightPathInverseLengthSquared;
-    double const fieldOriginPotential;
     double const falseVacuumPotential;
     double const trueVacuumPotential;
     double const falseVacuumEvaporationTemperature;
-    double const minimumScaleSquared;
     double const tunnelingScaleSquared;
     double shortestLength;
     double longestLength;
     size_t const undershootOvershootAttempts;
     size_t const energyConservingUndershootAttempts;
-    size_t const maximumMultipleOfLongestLength;
     double const initialFractionOfShortestLength;
     double const shootingThreshold;
+
+    // This returns true if pathParameterization.size() is only
+    // pathFromNodes.ParameterizationSize() (hence T = 0.0 is implicit) or if
+    // pathParameterization.back() <= 0.0; otherwise false is returned, or an
+    // exception is thrown if pathParameterization.size() is not
+    // ( pathFromNodes.ParameterizationSize() + 1 ).
+    bool ZeroTemperatureParameterization(
+                     std::vector< double > const& pathParameterization ) const;
 
     // This turns pathParameterization into a PathFieldsAndPotential, by first
     // checking for a non-zero temperature, then setting up the straight path
@@ -148,19 +153,6 @@ namespace VevaciousPlusPlus
     // [S_4 or ((S_3(T)/T + ln(S_3(T)))].
     double EffectiveBounceAction(
                   PathFieldsAndPotential const& pathFieldsAndPotential ) const;
-
-    // This sets fieldsAsPolynomials to be the parameterized path at the
-    // temperature given by pathParameterization.back(), as well as setting
-    // thermalFalseVacuumPotential, and thermalTrueVacuumPotential
-    // appropriately. There is no return value optimization because we cannot
-    // be sure that poor physicist users will have access to a C++11-compliant
-    // compiler.
-    void SetUpThermalPath( std::vector< double > const& pathParameterization,
-                          std::vector< SimplePolynomial >& fieldsAsPolynomials,
-                           std::vector< SimplePolynomial >& fieldDerivatives,
-                           double const givenTemperature,
-                           double& thermalFalseVacuumPotential,
-                           double& thermalTrueVacuumPotential ) const;
 
     // This puts a polynomial approximation of the potential along the path
     // given by pathFieldsAndPotential into pathFieldsAndPotential.
@@ -222,6 +214,7 @@ namespace VevaciousPlusPlus
   {
     PathFieldsAndPotential
     pathFieldsAndPotential( DecodePathParameters( pathParameterization ) );
+    PotentialAlongPath( pathFieldsAndPotential );
     // We return a thin-wall approximation if appropriate:
     bool thinWallIsGoodApproximation( false );
     double bounceAction( ThinWallApproximation( pathFieldsAndPotential,
@@ -264,6 +257,35 @@ namespace VevaciousPlusPlus
     pathFromNodes.InitialStepsForMinuit( initialStepSizes,
                                          zeroTemperatureStraightPath,
                                          stepSizeFraction );
+  }
+
+  // This returns true if pathParameterization.size() is only
+  // pathFromNodes.ParameterizationSize() (hence T = 0.0 is implicit) or if
+  // pathParameterization.back() <= 0.0; otherwise false is returned, or an
+  // exception is thrown if pathParameterization.size() is not
+  // ( pathFromNodes.ParameterizationSize() + 1 ).
+  inline bool ModifiedBounceForMinuit::ZeroTemperatureParameterization(
+                      std::vector< double > const& pathParameterization ) const
+  {
+    if( pathParameterization.size() == pathFromNodes.ParameterizationSize() )
+    {
+      return true;
+    }
+    if( pathParameterization.size()
+        == ( pathFromNodes.ParameterizationSize() + 1 ) )
+    {
+      return ( pathParameterization.back() <= 0.0 );
+    }
+    std::stringstream errorStream;
+    errorStream << "ModifiedBounceForMinuit::operator() was given a wrong"
+    << " number of parameters: " << pathParameterization.size()
+    << "; it should have been given "
+    << pathFromNodes.NumberOfVaryingPathNodes() << " nodes each of "
+    << pathFromNodes.NumberOfParameterizationFields()
+    << " fields, optionally 1 extra parameter for the temperature at the"
+    << " end, so " << pathFromNodes.ParameterizationSize() << " or "
+    << ( pathFromNodes.ParameterizationSize() + 1 ) << " parameters.";
+    throw std::range_error( errorStream.str() );
   }
 
 } /* namespace VevaciousPlusPlus */

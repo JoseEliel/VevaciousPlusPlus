@@ -19,6 +19,7 @@ namespace VevaciousPlusPlus
   {
   public:
     PathFieldsAndPotential( Eigen::MatrixXd const& pathCoefficients,
+                         std::vector< double > const& falseVacuumConfiguration,
                             double const falseVacuumDepth,
                             double const trueVacuumDepth,
                             double const givenTemperature );
@@ -73,9 +74,13 @@ namespace VevaciousPlusPlus
     // temperature, 3.0 for zero temperature.
     double DampingFactor() const;
 
+    // This is for debugging.
+    std::string AsDebuggingString() const;
+
 
   protected:
     SimplePolynomial potentialApproximation;
+    size_t const numberOfFields;
     std::vector< SimplePolynomial > fieldPath;
     std::vector< SimplePolynomial > pathTangent;
     std::vector< double > fieldConfiguration;
@@ -103,7 +108,7 @@ namespace VevaciousPlusPlus
                                                1 );
     std::vector< double >&
     potentialVector( potentialApproximation.CoefficientVector() );
-    size_t const approximationDegree( potentialVector.size() - 1 );
+    size_t const approximationDegree( potentialCoefficients.rows() + 1 );
     double finalCoefficientTimesMaxPower( 0.0 );
     for( size_t whichPower( 2 );
          whichPower < approximationDegree;

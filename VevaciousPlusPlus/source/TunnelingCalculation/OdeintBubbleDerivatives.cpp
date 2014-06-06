@@ -15,23 +15,90 @@ namespace VevaciousPlusPlus
     potentialDerivative(),
     firstDerivatives( pathFieldsAndPotential.FieldDerivatives() ),
     numberOfFields( pathFieldsAndPotential.FieldDerivatives().size() ),
-    secondDerivatives( numberOfFields ),
+    secondDerivatives( firstDerivatives.size() ),
     dampingFactor( pathFieldsAndPotential.DampingFactor() )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "OdeintBubbleDerivatives::OdeintBubbleDerivatives("
+    << " pathFieldsAndPotential ="
+    << pathFieldsAndPotential.AsDebuggingString() << " ) called.";
+    std::cout << std::endl;/**/
     potentialDerivative.BecomeFirstDerivativeOf(
                              pathFieldsAndPotential.PotentialApproximation() );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "potentialDerivative = " << potentialDerivative.AsDebuggingString();
+    std::cout << std::endl;/**/
+
     for( unsigned int fieldIndex( 0 );
          fieldIndex < firstDerivatives.size();
          ++fieldIndex )
     {
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "firstDerivatives[ " << fieldIndex << " ] = "
+      << firstDerivatives[ fieldIndex ].AsDebuggingString();
+      std::cout << std::endl;/**/
       secondDerivatives[ fieldIndex ].BecomeFirstDerivativeOf(
                                               firstDerivatives[ fieldIndex ] );
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "secondDerivatives[ " << fieldIndex << " ] = "
+      << secondDerivatives[ fieldIndex ].AsDebuggingString();
+      std::cout << std::endl;/**/
     }
   }
 
   OdeintBubbleDerivatives::~OdeintBubbleDerivatives()
   {
     // This does nothing.
+  }
+
+
+  // This is in the form required for the Boost odeint package.
+  void OdeintBubbleDerivatives::operator()(
+                      std::vector< double > const& auxiliaryAndFirstDerivative,
+                              std::vector< double >& firstAndSecondDerivatives,
+                                          double const radialValue )
+  {
+    double const auxiliaryValue( auxiliaryAndFirstDerivative[ 0 ] );
+    // This cheats if there has already been an overshoot, to try to avoid the
+    // integration going to small step sizes to resolve the oscillations of the
+    // field going off to infinity.
+    if( auxiliaryValue < 0.0 )
+    {
+      firstAndSecondDerivatives[ 0 ] = 0.0;
+      firstAndSecondDerivatives[ 1 ] = 0.0;
+      return;
+    }
+    double const auxiliaryDerivative( auxiliaryAndFirstDerivative[ 1 ] );
+    double firstDerivativeValue( 0.0 );
+    double fieldDerivativeSquared( 0.0 );
+    double fieldFirstDotSecondDerivatives( 0.0 );
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      firstDerivativeValue = firstDerivatives[ fieldIndex ]( auxiliaryValue );
+      fieldDerivativeSquared
+      += ( firstDerivativeValue * firstDerivativeValue );
+      fieldFirstDotSecondDerivatives
+      += ( firstDerivativeValue
+           * secondDerivatives[ fieldIndex ]( auxiliaryValue ) );
+    }
+    firstAndSecondDerivatives[ 0 ] = auxiliaryDerivative;
+    firstAndSecondDerivatives[ 1 ]
+     = ( ( ( potentialDerivative( auxiliaryValue )
+             - ( fieldFirstDotSecondDerivatives
+                 * auxiliaryDerivative * auxiliaryDerivative ) )
+           / fieldDerivativeSquared )
+         - ( ( dampingFactor * auxiliaryDerivative ) / radialValue ) );
   }
 
 } /* namespace VevaciousPlusPlus */

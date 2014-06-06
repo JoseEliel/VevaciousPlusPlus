@@ -9,6 +9,7 @@
 #define BUBBLEPROFILE_HPP_
 
 #include "../CommonIncludes.hpp"
+#include "boost/numeric/odeint/integrate/integrate.hpp"
 #include "../PotentialEvaluation/SimplePolynomial.hpp"
 #include "PathFieldsAndPotential.hpp"
 #include "OdeintBubbleDerivatives.hpp"
@@ -52,6 +53,7 @@ namespace VevaciousPlusPlus
     OdeintBubbleDerivatives bubbleDerivatives;
     OdeintBubbleObserver bubbleObserver;
     double integrationStepSize;
+    double integrationStartRadius;
     double integrationEndRadius;
     double undershootAuxiliary;
     double overshootAuxiliary;
@@ -91,14 +93,6 @@ namespace VevaciousPlusPlus
   inline void BubbleProfile::UndampedUndershoot(
                               size_t const energyConservingUndershootAttempts )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "BubbleProfile::UndampedUndershoot( "
-    << energyConservingUndershootAttempts << " ) called:"
-    << std::endl << "undershootAuxiliary = " << undershootAuxiliary
-    << ", overshootAuxiliary = " << overshootAuxiliary;
-    std::cout << std::endl;/**/
     for( size_t undershootGuessStep( 0 );
          undershootGuessStep < energyConservingUndershootAttempts;
          ++undershootGuessStep )
@@ -114,13 +108,6 @@ namespace VevaciousPlusPlus
       {
         undershootAuxiliary = initialAuxiliary;
       }
-      // debugging:
-      /**/std::cout << "tried currentAuxiliary = " << initialAuxiliary
-      << ", V(p) = "
-      << pathFieldsAndPotential.PotentialApproximation( initialAuxiliary )
-      << ", now undershootAuxiliary = " << undershootAuxiliary
-      << ", overshootAuxiliary = " << overshootAuxiliary;
-      std::cout << std::endl;/**/
     }
     // At this point we reset overshootAuxiliary for the integration including
     // damping.
@@ -146,7 +133,7 @@ namespace VevaciousPlusPlus
     size_t integrationSteps =/**/
     boost::numeric::odeint::integrate( bubbleDerivatives,
                                        initialConditions,
-                                       integrationStepSize,
+                                       integrationStartRadius,
                                        integrationEndRadius,
                                        integrationStepSize,
                                        bubbleObserver );
@@ -155,8 +142,8 @@ namespace VevaciousPlusPlus
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "integrationSteps = " << integrationSteps << ", bubble profile:";
+    << std::endl << "integrationSteps = " << integrationSteps
+    << ", bubble profile:" << std::endl;
     for( std::vector< BubbleRadialValueDescription >::const_iterator
          bubbleBit( auxiliaryProfile.begin() );
          bubbleBit < auxiliaryProfile.end();

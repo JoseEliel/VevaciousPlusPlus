@@ -22,6 +22,13 @@ namespace VevaciousPlusPlus
                                                      pathStepSize ) )
   {
     // This constructor is just an initialization list.
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PathFromNodes::PathFromNodes( " << numberOfFields << ", "
+    << referenceFieldIndex << ", " << numberOfVaryingPathNodes
+    << " ) called. pathStepInversion =" << std::endl << pathStepInversion;
+    std::cout << std::endl;/**/
   }
 
   PathFromNodes::~PathFromNodes()
@@ -192,7 +199,10 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "pathNodes =" << std::endl << pathNodes;
+    << "pathNodes =" << std::endl << pathNodes
+    << std::endl
+    << "( pathStepInversion * pathNodes )" << std::endl
+    << ( pathStepInversion * pathNodes );
     std::cout << std::endl;/**/
     // Once we have a set of nodes, we might want to project them from planes
     // perpendicular to v onto maybe hyperbolae? I dunno, something to maybe
@@ -202,7 +212,15 @@ namespace VevaciousPlusPlus
 
     // Getting the polynomial coefficients from the nodes is as easy as a
     // simple matrix multiplication:
-    return PathFieldsAndPotential( ( pathStepInversion * pathNodes ),
+    Eigen::MatrixXd const pathCoefficients( pathStepInversion * pathNodes );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "pathCoefficients =" << std::endl << pathCoefficients;
+    std::cout << std::endl;/**/
+
+    return PathFieldsAndPotential( pathCoefficients,
+                                   falseVacuumConfiguration,
                                    falseVacuumDepth,
                                    trueVacuumDepth,
                                    givenTemperature );

@@ -85,6 +85,8 @@ namespace VevaciousPlusPlus
     std::cout
     << "test path bounce = " << modifiedBounceForMinuit( initialStepSizes );
     std::cout << std::endl;/**/
+
+    // Should now do migrad
   }
 
   // This should set thermalSurvivalProbability and

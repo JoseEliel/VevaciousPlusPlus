@@ -5,70 +5,143 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/TunnelingCalculation/PathFieldsAndPotential.hpp"
+#include "../../include/TunnelingCalculation.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  PathFieldsAndPotential::PathFieldsAndPotential() :
-    fieldConfiguration( fieldPath.size() )
+  PathFieldsAndPotential::PathFieldsAndPotential(
+                                       Eigen::MatrixXd const& pathCoefficients,
+                         std::vector< double > const& falseVacuumConfiguration,
+                                                double const falseVacuumDepth,
+                                                 double const trueVacuumDepth,
+                                              double const givenTemperature ) :
+    potentialApproximation(),
+    numberOfFields( pathCoefficients.cols() ),
+    fieldPath( numberOfFields,
+               SimplePolynomial( pathCoefficients.rows() + 1 ) ),
+    pathTangent( fieldPath ),
+    fieldConfiguration( fieldPath.size(),
+                        0.0 ),
+    falseVacuumDepth( falseVacuumDepth ),
+    trueVacuumDepth( trueVacuumDepth ),
+    nonZeroTemperature( givenTemperature > 0.0 ),
+    givenTemperature( givenTemperature )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "STILL NEEDS WORK!";
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PathFieldsAndPotential::PathFieldsAndPotential( ... ) called.";
+    std::cout << std::endl;
+    std::cout << "pathCoefficients =" << std::endl << pathCoefficients;
     std::cout << std::endl;/**/
-    fieldsAsPolynomials.resize( numberOfFields,
-                            SimplePolynomial( numberOfVaryingPathNodes + 2 ) );
-    fieldDerivativesAsPolynomials = fieldsAsPolynomials;
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      std::vector< double >& coefficientVector(
-                       fieldsAsPolynomials[ fieldIndex ].CoefficientVector() );
+      std::vector< double >&
+      coefficientVector( fieldPath[ fieldIndex ].CoefficientVector() );
       coefficientVector[ 0 ] = falseVacuumConfiguration[ fieldIndex ];
-      for( unsigned int coefficientIndex( 0 );
-           coefficientIndex <= numberOfVaryingPathNodes;
+      for( size_t coefficientIndex( 0 );
+           coefficientIndex < pathCoefficients.rows();
            ++coefficientIndex )
       {
         coefficientVector[ coefficientIndex + 1 ]
         = pathCoefficients( coefficientIndex,
                             fieldIndex );
       }
-      fieldDerivativesAsPolynomials[ fieldIndex ]
-      = fieldsAsPolynomials[ fieldIndex ].FirstDerivative();
+      pathTangent[ fieldIndex ].BecomeFirstDerivativeOf(
+                                                     fieldPath[ fieldIndex ] );
     }
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "PathFromNodes::operator() finishing; fieldsAsPolynomials now is"
+    << "PathFieldsAndPotential::PathFieldsAndPotential(...) finishing;"
+    << " fieldPath now is"
     << std::endl;
     for( std::vector< SimplePolynomial >::const_iterator
-         fieldAsPolynomial( fieldsAsPolynomials.begin() );
-         fieldAsPolynomial < fieldsAsPolynomials.end();
+         fieldAsPolynomial( fieldPath.begin() );
+         fieldAsPolynomial < fieldPath.end();
          ++fieldAsPolynomial )
     {
       std::cout << fieldAsPolynomial->AsDebuggingString() << std::endl;
     }
-    std::cout << "fieldDerivativesAsPolynomials now is"
+    std::cout << "pathTangent now is"
     << std::endl;
     for( std::vector< SimplePolynomial >::const_iterator
-         fieldAsPolynomial( fieldDerivativesAsPolynomials.begin() );
-         fieldAsPolynomial < fieldDerivativesAsPolynomials.end();
+         fieldAsPolynomial( pathTangent.begin() );
+         fieldAsPolynomial < pathTangent.end();
          ++fieldAsPolynomial )
     {
       std::cout << fieldAsPolynomial->AsDebuggingString() << std::endl;
     }
-    std::cout << "(2 sets of " << fieldDerivativesAsPolynomials.size()
+    std::cout << "(2 sets of " << pathTangent.size()
     << " polynomials)";
+    std::cout << std::endl;/**/
+  }
+
+  PathFieldsAndPotential::PathFieldsAndPotential(
+                                   PathFieldsAndPotential const& copySource ) :
+    potentialApproximation( copySource.potentialApproximation ),
+    numberOfFields( copySource.numberOfFields ),
+    fieldPath( copySource.fieldPath ),
+    pathTangent( copySource.pathTangent ),
+    fieldConfiguration( copySource.fieldConfiguration ),
+    falseVacuumDepth( copySource.falseVacuumDepth ),
+    trueVacuumDepth( copySource.trueVacuumDepth ),
+    nonZeroTemperature( copySource.nonZeroTemperature ),
+    givenTemperature( copySource.givenTemperature )
+  {
+    // This constructor is just an initialization list.
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PathFieldsAndPotential copy constructor called.";
     std::cout << std::endl;/**/
   }
 
   PathFieldsAndPotential::~PathFieldsAndPotential()
   {
-    // TODO Auto-generated destructor stub
+    // This does nothing.
+  }
+
+
+  // This is for debugging.
+  std::string PathFieldsAndPotential::AsDebuggingString() const
+  {
+    std::stringstream returnStream;
+    returnStream << "potentialApproximation = "
+    << potentialApproximation.AsDebuggingString() << std::endl
+    << "numberOfFields = " << numberOfFields << std::endl << "fieldPath = { ";
+    for( std::vector< SimplePolynomial >::const_iterator
+         fieldAsPolynomial( fieldPath.begin() );
+         fieldAsPolynomial < fieldPath.end();
+         ++fieldAsPolynomial )
+    {
+      if( fieldAsPolynomial != fieldPath.begin() )
+      {
+        returnStream << "," << std::endl;
+      }
+      returnStream << fieldAsPolynomial->AsDebuggingString();
+    }
+    returnStream << " }" << std::endl << "pathTangent = {";
+    for( std::vector< SimplePolynomial >::const_iterator
+         fieldAsPolynomial( pathTangent.begin() );
+         fieldAsPolynomial < pathTangent.end();
+         ++fieldAsPolynomial )
+    {
+      if( fieldAsPolynomial != pathTangent.begin() )
+      {
+        returnStream << "," << std::endl;
+      }
+      returnStream << fieldAsPolynomial->AsDebuggingString();
+    }
+    returnStream << " }" << std::endl
+    << "falseVacuumDepth = " << falseVacuumDepth << ", trueVacuumDepth = "
+    << trueVacuumDepth << ", nonZeroTemperature = " << nonZeroTemperature
+    << ", givenTemperature = " << givenTemperature;
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */
