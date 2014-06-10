@@ -333,7 +333,7 @@ int main( int argumentCount,
   {
     vevaciousPlusPlus.RunPoint( slhaFile );
     vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "output",
-                                                      ( slhaFile + ".vout" ) ) );
+                                                    ( slhaFile + ".vout" ) ) );
     vevaciousPlusPlus.WriteSlhaResults( slhaFile );
   }
 
@@ -422,6 +422,12 @@ int main( int argumentCount,
   << fixedScalePotential( fixedScalePotential.DsbFieldValues() )
   << std::endl;
 
+  fixedScalePotential.WriteAsPython( "CtTest.py" );
+  std::cout
+  << "Wrote Python. fixedScalePotential.AsDebuggingString() =" << std::endl
+  << fixedScalePotential.AsDebuggingString()
+  << std::endl;
+
   /**/
   std::cout
   << std::endl
@@ -444,14 +450,16 @@ int main( int argumentCount,
   {
     testConfiguration[ 0 ] = ( 0.1
                                * (double)vdStep
-                               * fixedScalePotential.DsbFieldValues()[ 0 ] );
+                               //* fixedScalePotential.DsbFieldValues()[ 0 ] );
+                               * 1.0 );
     for( int vuStep( 0 );
          vuStep < 13;
          ++vuStep )
     {
       testConfiguration[ 1 ] = ( 0.1
                                  * (double)vuStep
-                                 * fixedScalePotential.DsbFieldValues()[ 1 ] );
+                                 //* fixedScalePotential.DsbFieldValues()[ 1 ] );
+                                 * 1.0 );
       std::cout << "For "
       << fixedScalePotential.FieldConfigurationAsMathematica(
                                                             testConfiguration )

@@ -11,6 +11,7 @@
 #include "../CommonIncludes.hpp"
 #include "../PotentialEvaluation/SimplePolynomial.hpp"
 #include "Eigen/Dense"
+#include "SplinePotential.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -28,15 +29,6 @@ namespace VevaciousPlusPlus
     ~PathFieldsAndPotential();
 
 
-    // This sets potentialApproximation to be a SimplePolynomial based on
-    // potentialCoefficients with a leading power of 2, also adding a final
-    // coefficient (for a term with power 1 higher than given by
-    // potentialCoefficients + 2 for the leading power, so its size + 2 (as it
-    // gives coefficients for powers 2 to its size + 1)) which makes the
-    // potential have a minimum when the auxiliary value is 1.0, which should
-    // have been taken into account already in creating potentialCoefficients.
-    void SetPotential( Eigen::VectorXd const& potentialCoefficients );
-
     double TruePotential() const{ return trueVacuumDepth; }
 
     double FalsePotential() const{ return falseVacuumDepth; }
@@ -44,7 +36,8 @@ namespace VevaciousPlusPlus
     double PotentialApproximation( double const auxiliaryValue ) const
     { return potentialApproximation( auxiliaryValue ); }
 
-    SimplePolynomial const& PotentialApproximation() const
+    SplinePotential& PotentialApproximation(){ return potentialApproximation; }
+    SplinePotential const& PotentialApproximation() const
     { return potentialApproximation; }
 
     std::vector< SimplePolynomial > const& FieldPath() const
@@ -77,9 +70,12 @@ namespace VevaciousPlusPlus
     // This is for debugging.
     std::string AsDebuggingString() const;
 
+    // This is for debugging.
+    std::string FieldsString( double const auxiliaryValue ) const;
+
 
   protected:
-    SimplePolynomial potentialApproximation;
+    SplinePotential potentialApproximation;
     size_t const numberOfFields;
     std::vector< SimplePolynomial > fieldPath;
     std::vector< SimplePolynomial > pathTangent;
@@ -92,34 +88,6 @@ namespace VevaciousPlusPlus
 
 
 
-
-  // This sets potentialApproximation to be a SimplePolynomial based on
-  // potentialCoefficients with a leading power of 2, also adding a final
-  // coefficient (for a term with power 1 higher than given by
-  // potentialCoefficients + 2 for the leading power, so its size + 2 (as it
-  // gives coefficients for powers 2 to its size + 1)) which makes the
-  // potential have a minimum when the auxiliary value is 1.0, which should
-  // have been taken into account already in creating potentialCoefficients.
-  inline void PathFieldsAndPotential::SetPotential(
-                                 Eigen::VectorXd const& potentialCoefficients )
-  {
-    potentialApproximation = SimplePolynomial( potentialCoefficients,
-                                               2,
-                                               1 );
-    std::vector< double >&
-    potentialVector( potentialApproximation.CoefficientVector() );
-    size_t const approximationDegree( potentialCoefficients.rows() + 1 );
-    double finalCoefficientTimesMaxPower( 0.0 );
-    for( size_t whichPower( 2 );
-         whichPower < approximationDegree;
-         ++whichPower )
-    {
-      finalCoefficientTimesMaxPower
-      -= ( (double)whichPower * potentialVector[ whichPower ] );
-    }
-    potentialVector.back() = ( finalCoefficientTimesMaxPower
-                               / (double)(approximationDegree) );
-  }
 
   // This evaluates fieldPath at auxiliaryValue, putting it in
   // fieldConfiguration, and returns fieldConfiguration.
@@ -168,6 +136,25 @@ namespace VevaciousPlusPlus
     // I could have written
     // return ( nonZeroTemperature ? 2.0 : 3.0 );
     // but I feel that it's nice to be verbose.
+  }
+
+  // This is for debugging.
+  inline std::string
+  PathFieldsAndPotential::FieldsString( double const auxiliaryValue ) const
+  {
+    std::stringstream returnStream;
+    for( size_t fieldIndex( 0 );
+         fieldIndex < fieldPath.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        returnStream << ", ";
+      }
+      returnStream << "f[" << fieldIndex << "] = "
+      << fieldPath[ fieldIndex ]( auxiliaryValue );
+    }
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

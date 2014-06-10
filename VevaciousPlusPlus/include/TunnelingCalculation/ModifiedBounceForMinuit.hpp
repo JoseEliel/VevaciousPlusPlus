@@ -16,6 +16,7 @@
 #include "../PotentialEvaluation.hpp"
 #include "PathFromNodes.hpp"
 #include "PathFieldsAndPotential.hpp"
+#include "SplinePotential.hpp"
 #include "BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
@@ -26,15 +27,15 @@ namespace VevaciousPlusPlus
   public:
     ModifiedBounceForMinuit( PotentialFunction const& potentialFunction,
                              size_t const numberOfVaryingPathNodes,
-                             size_t const potentialApproximationPower,
+                             size_t const numberOfSplinesInPotential,
                              PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
                              double const dsbEvaporationTemperature,
-                             size_t const undershootOvershootAttempts = 16,
+                             size_t const undershootOvershootAttempts = 64,
                              size_t const maximumMultipleOfLongestLength = 16,
                            double const initialFractionOfShortestLength = 0.05,
                            size_t const energyConservingUndershootAttempts = 4,
-                            double const minimumScaleSquared = 1.0,
+                             double const minimumScaleSquared = 1.0,
                             double const shootingCloseEnoughThreshold = 0.01 );
     virtual
     ~ModifiedBounceForMinuit();
@@ -46,7 +47,7 @@ namespace VevaciousPlusPlus
     //    as a function of a path auxiliary variable p, giving f(p) and df/dp.
     //    This is obtained from pathFromNodes.
     // 2) The potential is fitted as a polynomial in p of degree
-    //    potentialApproximationPower, giving V(p).
+    //    numberOfSplinesInPotential, giving V(p).
     // 3) If the potential difference between the vacua is small enough, the
     //    thin-wall approximation is tried, but only returned if the resulting
     //    bubble radius turns out to be large enough compared to the wall
@@ -104,7 +105,7 @@ namespace VevaciousPlusPlus
     size_t const numberOfFields;
     size_t referenceFieldIndex;
     PathFromNodes pathFromNodes;
-    size_t potentialApproximationPower;
+    size_t numberOfSplinesInPotential;
     PotentialMinimum const& falseVacuum;
     PotentialMinimum const& trueVacuum;
     // The vector in field space from falseVacuum to trueVacuum (which are
@@ -176,7 +177,7 @@ namespace VevaciousPlusPlus
   //    See the comment above DecodePathParameters for the format of
   //    pathParameterization.
   // 2) The potential is fitted as a polynomial in p of degree
-  //    potentialApproximationPower, giving V(p).
+  //    numberOfSplinesInPotential, giving V(p).
   // 3) If the potential difference between the vacua is small enough, the
   //    thin-wall approximation is tried, but only returned if the resulting
   //    bubble radius turns out to be large enough compared to the wall
@@ -214,6 +215,11 @@ namespace VevaciousPlusPlus
   {
     PathFieldsAndPotential
     pathFieldsAndPotential( DecodePathParameters( pathParameterization ) );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "about to try to get potential as splines.";
+    std::cout << std::endl;/**/
     PotentialAlongPath( pathFieldsAndPotential );
     // We return a thin-wall approximation if appropriate:
     bool thinWallIsGoodApproximation( false );
@@ -221,7 +227,13 @@ namespace VevaciousPlusPlus
                                                thinWallIsGoodApproximation ) );
     if( thinWallIsGoodApproximation )
     {
-      return bounceAction;
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "thin-wall bounce = " << bounceAction
+      << "but not returning yet, to test whether shooting matches this.";
+      std::cout << std::endl;/**/
+      //return bounceAction;
     }
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.

@@ -136,13 +136,6 @@ namespace VevaciousPlusPlus
                ( columnIndex + 1 ) );
       }
     }
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "pathStepPowers = " << pathStepPowers;
-    std::cout << std::endl
-    << "pathStepPowers.inverse() = " << pathStepPowers.inverse();
-    std::cout << std::endl;/**/
     return pathStepPowers.inverse();
   }
 

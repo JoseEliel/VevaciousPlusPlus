@@ -17,6 +17,7 @@
 #include "TunnelingCalculation/OdeintBubbleDerivatives.hpp"
 #include "TunnelingCalculation/OdeintBubbleObserver.hpp"
 #include "TunnelingCalculation/PathFromNodes.hpp"
+#include "TunnelingCalculation/SplinePotential.hpp"
 #include "TunnelingCalculation/ThermalActionFitter.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
 

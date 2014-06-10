@@ -70,6 +70,11 @@ namespace VevaciousPlusPlus
           ||
           ( fieldValue->imag() < -resolutionSize ) )
       {
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "Not purely real (" << fieldValue->imag() << "i).";
+        std::cout << std::endl;*/
         return;
       }
     }

@@ -77,7 +77,7 @@ namespace VevaciousPlusPlus
       // debugging:
       /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
       << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-      << initialAuxiliary;
+      << initialAuxiliary << "( 1 - " << ( 1.0 - initialAuxiliary ) << " ).";
       std::cout << std::endl;/**/
 
       // We cannot start at r = 0, as the damping term is proportional to 1/r,
@@ -141,8 +141,10 @@ namespace VevaciousPlusPlus
          ++bubbleBit )
     {
       std::cout << "r = " << bubbleBit->radialValue << ", p = "
-      << bubbleBit->auxiliaryValue << ", dp/dr = "
-      << bubbleBit->auxiliarySlope << std::endl;
+      << bubbleBit->auxiliaryValue << ", dp/dr = " << bubbleBit->auxiliarySlope
+      << ", "
+      << pathFieldsAndPotential.FieldsString( bubbleBit->auxiliarySlope )
+      << std::endl;
     }
     std::cout << std::endl;/**/
 

@@ -58,6 +58,12 @@ namespace VevaciousPlusPlus
     double const squaredLengthBeyondCap( CapFieldConfiguration(
                                                   cappedFieldConfiguration ) );
 
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "squaredLengthBeyondCap = " << squaredLengthBeyondCap;
+    std::cout << std::endl;*/
+
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
 
     // debugging:

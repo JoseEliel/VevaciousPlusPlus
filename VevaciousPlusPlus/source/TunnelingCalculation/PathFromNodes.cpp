@@ -23,12 +23,12 @@ namespace VevaciousPlusPlus
   {
     // This constructor is just an initialization list.
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PathFromNodes::PathFromNodes( " << numberOfFields << ", "
     << referenceFieldIndex << ", " << numberOfVaryingPathNodes
     << " ) called. pathStepInversion =" << std::endl << pathStepInversion;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   PathFromNodes::~PathFromNodes()
@@ -68,7 +68,7 @@ namespace VevaciousPlusPlus
       }
       std::cout << *pathParameter;
     }
-    std::cout << " }," << std::endl << "  straightPath = {";
+    std::cout << " }," << std::endl << "  straightPath = { ";
     for( std::vector< double >::const_iterator
          pathParameter( straightPath.begin() );
          pathParameter < straightPath.end();
@@ -82,7 +82,7 @@ namespace VevaciousPlusPlus
     }
     std::cout << " }," << std::endl << "  straightPathInverseLengthSquared = "
     << straightPathInverseLengthSquared << "," << std::endl
-    << "  falseVacuumConfiguration = {";
+    << "  falseVacuumConfiguration = { ";
     for( std::vector< double >::const_iterator
          fieldValue( falseVacuumConfiguration.begin() );
          fieldValue < falseVacuumConfiguration.end();
@@ -197,13 +197,14 @@ namespace VevaciousPlusPlus
       std::cout << " }";
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "pathNodes =" << std::endl << pathNodes
     << std::endl
     << "( pathStepInversion * pathNodes )" << std::endl
     << ( pathStepInversion * pathNodes );
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
+
     // Once we have a set of nodes, we might want to project them from planes
     // perpendicular to v onto maybe hyperbolae? I dunno, something to maybe
     // allow the path to leave the endpoints in directions that initially
@@ -211,15 +212,9 @@ namespace VevaciousPlusPlus
     // anyway.
 
     // Getting the polynomial coefficients from the nodes is as easy as a
-    // simple matrix multiplication:
-    Eigen::MatrixXd const pathCoefficients( pathStepInversion * pathNodes );
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "pathCoefficients =" << std::endl << pathCoefficients;
-    std::cout << std::endl;/**/
-
-    return PathFieldsAndPotential( pathCoefficients,
+    // simple matrix multiplication, so we pass the product
+    // ( pathStepInversion * pathNodes ) into PathFieldsAndPotential.
+    return PathFieldsAndPotential( ( pathStepInversion * pathNodes ),
                                    falseVacuumConfiguration,
                                    falseVacuumDepth,
                                    trueVacuumDepth,

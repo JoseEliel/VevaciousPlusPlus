@@ -13,7 +13,7 @@ namespace VevaciousPlusPlus
   ModifiedBounceForMinuit::ModifiedBounceForMinuit(
                                     PotentialFunction const& potentialFunction,
                                          size_t const numberOfVaryingPathNodes,
-                                      size_t const potentialApproximationPower,
+                                       size_t const numberOfSplinesInPotential,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                 double const falseVacuumEvaporationTemperature,
@@ -30,7 +30,7 @@ namespace VevaciousPlusPlus
     pathFromNodes( numberOfFields,
                    referenceFieldIndex,
                    numberOfVaryingPathNodes ),
-    potentialApproximationPower( potentialApproximationPower ),
+    numberOfSplinesInPotential( numberOfSplinesInPotential ),
     falseVacuum( falseVacuum ),
     trueVacuum( trueVacuum ),
     zeroTemperatureStraightPath( numberOfFields ),
@@ -111,6 +111,11 @@ namespace VevaciousPlusPlus
     }
     shortestLength = ( 1.0 / sqrt( highestScaleSquared ) );
     longestLength = ( 1.0 / sqrt( lowestScaleSquared ) );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "tunnelingScaleSquared = " << tunnelingScaleSquared;
+    std::cout << std::endl;/**/
   }
 
   ModifiedBounceForMinuit::~ModifiedBounceForMinuit()
@@ -204,134 +209,43 @@ namespace VevaciousPlusPlus
   void ModifiedBounceForMinuit::PotentialAlongPath(
                          PathFieldsAndPotential& pathFieldsAndPotential ) const
   {
-    std::vector< double > fieldConfiguration( numberOfFields );
-    // Here we set up the linear system to solve for the coefficients of the
-    // polynomial approximation of the potential:
-    size_t const
-    numberOfNonZeroCoefficients( potentialApproximationPower - 2 );
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "ModifiedBounceForMinuit::PotentialAlongPath(...) called."
-    << " numberOfNonZeroCoefficients = " << numberOfNonZeroCoefficients;
+    << " numberOfSplinesInPotential = " << numberOfSplinesInPotential;
     std::cout << std::endl;/**/
-    // The potential is approximated as a polynomial with zero coefficients
-    // (for a^0 and a^1, so that a = 0 is an extremum) which will be ignored
-    // for inverting the matrix equation. Furthermore, the final coefficient is
-    // related to the other coefficients by the condition that the derivative
-    // is 0 for a = 1, so for n = potentialApproximationPower
-    // -n c_n = 2 c_2 + 3 c_3 + ...
-    // making the equation defining the potential approximation become
-    // V(a) = c_2 ( a^2 - (2/n) a^n ) + c_3 ( a^3 - (3/n) a^n ) + ...
-    // and c_n will be explicitly put into the approximation object afterwards.
-    double const
-    auxiliaryStep( 1.0 / (double)numberOfNonZeroCoefficients );
+    std::vector< double > fieldConfiguration( numberOfFields );
+    // We choose to take the cos of a linear distribution of equally-spaced
+    // points so that we have a finer resolution of the potential near the
+    // minima
     double auxiliaryValue( 0.0 );
-    Eigen::VectorXd potentialValues( numberOfNonZeroCoefficients );
-    Eigen::MatrixXd coefficientMatrix( numberOfNonZeroCoefficients,
-                                       numberOfNonZeroCoefficients );
-    // We want to solve coefficientMatrix * c = potentialValues for the
-    // coefficients c. Since the potential approximation begins with the
-    // quadratic term, coefficientMatrix, for n auxiliary values x_1 to x_n and
-    // potentialApproximationPower = d, looks like
-    // [ [ x_1^2, x_1^3, ..., x_1^d ],
-    //   [ x_2^2, x_2^3, ..., x_2^d ],
-    //   ...,
-    //   [ x_n^2, x_n^3, ..., x_n^d ] ], and is n * (d-1) in size. However, we
-    // also fix c_d = (-1/d) * (2 c_2 + 3 c_3 + ... + (d-1) c_(d-1)) so that
-    // V(1) is also a minimum (well, extremum, but we hope that the
-    // approximation works out so that it is a minimum). Hence we can just take
-    // coefficientMatrix to be n * (d-2) in size, noting that c_j multiplies
-    // ( x^j - (j/d) x^d ) having substituted in for c_d. Therefore,
-    // coefficientMatrix looks like
-    // [ [ ( x_1^2 - (2/d) x_1^d ), ( x_1^3- (3/d) x_1^d ), ...,
-    //                                        ( x_1^(d-1)- ((d-1)/d) x_1^d ) ],
-    //   ...,
-    //   [ ( x_n^2 - (2/d) x_n^d ), ( x_n^3- (3/d) x_n^d ), ...,
-    //                                       ( x_n^(d-1)- ((d-1)/d) x_n^d ) ] ]
-    // and also x_j is simply (j/n).
-
-    double finalCoefficientPart( NAN );
-    double const finalCoefficientDenominatorInverse( 1.0 /
-                                            ( pow( numberOfNonZeroCoefficients,
-                                                  potentialApproximationPower )
-                                             * potentialApproximationPower ) );
-    // This gives the recurring (1/d(n^d)) from (j/d) x_k^d = (j/d) (k/n)^d.
-    // It is multiplied by j k^d.
-    // This corresponds now to k = whichStep + 1, j = whichPower in the
-    // following nested loops.
-    for( unsigned int whichStep( 0 );
-         whichStep < ( numberOfNonZeroCoefficients - 1 );
-         ++whichStep )
+    double previousAuxiliary( 0.0 );
+    for( size_t splinePoint( 1 );
+         splinePoint < numberOfSplinesInPotential;
+         ++splinePoint )
     {
-      auxiliaryValue += auxiliaryStep;
-      // Now auxiliaryValue = x_k = k/n.
+      previousAuxiliary = auxiliaryValue;
+      auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( (double)splinePoint * M_PI )
+                                    / (double)numberOfSplinesInPotential ) ) );
       std::vector< double > const&
       fieldConfiguration( pathFieldsAndPotential.FieldConfiguration(
                                                             auxiliaryValue ) );
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "fieldConfiguration = { ";
-      for( std::vector< double >::const_iterator
-           fieldValue( fieldConfiguration.begin() );
-           fieldValue < fieldConfiguration.end();
-           ++fieldValue )
-      {
-        if( fieldValue != fieldConfiguration.begin() )
-        {
-          std::cout << ", ";
-        }
-        std::cout << *fieldValue;
-      }
-      std::cout << " }. Going to set potentialValues( " << whichStep
-      << " ) to be " << ( potentialFunction( fieldConfiguration,
+      pathFieldsAndPotential.PotentialApproximation().AddPoint(
+                                        ( auxiliaryValue - previousAuxiliary ),
+                                       ( potentialFunction( fieldConfiguration,
                                     pathFieldsAndPotential.GivenTemperature() )
-                          - falseVacuumPotential );
-      std::cout << std::endl;/**/
-      potentialValues( whichStep ) = ( potentialFunction( fieldConfiguration,
-                                    pathFieldsAndPotential.GivenTemperature() )
-                                       - falseVacuumPotential );
-
-      finalCoefficientPart = ( pow( ( whichStep + 1 ),
-                                    potentialApproximationPower )
-                               * finalCoefficientDenominatorInverse );
-      // Now finalCoefficientPart = (k^d)/(d(n^d)) = ( (j/d) x_k^d )/j.
-      for( unsigned int whichPower( 2 );
-           whichPower < potentialApproximationPower;
-           ++whichPower )
-      {
-        coefficientMatrix( whichStep,
-                           ( whichPower - 2 ) )
-        = ( pow( auxiliaryValue,
-                 whichPower )
-            - ( (double)whichPower * finalCoefficientPart ) );
-        // Now coefficientMatrix( k, (j-2) ) = x_k^j - (j/d) x_k^d.
-      }
+                                         - falseVacuumPotential ) );
     }
-    potentialValues( numberOfNonZeroCoefficients - 1 )
-    = ( trueVacuumPotential - falseVacuumPotential );
-
+    pathFieldsAndPotential.PotentialApproximation().SetSplines(
+                                  trueVacuumPotential - falseVacuumPotential );
     // debugging:
     /**/std::cout << std::endl << "debugging:"
-    << std::endl;
-    std::cout << "potentialValues =" << std::endl << potentialValues;
+    << std::endl
+    << "ModifiedBounceForMinuit::PotentialAlongPath([pathFieldsAndPotential])"
+    << " set pathFieldsAndPotential to be" << std::endl
+    << pathFieldsAndPotential.AsDebuggingString();
     std::cout << std::endl;/**/
-    finalCoefficientPart = ( 1.0 / potentialApproximationPower );
-    for( unsigned int whichPower( 0 );
-         whichPower < numberOfNonZeroCoefficients;
-         ++whichPower )
-    {
-      coefficientMatrix( ( numberOfNonZeroCoefficients - 1 ),
-                         whichPower )
-      = ( 1.0 - ( (double)( whichPower + 2 ) * finalCoefficientPart ) );
-      // Now coefficientMatrix( n, (j-2) ) = 1^j - (j/d) 1^d.
-    }
-    std::cout << std::endl << "coefficientMatrix =" << std::endl
-    << coefficientMatrix;
-
-    pathFieldsAndPotential.SetPotential(
-            coefficientMatrix.colPivHouseholderQr().solve( potentialValues ) );
   }
 
   // This returns the effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))]
@@ -351,7 +265,7 @@ namespace VevaciousPlusPlus
     double const potentialDifference( pathFieldsAndPotential.FalsePotential()
                                     - pathFieldsAndPotential.TruePotential() );
     if( potentialDifference
-        > ( 1.0E-3 * tunnelingScaleSquared * tunnelingScaleSquared ) )
+        > ( 1.0E-1 * tunnelingScaleSquared * tunnelingScaleSquared ) )
     {
       thinWallIsGoodApproximation = false;
       return NAN;
@@ -371,8 +285,6 @@ namespace VevaciousPlusPlus
 
     double integratedAction( 0.0 );
     double potentialValue( 0.0 );
-    double fieldDerivative( 0.0 );
-    double derivativeSquared( 0.0 );
     double const thinWallStep( 0.05 );
     // The start and end of the integral are neglected as they are proportional
     // to the derivatives of the fields with respect to the auxiliary variable,
@@ -389,23 +301,33 @@ namespace VevaciousPlusPlus
     {
       potentialValue
       = pathFieldsAndPotential.PotentialApproximation( thinWallAuxiliary );
-      derivativeSquared = 0.0;
-      for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfFields;
-           ++fieldIndex )
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "thinWallAuxiliary = " << thinWallAuxiliary
+      << ", potentialValue = " << potentialValue;
+      std::cout << std::endl;/**/
+      if( potentialValue > 0.0 )
       {
-        fieldDerivative = pathFieldsAndPotential.FieldDerivative( fieldIndex,
-                                                           thinWallAuxiliary );
-        derivativeSquared += ( fieldDerivative * fieldDerivative );
+        integratedAction
+        += sqrt( pathFieldsAndPotential.FieldDerivativesSquared(
+                                        thinWallAuxiliary ) * potentialValue );
+        wallThickness += ( thinWallStep / sqrt( potentialValue ) );
       }
-      integratedAction += sqrt( derivativeSquared * potentialValue );
-      wallThickness += ( thinWallStep / sqrt( potentialValue ) );
     }
     integratedAction *= ( M_SQRT2 * thinWallStep );
     wallThickness *= pathFieldsAndPotential.FieldDerivatives()[
                              referenceFieldIndex ].CoefficientVector().front();
     // This last *= accounts for the change in integration variable to the
     // field linear in a.
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "integratedAction = " << integratedAction
+    << ", oneOverPotentialDifference = " << oneOverPotentialDifference
+    << ", wallThickness = " << wallThickness;
+    std::cout << std::endl;/**/
 
 
     // We return the thin-wall approximation of the bounce action only if the

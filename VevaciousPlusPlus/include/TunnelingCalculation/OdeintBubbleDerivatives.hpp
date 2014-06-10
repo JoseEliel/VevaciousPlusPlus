@@ -33,11 +33,11 @@ namespace VevaciousPlusPlus
     // This returns the first derivative of the polynomial approximation of the
     // potential function along the path with respect to the path auxiliary.
     double PotentialDerivative( double const auxiliaryValue ) const
-    { return potentialDerivative( auxiliaryValue ); }
+    { return potentialSpline.FirstDerivative( auxiliaryValue ); }
 
 
   protected:
-    SimplePolynomial potentialDerivative;
+    SplinePotential const& potentialSpline;
     std::vector< SimplePolynomial > const& firstDerivatives;
     size_t const numberOfFields;
     std::vector< SimplePolynomial > secondDerivatives;

@@ -367,70 +367,6 @@ namespace VevaciousPlusPlus
       vectorSquareMasses.push_back(
                                 &(vectorMassSquaredMatrices[ pointerIndex ]) );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "end of PotentialFromPolynomialAndMasses::"
-    << "PotentialFromPolynomialAndMasses( \"" << modelFilename << "\" )"
-    << std::endl << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::cout << fieldNames[ fieldIndex ] << ": "
-      << dsbFieldValuePolynomials[ fieldIndex ].AsString() << std::endl;
-    }
-    std::cout
-    << std::endl
-    << "renormalizationScaleSquared = " << renormalizationScaleSquared
-    << std::endl
-    << "minimumRenormalizationScaleSquared = "
-    << minimumRenormalizationScaleSquared
-    << std::endl
-    << "treeLevelPotential = " << treeLevelPotential.AsString()
-    << std::endl
-    << "polynomialLoopCorrections = " << polynomialLoopCorrections.AsString()
-    << std::endl
-    << "scalarSquareMasses = " << std::endl;
-    for( std::vector< RealMassesSquaredMatrix >::iterator
-         whichScalar( scalarSquareMasses.begin() );
-         whichScalar < scalarSquareMasses.end();
-         ++whichScalar )
-    {
-      std::cout << whichScalar->AsString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "fermionMasses = " << std::endl;
-    for( std::vector< SymmetricComplexMassMatrix >::iterator
-         whichFermion( fermionMasses.begin() );
-         whichFermion < fermionMasses.end();
-         ++whichFermion )
-    {
-      std::cout << whichFermion->AsString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "fermionMassSquareds = " << std::endl;
-    for( std::vector< ComplexMassSquaredMatrix >::iterator
-         whichFermion( fermionMassSquareds.begin() );
-         whichFermion < fermionMassSquareds.end();
-         ++whichFermion )
-    {
-      std::cout << whichFermion->AsString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "vectorSquareMasses = " << std::endl;
-    for( std::vector< RealMassesSquaredMatrix >::iterator
-         whichVector( vectorSquareMasses.begin() );
-         whichVector < vectorSquareMasses.end();
-         ++whichVector )
-    {
-      std::cout << whichVector->AsString();
-    }
-    std::cout << std::endl;*/
   }
 
   PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
@@ -884,7 +820,8 @@ namespace VevaciousPlusPlus
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
-    << "scalarQuantumCorrections = " << scalarQuantumCorrections;
+    << "scalarQuantumCorrections = " << scalarQuantumCorrections
+    << ", scalarThermalCorrections = " << scalarThermalCorrections;
     std::cout << std::endl;*/
 
 
@@ -907,7 +844,9 @@ namespace VevaciousPlusPlus
     /*std::cout << std::endl << "debugging:"
     << std::endl
     << "-2.0 * fermionQuantumCorrections = "
-    << ( -2.0 * fermionQuantumCorrections );
+    << ( -2.0 * fermionQuantumCorrections )
+    << ", 2.0 * fermionThermalCorrections = "
+    << ( 2.0 * fermionThermalCorrections );
     std::cout << std::endl;*/
 
     // Weyl fermion degrees of freedom add to both quantum and thermal
@@ -932,7 +871,9 @@ namespace VevaciousPlusPlus
     /*std::cout << std::endl << "debugging:"
     << std::endl
     << "3.0 * vectorQuantumCorrections = "
-    << ( 3.0 * vectorQuantumCorrections );
+    << ( 3.0 * vectorQuantumCorrections )
+    << ", 2.0 * vectorThermalCorrections = "
+    << ( 2.0 * vectorThermalCorrections );
     std::cout << std::endl;*/
 
     // Vector boson degrees of freedom add to quantum corrections with a factor
@@ -1382,6 +1323,85 @@ namespace VevaciousPlusPlus
       << "cumulativeQuantumCorrection = " << cumulativeQuantumCorrection;
       std::cout << std::endl;*/
     }
+  }
+
+  // This is for debugging.
+  std::string PotentialFromPolynomialAndMasses::AsDebuggingString() const
+  {
+    std::stringstream returnStream;
+    returnStream << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      returnStream << fieldNames[ fieldIndex ] << ": "
+      << dsbFieldValuePolynomials[ fieldIndex ].AsDebuggingString()
+      << std::endl;
+    }
+    returnStream
+    << std::endl
+    << "currentMinimumRenormalizationScale = "
+    << currentMinimumRenormalizationScale
+    << std::endl
+    << "squareOfMinimumRenormalizationScale = "
+    << squareOfMinimumRenormalizationScale
+    << std::endl
+    << "currentMaximumRenormalizationScale = "
+    << currentMaximumRenormalizationScale
+    << std::endl
+    << "squareOfMaximumRenormalizationScale = "
+    << squareOfMaximumRenormalizationScale
+    << std::endl
+    << std::endl
+    << "treeLevelPotential = " << treeLevelPotential.AsDebuggingString()
+    << std::endl
+    << "polynomialLoopCorrections = "
+    << polynomialLoopCorrections.AsDebuggingString()
+    << std::endl
+    << "scalarSquareMasses = " << std::endl;
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+         whichScalar( scalarMassSquaredMatrices.begin() );
+         whichScalar < scalarMassSquaredMatrices.end();
+         ++whichScalar )
+    {
+      returnStream << whichScalar->AsString();
+    }
+    returnStream << std::endl;
+    returnStream << std::endl
+    << "fermionMasses = " << std::endl;
+    for( std::vector< SymmetricComplexMassMatrix >::const_iterator
+         whichFermion( fermionMassMatrices.begin() );
+         whichFermion < fermionMassMatrices.end();
+         ++whichFermion )
+    {
+      returnStream << whichFermion->AsString();
+    }
+    returnStream << std::endl;
+    returnStream << std::endl
+    << "fermionMassSquareds = " << std::endl;
+    for( std::vector< ComplexMassSquaredMatrix >::const_iterator
+         whichFermion( fermionMassSquaredMatrices.begin() );
+         whichFermion < fermionMassSquaredMatrices.end();
+         ++whichFermion )
+    {
+      returnStream << whichFermion->AsString();
+    }
+    returnStream << std::endl;
+    returnStream << std::endl
+    << "vectorSquareMasses = " << std::endl;
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+         whichVector( vectorMassSquaredMatrices.begin() );
+         whichVector < vectorMassSquaredMatrices.end();
+         ++whichVector )
+    {
+      returnStream << whichVector->AsString();
+    }
+    returnStream << std::endl
+    << "vectorMassCorrectionConstant = " << vectorMassCorrectionConstant
+    << std::endl << "needToUpdateHomotopyContinuation = "
+    << needToUpdateHomotopyContinuation << std::endl
+    << "scaleRangeMinimumFactor = " << scaleRangeMinimumFactor << std::endl;
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

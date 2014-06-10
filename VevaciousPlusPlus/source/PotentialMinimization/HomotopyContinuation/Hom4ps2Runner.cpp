@@ -232,12 +232,12 @@ namespace VevaciousPlusPlus
         targetSystem.AppendPureRealSolutionAndValidSignFlips(
                                                          candidateRealSolution,
                                                       purelyRealSolutionSets,
-                                                                     2.0 );
+                                                              0.01 );
       }
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "purelyRealSolutionSets = {" << std::endl;
     for( std::vector< std::vector< double > >::iterator
@@ -256,7 +256,7 @@ namespace VevaciousPlusPlus
       std::cout << " }" << std::endl;
     }
     std::cout << "}" << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -41,6 +41,9 @@ namespace VevaciousPlusPlus
     // needToUpdateHomotopyContinuation to true.
     PolynomialGradientTargetSystem& HomotopyContinuationTargetSystem();
 
+    // This is for debugging.
+    std::string AsDebuggingString() const;
+
 
   protected:
     typedef std::pair< std::vector< double >, double > DoubleVectorWithDouble;

@@ -12,7 +12,7 @@ namespace VevaciousPlusPlus
 
   OdeintBubbleDerivatives::OdeintBubbleDerivatives(
                        PathFieldsAndPotential const& pathFieldsAndPotential ) :
-    potentialDerivative(),
+    potentialSpline( pathFieldsAndPotential.PotentialApproximation() ),
     firstDerivatives( pathFieldsAndPotential.FieldDerivatives() ),
     numberOfFields( pathFieldsAndPotential.FieldDerivatives().size() ),
     secondDerivatives( firstDerivatives.size() ),
@@ -24,14 +24,8 @@ namespace VevaciousPlusPlus
     << "OdeintBubbleDerivatives::OdeintBubbleDerivatives("
     << " pathFieldsAndPotential ="
     << pathFieldsAndPotential.AsDebuggingString() << " ) called.";
-    std::cout << std::endl;/**/
-    potentialDerivative.BecomeFirstDerivativeOf(
-                             pathFieldsAndPotential.PotentialApproximation() );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "potentialDerivative = " << potentialDerivative.AsDebuggingString();
+    std::cout << std::endl << "potentialSpline =" << std::endl
+    << potentialSpline.AsDebuggingString();
     std::cout << std::endl;/**/
 
     for( unsigned int fieldIndex( 0 );
@@ -94,7 +88,7 @@ namespace VevaciousPlusPlus
     }
     firstAndSecondDerivatives[ 0 ] = auxiliaryDerivative;
     firstAndSecondDerivatives[ 1 ]
-     = ( ( ( potentialDerivative( auxiliaryValue )
+     = ( ( ( potentialSpline.FirstDerivative( auxiliaryValue )
              - ( fieldFirstDotSecondDerivatives
                  * auxiliaryDerivative * auxiliaryDerivative ) )
            / fieldDerivativeSquared )

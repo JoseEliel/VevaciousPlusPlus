@@ -60,14 +60,14 @@ namespace VevaciousPlusPlus
 
     criticalRatherThanEvaporation = false;
     evaporationMinimum = falseVacuum;
-    double evaporationTemperature( CriticalOrEvaporationTemperature(
-                potentialFunction( potentialFunction.FieldValuesOrigin() ) ) );
+    //double evaporationTemperature( CriticalOrEvaporationTemperature(
+    //          potentialFunction( potentialFunction.FieldValuesOrigin() ) ) );
     ModifiedBounceForMinuit modifiedBounceForMinuit( potentialFunction,
                                                      3,
                                                      8,
                                                      falseVacuum,
                                                      trueVacuum,
-                                                     evaporationTemperature );
+                                                     0.0 );
     std::vector< double > pathParameterization;
     std::vector< double > initialStepSizes;
     modifiedBounceForMinuit.SetUpStraightPathForMinuit( pathParameterization,

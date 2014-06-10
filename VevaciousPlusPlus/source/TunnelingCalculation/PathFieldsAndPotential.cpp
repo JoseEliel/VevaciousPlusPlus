@@ -43,7 +43,7 @@ namespace VevaciousPlusPlus
       coefficientVector( fieldPath[ fieldIndex ].CoefficientVector() );
       coefficientVector[ 0 ] = falseVacuumConfiguration[ fieldIndex ];
       for( size_t coefficientIndex( 0 );
-           coefficientIndex < pathCoefficients.rows();
+           coefficientIndex < (size_t)pathCoefficients.rows();
            ++coefficientIndex )
       {
         coefficientVector[ coefficientIndex + 1 ]
