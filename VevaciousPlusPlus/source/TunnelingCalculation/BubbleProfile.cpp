@@ -55,6 +55,10 @@ namespace VevaciousPlusPlus
   {
     shootAttemptsLeft = undershootOvershootAttempts;
     shootingThresholdSquared = ( shootingThreshold * shootingThreshold );
+    undershootAuxiliary = pathFieldsAndPotential.PotentialApproximation(
+                                               ).DefiniteUndershootAuxiliary();
+    overshootAuxiliary = pathFieldsAndPotential.PotentialApproximation(
+                                                ).DefiniteOvershootAuxiliary();
 
     // This loop is broken out of if the shoot attempt seems to have been close
     // enough that the integration would take too long to find an overshoot or
@@ -77,7 +81,7 @@ namespace VevaciousPlusPlus
       // debugging:
       /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
       << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-      << initialAuxiliary << "( 1 - " << ( 1.0 - initialAuxiliary ) << " ).";
+      << initialAuxiliary << " (1 - " << ( 1.0 - initialAuxiliary ) << ").";
       std::cout << std::endl;/**/
 
       // We cannot start at r = 0, as the damping term is proportional to 1/r,

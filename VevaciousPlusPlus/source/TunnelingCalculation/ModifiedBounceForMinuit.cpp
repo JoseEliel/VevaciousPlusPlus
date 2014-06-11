@@ -20,7 +20,6 @@ namespace VevaciousPlusPlus
                                       size_t const undershootOvershootAttempts,
                                    size_t const maximumMultipleOfLongestLength,
                                   double const initialFractionOfShortestLength,
-                               size_t const energyConservingUndershootAttempts,
                                               double const minimumScaleSquared,
                                   double const shootingCloseEnoughThreshold ) :
     ROOT::Minuit2::FCNBase(),
@@ -47,7 +46,6 @@ namespace VevaciousPlusPlus
     shortestLength( 1.0 ),
     longestLength( 1.0 ),
     undershootOvershootAttempts( undershootOvershootAttempts ),
-    energyConservingUndershootAttempts( energyConservingUndershootAttempts ),
     initialFractionOfShortestLength( initialFractionOfShortestLength ),
     shootingThreshold( shootingCloseEnoughThreshold )
   {
@@ -220,24 +218,21 @@ namespace VevaciousPlusPlus
     // points so that we have a finer resolution of the potential near the
     // minima
     double auxiliaryValue( 0.0 );
-    double previousAuxiliary( 0.0 );
     for( size_t splinePoint( 1 );
          splinePoint < numberOfSplinesInPotential;
          ++splinePoint )
     {
-      previousAuxiliary = auxiliaryValue;
       auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( (double)splinePoint * M_PI )
                                     / (double)numberOfSplinesInPotential ) ) );
       std::vector< double > const&
       fieldConfiguration( pathFieldsAndPotential.FieldConfiguration(
                                                             auxiliaryValue ) );
-      pathFieldsAndPotential.PotentialApproximation().AddPoint(
-                                        ( auxiliaryValue - previousAuxiliary ),
+      pathFieldsAndPotential.PotentialApproximation().AddPoint( auxiliaryValue,
                                        ( potentialFunction( fieldConfiguration,
                                     pathFieldsAndPotential.GivenTemperature() )
                                          - falseVacuumPotential ) );
     }
-    pathFieldsAndPotential.PotentialApproximation().SetSplines(
+    pathFieldsAndPotential.PotentialApproximation().SetSpline(
                                   trueVacuumPotential - falseVacuumPotential );
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -382,7 +377,6 @@ namespace VevaciousPlusPlus
     BubbleProfile bubbleProfile( pathFieldsAndPotential,
                           ( initialFractionOfShortestLength * shortestLength ),
                                  longestLength );
-    bubbleProfile.UndampedUndershoot( energyConservingUndershootAttempts );
     std::vector< BubbleRadialValueDescription > const&
     auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
                                                    shootingThreshold ) );

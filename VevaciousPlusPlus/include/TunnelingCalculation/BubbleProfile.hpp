@@ -28,13 +28,6 @@ namespace VevaciousPlusPlus
     ~BubbleProfile();
 
 
-    // This tries the average of undershootAuxiliary and overshootAuxiliary
-    // and uses it to update one of them based on whether its energy would
-    // lead to undershooting or overshooting in the absence of the damping
-    // term, and repeats this for a total of energyConservingUndershootAttempts
-    // times.
-    void UndampedUndershoot( size_t const energyConservingUndershootAttempts );
-
     // This tries to find the perfect shot undershootOvershootAttempts times,
     // then returns the bubble profile in terms of the auxiliary variable based
     // on the best shot. It integrates the auxiliary variable derivative to
@@ -83,36 +76,6 @@ namespace VevaciousPlusPlus
   };
 
 
-
-
-  // This tries the average of undershootAuxiliary and overshootAuxiliary
-  // and uses it to update one of them based on whether its energy would
-  // lead to undershooting or overshooting in the absence of the damping
-  // term, and repeats this for a total of energyConservingUndershootAttempts
-  // times.
-  inline void BubbleProfile::UndampedUndershoot(
-                              size_t const energyConservingUndershootAttempts )
-  {
-    for( size_t undershootGuessStep( 0 );
-         undershootGuessStep < energyConservingUndershootAttempts;
-         ++undershootGuessStep )
-    {
-      initialAuxiliary
-      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-      if( pathFieldsAndPotential.PotentialApproximation( initialAuxiliary )
-          < 0.0 )
-      {
-        overshootAuxiliary = initialAuxiliary;
-      }
-      else
-      {
-        undershootAuxiliary = initialAuxiliary;
-      }
-    }
-    // At this point we reset overshootAuxiliary for the integration including
-    // damping.
-    overshootAuxiliary = 1.0;
-  }
 
 
   // This performs the integration based on what is in initialConditions. It

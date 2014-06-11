@@ -14,63 +14,82 @@ namespace VevaciousPlusPlus
   class SplinePotential
   {
   public:
-    SplinePotential();
+    SplinePotential( double const minimumFalseVacuumConcavity = 1.0e-6 );
     SplinePotential( SplinePotential const& copySource );
     virtual
     ~SplinePotential();
 
 
     // This returns the value of the potential at auxiliaryValue, by finding
-    // the correct spline and then returning its value at that point.
+    // the correct segment and then returning its value at that point.
     virtual double operator()( double auxiliaryValue ) const;
 
     // This returns the value of the first derivative of the potential at
-    // auxiliaryValue, by finding the correct spline and then returning its
+    // auxiliaryValue, by finding the correct segment and then returning its
     // slope at that point.
     virtual double FirstDerivative( double const auxiliaryValue ) const;
 
     // This adds another point for the spline, assuming that it goes after the
     // previously-added point by auxiliaryDifference from the previous point,
     // to a potential value of potentialValue relative to the false vacuum.
-    void AddPoint( double const auxiliaryDifference,
-                   double const potentialValue )
-    { auxiliaryValues.push_back( auxiliaryDifference );
-      potentialValues.push_back( potentialValue );
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "SplinePotential::AddPoint( " << auxiliaryDifference << ", "
-    << potentialValue << " ) called.";
-    std::cout << std::endl;/**/}
+    void AddPoint( double const auxiliaryValue,
+                   double const potentialValue );
 
-    // This sets up the splines based on auxiliaryValues and potentialValues,
+    // This sets up the spline based on auxiliaryValues and potentialValues,
     // ensuring that the potential reaches the correct values for the vacua,
-    // and that the potential derivative vanishes at the vacua.
-    void SetSplines( double const trueVacuumPotentialDifference );
+    // and that the potential derivative vanishes at the vacua. It also notes
+    // the first point where the potential drops below that of the false vacuum
+    // in definiteUndershootAuxiliary and the first maximum after that in
+    // definiteOvershootAuxiliary.
+    void SetSpline( double const trueVacuumPotentialDifference );
+
+    double DefiniteUndershootAuxiliary() const
+    { return definiteUndershootAuxiliary; }
+
+    double DefiniteOvershootAuxiliary() const
+    { return definiteOvershootAuxiliary; }
 
     // This is for debugging.
     std::string AsDebuggingString() const;
 
 
   protected:
-    // There are auxiliaryValues.size() normal splines, each represented by 4
-    // values: the size of the spline in the auxiliary value, the potential
+    // There are auxiliaryValues.size() normal segments, each represented by 4
+    // values: the size of the segment in the auxiliary value, the potential
     // (relative to the false vacuum at zero auxiliary value), its first
-    // derivative, and its second derivative. Within the spline, the potential
+    // derivative, and its second derivative. Within the segment, the potential
     // is approximated by
-    // V(p_j + d) + d * V'(p_j) + d^2 * V''(p_j),
+    // V(p_j + d) + d * V'(p_j) + d^2 * [0.5*V''(p_j)],
     // where the auxiliary value is p = p_j + d. There is also one final
-    // spline, where for an auxiliary value = 1 - d, the potential is
+    // segment, where for an auxiliary value = 1 - d, the potential is
     // approximated by
-    // V(1.0) + d^2 * V''(1) + d^3 * V'''(1).
+    // V(1.0) + d^2 * [0.5*V''(1)] + d^4 * [V''''(1)/(4*3*2)].
     std::vector< double > auxiliaryValues;
     std::vector< double > potentialValues;
     std::vector< double > firstDerivatives;
     std::vector< double > halfSecondDerivatives;
     double finalPotential;
     double halfFinalSecondDerivative;
-    double finalCubicCoefficient;
+    double finalQuarticCoefficient;
+    double const minimumFalseVacuumConcavity;
+    double definiteUndershootAuxiliary;
+    double definiteOvershootAuxiliary;
+    double auxiliaryUpToCurrentSegment;
   };
+
+
+
+
+  // This adds another point for the spline, assuming that it goes after the
+  // previously-added point by auxiliaryDifference from the previous point,
+  // to a potential value of potentialValue relative to the false vacuum.
+  inline void SplinePotential::AddPoint( double const auxiliaryValue,
+                                         double const potentialValue )
+  {
+    auxiliaryValues.push_back( auxiliaryValue - auxiliaryUpToCurrentSegment );
+    potentialValues.push_back( potentialValue );
+    auxiliaryUpToCurrentSegment = auxiliaryValue;
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* SPLINEPOTENTIAL_HPP_ */

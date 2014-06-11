@@ -34,7 +34,6 @@ namespace VevaciousPlusPlus
                              size_t const undershootOvershootAttempts = 64,
                              size_t const maximumMultipleOfLongestLength = 16,
                            double const initialFractionOfShortestLength = 0.05,
-                           size_t const energyConservingUndershootAttempts = 4,
                              double const minimumScaleSquared = 1.0,
                             double const shootingCloseEnoughThreshold = 0.01 );
     virtual
@@ -119,7 +118,6 @@ namespace VevaciousPlusPlus
     double shortestLength;
     double longestLength;
     size_t const undershootOvershootAttempts;
-    size_t const energyConservingUndershootAttempts;
     double const initialFractionOfShortestLength;
     double const shootingThreshold;
 
