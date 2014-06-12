@@ -29,6 +29,12 @@ namespace VevaciousPlusPlus
     // slope at that point.
     virtual double FirstDerivative( double const auxiliaryValue ) const;
 
+    // This returns the value of the first derivative of the potential at
+    // (definiteOvershootAuxiliary - differenceFromMaximumAuxiliary), assuming
+    // that it is in the implicit final segment.
+    virtual double DerivativeNearPathPanic(
+                           double const differenceFromMaximumAuxiliary ) const;
+
     // This adds another point for the spline, assuming that it goes after the
     // previously-added point by auxiliaryDifference from the previous point,
     // to a potential value of potentialValue relative to the false vacuum.
@@ -48,6 +54,10 @@ namespace VevaciousPlusPlus
 
     double DefiniteOvershootAuxiliary() const
     { return definiteOvershootAuxiliary; }
+
+    double StartOfFinalSegment() const{ return startOfFinalSegment; }
+
+    double SizeOfFinalSegment() const{ return sizeOfFinalSegment; }
 
     // This is for debugging.
     std::string AsDebuggingString() const;
@@ -75,10 +85,25 @@ namespace VevaciousPlusPlus
     double definiteUndershootAuxiliary;
     double definiteOvershootAuxiliary;
     double auxiliaryUpToCurrentSegment;
+    double startOfFinalSegment;
+    double sizeOfFinalSegment;
   };
 
 
 
+
+  // This returns the value of the first derivative of the potential at
+  // (definiteOvershootAuxiliary - differenceFromMaximumAuxiliary), assuming
+  // that it is in the implicit final segment.
+  inline double SplinePotential::DerivativeNearPathPanic(
+                            double const differenceFromMaximumAuxiliary ) const
+  {
+    return ( ( ( 2.0 * halfFinalSecondDerivative )
+                   + ( 4.0 * finalQuarticCoefficient
+                           * differenceFromMaximumAuxiliary
+                           * differenceFromMaximumAuxiliary ) )
+                 * differenceFromMaximumAuxiliary );
+  }
 
   // This adds another point for the spline, assuming that it goes after the
   // previously-added point by auxiliaryDifference from the previous point,

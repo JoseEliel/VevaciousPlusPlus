@@ -210,8 +210,9 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "ModifiedBounceForMinuit::PotentialAlongPath(...) called."
-    << " numberOfSplinesInPotential = " << numberOfSplinesInPotential;
+    << "ModifiedBounceForMinuit::PotentialAlongPath(pathFieldsAndPotential="
+    << pathFieldsAndPotential.AsDebuggingString()
+    << ") called. numberOfSplinesInPotential = " << numberOfSplinesInPotential;
     std::cout << std::endl;/**/
     std::vector< double > fieldConfiguration( numberOfFields );
     // We choose to take the cos of a linear distribution of equally-spaced

@@ -77,7 +77,7 @@ namespace VevaciousPlusPlus
       std::cout << fieldAsPolynomial->AsDebuggingString() << std::endl;
     }
     std::cout << "(2 sets of " << pathTangent.size()
-    << " polynomials)";
+    << " polynomials), numberOfFields = " << numberOfFields;
     std::cout << std::endl;/**/
   }
 
@@ -97,7 +97,8 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "PathFieldsAndPotential copy constructor called.";
+    << "PathFieldsAndPotential copy constructor called. numberOfFields = "
+    << numberOfFields;
     std::cout << std::endl;/**/
   }
 

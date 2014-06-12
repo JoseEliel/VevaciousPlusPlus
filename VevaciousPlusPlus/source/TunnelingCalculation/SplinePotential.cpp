@@ -23,7 +23,9 @@ namespace VevaciousPlusPlus
     minimumFalseVacuumConcavity( minimumFalseVacuumConcavity ),
     definiteUndershootAuxiliary( NAN ),
     definiteOvershootAuxiliary( 1.0 ),
-    auxiliaryUpToCurrentSegment( 0.0 )
+    auxiliaryUpToCurrentSegment( 0.0 ),
+    startOfFinalSegment( NAN ),
+    sizeOfFinalSegment( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -39,7 +41,9 @@ namespace VevaciousPlusPlus
     minimumFalseVacuumConcavity( copySource.minimumFalseVacuumConcavity ),
     definiteUndershootAuxiliary( copySource.definiteUndershootAuxiliary ),
     definiteOvershootAuxiliary( copySource.definiteOvershootAuxiliary ),
-    auxiliaryUpToCurrentSegment( copySource.auxiliaryUpToCurrentSegment )
+    auxiliaryUpToCurrentSegment( copySource.auxiliaryUpToCurrentSegment ),
+    startOfFinalSegment( copySource.startOfFinalSegment ),
+    sizeOfFinalSegment( copySource.sizeOfFinalSegment )
   {
     // This constructor is just an initialization list.
   }
@@ -268,6 +272,8 @@ namespace VevaciousPlusPlus
           potentialValues.resize( segmentIndex );
           firstDerivatives.resize( segmentIndex );
           halfSecondDerivatives.resize( segmentIndex );
+          startOfFinalSegment = auxiliaryUpToCurrentSegment;
+          sizeOfFinalSegment = extremumAuxiliary;
           return;
         }
       }
@@ -275,6 +281,7 @@ namespace VevaciousPlusPlus
       // Now we note the auxiliary value that starts the next segment.
       auxiliaryUpToCurrentSegment += auxiliaryValues[ segmentIndex ];
     }
+    startOfFinalSegment = auxiliaryUpToCurrentSegment;
 
     // If we get to here, there is only 1 deeper-than-false-vacuum minimum and
     // it is in the implicit final segment. The last element of potentialValues
@@ -282,20 +289,22 @@ namespace VevaciousPlusPlus
     // segment, but firstDerivatives.back() is only the slope at the start of
     // the last normal segment, so the second derivative must be added,
     // multiplied by the last element of auxiliaryValues.
-    double const finalDifference( auxiliaryUpToCurrentSegment - 1.0 );
+    sizeOfFinalSegment = ( 1.0 - auxiliaryUpToCurrentSegment );
     halfFinalSecondDerivative
     = ( 0.5 * ( ( 4.0 * ( potentialValues.back() - finalPotential ) )
-                - ( ( firstDerivatives.back()
+                + ( ( firstDerivatives.back()
                       + ( 2.0 * halfSecondDerivatives.back()
                               * auxiliaryValues.back() ) )
-                    * finalDifference ) ) );
+                    * sizeOfFinalSegment ) ) );
+    // The derivative is added because sizeOfFinalSegment is 1-p, so flips the
+    // sign.
     finalQuarticCoefficient
     = ( ( potentialValues.back() - finalPotential
           - halfFinalSecondDerivative )
-        / ( finalDifference * finalDifference
-            * finalDifference * finalDifference ) );
+        / ( sizeOfFinalSegment * sizeOfFinalSegment
+            * sizeOfFinalSegment * sizeOfFinalSegment ) );
     halfFinalSecondDerivative = ( halfFinalSecondDerivative
-                                   / ( finalDifference * finalDifference ) );
+                               / ( sizeOfFinalSegment * sizeOfFinalSegment ) );
 
     // If the definite undershoot has not been found yet, both
     // definiteUndershootAuxiliary and definiteOvershootAuxiliary must be in
@@ -317,6 +326,7 @@ namespace VevaciousPlusPlus
       {
         definiteOvershootAuxiliary
         = ( 1.0 - sqrt( squareOfPossibleSolution ) );
+        sizeOfFinalSegment -= ( 1.0 - definiteOvershootAuxiliary );
       }
       else
       {
@@ -349,8 +359,10 @@ namespace VevaciousPlusPlus
     }
     returnStream
     << " + UnitStep[x - " << cumulativeAuxiliary << "] * ( (" << finalPotential
-    << ") + (x-1)^2 * (" << halfFinalSecondDerivative << ") + (x-1)^4 * ("
-    << finalQuarticCoefficient << ") ) * UnitStep[1 - x]";
+    << ") + (x-" << definiteOvershootAuxiliary << ")^2 * ("
+    << halfFinalSecondDerivative << ") + (x-" << definiteOvershootAuxiliary
+    << ")^4 * (" << finalQuarticCoefficient << ") ) * UnitStep["
+    << definiteOvershootAuxiliary << " - x]";
     return returnStream.str();
   }
 

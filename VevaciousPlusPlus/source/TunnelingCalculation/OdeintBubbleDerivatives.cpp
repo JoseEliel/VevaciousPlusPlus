@@ -59,8 +59,37 @@ namespace VevaciousPlusPlus
   void OdeintBubbleDerivatives::operator()(
                       std::vector< double > const& auxiliaryAndFirstDerivative,
                               std::vector< double >& firstAndSecondDerivatives,
-                                          double const radialValue )
+                                            double const radialValue )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "OdeintBubbleDerivatives::operator( auxiliaryAndFirstDerivative = { ";
+    for( std::vector< double >::const_iterator
+         inputData( auxiliaryAndFirstDerivative.begin() );
+         inputData < auxiliaryAndFirstDerivative.end();
+         ++inputData )
+    {
+      if( inputData > auxiliaryAndFirstDerivative.begin() )
+      {
+        std::cout << ", ";
+      }
+      std::cout << *inputData;
+    }
+    std::cout << " }, firstAndSecondDerivatives = { ";
+    for( std::vector< double >::const_iterator
+         inputData( firstAndSecondDerivatives.begin() );
+         inputData < firstAndSecondDerivatives.end();
+         ++inputData )
+    {
+      if( inputData > firstAndSecondDerivatives.begin() )
+      {
+        std::cout << ", ";
+      }
+      std::cout << *inputData;
+    }
+    std::cout << " }, radialValue = " << radialValue << " ) called.";
+    std::cout << std::endl;/**/
     double const auxiliaryValue( auxiliaryAndFirstDerivative[ 0 ] );
     // This cheats if there has already been an overshoot, to try to avoid the
     // integration going to small step sizes to resolve the oscillations of the

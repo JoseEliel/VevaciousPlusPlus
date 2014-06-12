@@ -9,6 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
+  double const BubbleProfile::auxiliaryPrecisionResolution( 1.0e-6 );
 
   BubbleProfile::BubbleProfile(
                           PathFieldsAndPotential const& pathFieldsAndPotential,
@@ -18,15 +19,19 @@ namespace VevaciousPlusPlus
     odeintProfile( 1,
                    BubbleRadialValueDescription() ),
     pathFieldsAndPotential( pathFieldsAndPotential ),
+    pathPotential( pathFieldsAndPotential.PotentialApproximation() ),
     bubbleDerivatives( pathFieldsAndPotential ),
     bubbleObserver( odeintProfile ),
     integrationStepSize( initialIntegrationStepSize ),
     integrationStartRadius( initialIntegrationStepSize ),
     integrationEndRadius( initialIntegrationEndRadius ),
-    undershootAuxiliary( 0.0 ),
-    overshootAuxiliary( 1.0 ),
+    undershootAuxiliary( NAN ),
+    overshootAuxiliary( NAN ),
     initialAuxiliary( NAN ),
     initialConditions( 2 ),
+    initialPositiveAuxiliary( NAN ),
+    initialPotentialDerivative( NAN ),
+    initialQuadraticCoefficient( NAN ),
     twiceDampingFactorPlusOne( ( 2.0 * pathFieldsAndPotential.DampingFactor() )
                                + 1.0 ),
     shootingThresholdSquared( NAN ),
@@ -55,10 +60,23 @@ namespace VevaciousPlusPlus
   {
     shootAttemptsLeft = undershootOvershootAttempts;
     shootingThresholdSquared = ( shootingThreshold * shootingThreshold );
-    undershootAuxiliary = pathFieldsAndPotential.PotentialApproximation(
-                                               ).DefiniteUndershootAuxiliary();
-    overshootAuxiliary = pathFieldsAndPotential.PotentialApproximation(
-                                                ).DefiniteOvershootAuxiliary();
+    undershootAuxiliary = pathPotential.DefiniteUndershootAuxiliary();
+    overshootAuxiliary = pathPotential.DefiniteOvershootAuxiliary();
+
+    // If undershootAuxiliary or overshootAuxiliary is in the final segment, it
+    // is set to be the (negative) offset from the end of the final segment.
+    // (This should mitigate precision issues for trying to start very close to
+    // the path panic minimum.)
+    if( undershootAuxiliary >= pathPotential.StartOfFinalSegment() )
+    {
+      undershootAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
+                              - undershootAuxiliary );
+    }
+    if( overshootAuxiliary >= pathPotential.StartOfFinalSegment() )
+    {
+      overshootAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
+                             - overshootAuxiliary );
+    }
 
     // This loop is broken out of if the shoot attempt seems to have been close
     // enough that the integration would take too long to find an overshoot or
@@ -76,26 +94,81 @@ namespace VevaciousPlusPlus
       worthIntegratingFurther = true;
       auxiliaryProfile.clear();
       integrationStartRadius = integrationStepSize;
-      initialAuxiliary
-      = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
-      // debugging:
-      /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
-      << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-      << initialAuxiliary << " (1 - " << ( 1.0 - initialAuxiliary ) << ").";
-      std::cout << std::endl;/**/
+
+      // It shouldn't ever happen that undershootAuxiliary is negative while
+      // undershootAuxiliary is positive, as then the undershoot would be at a
+      // larger auxiliary value than the overshoot.
+      if( ( undershootAuxiliary > 0.0 )
+          &&
+          ( overshootAuxiliary <= 0.0 ) )
+      {
+        initialAuxiliary = ( 0.5 * ( undershootAuxiliary
+                                     + overshootAuxiliary
+                              + pathPotential.DefiniteOvershootAuxiliary() ) );
+        if( initialAuxiliary >= pathPotential.StartOfFinalSegment() )
+        {
+          initialAuxiliary = ( pathPotential.StartOfFinalSegment()
+                              - initialAuxiliary );
+        }
+      }
+      else
+      {
+        initialAuxiliary
+        = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
+      }
 
       // We cannot start at r = 0, as the damping term is proportional to 1/r,
       // so the initial conditions are set by a Euler step assuming that near
       // r = 0, p goes as p_0 + p_2 r^2 (as the bubble should have smooth
       // fields at its center); hence d^2p/dr^2 at r = 0 is
       // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
-      initialConditions[ 0 ] = initialAuxiliary;
-      initialConditions[ 1 ]
-      = ( ( bubbleDerivatives.PotentialDerivative( initialAuxiliary )
-            * integrationStartRadius )
-          / ( twiceDampingFactorPlusOne
-              * pathFieldsAndPotential.FieldDerivativesSquared(
-                                                        initialAuxiliary ) ) );
+      // The initial step should be big enough that the initial conditions for
+      // Boost::odeint will not suffer from precision problems from being too
+      // close to the path panic minimum.
+      if( initialAuxiliary <= 0.0 )
+      {
+        initialPositiveAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
+                                     + initialAuxiliary );
+        initialPotentialDerivative
+        = pathPotential.DerivativeNearPathPanic( initialAuxiliary );
+        // debugging:
+        /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
+        << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
+        << initialPositiveAuxiliary << " ("
+        << pathPotential.DefiniteOvershootAuxiliary() << " - "
+        << -initialAuxiliary << "), initialPotentialDerivative = "
+        << initialPotentialDerivative;
+        std::cout << std::endl;/**/
+      }
+      else
+      {
+        initialPositiveAuxiliary = initialAuxiliary;
+        initialPotentialDerivative
+        = pathPotential.FirstDerivative( initialAuxiliary );
+        // debugging:
+        /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
+        << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
+        << initialAuxiliary << " ("
+        << pathPotential.DefiniteOvershootAuxiliary() << " - "
+        << ( pathPotential.DefiniteOvershootAuxiliary() - initialAuxiliary )
+        << "), initialPotentialDerivative = " << initialPotentialDerivative;
+        std::cout << std::endl;/**/
+      }
+      initialQuadraticCoefficient = ( initialPotentialDerivative
+                                      / ( twiceDampingFactorPlusOne
+                              * pathFieldsAndPotential.FieldDerivativesSquared(
+                                                initialPositiveAuxiliary ) ) );
+
+      integrationStartRadius = ( -auxiliaryPrecisionResolution
+                     / ( initialQuadraticCoefficient * integrationStepSize ) );
+
+
+      initialConditions[ 0 ] = ( initialPositiveAuxiliary
+                                 + ( initialQuadraticCoefficient
+                                     * integrationStartRadius
+                                     * integrationStartRadius ) );
+      initialConditions[ 1 ] = ( 2.0 * initialQuadraticCoefficient
+                                     * integrationStartRadius );
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"

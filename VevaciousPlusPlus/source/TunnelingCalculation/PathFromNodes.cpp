@@ -23,12 +23,12 @@ namespace VevaciousPlusPlus
   {
     // This constructor is just an initialization list.
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "PathFromNodes::PathFromNodes( " << numberOfFields << ", "
     << referenceFieldIndex << ", " << numberOfVaryingPathNodes
     << " ) called. pathStepInversion =" << std::endl << pathStepInversion;
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
   }
 
   PathFromNodes::~PathFromNodes()

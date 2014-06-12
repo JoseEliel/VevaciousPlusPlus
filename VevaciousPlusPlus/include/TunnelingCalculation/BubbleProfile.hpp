@@ -40,9 +40,12 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    static double const auxiliaryPrecisionResolution;
+
     std::vector< BubbleRadialValueDescription > auxiliaryProfile;
     std::vector< BubbleRadialValueDescription > odeintProfile;
     PathFieldsAndPotential const& pathFieldsAndPotential;
+    SplinePotential const& pathPotential;
     OdeintBubbleDerivatives bubbleDerivatives;
     OdeintBubbleObserver bubbleObserver;
     double integrationStepSize;
@@ -52,11 +55,15 @@ namespace VevaciousPlusPlus
     double overshootAuxiliary;
     double initialAuxiliary;
     std::vector< double > initialConditions;
+    double initialPositiveAuxiliary;
+    double initialPotentialDerivative;
+    double initialQuadraticCoefficient;
     double const twiceDampingFactorPlusOne;
     double shootingThresholdSquared;
     size_t shootAttemptsLeft;
     bool worthIntegratingFurther;
     bool currentShotGoodEnough;
+
 
     // This looks through odeintProfile to see if there was a definite
     // undershoot or overshoot, setting undershootAuxiliary or
