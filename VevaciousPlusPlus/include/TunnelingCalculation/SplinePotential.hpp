@@ -40,7 +40,7 @@ namespace VevaciousPlusPlus
     // and that the potential derivative vanishes at the vacua. It also notes
     // the first point where the potential drops below that of the false vacuum
     // in definiteUndershootAuxiliary and the first maximum after that in
-    // definiteOvershootAuxiliary.
+    // definiteOvershootAuxiliary, and cuts off the potential at that maximum.
     void SetSpline( double const trueVacuumPotentialDifference );
 
     double DefiniteUndershootAuxiliary() const

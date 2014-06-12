@@ -22,7 +22,7 @@ namespace VevaciousPlusPlus
     finalQuarticCoefficient( NAN ),
     minimumFalseVacuumConcavity( minimumFalseVacuumConcavity ),
     definiteUndershootAuxiliary( NAN ),
-    definiteOvershootAuxiliary( NAN ),
+    definiteOvershootAuxiliary( 1.0 ),
     auxiliaryUpToCurrentSegment( 0.0 )
   {
     // This constructor is just an initialization list.
@@ -58,7 +58,7 @@ namespace VevaciousPlusPlus
     {
       return potentialValues.front();
     }
-    if( auxiliaryValue >= 1.0 )
+    if( auxiliaryValue >= definiteOvershootAuxiliary )
     {
       return finalPotential;
     }
@@ -94,7 +94,7 @@ namespace VevaciousPlusPlus
   {
     if( ( auxiliaryValue <= 0.0 )
         ||
-        ( auxiliaryValue >= 1.0 ) )
+        ( auxiliaryValue >= definiteOvershootAuxiliary ) )
     {
       return 0.0;
     }
@@ -125,7 +125,7 @@ namespace VevaciousPlusPlus
   // and that the potential derivative vanishes at the vacua. It also notes
   // the first point where the potential drops below that of the false vacuum
   // in definiteUndershootAuxiliary and the first maximum after that in
-  // definiteOvershootAuxiliary.
+  // definiteOvershootAuxiliary, and cuts off the potential at that maximum.
   void
   SplinePotential::SetSpline( double const trueVacuumPotentialDifference )
   {
@@ -243,21 +243,46 @@ namespace VevaciousPlusPlus
             &&
             ( extremumAuxiliary < auxiliaryValues[ segmentIndex ] ) )
         {
+          // If we find a minimum in a normal segment after having crossed to
+          // deeper than the false vacuum (since the spline segments are only
+          // quadratic, crossing the depth means that the slope is negative
+          // and within any segment that starts with a negative slope, if there
+          // is an extremum, it is a minimum; the slope also cannot turn
+          // positive without having gone through a minimum), we set it up to
+          // be the implicit final segment, purely as
+          // finalPotential
+          // + (definiteOvershootAuxiliary-p)^2 * halfFinalSecondDerivative
+          // (no quartic term), and then remove this normal segment and all
+          // those after it, and ends the function.
           definiteOvershootAuxiliary
           = ( auxiliaryUpToCurrentSegment + extremumAuxiliary );
           definiteOvershootFound = true;
+          finalPotential = ( potentialValues[ segmentIndex ]
+                             + ( firstDerivatives[ segmentIndex ]
+                                 * extremumAuxiliary )
+                             + ( halfSecondDerivatives[ segmentIndex ]
+                                 * extremumAuxiliary * extremumAuxiliary ) );
+          finalQuarticCoefficient = 0.0;
+          halfFinalSecondDerivative = halfSecondDerivatives[ segmentIndex ];
+          auxiliaryValues.resize( segmentIndex );
+          potentialValues.resize( segmentIndex );
+          firstDerivatives.resize( segmentIndex );
+          halfSecondDerivatives.resize( segmentIndex );
+          return;
         }
       }
 
       // Now we note the auxiliary value that starts the next segment.
       auxiliaryUpToCurrentSegment += auxiliaryValues[ segmentIndex ];
     }
-    // The last element of potentialValues is already the value of the
-    // potential at the end of the last normal segment, but
-    // firstDerivatives.back() is only the slope at the start of the last
-    // normal segment, so the second derivative must be added, multiplied by
-    // the last element of auxiliaryValues.
-    double finalDifference( auxiliaryUpToCurrentSegment - 1.0 );
+
+    // If we get to here, there is only 1 deeper-than-false-vacuum minimum and
+    // it is in the implicit final segment. The last element of potentialValues
+    // is already the value of the potential at the end of the last normal
+    // segment, but firstDerivatives.back() is only the slope at the start of
+    // the last normal segment, so the second derivative must be added,
+    // multiplied by the last element of auxiliaryValues.
+    double const finalDifference( auxiliaryUpToCurrentSegment - 1.0 );
     halfFinalSecondDerivative
     = ( 0.5 * ( ( 4.0 * ( potentialValues.back() - finalPotential ) )
                 - ( ( firstDerivatives.back()
