@@ -58,6 +58,13 @@ namespace VevaciousPlusPlus
   BubbleProfile::DampedProfile( size_t const undershootOvershootAttempts,
                                 double const shootingThreshold )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "THERE IS STILL AN ISSUE WITH THE INITIAL INTEGRATION RADIUS OVERTAKING"
+    << " THE END RADIUS IF THE INITIAL EULER STEP GETS TOO LARGE WITHOUT THE"
+    << " END RADIUS BEING INCREASED ACCORDINGLY!";
+    std::cout << std::endl;/**/
     shootAttemptsLeft = undershootOvershootAttempts;
     shootingThresholdSquared = ( shootingThreshold * shootingThreshold );
     undershootAuxiliary = pathPotential.DefiniteUndershootAuxiliary();
