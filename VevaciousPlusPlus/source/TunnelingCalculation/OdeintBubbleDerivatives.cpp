@@ -62,7 +62,7 @@ namespace VevaciousPlusPlus
                                             double const radialValue )
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "OdeintBubbleDerivatives::operator( auxiliaryAndFirstDerivative = { ";
     for( std::vector< double >::const_iterator
@@ -89,7 +89,7 @@ namespace VevaciousPlusPlus
       std::cout << *inputData;
     }
     std::cout << " }, radialValue = " << radialValue << " ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     double const auxiliaryValue( auxiliaryAndFirstDerivative[ 0 ] );
     // This cheats if there has already been an overshoot, to try to avoid the
     // integration going to small step sizes to resolve the oscillations of the

@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
     halfSecondDerivatives(),
     finalPotential( NAN ),
     halfFinalSecondDerivative( NAN ),
-    finalQuarticCoefficient( NAN ),
+    finalCubicCoefficient( NAN ),
     minimumFalseVacuumConcavity( minimumFalseVacuumConcavity ),
     definiteUndershootAuxiliary( NAN ),
     definiteOvershootAuxiliary( 1.0 ),
@@ -37,7 +37,7 @@ namespace VevaciousPlusPlus
     halfSecondDerivatives( copySource.halfSecondDerivatives ),
     finalPotential( copySource.finalPotential ),
     halfFinalSecondDerivative( copySource.halfFinalSecondDerivative ),
-    finalQuarticCoefficient( copySource.finalQuarticCoefficient ),
+    finalCubicCoefficient( copySource.finalCubicCoefficient ),
     minimumFalseVacuumConcavity( copySource.minimumFalseVacuumConcavity ),
     definiteUndershootAuxiliary( copySource.definiteUndershootAuxiliary ),
     definiteOvershootAuxiliary( copySource.definiteOvershootAuxiliary ),
@@ -86,9 +86,8 @@ namespace VevaciousPlusPlus
     auxiliaryDifference = ( auxiliaryValue - 1.0 );
     return ( finalPotential
              + ( ( halfFinalSecondDerivative
-                   + ( finalQuarticCoefficient
-                       * auxiliaryDifference * auxiliaryDifference ) )
-                 * ( auxiliaryDifference * auxiliaryDifference ) ) );
+                   + ( finalCubicCoefficient * auxiliaryDifference ) )
+                 * auxiliaryDifference * auxiliaryDifference ) );
   }
 
   // This returns the value of the first derivative of the potential at
@@ -119,9 +118,8 @@ namespace VevaciousPlusPlus
     // auxiliaryValues[ currentGivenSize - 1 ] < auxiliaryValue < 1.0.
     auxiliaryDifference = ( auxiliaryValue - 1.0 );
     return ( ( ( 2.0 * halfFinalSecondDerivative )
-               + ( 4.0 * finalQuarticCoefficient
-                       * auxiliaryDifference * auxiliaryDifference ) )
-             * auxiliaryDifference );
+               + ( 3.0 * finalCubicCoefficient * auxiliaryDifference ) )
+                 * auxiliaryDifference );
   }
 
   // This sets up the spline based on auxiliaryValues and potentialValues,
@@ -146,6 +144,12 @@ namespace VevaciousPlusPlus
     // p = 0). It has the side-effect that potentials with energy barriers too
     // thin to be resolved by the path resolution are then forced to have a
     // small barrier at least.
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "potentialValues[ 0 ] = " << potentialValues[ 0 ]
+    << ", potentialValues[ 1 ] = " << potentialValues[ 1 ];
+    std::cout << std::endl;/**/
     if( potentialValues[ 1 ] < 0.0 )
     {
       halfSecondDerivatives[ 0 ] = minimumFalseVacuumConcavity;
@@ -162,6 +166,14 @@ namespace VevaciousPlusPlus
       halfSecondDerivatives[ 0 ] = ( potentialValues[ 1 ]
                            / ( auxiliaryValues[ 0 ] * auxiliaryValues[ 0 ] ) );
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "auxiliaryValues[ 0 ] = " << auxiliaryValues[ 0 ]
+    << ", potentialValues[ 0 ] = " << potentialValues[ 0 ]
+    << ", firstDerivatives[ 0 ] = " << firstDerivatives[ 0 ]
+    << ", halfSecondDerivatives[ 0 ] = " << halfSecondDerivatives[ 0 ];
+    std::cout << std::endl;/**/
     bool definiteUndershootFound( false );
     bool definiteOvershootFound( false );
     auxiliaryUpToCurrentSegment = auxiliaryValues[ 0 ];
@@ -180,6 +192,20 @@ namespace VevaciousPlusPlus
                 * auxiliaryValues[ segmentIndex ] ) )
         / ( auxiliaryValues[ segmentIndex ]
             * auxiliaryValues[ segmentIndex ] ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "auxiliaryUpToCurrentSegment = " << auxiliaryUpToCurrentSegment
+      << ", auxiliaryValues[ " << segmentIndex << " ] = "
+      << auxiliaryValues[ segmentIndex ]
+      << ", potentialValues[ " << segmentIndex << " ] = "
+      << potentialValues[ segmentIndex ]
+      << ", firstDerivatives[ " << segmentIndex << " ] = "
+      << firstDerivatives[ segmentIndex ]
+      << ", halfSecondDerivatives[ " << segmentIndex << " ] = "
+      << halfSecondDerivatives[ segmentIndex ];
+      std::cout << std::endl;/**/
 
       // Now we check for the potential dropping below potentialValues[ 0 ] in
       // this segment.
@@ -228,6 +254,13 @@ namespace VevaciousPlusPlus
             }
           }
         }
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "after checking, definiteUndershootFound = "
+        << definiteUndershootFound << ", definiteUndershootAuxiliary = "
+        << definiteUndershootAuxiliary;
+        std::cout << std::endl;/**/
       }
       // End of checking for crossing the line where the potential equals its
       // value at the false vacuum.
@@ -239,8 +272,16 @@ namespace VevaciousPlusPlus
           !definiteOvershootFound )
       {
         double const
-        extremumAuxiliary( ( 0.5 * firstDerivatives[ segmentIndex ] )
+        extremumAuxiliary( ( -0.5 * firstDerivatives[ segmentIndex ] )
                            / ( halfSecondDerivatives[ segmentIndex ] ) );
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "definiteUndershootFound = " << definiteUndershootFound
+        << ", definiteOvershootFound = " << definiteOvershootFound
+        << ", extremumAuxiliary = " << extremumAuxiliary
+        << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary;
+        std::cout << std::endl;/**/
         if( ( extremumAuxiliary > std::max( 0.0,
                                             ( definiteUndershootAuxiliary
                                             - auxiliaryUpToCurrentSegment ) ) )
@@ -256,8 +297,9 @@ namespace VevaciousPlusPlus
           // be the implicit final segment, purely as
           // finalPotential
           // + (definiteOvershootAuxiliary-p)^2 * halfFinalSecondDerivative
-          // (no quartic term), and then remove this normal segment and all
-          // those after it, and ends the function.
+          // (no cubic term, and the linear term is absorbed by the shift of
+          // the end of the segment to the minimum), and then remove this
+          // normal segment and all those after it, and ends the function.
           definiteOvershootAuxiliary
           = ( auxiliaryUpToCurrentSegment + extremumAuxiliary );
           definiteOvershootFound = true;
@@ -266,14 +308,24 @@ namespace VevaciousPlusPlus
                                  * extremumAuxiliary )
                              + ( halfSecondDerivatives[ segmentIndex ]
                                  * extremumAuxiliary * extremumAuxiliary ) );
-          finalQuarticCoefficient = 0.0;
           halfFinalSecondDerivative = halfSecondDerivatives[ segmentIndex ];
+          finalCubicCoefficient = 0.0;
           auxiliaryValues.resize( segmentIndex );
           potentialValues.resize( segmentIndex );
           firstDerivatives.resize( segmentIndex );
           halfSecondDerivatives.resize( segmentIndex );
           startOfFinalSegment = auxiliaryUpToCurrentSegment;
           sizeOfFinalSegment = extremumAuxiliary;
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "found early path panic minimum in segment " << segmentIndex
+          << ", startOfFinalSegment = " << startOfFinalSegment
+          << ", sizeOfFinalSegment = " << sizeOfFinalSegment
+          << ", definiteUndershootFound = " << definiteUndershootFound
+          << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
+          << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary;
+          std::cout << std::endl;/**/
           return;
         }
       }
@@ -283,32 +335,6 @@ namespace VevaciousPlusPlus
     }
     startOfFinalSegment = auxiliaryUpToCurrentSegment;
 
-    // If we get to here, there is only 1 deeper-than-false-vacuum minimum and
-    // it is in the implicit final segment. The last element of potentialValues
-    // is already the value of the potential at the end of the last normal
-    // segment, but firstDerivatives.back() is only the slope at the start of
-    // the last normal segment, so the second derivative must be added,
-    // multiplied by the last element of auxiliaryValues.
-    sizeOfFinalSegment = ( 1.0 - auxiliaryUpToCurrentSegment );
-    halfFinalSecondDerivative
-    = ( 0.5 * ( ( 4.0 * ( potentialValues.back() - finalPotential ) )
-                + ( ( firstDerivatives.back()
-                      + ( 2.0 * halfSecondDerivatives.back()
-                              * auxiliaryValues.back() ) )
-                    * sizeOfFinalSegment ) ) );
-    // The derivative is added because sizeOfFinalSegment is 1-p, so flips the
-    // sign.
-    finalQuarticCoefficient
-    = ( ( potentialValues.back() - finalPotential
-          - halfFinalSecondDerivative )
-        / ( sizeOfFinalSegment * sizeOfFinalSegment
-            * sizeOfFinalSegment * sizeOfFinalSegment ) );
-    halfFinalSecondDerivative = ( halfFinalSecondDerivative
-                               / ( sizeOfFinalSegment * sizeOfFinalSegment ) );
-
-    // If the definite undershoot has not been found yet, both
-    // definiteUndershootAuxiliary and definiteOvershootAuxiliary must be in
-    // the (implicit) last segment.
     if( !definiteUndershootFound )
     {
       // If the potential hasn't dropped below the value of the false potential
@@ -316,23 +342,68 @@ namespace VevaciousPlusPlus
       // auxiliary value as the start of the final segment.
       definiteUndershootAuxiliary = auxiliaryUpToCurrentSegment;
     }
-    if( !definiteOvershootFound )
+
+    // If we get to here, there is only 1 deeper-than-false-vacuum minimum and
+    // it is in the implicit final segment. The last element of potentialValues
+    // is already the value of the potential at the end of the last normal
+    // segment, but firstDerivatives.back() is only the slope at the start of
+    // the last normal segment, so the second derivative must be added,
+    // multiplied by the last element of auxiliaryValues.
+    sizeOfFinalSegment = ( 1.0 - auxiliaryUpToCurrentSegment );
+    double const finalPotentialDrop( potentialValues.back() - finalPotential );
+    double const finalStartSlope( firstDerivatives.back()
+                                  + ( 2.0 * halfSecondDerivatives.back()
+                                          * auxiliaryValues.back() ) );
+    // If the slope at the start of the final segment is steep enough that a
+    // quadratic spline would have a path panic minimum before p = 1.0, we keep
+    // it and just end the spline at that minimum (no cubic term, and the
+    // linear term is absorbed by the shift of the end of the segment to the
+    // minimum). This is definitely the case if finalPotentialDrop is negative
+    // or small enough compared to -finalStartSlope (finalStartSlope must be
+    // negative or we would have already found an early path potential
+    // minimum).
+    if( ( 2.0 * finalPotentialDrop )
+        + ( finalStartSlope * sizeOfFinalSegment ) <= 0.0 )
     {
-      // The definite overshoot auxiliary depends on whether the minimization
-      // condition can be satisfied for p != 1.
-      double squareOfPossibleSolution( -halfFinalSecondDerivative
-                                       / ( 2.0 * finalQuarticCoefficient ) );
-      if( squareOfPossibleSolution > 0.0 )
-      {
-        definiteOvershootAuxiliary
-        = ( 1.0 - sqrt( squareOfPossibleSolution ) );
-        sizeOfFinalSegment -= ( 1.0 - definiteOvershootAuxiliary );
-      }
-      else
-      {
-        definiteOvershootAuxiliary = 1.0;
-      }
+      finalCubicCoefficient = 0.0;
+      halfFinalSecondDerivative
+      = ( -( finalPotentialDrop + ( finalStartSlope * sizeOfFinalSegment ) )
+          / ( sizeOfFinalSegment * sizeOfFinalSegment ) );
+      double const
+      offsetOfMinimumFromOne( 0.5 * ( sizeOfFinalSegment
+                                      - ( finalPotentialDrop
+                                          / ( halfFinalSecondDerivative
+                                              * sizeOfFinalSegment ) ) ) );
+      definiteOvershootAuxiliary = ( 1.0 - offsetOfMinimumFromOne );
+      sizeOfFinalSegment -= offsetOfMinimumFromOne;
+      finalPotential = ( potentialValues.back()
+                         - ( halfFinalSecondDerivative * sizeOfFinalSegment
+                                                      * sizeOfFinalSegment ) );
     }
+    else
+    {
+      halfFinalSecondDerivative = ( ( 3.0 * finalPotentialDrop )
+                                  + ( finalStartSlope * sizeOfFinalSegment ) );
+      finalCubicCoefficient
+      = ( ( halfFinalSecondDerivative - finalPotentialDrop )
+          / ( sizeOfFinalSegment * sizeOfFinalSegment * sizeOfFinalSegment ) );
+      halfFinalSecondDerivative = ( halfFinalSecondDerivative
+                               / ( sizeOfFinalSegment * sizeOfFinalSegment ) );
+      definiteOvershootAuxiliary = 1.0;
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Implicit final segment:" << std::endl
+    << "startOfFinalSegment = " << startOfFinalSegment
+    << ", sizeOfFinalSegment = " << sizeOfFinalSegment
+    << ", finalPotential = " << finalPotential
+    << ", halfFinalSecondDerivative = " << halfFinalSecondDerivative
+    << ", finalCubicCoefficient = " << finalCubicCoefficient
+    << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
+    << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary;
+    std::cout << std::endl;/**/
   }
 
   // This is for debugging.
@@ -361,7 +432,7 @@ namespace VevaciousPlusPlus
     << " + UnitStep[x - " << cumulativeAuxiliary << "] * ( (" << finalPotential
     << ") + (x-" << definiteOvershootAuxiliary << ")^2 * ("
     << halfFinalSecondDerivative << ") + (x-" << definiteOvershootAuxiliary
-    << ")^4 * (" << finalQuarticCoefficient << ") ) * UnitStep["
+    << ")^3 * (" << finalCubicCoefficient << ") ) * UnitStep["
     << definiteOvershootAuxiliary << " - x]";
     return returnStream.str();
   }

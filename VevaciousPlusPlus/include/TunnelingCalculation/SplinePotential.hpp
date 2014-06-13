@@ -80,7 +80,7 @@ namespace VevaciousPlusPlus
     std::vector< double > halfSecondDerivatives;
     double finalPotential;
     double halfFinalSecondDerivative;
-    double finalQuarticCoefficient;
+    double finalCubicCoefficient;
     double const minimumFalseVacuumConcavity;
     double definiteUndershootAuxiliary;
     double definiteOvershootAuxiliary;
@@ -99,7 +99,7 @@ namespace VevaciousPlusPlus
                             double const differenceFromMaximumAuxiliary ) const
   {
     return ( ( ( 2.0 * halfFinalSecondDerivative )
-                   + ( 4.0 * finalQuarticCoefficient
+                   + ( 4.0 * finalCubicCoefficient
                            * differenceFromMaximumAuxiliary
                            * differenceFromMaximumAuxiliary ) )
                  * differenceFromMaximumAuxiliary );

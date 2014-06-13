@@ -1,0 +1,7 @@
+block PHIFOURTH Q=  1.0E+02  #
+ 1  0.1 # lambda
+ 2  0.6 # mu^2
+block PHIFOURTHVEVS Q=  1.0E+02  #
+ 1  123.4 # DSB vev
+block PHIFOURTHLINEAR Q=  1.0E+02  #
+ 1  0.1 # epsilon

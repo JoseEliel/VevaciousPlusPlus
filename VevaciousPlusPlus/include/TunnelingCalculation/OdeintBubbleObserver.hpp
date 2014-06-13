@@ -29,16 +29,7 @@ namespace VevaciousPlusPlus
                      double const radialValue )
     { bubbleDescription.push_back( BubbleRadialValueDescription( radialValue,
                                               auxiliaryAndFirstDerivative[ 0 ],
-                                        auxiliaryAndFirstDerivative[ 1 ] ) );
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "OdeintBubbleObserver::operator() finished: bubbleDescription.size() = "
-    << bubbleDescription.size() << ", bubbleDescription.back() = { r = "
-    << bubbleDescription.back().radialValue << ", p = "
-    << bubbleDescription.back().auxiliaryValue << ", dp/dr = "
-    << bubbleDescription.back().auxiliarySlope << " }";
-    std::cout << std::endl;/**/ }
+                                        auxiliaryAndFirstDerivative[ 1 ] ) ); }
 
 
   protected:

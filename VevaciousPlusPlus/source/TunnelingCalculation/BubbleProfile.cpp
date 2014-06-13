@@ -58,13 +58,6 @@ namespace VevaciousPlusPlus
   BubbleProfile::DampedProfile( size_t const undershootOvershootAttempts,
                                 double const shootingThreshold )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "THERE IS STILL AN ISSUE WITH THE INITIAL INTEGRATION RADIUS OVERTAKING"
-    << " THE END RADIUS IF THE INITIAL EULER STEP GETS TOO LARGE WITHOUT THE"
-    << " END RADIUS BEING INCREASED ACCORDINGLY!";
-    std::cout << std::endl;/**/
     shootAttemptsLeft = undershootOvershootAttempts;
     shootingThresholdSquared = ( shootingThreshold * shootingThreshold );
     undershootAuxiliary = pathPotential.DefiniteUndershootAuxiliary();
@@ -76,13 +69,11 @@ namespace VevaciousPlusPlus
     // the path panic minimum.)
     if( undershootAuxiliary >= pathPotential.StartOfFinalSegment() )
     {
-      undershootAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
-                              - undershootAuxiliary );
+      undershootAuxiliary -= pathPotential.DefiniteOvershootAuxiliary();
     }
     if( overshootAuxiliary >= pathPotential.StartOfFinalSegment() )
     {
-      overshootAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
-                             - overshootAuxiliary );
+      overshootAuxiliary -= pathPotential.DefiniteOvershootAuxiliary();
     }
 
     // This loop is broken out of if the shoot attempt seems to have been close
@@ -169,6 +160,10 @@ namespace VevaciousPlusPlus
       integrationStartRadius = ( -auxiliaryPrecisionResolution
                      / ( initialQuadraticCoefficient * integrationStepSize ) );
 
+      // We have to ensure that the end radius is larger than the start radius.
+      integrationEndRadius = std::max( integrationEndRadius,
+                                       ( 2.0 * integrationStartRadius ) );
+
 
       initialConditions[ 0 ] = ( initialPositiveAuxiliary
                                  + ( initialQuadraticCoefficient
@@ -184,7 +179,8 @@ namespace VevaciousPlusPlus
       << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
       << " }. integrationStepSize = " << integrationStepSize
       << ", integrationStartRadius = " << integrationStartRadius
-      << ", integrationEndRadius = " << integrationEndRadius;
+      << ", integrationEndRadius = " << integrationEndRadius
+      << ", shootAttemptsLeft = " << shootAttemptsLeft;
       std::cout << std::endl;/**/
 
       ShootFromInitialConditions();
@@ -194,8 +190,7 @@ namespace VevaciousPlusPlus
         integrationStartRadius = auxiliaryProfile.back().radialValue;
         initialConditions[ 0 ] = auxiliaryProfile.back().auxiliaryValue;
         initialConditions[ 1 ] = auxiliaryProfile.back().auxiliarySlope;
-        integrationEndRadius = ( integrationStartRadius
-                                 + integrationStartRadius );
+        integrationEndRadius = ( 2.0 * integrationStartRadius );
 
         // debugging:
         /**/std::cout << std::endl << "debugging:"
@@ -227,7 +222,7 @@ namespace VevaciousPlusPlus
       std::cout << "r = " << bubbleBit->radialValue << ", p = "
       << bubbleBit->auxiliaryValue << ", dp/dr = " << bubbleBit->auxiliarySlope
       << ", "
-      << pathFieldsAndPotential.FieldsString( bubbleBit->auxiliarySlope )
+      << pathFieldsAndPotential.FieldsString( bubbleBit->auxiliaryValue )
       << std::endl;
     }
     std::cout << std::endl;/**/
