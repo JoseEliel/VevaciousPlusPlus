@@ -381,19 +381,42 @@ namespace VevaciousPlusPlus
     std::vector< BubbleRadialValueDescription > const&
     auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
                                                    shootingThreshold ) );
-    double bounceAction( 0.0 );
-    double previousIntegrand( 0.0 );
     // The bounce action density at r = 0 is 0 by merit of
     // r_0^dampingFactor = 0,
     // dp/dr = 0 at r = 0,
     // and potentialApproximation(p(0)) = 0 by construction.
     // The smallest r recorded by bubbleProfile is non-zero because of this.
-    double currentAuxiliary( NAN );
-    double currentIntegrand( 0.0 );
-    double previousRadius( 0.0 );
-    double currentRadius( 0.0 );
+    // Thus we add a sphere of 3 or 4 dimensions with just the potential
+    // contribution, assuming the kinetic contribution up to the 1st radius is
+    // negligible, before adding in spherical layers of integrand. (The solid
+    // angle factor is left until afterwards.)
+    double currentAuxiliary( auxiliaryProfile.front().auxiliaryValue );
+    double currentRadius( auxiliaryProfile.front().radialValue );
+    double currentIntegrand( pathFieldsAndPotential.PotentialApproximation(
+                                                             currentAuxiliary )
+                             * currentRadius * currentRadius );
+    double previousIntegrand( NAN );
+    double bounceAction( NAN );
+    if( pathFieldsAndPotential.NonZeroTemperature() )
+    {
+      bounceAction = ( currentIntegrand / 3.0 );
+    }
+    else
+    {
+      currentIntegrand *= currentRadius;
+      bounceAction = ( 0.25 * currentIntegrand );
+    }
+    double previousRadius( currentIntegrand );
     double kineticTerm( NAN );
-    for( unsigned int radiusIndex( 0 );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "keeping track of parts of integral. pathFieldsAndPotential ="
+    << std::endl << pathFieldsAndPotential.AsDebuggingString();
+    double debugKineticSum( 0.0 );
+    double debugPotentialSum( 0.0 );
+    std::cout << std::endl;/**/
+    for( size_t radiusIndex( 1 );
          radiusIndex < auxiliaryProfile.size();
          ++radiusIndex )
     {
@@ -416,6 +439,32 @@ namespace VevaciousPlusPlus
       bounceAction += ( ( currentIntegrand + previousIntegrand )
                         * ( currentRadius - previousRadius ) );
       // A common factor of 1/2 is being left until after the loop.
+      // debugging:
+      /**/
+      debugKineticSum
+      += ( kineticTerm
+          * currentRadius * currentRadius * currentRadius
+          * ( currentRadius - previousRadius ) );
+      debugPotentialSum
+      += ( pathFieldsAndPotential.PotentialApproximation( currentAuxiliary )
+           * currentRadius * currentRadius * currentRadius
+           * ( currentRadius - previousRadius ) );
+      std::cout << std::endl << "debugging:"
+      << std::endl
+      << "radiusIndex = " << radiusIndex
+      << ", r = " << currentRadius
+      << ", dr = " << ( currentRadius - previousRadius )
+      << ", p = " << currentAuxiliary
+      << ", |dp/dr|^2 = "
+      << pow( auxiliaryProfile[ radiusIndex ].auxiliarySlope,
+              2 )
+      << ", df/dp.df/dp = "
+      << pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary )
+      << ", V(p) = "
+      << pathFieldsAndPotential.PotentialApproximation( currentAuxiliary )
+      << ", debugKineticSum = " << debugKineticSum
+      << ", debugPotentialSum = " << debugPotentialSum;
+      std::cout << std::endl;/**/
     }
     // The common factor of 1/2 is combined with the solid angle of
     // 2 pi^2 (quantum) or 4 pi (thermal):

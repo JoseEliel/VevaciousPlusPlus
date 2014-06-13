@@ -99,10 +99,9 @@ namespace VevaciousPlusPlus
                             double const differenceFromMaximumAuxiliary ) const
   {
     return ( ( ( 2.0 * halfFinalSecondDerivative )
-                   + ( 4.0 * finalCubicCoefficient
-                           * differenceFromMaximumAuxiliary
+                   + ( 3.0 * finalCubicCoefficient
                            * differenceFromMaximumAuxiliary ) )
-                 * differenceFromMaximumAuxiliary );
+             * differenceFromMaximumAuxiliary );
   }
 
   // This adds another point for the spline, assuming that it goes after the

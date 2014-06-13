@@ -82,8 +82,8 @@ namespace VevaciousPlusPlus
       ++segmentIndex;
     }
     // If we get to here, we're beyond the last normal segment:
-    // auxiliaryValues.back() < auxiliaryValue < 1.0.
-    auxiliaryDifference = ( auxiliaryValue - 1.0 );
+    // auxiliaryValues.back() < auxiliaryValue < definiteOvershootAuxiliary.
+    auxiliaryDifference = ( auxiliaryValue - definiteOvershootAuxiliary );
     return ( finalPotential
              + ( ( halfFinalSecondDerivative
                    + ( finalCubicCoefficient * auxiliaryDifference ) )
@@ -116,7 +116,7 @@ namespace VevaciousPlusPlus
     }
     // If we get to here, we're beyond the last normal segment:
     // auxiliaryValues[ currentGivenSize - 1 ] < auxiliaryValue < 1.0.
-    auxiliaryDifference = ( auxiliaryValue - 1.0 );
+    auxiliaryDifference = ( auxiliaryValue - definiteOvershootAuxiliary );
     return ( ( ( 2.0 * halfFinalSecondDerivative )
                + ( 3.0 * finalCubicCoefficient * auxiliaryDifference ) )
                  * auxiliaryDifference );
