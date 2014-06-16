@@ -38,6 +38,10 @@ namespace VevaciousPlusPlus
     DampedProfile( size_t const undershootOvershootAttempts,
                    double const shootingThreshold );
 
+    // This returns the value that the auxiliary variable should have at the
+    // center of the bubble.
+    double AuxiliaryAtBubbleCenter() const;
+
 
   protected:
     static double const auxiliaryPrecisionResolution;
@@ -58,7 +62,7 @@ namespace VevaciousPlusPlus
     double initialPositiveAuxiliary;
     double initialPotentialDerivative;
     double initialQuadraticCoefficient;
-    double const twiceDampingFactorPlusOne;
+    double const twoPlusTwiceDampingFactor;
     double shootingThresholdSquared;
     size_t shootAttemptsLeft;
     bool worthIntegratingFurther;
@@ -84,6 +88,18 @@ namespace VevaciousPlusPlus
 
 
 
+
+
+  // This returns the value that the auxiliary variable should have at the
+  // center of the bubble.
+  inline double BubbleProfile::AuxiliaryAtBubbleCenter() const
+  {
+    if( initialAuxiliary < 0.0 )
+    {
+      return ( pathPotential.DefiniteOvershootAuxiliary() + initialAuxiliary );
+    }
+    return initialAuxiliary;
+  }
 
   // This performs the integration based on what is in initialConditions. It
   // also sets undershootAuxiliary, overshootAuxiliary, and

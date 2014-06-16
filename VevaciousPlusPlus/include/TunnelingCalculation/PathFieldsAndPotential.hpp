@@ -63,9 +63,13 @@ namespace VevaciousPlusPlus
 
     double GivenTemperature() const{ return givenTemperature; }
 
-    // This returns the dimensionality of the radial integral: 2.0 for non-zero
-    // temperature, 3.0 for zero temperature.
+    // This returns one less than the dimensionality of the radial integral:
+    // 2.0 for non-zero temperature, 3.0 for zero temperature.
     double DampingFactor() const;
+
+    // This returns 1.0 / [the dimensionality of the radial integral]:
+    // (1.0/3.0) for non-zero temperature, 0.25 for zero temperature.
+    double OneOverIntegralDimension() const;
 
     // This is for debugging.
     std::string AsDebuggingString() const;
@@ -121,8 +125,8 @@ namespace VevaciousPlusPlus
     return returnValue;
   }
 
-  // This returns the dimensionality of the radial integral: 2.0 for non-zero
-  // temperature, 3.0 for zero temperature.
+  // This returns one less than the dimensionality of the radial integral:
+  // 2.0 for non-zero temperature, 3.0 for zero temperature.
   inline double PathFieldsAndPotential::DampingFactor() const
   {
     if( nonZeroTemperature )
@@ -135,6 +139,23 @@ namespace VevaciousPlusPlus
     }
     // I could have written
     // return ( nonZeroTemperature ? 2.0 : 3.0 );
+    // but I feel that it's nice to be verbose.
+  }
+
+  // This returns 1.0 / [the dimensionality of the radial integral]:
+  // (1.0/3.0) for non-zero temperature, 0.25 for zero temperature.
+  inline double PathFieldsAndPotential::OneOverIntegralDimension() const
+  {
+    if( nonZeroTemperature )
+    {
+      return ( 1.0 / 3.0 );
+    }
+    else
+    {
+      return 0.25;
+    }
+    // I could have written
+    // return ( nonZeroTemperature ? (1.0/3.0) : 0.25 );
     // but I feel that it's nice to be verbose.
   }
 

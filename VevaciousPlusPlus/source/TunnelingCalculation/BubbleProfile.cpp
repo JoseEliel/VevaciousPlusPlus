@@ -32,8 +32,8 @@ namespace VevaciousPlusPlus
     initialPositiveAuxiliary( NAN ),
     initialPotentialDerivative( NAN ),
     initialQuadraticCoefficient( NAN ),
-    twiceDampingFactorPlusOne( ( 2.0 * pathFieldsAndPotential.DampingFactor() )
-                               + 1.0 ),
+    twoPlusTwiceDampingFactor( 2.0 * ( pathFieldsAndPotential.DampingFactor()
+                                       + 1.0 ) ),
     shootingThresholdSquared( NAN ),
     shootAttemptsLeft( 0 ),
     worthIntegratingFurther( true ),
@@ -118,8 +118,8 @@ namespace VevaciousPlusPlus
       // We cannot start at r = 0, as the damping term is proportional to 1/r,
       // so the initial conditions are set by a Euler step assuming that near
       // r = 0, p goes as p_0 + p_2 r^2 (as the bubble should have smooth
-      // fields at its center); hence d^2p/dr^2 at r = 0 is
-      // ( dV/dp ) / ( ( 1 + 2 * dampingFactor ) |df/dp|^2 ).
+      // fields at its center); hence d^2p/dr^2 (= 2 p_2) at r = 0 is
+      // ( dV/dp ) / ( ( 1 + dampingFactor ) |df/dp|^2 ).
       // The initial step should be big enough that the initial conditions for
       // Boost::odeint will not suffer from precision problems from being too
       // close to the path panic minimum.
@@ -153,7 +153,7 @@ namespace VevaciousPlusPlus
         std::cout << std::endl;/**/
       }
       initialQuadraticCoefficient = ( initialPotentialDerivative
-                                      / ( twiceDampingFactorPlusOne
+                                      / ( twoPlusTwiceDampingFactor
                               * pathFieldsAndPotential.FieldDerivativesSquared(
                                                 initialPositiveAuxiliary ) ) );
 

@@ -100,6 +100,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    static double const radiusDifferenceThreshold;
+
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     size_t referenceFieldIndex;
@@ -143,9 +145,16 @@ namespace VevaciousPlusPlus
     // Before returning, it sets thinWallIsGoodApproximation to be true or
     // false depending on whether the thin-wall approximation is a good
     // approximation or not.
+    //double
+    //ThinWallApproximation( PathFieldsAndPotential const pathFieldsAndPotential,
+    //                       bool& thinWallIsGoodApproximation ) const;
+    // Actually, I don't think that this is worth using.
+
+    // This evaluates the bounce action density at the given point on the
+    // bubble profile.
     double
-    ThinWallApproximation( PathFieldsAndPotential const pathFieldsAndPotential,
-                           bool& thinWallIsGoodApproximation ) const;
+    BounceActionDensity( PathFieldsAndPotential const& pathFieldsAndPotential,
+                      BubbleRadialValueDescription const& profilePoint ) const;
 
     // This sets up the bubble profile, numerically integrates the bounce
     // action over it, and then returns effective bounce action
@@ -220,22 +229,38 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
     PotentialAlongPath( pathFieldsAndPotential );
     // We return a thin-wall approximation if appropriate:
-    bool thinWallIsGoodApproximation( false );
+    /*bool thinWallIsGoodApproximation( false );
     double bounceAction( ThinWallApproximation( pathFieldsAndPotential,
                                                thinWallIsGoodApproximation ) );
     if( thinWallIsGoodApproximation )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      *//*std::cout << std::endl << "debugging:"
       << std::endl
       << "thin-wall bounce = " << bounceAction
       << "but not returning yet, to test whether shooting matches this.";
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*//*
       //return bounceAction;
-    }
+    }*/
+    // Actually, we don't bother.
     // If we didn't return bounceAction already, it means that the we go on to
     // try undershooting/overshooting.
     return EffectiveBounceAction( pathFieldsAndPotential );
+  }
+
+  // This evaluates the bounce action density at the given point on the
+  // bubble profile.
+  inline double ModifiedBounceForMinuit::BounceActionDensity(
+                          PathFieldsAndPotential const& pathFieldsAndPotential,
+                       BubbleRadialValueDescription const& profilePoint ) const
+  {
+    double const currentAuxiliary( profilePoint.auxiliaryValue );
+    double kineticTerm( profilePoint.auxiliarySlope );
+    kineticTerm *= ( 0.5 * kineticTerm
+        * pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary ) );
+    return
+    ( kineticTerm
+         + pathFieldsAndPotential.PotentialApproximation( currentAuxiliary ) );
   }
 
   // This sets up initialParameterization and initialStepSizes to be a

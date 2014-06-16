@@ -9,6 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
+  double const ModifiedBounceForMinuit::radiusDifferenceThreshold( 0.01 );
 
   ModifiedBounceForMinuit::ModifiedBounceForMinuit(
                                     PotentialFunction const& potentialFunction,
@@ -248,15 +249,15 @@ namespace VevaciousPlusPlus
   // calculated under the thin-wall approximation. Before returning, it sets
   // thinWallIsGoodApproximation to be true or false depending on whether
   // the thin-wall approximation is a good approximation or not.
-  double ModifiedBounceForMinuit::ThinWallApproximation(
+  /*double ModifiedBounceForMinuit::ThinWallApproximation(
                            PathFieldsAndPotential const pathFieldsAndPotential,
                                       bool& thinWallIsGoodApproximation ) const
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    *//*std::cout << std::endl << "debugging:"
     << std::endl
     << "Must remember to test thin-wall approximation!";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*//*
 
     double const potentialDifference( pathFieldsAndPotential.FalsePotential()
                                     - pathFieldsAndPotential.TruePotential() );
@@ -298,11 +299,11 @@ namespace VevaciousPlusPlus
       potentialValue
       = pathFieldsAndPotential.PotentialApproximation( thinWallAuxiliary );
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      *//*std::cout << std::endl << "debugging:"
       << std::endl
       << "thinWallAuxiliary = " << thinWallAuxiliary
       << ", potentialValue = " << potentialValue;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*//*
       if( potentialValue > 0.0 )
       {
         integratedAction
@@ -318,12 +319,12 @@ namespace VevaciousPlusPlus
     // field linear in a.
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    *//*std::cout << std::endl << "debugging:"
     << std::endl
     << "integratedAction = " << integratedAction
     << ", oneOverPotentialDifference = " << oneOverPotentialDifference
     << ", wallThickness = " << wallThickness;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*//*
 
 
     // We return the thin-wall approximation of the bounce action only if the
@@ -360,7 +361,7 @@ namespace VevaciousPlusPlus
       // S_4 is likely to be at least 10^6, leading to a totally negligible
       // tunneling probability...
     }
-  }
+  }*/
 
   // This sets up the bubble profile, numerically integrates the bounce action
   // over it, and then returns effective bounce action
@@ -381,110 +382,162 @@ namespace VevaciousPlusPlus
     std::vector< BubbleRadialValueDescription > const&
     auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
                                                    shootingThreshold ) );
-    // The bounce action density at r = 0 is 0 by merit of
-    // r_0^dampingFactor = 0,
-    // dp/dr = 0 at r = 0,
-    // and potentialApproximation(p(0)) = 0 by construction.
-    // The smallest r recorded by bubbleProfile is non-zero because of this.
-    // Thus we add a sphere of 3 or 4 dimensions with just the potential
-    // contribution, assuming the kinetic contribution up to the 1st radius is
-    // negligible, before adding in spherical layers of integrand. (The solid
-    // angle factor is left until afterwards.)
-    double currentAuxiliary( auxiliaryProfile.front().auxiliaryValue );
+
+    // We have a set of r_i, p(r_i), and dp/dr|_{r=r_i}, and can easily
+    // evaluate a set of "bounce action densities" B_i = B(r_i). The numerical
+    // integral is then the sum of B_i * [differential volume at r_i], which
+    // normally would be
+    // B_i * r_i^dampingFactor * [solid angle] * ( r_{i+1} - r_i ).
+    // In an attempt to reduce the numerical error, one can instead take
+    // 0.5 * (B_i + B_{i+1}) * r_i^dampingFactor
+    //     * [solid angle] * ( r_{i+1} - r_i ), or other averages that are
+    // formally identical as the difference in radius vanishes. We take the
+    // average B(r) over each differential volume:
+    // ( 0.5 * (B_i + B_{i+1}) ) * [differential volume]
+    // where [differential volume] is
+    // ( r_i^dampingFactor * [solid angle] * ( r_{i+1} - r_i ) )
+    // if ( r_{i+1} - r_i ) is small compared to r_{i+1} and r_i, or we take
+    // [solid angle] * ( r_{i+1}^d - r_i^d )/d where d = (dampingFactor+1) if
+    // the difference in radius is not small enough.
+    // Since then say B_4 is counted with 2 volumes (with a factor of 0.5 each
+    // time), we actually sum up each B_i with the sum of its 2 adjacent
+    // volumes, hence we sum up
+    // 0.5 * [solid angle] * B_i * r_i^(d-1) * ( r_{i+1} - r_{i-1} )
+    // or 0.5 * [solid angle] * B_i * ( r_{i+1}^d - r_{i-1}^d )/d.
+    // (Actually, we leave the common factor of 0.5 * [solid angle] until after
+    // the end of the loop.)
+    // The first and last contributions have to be treated slightly
+    // differently, because of the lack of radii at indices beyond the range of
+    // auxiliaryProfile.
+
+    double previousRadius( 0.0 );
+    double previousVolume( 0.0 );
     double currentRadius( auxiliaryProfile.front().radialValue );
-    double currentIntegrand( pathFieldsAndPotential.PotentialApproximation(
-                                                             currentAuxiliary )
-                             * currentRadius * currentRadius );
-    double previousIntegrand( NAN );
-    double bounceAction( NAN );
+    double currentVolume( currentRadius * currentRadius * currentRadius );
+    double nextRadius( auxiliaryProfile[ 1 ].radialValue );
+    double nextVolume( nextRadius * nextRadius * nextRadius );
     if( pathFieldsAndPotential.NonZeroTemperature() )
     {
-      bounceAction = ( currentIntegrand / 3.0 );
+      currentVolume /= 3.0;
+      nextVolume /= 3.0;
     }
     else
     {
-      currentIntegrand *= currentRadius;
-      bounceAction = ( 0.25 * currentIntegrand );
+      currentVolume *= ( 0.25 * currentRadius );
+      nextVolume *= ( 0.25 * nextRadius );
     }
-    double previousRadius( currentIntegrand );
-    double kineticTerm( NAN );
+    // The bounce action up to the radius of auxiliaryProfile[ 1 ] is given by
+    // B_{-1} (the bounce action density at r = 0.0, which has no kinetic
+    // contribution because the bubble is smooth at its center by construction)
+    // and B_0 as
+    // ( 0.5 * ( B_{-1} + B_{0} ) * [volume from r = 0.0 to r_0] )
+    // + ( 0.5 * ( B_{0} + B_{1} ) * [volume from r = r_0 to r_1] ).
+    // The contribution from B_{1} is taken care of with the 1st iteration of
+    // the loop, so the contribution up to the loop is given by
+    // ( 0.5 * [solid angle] * B_{-1} * currentVolume )
+    // + ( 0.5 * [solid angle] * B_{0} * ( nextVolume - currentVolume ) )
+    // with the values currently in currentVolume and nextVolume, also with the
+    // common factor of 0.5 * [solid angle] being left until after the loop.
+    double
+    bounceAction( ( currentVolume
+                    * pathFieldsAndPotential.PotentialApproximation(
+                                    bubbleProfile.AuxiliaryAtBubbleCenter() ) )
+                  + ( ( nextVolume - currentVolume )
+                      * ( BounceActionDensity( pathFieldsAndPotential,
+                                              auxiliaryProfile.front() ) ) ) );
+
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "keeping track of parts of integral. pathFieldsAndPotential ="
-    << std::endl << pathFieldsAndPotential.AsDebuggingString();
-    double debugKineticSum( 0.0 );
-    double debugPotentialSum( 0.0 );
+    << "Before loop: currentRadius = " << currentRadius << ", currentVolume = "
+    << currentVolume << ", nextRadius = " << nextRadius << ", nextVolume = "
+    << nextVolume << ", p(0) = " << bubbleProfile.AuxiliaryAtBubbleCenter()
+    << ", B_{-1} = " << pathFieldsAndPotential.PotentialApproximation(
+                                     bubbleProfile.AuxiliaryAtBubbleCenter() )
+    << ", B_{0} = " << BounceActionDensity( pathFieldsAndPotential,
+                                            auxiliaryProfile.front() )
+    << ", bounceAction = " << bounceAction;
     std::cout << std::endl;/**/
+
     for( size_t radiusIndex( 1 );
-         radiusIndex < auxiliaryProfile.size();
+         radiusIndex < ( auxiliaryProfile.size() - 1 );
          ++radiusIndex )
     {
       previousRadius = currentRadius;
-      previousIntegrand = currentIntegrand;
-      currentRadius = auxiliaryProfile[ radiusIndex ].radialValue;
-      currentAuxiliary = auxiliaryProfile[ radiusIndex ].auxiliaryValue;
-      kineticTerm = auxiliaryProfile[ radiusIndex ].auxiliarySlope;
-      kineticTerm
-      *= ( 0.5 * kineticTerm
-        * pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary ) );
-      currentIntegrand
-      = ( ( kineticTerm
-          + pathFieldsAndPotential.PotentialApproximation( currentAuxiliary ) )
-                           * currentRadius * currentRadius );
+      previousVolume = currentVolume;
+      currentRadius = nextRadius;
+      currentVolume = nextVolume;
+      nextRadius = auxiliaryProfile[ radiusIndex + 1 ].radialValue;
+      nextVolume = ( nextRadius * nextRadius * nextRadius );
       if( pathFieldsAndPotential.NonZeroTemperature() )
       {
-        currentIntegrand *= currentRadius;
+        nextVolume /= 3.0;
       }
-      bounceAction += ( ( currentIntegrand + previousIntegrand )
-                        * ( currentRadius - previousRadius ) );
-      // A common factor of 1/2 is being left until after the loop.
+      else
+      {
+        nextVolume *= ( 0.25 * nextRadius );
+      }
+
       // debugging:
-      /**/
-      debugKineticSum
-      += ( kineticTerm
-          * currentRadius * currentRadius * currentRadius
-          * ( currentRadius - previousRadius ) );
-      debugPotentialSum
-      += ( pathFieldsAndPotential.PotentialApproximation( currentAuxiliary )
-           * currentRadius * currentRadius * currentRadius
-           * ( currentRadius - previousRadius ) );
-      std::cout << std::endl << "debugging:"
+      /**/std::cout << std::endl << "debugging:"
       << std::endl
-      << "radiusIndex = " << radiusIndex
-      << ", r = " << currentRadius
-      << ", dr = " << ( currentRadius - previousRadius )
-      << ", p = " << currentAuxiliary
-      << ", |dp/dr|^2 = "
-      << pow( auxiliaryProfile[ radiusIndex ].auxiliarySlope,
-              2 )
-      << ", df/dp.df/dp = "
-      << pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary )
-      << ", V(p) = "
-      << pathFieldsAndPotential.PotentialApproximation( currentAuxiliary )
-      << ", debugKineticSum = " << debugKineticSum
-      << ", debugPotentialSum = " << debugPotentialSum;
+      << "previousRadius = " << previousRadius
+      << ", previousVolume = " << previousVolume
+      << ", currentRadius = " << currentRadius
+      << ", currentVolume = " << currentVolume
+      << ", nextRadius = " << nextRadius
+      << ", nextVolume = " << nextVolume
+      << ", B_" << radiusIndex << " = "
+      << BounceActionDensity( pathFieldsAndPotential,
+                              auxiliaryProfile[ radiusIndex ] );
+      std::cout << std::endl;/**/
+
+      // B_i * r_i^(d-1) * ( r_{i+1} - r_{i-1} )
+      // or B_i * ( r_{i+1}^d - r_{i-1}^d )/d.
+      if( ( nextRadius - previousRadius )
+          > ( radiusDifferenceThreshold * currentRadius ) )
+      {
+        bounceAction
+        += ( BounceActionDensity( pathFieldsAndPotential,
+                                    auxiliaryProfile[ radiusIndex ] )
+             * ( nextVolume - previousVolume ) );
+      }
+      else
+      {
+        double currentArea( currentRadius * currentRadius );
+        if( !(pathFieldsAndPotential.NonZeroTemperature()) )
+        {
+          currentArea *= currentRadius;
+        }
+        bounceAction
+        += ( BounceActionDensity( pathFieldsAndPotential,
+                                    auxiliaryProfile[ radiusIndex ] )
+             * ( nextRadius - previousRadius )
+             * currentArea );
+      }
+      // The common factor of 0.5 * [solid angle] is being left until after the
+      // loop.
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "bounceAction = " << bounceAction;
       std::cout << std::endl;/**/
     }
+    // We do not bother including the contribution to the bounce action from
+    // the largest radius. Maybe we should do something fancy with decaying
+    // exponentials.
+
     // The common factor of 1/2 is combined with the solid angle of
     // 2 pi^2 (quantum) or 4 pi (thermal):
     if( pathFieldsAndPotential.NonZeroTemperature() )
     {
       bounceAction *= ( 2.0 * M_PI );
-    }
-    else
-    {
-      bounceAction *= ( M_PI * M_PI );
-    }
-
-    if( pathFieldsAndPotential.NonZeroTemperature() )
-    {
       return ( ( bounceAction / pathFieldsAndPotential.GivenTemperature() )
                + log( bounceAction ) );
     }
     else
     {
-      return bounceAction;
+      return ( bounceAction * ( M_PI * M_PI ) );
     }
   }
 

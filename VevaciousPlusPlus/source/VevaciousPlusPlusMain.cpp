@@ -421,14 +421,8 @@ int main( int argumentCount,
   << "Fixed-scale at DSB = "
   << fixedScalePotential( fixedScalePotential.DsbFieldValues() )
   << std::endl;
-
-  fixedScalePotential.WriteAsPython( "CtTest.py" );
-  std::cout
-  << "Wrote Python. fixedScalePotential.AsDebuggingString() =" << std::endl
-  << fixedScalePotential.AsDebuggingString()
-  << std::endl;
-
   /**/
+
   std::cout
   << std::endl
   << "------" << std::endl << std::endl;
