@@ -60,6 +60,8 @@ namespace VevaciousPlusPlus
                                     - falseFieldConfiguration.front() );
     double currentFieldDifference( greatestFieldDifference );
     zeroTemperatureStraightPath.front() = currentFieldDifference;
+    zeroTemperatureStraightPathInverseLengthSquared
+    += ( currentFieldDifference * currentFieldDifference );
     if( greatestFieldDifference < 0.0 )
     {
       greatestFieldDifference = -greatestFieldDifference;

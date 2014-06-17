@@ -9,7 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
-  double const BubbleProfile::auxiliaryPrecisionResolution( 1.0e-8 );
+  double const BubbleProfile::auxiliaryPrecisionResolution( 1.0e-10 );
 
   BubbleProfile::BubbleProfile(
                           PathFieldsAndPotential const& pathFieldsAndPotential,

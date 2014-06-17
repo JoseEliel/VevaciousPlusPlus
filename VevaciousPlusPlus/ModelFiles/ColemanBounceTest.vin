@@ -1,7 +1,7 @@
 <VevaciousModelFile>
 
 <ModelFileDetails
- ModelName="SingleFieldTest"
+ ModelName="ColemanBounceTest"
  VevaciousMajorVersion="2" VevaciousMinorVersion="0" />
 
 <!-- All variables which are NOT explicitly given in AllowedNonZeroVariables
@@ -34,6 +34,11 @@
        after DerivedParameters so that values from the SLHA input can be
        referenced. -->
   <FieldVariables>
+  <!-- Actually, because of the VevaciousPlusPlus feature of treating sign-flips
+       as phase rotations and assuming that phase rotations are not physically
+       different, which is great for complex scalars, we cannot take phi as the
+       field variable, so we take f = phi + a, so the true vacuum will be close
+       to f = 0, and the false vacuum close to f = 2a. -->
     f
   </FieldVariables>
   
@@ -55,7 +60,7 @@
        in from the SLHA file, and also that g[1] in the rest of this model file
        is equivalent to GAUGE[1] and so on. -->
   <SlhaBlocks>
-    PHIFOURTH
+    COLEMANTEST
   </SlhaBlocks>
 
   <!-- Every other non-zero parameter should appear here, each on a separate
@@ -114,6 +119,20 @@
     oneThird = DIVIDE[1, 3]-->
     <!-- These examples have varied whitespace and number format conventions,
          just to show what can be interpreted. -->
+    <!-- Coleman chose to write his potential as
+         (lambda/8)(phi^2 - (mu^2/lambda))^2 + (epsilon/(2a))(phi - a),
+         where a^2 = mu^2/lambda. I chose to assign the variables
+         lambda, mu, and epsilon as the 1st 3 elements of a SLHA-format block
+         called COLEMANTEST. Hence a here is a derived parameter, and because
+         the VevaciousPlusPlus format does not allow explicit division, we also
+         need to pre-divide epsilon by (2a). -->
+    lambda = SLHAELEMENT[ COLEMANTEST, 1 ]
+    mu = SLHAELEMENT[ COLEMANTEST, 2 ]
+    epsilon = SLHAELEMENT[ COLEMANTEST, 3 ]
+    squareRootOfLambda = SQRT[ lambda ]
+    a = DIVIDE[ mu, squareRootOfLambda ]
+    aTimesTwo = TIMES[ a, 2.0 ]
+    epsilonScaled = DIVIDE[ epsilon, aTimesTwo ]
   </DerivedParameters>
   
   <!-- Non-zero values for fields from FieldVariables should be specified here
@@ -144,7 +163,7 @@
        constant over all scales, so leaving EvaluationScale out will still give
        the same values as putting it in (with any value). -->
   <DsbMinimum>
-    f = PHIFOURTH[ 5 ]
+    f = aTimesTwo
   </DsbMinimum>
 
 </AllowedNonZeroVariables>
@@ -161,7 +180,14 @@
      It is used as the tree-level part of the potential energy density
      function. -->
 <TreeLevelPotential>
-PHIFOURTH[4] * f^4 + PHIFOURTH[3] * f^3 + PHIFOURTH[2] * f^2 + PHIFOURTH[1] * f
+ <!-- U = (lambda/8)(phi^2 - (mu^2/lambda))^2 + (epsilon/(2a))(phi - a)
+      and f = phi + a,
+      so we need to expand out
+      (lambda/8)((f-a)^2 - (mu^2/lambda))^2 + (epsilon/(2a)) (f - 2a)
+      = (lambda/8)(f^2 - 2 a f)^2 + (epsilon/(2a)) f
+      (ignoring the constant term) -->
+ 0.125 * lambda * f^4 - 0.5 * lambda * a * f^3 + 0.5 * lambda * a^2 * f^2
+ + epsilonScaled * f
 </TreeLevelPotential>
 
 <!-- The loop corrections come in 2 forms: an additional polynomial in the same

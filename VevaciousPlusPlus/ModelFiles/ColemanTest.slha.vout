@@ -1,0 +1,24 @@
+<VevaciousResults>
+  <ReferenceData>
+     <VevaciousVersion>
+       1.0.00.alpha.003
+     </VevaciousVersion>
+     <CitationArticle>
+       [none as yet]
+     </CitationArticle>
+     <ResultTimestamp>
+       Tue Jun 17 12:07:22 2014
+     </ResultTimestamp>
+  </ReferenceData>
+  <StableOrMetastable>
+    stable
+  </StableOrMetastable>
+  <DsbVacuum>
+    <FieldValues>
+      -200 <!-- f -->
+    </FieldValues>
+    <RelativeDepth>
+      -1 <!-- Potential in GeV^4 minus value for all fields = 0 -->
+    </RelativeDepth>
+  </DsbVacuum>
+</VevaciousResults>

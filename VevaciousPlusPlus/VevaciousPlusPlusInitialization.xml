@@ -31,6 +31,15 @@
   <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
   /Users/oleary/BOL/machine-specific/HOM4PS2/
   </PathToHom4ps2>
+  <Hom4ps2Argument>
+  <!-- The argument for HOM4PS2: as prompted by HOM4PS2:
+       "Please enter the option of homotopy method
+          1. The polyhedral homotopy
+          2. The classical linear homotopy"
+       1 can be faster for systems of many variables,
+       but 2 seems more reliable. -->
+  2
+  </Hom4ps2Argument>
   
   <TunnelingStrategy>
   <!-- Valid options: NoTunneling, JustQuantum, JustThermal,

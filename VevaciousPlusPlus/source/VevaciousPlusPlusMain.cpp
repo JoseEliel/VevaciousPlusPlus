@@ -159,13 +159,13 @@ int main( int argumentCount,
   else if( homotopyContinuationClass.compare( "Hom4ps2Runner" ) == 0 )
   {
     std::string pathToHom4ps2( argumentParser.fromTag( "PathToHom4ps2",
-                                                              "./HOM4PS2/" ) );
+                                                       "./HOM4PS2/" ) );
     homotopyContinuationSolver
     = new VevaciousPlusPlus::Hom4ps2Runner(
                          potentialFunction->HomotopyContinuationTargetSystem(),
                                             pathToHom4ps2,
                                      argumentParser.fromTag( "Hom4ps2Argument",
-                                                               "1" ) );
+                                                             "2" ) );
 
     std::cout
     << std::endl

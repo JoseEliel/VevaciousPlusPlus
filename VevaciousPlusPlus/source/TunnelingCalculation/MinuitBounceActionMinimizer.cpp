@@ -67,7 +67,14 @@ namespace VevaciousPlusPlus
                                                      16,
                                                      falseVacuum,
                                                      trueVacuum,
-                                                     0.0 );
+                                                     0.0,
+                                                     16 );
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "Remember to write in taking shoot attempts, path resolution, etc.,"
+    << " from input XML.";
+    std::cout << std::endl;/**/
     std::vector< double > pathParameterization;
     std::vector< double > initialStepSizes;
     modifiedBounceForMinuit.SetUpStraightPathForMinuit( pathParameterization,
