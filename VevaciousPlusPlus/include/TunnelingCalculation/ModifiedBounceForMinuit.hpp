@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
                              PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
                              double const dsbEvaporationTemperature,
-                             size_t const undershootOvershootAttempts = 64,
+                             size_t const undershootOvershootAttempts = 32,
                              size_t const maximumMultipleOfLongestLength = 16,
                            double const initialFractionOfShortestLength = 0.05,
                              double const minimumScaleSquared = 1.0,

@@ -226,6 +226,12 @@ namespace VevaciousPlusPlus
     {
       auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( (double)splinePoint * M_PI )
                                     / (double)numberOfSplinesInPotential ) ) );
+      // The above might run into numerical precision issues if too many spline
+      // segments are asked for, but it's probably OK up to even 10^5 segments
+      // (cos(0.0) - cos(10^(-5)) = 5E-11 which should still be well-resolved
+      // by doubles).
+      //auxiliaryValue
+      //= ( (double)splinePoint /(double)numberOfSplinesInPotential );
       std::vector< double > const&
       fieldConfiguration( pathFieldsAndPotential.FieldConfiguration(
                                                             auxiliaryValue ) );

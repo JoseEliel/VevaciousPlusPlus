@@ -64,7 +64,7 @@ namespace VevaciousPlusPlus
     //          potentialFunction( potentialFunction.FieldValuesOrigin() ) ) );
     ModifiedBounceForMinuit modifiedBounceForMinuit( potentialFunction,
                                                      3,
-                                                     8,
+                                                     16,
                                                      falseVacuum,
                                                      trueVacuum,
                                                      0.0 );
