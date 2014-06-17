@@ -260,7 +260,7 @@ namespace VevaciousPlusPlus
         * pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary ) );
     return
     ( kineticTerm
-         + pathFieldsAndPotential.PotentialApproximation( currentAuxiliary ) );
+      + pathFieldsAndPotential.PotentialApproximation( currentAuxiliary ) );
   }
 
   // This sets up initialParameterization and initialStepSizes to be a

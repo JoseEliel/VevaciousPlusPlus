@@ -435,14 +435,14 @@ namespace VevaciousPlusPlus
     // The contribution from B_{1} is taken care of with the 1st iteration of
     // the loop, so the contribution up to the loop is given by
     // ( 0.5 * [solid angle] * B_{-1} * currentVolume )
-    // + ( 0.5 * [solid angle] * B_{0} * ( nextVolume - currentVolume ) )
+    // + ( 0.5 * [solid angle] * B_{0} * nextVolume )
     // with the values currently in currentVolume and nextVolume, also with the
     // common factor of 0.5 * [solid angle] being left until after the loop.
     double
     bounceAction( ( currentVolume
                     * pathFieldsAndPotential.PotentialApproximation(
                                     bubbleProfile.AuxiliaryAtBubbleCenter() ) )
-                  + ( ( nextVolume - currentVolume )
+                  + ( nextVolume
                       * ( BounceActionDensity( pathFieldsAndPotential,
                                               auxiliaryProfile.front() ) ) ) );
 
@@ -523,9 +523,70 @@ namespace VevaciousPlusPlus
       << "bounceAction = " << bounceAction;
       std::cout << std::endl;/**/
     }
-    // We do not bother including the contribution to the bounce action from
-    // the largest radius. Maybe we should do something fancy with decaying
-    // exponentials.
+    // Now we add the last shell:
+    double const currentAuxiliary( auxiliaryProfile.back().auxiliaryValue );
+    double kineticTerm( auxiliaryProfile.back().auxiliarySlope );
+    kineticTerm *= ( 0.5 * kineticTerm
+        * pathFieldsAndPotential.FieldDerivativesSquared( currentAuxiliary ) );
+    double const potentialTerm( pathFieldsAndPotential.PotentialApproximation(
+                                                          currentAuxiliary ) );
+    if( ( nextRadius - currentRadius )
+        > ( radiusDifferenceThreshold * currentRadius ) )
+    {
+      bounceAction
+      += ( ( kineticTerm + potentialTerm ) * ( nextVolume - currentVolume ) );
+    }
+    else
+    {
+      double currentArea( currentRadius * currentRadius );
+      if( !(pathFieldsAndPotential.NonZeroTemperature()) )
+      {
+        currentArea *= currentRadius;
+      }
+      bounceAction += ( ( kineticTerm + potentialTerm )
+                        * ( nextRadius - currentRadius ) * currentArea );
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "After last shell, bounceAction = " << bounceAction;
+    std::cout << std::endl;/**/
+
+    // If the bubble profile satisfies its equations of motion, at large r, we
+    // can ignore the damping term and linearize the fields around the false
+    // vacuum, which should be in the form of a quadratic near the minimum.
+    // Thus we get that d^2f/dr^2 = d^2V/df^2 f for a field f, which is solved
+    // by f being proportional to exp(-r). Therefore the kinetic term decays
+    // like e^( 2 - ((2 r)/r_n) ) while the potential term decays as
+    // e^( 1 - (r/r_n) ), with r_n being the largest r given by
+    // auxiliaryProfile. The integrals given by Mathematica from r_n to
+    // infinity are:
+    // r^2 e(-r/r_n) -> 5 r_n^3 / e
+    // r^3 e(-r/r_n) -> 16 r_n^4 / e
+    // r^2 e(-(2r)/r_n) -> (5/4) r_n^3 / e^2
+    // r^3 e(-(2r)/r_n) -> (19/8) r_n^4 / e^2
+    // Hence the potential term integrates to 5 r_n^3 V(r_n)
+    // and 16 r_n^4 V(r_n) for the thermal and quantum cases respectively, and
+    // the kinetic term to (5/4) r_n^3 * [kinetic term at r_n] or
+    // (19/8) r_n^4 * [kinetic term at r_n] respectively.
+    if( pathFieldsAndPotential.NonZeroTemperature() )
+    {
+      bounceAction += ( 5.0 * nextRadius * nextRadius * nextRadius
+                        * ( potentialTerm + ( 0.25 * kineticTerm ) ) );
+    }
+    else
+    {
+      bounceAction
+      += ( nextRadius * nextRadius * nextRadius * nextRadius
+           * ( ( 16.0 * potentialTerm ) + ( 2.375 * kineticTerm ) ) );
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "After exponents to infinity, bounceAction = " << bounceAction;
+    std::cout << std::endl;/**/
 
     // The common factor of 1/2 is combined with the solid angle of
     // 2 pi^2 (quantum) or 4 pi (thermal):
