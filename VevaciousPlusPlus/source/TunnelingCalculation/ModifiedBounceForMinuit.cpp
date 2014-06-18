@@ -262,10 +262,10 @@ namespace VevaciousPlusPlus
                                       bool& thinWallIsGoodApproximation ) const
   {
     // debugging:
-    *//*std::cout << std::endl << "debugging:"
+    std::cout << std::endl << "debugging:"
     << std::endl
     << "Must remember to test thin-wall approximation!";
-    std::cout << std::endl;*//*
+    std::cout << std::endl;
 
     double const potentialDifference( pathFieldsAndPotential.FalsePotential()
                                     - pathFieldsAndPotential.TruePotential() );
@@ -307,11 +307,11 @@ namespace VevaciousPlusPlus
       potentialValue
       = pathFieldsAndPotential.PotentialApproximation( thinWallAuxiliary );
       // debugging:
-      *//*std::cout << std::endl << "debugging:"
+      std::cout << std::endl << "debugging:"
       << std::endl
       << "thinWallAuxiliary = " << thinWallAuxiliary
       << ", potentialValue = " << potentialValue;
-      std::cout << std::endl;*//*
+      std::cout << std::endl;
       if( potentialValue > 0.0 )
       {
         integratedAction
@@ -327,13 +327,12 @@ namespace VevaciousPlusPlus
     // field linear in a.
 
     // debugging:
-    *//*std::cout << std::endl << "debugging:"
+    std::cout << std::endl << "debugging:"
     << std::endl
     << "integratedAction = " << integratedAction
     << ", oneOverPotentialDifference = " << oneOverPotentialDifference
     << ", wallThickness = " << wallThickness;
-    std::cout << std::endl;*//*
-
+    std::cout << std::endl;
 
     // We return the thin-wall approximation of the bounce action only if the
     // bubble radius is sufficiently large compared to the tunneling scale,

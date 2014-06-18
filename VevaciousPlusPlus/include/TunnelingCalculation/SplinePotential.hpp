@@ -29,10 +29,21 @@ namespace VevaciousPlusPlus
     // slope at that point.
     virtual double FirstDerivative( double const auxiliaryValue ) const;
 
+    // This returns the value of the second derivative of the potential at
+    // auxiliaryValue, by finding the correct segment and then returning its
+    // slope at that point.
+    virtual double SecondDerivative( double const auxiliaryValue ) const;
+
     // This returns the value of the first derivative of the potential at
-    // (definiteOvershootAuxiliary - differenceFromMaximumAuxiliary), assuming
+    // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
     // that it is in the implicit final segment.
-    virtual double DerivativeNearPathPanic(
+    virtual double FirstDerivativeNearPathPanic(
+                           double const differenceFromMaximumAuxiliary ) const;
+
+    // This returns the value of the second derivative of the potential at
+    // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
+    // that it is in the implicit final segment.
+    virtual double SecondDerivativeNearPathPanic(
                            double const differenceFromMaximumAuxiliary ) const;
 
     // This adds another point for the spline, assuming that it goes after the
@@ -93,15 +104,26 @@ namespace VevaciousPlusPlus
 
 
   // This returns the value of the first derivative of the potential at
-  // (definiteOvershootAuxiliary - differenceFromMaximumAuxiliary), assuming
+  // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
   // that it is in the implicit final segment.
-  inline double SplinePotential::DerivativeNearPathPanic(
+  inline double SplinePotential::FirstDerivativeNearPathPanic(
                             double const differenceFromMaximumAuxiliary ) const
   {
     return ( ( ( 2.0 * halfFinalSecondDerivative )
                    + ( 3.0 * finalCubicCoefficient
                            * differenceFromMaximumAuxiliary ) )
              * differenceFromMaximumAuxiliary );
+  }
+
+  // This returns the value of the second derivative of the potential at
+  // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
+  // that it is in the implicit final segment.
+  inline double SplinePotential::SecondDerivativeNearPathPanic(
+                            double const differenceFromMaximumAuxiliary ) const
+  {
+    return ( ( 2.0 * halfFinalSecondDerivative )
+               + ( 6.0 * finalCubicCoefficient
+                       * differenceFromMaximumAuxiliary ) );
   }
 
   // This adds another point for the spline, assuming that it goes after the

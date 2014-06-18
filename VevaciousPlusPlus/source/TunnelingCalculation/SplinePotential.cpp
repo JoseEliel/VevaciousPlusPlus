@@ -122,6 +122,35 @@ namespace VevaciousPlusPlus
                  * auxiliaryDifference );
   }
 
+  // This returns the value of the first derivative of the potential at
+  // auxiliaryValue, by finding the correct segment and then returning its
+  // slope at that point.
+  double SplinePotential::SecondDerivative( double const auxiliaryValue ) const
+  {
+    if( ( auxiliaryValue <= 0.0 )
+        ||
+        ( auxiliaryValue >= definiteOvershootAuxiliary ) )
+    {
+      return 0.0;
+    }
+    size_t segmentIndex( 0 );
+    double auxiliaryDifference( auxiliaryValue );
+    while( segmentIndex < auxiliaryValues.size() )
+    {
+      if( auxiliaryDifference < auxiliaryValues[ segmentIndex ] )
+      {
+        return ( 2.0 * halfSecondDerivatives[ segmentIndex ] );
+      }
+      auxiliaryDifference -= auxiliaryValues[ segmentIndex ];
+      ++segmentIndex;
+    }
+    // If we get to here, we're beyond the last normal segment:
+    // auxiliaryValues[ currentGivenSize - 1 ] < auxiliaryValue < 1.0.
+    auxiliaryDifference = ( auxiliaryValue - definiteOvershootAuxiliary );
+    return ( ( 2.0 * halfFinalSecondDerivative )
+             + ( 3.0 * finalCubicCoefficient * auxiliaryDifference ) );
+  }
+
   // This sets up the spline based on auxiliaryValues and potentialValues,
   // ensuring that the potential reaches the correct values for the vacua,
   // and that the potential derivative vanishes at the vacua. It also notes

@@ -9,7 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
-  double const BubbleProfile::auxiliaryPrecisionResolution( 1.0e-10 );
+  double const BubbleProfile::auxiliaryPrecisionResolution( 1.0e-6 );
 
   BubbleProfile::BubbleProfile(
                           PathFieldsAndPotential const& pathFieldsAndPotential,
@@ -125,10 +125,32 @@ namespace VevaciousPlusPlus
       // close to the path panic minimum.
       if( initialAuxiliary <= 0.0 )
       {
+        // If we're in the last segment, we go with a full solution of the
+        // equation linearized in p:
+        // [d^2/dr^2 + (dampingFactor/d) d/dr - ((d^2V/dp^2)/(|df/dp|^2)] p = 0
+        // assuming that p is close enough to a minimum that dV/dp is
+        // proportional to p and that dp/dr is small enough that we can neglect
+        // the (dp/dr)^2 (df/dp).(d^2f/dp^2) part of (df/dp).(d^2f/dr^2).
+        // The solutions are actually quite neat:
+        // T = 0: p - p_0 = (p_i - p_0) * ( [ (4 * I_1(b*r)) / (b*r) ] - 1 )
+        // T != 0: p - p_0 = (p_i - p_0) * ( [ (2 * sinh(b*r)) / (b*r) ] - 1 )
+        // where I_1 is the modified Bessel function of the 1st kind,
+        // b^2 = ((d^2V/dp^2)/(|df/dp|^2), p_0 is the auxiliary value at the
+        // path panic minimum, and p_i is the initial value of the auxiliary
+        // variable for the shoot.
+        // We need the value of r such that
+        // |dp/dr| > auxiliaryPrecisionResolution
+        // and
+        // SOMETHING!
+        DO SOMETHING!
         initialPositiveAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
                                      + initialAuxiliary );
-        initialPotentialDerivative
-        = pathPotential.DerivativeNearPathPanic( initialAuxiliary );
+        initialQuadraticCoefficient
+        = ( pathFieldsAndPotential.PotentialApproximation(
+                            ).SecondDerivativeNearPathPanic( initialAuxiliary )
+            / pathFieldsAndPotential.FieldDerivativesSquared(
+                                                  initialPositiveAuxiliary ) );
+
         // debugging:
         /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
         << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
@@ -140,7 +162,9 @@ namespace VevaciousPlusPlus
       }
       else
       {
-        initialPositiveAuxiliary = initialAuxiliary;
+        // If we're not starting in the last segment, we should not be
+        // suffering from any of the problems due to having to roll very slowly
+        // for a long r.
         initialPotentialDerivative
         = pathPotential.FirstDerivative( initialAuxiliary );
         // debugging:
@@ -151,26 +175,27 @@ namespace VevaciousPlusPlus
         << ( pathPotential.DefiniteOvershootAuxiliary() - initialAuxiliary )
         << "), initialPotentialDerivative = " << initialPotentialDerivative;
         std::cout << std::endl;/**/
-      }
-      initialQuadraticCoefficient = ( initialPotentialDerivative
-                                      / ( twoPlusTwiceDampingFactor
+        initialQuadraticCoefficient = ( initialPotentialDerivative
+                                        / ( twoPlusTwiceDampingFactor
                               * pathFieldsAndPotential.FieldDerivativesSquared(
-                                                initialPositiveAuxiliary ) ) );
+                                                        initialAuxiliary ) ) );
 
-      integrationStartRadius = ( -auxiliaryPrecisionResolution
+        integrationStartRadius = ( -auxiliaryPrecisionResolution
                      / ( initialQuadraticCoefficient * integrationStepSize ) );
+
+        initialConditions[ 0 ] = ( initialAuxiliary
+                                   + ( initialQuadraticCoefficient
+                                       * integrationStartRadius
+                                       * integrationStartRadius ) );
+        initialConditions[ 1 ] = ( 2.0 * initialQuadraticCoefficient
+                                       * integrationStartRadius );
+      }
+
 
       // We have to ensure that the end radius is larger than the start radius.
       integrationEndRadius = std::max( integrationEndRadius,
                                        ( 2.0 * integrationStartRadius ) );
 
-
-      initialConditions[ 0 ] = ( initialPositiveAuxiliary
-                                 + ( initialQuadraticCoefficient
-                                     * integrationStartRadius
-                                     * integrationStartRadius ) );
-      initialConditions[ 1 ] = ( 2.0 * initialQuadraticCoefficient
-                                     * integrationStartRadius );
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
