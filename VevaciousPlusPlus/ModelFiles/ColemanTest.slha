@@ -1,4 +1,4 @@
 Block COLEMANTEST Q= 100.0 # Testing thin-wall approximation of Coleman
  1      1.0  # lambda
  2    100.0  # mu
- 3  1.0E+04  # epsilon
+ 3  1.0E+06  # epsilon

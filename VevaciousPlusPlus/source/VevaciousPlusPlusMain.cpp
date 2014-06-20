@@ -444,16 +444,32 @@ int main( int argumentCount,
   {
     testConfiguration[ 0 ] = ( 0.1
                                * (double)vdStep
-                               //* fixedScalePotential.DsbFieldValues()[ 0 ] );
-                               * 1.0 );
-    for( int vuStep( 0 );
-         vuStep < 13;
-         ++vuStep )
+                               * std::min( 1.0,
+                                 fixedScalePotential.DsbFieldValues()[ 0 ] ) );
+    if( testConfiguration.size() > 1 )
     {
-      testConfiguration[ 1 ] = ( 0.1
-                                 * (double)vuStep
-                                 //* fixedScalePotential.DsbFieldValues()[ 1 ] );
-                                 * 1.0 );
+      for( int vuStep( 0 );
+           vuStep < 13;
+           ++vuStep )
+      {
+        testConfiguration[ 1 ] = ( 0.1
+                                   * (double)vuStep
+                                   * std::min( 1.0,
+                                 fixedScalePotential.DsbFieldValues()[ 1 ] ) );
+        std::cout << "For "
+        << fixedScalePotential.FieldConfigurationAsMathematica(
+                                                            testConfiguration )
+        << ", fixedScalePotential => "
+        << fixedScalePotential( testConfiguration )
+        << " => " << ( fixedScalePotential( testConfiguration )
+                       - subtractionConstant )
+        << "; tree = "
+        << fixedScalePotential.QuickApproximation( testConfiguration );
+        std::cout << std::endl;
+      }
+    }
+    else
+    {
       std::cout << "For "
       << fixedScalePotential.FieldConfigurationAsMathematica(
                                                             testConfiguration )

@@ -68,7 +68,7 @@ namespace VevaciousPlusPlus
                                                      falseVacuum,
                                                      trueVacuum,
                                                      0.0,
-                                                     16 );
+                                                     32 );
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
@@ -88,12 +88,15 @@ namespace VevaciousPlusPlus
     << "straight path bounce = "
     << modifiedBounceForMinuit( pathParameterization );
     std::cout << std::endl;
-    initialStepSizes.back() = 0.0;
-    std::cout
-    << "test path bounce = " << modifiedBounceForMinuit( initialStepSizes );
+    if( !(initialStepSizes.empty()) )
+    {
+      initialStepSizes.back() = 0.0;
+      std::cout
+      << "test path bounce = " << modifiedBounceForMinuit( initialStepSizes );
+    }
     std::cout << std::endl;/**/
 
-    // Should now do migrad
+    // Should now do migrad...
   }
 
   // This should set thermalSurvivalProbability and

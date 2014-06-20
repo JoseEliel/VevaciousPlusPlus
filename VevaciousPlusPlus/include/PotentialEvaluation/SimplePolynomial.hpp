@@ -93,8 +93,8 @@ namespace VevaciousPlusPlus
     = std::vector< double >( ( eigenVector.rows() + leadingPower
                                + extraEmptyEntriesAtConstruction ),
                              0.0 );
-    for( unsigned int whichIndex( 0 );
-         whichIndex < eigenVector.rows();
+    for( size_t whichIndex( 0 );
+         whichIndex < (size_t)(eigenVector.rows());
          ++whichIndex )
     {
       coefficientVector[ whichIndex + leadingPower ]

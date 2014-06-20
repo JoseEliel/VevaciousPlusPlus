@@ -29,9 +29,6 @@ namespace VevaciousPlusPlus
     overshootAuxiliary( NAN ),
     initialAuxiliary( NAN ),
     initialConditions( 2 ),
-    initialPositiveAuxiliary( NAN ),
-    initialPotentialDerivative( NAN ),
-    initialQuadraticCoefficient( NAN ),
     twoPlusTwiceDampingFactor( 2.0 * ( pathFieldsAndPotential.DampingFactor()
                                        + 1.0 ) ),
     shootingThresholdSquared( NAN ),
@@ -138,45 +135,148 @@ namespace VevaciousPlusPlus
         // b^2 = ((d^2V/dp^2)/(|df/dp|^2), p_0 is the auxiliary value at the
         // path panic minimum, and p_i is the initial value of the auxiliary
         // variable for the shoot.
-        // We need the value of r such that
-        // |dp/dr| > auxiliaryPrecisionResolution
-        // and
-        // SOMETHING!
-        DO SOMETHING!
-        initialPositiveAuxiliary = ( pathPotential.DefiniteOvershootAuxiliary()
-                                     + initialAuxiliary );
-        initialQuadraticCoefficient
-        = ( pathFieldsAndPotential.PotentialApproximation(
+
+        // We need the value of r such that |dp/dr| is larger than
+        // auxiliaryPrecisionResolution but not much larger. We start assuming
+        // that r is small and that we can expand out p(r) as p_0 + p_2 r^2,
+        // which gives the same result as in the else statement complementary
+        // to this branch, but here dV/dp = 2 * (p-p_0) * d^2V/dp^2.
+        double const
+        initialPositiveAuxiliary( pathPotential.DefiniteOvershootAuxiliary()
+                                  + initialAuxiliary );
+        double const
+        scaledSecondDerivative( pathFieldsAndPotential.PotentialApproximation(
                             ).SecondDerivativeNearPathPanic( initialAuxiliary )
-            / pathFieldsAndPotential.FieldDerivativesSquared(
+                              / pathFieldsAndPotential.FieldDerivativesSquared(
                                                   initialPositiveAuxiliary ) );
+        double const
+        initialQuadraticCoefficient( 2.0 * initialAuxiliary
+                                         * scaledSecondDerivative );
+        integrationStartRadius = ( -auxiliaryPrecisionResolution
+                     / ( initialQuadraticCoefficient * integrationStepSize ) );
 
         // debugging:
-        /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
-        << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-        << initialPositiveAuxiliary << " ("
-        << pathPotential.DefiniteOvershootAuxiliary() << " - "
-        << -initialAuxiliary << "), initialPotentialDerivative = "
-        << initialPotentialDerivative;
+        /**/std::cout << "in last segment. undershootAuxiliary = "
+        << undershootAuxiliary << ", overshootAuxiliary = "
+        << overshootAuxiliary << ", p = " << initialPositiveAuxiliary
+        << " (" << pathPotential.DefiniteOvershootAuxiliary() << " - "
+        << -initialAuxiliary << "), initialQuadraticCoefficient = "
+        << initialQuadraticCoefficient << ", integrationStartRadius = "
+        << integrationStartRadius;
         std::cout << std::endl;/**/
+
+        if( integrationStartRadius <= integrationStepSize )
+        {
+          // If integrationStartRadius turns out to be relatively small, we
+          // carry on with the Euler step from the small-r approximation.
+          initialConditions[ 0 ] = ( initialPositiveAuxiliary
+                                     + ( initialQuadraticCoefficient
+                                         * integrationStartRadius
+                                         * integrationStartRadius ) );
+          initialConditions[ 1 ] = ( 2.0 * initialQuadraticCoefficient
+                                         * integrationStartRadius );
+
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "small enough integrationStartRadius = " << integrationStartRadius
+          << " <= integrationStepSize = " << integrationStepSize;
+          std::cout << std::endl;/**/
+        }
+        else
+        {
+          // If it turns out that maybe the initial step is too large to
+          // consider the small-r expansion valid, we use the better
+          // Bessel/sinh approximation mentioned above.
+          double const inverseRadialScale( sqrt( scaledSecondDerivative ) );
+          double const minimumScaledSlope( -auxiliaryPrecisionResolution
+                                 / ( initialAuxiliary * inverseRadialScale ) );
+          double scaledRadius( std::max( log( minimumScaledSlope ),
+                              ( inverseRadialScale * integrationStepSize ) ) );
+          double scaledSlope( sinhOrBesselScaledSlope(
+                                   pathFieldsAndPotential.NonZeroTemperature(),
+                                                       scaledRadius ) );
+          while( ( scaledSlope > ( 2.0 * minimumScaledSlope ) )
+                 &&
+                 ( scaledSlope > auxiliaryPrecisionResolution ) )
+          {
+            scaledRadius *= 0.5;
+            scaledSlope = sinhOrBesselScaledSlope(
+                                   pathFieldsAndPotential.NonZeroTemperature(),
+                                                   scaledRadius );
+            // debugging:
+            /**/std::cout << std::endl << "debugging:"
+            << std::endl
+            << "at scaled r = " << scaledRadius << ", scaled slope = "
+            << scaledSlope;
+            std::cout << std::endl;/**/
+          }
+          while( scaledSlope < minimumScaledSlope )
+          {
+            scaledRadius = std::min( ( 2.0 * scaledRadius ),
+                                     ( scaledRadius + 1.0 ) );
+            scaledSlope = sinhOrBesselScaledSlope(
+                                   pathFieldsAndPotential.NonZeroTemperature(),
+                                                   scaledRadius );
+            // debugging:
+            /**/std::cout << std::endl << "debugging:"
+            << std::endl
+            << "at scaled r = " << scaledRadius << ", scaled slope = "
+            << scaledSlope;
+            std::cout << std::endl;/**/
+          }
+          // At this point, the slope of p(r) at
+          // r = inverseRadialScale * scaledSlope ) should be large enough that
+          // the magnitude of its product with integrationStepSize should be
+          // larger than auxiliaryPrecisionResolution and thus the numeric
+          // integration should be able to proceed normally.
+          double sinhOrBesselPart( NAN );
+          if( pathFieldsAndPotential.NonZeroTemperature() )
+          {
+            sinhOrBesselPart = ( sinh( scaledRadius ) / scaledRadius );
+          }
+          else
+          {
+            sinhOrBesselPart = ( ( 2.0 * boost::math::cyl_bessel_i( (int)1,
+                                                               scaledRadius ) )
+                                 / scaledRadius );
+          }
+          initialConditions[ 0 ] = ( pathPotential.DefiniteOvershootAuxiliary()
+                                     + ( initialAuxiliary
+                                    * ( ( 2.0 * sinhOrBesselPart ) - 1.0 ) ) );
+          initialConditions[ 1 ]
+          = ( initialAuxiliary * inverseRadialScale * scaledSlope );
+          integrationStartRadius = ( scaledRadius / inverseRadialScale );
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "needed to do Bessel/sinh approximation: inverseRadialScale = "
+          << inverseRadialScale << ", minimumScaledSlope = "
+          << minimumScaledSlope << ", scaledRadius = " << scaledRadius
+          << ", scaledSlope = " << scaledSlope << ", sinhOrBesselPart = "
+          << sinhOrBesselPart;
+          std::cout << std::endl;/**/
+        }
       }
       else
       {
         // If we're not starting in the last segment, we should not be
         // suffering from any of the problems due to having to roll very slowly
         // for a long r.
-        initialPotentialDerivative
-        = pathPotential.FirstDerivative( initialAuxiliary );
+        double const initialPotentialDerivative(pathPotential.FirstDerivative(
+                                                          initialAuxiliary ) );
+
         // debugging:
-        /**/std::cout << "undershootAuxiliary = " << undershootAuxiliary
-        << ", overshootAuxiliary = " << overshootAuxiliary << ", trying p = "
-        << initialAuxiliary << " ("
+        /**/std::cout << "not in last segment. undershootAuxiliary = "
+        << undershootAuxiliary << ", overshootAuxiliary = "
+        << overshootAuxiliary << ", trying p = " << initialAuxiliary << " ("
         << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << ( pathPotential.DefiniteOvershootAuxiliary() - initialAuxiliary )
         << "), initialPotentialDerivative = " << initialPotentialDerivative;
         std::cout << std::endl;/**/
-        initialQuadraticCoefficient = ( initialPotentialDerivative
-                                        / ( twoPlusTwiceDampingFactor
+
+        double const initialQuadraticCoefficient ( initialPotentialDerivative
+                                                  / ( twoPlusTwiceDampingFactor
                               * pathFieldsAndPotential.FieldDerivativesSquared(
                                                         initialAuxiliary ) ) );
 

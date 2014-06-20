@@ -10,6 +10,7 @@
 
 #include "../CommonIncludes.hpp"
 #include "boost/numeric/odeint/integrate/integrate.hpp"
+#include "boost/math/special_functions/bessel.hpp"
 #include "../PotentialEvaluation/SimplePolynomial.hpp"
 #include "PathFieldsAndPotential.hpp"
 #include "OdeintBubbleDerivatives.hpp"
@@ -59,9 +60,6 @@ namespace VevaciousPlusPlus
     double overshootAuxiliary;
     double initialAuxiliary;
     std::vector< double > initialConditions;
-    double initialPositiveAuxiliary;
-    double initialPotentialDerivative;
-    double initialQuadraticCoefficient;
     double const twoPlusTwiceDampingFactor;
     double shootingThresholdSquared;
     size_t shootAttemptsLeft;
@@ -84,6 +82,12 @@ namespace VevaciousPlusPlus
     // or that the auxiliary variable has not yet gotten within
     // shootingThresholdSquared^(1/2) of 0.
     void ShootFromInitialConditions();
+
+    // This returns the slope of the solution for the bubble equation of motion
+    // along the path in terms of p, which is either the derivative of
+    // 2*sinh(x)/x for T != 0 or of 4*I_1(x)/x.
+    double sinhOrBesselScaledSlope( bool const nonZeroTemperature,
+                                    double const scaledRadius ) const;
   };
 
 
@@ -140,6 +144,32 @@ namespace VevaciousPlusPlus
       << bubbleBit->auxiliarySlope << std::endl;
     }
     std::cout << std::endl;/**/
+  }
+
+  // This returns the slope of the solution for the bubble equation of motion
+  // along the path in terms of p, which is either the derivative of
+  // 2*sinh(x)/x for T != 0 or of 4*I_1(x)/x.
+  inline double
+  BubbleProfile::sinhOrBesselScaledSlope( bool const nonZeroTemperature,
+                                          double const scaledRadius ) const
+  {
+    if( nonZeroTemperature )
+    {
+      return ( ( 2.0 * ( ( scaledRadius * cosh( scaledRadius ) )
+                         - sinh( scaledRadius ) ) )
+               / ( scaledRadius * scaledRadius ) );
+    }
+    else
+    {
+      return ( ( 2.0 * ( ( scaledRadius *
+                           ( boost::math::cyl_bessel_i( (int)0,
+                                                        scaledRadius )
+                             + boost::math::cyl_bessel_i( (int)2,
+                                                          scaledRadius ) ) )
+                         - ( 2.0 * boost::math::cyl_bessel_i( (int)1,
+                                                           scaledRadius ) ) ) )
+               / ( scaledRadius * scaledRadius ) );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */
