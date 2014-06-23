@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
     typedef typename
     Eigen::Matrix< ElementType, Eigen::Dynamic, Eigen::Dynamic > EigenMatrix;
 
-    MassesSquaredFromMatrix( unsigned int numberOfRows,
+    MassesSquaredFromMatrix( size_t numberOfRows,
                     std::map< std::string, std::string > const& attributeMap );
     MassesSquaredFromMatrix( MassesSquaredFromMatrix const& copySource );
     MassesSquaredFromMatrix();
@@ -40,11 +40,11 @@ namespace VevaciousPlusPlus
     MassesSquared( std::vector< double > const& fieldConfiguration,
                    double const logarithmOfScale ) const;
 
-    unsigned int NumberOfRows() const{ return numberOfRows; }
+    size_t NumberOfRows() const{ return numberOfRows; }
 
 
   protected:
-    unsigned int numberOfRows;
+    size_t numberOfRows;
 
     // This should return a matrix of the values of the elements for a field
     // configuration given by fieldConfiguration, with all functionoids
@@ -64,7 +64,7 @@ namespace VevaciousPlusPlus
 
   template< typename ElementType > inline
   MassesSquaredFromMatrix< ElementType >::MassesSquaredFromMatrix(
-                                                     unsigned int numberOfRows,
+                                                           size_t numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
     MassesSquaredCalculator( attributeMap ),
     numberOfRows( numberOfRows )
@@ -107,7 +107,7 @@ namespace VevaciousPlusPlus
     eigenvalueFinder( CurrentValues( fieldConfiguration ),
                       Eigen::EigenvaluesOnly );
     std::vector< double > massesSquared( numberOfRows );
-    for( unsigned int whichIndex( 0 );
+    for( size_t whichIndex( 0 );
          whichIndex < numberOfRows;
          ++whichIndex )
     {
@@ -129,7 +129,7 @@ namespace VevaciousPlusPlus
                                      logarithmOfScale ),
                       Eigen::EigenvaluesOnly );
     std::vector< double > massesSquared( numberOfRows );
-    for( unsigned int whichIndex( 0 );
+    for( size_t whichIndex( 0 );
          whichIndex < numberOfRows;
          ++whichIndex )
     {

@@ -116,11 +116,11 @@ namespace VevaciousPlusPlus
     odeintProfile.clear();
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "BubbleProfile::ShootFromInitialConditions() called.";
     std::cout << std::endl;
-    size_t integrationSteps =/**/
+    size_t integrationSteps =*/
     boost::numeric::odeint::integrate( bubbleDerivatives,
                                        initialConditions,
                                        integrationStartRadius,
@@ -131,7 +131,7 @@ namespace VevaciousPlusPlus
     RecordFromOdeintProfile();
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl << "integrationSteps = " << integrationSteps
     << ", bubble profile:" << std::endl;
     for( std::vector< BubbleRadialValueDescription >::const_iterator
@@ -143,7 +143,7 @@ namespace VevaciousPlusPlus
       << bubbleBit->auxiliaryValue << ", dp/dr = "
       << bubbleBit->auxiliarySlope << std::endl;
     }
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   // This returns the slope of the solution for the bubble equation of motion

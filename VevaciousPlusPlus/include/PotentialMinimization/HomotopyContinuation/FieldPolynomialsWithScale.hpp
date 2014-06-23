@@ -18,7 +18,7 @@ namespace VevaciousPlusPlus
   {
   public:
     FieldPolynomialsWithScale( PolynomialSum const& potentialPolynomial,
-                               unsigned int const numberOfVariables,
+                               size_t const numberOfVariables,
                                SlhaUpdatePropagator& previousPropagator );
     virtual
     ~FieldPolynomialsWithScale();
@@ -46,10 +46,6 @@ namespace VevaciousPlusPlus
     // should be given by lowerEndOfStartValues, and upperEndOfStartValues
     // should give the maximum renormalization scale.
     void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
-
-
-  protected:
-    unsigned int const numberOfFields;
   };
 
 

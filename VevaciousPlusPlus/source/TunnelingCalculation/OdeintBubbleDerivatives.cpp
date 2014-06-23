@@ -19,33 +19,33 @@ namespace VevaciousPlusPlus
     dampingFactor( pathFieldsAndPotential.DampingFactor() )
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "OdeintBubbleDerivatives::OdeintBubbleDerivatives("
     << " pathFieldsAndPotential ="
     << pathFieldsAndPotential.AsDebuggingString() << " ) called.";
     std::cout << std::endl << "potentialSpline =" << std::endl
     << potentialSpline.AsDebuggingString();
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     for( unsigned int fieldIndex( 0 );
          fieldIndex < firstDerivatives.size();
          ++fieldIndex )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "firstDerivatives[ " << fieldIndex << " ] = "
       << firstDerivatives[ fieldIndex ].AsDebuggingString();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
       secondDerivatives[ fieldIndex ].BecomeFirstDerivativeOf(
                                               firstDerivatives[ fieldIndex ] );
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "secondDerivatives[ " << fieldIndex << " ] = "
       << secondDerivatives[ fieldIndex ].AsDebuggingString();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
   }
 

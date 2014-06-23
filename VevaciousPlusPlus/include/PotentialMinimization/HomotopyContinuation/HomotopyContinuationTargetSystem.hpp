@@ -29,6 +29,11 @@ namespace VevaciousPlusPlus
                    std::vector< std::complex< double > > solutionConfiguration,
                 std::vector< std::complex< double > >& destinationVector ) = 0;
 
+    // This should be the real-valued version of the above.
+    virtual void HomotopyContinuationSystemValues(
+                                   std::vector< double > solutionConfiguration,
+                                std::vector< double >& destinationVector ) = 0;
+
     // This should evaluate the derivatives of the target system and place the
     // values in destinationMatrix.
     virtual void HomotopyContinuationSystemGradients(
@@ -63,6 +68,12 @@ namespace VevaciousPlusPlus
             std::vector< std::complex< double > > const& solutionConfiguration,
                            std::vector< std::vector< double > >& realSolutions,
                                                  double const resolutionSize );
+
+  protected:
+    // This allows derived classes to veto particular solutions from being
+    // appended to realSolutions in AppendPureRealSolutionAndValidSignFlips.
+    virtual bool AllowedSolution(
+                      std::vector< double > const& solutionConfiguration ) = 0;
   };
 
 } /* namespace VevaciousPlusPlus */

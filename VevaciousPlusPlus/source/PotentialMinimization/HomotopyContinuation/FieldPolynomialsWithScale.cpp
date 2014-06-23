@@ -12,14 +12,13 @@ namespace VevaciousPlusPlus
 
   FieldPolynomialsWithScale::FieldPolynomialsWithScale(
                                       PolynomialSum const& potentialPolynomial,
-                                             unsigned int const numberOfFields,
+                                                   size_t const numberOfFields,
                                    SlhaUpdatePropagator& previousPropagator ) :
     PolynomialGradientTargetSystem( potentialPolynomial,
                                     ( numberOfFields + 1 ),
-                                    previousPropagator ),
-    numberOfFields( numberOfFields )
+                                    previousPropagator )
   {
-    // This constructor is just an initialization list.
+    this->numberOfFields = numberOfFields;
   }
 
   FieldPolynomialsWithScale::~FieldPolynomialsWithScale()

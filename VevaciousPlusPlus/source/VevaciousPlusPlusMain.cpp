@@ -137,6 +137,21 @@ int main( int argumentCount,
     return EXIT_FAILURE;
   }
 
+  // Here we allow for the non-minima extrema found by homotopy continuation to
+  // be skipped by MINUIT, if requested in the initialization file.
+  std::string onlyRollMinimaInput(
+              argumentParser.fromTag( "RollOnlyMinimaFromHomotopyContinuation",
+                                      "false" ) );
+  BOL::StringParser::transformToLowercase( onlyRollMinimaInput );
+  bool onlyRollMinimaFlag( onlyRollMinimaInput.compare( "true" ) == 0 );
+  if( !onlyRollMinimaFlag
+      &&
+      ( onlyRollMinimaInput.compare( "yes" ) == 0 ) )
+  {
+    onlyRollMinimaFlag = true;
+  }
+  potentialFunction->HomotopyContinuationTargetSystem(
+                           ).ConsiderOnlyMinimaToBeValid( onlyRollMinimaFlag );
 
   VevaciousPlusPlus::HomotopyContinuationSolver*
   homotopyContinuationSolver( NULL );
@@ -144,7 +159,8 @@ int main( int argumentCount,
   std::string homotopyContinuationClass(
                            argumentParser.fromTag( "HomotopyContinuationClass",
                                      "BasicPolynomialHomotopyContinuation" ) );
-  if( homotopyContinuationClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
+  if( homotopyContinuationClass.compare(
+                                 "BasicPolynomialHomotopyContinuation" ) == 0 )
   {
     homotopyContinuationSolver
     = new VevaciousPlusPlus::BasicPolynomialHomotopyContinuation(
@@ -444,7 +460,7 @@ int main( int argumentCount,
   {
     testConfiguration[ 0 ] = ( 0.1
                                * (double)vdStep
-                               * std::min( 1.0,
+                               * std::max( 1.0,
                                  fixedScalePotential.DsbFieldValues()[ 0 ] ) );
     if( testConfiguration.size() > 1 )
     {
@@ -454,7 +470,7 @@ int main( int argumentCount,
       {
         testConfiguration[ 1 ] = ( 0.1
                                    * (double)vuStep
-                                   * std::min( 1.0,
+                                   * std::max( 1.0,
                                  fixedScalePotential.DsbFieldValues()[ 1 ] ) );
         std::cout << "For "
         << fixedScalePotential.FieldConfigurationAsMathematica(
@@ -493,8 +509,6 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "reset \"too close\" threshold for rolled minima to 1 GeV again"
-  << std::endl
   << "write MinuitBounceActionMinimizer - remember to check action after e.g."
   << " 10 * n_fields FCN calls" << std::endl
   << "add in <TakenPositive>" << std::endl

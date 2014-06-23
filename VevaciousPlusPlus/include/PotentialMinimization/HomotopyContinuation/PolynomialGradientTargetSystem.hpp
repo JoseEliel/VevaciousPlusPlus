@@ -9,6 +9,7 @@
 #define POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 
 #include "../../CommonIncludes.hpp"
+#include "Eigen/Dense"
 #include "HomotopyContinuationTargetSystem.hpp"
 #include "../../PotentialEvaluation/SumOfProductOfPolynomialSums.hpp"
 
@@ -20,11 +21,16 @@ namespace VevaciousPlusPlus
   {
   public:
     PolynomialGradientTargetSystem( PolynomialSum const& potentialPolynomial,
-                                    unsigned int const numberOfVariables,
+                                    size_t const numberOfVariables,
                                     SlhaUpdatePropagator& previousPropagator );
     virtual
     ~PolynomialGradientTargetSystem();
 
+
+    // Setting skipSaddlePoints to true means that
+    virtual void
+    ConsiderOnlyMinimaToBeValid( bool const skipSaddlePoints = true )
+    { this->skipSaddlePoints = skipSaddlePoints; }
 
     // This fills targetSystem, startSystem, targetHessian, and startHessian
     // appropriately. The starting system is set with
@@ -59,6 +65,11 @@ namespace VevaciousPlusPlus
     virtual void HomotopyContinuationSystemValues(
                    std::vector< std::complex< double > > solutionConfiguration,
                     std::vector< std::complex< double > >& destinationVector );
+
+    // This is the real-valued version of the above.
+    virtual void HomotopyContinuationSystemValues(
+                                   std::vector< double > solutionConfiguration,
+                                    std::vector< double >& destinationVector );
 
     // This evaluates the derivatives of the target system and places the
     // values in destinationMatrix.
@@ -107,9 +118,10 @@ namespace VevaciousPlusPlus
 
   protected:
     PolynomialSum const& potentialPolynomial;
-    unsigned int const numberOfVariables;
+    size_t const numberOfVariables;
+    size_t numberOfFields;
     std::vector< PolynomialSum > targetSystem;
-    unsigned int highestDegreeOfTargetSystem;
+    size_t highestDegreeOfTargetSystem;
     double minimumScale;
     double maximumScale;
     std::vector< ProductOfPolynomialSums > startSystem;
@@ -117,6 +129,13 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< std::complex< double > > > validSolutions;
     std::vector< std::vector< PolynomialSum > > targetHessian;
     std::vector< std::vector< SumOfProductOfPolynomialSums > > startHessian;
+    bool skipSaddlePoints;
+
+
+    // This vetoes homotopy continuation solutions if they do not correspond to
+    // a minimum (rather than just an extremum) of potentialPolynomial.
+    virtual bool
+    AllowedSolution( std::vector< double > const& solutionConfiguration );
 
     // This fills targetSystem from potentialPolynomial.
     virtual void
@@ -127,7 +146,12 @@ namespace VevaciousPlusPlus
 
     // This fills startHessian[ variableIndex ] from
     // startValues[ variableIndex ].
-    void SetStartHessian( unsigned int const variableIndex );
+    void SetStartHessian( size_t const variableIndex );
+
+    // This returns the 2nd derivative matrix of potentialPolynomial with
+    // respect to its fields.
+    virtual Eigen::MatrixXd FieldHessianOfPotential(
+                          std::vector< double > const& solutionConfiguration );
   };
 
 
@@ -169,7 +193,7 @@ namespace VevaciousPlusPlus
                      std::vector< std::complex< double > >& destinationVector )
   {
     destinationVector.resize( targetSystem.size() );
-    for( unsigned int whichIndex( 0 );
+    for( size_t whichIndex( 0 );
          whichIndex < targetSystem.size();
          ++whichIndex )
     {
@@ -181,7 +205,7 @@ namespace VevaciousPlusPlus
     << std::endl
     << "PolynomialGradientTargetSystem::HomotopyContinuationSystemValues("
     << " {";
-    for( unsigned int whichIndex( 0 );
+    for( size_t whichIndex( 0 );
          whichIndex < solutionConfiguration.size();
          ++whichIndex )
     {
@@ -189,7 +213,7 @@ namespace VevaciousPlusPlus
        << ", " << solutionConfiguration[ whichIndex ].imag() << " )";
     }
     std::cout << " }, ... ) set destinationVector to be { ";
-    for( unsigned int whichIndex( 0 );
+    for( size_t whichIndex( 0 );
          whichIndex < destinationVector.size();
          ++whichIndex )
     {
@@ -199,6 +223,23 @@ namespace VevaciousPlusPlus
     std::cout << " }.";
     std::cout << std::endl;
     std::cout << std::endl;*/
+  }
+
+  // This evaluates the target system and places the values in
+  // destinationVector.
+  inline void
+  PolynomialGradientTargetSystem::HomotopyContinuationSystemValues(
+                                   std::vector< double > solutionConfiguration,
+                                     std::vector< double >& destinationVector )
+  {
+    destinationVector.resize( targetSystem.size() );
+    for( size_t whichIndex( 0 );
+         whichIndex < targetSystem.size();
+         ++whichIndex )
+    {
+      destinationVector[ whichIndex ]
+      = targetSystem[ whichIndex ]( solutionConfiguration );
+    }
   }
 
   // This evaluates the derivatives of the target system and places the
@@ -284,6 +325,31 @@ namespace VevaciousPlusPlus
     }
     std::cout << std::endl;
     std::cout << std::endl;*/
+  }
+
+
+  // This returns the 2nd derivative matrix of potentialPolynomial with
+  // respect to its fields.
+  inline Eigen::MatrixXd
+  PolynomialGradientTargetSystem::FieldHessianOfPotential(
+                           std::vector< double > const& solutionConfiguration )
+  {
+    Eigen::MatrixXd hessianMatrix( numberOfFields,
+                                   numberOfFields );
+    for( size_t rowIndex( 0 );
+         rowIndex < numberOfFields;
+         ++rowIndex )
+    {
+      for( size_t columnIndex( 0 );
+           columnIndex < numberOfFields;
+           ++columnIndex )
+      {
+        hessianMatrix( rowIndex,
+                       columnIndex )
+        = targetHessian[ rowIndex ][ columnIndex ]( solutionConfiguration );
+      }
+    }
+    return hessianMatrix;
   }
 
 } /* namespace VevaciousPlusPlus */

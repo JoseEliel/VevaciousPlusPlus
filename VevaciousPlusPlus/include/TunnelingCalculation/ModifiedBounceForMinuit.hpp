@@ -222,11 +222,6 @@ namespace VevaciousPlusPlus
   {
     PathFieldsAndPotential
     pathFieldsAndPotential( DecodePathParameters( pathParameterization ) );
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "about to try to get potential as splines.";
-    std::cout << std::endl;/**/
     PotentialAlongPath( pathFieldsAndPotential );
     // We return a thin-wall approximation if appropriate:
     /*bool thinWallIsGoodApproximation( false );

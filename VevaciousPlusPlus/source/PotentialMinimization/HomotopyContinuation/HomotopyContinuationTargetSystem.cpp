@@ -61,14 +61,15 @@ namespace VevaciousPlusPlus
 
     // First we return from the function having done nothing if the solution is
     // not purely real.
-    for( std::vector< std::complex< double > >::const_iterator
-         fieldValue( solutionConfiguration.begin() );
-         fieldValue < solutionConfiguration.end();
-         ++fieldValue )
+    size_t const numberOfValues( solutionConfiguration.size() );
+    std::vector< double > realSolution( numberOfValues );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < solutionConfiguration.size();
+         ++fieldIndex )
     {
-      if( ( fieldValue->imag() > resolutionSize )
+      if( ( solutionConfiguration[ fieldIndex ].imag() > resolutionSize )
           ||
-          ( fieldValue->imag() < -resolutionSize ) )
+          ( solutionConfiguration[ fieldIndex ].imag() < -resolutionSize ) )
       {
         // debugging:
         /*std::cout << std::endl << "debugging:"
@@ -77,23 +78,22 @@ namespace VevaciousPlusPlus
         std::cout << std::endl;*/
         return;
       }
+      realSolution[ fieldIndex ] = solutionConfiguration[ fieldIndex ].real();
     }
 
     // Next we make a vector of vectors with all possible sign flips, since we
     // got to this point because solutionConfiguration is purely real (or real
     // enough).
-    unsigned int const numberOfValues( solutionConfiguration.size() );
-    std::vector< std::complex< double > > currentValues( numberOfValues,
-                                                   std::complex< double >( 0.0,
-                                                                       0.0 ) );
-    std::vector< std::vector< std::complex< double > > > signFlips;
-    signFlips.push_back( solutionConfiguration );
-    for( unsigned int flipIndex( 0 );
-        flipIndex < numberOfValues;
+    std::vector< double > currentValues( numberOfValues,
+                                         0.0 );
+    std::vector< std::vector< double > > signFlips;
+    signFlips.push_back( realSolution );
+    for( size_t flipIndex( 0 );
+         flipIndex < numberOfValues;
          ++flipIndex )
     {
-      unsigned int const vectorSize( signFlips.size() );
-      for( unsigned int vectorIndex( 0 );
+      size_t const vectorSize( signFlips.size() );
+      for( size_t vectorIndex( 0 );
            vectorIndex < vectorSize;
            ++vectorIndex )
       {
@@ -108,29 +108,28 @@ namespace VevaciousPlusPlus
 
     // Now we check to see what sign flips solve the homotopy continuation
     // target system (within tolerance).
-    std::vector< std::complex< double > > offsetValues( currentValues );
+    std::vector< double > offsetValues( currentValues );
     double positivePartialSlope( 0.0 );
     double negativePartialSlope( 0.0 );
-    for( std::vector< std::vector< std::complex< double > > >::iterator
+    for( std::vector< std::vector< double > >::iterator
          signFlip( signFlips.begin() );
          signFlip < signFlips.end();
          ++signFlip )
     {
       bool validSolution( true );
-      for( unsigned int whichIndex( 0 );
+      for( size_t whichIndex( 0 );
            whichIndex < numberOfValues;
            ++whichIndex )
       {
         offsetValues = *signFlip;
-        offsetValues[ whichIndex ].real() += resolutionSize;
+        offsetValues[ whichIndex ] += resolutionSize;
         HomotopyContinuationSystemValues( offsetValues,
                                           currentValues );
-        positivePartialSlope = currentValues[ whichIndex ].real();
-        offsetValues[ whichIndex ].real()
-        -= ( resolutionSize + resolutionSize );
+        positivePartialSlope = currentValues[ whichIndex ];
+        offsetValues[ whichIndex ] -= ( resolutionSize + resolutionSize );
         HomotopyContinuationSystemValues( offsetValues,
                                           currentValues );
-        negativePartialSlope = currentValues[ whichIndex ].real();
+        negativePartialSlope = currentValues[ whichIndex ];
         validSolution = ( ( positivePartialSlope == 0.0 )
                           ||
                           ( ( negativePartialSlope
@@ -143,7 +142,7 @@ namespace VevaciousPlusPlus
           /*std::cout << std::endl << "debugging:"
           << std::endl
           << "signFlip {";
-          for( std::vector< std::complex< double > >::const_iterator
+          for( std::vector< double >::const_iterator
                fieldValue( signFlip->begin() );
                fieldValue < signFlip->end();
                ++fieldValue )
@@ -171,7 +170,7 @@ namespace VevaciousPlusPlus
                ++valueIndex )
           {
             valueDifference = ( (*existingSolution)[ valueIndex ]
-                                - (*signFlip)[ valueIndex ].real() );
+                                - (*signFlip)[ valueIndex ] );
             if( valueDifference < 0.0 )
             {
               valueDifference = -valueDifference;
@@ -193,18 +192,15 @@ namespace VevaciousPlusPlus
           }
         }
         // If validSolution is true after leaving the loop over existing
-        // solutions, then we should append the real values of *signFlip to
-        // realSolutions.
+        // solutions, then we should append *signFlip to realSolutions, unless
+        // a derived class has a further veto on this solution (such as
+        // requiring it to be a minimum of the tree-level potential rather than
+        // just an extremum, for PolynomialGradientTarget for a
+        // PotentialFromPolynomialAndMasses instance, for example).
+        validSolution = AllowedSolution( *signFlip );
         if( validSolution )
         {
-          realSolutions.push_back( std::vector< double >( numberOfValues ) );
-          for( unsigned int valueIndex( 0 );
-               valueIndex < numberOfValues;
-               ++valueIndex )
-          {
-            realSolutions.back()[ valueIndex ]
-            = (*signFlip)[ valueIndex ].real();
-          }
+          realSolutions.push_back( *signFlip );
         }
       }
     }

@@ -232,7 +232,7 @@ namespace VevaciousPlusPlus
         targetSystem.AppendPureRealSolutionAndValidSignFlips(
                                                          candidateRealSolution,
                                                       purelyRealSolutionSets,
-                                                              0.01 );
+                                                              1.0 );
       }
     }
 

@@ -77,11 +77,11 @@ namespace VevaciousPlusPlus
     // enough that the integration would take too long to find an overshoot or
     // undershoot, or that the shot was dead on.
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "BubbleProfile::DampedProfile(" << undershootOvershootAttempts << ", "
     << shootingThreshold << " ) called:";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     while( !currentShotGoodEnough
            &&
            ( shootAttemptsLeft > 0 ) )
@@ -156,14 +156,14 @@ namespace VevaciousPlusPlus
                      / ( initialQuadraticCoefficient * integrationStepSize ) );
 
         // debugging:
-        /**/std::cout << "in last segment. undershootAuxiliary = "
+        /*std::cout << "in last segment. undershootAuxiliary = "
         << undershootAuxiliary << ", overshootAuxiliary = "
         << overshootAuxiliary << ", p = " << initialPositiveAuxiliary
         << " (" << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << -initialAuxiliary << "), initialQuadraticCoefficient = "
         << initialQuadraticCoefficient << ", integrationStartRadius = "
         << integrationStartRadius;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( integrationStartRadius <= integrationStepSize )
         {
@@ -267,13 +267,13 @@ namespace VevaciousPlusPlus
                                                           initialAuxiliary ) );
 
         // debugging:
-        /**/std::cout << "not in last segment. undershootAuxiliary = "
+        /*std::cout << "not in last segment. undershootAuxiliary = "
         << undershootAuxiliary << ", overshootAuxiliary = "
         << overshootAuxiliary << ", trying p = " << initialAuxiliary << " ("
         << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << ( pathPotential.DefiniteOvershootAuxiliary() - initialAuxiliary )
         << "), initialPotentialDerivative = " << initialPotentialDerivative;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         double const initialQuadraticCoefficient ( initialPotentialDerivative
                                                   / ( twoPlusTwiceDampingFactor
@@ -298,7 +298,7 @@ namespace VevaciousPlusPlus
 
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "after Euler 1st step, initialConditions = { "
       << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
@@ -306,7 +306,7 @@ namespace VevaciousPlusPlus
       << ", integrationStartRadius = " << integrationStartRadius
       << ", integrationEndRadius = " << integrationEndRadius
       << ", shootAttemptsLeft = " << shootAttemptsLeft;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       ShootFromInitialConditions();
 
@@ -318,13 +318,13 @@ namespace VevaciousPlusPlus
         integrationEndRadius = ( 2.0 * integrationStartRadius );
 
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "after start of loop integrating further, initialConditions = { "
         << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
         << " }. integrationStartRadius = " << integrationStartRadius
         << ", integrationEndRadius = " << integrationEndRadius;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         ShootFromInitialConditions();
       }
@@ -363,12 +363,6 @@ namespace VevaciousPlusPlus
   // odeintProfile to auxiliaryProfile.
   void BubbleProfile::RecordFromOdeintProfile()
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "BubbleProfile::RecordFromOdeintProfile() called."
-    << " odeintProfile.size() = " << odeintProfile.size();
-    std::cout << std::endl;/**/
     // We start from the beginning of odeintProfile so that we record only as
     // much of the bubble profile as there is before the shot starts to roll
     // backwards or overshoot.
@@ -380,12 +374,12 @@ namespace VevaciousPlusPlus
       if( odeintProfile[ radialIndex ].auxiliaryValue < 0.0 )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "overshoot! radialIndex = " << radialIndex
         << ", overshootAuxiliary = " << overshootAuxiliary << " -> "
         << initialAuxiliary;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
         overshootAuxiliary = initialAuxiliary;
         worthIntegratingFurther = false;
         currentShotGoodEnough = false;
@@ -396,12 +390,12 @@ namespace VevaciousPlusPlus
       else if( odeintProfile[ radialIndex ].auxiliarySlope > 0.0 )
       {
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "undershoot! radialIndex = " << radialIndex
         << ", undershootAuxiliary = " << undershootAuxiliary << " -> "
         << initialAuxiliary;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
         undershootAuxiliary = initialAuxiliary;
         worthIntegratingFurther = false;
         currentShotGoodEnough = false;
@@ -410,10 +404,10 @@ namespace VevaciousPlusPlus
       ++radialIndex;
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "radialIndex = " << radialIndex;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     if( radialIndex < odeintProfile.size() )
     {
       auxiliaryProfile.insert( auxiliaryProfile.end(),
@@ -456,13 +450,13 @@ namespace VevaciousPlusPlus
       worthIntegratingFurther = !currentShotGoodEnough;
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "currentDistanceSquared = " << currentDistanceSquared
       << ", initialDistanceSquared = " << initialDistanceSquared
       << ", shootingThresholdSquared = " << shootingThresholdSquared
       << ", currentShotGoodEnough = " << currentShotGoodEnough;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
   }
 

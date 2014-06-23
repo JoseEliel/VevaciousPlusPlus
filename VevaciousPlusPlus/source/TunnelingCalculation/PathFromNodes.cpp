@@ -22,13 +22,6 @@ namespace VevaciousPlusPlus
                                                      pathStepSize ) )
   {
     // This constructor is just an initialization list.
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PathFromNodes::PathFromNodes( " << numberOfFields << ", "
-    << referenceFieldIndex << ", " << numberOfVaryingPathNodes
-    << " ) called. pathStepInversion =" << std::endl << pathStepInversion;
-    std::cout << std::endl;/**/
   }
 
   PathFromNodes::~PathFromNodes()
@@ -52,9 +45,8 @@ namespace VevaciousPlusPlus
                              double const trueVacuumDepth,
                              double const givenTemperature ) const
   {
-
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PathFromNodes::operator( pathParameterization = { ";
     for( std::vector< double >::const_iterator
@@ -95,7 +87,7 @@ namespace VevaciousPlusPlus
       std::cout << *fieldValue;
     }
     std::cout << " } ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // The nodes are taken as being in the plane with reference field = 0 and
     // as being relative to the false vacuum configuration. Now we project them
@@ -154,7 +146,7 @@ namespace VevaciousPlusPlus
                          - ( dotProductWithStraightPath
                              * straightPathInverseLengthSquared ) );
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "nodeIndex = " << nodeIndex << ", pathStepsToAdd = "
       << pathStepsToAdd << ", nodeVector = { ";
@@ -169,7 +161,7 @@ namespace VevaciousPlusPlus
         std::cout << nodeVector[ fieldIndex ];
       }
       std::cout << " }";
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
       for( unsigned int fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
@@ -180,7 +172,7 @@ namespace VevaciousPlusPlus
             + ( straightPath[ fieldIndex ] * pathStepsToAdd ) );
       }
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "pathNodes( nodeIndex, . ) = { ";
       for( unsigned int fieldIndex( 0 );
@@ -194,7 +186,7 @@ namespace VevaciousPlusPlus
         std::cout << pathNodes( nodeIndex,
                                 fieldIndex );
       }
-      std::cout << " }";
+      std::cout << " }";*/
     }
     // debugging:
     /*std::cout << std::endl << "debugging:"

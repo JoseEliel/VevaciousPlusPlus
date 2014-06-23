@@ -21,7 +21,7 @@
   <model>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
   <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevsJustTree.vin
   </model>
   
   <HomotopyContinuationClass>
@@ -32,7 +32,7 @@
   /Users/oleary/BOL/machine-specific/HOM4PS2/
   </PathToHom4ps2>
   <Hom4ps2Argument>
-  <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
+  <!-- The argument for HOM4PS2: as prompted by HOM4PS2:
        "Please enter the option of homotopy method
           1. The polyhedral homotopy
           2. The classical linear homotopy"
@@ -40,11 +40,6 @@
        but 2 seems more reliable. -->
   2
   </Hom4ps2Argument>
-  
-  <RollOnlyMinimaFromHomotopyContinuation>
-  <!-- Either "true"/"yes" or "false"/"no" (case-insensitive). -->
-  yeS
-  </RollOnlyMinimaFromHomotopyContinuation>
   
   <TunnelingStrategy>
   <!-- Valid options: NoTunneling, JustQuantum, JustThermal,
@@ -56,13 +51,14 @@
   </SurvivalProbabilityThreshold>
   
   <TunnelingClass>
-  MinuitBounceActionMinimizer
+  CosmoTransitionsRunner
   <!-- MinuitBounceActionMinimizer -->
   <!-- CosmoTransitionsRunner -->
   </TunnelingClass>
   
   <PathToCosmotransitions>
-  /Users/oleary/BOL/machine-specific/CosmoTransitions2/
+  <!-- /Users/oleary/BOL/machine-specific/CosmoTransitions2/ -->
+  /Users/oleary/BOL/machine-specific/build_directories/CosmoTransitions_vBOL/
   </PathToCosmotransitions>
   
   <slha>

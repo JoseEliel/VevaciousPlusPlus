@@ -112,11 +112,6 @@ namespace VevaciousPlusPlus
     }
     shortestLength = ( 1.0 / sqrt( highestScaleSquared ) );
     longestLength = ( 1.0 / sqrt( lowestScaleSquared ) );
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "tunnelingScaleSquared = " << tunnelingScaleSquared;
-    std::cout << std::endl;/**/
   }
 
   ModifiedBounceForMinuit::~ModifiedBounceForMinuit()
@@ -210,13 +205,6 @@ namespace VevaciousPlusPlus
   void ModifiedBounceForMinuit::PotentialAlongPath(
                          PathFieldsAndPotential& pathFieldsAndPotential ) const
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "ModifiedBounceForMinuit::PotentialAlongPath(pathFieldsAndPotential="
-    << pathFieldsAndPotential.AsDebuggingString()
-    << ") called. numberOfSplinesInPotential = " << numberOfSplinesInPotential;
-    std::cout << std::endl;/**/
     std::vector< double > fieldConfiguration( numberOfFields );
     // We choose to take the cos of a linear distribution of equally-spaced
     // points so that we have a finer resolution of the potential near the
@@ -245,12 +233,12 @@ namespace VevaciousPlusPlus
     pathFieldsAndPotential.PotentialApproximation().SetSpline(
                                   trueVacuumPotential - falseVacuumPotential );
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "ModifiedBounceForMinuit::PotentialAlongPath([pathFieldsAndPotential])"
     << " set pathFieldsAndPotential to be" << std::endl
     << pathFieldsAndPotential.AsDebuggingString();
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   // This returns the effective bounce action [S_4 or ((S_3(T)/T + ln(S_3(T)))]
@@ -403,6 +391,7 @@ namespace VevaciousPlusPlus
     plotColors.push_back( "blue" );
     plotColors.push_back( "green" );
     plotColors.push_back( "orange" );
+    plotColors.push_back( "gold" );
     size_t const numberOfPlottedFields( std::min( plotColors.size(),
                                                   numberOfFields ) );
     std::vector< BOL::TwoDimensionalDataPlotter::DoublePairVectorWithString >
@@ -497,7 +486,7 @@ namespace VevaciousPlusPlus
                                               auxiliaryProfile.front() ) ) ) );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "Before loop: currentRadius = " << currentRadius << ", currentVolume = "
     << currentVolume << ", nextRadius = " << nextRadius << ", nextVolume = "
@@ -507,7 +496,7 @@ namespace VevaciousPlusPlus
     << ", B_{0} = " << BounceActionDensity( pathFieldsAndPotential,
                                             auxiliaryProfile.front() )
     << ", bounceAction = " << bounceAction;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     for( size_t radiusIndex( 1 );
          radiusIndex < ( auxiliaryProfile.size() - 1 );
@@ -529,7 +518,7 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "previousRadius = " << previousRadius
       << ", previousVolume = " << previousVolume
@@ -540,7 +529,7 @@ namespace VevaciousPlusPlus
       << ", B_" << radiusIndex << " = "
       << BounceActionDensity( pathFieldsAndPotential,
                               auxiliaryProfile[ radiusIndex ] );
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       // B_i * r_i^(d-1) * ( r_{i+1} - r_{i-1} )
       // or B_i * ( r_{i+1}^d - r_{i-1}^d )/d.
@@ -568,10 +557,10 @@ namespace VevaciousPlusPlus
       // The common factor of 0.5 * [solid angle] is being left until after the
       // loop.
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "bounceAction = " << bounceAction;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
     // Now we add the last shell:
     double const currentAuxiliary( auxiliaryProfile.back().auxiliaryValue );
@@ -598,10 +587,10 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "After last shell, bounceAction = " << bounceAction;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // If the bubble profile satisfies its equations of motion, at large r, we
     // can ignore the damping term and linearize the fields around the false
@@ -633,10 +622,10 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "After exponents to infinity, bounceAction = " << bounceAction;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // The common factor of 1/2 is combined with the solid angle of
     // 2 pi^2 (quantum) or 4 pi (thermal):

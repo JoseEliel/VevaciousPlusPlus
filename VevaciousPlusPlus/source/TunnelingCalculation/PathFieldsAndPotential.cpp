@@ -28,13 +28,6 @@ namespace VevaciousPlusPlus
     nonZeroTemperature( givenTemperature > 0.0 ),
     givenTemperature( givenTemperature )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PathFieldsAndPotential::PathFieldsAndPotential( ... ) called.";
-    std::cout << std::endl;
-    std::cout << "pathCoefficients =" << std::endl << pathCoefficients;
-    std::cout << std::endl;/**/
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -55,7 +48,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PathFieldsAndPotential::PathFieldsAndPotential(...) finishing;"
     << " fieldPath now is"
@@ -78,7 +71,7 @@ namespace VevaciousPlusPlus
     }
     std::cout << "(2 sets of " << pathTangent.size()
     << " polynomials), numberOfFields = " << numberOfFields;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   PathFieldsAndPotential::PathFieldsAndPotential(
@@ -94,12 +87,6 @@ namespace VevaciousPlusPlus
     givenTemperature( copySource.givenTemperature )
   {
     // This constructor is just an initialization list.
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PathFieldsAndPotential copy constructor called. numberOfFields = "
-    << numberOfFields;
-    std::cout << std::endl;/**/
   }
 
   PathFieldsAndPotential::~PathFieldsAndPotential()

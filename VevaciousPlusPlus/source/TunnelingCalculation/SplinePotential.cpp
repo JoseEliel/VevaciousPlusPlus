@@ -174,11 +174,11 @@ namespace VevaciousPlusPlus
     // thin to be resolved by the path resolution are then forced to have a
     // small barrier at least.
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "potentialValues[ 0 ] = " << potentialValues[ 0 ]
     << ", potentialValues[ 1 ] = " << potentialValues[ 1 ];
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     if( potentialValues[ 1 ] < 0.0 )
     {
       halfSecondDerivatives[ 0 ] = minimumFalseVacuumConcavity;
@@ -196,13 +196,13 @@ namespace VevaciousPlusPlus
                            / ( auxiliaryValues[ 0 ] * auxiliaryValues[ 0 ] ) );
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "auxiliaryValues[ 0 ] = " << auxiliaryValues[ 0 ]
     << ", potentialValues[ 0 ] = " << potentialValues[ 0 ]
     << ", firstDerivatives[ 0 ] = " << firstDerivatives[ 0 ]
     << ", halfSecondDerivatives[ 0 ] = " << halfSecondDerivatives[ 0 ];
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     bool definiteUndershootFound( false );
     bool definiteOvershootFound( false );
     auxiliaryUpToCurrentSegment = auxiliaryValues[ 0 ];
@@ -223,7 +223,7 @@ namespace VevaciousPlusPlus
             * auxiliaryValues[ segmentIndex ] ) );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "auxiliaryUpToCurrentSegment = " << auxiliaryUpToCurrentSegment
       << ", auxiliaryValues[ " << segmentIndex << " ] = "
@@ -234,7 +234,7 @@ namespace VevaciousPlusPlus
       << firstDerivatives[ segmentIndex ]
       << ", halfSecondDerivatives[ " << segmentIndex << " ] = "
       << halfSecondDerivatives[ segmentIndex ];
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       // Now we check for the potential dropping below potentialValues[ 0 ] in
       // this segment.
@@ -284,12 +284,12 @@ namespace VevaciousPlusPlus
           }
         }
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "after checking, definiteUndershootFound = "
         << definiteUndershootFound << ", definiteUndershootAuxiliary = "
         << definiteUndershootAuxiliary;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
       }
       // End of checking for crossing the line where the potential equals its
       // value at the false vacuum.
@@ -304,13 +304,13 @@ namespace VevaciousPlusPlus
         extremumAuxiliary( ( -0.5 * firstDerivatives[ segmentIndex ] )
                            / ( halfSecondDerivatives[ segmentIndex ] ) );
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "definiteUndershootFound = " << definiteUndershootFound
         << ", definiteOvershootFound = " << definiteOvershootFound
         << ", extremumAuxiliary = " << extremumAuxiliary
         << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
         if( ( extremumAuxiliary > std::max( 0.0,
                                             ( definiteUndershootAuxiliary
                                             - auxiliaryUpToCurrentSegment ) ) )
@@ -346,7 +346,7 @@ namespace VevaciousPlusPlus
           startOfFinalSegment = auxiliaryUpToCurrentSegment;
           sizeOfFinalSegment = extremumAuxiliary;
           // debugging:
-          /**/std::cout << std::endl << "debugging:"
+          /*std::cout << std::endl << "debugging:"
           << std::endl
           << "found early path panic minimum in segment " << segmentIndex
           << ", startOfFinalSegment = " << startOfFinalSegment
@@ -354,7 +354,7 @@ namespace VevaciousPlusPlus
           << ", definiteUndershootFound = " << definiteUndershootFound
           << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
           << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary;
-          std::cout << std::endl;/**/
+          std::cout << std::endl;*/
           return;
         }
       }
@@ -422,7 +422,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "Implicit final segment:" << std::endl
     << "startOfFinalSegment = " << startOfFinalSegment
@@ -432,7 +432,7 @@ namespace VevaciousPlusPlus
     << ", finalCubicCoefficient = " << finalCubicCoefficient
     << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
     << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   // This is for debugging.
