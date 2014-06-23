@@ -493,6 +493,8 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
+  << "reset \"too close\" threshold for rolled minima to 1 GeV again"
+  << std::endl
   << "write MinuitBounceActionMinimizer - remember to check action after e.g."
   << " 10 * n_fields FCN calls" << std::endl
   << "add in <TakenPositive>" << std::endl

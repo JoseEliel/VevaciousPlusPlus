@@ -7,7 +7,7 @@
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-       Fri Jun 20 17:36:57 2014
+       Mon Jun 23 11:06:57 2014
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
@@ -15,18 +15,18 @@
   </StableOrMetastable>
   <DsbVacuum>
     <FieldValues>
-      194.741 <!-- f -->
+      199.5 <!-- f -->
     </FieldValues>
     <RelativeDepth>
-      9.86816e+06 <!-- Potential in GeV^4 minus value for all fields = 0 -->
+      998744 <!-- Potential in GeV^4 minus value for all fields = 0 -->
     </RelativeDepth>
   </DsbVacuum>
   <PanicVacuum>
     <FieldValues>
-      -4.66805 <!-- f -->
+      -0.496299 <!-- f -->
     </FieldValues>
     <RelativeDepth>
-      -119304 <!-- Potential in GeV^4 minus value for all fields = 0 -->
+      -1243.81 <!-- Potential in GeV^4 minus value for all fields = 0 -->
     </RelativeDepth>
   </PanicVacuum>
   <!-- Survival probability at zero temperature not calculated. -->

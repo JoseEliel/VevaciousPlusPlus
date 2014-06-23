@@ -87,14 +87,15 @@ namespace VevaciousPlusPlus
     << std::endl
     << "straight path bounce = "
     << modifiedBounceForMinuit( pathParameterization );
-    std::cout << std::endl;
-    if( !(initialStepSizes.empty()) )
+    std::cout << std::endl;/**/
+    // more debugging:
+    /**if( !(initialStepSizes.empty()) )
     {
       initialStepSizes.back() = 0.0;
       std::cout
       << "test path bounce = " << modifiedBounceForMinuit( initialStepSizes );
     }
-    std::cout << std::endl;/**/
+    std::cout << std::endl;**/
 
     // Should now do migrad...
   }
