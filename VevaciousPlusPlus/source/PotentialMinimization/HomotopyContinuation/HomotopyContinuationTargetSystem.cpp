@@ -106,7 +106,7 @@ namespace VevaciousPlusPlus
       }
     }
 
-    // Now we check to see what sign flips solve the homotopy continuation
+    // Now we check to see which sign flips solve the homotopy continuation
     // target system (within tolerance).
     std::vector< double > offsetValues( currentValues );
     double positivePartialSlope( 0.0 );
@@ -159,13 +159,40 @@ namespace VevaciousPlusPlus
       if( validSolution )
       {
         double valueDifference( 0.0 );
-        for( std::vector< std::vector< double > >::iterator
+        for( std::vector< std::vector< double > >::const_iterator
              existingSolution( realSolutions.begin() );
              existingSolution < realSolutions.end();
              ++existingSolution )
         {
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "Comparing *signFlip = { ";
+          for( size_t valueIndex( 0 );
+               valueIndex < numberOfValues;
+               ++valueIndex )
+          {
+            if( valueIndex > 0 )
+            {
+              std::cout << ", ";
+            }
+            std::cout << (*signFlip)[ valueIndex ];
+          }
+          std::cout << " } to *existingSolution = { ";
+          for( size_t valueIndex( 0 );
+               valueIndex < numberOfValues;
+               ++valueIndex )
+          {
+            if( valueIndex > 0 )
+            {
+              std::cout << ", ";
+            }
+            std::cout << (*existingSolution)[ valueIndex ];
+          }
+          std::cout << " }. resolutionSize = " << resolutionSize;
+          std::cout << std::endl;*/
           validSolution = false;
-          for( unsigned int valueIndex( 0 );
+          for( size_t valueIndex( 0 );
                valueIndex < numberOfValues;
                ++valueIndex )
           {
@@ -177,14 +204,14 @@ namespace VevaciousPlusPlus
             }
             validSolution = ( valueDifference > resolutionSize );
             // We leave the inner loop noting that *signFlip is sufficiently
-            // far away from existingSolution.
+            // far away from *existingSolution.
             if( validSolution )
             {
               break;
             }
           }
           // At this point, validSolution is true if *signFlip is sufficiently
-          // far away from existingSolution. If not, we should leave this loop
+          // far away from *existingSolution. If not, we should leave this loop
           // over existing solutions, leaving validSolution as false.
           if( !validSolution )
           {
@@ -197,7 +224,10 @@ namespace VevaciousPlusPlus
         // requiring it to be a minimum of the tree-level potential rather than
         // just an extremum, for PolynomialGradientTarget for a
         // PotentialFromPolynomialAndMasses instance, for example).
-        validSolution = AllowedSolution( *signFlip );
+        if( validSolution )
+        {
+          validSolution = AllowedSolution( *signFlip );
+        }
         if( validSolution )
         {
           realSolutions.push_back( *signFlip );

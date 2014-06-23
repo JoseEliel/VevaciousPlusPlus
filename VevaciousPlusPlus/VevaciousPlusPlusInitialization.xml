@@ -16,6 +16,7 @@
  -->
  
   <PotentialClass>
+  <!-- Either FixedScaleOneLoopPotential or RgeImprovedOneLoopPotential. -->
   FixedScaleOneLoopPotential
   </PotentialClass>
   <model>
@@ -42,8 +43,17 @@
   </Hom4ps2Argument>
   
   <RollOnlyMinimaFromHomotopyContinuation>
-  <!-- Either "true"/"yes" or "false"/"no" (case-insensitive). -->
-  yeS
+  <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if true and
+       using FixedScaleOneLoopPotential or RgeImprovedOneLoopPotential for
+       PotentialClass, then the starting points for MINUIT are only the subset
+       of solutions from the homotopy continuation solutions which also are
+       minima of the tree-level potential (so discarding tree-level maxima and
+       saddle points). This should only be used if you are sure that the
+       tree-level minima suffice to find every one-loop minimum with MINUIT,
+       and it will only speed up this part of the run, while under usual
+       circumstances it is the tunneling calculation which is the bottleneck
+       slowing the whole run down. -->
+  true
   </RollOnlyMinimaFromHomotopyContinuation>
   
   <TunnelingStrategy>
