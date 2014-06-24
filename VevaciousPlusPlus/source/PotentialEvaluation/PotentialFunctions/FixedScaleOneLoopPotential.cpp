@@ -18,7 +18,9 @@ namespace VevaciousPlusPlus
     inverseRenormalizationScaleSquared( NAN ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative )
   {
     // This constructor is just an initialization list.
   }
@@ -29,7 +31,9 @@ namespace VevaciousPlusPlus
     inverseRenormalizationScaleSquared( NAN ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative )
   {
     // This constructor is just an initialization list.
   }

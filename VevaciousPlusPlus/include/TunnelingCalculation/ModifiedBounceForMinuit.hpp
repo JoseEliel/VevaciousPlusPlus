@@ -98,6 +98,15 @@ namespace VevaciousPlusPlus
                                 double const startingTemperature,
                                 double const stepSizeFraction = 0.2 ) const;
 
+    // This plots the fields as functions of the bubble radial value in a file
+    // called plotFilename in .eps format, with each field plotted in the color
+    // given by fieldColors: the field with index i is plotted in the color
+    // given by fieldColors[ i ]. An empty string indicates that the field
+    // should not be plotted.
+    void PlotBubbleProfile( std::vector< double > const& pathParameterization,
+                            std::vector< std::string > const& fieldColors,
+                            std::string const& plotFilename ) const;
+
 
   protected:
     static double const radiusDifferenceThreshold;
@@ -156,16 +165,16 @@ namespace VevaciousPlusPlus
     BounceActionDensity( PathFieldsAndPotential const& pathFieldsAndPotential,
                       BubbleRadialValueDescription const& profilePoint ) const;
 
+    // This puts a polynomial approximation of the potential along the path
+    // given by pathFieldsAndPotential into pathFieldsAndPotential.
+    void
+    PotentialAlongPath( PathFieldsAndPotential& pathFieldsAndPotential ) const;
+
     // This sets up the bubble profile, numerically integrates the bounce
     // action over it, and then returns effective bounce action
     // [S_4 or ((S_3(T)/T + ln(S_3(T)))].
     double EffectiveBounceAction(
                   PathFieldsAndPotential const& pathFieldsAndPotential ) const;
-
-    // This puts a polynomial approximation of the potential along the path
-    // given by pathFieldsAndPotential into pathFieldsAndPotential.
-    void
-    PotentialAlongPath( PathFieldsAndPotential& pathFieldsAndPotential ) const;
   };
 
 
@@ -271,22 +280,16 @@ namespace VevaciousPlusPlus
                                               double const startingTemperature,
                                           double const stepSizeFraction ) const
   {
-    size_t parameterizationSize( pathFromNodes.ParameterizationSize() );
-    if( startingTemperature > 0.0 )
-    {
-      ++parameterizationSize;
-    }
-    initialParameterization.assign( parameterizationSize,
-                                    0.0 );
-    initialStepSizes.resize( initialParameterization.size() );
-    if( startingTemperature > 0.0 )
-    {
-      initialParameterization.back() = startingTemperature;
-      initialStepSizes.back() = ( stepSizeFraction * startingTemperature );
-    }
     pathFromNodes.InitialStepsForMinuit( initialStepSizes,
                                          zeroTemperatureStraightPath,
                                          stepSizeFraction );
+    initialParameterization.assign( pathFromNodes.ParameterizationSize(),
+                                    0.0 );
+    if( startingTemperature > 0.0 )
+    {
+      initialParameterization.push_back( startingTemperature );
+      initialStepSizes.push_back( stepSizeFraction * startingTemperature );
+    }
   }
 
   // This returns true if pathParameterization.size() is only

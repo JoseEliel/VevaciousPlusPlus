@@ -19,7 +19,9 @@ namespace VevaciousPlusPlus
     logarithmOfMaximumRenormalizationScale( NAN ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative )
   {
     // This constructor is just an initialization list.
   }
@@ -33,7 +35,9 @@ namespace VevaciousPlusPlus
                                         currentMaximumRenormalizationScale ) ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative )
   {
     // This constructor is just an initialization list.
   }

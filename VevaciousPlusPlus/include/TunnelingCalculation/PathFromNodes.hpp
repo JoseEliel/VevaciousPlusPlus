@@ -90,10 +90,12 @@ namespace VevaciousPlusPlus
                                      std::vector< double > const& straightPath,
                                           double const stepSizeFraction ) const
   {
+    pathParameterization.resize( numberOfVaryingPathNodes
+                                 * numberOfParameterizationFields );
     size_t actualFieldIndex( 0 );
     for( size_t nodeIndex( 0 );
          nodeIndex < numberOfVaryingPathNodes;
-         nodeIndex += numberOfVaryingPathNodes )
+         ++nodeIndex )
     {
       for( size_t parameterizationFieldIndex( 0 );
            parameterizationFieldIndex < numberOfParameterizationFields;
@@ -104,7 +106,8 @@ namespace VevaciousPlusPlus
         {
           ++actualFieldIndex;
         }
-        pathParameterization[ nodeIndex + parameterizationFieldIndex ]
+        pathParameterization[ ( nodeIndex * numberOfVaryingPathNodes )
+                              + parameterizationFieldIndex ]
         = ( stepSizeFraction * straightPath[ actualFieldIndex ] );
       }
     }

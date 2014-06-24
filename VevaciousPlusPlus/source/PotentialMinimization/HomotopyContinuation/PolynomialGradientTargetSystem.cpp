@@ -13,7 +13,9 @@ namespace VevaciousPlusPlus
   PolynomialGradientTargetSystem::PolynomialGradientTargetSystem(
                                       PolynomialSum const& potentialPolynomial,
                                                    size_t const numberOfFields,
-                                   SlhaUpdatePropagator& previousPropagator ) :
+                                      SlhaUpdatePropagator& previousPropagator,
+                            std::vector< size_t > const& fieldsAssumedPositive,
+                         std::vector< size_t > const& fieldsAssumedNegative ) :
     HomotopyContinuationTargetSystem( previousPropagator ),
     potentialPolynomial( potentialPolynomial ),
     numberOfVariables( numberOfFields ),
@@ -27,7 +29,9 @@ namespace VevaciousPlusPlus
     validSolutions(),
     targetHessian(),
     startHessian(),
-    skipSaddlePoints( false )
+    skipSaddlePoints( false ),
+    fieldsAssumedPositive( fieldsAssumedPositive ),
+    fieldsAssumedNegative( fieldsAssumedNegative )
   {
     // This constructor is just an initialization list.
   }
@@ -102,14 +106,14 @@ namespace VevaciousPlusPlus
   // ( lowerEndOfStartValues^(2/3) * upperEndOfStartValues^(1/3) ),
   // ( lowerEndOfStartValues^(1/3) * upperEndOfStartValues^(2/3) ),
   // upperEndOfStartValues }.
-  void PolynomialGradientTargetSystem::SetStartSystem(
-                                              unsigned int const variableIndex,
+  void
+  PolynomialGradientTargetSystem::SetStartSystem( size_t const variableIndex,
                                             double const lowerEndOfStartValues,
                                            double const upperEndOfStartValues )
   {
     startValues[ variableIndex ].clear();
     startSystem[ variableIndex ] = ProductOfPolynomialSums();
-    unsigned int numberOfNonZeroStartValues( highestDegreeOfTargetSystem / 2 );
+    size_t numberOfNonZeroStartValues( highestDegreeOfTargetSystem / 2 );
     std::complex< double > startValue( 0.0,
                                        0.0 );
     if( ( highestDegreeOfTargetSystem % 2 ) == 1 )
@@ -134,7 +138,7 @@ namespace VevaciousPlusPlus
       double upperPower( 0.0 );
       double const
       powerDivisor( 1.0 / (double)( numberOfNonZeroStartValues - 1 ) );
-      for( unsigned int valueIndex( 0 );
+      for( size_t valueIndex( 0 );
            valueIndex < numberOfNonZeroStartValues;
            ++valueIndex )
       {
@@ -188,6 +192,85 @@ namespace VevaciousPlusPlus
     }
     std::cout << std::endl << "}";
     std::cout << std::endl;*/
+  }
+
+  // This vetoes a homotopy continuation solution if any of the fields with
+  // index in fieldsAssumedPositive are negative (allowing for a small amount
+  // of numerical jitter) or if any of the fields with index in
+  // fieldsAssumedNegitive are positive ( also allowing for a small amount of
+  // numerical jitter), or if skipSaddlePoints is true and the solution does
+  // not correspond to a minimum (rather than just an extremum) of
+  // potentialPolynomial.
+  bool PolynomialGradientTargetSystem::AllowedSolution(
+                           std::vector< double > const& solutionConfiguration )
+  {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PolynomialGradientTargetSystem::AllowedSolution( { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < solutionConfiguration.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << solutionConfiguration[ fieldIndex ];
+    }
+    std::cout << " } ) called. skipSaddlePoints = " << skipSaddlePoints;
+    std::cout << std::endl;*/
+
+    for( std::vector< size_t >::const_iterator
+         positiveIndex( fieldsAssumedPositive.begin() );
+         positiveIndex < fieldsAssumedPositive.end();
+         ++positiveIndex )
+    {
+      if( solutionConfiguration[ *positiveIndex ] < -1.0 )
+      {
+        return false;
+      }
+    }
+    for( std::vector< size_t >::const_iterator
+         negativeIndex( fieldsAssumedNegative.begin() );
+         negativeIndex < fieldsAssumedNegative.end();
+         ++negativeIndex )
+    {
+      if( solutionConfiguration[ *negativeIndex ] > 1.0 )
+      {
+        return false;
+      }
+    }
+
+    // We only check for a negative eigenvalue if skipping was requested.
+    if( skipSaddlePoints )
+    {
+      // We need to check to see if targetHessian has any negative
+      // eigenvalues for solutionConfiguration.
+      Eigen::SelfAdjointEigenSolver< Eigen::MatrixXd >
+      eigenvalueFinder( FieldHessianOfPotential( solutionConfiguration ),
+                        Eigen::EigenvaluesOnly );
+      // The eigenvalues are sorted in ascending order according to the Eigen
+      // documentation, so it suffices to only check the 1st value.
+      if( eigenvalueFinder.eigenvalues()( 0 ) < 0.0 )
+      {
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "1st eigenvalue = " << eigenvalueFinder.eigenvalues()( 0 )
+        << ", so returning false.";
+        std::cout << std::endl;*/
+        return false;
+      }
+    }
+    // If we get here, either we were not skipping in the 1st place, or none of
+    // the eigenvalues were negative.
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Returning true.";
+    std::cout << std::endl;*/
+    return true;
   }
 
   // This fills startHessian[ variableIndex ] from

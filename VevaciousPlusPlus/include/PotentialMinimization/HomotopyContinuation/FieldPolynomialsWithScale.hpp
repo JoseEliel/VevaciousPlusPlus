@@ -19,7 +19,9 @@ namespace VevaciousPlusPlus
   public:
     FieldPolynomialsWithScale( PolynomialSum const& potentialPolynomial,
                                size_t const numberOfVariables,
-                               SlhaUpdatePropagator& previousPropagator );
+                               SlhaUpdatePropagator& previousPropagator,
+                            std::vector< size_t > const& fieldsAssumedPositive,
+                          std::vector< size_t > const& fieldsAssumedNegative );
     virtual
     ~FieldPolynomialsWithScale();
 

@@ -511,8 +511,6 @@ int main( int argumentCount,
   << "Still to do:" << std::endl
   << "write MinuitBounceActionMinimizer - remember to check action after e.g."
   << " 10 * n_fields FCN calls" << std::endl
-  << "add in <TakenPositive>" << std::endl
-  << "add in <RollOnlyTreeLevelMinima>" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
   std::cout << std::endl;

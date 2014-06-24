@@ -53,6 +53,8 @@ namespace VevaciousPlusPlus
     static std::string const allowedVariableChars;
     static double const loopFactor;
     static double const thermalFactor;
+    static std::string const positiveByConvention;
+    static std::string const negativeByConvention;
 
     RunningParameterManager& runningParameters;
     std::vector< PolynomialSum > dsbFieldValuePolynomials;
@@ -72,6 +74,8 @@ namespace VevaciousPlusPlus
     double vectorMassCorrectionConstant;
     bool needToUpdateHomotopyContinuation;
     double const scaleRangeMinimumFactor;
+    std::vector< size_t > fieldsAssumedPositive;
+    std::vector< size_t > fieldsAssumedNegative;
 
 
     // This is just for derived classes.

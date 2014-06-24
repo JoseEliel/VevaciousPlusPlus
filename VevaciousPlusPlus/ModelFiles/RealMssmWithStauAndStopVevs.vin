@@ -35,14 +35,14 @@
        referenced. -->
   <FieldVariables>
     Hd
-    Hu
+    Hu   PositiveByConvention
     L[-1,3]
-    E[3]
+    E[3] PositiveByConvention
     <!--
     L[+1,2]
     -->
     Q[+1,3]
-    U[3]
+    U[3] NegativeByConvention
   </FieldVariables>
   
   <!-- Every block that will be read in from an SLHA file should be enumerated

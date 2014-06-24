@@ -22,7 +22,9 @@ namespace VevaciousPlusPlus
   public:
     PolynomialGradientTargetSystem( PolynomialSum const& potentialPolynomial,
                                     size_t const numberOfVariables,
-                                    SlhaUpdatePropagator& previousPropagator );
+                                    SlhaUpdatePropagator& previousPropagator,
+                            std::vector< size_t > const& fieldsAssumedPositive,
+                          std::vector< size_t > const& fieldsAssumedNegative );
     virtual
     ~PolynomialGradientTargetSystem();
 
@@ -111,7 +113,7 @@ namespace VevaciousPlusPlus
     // ( lowerEndOfStartValues^(2/3) * upperEndOfStartValues^(1/3) ),
     // ( lowerEndOfStartValues^(1/3) * upperEndOfStartValues^(2/3) ),
     // upperEndOfStartValues }.
-    void SetStartSystem( unsigned int const variableIndex,
+    void SetStartSystem( size_t const variableIndex,
                          double const lowerEndOfStartValues,
                          double const upperEndOfStartValues );
 
@@ -130,10 +132,17 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< PolynomialSum > > targetHessian;
     std::vector< std::vector< SumOfProductOfPolynomialSums > > startHessian;
     bool skipSaddlePoints;
+    std::vector< size_t > const& fieldsAssumedPositive;
+    std::vector< size_t > const& fieldsAssumedNegative;
 
 
-    // This vetoes homotopy continuation solutions if they do not correspond to
-    // a minimum (rather than just an extremum) of potentialPolynomial.
+    // This vetoes a homotopy continuation solution if any of the fields with
+    // index in fieldsAssumedPositive are negative (allowing for a small amount
+    // of numerical jitter) or if any of the fields with index in
+    // fieldsAssumedNegitive are positive ( also allowing for a small amount of
+    // numerical jitter), or if skipSaddlePoints is true and the solution does
+    // not correspond to a minimum (rather than just an extremum) of
+    // potentialPolynomial.
     virtual bool
     AllowedSolution( std::vector< double > const& solutionConfiguration );
 
@@ -267,58 +276,6 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This vetoes homotopy continuation solutions if they do not correspond to
-  // a minimum (rather than just an extremum) of potentialPolynomial.
-  inline bool PolynomialGradientTargetSystem::AllowedSolution(
-                           std::vector< double > const& solutionConfiguration )
-  {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialGradientTargetSystem::AllowedSolution( { ";
-    for( size_t fieldIndex( 0 );
-         fieldIndex < solutionConfiguration.size();
-         ++fieldIndex )
-    {
-      if( fieldIndex > 0 )
-      {
-        std::cout << ", ";
-      }
-      std::cout << solutionConfiguration[ fieldIndex ];
-    }
-    std::cout << " } ) called. skipSaddlePoints = " << skipSaddlePoints;
-    std::cout << std::endl;*/
-    // We only do something if skipping was requested.
-    if( skipSaddlePoints )
-    {
-      // We need to check to see if targetHessian has any negative
-      // eigenvalues for solutionConfiguration.
-      Eigen::SelfAdjointEigenSolver< Eigen::MatrixXd >
-      eigenvalueFinder( FieldHessianOfPotential( solutionConfiguration ),
-                        Eigen::EigenvaluesOnly );
-      // The eigenvalues are sorted in ascending order according to the Eigen
-      // documentation, so it suffices to only check the 1st value.
-      if( eigenvalueFinder.eigenvalues()( 0 ) < 0.0 )
-      {
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "1st eigenvalue = " << eigenvalueFinder.eigenvalues()( 0 )
-        << ", so returning false.";
-        std::cout << std::endl;*/
-        return false;
-      }
-    }
-    // If we get here, either we were not skipping in the 1st place, or none of
-    // the eigenvalues were negative.
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Returning true.";
-    std::cout << std::endl;*/
-    return true;
-  }
-
   // This fills targetSystem from potentialPolynomial.
   inline void PolynomialGradientTargetSystem::PreparePolynomialGradient(
                                      PolynomialSum const& potentialPolynomial )
@@ -337,7 +294,7 @@ namespace VevaciousPlusPlus
     <<  ", polynomialForGradient.size() = " << polynomialForGradient.size();
     std::cout << std::endl;*/
 
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < numberOfVariables;
          ++fieldIndex )
     {

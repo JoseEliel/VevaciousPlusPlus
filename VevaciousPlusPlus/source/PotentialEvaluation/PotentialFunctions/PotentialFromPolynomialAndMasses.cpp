@@ -25,6 +25,10 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialAndMasses::loopFactor( 1.0 / ( 64.0 * M_PI * M_PI ) );
   double const PotentialFromPolynomialAndMasses::thermalFactor( 1.0
                                                      / ( 2.0 * M_PI * M_PI ) );
+  std::string const PotentialFromPolynomialAndMasses::positiveByConvention(
+                                                      "PositiveByConvention" );
+  std::string const PotentialFromPolynomialAndMasses::negativeByConvention(
+                                                      "NegativeByConvention" );
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                                               std::string const& modelFilename,
@@ -49,7 +53,9 @@ namespace VevaciousPlusPlus
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
     needToUpdateHomotopyContinuation( false ),
-    scaleRangeMinimumFactor( scaleRangeMinimumFactor )
+    scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
+    fieldsAssumedPositive(),
+    fieldsAssumedNegative()
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -96,15 +102,115 @@ namespace VevaciousPlusPlus
          ++lineIndex )
     {
       readFieldName.assign( BOL::StringParser::trimFromFrontAndBack(
-                               FormatVariable( elementLines[ lineIndex ] ) ) );
+                                                 elementLines[ lineIndex ] ) );
       if( !(readFieldName.empty()) )
       {
-        fieldNames.push_back( readFieldName );
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "readFieldName = \"" << readFieldName << "\"";
+        std::cout << std::endl;
+        if( readFieldName.size() > positiveByConvention.size() )
+        {
+          std::cout << "long enough to include positiveByConvention."
+          << " readFieldName.compare(...) = "
+          << readFieldName.compare( ( readFieldName.size()
+                                    - positiveByConvention.size() ),
+                                    positiveByConvention.size(),
+                                    positiveByConvention ) << std::endl;
+        }*/
+
+        if( ( readFieldName.size() > positiveByConvention.size() )
+            &&
+            ( readFieldName.compare( ( readFieldName.size()
+                                       - positiveByConvention.size() ),
+                                     positiveByConvention.size(),
+                                     positiveByConvention ) == 0 ) )
+        {
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "readFieldName.substr( 0, ( " << readFieldName.size() << " - "
+          << positiveByConvention.size() << " ) = "
+          << ( readFieldName.size() - positiveByConvention.size() )
+          << " ) = \""
+          << readFieldName.substr( 0,
+                       ( readFieldName.size() - positiveByConvention.size() ) )
+          << "\"";
+          std::cout << std::endl;*/
+          fieldsAssumedPositive.push_back( fieldNames.size() );
+          fieldNames.push_back( FormatVariable(
+                                       BOL::StringParser::trimFromFrontAndBack(
+                                                       readFieldName.substr( 0,
+                ( readFieldName.size() - positiveByConvention.size() ) ) ) ) );
+        }
+        else if( ( readFieldName.size() > negativeByConvention.size() )
+                 &&
+                 ( readFieldName.compare( ( readFieldName.size()
+                                            - negativeByConvention.size() ),
+                                          negativeByConvention.size(),
+                                          negativeByConvention ) == 0 ) )
+        {
+          fieldsAssumedNegative.push_back( fieldNames.size() );
+          fieldNames.push_back( FormatVariable(
+                                       BOL::StringParser::trimFromFrontAndBack(
+                                                       readFieldName.substr( 0,
+                ( readFieldName.size() - negativeByConvention.size() ) ) ) ) );
+        }
+        else
+        {
+          fieldNames.push_back( FormatVariable( readFieldName ) );
+        }
       }
     }
     numberOfFields = fieldNames.size();
     dsbFieldValuePolynomials.resize( numberOfFields );
     dsbFieldValueInputs.resize( numberOfFields );
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses constructor: fieldNames = { \"";
+    for( std::vector< std::string >::const_iterator
+         fieldName( fieldNames.begin() );
+         fieldName < fieldNames.end();
+         ++fieldName )
+    {
+      if( fieldName > fieldNames.begin() )
+      {
+        std::cout << "\", \"";
+      }
+      std::cout << *fieldName;
+    }
+    std::cout << "\" }, fieldsAssumedPositive = { ";
+    for( std::vector< size_t >::const_iterator
+         positiveField( fieldsAssumedPositive.begin() );
+         positiveField < fieldsAssumedPositive.end();
+         ++positiveField )
+    {
+      {
+        if( positiveField > fieldsAssumedPositive.begin() )
+        {
+          std::cout << ", ";
+        }
+        std::cout << *positiveField;
+      }
+    }
+    std::cout << " }, fieldsAssumedNegative = { ";
+    for( std::vector< size_t >::const_iterator
+         negativeField( fieldsAssumedNegative.begin() );
+         negativeField < fieldsAssumedNegative.end();
+         ++negativeField )
+    {
+      {
+        if( negativeField > fieldsAssumedNegative.begin() )
+        {
+          std::cout << ", ";
+        }
+        std::cout << *negativeField;
+      }
+    }
+    std::cout << " }";
+    std::cout << std::endl;*/
     //   </FieldVariables>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
@@ -182,8 +288,7 @@ namespace VevaciousPlusPlus
         errorMessage.append( "\")" );
         throw std::runtime_error( errorMessage );
       }
-      unsigned int fieldIndex( FieldIndex(
-                                       BOL::StringParser::trimFromFrontAndBack(
+      size_t fieldIndex( FieldIndex( BOL::StringParser::trimFromFrontAndBack(
                                            elementLines[ lineIndex ].substr( 0,
                                                         equalsPosition ) ) ) );
       if( !( fieldIndex < fieldNames.size() ) )
@@ -340,27 +445,27 @@ namespace VevaciousPlusPlus
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
     // after the constructor.
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < scalarMassSquaredMatrices.size();
          ++pointerIndex )
     {
       scalarSquareMasses.push_back(
                                 &(scalarMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back( &(fermionMassMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassSquaredMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back(
                                &(fermionMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < vectorMassSquaredMatrices.size();
          ++pointerIndex )
     {
@@ -696,7 +801,9 @@ namespace VevaciousPlusPlus
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
     needToUpdateHomotopyContinuation( false ),
-    scaleRangeMinimumFactor( NAN )
+    scaleRangeMinimumFactor( NAN ),
+    fieldsAssumedPositive(),
+    fieldsAssumedNegative()
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -730,32 +837,34 @@ namespace VevaciousPlusPlus
     vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant ),
     needToUpdateHomotopyContinuation(
                                  copySource.needToUpdateHomotopyContinuation ),
-    scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor )
+    scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
+    fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
+    fieldsAssumedNegative( copySource.fieldsAssumedNegative )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
     // after the constructor.
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < scalarMassSquaredMatrices.size();
          ++pointerIndex )
     {
       scalarSquareMasses.push_back(
                                 &(scalarMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back( &(fermionMassMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassSquaredMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back(
                                &(fermionMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < vectorMassSquaredMatrices.size();
          ++pointerIndex )
     {

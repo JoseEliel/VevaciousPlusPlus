@@ -120,6 +120,66 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This plots the fields as functions of the bubble radial value in a file
+  // called plotFilename in .eps format, with each field plotted in the color
+  // given by fieldColors: the field with index i is plotted in the color
+  // given by fieldColors[ i ]. An empty string indicates that the field
+  // should not be plotted.
+  void ModifiedBounceForMinuit::PlotBubbleProfile(
+                             std::vector< double > const& pathParameterization,
+                                 std::vector< std::string > const& fieldColors,
+                                        std::string const& plotFilename ) const
+  {
+    PathFieldsAndPotential
+    pathFieldsAndPotential( DecodePathParameters( pathParameterization ) );
+    PotentialAlongPath( pathFieldsAndPotential );
+    BubbleProfile bubbleProfile( pathFieldsAndPotential,
+                          ( initialFractionOfShortestLength * shortestLength ),
+                                 longestLength );
+    std::vector< BubbleRadialValueDescription > const&
+    auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
+                                                   shootingThreshold ) );
+    BOL::TwoDimensionalDataPlotter bubblePlotter( "/opt/local/bin/gnuplot",
+                                                  plotFilename );
+    size_t numberOfPlottedFields( std::min( fieldColors.size(),
+                                            numberOfFields ) );
+    BOL::TwoDimensionalDataPlotter::PlotDataVector plotData;
+    BOL::TwoDimensionalDataPlotter::DoublePairVectorWithStringPair fieldData;
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfPlottedFields;
+         ++fieldIndex )
+    {
+      if( !(fieldColors[ fieldIndex ].empty()) )
+      {
+        fieldData.second.first.assign( fieldColors[ fieldIndex ] );
+        fieldData.second.second.assign(
+                                potentialFunction.FieldNames()[ fieldIndex ] );
+        plotData.push_back( fieldData );
+      }
+    }
+    numberOfPlottedFields = plotData.size();
+    std::vector< SimplePolynomial > const&
+    fieldPath( pathFieldsAndPotential.FieldPath() );
+    for( size_t radiusIndex( 0 );
+         radiusIndex < auxiliaryProfile.size();
+         ++radiusIndex )
+    {
+      double const
+      radialValue( auxiliaryProfile[ radiusIndex ].radialValue );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfPlottedFields;
+           ++fieldIndex )
+      {
+        plotData[ fieldIndex ].first.push_back( std::make_pair( radialValue,
+                                                       fieldPath[ fieldIndex ](
+                          auxiliaryProfile[ radiusIndex ].auxiliaryValue ) ) );
+      }
+    }
+    bubblePlotter.plotData( plotData,
+                            "rho/(1/GeV)",
+                            "field/GeV" );
+  }
+
   // This turns pathParameterization into a PathFieldsAndPotential, by first
   // checking for a non-zero temperature, then setting up the straight path
   // in field space, and projecting the nodes extracted from
@@ -129,6 +189,23 @@ namespace VevaciousPlusPlus
   PathFieldsAndPotential ModifiedBounceForMinuit::DecodePathParameters(
                       std::vector< double > const& pathParameterization ) const
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "ModifiedBounceForMinuit::DecodePathParameters( { ";
+    for( std::vector< double >::const_iterator
+         pathParameter( pathParameterization.begin() );
+         pathParameter < pathParameterization.end();
+         ++pathParameter )
+    {
+      if( pathParameter != pathParameterization.begin() )
+      {
+        std::cout << ", ";
+      }
+      std::cout << *pathParameter;
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;/**/
     if( ZeroTemperatureParameterization( pathParameterization ) )
     {
       return pathFromNodes( pathParameterization,
@@ -377,50 +454,6 @@ namespace VevaciousPlusPlus
     std::vector< BubbleRadialValueDescription > const&
     auxiliaryProfile( bubbleProfile.DampedProfile( undershootOvershootAttempts,
                                                    shootingThreshold ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Preparing to plot bubble profile.";
-    std::cout << std::endl;
-    BOL::TwoDimensionalDataPlotter bubblePlotter( "/opt/local/bin/gnuplot",
-                                                  "BolBubbleProfile.eps" );
-    std::vector< std::string > plotColors;
-    plotColors.push_back( "red" );
-    plotColors.push_back( "purple" );
-    plotColors.push_back( "blue" );
-    plotColors.push_back( "green" );
-    plotColors.push_back( "orange" );
-    plotColors.push_back( "gold" );
-    size_t const numberOfPlottedFields( std::min( plotColors.size(),
-                                                  numberOfFields ) );
-    std::vector< BOL::TwoDimensionalDataPlotter::DoublePairVectorWithString >
-    dataAndColors( numberOfPlottedFields );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfPlottedFields;
-         ++fieldIndex )
-    {
-      dataAndColors[ fieldIndex ].second.assign( plotColors[ fieldIndex ] );
-    }
-    std::vector< SimplePolynomial > const&
-    fieldPath( pathFieldsAndPotential.FieldPath() );
-    for( size_t radiusIndex( 0 );
-         radiusIndex < auxiliaryProfile.size();
-         ++radiusIndex )
-    {
-      double const
-      radialValue( auxiliaryProfile[ radiusIndex ].radialValue );
-      for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfPlottedFields;
-           ++fieldIndex )
-      {
-        dataAndColors[ fieldIndex ].first.push_back(
-                                                   std::make_pair( radialValue,
-                                                       fieldPath[ fieldIndex ](
-                          auxiliaryProfile[ radiusIndex ].auxiliaryValue ) ) );
-      }
-    }
-    bubblePlotter.plotData( dataAndColors );/**/
 
     // We have a set of r_i, p(r_i), and dp/dr|_{r=r_i}, and can easily
     // evaluate a set of "bounce action densities" B_i = B(r_i). The numerical

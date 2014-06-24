@@ -177,11 +177,11 @@ namespace VevaciousPlusPlus
                                          * integrationStartRadius );
 
           // debugging:
-          /**/std::cout << std::endl << "debugging:"
+          /*std::cout << std::endl << "debugging:"
           << std::endl
           << "small enough integrationStartRadius = " << integrationStartRadius
           << " <= integrationStepSize = " << integrationStepSize;
-          std::cout << std::endl;/**/
+          std::cout << std::endl;*/
         }
         else
         {
@@ -205,11 +205,11 @@ namespace VevaciousPlusPlus
                                    pathFieldsAndPotential.NonZeroTemperature(),
                                                    scaledRadius );
             // debugging:
-            /**/std::cout << std::endl << "debugging:"
+            /*std::cout << std::endl << "debugging:"
             << std::endl
             << "at scaled r = " << scaledRadius << ", scaled slope = "
             << scaledSlope;
-            std::cout << std::endl;/**/
+            std::cout << std::endl;*/
           }
           while( scaledSlope < minimumScaledSlope )
           {
@@ -219,11 +219,11 @@ namespace VevaciousPlusPlus
                                    pathFieldsAndPotential.NonZeroTemperature(),
                                                    scaledRadius );
             // debugging:
-            /**/std::cout << std::endl << "debugging:"
+            /*std::cout << std::endl << "debugging:"
             << std::endl
             << "at scaled r = " << scaledRadius << ", scaled slope = "
             << scaledSlope;
-            std::cout << std::endl;/**/
+            std::cout << std::endl;*/
           }
           // At this point, the slope of p(r) at
           // r = inverseRadialScale * scaledSlope ) should be large enough that
@@ -248,14 +248,14 @@ namespace VevaciousPlusPlus
           = ( initialAuxiliary * inverseRadialScale * scaledSlope );
           integrationStartRadius = ( scaledRadius / inverseRadialScale );
           // debugging:
-          /**/std::cout << std::endl << "debugging:"
+          /*std::cout << std::endl << "debugging:"
           << std::endl
           << "needed to do Bessel/sinh approximation: inverseRadialScale = "
           << inverseRadialScale << ", minimumScaledSlope = "
           << minimumScaledSlope << ", scaledRadius = " << scaledRadius
           << ", scaledSlope = " << scaledSlope << ", sinhOrBesselPart = "
           << sinhOrBesselPart;
-          std::cout << std::endl;/**/
+          std::cout << std::endl;*/
         }
       }
       else

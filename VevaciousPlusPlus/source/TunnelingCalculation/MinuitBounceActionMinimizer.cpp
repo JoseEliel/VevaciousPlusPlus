@@ -88,14 +88,36 @@ namespace VevaciousPlusPlus
     << "straight path bounce = "
     << modifiedBounceForMinuit( pathParameterization );
     std::cout << std::endl;/**/
+    std::vector< std::string > plotColors;
+    plotColors.push_back( "red" );
+    plotColors.push_back( "purple" );
+    plotColors.push_back( "blue" );
+    plotColors.push_back( "green" );
+    plotColors.push_back( "orange" );
+    plotColors.push_back( "gold" );
+    modifiedBounceForMinuit.PlotBubbleProfile( pathParameterization,
+                                               plotColors,
+                                               "StraightBubbleProfile.eps" );
     // more debugging:
-    /**if( !(initialStepSizes.empty()) )
+    /**/if( !(initialStepSizes.empty()) )
     {
-      initialStepSizes.back() = 0.0;
-      std::cout
-      << "test path bounce = " << modifiedBounceForMinuit( initialStepSizes );
+      for( size_t parameterIndex( 0 );
+           parameterIndex < pathParameterization.size();
+           ++parameterIndex )
+      {
+        pathParameterization[ parameterIndex ]
+        = ( initialStepSizes[ parameterIndex ]
+            * (double)( 1
+                        + ( parameterIndex
+                    / ( potentialFunction.NumberOfFieldVariables() - 1 ) ) ) );
+      }
+      std::cout << "test path bounce = "
+      << modifiedBounceForMinuit( pathParameterization );
+      modifiedBounceForMinuit.PlotBubbleProfile( pathParameterization,
+                                                 plotColors,
+                                                 "WigglyBubbleProfile.eps" );
     }
-    std::cout << std::endl;**/
+    std::cout << std::endl;/**/
 
     // Should now do migrad...
   }
