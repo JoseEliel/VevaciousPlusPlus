@@ -32,7 +32,32 @@
        (i.e. the minimum that should be the physical vacuum for the parameter
        point if it's physically acceptable) are given later, in DsbMinimum,
        after DerivedParameters so that values from the SLHA input can be
-       referenced. -->
+       referenced.
+
+       Each field name can be followed on the same line by the keyword
+       "PositiveByConvention" or by the keyword "NegativeByConvention". Please
+       be aware that it is a guide for the code, NOT a property of the model!
+       If a field is followed by PositiveByConvention, any starting points for
+       gradient-based minimization of the full potential which have negative
+       values of this field are discarded rather than used as starting points.
+       Similarly a field with the NegativeByConvention must be  <= 0 for a
+       starting point to be used. These keywords should only be used if the
+       user is ABSOLUTELY SURE that the symmetries of the Lagrangian allow the
+       field to always be taken as possible through unphysical field phase
+       redefinitions. Hence it is only possible for complex scalar fields, such
+       as the neutral components of Hd and Hu in two-Higgs-doublet models:
+       if {phi_d = +|v_d|, phi_u = +|v_u|} is a valid minimum,
+       {phi_d = -|v_d|, phi_u = -|v_u|} is also valid, and corresponds to the
+       same physical vacuum through a rotation of the phases of phi_d and phi_u
+       which is also a Goldstone boson direction. In this case, only the
+       relative phase of phi_d to phi_u is physical, so e.g. phi_u may be
+       taken as positive, so VevaciousPlusPlus won't bother looking at
+       {phi_d = -|v_d|, phi_u = -|v_u|}. However, forcing both to be taken
+       positive for example will mean that VevaciousPlusPlus would not bother
+       looking at {phi_d = +|v_d|, phi_u = -|v_u|} which, for a general
+       two-Higgs-doublet model, could correspond to another minimum of the
+       potential, which is not physically equivalent to
+       {phi_d = +|v_d|, phi_u = +|v_u|}. -->
   <FieldVariables>
     Hd
     Hu

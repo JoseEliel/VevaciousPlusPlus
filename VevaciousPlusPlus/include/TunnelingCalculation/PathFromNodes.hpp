@@ -81,38 +81,6 @@ namespace VevaciousPlusPlus
 
 
 
-  // This sets pathParameterization to be repeated nodes of stepSizeFraction
-  // times straightPath, less the reference field. There is no return value
-  // optimization because we cannot be sure that poor physicist users will
-  // have access to a C++11-compliant compiler.
-  inline void PathFromNodes::InitialStepsForMinuit(
-                                   std::vector< double >& pathParameterization,
-                                     std::vector< double > const& straightPath,
-                                          double const stepSizeFraction ) const
-  {
-    pathParameterization.resize( numberOfVaryingPathNodes
-                                 * numberOfParameterizationFields );
-    size_t actualFieldIndex( 0 );
-    for( size_t nodeIndex( 0 );
-         nodeIndex < numberOfVaryingPathNodes;
-         ++nodeIndex )
-    {
-      for( size_t parameterizationFieldIndex( 0 );
-           parameterizationFieldIndex < numberOfParameterizationFields;
-           ++parameterizationFieldIndex )
-      {
-        actualFieldIndex = parameterizationFieldIndex;
-        if( parameterizationFieldIndex >= referenceFieldIndex )
-        {
-          ++actualFieldIndex;
-        }
-        pathParameterization[ ( nodeIndex * numberOfVaryingPathNodes )
-                              + parameterizationFieldIndex ]
-        = ( stepSizeFraction * straightPath[ actualFieldIndex ] );
-      }
-    }
-  }
-
   // This sets up a ( numberOfVaryingPathNodes + 1 )-square matrix M where
   // M_ij = (i * pathStepSize)^j, then returns its inverse.
   inline Eigen::MatrixXd PathFromNodes::CreatePathStepPowersInverse(

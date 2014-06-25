@@ -46,7 +46,7 @@ namespace VevaciousPlusPlus
                              double const givenTemperature ) const
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PathFromNodes::operator( pathParameterization = { ";
     for( std::vector< double >::const_iterator
@@ -87,7 +87,7 @@ namespace VevaciousPlusPlus
       std::cout << *fieldValue;
     }
     std::cout << " } ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // The nodes are taken as being in the plane with reference field = 0 and
     // as being relative to the false vacuum configuration. Now we project them
@@ -104,7 +104,7 @@ namespace VevaciousPlusPlus
                                numberOfFields );
     // We set the last node to be the true vacuum (relative to the false
     // vacuum):
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
@@ -146,7 +146,7 @@ namespace VevaciousPlusPlus
                          - ( dotProductWithStraightPath
                              * straightPathInverseLengthSquared ) );
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "nodeIndex = " << nodeIndex << ", pathStepsToAdd = "
       << pathStepsToAdd << ", nodeVector = { ";
@@ -160,8 +160,9 @@ namespace VevaciousPlusPlus
         }
         std::cout << nodeVector[ fieldIndex ];
       }
-      std::cout << " }";
-      std::cout << std::endl;/**/
+      std::cout << " }, dotProductWithStraightPath = "
+      << dotProductWithStraightPath << ", pathStepSize = " << pathStepSize;
+      std::cout << std::endl;*/
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
@@ -172,7 +173,7 @@ namespace VevaciousPlusPlus
             + ( straightPath[ fieldIndex ] * pathStepsToAdd ) );
       }
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "pathNodes( nodeIndex, . ) = { ";
       for( size_t fieldIndex( 0 );
@@ -186,16 +187,16 @@ namespace VevaciousPlusPlus
         std::cout << pathNodes( nodeIndex,
                                 fieldIndex );
       }
-      std::cout << " }";/**/
+      std::cout << " }";*/
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "pathNodes =" << std::endl << pathNodes
     << std::endl
     << "( pathStepInversion * pathNodes )" << std::endl
     << ( pathStepInversion * pathNodes );
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // Once we have a set of nodes, we might want to project them from planes
     // perpendicular to v onto maybe hyperbolae? I dunno, something to maybe
@@ -211,6 +212,103 @@ namespace VevaciousPlusPlus
                                    falseVacuumDepth,
                                    trueVacuumDepth,
                                    givenTemperature );
+  }
+
+  // This sets pathParameterization to be repeated nodes of stepSizeFraction
+  // times straightPath, less the reference field. There is no return value
+  // optimization because we cannot be sure that poor physicist users will
+  // have access to a C++11-compliant compiler.
+ void PathFromNodes::InitialStepsForMinuit(
+                                   std::vector< double >& pathParameterization,
+                                     std::vector< double > const& straightPath,
+                                          double const stepSizeFraction ) const
+  {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PathFromNodes::InitialStepsForMinuit( pathParameterization = {";
+    for( size_t parameterIndex( 0 );
+         parameterIndex < pathParameterization.size();
+         ++parameterIndex )
+    {
+      if( parameterIndex > 0 )
+      {
+        std::cout << ",";
+        if( ( parameterIndex % numberOfParameterizationFields ) == 0 )
+        {
+          std::cout << std::endl;
+        }
+      }
+      std::cout << " " << pathParameterization[ parameterIndex ];
+    }
+    std::cout << " }, straightPath = {";
+    for( size_t parameterIndex( 0 );
+         parameterIndex < straightPath.size();
+         ++parameterIndex )
+    {
+      if( parameterIndex > 0 )
+      {
+        std::cout << ",";
+      }
+      std::cout << " " << straightPath[ parameterIndex ];
+    }
+    std::cout << " }, stepSizeFraction = " << stepSizeFraction
+    << " ) called. referenceFieldIndex = " << referenceFieldIndex;
+    std::cout << std::endl;*/
+    pathParameterization.resize( numberOfVaryingPathNodes
+                                 * numberOfParameterizationFields );
+    size_t actualFieldIndex( 0 );
+    for( size_t nodeIndex( 0 );
+         nodeIndex < numberOfVaryingPathNodes;
+         ++nodeIndex )
+    {
+      for( size_t parameterizationFieldIndex( 0 );
+           parameterizationFieldIndex < numberOfParameterizationFields;
+           ++parameterizationFieldIndex )
+      {
+        actualFieldIndex = parameterizationFieldIndex;
+        if( parameterizationFieldIndex >= referenceFieldIndex )
+        {
+          ++actualFieldIndex;
+        }
+        pathParameterization[ ( nodeIndex * numberOfParameterizationFields )
+                              + parameterizationFieldIndex ]
+        = ( stepSizeFraction * straightPath[ actualFieldIndex ] );
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "nodeIndex = " << nodeIndex << ", parameterizationFieldIndex = "
+        << parameterizationFieldIndex << ", actualFieldIndex = "
+        << actualFieldIndex << ", => pathParameterization[ "
+        << ( ( nodeIndex * numberOfParameterizationFields )
+             + parameterizationFieldIndex ) << " ] = "
+        << pathParameterization[ ( nodeIndex * numberOfVaryingPathNodes )
+                                 + parameterizationFieldIndex ]
+        << " = ( " << stepSizeFraction << " * straightPath[ "
+        << actualFieldIndex << " ]";
+        std::cout << std::endl;*/
+      }
+    }
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Set pathParameterization to {";
+    for( size_t parameterIndex( 0 );
+         parameterIndex < pathParameterization.size();
+         ++parameterIndex )
+    {
+      if( parameterIndex > 0 )
+      {
+        std::cout << ",";
+        if( ( parameterIndex % numberOfParameterizationFields ) == 0 )
+        {
+          std::cout << std::endl;
+        }
+      }
+      std::cout << " " << pathParameterization[ parameterIndex ];
+    }
+    std::cout << " }.";
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -190,7 +190,7 @@ namespace VevaciousPlusPlus
                       std::vector< double > const& pathParameterization ) const
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "ModifiedBounceForMinuit::DecodePathParameters( { ";
     for( std::vector< double >::const_iterator
@@ -205,7 +205,7 @@ namespace VevaciousPlusPlus
       std::cout << *pathParameter;
     }
     std::cout << " } ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     if( ZeroTemperatureParameterization( pathParameterization ) )
     {
       return pathFromNodes( pathParameterization,
@@ -442,12 +442,12 @@ namespace VevaciousPlusPlus
                    PathFieldsAndPotential const& pathFieldsAndPotential ) const
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "ModifiedBounceForMinuit::EffectiveBounceAction("
     << " pathFieldsAndPotential =" << std::endl
     << pathFieldsAndPotential.AsDebuggingString() << " ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     BubbleProfile bubbleProfile( pathFieldsAndPotential,
                           ( initialFractionOfShortestLength * shortestLength ),
                                  longestLength );
