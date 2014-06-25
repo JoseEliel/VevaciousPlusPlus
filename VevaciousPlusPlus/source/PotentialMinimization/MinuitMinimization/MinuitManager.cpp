@@ -38,7 +38,7 @@ namespace VevaciousPlusPlus
   {
     std::vector< double > initialStepSizes( startingPoint.size() );
     double stepSize( 0.0 );
-    for( unsigned int vectorIndex( 0 );
+    for( size_t vectorIndex( 0 );
          vectorIndex < startingPoint.size();
          ++vectorIndex )
     {
@@ -56,11 +56,8 @@ namespace VevaciousPlusPlus
     if( givenTolerance <= 0.0 )
     {
       givenTolerance
-      = ( errorFraction * minimizationFunction( startingPoint ) );
-    }
-    if( givenTolerance <= 0.0 )
-    {
-      givenTolerance = errorMinimum;
+      = std::max( errorMinimum,
+                  ( errorFraction * minimizationFunction( startingPoint ) ) );
     }
     ROOT::Minuit2::MnMigrad mnMigrad( minimizationFunction,
                                       startingPoint,

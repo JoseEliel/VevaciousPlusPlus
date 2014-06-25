@@ -11,6 +11,7 @@
 #include "BounceWithSplines.hpp"
 #include "../PotentialEvaluation.hpp"
 #include "../PotentialMinimization.hpp"
+#include "Minuit2/MnPrint.h"
 #include "ModifiedBounceForMinuit.hpp"
 
 namespace VevaciousPlusPlus
@@ -21,7 +22,11 @@ namespace VevaciousPlusPlus
   public:
     MinuitBounceActionMinimizer( PotentialFunction& potentialFunction,
                                  TunnelingStrategy const tunnelingStrategy,
-                                 double const survivalProbabilityThreshold );
+                                 double const survivalProbabilityThreshold,
+                                 size_t const numberOfNodes,
+                                 double const initialStepSize,
+                                 unsigned int const minuitStrategy = 1,
+                                 double const minuitTolerance = 100.0 );
     virtual
     ~MinuitBounceActionMinimizer();
 
@@ -33,11 +38,20 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    // This should set quantumSurvivalProbability and quantumLifetimeInSeconds
-    // appropriately.
-    virtual void
-    CalculateQuantumTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum );
+    size_t const numberOfNodes;
+    double const initialStepSize;
+    unsigned int const minuitStrategy;
+    double const minuitTolerance;
+
+
+    // This returns either the dimensionless bounce action integrated over
+    // four dimensions (for zero temperature) or the dimensionful bounce
+    // action integrated over three dimensions (for non-zero temperature) for
+    // tunneling from falseVacuum to trueVacuum at temperature
+    // tunnelingTemperature.
+    virtual double BounceAction( PotentialMinimum const& falseVacuum,
+                                 PotentialMinimum const& trueVacuum,
+                                 double const tunnelingTemperature ) const;
 
     // This should set thermalSurvivalProbability and
     // dominantTemperatureInGigaElectronVolts appropriately.

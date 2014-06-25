@@ -12,7 +12,7 @@
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/FunctionMinimum.h"
-#include "../PotentialMinimum.hpp"
+#include "MinuitMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {

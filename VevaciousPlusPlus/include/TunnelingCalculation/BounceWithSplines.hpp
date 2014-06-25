@@ -35,6 +35,8 @@ namespace VevaciousPlusPlus
     static double const maximumPowerOfNaturalExponent;
     static double const hBarInGigaElectronVoltSeconds;
     static double const ageOfKnownUniverseInSeconds;
+    static double const ageOfKnownUniverseInInverseGigaElectronVolts;
+    static double const fourVolumeOfKnownUniverseOverGevFourth;
     static double const lnOfThermalIntegrationFactor;
     PotentialFunction const& potentialFunction;
     PotentialForMinuit potentialForMinuit;
@@ -48,11 +50,20 @@ namespace VevaciousPlusPlus
     // both quantum and thermal tunneling. By default, it does nothing.
     virtual void PrepareCommonExtras(){}
 
-    // This should set quantumSurvivalProbability and quantumLifetimeInSeconds
+    // This should return either the dimensionless bounce action integrated
+    // over four dimensions (for zero temperature) or the dimensionful bounce
+    // action integrated over three dimensions (for non-zero temperature) for
+    // tunneling from falseVacuum to trueVacuum at temperature
+    // tunnelingTemperature.
+    virtual double BounceAction( PotentialMinimum const& falseVacuum,
+                                 PotentialMinimum const& trueVacuum,
+                                 double const tunnelingTemperature ) const = 0;
+
+    // This sets quantumSurvivalProbability and quantumLifetimeInSeconds
     // appropriately.
     virtual void
     CalculateQuantumTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum ) = 0;
+                               PotentialMinimum const& trueVacuum );
 
     // This should set thermalSurvivalProbability and
     // dominantTemperatureInGigaElectronVolts appropriately.
@@ -82,14 +93,15 @@ namespace VevaciousPlusPlus
     bool BelowCriticalOrEvaporation( double const temperatureGuess );
 
     // This returns a number of points which should be appropriate for
-    // resolving the potential to the extent that there are 10 points between
-    // the field origin and the false vacuum.
-    unsigned int TunnelPathResolution( PotentialMinimum const& falseVacuum,
-                                       PotentialMinimum const& trueVacuum,
-                               unsigned int const resolutionOfDsbVacuum ) const
+    // resolving the potential to the extent that there are
+    // resolutionOfDsbVacuum points between the field origin and the false
+    // vacuum.
+    size_t TunnelPathResolution( PotentialMinimum const& falseVacuum,
+                                 PotentialMinimum const& trueVacuum,
+                                 size_t const resolutionOfDsbVacuum ) const
     { return ( resolutionOfDsbVacuum
-              * (unsigned int)(sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
-                                     / falseVacuum.LengthSquared() ) ) ); }
+              * (size_t)(sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
+                               / falseVacuum.LengthSquared() ) ) ); }
   };
 
 

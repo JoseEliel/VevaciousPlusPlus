@@ -10,21 +10,21 @@
 namespace VevaciousPlusPlus
 {
 
-  MinuitMinimum::MinuitMinimum( unsigned int numberOfFields,
+  MinuitMinimum::MinuitMinimum( size_t numberOfVariables,
                         ROOT::Minuit2::FunctionMinimum const& minuitMinimum ) :
-    variableValues( numberOfFields ),
-    variableErrors( numberOfFields ),
+    variableValues( numberOfVariables ),
+    variableErrors( numberOfVariables ),
     functionValue( minuitMinimum.Fval() ),
     functionError( minuitMinimum.Edm() )
   {
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
+    for( size_t variableIndex( 0 );
+         variableIndex < numberOfVariables;
+         ++variableIndex )
     {
-      variableValues[ fieldIndex ]
-      = minuitMinimum.UserParameters().Value( fieldIndex );
-      variableErrors[ fieldIndex ]
-      = minuitMinimum.UserParameters().Error( fieldIndex );
+      variableValues[ variableIndex ]
+      = minuitMinimum.UserParameters().Value( variableIndex );
+      variableErrors[ variableIndex ]
+      = minuitMinimum.UserParameters().Error( variableIndex );
     }
   }
 

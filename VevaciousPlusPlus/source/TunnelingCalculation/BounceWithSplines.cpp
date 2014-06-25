@@ -14,6 +14,14 @@ namespace VevaciousPlusPlus
   double const
   BounceWithSplines::hBarInGigaElectronVoltSeconds( 6.58211928E-25 );
   double const BounceWithSplines::ageOfKnownUniverseInSeconds( 4.3E+17 );
+  double const BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts(
+                                 BounceWithSplines::ageOfKnownUniverseInSeconds
+                          / BounceWithSplines::hBarInGigaElectronVoltSeconds );
+  double const BounceWithSplines::fourVolumeOfKnownUniverseOverGevFourth(
+                BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts
+              * BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts
+              * BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts
+           * BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts );
   double const BounceWithSplines::lnOfThermalIntegrationFactor( 244.53 );
 // Based on correspondence with Alexander Kusenko and discussion with Bjoern
 // Garbrecht:
@@ -144,6 +152,81 @@ namespace VevaciousPlusPlus
       << " \"NoTunneling\"!";
       std::cout << std::endl;
     }
+  }
+
+  // This sets quantumSurvivalProbability and quantumLifetimeInSeconds
+  // appropriately.
+  void BounceWithSplines::CalculateQuantumTunneling(
+                                           PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum )
+  {
+    double quantumAction( BounceAction( falseVacuum,
+                                        trueVacuum,
+                                        0.0 ) );
+    double const fourthRootOfSolitonicFactor( sqrt(
+                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
+                                                              trueVacuum ) ) );
+    logOfMinusLogOfQuantumProbability
+    = ( log( ( ageOfKnownUniverseInSeconds * hBarInGigaElectronVoltSeconds )
+             / fourthRootOfSolitonicFactor ) - ( 0.25 * quantumAction ) );
+    if( quantumAction >= maximumPowerOfNaturalExponent )
+    {
+      quantumLifetimeInSeconds = 1.0;
+      quantumSurvivalProbability = 0.0;
+      std::cout
+      << std::endl
+      << "Warning! The calculated bounce action was so large and positive that"
+      << " exponentiating it would result in an overflow error, so capping the"
+      << " lifetime at " << quantumLifetimeInSeconds
+      << " and the survival probability at " << quantumSurvivalProbability;
+      std::cout << std::endl;
+      return;
+    }
+    else if( quantumAction <= -maximumPowerOfNaturalExponent )
+    {
+      quantumLifetimeInSeconds = 1.0E+100;
+      quantumSurvivalProbability = 1.0;
+      std::cout
+      << std::endl
+      << "Warning! The calculated bounce action was so large and negative that"
+      << " exponentiating it would result in an overflow error, so capping the"
+      << " lifetime at " << quantumLifetimeInSeconds
+      << " and the survival probability at " << quantumSurvivalProbability;
+      std::cout << std::endl;
+      return;
+    }
+    quantumLifetimeInSeconds
+    = ( ( exp( 0.25 * quantumAction )
+          * hBarInGigaElectronVoltSeconds )
+        / fourthRootOfSolitonicFactor );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "quantumLifetimeInSeconds = " << quantumLifetimeInSeconds;
+    std::cout << std::endl;/**/
+
+    double
+    survivalExponent( ageOfKnownUniverseInSeconds / quantumLifetimeInSeconds );
+    if( survivalExponent >= maximumPowerOfNaturalExponent )
+    {
+      std::cout
+      << std::endl
+      << "Warning! The calculated decay width was so large that"
+      << " exponentiating it would result in an overflow error, so setting the"
+      << " survival probability to zero.";
+      quantumSurvivalProbability = 0.0;
+    }
+    else
+    {
+      quantumSurvivalProbability = exp( -survivalExponent );
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "quantumSurvivalProbability = " << quantumSurvivalProbability;
+    std::cout << std::endl;/**/
   }
 
   // This calculates the temperature at which either tunneling from

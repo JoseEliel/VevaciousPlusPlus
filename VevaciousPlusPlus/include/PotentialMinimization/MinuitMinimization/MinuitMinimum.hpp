@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
   class MinuitMinimum
   {
   public:
-    MinuitMinimum( unsigned int numberOfFields,
+    MinuitMinimum( size_t numberOfVariables,
                    ROOT::Minuit2::FunctionMinimum const& minuitMinimum );
     virtual
     ~MinuitMinimum();
@@ -57,7 +57,7 @@ namespace VevaciousPlusPlus
     std::stringstream stringBuilder;
     stringBuilder << "functionValue = " << functionValue << std::endl
     << "functionError = " << functionError << std::endl;
-    for( unsigned int variableIndex( 0 );
+    for( size_t variableIndex( 0 );
          variableIndex < variableValues.size();
          ++variableIndex )
     {

@@ -293,10 +293,52 @@ int main( int argumentCount,
 
   if( tunnelingClass.compare( "MinuitBounceActionMinimizer" ) == 0 )
   {
+    std::string numberOfNodesString(
+                     argumentParser.fromTag( "NumberOfMinuitNodesForTunneling",
+                                             "10" ) );
+    double numberOfNodesDouble( -1.0 );
+    validInput = BOL::StringParser::stringIsDouble( numberOfNodesString,
+                                                    numberOfNodesDouble );
+    if( !validInput
+        ||
+        !( numberOfNodesDouble >= 1.0 ) )
+    {
+      std::cout
+      << std::endl
+      << "NumberOfMinuitNodesForTunneling was not a number > 1, but was "
+      << numberOfNodesString << "."
+      << " Aborting!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+
+    std::string initialStepSizeString(
+           argumentParser.fromTag( "InitialMinuitStepSizeFractionForTunneling",
+                                   "0.1" ) );
+    double initialStepSize( -1.0 );
+    validInput = BOL::StringParser::stringIsDouble( initialStepSizeString,
+                                                    initialStepSize );
+    if( !validInput
+        ||
+        !( initialStepSize > 0.0 ) )
+    {
+      std::cout
+      << std::endl
+      << "NumberOfMinuitNodesForTunneling was not a number > 0, but was "
+      << initialStepSizeString << "."
+      << " Aborting!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+
     tunnelingCalculator
     = new VevaciousPlusPlus::MinuitBounceActionMinimizer( *potentialFunction,
                                                           tunnelingStrategy,
-                                                survivalProbabilityThreshold );
+                                                  survivalProbabilityThreshold,
+                                                   (size_t)numberOfNodesDouble,
+                                                          initialStepSize );
 
     std::cout
     << std::endl

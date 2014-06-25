@@ -42,7 +42,7 @@ namespace VevaciousPlusPlus
 
     IWritesPythonPotential& pythonPotential;
     std::string const pathToCosmotransitions;
-    unsigned int const resolutionOfDsbVacuum;
+    size_t const resolutionOfDsbVacuum;
 
 
     // This creates a Python file with the potential in a form that can be used
@@ -50,11 +50,16 @@ namespace VevaciousPlusPlus
     virtual void PrepareCommonExtras()
     { pythonPotential.WriteAsPython( pythonPotentialFilenameBase + ".py" ); }
 
-    // This writes and runs a Python program using the potential from
-    // pythonPotentialFilename for CosmoTransitions.
-    virtual void
-    CalculateQuantumTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum );
+    // This returns either the dimensionless bounce action integrated over four
+    // dimensions (for zero temperature) or the dimensionful bounce action
+    // integrated over three dimensions (for non-zero temperature) for
+    // tunneling from falseVacuum to trueVacuum at temperature
+    // tunnelingTemperature. It does so by writing and running a Python program
+    // using the potential from pythonPotentialFilename for CosmoTransitions to
+    // use to calculate the bounce action at tunnelingTemperature.
+    virtual double BounceAction( PotentialMinimum const& falseVacuum,
+                                 PotentialMinimum const& trueVacuum,
+                                 double const tunnelingTemperature ) const;
 
     // This calculates the evaporation and critical temperatures, then writes
     // and runs a Python program using the potential from
@@ -66,10 +71,6 @@ namespace VevaciousPlusPlus
     virtual void
     CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
                                PotentialMinimum const& trueVacuum );
-
-    double const DeformedPathAction( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum,
-                                     double const tunnelingTemperature ) const;
   };
 
 } /* namespace VevaciousPlusPlus */
