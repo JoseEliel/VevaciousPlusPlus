@@ -15,7 +15,8 @@ namespace VevaciousPlusPlus
                                                    size_t const numberOfFields,
                                       SlhaUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
-                         std::vector< size_t > const& fieldsAssumedNegative ) :
+                            std::vector< size_t > const& fieldsAssumedNegative,
+                             bool const treeLevelMinimaOnlyAsValidSolutions ) :
     HomotopyContinuationTargetSystem( previousPropagator ),
     potentialPolynomial( potentialPolynomial ),
     numberOfVariables( numberOfFields ),
@@ -29,9 +30,9 @@ namespace VevaciousPlusPlus
     validSolutions(),
     targetHessian(),
     startHessian(),
-    skipSaddlePoints( false ),
     fieldsAssumedPositive( fieldsAssumedPositive ),
-    fieldsAssumedNegative( fieldsAssumedNegative )
+    fieldsAssumedNegative( fieldsAssumedNegative ),
+    treeLevelMinimaOnlyAsValidSolutions( treeLevelMinimaOnlyAsValidSolutions )
   {
     // This constructor is just an initialization list.
   }
@@ -198,7 +199,7 @@ namespace VevaciousPlusPlus
   // index in fieldsAssumedPositive are negative (allowing for a small amount
   // of numerical jitter) or if any of the fields with index in
   // fieldsAssumedNegitive are positive ( also allowing for a small amount of
-  // numerical jitter), or if skipSaddlePoints is true and the solution does
+  // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and the solution does
   // not correspond to a minimum (rather than just an extremum) of
   // potentialPolynomial.
   bool PolynomialGradientTargetSystem::AllowedSolution(
@@ -218,7 +219,7 @@ namespace VevaciousPlusPlus
       }
       std::cout << solutionConfiguration[ fieldIndex ];
     }
-    std::cout << " } ) called. skipSaddlePoints = " << skipSaddlePoints;
+    std::cout << " } ) called. treeLevelMinimaOnlyAsValidSolutions = " << treeLevelMinimaOnlyAsValidSolutions;
     std::cout << std::endl;*/
 
     for( std::vector< size_t >::const_iterator
@@ -243,7 +244,7 @@ namespace VevaciousPlusPlus
     }
 
     // We only check for a negative eigenvalue if skipping was requested.
-    if( skipSaddlePoints )
+    if( treeLevelMinimaOnlyAsValidSolutions )
     {
       // We need to check to see if targetHessian has any negative
       // eigenvalues for solutionConfiguration.

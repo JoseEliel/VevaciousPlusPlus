@@ -9,25 +9,335 @@
 
 namespace VevaciousPlusPlus
 {
-  std::string const VevaciousPlusPlus::versionString( "1.0.00.alpha.003" );
+  std::string const VevaciousPlusPlus::versionString( "1.0.00.alpha001" );
   std::string const VevaciousPlusPlus::citationString( "[none as yet]" );
+
+  VevaciousPlusPlus::VevaciousPlusPlus(
+                                  std::string const& initializationFileName ) :
+    potentialFunction( NULL ),
+    potentialFunctionDeleter( NULL ),
+    runningParameterManager(),
+    potentialMinimizer( NULL ),
+    potentialMinimizerDeleter( NULL ),
+    tunnelingCalculator( NULL ),
+    tunnelingCalculatorDeleter( NULL ),
+    currentTime()
+  {
+    BOL::AsciiXmlParser fileParser;
+    BOL::AsciiXmlParser elementParser;
+    fileParser.openRootElementOfFile( initializationFileName );
+    while( fileParser.readNextElement() )
+    {
+      elementParser.loadString( fileParser.getTrimmedCurrentElementContent() );
+      if( fileParser.currentElementNameMatches( "PotentialClass" ) )
+      {
+        // <PotentialClass> should have child elements <ClassName> and
+        // <ConstructorArguments>.
+        elementParser.readNextElement();
+        std::string
+        potentialClass( elementParser.getTrimmedCurrentElementContent() );
+        elementParser.readNextElement();
+        std::string constructorArguments(
+                             elementParser.getTrimmedCurrentElementContent() );
+        if( potentialClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
+        {
+          potentialFunction
+          = new FixedScaleOneLoopPotential( constructorArguments,
+                                            runningParameterManager );
+        }
+        else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
+        {
+          potentialFunction
+          = new RgeImprovedOneLoopPotential( constructorArguments,
+                                             runningParameterManager );
+        }
+        else
+        {
+          std::stringstream errorStream;
+          errorStream
+          << "PotentialType was not a recognized form! The only types"
+          << " currently valid are \"FixedScaleOneLoopPotential\" and"
+          << " \"RgeImprovedOneLoopPotential\".";
+          throw std::runtime_error( errorStream.str() );
+        }
+        potentialFunctionDeleter = potentialFunction;
+      }
+      else if( fileParser.currentElementNameMatches( "MinimizerClass" ) )
+      {
+        // <MinimizerClass> should have child elements <ClassName> and
+        // <ConstructorArguments>.
+        elementParser.readNextElement();
+        std::string minimizerClass(
+                             elementParser.getTrimmedCurrentElementContent() );
+        elementParser.readNextElement();
+        std::string constructorArguments(
+                             elementParser.getTrimmedCurrentElementContent() );
+        if( minimizerClass.compare( "GradientFromStartingPoints" ) == 0 )
+        {
+          potentialMinimizer
+          = new GradientFromStartingPoints( constructorArguments,
+                                            runningParameterManager );
+        }
+        else
+        {
+          std::stringstream errorStream;
+          errorStream
+          << "PotentialType was not a recognized form! The only types"
+          << " currently valid are \"FixedScaleOneLoopPotential\" and"
+          << " \"RgeImprovedOneLoopPotential\".";
+          throw std::runtime_error( errorStream.str() );
+        }
+        potentialMinimizerDeleter = potentialMinimizer;
+      }
+    }
+
+
+    VevaciousPlusPlus::HomotopyContinuationSolver*
+    homotopyContinuationSolver( NULL );
+
+    std::string homotopyContinuationClass(
+                             argumentParser.fromTag( "HomotopyContinuationClass",
+                                       "BasicPolynomialHomotopyContinuation" ) );
+    if( homotopyContinuationClass.compare(
+                                   "BasicPolynomialHomotopyContinuation" ) == 0 )
+    {
+      homotopyContinuationSolver
+      = new VevaciousPlusPlus::BasicPolynomialHomotopyContinuation(
+                         potentialFunction->HomotopyContinuationTargetSystem() );
+
+      std::cout
+      << std::endl
+      << "Created BasicPolynomialHomotopyContinuation, but this does not yet"
+      << " work...";
+      std::cout << std::endl;
+    }
+    else if( homotopyContinuationClass.compare( "Hom4ps2Runner" ) == 0 )
+    {
+      std::string pathToHom4ps2( argumentParser.fromTag( "PathToHom4ps2",
+                                                         "./HOM4PS2/" ) );
+      homotopyContinuationSolver
+      = new VevaciousPlusPlus::Hom4ps2Runner(
+                           potentialFunction->HomotopyContinuationTargetSystem(),
+                                              pathToHom4ps2,
+                                       argumentParser.fromTag( "Hom4ps2Argument",
+                                                               "2" ) );
+
+      std::cout
+      << std::endl
+      << "Created Hom4ps2Runner to run " << pathToHom4ps2 << "/hom4ps2";
+      std::cout << std::endl;
+    }
+    else
+    {
+      std::cout
+      << std::endl
+      << "HomotopyContinuationClass was not a recognized form! The only"
+      << " currently-valid types are \"BasicPolynomialHomotopyContinuation\""
+      << " (not yet implemented, sorry!) and \"Hom4ps2Runner\". Aborting!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+
+    // Now the HomotopyContinuationAndGradient object can be constructed:
+    VevaciousPlusPlus::HomotopyContinuationAndMinuit
+    potentialMinimizer( *potentialFunction,
+                        *homotopyContinuationSolver,
+                       BOL::StringParser::stringToDouble( argumentParser.fromTag(
+                                                     "MinimaSeparationThreshold",
+                                                                     "0.1" ) ) );
+
+
+    std::string
+    tunnelingStrategyAsString( argumentParser.fromTag( "TunnelingStrategy",
+                                                       "DefaultTunneling" ) );
+    VevaciousPlusPlus::TunnelingCalculator::TunnelingStrategy
+    tunnelingStrategy( VevaciousPlusPlus::TunnelingCalculator::NotSet );
+    if( ( tunnelingStrategyAsString.compare( "DefaultTunneling" ) == 0 )
+        ||
+        ( tunnelingStrategyAsString.compare( "ThermalThenQuantum" ) == 0 ) )
+    {
+      tunnelingStrategy
+      = VevaciousPlusPlus::TunnelingCalculator::ThermalThenQuantum;
+    }
+    else if( tunnelingStrategyAsString.compare( "QuantumThenThermal" ) == 0 )
+    {
+      tunnelingStrategy
+      = VevaciousPlusPlus::TunnelingCalculator::QuantumThenThermal;
+    }
+    else if( tunnelingStrategyAsString.compare( "JustThermal" ) == 0 )
+    {
+      tunnelingStrategy
+      = VevaciousPlusPlus::TunnelingCalculator::JustThermal;
+    }
+    else if( tunnelingStrategyAsString.compare( "JustQuantum" ) == 0 )
+    {
+      tunnelingStrategy
+      = VevaciousPlusPlus::TunnelingCalculator::JustQuantum;
+    }
+    else if( ( tunnelingStrategyAsString.compare( "NoTunneling" ) == 0 )
+             ||
+             ( tunnelingStrategyAsString.compare( "None" ) == 0 ) )
+    {
+      tunnelingStrategy
+      = VevaciousPlusPlus::TunnelingCalculator::NoTunneling;
+    }
+    else
+    {
+      std::cout
+      << std::endl
+      << "TunnelingStrategy was not a recognized form! The only currently-valid"
+      << " types are \"DefaultTunneling\" (=\"ThermalThenQuantum\"),"
+      << " \"ThermalThenQuantum\", \"QuantumThenThermal\", \"JustThermal\","
+      << " \"JustQuantum\", \"NoTunneling\", and \"None\" ( =\"NoTunneling\")."
+      << " Aborting!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+    std::cout
+    << std::endl
+    << "Tunneling strategy is " << tunnelingStrategyAsString;
+    std::cout << std::endl;
+
+    std::string survivalProbabilityThresholdAsString(
+                          argumentParser.fromTag( "SurvivalProbabilityThreshold",
+                                                  "0.01" ) );
+    double survivalProbabilityThreshold( -1.0 );
+    bool validInput( BOL::StringParser::stringIsDouble(
+                                            survivalProbabilityThresholdAsString,
+                                                survivalProbabilityThreshold ) );
+    if( !validInput
+        ||
+        ( survivalProbabilityThreshold <= 0.0 )
+        ||
+        ( survivalProbabilityThreshold >= 1.0 ) )
+    {
+      std::cout
+      << std::endl
+      << "SurvivalProbabilityThreshold was not a number between 0.0 and 1.0 but"
+      << " was " << survivalProbabilityThresholdAsString << "."
+      << " Aborting!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+
+
+    VevaciousPlusPlus::TunnelingCalculator*
+    tunnelingCalculator( NULL );
+
+    std::string tunnelingClass( argumentParser.fromTag( "TunnelingClass",
+                                               "MinuitBounceActionMinimizer" ) );
+
+    if( tunnelingClass.compare( "MinuitBounceActionMinimizer" ) == 0 )
+    {
+      std::string numberOfNodesString(
+                       argumentParser.fromTag( "NumberOfMinuitNodesForTunneling",
+                                               "10" ) );
+      double numberOfNodesDouble( -1.0 );
+      validInput = BOL::StringParser::stringIsDouble( numberOfNodesString,
+                                                      numberOfNodesDouble );
+      if( !validInput
+          ||
+          !( numberOfNodesDouble >= 1.0 ) )
+      {
+        std::cout
+        << std::endl
+        << "NumberOfMinuitNodesForTunneling was not a number > 1, but was "
+        << numberOfNodesString << "."
+        << " Aborting!";
+        std::cout << std::endl;
+
+        return EXIT_FAILURE;
+      }
+
+      std::string initialStepSizeString(
+             argumentParser.fromTag( "InitialMinuitStepSizeFractionForTunneling",
+                                     "0.1" ) );
+      double initialStepSize( -1.0 );
+      validInput = BOL::StringParser::stringIsDouble( initialStepSizeString,
+                                                      initialStepSize );
+      if( !validInput
+          ||
+          !( initialStepSize > 0.0 ) )
+      {
+        std::cout
+        << std::endl
+        << "NumberOfMinuitNodesForTunneling was not a number > 0, but was "
+        << initialStepSizeString << "."
+        << " Aborting!";
+        std::cout << std::endl;
+
+        return EXIT_FAILURE;
+      }
+
+      tunnelingCalculator
+      = new VevaciousPlusPlus::MinuitBounceActionMinimizer( *potentialFunction,
+                                                            tunnelingStrategy,
+                                                    survivalProbabilityThreshold,
+                                                     (size_t)numberOfNodesDouble,
+                                                            initialStepSize );
+
+      std::cout
+      << std::endl
+      << "Created MinuitBounceActionMinimizer, but this does not yet"
+      << " work...";
+      std::cout << std::endl;
+      std::cout << std::endl;
+    }
+    else if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
+    {
+      std::string
+      pathToCosmotransitions( argumentParser.fromTag( "PathToCosmotransitions",
+                                                 "./CosmoTransitions-1.0.2/" ) );
+      tunnelingCalculator
+      = new VevaciousPlusPlus::CosmoTransitionsRunner( *potentialFunction,
+                                                       *potentialFunction,
+                                                       tunnelingStrategy,
+                                                    survivalProbabilityThreshold,
+                                                       pathToCosmotransitions );
+
+      std::cout
+      << std::endl
+      << "Created CosmoTransitionsRunner from " << modelFile;
+      std::cout << std::endl;
+    }
+    else
+    {
+      std::cout
+      << std::endl
+      << "TunnelingClass was not a recognized form! The only currently-valid"
+      << " types are \"MinuitBounceActionMinimizer\" (not yet implemented,"
+      << " sorry!)  and \"CosmoTransitionsRunner\". Aborting!";
+      std::cout << std::endl;
+
+      return EXIT_FAILURE;
+    }
+
+  }
 
   VevaciousPlusPlus::VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
                                         SlhaManager& slhaManager,
                                         PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
-    slhaManager( slhaManager ),
-    potentialMinimizer( potentialMinimizer ),
-    tunnelingCalculator( tunnelingCalculator ),
-    currentTime(),
-    runTimer( 600.0 )
+    potentialFunction( NULL ),
+    potentialFunctionDeleter( NULL ),
+    runningParameterManager(),
+    potentialMinimizer( &potentialMinimizer ),
+    potentialMinimizerDeleter( NULL ),
+    tunnelingCalculator( &tunnelingCalculator ),
+    tunnelingCalculatorDeleter( NULL ),
+    currentTime()
   {
     // This constructor is just an initialization list.
   }
 
   VevaciousPlusPlus::~VevaciousPlusPlus()
   {
-    // This does nothing.
+    delete tunnelingCalculatorDeleter;
+    delete potentialMinimizerDeleter;
+    delete potentialFunctionDeleter;
   }
 
 
@@ -39,40 +349,39 @@ namespace VevaciousPlusPlus
     << "Running " << parameterFilename << " starting at "
     << ctime( &currentTime );
     std::cout << std::endl;
-    runTimer.setStartTime();
-    timeval startTime;
-    gettimeofday( &startTime,
-                  NULL );
+    BOL::BasicTimer stageTimer;
+    BOL::BasicTimer totalTimer;
 
-    slhaManager.UpdateSlhaData( parameterFilename );
-    potentialMinimizer.FindMinima( 0.0 );
+    runningParameterManager.UpdateSlhaData( parameterFilename );
+    potentialMinimizer->FindMinima( 0.0 );
 
     time( &currentTime );
     std::cout
     << std::endl
-    << "Minimization of potential took " << runTimer.secondsSinceStart()
+    << "Minimization of potential took " << stageTimer.secondsSinceStart()
     << " seconds, finished at " << ctime( &currentTime );
     std::cout << std::endl;
 
-    if( potentialMinimizer.DsbVacuumIsMetastable() )
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
-      runTimer.setStartTime();
-      tunnelingCalculator.CalculateTunneling( potentialMinimizer.DsbVacuum(),
-                                            potentialMinimizer.PanicVacuum() );
+      stageTimer.setStartTime();
+      tunnelingCalculator->CalculateTunneling( potentialMinimizer->DsbVacuum(),
+                                           potentialMinimizer->PanicVacuum() );
 
       time( &currentTime );
       std::cout
       << std::endl
-      << "Tunneling calculation took " << runTimer.secondsSinceStart()
+      << "Tunneling calculation took " << stageTimer.secondsSinceStart()
       << " seconds, finished at " << ctime( &currentTime );
       std::cout << std::endl;
       std::cout << std::endl;
     }
 
+    time( &currentTime );
     std::cout
     << std::endl
-    << "Total running time was " << runTimer.secondsSince( startTime )
-    << " seconds.";
+    << "Total running time was " << totalTimer.secondsSinceStart()
+    << " seconds, finished at " << ctime( &currentTime );
     std::cout << std::endl;
   }
 
@@ -94,31 +403,32 @@ namespace VevaciousPlusPlus
     "  </ReferenceData>\n"
     "  <StableOrMetastable>\n"
     "    ";
-    if( potentialMinimizer.DsbVacuumIsMetastable() )
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       xmlFile << "meta";
     }
     xmlFile << "stable\n"
     "  </StableOrMetastable>\n"
-    << potentialMinimizer.DsbVacuum().AsVevaciousXmlElement( "DsbVacuum",
-                                             potentialMinimizer.FieldNames() );
-    if( potentialMinimizer.DsbVacuumIsMetastable() )
+    << potentialMinimizer->DsbVacuum().AsVevaciousXmlElement( "DsbVacuum",
+                                            potentialMinimizer->FieldNames() );
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       xmlFile
-      << potentialMinimizer.PanicVacuum().AsVevaciousXmlElement( "PanicVacuum",
-                                             potentialMinimizer.FieldNames() );
-      if( tunnelingCalculator.QuantumSurvivalProbability() >= 0.0 )
+      << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
+                                                                "PanicVacuum",
+                                            potentialMinimizer->FieldNames() );
+      if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
       {
         xmlFile << "  <ZeroTemperatureDsbSurvival>\n"
         "    <DsbSurvivalProbability>\n"
-        "      " << tunnelingCalculator.QuantumSurvivalProbability() << "\n"
+        "      " << tunnelingCalculator->QuantumSurvivalProbability() << "\n"
         "    </DsbSurvivalProbability>\n"
         "    <LogOfMinusLogOfDsbSurvival>\n"
-        "      " << tunnelingCalculator.LogOfMinusLogOfQuantumProbability()
+        "      " << tunnelingCalculator->LogOfMinusLogOfQuantumProbability()
         << " <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->\n"
         "    </LogOfMinusLogOfDsbSurvival>\n"
         "    <DsbLifetime>\n"
-        "      " << tunnelingCalculator.QuantumLifetimeInSeconds()
+        "      " << tunnelingCalculator->QuantumLifetimeInSeconds()
         << " <!-- in seconds; age of observed Universe is 4.3E+17s -->\n"
         << "    </DsbLifetime>\n"
         "  </ZeroTemperatureDsbSurvival>\n";
@@ -128,20 +438,19 @@ namespace VevaciousPlusPlus
         xmlFile << "  <!-- Survival probability at zero temperature not"
                                                           " calculated. -->\n";
       }
-      if( tunnelingCalculator.ThermalSurvivalProbability() >= 0.0 )
+      if( tunnelingCalculator->ThermalSurvivalProbability() >= 0.0 )
       {
         xmlFile << "  <NonZeroTemperatureDsbSurvival>\n"
         "    <DsbSurvivalProbability>\n"
-        "      " << tunnelingCalculator.ThermalSurvivalProbability()
-        << "\n"
+        "      " << tunnelingCalculator->ThermalSurvivalProbability() << "\n"
         "    </DsbSurvivalProbability>\n"
         "    <LogOfMinusLogOfDsbSurvival>\n"
-        "      " << tunnelingCalculator.LogOfMinusLogOfThermalProbability()
+        "      " << tunnelingCalculator->LogOfMinusLogOfThermalProbability()
         << " <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> \n"
         "    </LogOfMinusLogOfDsbSurvival>\n"
         "    <DominantTunnelingTemperature>\n"
         "      "
-        << tunnelingCalculator.DominantTemperatureInGigaElectronVolts()
+        << tunnelingCalculator->DominantTemperatureInGigaElectronVolts()
         << " <!-- in GeV -->\n"
         << "    </DominantTunnelingTemperature>\n"
         "  </NonZeroTemperatureDsbSurvival>\n";
@@ -191,7 +500,7 @@ namespace VevaciousPlusPlus
     "# Results written " << std::string( ctime( &currentTime ) )
     << "# [index] [verdict int]\n"
     "  1  ";
-    if( potentialMinimizer.DsbVacuumIsStable() )
+    if( potentialMinimizer->DsbVacuumIsStable() )
     {
       outputFile << "1  # Stable DSB vacuum\n";
     }
@@ -201,62 +510,62 @@ namespace VevaciousPlusPlus
     }
     outputFile << "BLOCK VEVACIOUSZEROTEMPERATURE # Results at T = 0\n"
     "# [index] [verdict float]\n";
-    if( tunnelingCalculator.QuantumSurvivalProbability() >= 0.0 )
+    if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
     {
       outputFile <<  "  1  " << slhaDoubleMaker.doubleToString(
-                             tunnelingCalculator.QuantumSurvivalProbability() )
+                            tunnelingCalculator->QuantumSurvivalProbability() )
       << "  # Probability of DSB vacuum surviving 4.3E17 seconds\n";
       outputFile << "  2  " << slhaDoubleMaker.doubleToString(
-                               tunnelingCalculator.QuantumLifetimeInSeconds() )
+                              tunnelingCalculator->QuantumLifetimeInSeconds() )
       << "  # Tunneling time out of DSB vacuum in seconds\n"
       "  3  " << slhaDoubleMaker.doubleToString(
-                      tunnelingCalculator.LogOfMinusLogOfQuantumProbability() )
+                     tunnelingCalculator->LogOfMinusLogOfQuantumProbability() )
       << "  # L = ln(-ln(P)), => P = e^(-e^L)\n";
     }
     else
     {
       outputFile << "  1  " << slhaDoubleMaker.doubleToString(
-          tunnelingCalculator.QuantumSurvivalProbability() )
+          tunnelingCalculator->QuantumSurvivalProbability() )
       << "  # Not calculated: ignore this number\n"
       "  2  " << slhaDoubleMaker.doubleToString(
-                               tunnelingCalculator.QuantumLifetimeInSeconds() )
+                              tunnelingCalculator->QuantumLifetimeInSeconds() )
       << "  # Not calculated: ignore this number\n"
       "  3  " << slhaDoubleMaker.doubleToString(
-                      tunnelingCalculator.LogOfMinusLogOfQuantumProbability() )
+                     tunnelingCalculator->LogOfMinusLogOfQuantumProbability() )
       << "  # Not calculated: ignore this number\n";
     }
     outputFile << "BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0\n"
     "# [index] [verdict float]\n";
-    if( tunnelingCalculator.ThermalSurvivalProbability() >= 0.0 )
+    if( tunnelingCalculator->ThermalSurvivalProbability() >= 0.0 )
     {
       outputFile <<  "  1  " << slhaDoubleMaker.doubleToString(
-                             tunnelingCalculator.ThermalSurvivalProbability() )
+                            tunnelingCalculator->ThermalSurvivalProbability() )
       << "  # Probability of DSB vacuum surviving thermal tunneling\n";
       outputFile << "  2  " << slhaDoubleMaker.doubleToString(
-                 tunnelingCalculator.DominantTemperatureInGigaElectronVolts() )
+                tunnelingCalculator->DominantTemperatureInGigaElectronVolts() )
       << "  # Dominant tunneling temperature in GeV\n"
       "  3  " << slhaDoubleMaker.doubleToString(
-                      tunnelingCalculator.LogOfMinusLogOfThermalProbability() )
+                     tunnelingCalculator->LogOfMinusLogOfThermalProbability() )
       << "  # L = ln(-ln(P)), => P = e^(-e^L)\n";
     }
     else
     {
       outputFile << "  1  " << slhaDoubleMaker.doubleToString(
-          tunnelingCalculator.ThermalSurvivalProbability() )
+                            tunnelingCalculator->ThermalSurvivalProbability() )
       << "  # Not calculated: ignore this number\n"
       "  2  " << slhaDoubleMaker.doubleToString(
-                 tunnelingCalculator.DominantTemperatureInGigaElectronVolts() )
+                 tunnelingCalculator->DominantTemperatureInGigaElectronVolts() )
       << "  # Not calculated: ignore this number\n"
       "  3  " << slhaDoubleMaker.doubleToString(
-                      tunnelingCalculator.LogOfMinusLogOfThermalProbability() )
+                     tunnelingCalculator->LogOfMinusLogOfThermalProbability() )
       << "  # Not calculated: ignore this number\n";
     }
     outputFile
     << "BLOCK VEVACIOUSFIELDNAMES # Field names for each index\n"
     "# [index] [field name in \"\"]\n";
     std::vector< std::string > const&
-    fieldNames( potentialMinimizer.FieldNames() );
-    for( unsigned int fieldIndex( 0 );
+    fieldNames( potentialMinimizer->FieldNames() );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
@@ -266,8 +575,8 @@ namespace VevaciousPlusPlus
     outputFile << "BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV\n"
     "# [index] [field VEV in GeV]\n";
     std::vector< double > const&
-    dsbFields( potentialMinimizer.DsbVacuum().FieldConfiguration() );
-    for( unsigned int fieldIndex( 0 );
+    dsbFields( potentialMinimizer->DsbVacuum().FieldConfiguration() );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
@@ -277,7 +586,7 @@ namespace VevaciousPlusPlus
     }
     outputFile
     << "BLOCK VEVACIOUSPANICVACUUM # ";
-    if( potentialMinimizer.DsbVacuumIsMetastable() )
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       outputFile << "VEVs for panic vacuum in GeV\n";
     }
@@ -287,12 +596,12 @@ namespace VevaciousPlusPlus
     }
     outputFile << "# [index] [field VEV in GeV]\n";
     std::vector< double > const*
-    panicFields( &(potentialMinimizer.DsbVacuum().FieldConfiguration()) );
-    if( potentialMinimizer.DsbVacuumIsMetastable() )
+    panicFields( &(potentialMinimizer->DsbVacuum().FieldConfiguration()) );
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
-      panicFields = &(potentialMinimizer.PanicVacuum().FieldConfiguration());
+      panicFields = &(potentialMinimizer->PanicVacuum().FieldConfiguration());
     }
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {

@@ -11,9 +11,9 @@ namespace VevaciousPlusPlus
 {
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-                                              std::string const& modelFilename,
+                                               std::string const& xmlArguments,
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFromPolynomialAndMasses( modelFilename,
+    PotentialFromPolynomialAndMasses( xmlArguments,
                                       runningParameterManager ),
     logarithmOfMinimumRenormalizationScale( NAN ),
     logarithmOfMaximumRenormalizationScale( NAN ),
@@ -21,7 +21,8 @@ namespace VevaciousPlusPlus
                                       numberOfFields,
                                       *this,
                                       fieldsAssumedPositive,
-                                      fieldsAssumedNegative )
+                                      fieldsAssumedNegative,
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // This constructor is just an initialization list.
   }
@@ -37,7 +38,8 @@ namespace VevaciousPlusPlus
                                       numberOfFields,
                                       *this,
                                       fieldsAssumedPositive,
-                                      fieldsAssumedNegative )
+                                      fieldsAssumedNegative,
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // This constructor is just an initialization list.
   }

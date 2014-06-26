@@ -23,9 +23,8 @@ namespace VevaciousPlusPlus
                                            public IWritesPythonPotential
   {
   public:
-    PotentialFromPolynomialAndMasses( std::string const& modelFilename,
-                              RunningParameterManager& runningParameterManager,
-                                 double const scaleRangeMinimumFactor = 10.0 );
+    PotentialFromPolynomialAndMasses( std::string const& xmlArguments,
+                            RunningParameterManager& runningParameterManager );
     virtual
     ~PotentialFromPolynomialAndMasses();
 
@@ -73,7 +72,8 @@ namespace VevaciousPlusPlus
     std::vector< RealMassesSquaredMatrix > vectorMassSquaredMatrices;
     double vectorMassCorrectionConstant;
     bool needToUpdateHomotopyContinuation;
-    double const scaleRangeMinimumFactor;
+    bool treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions;
+    double scaleRangeMinimumFactor;
     std::vector< size_t > fieldsAssumedPositive;
     std::vector< size_t > fieldsAssumedNegative;
 

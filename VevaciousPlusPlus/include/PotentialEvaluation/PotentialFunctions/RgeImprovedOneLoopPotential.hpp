@@ -17,7 +17,7 @@ namespace VevaciousPlusPlus
   class RgeImprovedOneLoopPotential : public PotentialFromPolynomialAndMasses
   {
   public:
-    RgeImprovedOneLoopPotential( std::string const& modelFilename,
+    RgeImprovedOneLoopPotential( std::string const& xmlArguments,
                             RunningParameterManager& runningParameterManager );
     RgeImprovedOneLoopPotential(
     PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );

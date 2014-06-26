@@ -22,12 +22,14 @@ namespace VevaciousPlusPlus
     static std::string const versionString;
     static std::string const citationString;
 
+    VevaciousPlusPlus( std::string const& initializationFileName );
+
     VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
                        SlhaManager& slhaManager,
                        PotentialMinimizer& potentialMinimizer,
                        TunnelingCalculator& tunnelingCalculator );
-    virtual
-    ~VevaciousPlusPlus();
+
+    virtual ~VevaciousPlusPlus();
 
     void RunPoint( std::string const& parameterFilename );
 
@@ -38,11 +40,14 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaManager& slhaManager;
-    PotentialMinimizer& potentialMinimizer;
-    TunnelingCalculator& tunnelingCalculator;
+    PotentialFromPolynomialAndMasses* potentialFunction;
+    PotentialFromPolynomialAndMasses* potentialFunctionDeleter;
+    RunningParameterManager runningParameterManager;
+    PotentialMinimizer* potentialMinimizer;
+    PotentialMinimizer* potentialMinimizerDeleter;
+    TunnelingCalculator* tunnelingCalculator;
+    TunnelingCalculator* tunnelingCalculatorDeleter;
     time_t currentTime;
-    BOL::BasicTimer runTimer;
   };
 
 } /* namespace VevaciousPlusPlus */

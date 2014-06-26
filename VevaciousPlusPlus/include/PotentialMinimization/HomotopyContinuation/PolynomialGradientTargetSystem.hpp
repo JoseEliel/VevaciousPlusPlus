@@ -24,15 +24,11 @@ namespace VevaciousPlusPlus
                                     size_t const numberOfVariables,
                                     SlhaUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
-                          std::vector< size_t > const& fieldsAssumedNegative );
+                            std::vector< size_t > const& fieldsAssumedNegative,
+                              bool const treeLevelMinimaOnlyAsValidSolutions );
     virtual
     ~PolynomialGradientTargetSystem();
 
-
-    // Setting skipSaddlePoints to true means that
-    virtual void
-    ConsiderOnlyMinimaToBeValid( bool const skipSaddlePoints = true )
-    { this->skipSaddlePoints = skipSaddlePoints; }
 
     // This fills targetSystem, startSystem, targetHessian, and startHessian
     // appropriately. The starting system is set with
@@ -131,16 +127,16 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< std::complex< double > > > validSolutions;
     std::vector< std::vector< PolynomialSum > > targetHessian;
     std::vector< std::vector< SumOfProductOfPolynomialSums > > startHessian;
-    bool skipSaddlePoints;
     std::vector< size_t > const& fieldsAssumedPositive;
     std::vector< size_t > const& fieldsAssumedNegative;
+    bool treeLevelMinimaOnlyAsValidSolutions;
 
 
     // This vetoes a homotopy continuation solution if any of the fields with
     // index in fieldsAssumedPositive are negative (allowing for a small amount
     // of numerical jitter) or if any of the fields with index in
     // fieldsAssumedNegitive are positive ( also allowing for a small amount of
-    // numerical jitter), or if skipSaddlePoints is true and the solution does
+    // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and the solution does
     // not correspond to a minimum (rather than just an extremum) of
     // potentialPolynomial.
     virtual bool

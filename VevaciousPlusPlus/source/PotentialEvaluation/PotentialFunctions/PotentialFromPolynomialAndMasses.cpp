@@ -31,9 +31,8 @@ namespace VevaciousPlusPlus
                                                       "NegativeByConvention" );
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
-                                              std::string const& modelFilename,
-                              RunningParameterManager& runningParameterManager,
-                                       double const scaleRangeMinimumFactor ) :
+                                               std::string const& xmlArguments,
+                           RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
@@ -53,10 +52,42 @@ namespace VevaciousPlusPlus
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
     needToUpdateHomotopyContinuation( false ),
-    scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
+    scaleRangeMinimumFactor( 10.0 ),
     fieldsAssumedPositive(),
     fieldsAssumedNegative()
   {
+    BOL::AsciiXmlParser argumentParser;
+    argumentParser.loadString( xmlArguments );
+    std::string modelFilename;
+    while( argumentParser.readNextElement() )
+    {
+      if( argumentParser.currentElementNameMatches( "ModelFile" ) )
+      {
+        modelFilename.assign(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches( "RollOnlyMinima" ) )
+      {
+        std::string rollOnlyMinima(
+                            argumentParser.getTrimmedCurrentElementContent() );
+        BOL::StringParser::transformToLowercase( rollOnlyMinima );
+        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions
+        = ( rollOnlyMinima.compare( "true" ) == 0 );
+        if( !treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions
+            &&
+            ( rollOnlyMinima.compare( "yes" ) == 0 ) )
+        {
+          treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions = true;
+        }
+      }
+      else if( argumentParser.currentElementNameMatches(
+                                                  "ScaleRangeMinimumFactor" ) )
+      {
+        scaleRangeMinimumFactor = BOL::StringParser::stringToDouble(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+    }
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
     BOL::VectorlikeArray< std::string > elementLines;
@@ -803,7 +834,8 @@ namespace VevaciousPlusPlus
     needToUpdateHomotopyContinuation( false ),
     scaleRangeMinimumFactor( NAN ),
     fieldsAssumedPositive(),
-    fieldsAssumedNegative()
+    fieldsAssumedNegative(),
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -839,7 +871,9 @@ namespace VevaciousPlusPlus
                                  copySource.needToUpdateHomotopyContinuation ),
     scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
     fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
-    fieldsAssumedNegative( copySource.fieldsAssumedNegative )
+    fieldsAssumedNegative( copySource.fieldsAssumedNegative ),
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
+           copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more

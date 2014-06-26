@@ -1,0 +1,143 @@
+<VevaciousPlusPlusObjectInitialization>
+
+<!--
+#  VevaciousPlusPlusObjectInitialization.xml
+#
+#  Created on: Apr 10, 2014
+#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+#      Copyright 2014 Ben O'Leary
+#
+#      This file is part of VevaciousPlusPlus, released under the
+#      GNU General Public License. Please see the accompanying
+#      README.VevaciousPlusPlus.txt file for a full list of files, brief
+#      documentation on how to use these classes, and further details on the
+#      license.
+#
+ -->
+ 
+  <PotentialClass>
+    <!-- Currently ClassType must be either FixedScaleOneLoopPotential or
+         RgeImprovedOneLoopPotential. Both are classes that construct the
+         potential energy density from a tree-level polynomial with one-loop
+         corrections in the form of a polynomial of finite parts of
+         counterterms along with the usual corrections from mass-squared
+         eigenvalues in form m^4 ( ln[m^2/Q^2] - constant ), and thus both need
+         ConstructorArguments to give the model file in ModelFile. Optionally,
+         whether or not tree-level saddle points and maxima can be used as
+         valid starting points for gradient-based minimization can be set in
+         RollOnlyMinima within ConstructorArguments (defaulting to false). -->
+    <ClassType>
+      FixedScaleOneLoopPotential
+    </ClassType>
+    <ConstructorArguments>
+      <ModelFile>
+        <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
+        <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
+        /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
+      </ModelFile>
+      <RollOnlyMinima>
+        <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if true
+             then the starting points for MINUIT are only the subset of
+             solutions from the homotopy continuation solutions which also are
+             minima of the tree-level potential (so discarding tree-level
+             maxima and saddle points). This should only be used if you are
+             sure that the tree-level minima suffice to find every one-loop
+             minimum with MINUIT, and it will only speed up this part of the
+             run, while under usual circumstances it is the tunneling
+             calculation which is the bottleneck. -->
+        true
+      </RollOnlyMinima>
+      <ScaleRangeMinimumFactor>
+      <!-- Another option: the maximum scale is at least the minimum scale in
+           the SLHA file multiplied by the number given here. For example, if
+           this number were 10.0, and the SLHA file had blocks at Q= 246.0 up
+           to Q= 1000.0, the maximum scale would be pushed up to 2460.0; in
+           contrast, if the number here were 2.0, the maximum scale would
+           remain 1000.0 as opposed to 2.0 * 246.0 = 492.0 (for purposes of
+           restricting MINUIT from rolling too far away from the region of
+           validity, for example).
+        10.0
+      </ScaleRangeMinimumFactor>
+    </ConstructorArguments>
+  </PotentialClass>
+  
+  <MinimizerClass>
+    <!-- Currently ClassType must be GradientFromStartingPoints, and
+         ConstructorArguments must give the StartingPointFinderClass and
+         GradientMinimizerClass components. -->
+    <ClassType>
+      GradientFromStartingPoints
+    </ClassType>
+    <ConstructorArguments>
+      <StartingPointFinderClass>
+        <!-- Currently ClassType must be Hom4ps2Runner, and
+             ConstructorArguments must give the path to the directory with the
+             hom4ps2 executable by PathToHom4ps2 and the argument for the
+              executable by Hom4ps2Argument. -->
+        <ClassType>
+          Hom4ps2Runner
+        </ClassType>
+        <ConstructorArguments>
+          <PathToHom4ps2>
+            <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
+            /Users/oleary/BOL/machine-specific/HOM4PS2/
+          </PathToHom4ps2>
+          <Hom4ps2Argument>
+            <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
+                 "Please enter the option of homotopy method
+                    1. The polyhedral homotopy
+                    2. The classical linear homotopy"
+                 1 can be faster for systems of many variables,
+                 but 2 seems more reliable. -->
+            2
+          </Hom4ps2Argument>
+        </ConstructorArguments>
+      </StartingPointFinderClass>
+      <GradientMinimizerClass>
+        <!-- Currently ClassType must be MinuitPotentialMinimizer and
+             ConstructorArguments must give MinimaSeparationThreshold. -->
+        <ClassType>
+          MinuitPotentialMinimizer
+        </ClassType>
+        <ConstructorArguments>
+          <MinimaSeparationThreshold>
+            <!-- The number here is the threshold fraction for considering
+                 minima to be numerically distinct. For example, if this number
+                 were 0.1, any minima separated by less than 10% of the shorter
+                 of the 2 Euclidean lengths in field space would be considered
+                 to be the same minimum that was almost reached twice without
+                 getting the exact same minimum. -->
+            0.1
+          </MinimaSeparationThreshold>
+        </ConstructorArguments>
+      </GradientMinimizerClass>
+    </ConstructorArguments>
+  </MinimizerClass>
+  
+  <TunnelingClass>
+    <!-- Currently ClassType must be either MinuitBounceActionMinimizer or
+         CosmoTransitionsRunner, both needing ConstructorArguments to have
+         child elements TunnelingStrategy and SurvivalProbabilityThreshold.
+         CosmoTransitionsRunner requires ConstructorArguments to also give the
+         path to the CosmoTransitions directory (where pathDeformation.py is)
+         by a child element PathToCosmotransitions. -->
+    <ClassType>
+      MinuitBounceActionMinimizer
+    </ClassType>
+    <ConstructorArguments>
+      <TunnelingStrategy>
+        <!-- Valid options: NoTunneling, JustQuantum, JustThermal,
+                            ThermalThenQuantum, QuantumThenThermal -->
+        JustQuantum
+      </TunnelingStrategy>
+      <SurvivalProbabilityThreshold>
+        0.01
+      </SurvivalProbabilityThreshold>
+      <PathToCosmotransitions>
+        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
+      </PathToCosmotransitions>
+    </ConstructorArguments>
+  </TunnelingClass>
+
+</VevaciousPlusPlusObjectInitialization>
+
