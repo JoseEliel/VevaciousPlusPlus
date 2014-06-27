@@ -9,6 +9,7 @@
 #define POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
 #include "../../CommonIncludes.hpp"
+#include "boost/math/constants/constants.hpp"
 #include "PotentialFunction.hpp"
 #include "../RunningParameterManager.hpp"
 #include "../PolynomialSum.hpp"
@@ -50,6 +51,7 @@ namespace VevaciousPlusPlus
     static std::string const dotAndDigits;
     static std::string const allowedVariableInitials;
     static std::string const allowedVariableChars;
+    static double const piSquared;
     static double const loopFactor;
     static double const thermalFactor;
     static std::string const positiveByConvention;

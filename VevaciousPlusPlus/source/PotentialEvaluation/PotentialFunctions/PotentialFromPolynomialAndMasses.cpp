@@ -21,10 +21,13 @@ namespace VevaciousPlusPlus
                       PotentialFromPolynomialAndMasses::allowedVariableInitials
                                  + PotentialFromPolynomialAndMasses::digitChars
                                                                       + "_~" );
+  double const PotentialFromPolynomialAndMasses::piSquared(
+       boost::math::double_constants::pi * boost::math::double_constants::pi );
   double const
-  PotentialFromPolynomialAndMasses::loopFactor( 1.0 / ( 64.0 * M_PI * M_PI ) );
+  PotentialFromPolynomialAndMasses::loopFactor( 1.0
+                    / ( 64.0 * PotentialFromPolynomialAndMasses::piSquared ) );
   double const PotentialFromPolynomialAndMasses::thermalFactor( 1.0
-                                                     / ( 2.0 * M_PI * M_PI ) );
+                     / ( 2.0 * PotentialFromPolynomialAndMasses::piSquared ) );
   std::string const PotentialFromPolynomialAndMasses::positiveByConvention(
                                                       "PositiveByConvention" );
   std::string const PotentialFromPolynomialAndMasses::negativeByConvention(

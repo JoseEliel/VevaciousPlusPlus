@@ -310,7 +310,8 @@ namespace VevaciousPlusPlus
          splinePoint < numberOfSplinesInPotential;
          ++splinePoint )
     {
-      auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( (double)splinePoint * M_PI )
+      auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( (double)splinePoint
+                                          * boost::math::double_constants::pi )
                                     / (double)numberOfSplinesInPotential ) ) );
       // The above might run into numerical precision issues if too many spline
       // segments are asked for, but it's probably OK up to even 10^5 segments
@@ -567,11 +568,13 @@ namespace VevaciousPlusPlus
     << "bounce action = ";
     if( pathFieldsAndPotential.NonZeroTemperature() )
     {
-      std::cout << ( bounceAction * 2.0 * M_PI ) << " GeV.";
+      std::cout << ( bounceAction * 2.0 * boost::math::double_constants::pi )
+      << " GeV.";
     }
     else
     {
-      std::cout << ( bounceAction * M_PI * M_PI ) << ".";
+      std::cout << ( bounceAction * boost::math::double_constants::pi
+                                  * boost::math::double_constants::pi ) << ".";
     }
     std::cout << std::endl;*/
 
@@ -579,11 +582,12 @@ namespace VevaciousPlusPlus
     // 2 pi^2 (quantum) or 4 pi (thermal):
     if( pathFieldsAndPotential.NonZeroTemperature() )
     {
-      return ( bounceAction * 2.0 * M_PI );
+      return ( bounceAction * 2.0 * boost::math::double_constants::pi );
     }
     else
     {
-      return ( bounceAction * M_PI * M_PI );
+      return ( bounceAction * boost::math::double_constants::pi
+                            * boost::math::double_constants::pi );
     }
   }
 

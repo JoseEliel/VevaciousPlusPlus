@@ -13,6 +13,7 @@
 #include "Minuit2/MnMigrad.h"
 #include "Eigen/Dense"
 #include "boost/numeric/odeint/integrate/integrate.hpp"
+#include "boost/math/constants/constants.hpp"
 #include "../PotentialEvaluation.hpp"
 #include "PathFromNodes.hpp"
 #include "PathFieldsAndPotential.hpp"
