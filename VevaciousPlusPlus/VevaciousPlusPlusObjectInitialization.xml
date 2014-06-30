@@ -157,34 +157,32 @@
              <NumberOfNodesForPotentialFit> (excluding the false vacuum and
              true vacuum, so if "3" were given, the potential would be fitted
              to 5 points: the false vacuum, the true vacuum, and 3 intermediate
-             points), while the way the potential is interpolated is given by
-             <InterpolationStyle>. -->
+             points).
+             
+             Currently, the way the potential is interpolated is fixed to being
+             approximated as quadratic polynomials between nodes, with
+             continuous slope between the spline segments. The first and last
+             spline segments (i.e. each segment with a vacuum at one end) are
+             taken as being in the form p^2 + const, where p is the distance
+             from the vacuum end of the segment in the path parameterization
+             variable, so the vacua are proper minima. Unfortunately it is
+             crucial that the approximation in the neighborhoods of a vacuum
+             has the properties that the slope vanishes exactly at the vacuum,
+             decreasing monotonically as the distance from the vacuum
+             decreases, and that very small distances from the vacuum are
+             resolved precisely. If not, the undershoot/overshoot method
+             implemented in VevaciousPlusPlus will break down, as the
+             "particle rolling from one hill to another" might get stuck close
+             to the true vacuum if the slope resolves to zero instead of
+             10^-16, for example. A polynomial of degree
+             NumberOfNodesForPotentialFit really failed in our test cases where
+             the bubble would have a thin wall, as did quadratic splines
+             without the extra care to have special cases for the first and
+             last segments. -->
+          QuadraticSplinePath
         <NumberOfNodesForPotentialFit>
           8
         </NumberOfNodesForPotentialFit>
-        <InterpolationStyle>
-          <!-- The only valid option for this version of VevaciousPlusPlus is
-               "QuadraticSplinePath" (approximated as quadratic polynomials
-               between nodes, with continuous slope between the spline
-               segments).
-               The first and last spline segments (i.e. the segments with a
-               vacuum at one end) are taken as being in the form p^2 + const,
-               where p is the distance from the vacuum end of the segment in
-               the path parameterization variable, so the vacua are proper
-               minima. Unfortunately it is crucial that the approximation in
-               the neighborhoods of the vacua have the properties that the
-               slope vanishes exactly at the vacuum, decreasing monotonically
-               as the distance from the vacuum decreases, and that very small
-               distances from the vacua are resolved precisely. If not, the
-               undershoot/overshoot method implemented in VevaciousPlusPlus
-               will break down, as the "particle" might get stuck close to the
-               true vacuum if the slope resolves to zero instead of 10^-12,
-               for example. A polynomial of degree NumberOfNodesForPotentialFit
-               really failed in our test cases where the bubble would have a
-               thin wall, as did quadratic splines without the extra care to
-               have special cases for the first and last segments. -->
-          QuadraticSplinePath
-        </InterpolationStyle>
       </PotentialFit>
       <PathFinder>
         <ClassType>
