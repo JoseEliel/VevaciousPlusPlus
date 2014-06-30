@@ -8,10 +8,10 @@
 #ifndef BUBBLEPROFILE_HPP_
 #define BUBBLEPROFILE_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "boost/numeric/odeint/integrate/integrate.hpp"
 #include "boost/math/special_functions/bessel.hpp"
-#include "../PotentialEvaluation/SimplePolynomial.hpp"
+#include "PotentialEvaluation/SimplePolynomial.hpp"
 #include "PathFieldsAndPotential.hpp"
 #include "OdeintBubbleDerivatives.hpp"
 #include "OdeintBubbleObserver.hpp"

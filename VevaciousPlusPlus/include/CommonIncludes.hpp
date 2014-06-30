@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <ctime>
 #include "BOLlib/include/BOLlib.hpp"
 #include "SLHA.hpp"
 

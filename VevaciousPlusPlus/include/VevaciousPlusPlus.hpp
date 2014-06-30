@@ -9,10 +9,10 @@
 #define VEVACIOUSPLUSPLUS_HPP_
 
 #include "CommonIncludes.hpp"
-#include "PotentialEvaluation.hpp"
-#include "PotentialMinimization.hpp"
-#include "TunnelingCalculation.hpp"
-#include <ctime>
+#include "PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
+#include "PotentialMinimization/PotentialMinimizer.hpp"
+#include "TunnelingCalculation/TunnelingCalculator.hpp"
 
 namespace VevaciousPlusPlus
 {

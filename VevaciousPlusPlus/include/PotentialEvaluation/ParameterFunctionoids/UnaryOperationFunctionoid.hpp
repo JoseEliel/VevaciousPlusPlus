@@ -8,8 +8,8 @@
 #ifndef UNARYOPERATIONFUNCTIONOID_HPP_
 #define UNARYOPERATIONFUNCTIONOID_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "CommonIncludes.hpp"
+#include "../ParameterFunctionoid.hpp"
 
 
 namespace VevaciousPlusPlus

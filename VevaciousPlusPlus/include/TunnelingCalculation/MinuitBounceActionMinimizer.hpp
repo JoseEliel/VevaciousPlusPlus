@@ -9,8 +9,8 @@
 #define MINUITBOUNCEACTIONMINIMIZER_HPP_
 
 #include "BounceWithSplines.hpp"
-#include "../PotentialEvaluation.hpp"
-#include "../PotentialMinimization.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 #include "Minuit2/MnPrint.h"
 #include "ModifiedBounceForMinuit.hpp"
 

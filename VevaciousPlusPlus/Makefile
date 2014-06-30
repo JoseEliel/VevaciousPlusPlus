@@ -40,27 +40,27 @@ PARAMETERFUNCTIONOIDS=source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS=source/PotentialEvaluation/PotentialFunctions/
 HOMOTOPYCONTINUATION=source/PotentialMinimization/HomotopyContinuation/
 MINUITMINIMIZATION=source/PotentialMinimization/MinuitMinimization/
-SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/MassesSquaredCalculator.cpp \
+SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
+ source/PotentialEvaluation/BasicFunctions/PolynomialTerm.cpp \
+ source/PotentialEvaluation/BasicFunctions/ProductOfPolynomialSums.cpp \
+ source/PotentialEvaluation/BasicFunctions/SimplePolynomial.cpp \
+ source/PotentialEvaluation/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
+ source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
+ source/PotentialEvaluation/ParameterFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
- $(PARAMETERFUNCTIONOIDS)/ParameterFunctionoid.cpp \
+ source/PotentialEvaluation/PotentialFunction.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
- $(POTENTIALFUNCTIONS)/PotentialFunction.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
- source/PotentialEvaluation/PolynomialSum.cpp \
- source/PotentialEvaluation/PolynomialTerm.cpp \
- source/PotentialEvaluation/ProductOfPolynomialSums.cpp \
- source/PotentialEvaluation/RunningParameterManager.cpp \
- source/PotentialEvaluation/SimplePolynomial.cpp \
- source/PotentialEvaluation/SumOfProductOfPolynomialSums.cpp \
- source/PotentialEvaluation/SlhaManager.cpp \
- source/PotentialEvaluation/SlhaUpdatePropagator.cpp \
+ source/PotentialEvaluation/SlhaManagement/RunningParameterManager.cpp \
+ source/PotentialEvaluation/SlhaManagement/SlhaManager.cpp \
+ source/PotentialEvaluation/SlhaManagement/SlhaUpdatePropagator.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
@@ -71,10 +71,13 @@ SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MINUITMINIMIZATION)/MinuitManager.cpp \
  $(MINUITMINIMIZATION)/MinuitMinimum.cpp \
  $(MINUITMINIMIZATION)/PotentialForMinuit.cpp \
+ source/PotentialMinimization/GradientFromStartingPoints.cpp \
+ source/PotentialMinimization/GradientMinimizer.cpp \
  source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
  source/PotentialMinimization/HomotopyContinuationAndMinuit.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
+ source/PotentialMinimization/StartingPointFinder.cpp \
  source/TunnelingCalculation/BounceActionForMinuit.cpp \
  source/TunnelingCalculation/BounceWithSplines.cpp \
  source/TunnelingCalculation/BubbleProfile.cpp \

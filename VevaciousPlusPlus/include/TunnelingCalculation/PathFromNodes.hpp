@@ -8,9 +8,9 @@
 #ifndef PATHFROMNODES_HPP_
 #define PATHFROMNODES_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "Eigen/Dense"
-#include "../PotentialEvaluation/SimplePolynomial.hpp"
+#include "PotentialEvaluation/SimplePolynomial.hpp"
 #include "PathFieldsAndPotential.hpp"
 
 namespace VevaciousPlusPlus

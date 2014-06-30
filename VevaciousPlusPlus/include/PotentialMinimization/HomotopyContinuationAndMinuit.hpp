@@ -8,9 +8,9 @@
 #ifndef HOMOTOPYCONTINUATIONANDMINUIT_HPP_
 #define HOMOTOPYCONTINUATIONANDMINUIT_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "HomotopyContinuationAndGradient.hpp"
-#include "../PotentialEvaluation.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "MinuitMinimization.hpp"
 
 namespace VevaciousPlusPlus
@@ -70,7 +70,7 @@ namespace VevaciousPlusPlus
   inline void
   HomotopyContinuationAndMinuit::FindMinima( double const temperatureInGev )
   {
-    homotopyContinuationSolver.FindTreeLevelExtrema( purelyRealSolutionSets );
+    homotopyContinuationSolver( purelyRealSolutionSets );
     potentialForMinuit.SetTemperature( temperatureInGev );
     dsbVacuum = minuitManager( potentialFunction.DsbFieldValues() );
     RollAndSortExtrema();

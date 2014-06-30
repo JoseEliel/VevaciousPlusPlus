@@ -8,7 +8,7 @@
 #ifndef BASICPOLYNOMIALHOMOTOPYCONTINUATION_HPP_
 #define BASICPOLYNOMIALHOMOTOPYCONTINUATION_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "HomotopyContinuationSolver.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
 

@@ -8,8 +8,8 @@
 #ifndef POTENTIALMINIMIZER_HPP_
 #define POTENTIALMINIMIZER_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialEvaluation.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
@@ -23,25 +23,25 @@ namespace VevaciousPlusPlus
 
 
     // This should find all the minima of the potential evaluated at a
-    // temperature given by temperatureInGev, and record them in foundMinima.
-    // It should also set dsbVacuum (which is assumed to not have been updated
-    // directly by the SLHA manager yet; also it may be that the SLHA data only
-    // gives the approximate position of the DSB minimum for potentialFunction
-    // which may not be as high an order approximation as the calculation that
-    // created the SLHA data, so the DSB input has to be taken as a starting
-    // point for MINUIT, for example; furthermore, in general the DSB minimum
-    // will change with temperature), and record the minima lower than
-    // dsbVacuum in panicVacua, and of those, it should set panicVacuum to be
-    // the prime candidate for tunneling out of dsbVacuum (by default, taken to
-    // be the minimum in panicVacua closest to dsbVacuum).
-    virtual void FindMinima( double const temperatureInGev = 0.0 ) = 0;
+    // temperature given by minimizationTemperature, and record them in
+    // foundMinima. It should also set dsbVacuum (which is assumed to not have
+    // been updated directly by the SLHA manager yet; also it may be that the
+    // SLHA data only gives the approximate position of the DSB minimum for
+    // potentialFunction which may not be as high an order approximation as the
+    // calculation that created the SLHA data, so the DSB input has to be taken
+    // as a starting point for MINUIT, for example; furthermore, in general the
+    // DSB minimum will change with temperature), and record the minima lower
+    // than dsbVacuum in panicVacua, and of those, it should set panicVacuum to
+    // be the prime candidate for tunneling out of dsbVacuum (by default, taken
+    // to be the minimum in panicVacua closest to dsbVacuum).
+    virtual void FindMinima( double const minimizationTemperature = 0.0 ) = 0;
 
-    // This should find the minimum at temperature temperatureInGev nearest to
-    // minimumToAdjust (which is assumed to be a minimum of the potential at a
-    // different temperature).
+    // This should find the minimum at temperature minimizationTemperature
+    // nearest to minimumToAdjust (which is assumed to be a minimum of the
+    // potential at a different temperature).
     virtual PotentialMinimum
     AdjustMinimumForTemperature( PotentialMinimum const& minimumToAdjust,
-                                 double const temperatureInGev ) = 0;
+                                 double const minimizationTemperature ) = 0;
 
     // This returns the set of minima of the potential which were found.
     std::vector< PotentialMinimum > const& FoundMinima() const

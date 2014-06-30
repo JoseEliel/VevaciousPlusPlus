@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/HomotopyContinuation/FieldPolynomialsWithScale.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -76,7 +76,7 @@ namespace VevaciousPlusPlus
     freshTerm.RaiseFieldPower( numberOfFields,
                                2 );
     scaleConstraint.PolynomialTerms().push_back( freshTerm );
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {

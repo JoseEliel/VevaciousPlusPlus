@@ -8,9 +8,9 @@
 #ifndef HOM4PS2RUNNER_HPP_
 #define HOM4PS2RUNNER_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "HomotopyContinuationSolver.hpp"
-#include "HomotopyContinuationTargetSystem.hpp"
+#include "PolynomialGradientTargetSystem.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -20,26 +20,25 @@ namespace VevaciousPlusPlus
   {
   public:
     Hom4ps2Runner( PolynomialGradientTargetSystem& targetSystem,
-                   std::string const& pathToHom4ps2,
-                   std::string const homotopyType = "1" );
+                   std::string const& xmlArguments );
     virtual
     ~Hom4ps2Runner();
 
 
-    // This uses HOM4PS2 to fill purelyRealSolutionSets with all the extrema of
+    // This uses HOM4PS2 to fill startingPoints with all the extrema of
     // targetSystem.TargetPolynomialGradient().
-    virtual void FindTreeLevelExtrema(
-                std::vector< std::vector< double > >& purelyRealSolutionSets );
+    virtual void
+    operator()( std::vector< std::vector< double > >& startingPoints );
 
 
   protected:
     PolynomialGradientTargetSystem& targetSystem;
-    std::string const pathToHom4ps2;
-    std::string const homotopyType;
+    std::string pathToHom4ps2;
+    std::string homotopyType;
     BOL::StringParser variableNamer;
     std::vector< std::complex< long double > > complexSolutions;
     std::vector< std::string > variableNames;
-    std::map< std::string, unsigned int > nameToIndexMap;
+    std::map< std::string, size_t > nameToIndexMap;
 
     void WriteHom4p2Input( std::string const& hom4ps2InputFilename );
 

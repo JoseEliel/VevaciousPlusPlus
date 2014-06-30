@@ -8,8 +8,8 @@
 #ifndef MASSESSQUAREDFROMMATRIX_HPP_
 #define MASSESSQUAREDFROMMATRIX_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "MassesSquaredCalculator.hpp"
+#include "CommonIncludes.hpp"
+#include "../MassesSquaredCalculator.hpp"
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus

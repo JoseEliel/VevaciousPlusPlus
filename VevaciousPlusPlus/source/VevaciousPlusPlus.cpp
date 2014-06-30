@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../include/VevaciousPlusPlus.hpp"
+#include "VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
       elementParser.loadString( fileParser.getTrimmedCurrentElementContent() );
       if( fileParser.currentElementNameMatches( "PotentialClass" ) )
       {
-        // <PotentialClass> should have child elements <ClassName> and
+        // <PotentialClass> should have child elements <ClassType> and
         // <ConstructorArguments>.
         elementParser.readNextElement();
         std::string
@@ -55,7 +55,7 @@ namespace VevaciousPlusPlus
         {
           std::stringstream errorStream;
           errorStream
-          << "PotentialType was not a recognized form! The only types"
+          << "<PotentialClass> was not a recognized form! The only types"
           << " currently valid are \"FixedScaleOneLoopPotential\" and"
           << " \"RgeImprovedOneLoopPotential\".";
           throw std::runtime_error( errorStream.str() );
@@ -75,16 +75,16 @@ namespace VevaciousPlusPlus
         if( minimizerClass.compare( "GradientFromStartingPoints" ) == 0 )
         {
           potentialMinimizer
-          = new GradientFromStartingPoints( constructorArguments,
+          = new GradientFromStartingPoints( potentialFunction,
+                                            constructorArguments,
                                             runningParameterManager );
         }
         else
         {
           std::stringstream errorStream;
           errorStream
-          << "PotentialType was not a recognized form! The only types"
-          << " currently valid are \"FixedScaleOneLoopPotential\" and"
-          << " \"RgeImprovedOneLoopPotential\".";
+          << "<MinimizerClass> was not a recognized form! The only type"
+          << " currently valid is \"GradientFromStartingPoints\".";
           throw std::runtime_error( errorStream.str() );
         }
         potentialMinimizerDeleter = potentialMinimizer;

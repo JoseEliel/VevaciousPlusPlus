@@ -8,8 +8,8 @@
 #ifndef PATHFIELDSANDPOTENTIAL_HPP_
 #define PATHFIELDSANDPOTENTIAL_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialEvaluation/SimplePolynomial.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialEvaluation/SimplePolynomial.hpp"
 #include "Eigen/Dense"
 #include "SplinePotential.hpp"
 

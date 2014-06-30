@@ -8,9 +8,9 @@
 #ifndef HOMOTOPYCONTINUATIONANDGRADIENT_HPP_
 #define HOMOTOPYCONTINUATIONANDGRADIENT_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "PotentialMinimizer.hpp"
-#include "../PotentialEvaluation.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 
 namespace VevaciousPlusPlus
 {

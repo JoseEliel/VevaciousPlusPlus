@@ -8,8 +8,8 @@
 #ifndef ODEINTBUBBLEDERIVATIVES_HPP_
 #define ODEINTBUBBLEDERIVATIVES_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialEvaluation/SimplePolynomial.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialEvaluation/SimplePolynomial.hpp"
 #include "BubbleRadialValueDescription.hpp"
 
 namespace VevaciousPlusPlus

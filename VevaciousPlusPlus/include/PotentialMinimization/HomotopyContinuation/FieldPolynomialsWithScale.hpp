@@ -8,8 +8,11 @@
 #ifndef FIELDPOLYNOMIALSWITHSCALE_HPP_
 #define FIELDPOLYNOMIALSWITHSCALE_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "PolynomialGradientTargetSystem.hpp"
+#include "SlhaManagement/SlhaUpdatePropagator.hpp"
+#include "BasicFunctions/PolynomialTerm.hpp"
+#include "BasicFunctions/PolynomialSum.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -8,8 +8,8 @@
 #ifndef HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 #define HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "../../PotentialEvaluation/SlhaUpdatePropagator.hpp"
+#include "CommonIncludes.hpp"
+#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -8,9 +8,9 @@
 #ifndef TUNNELINGCALCULATOR_HPP_
 #define TUNNELINGCALCULATOR_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialMinimization/PotentialMinimum.hpp"
-#include "../PotentialEvaluation/SlhaUpdatePropagator.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "PotentialEvaluation/SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {

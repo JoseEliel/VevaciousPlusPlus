@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/PotentialEvaluation/SlhaManager.hpp"
+#include "SlhaManagement/SlhaManager.hpp"
 
 namespace VevaciousPlusPlus
 {

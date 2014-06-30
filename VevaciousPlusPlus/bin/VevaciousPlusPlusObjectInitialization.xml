@@ -74,7 +74,9 @@
   <MinimizerClass>
     <!-- Currently <ClassType> must be "GradientFromStartingPoints", and
          <ConstructorArguments> must give the <StartingPointFinderClass> and
-         <GradientMinimizerClass> components. -->
+         <GradientMinimizerClass> components. Optional elements
+         <ExtremumSeparationThresholdFraction> and
+         <NonDsbRollingToDsbScalingFactor> may also be given. -->
     <ClassType>
       GradientFromStartingPoints
     </ClassType>
@@ -121,6 +123,35 @@
           </MinimaSeparationThreshold>
         </ConstructorArguments>
       </GradientMinimizerClass>
+      <ExtremumSeparationThresholdFraction>
+        <!-- The number given here is used as a threshold for ensuring that
+             the same minimum rolled to from separate starting points is
+             treated as the same minimum even if the minimizations did not lead
+             to exactly the same numbers for the values of the fields. If the
+             shorter of the Euclidean lengths of the 2 vectors in field space
+             describing the minima is l, and the Euclidean length of the
+             difference is d, and the number given by this element is f, then
+             2 minima are treated as the same minimum if d < (f * l). If not
+             given, 0.05 is taken as the default. -->
+        0.05
+      </ExtremumSeparationThresholdFraction>
+      <NonDsbRollingToDsbScalingFactor>
+        <!-- The number given here is used as a scaling factor if the minimum
+             is suspected of being the result of some unfortunate shifting of
+             basins of attraction: we discovered in explorations with
+             Vevacious 1 that it could happen that the basin of attraction of
+             the DSB minimum at 1-loop level could grow so large that it would
+             encompass tree-level minima that belong in some sense to other
+             1-loop minima, which moved very far away due to loop corrections,
+             so even though their basins of attraction also grew very large in
+             the same way that of the DSB minimum did, they moved enough that
+             "their" tree-level minima were left out. If a starting point is
+             sufficiently far away from the DSB minimum yet rolls there under
+             gradient-based minimization, the starting point's field values are
+             scaled up by the number given by this element, and used as a new
+             starting point. If not given, 10.0 is taken as the default. -->
+        10.0
+      </NonDsbRollingToDsbScalingFactor>
     </ConstructorArguments>
   </MinimizerClass>
   

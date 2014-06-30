@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/HomotopyContinuationAndMinuit.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -160,7 +160,7 @@ namespace VevaciousPlusPlus
     << "panicVacuum = " << panicVacuum.AsDebuggingString()
     << std::endl
     << "panicVacua.size() = " << panicVacua.size();
-    for( unsigned int panicIndex( 0 );
+    for( size_t panicIndex( 0 );
          panicIndex < panicVacua.size();
          ++panicIndex )
     {

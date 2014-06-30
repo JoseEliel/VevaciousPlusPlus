@@ -8,8 +8,8 @@
 #ifndef MASSESSQUAREDCALCULATORS_HPP_
 #define MASSESSQUAREDCALCULATORS_HPP_
 
+#include "MassesSquaredCalculator.hpp"
 #include "MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
-#include "MassesSquaredCalculators/MassesSquaredCalculator.hpp"
 #include "MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
 #include "MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
 #include "MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"

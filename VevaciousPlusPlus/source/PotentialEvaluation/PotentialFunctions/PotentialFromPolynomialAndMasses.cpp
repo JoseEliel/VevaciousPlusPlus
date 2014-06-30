@@ -5,7 +5,8 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
+#include "VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {

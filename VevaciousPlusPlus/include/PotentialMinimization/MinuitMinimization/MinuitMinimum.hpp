@@ -8,7 +8,7 @@
 #ifndef MINUITMINIMUM_HPP_
 #define MINUITMINIMUM_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "Minuit2/FunctionMinimum.h"
 
 namespace VevaciousPlusPlus

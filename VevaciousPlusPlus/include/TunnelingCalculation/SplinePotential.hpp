@@ -8,6 +8,8 @@
 #ifndef SPLINEPOTENTIAL_HPP_
 #define SPLINEPOTENTIAL_HPP_
 
+#include "CommonIncludes.hpp"
+
 namespace VevaciousPlusPlus
 {
 

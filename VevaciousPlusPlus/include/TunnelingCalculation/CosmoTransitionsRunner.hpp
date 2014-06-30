@@ -8,11 +8,12 @@
 #ifndef COSMOTRANSITIONSRUNNER_HPP_
 #define COSMOTRANSITIONSRUNNER_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialEvaluation.hpp"
-#include "../PotentialMinimization.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
+#include "PotentialEvaluation/PotentialFunctions/IWritesPythonPotential.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 #include "BounceWithSplines.hpp"
-#include "../PotentialMinimization/MinuitMinimization.hpp"
+#include "PotentialMinimization/MinuitMinimization.hpp"
 #include "ThermalActionFitter.hpp"
 
 

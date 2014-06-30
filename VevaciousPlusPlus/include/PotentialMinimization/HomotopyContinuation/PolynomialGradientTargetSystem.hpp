@@ -8,10 +8,14 @@
 #ifndef POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 #define POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "Eigen/Dense"
 #include "HomotopyContinuationTargetSystem.hpp"
-#include "../../PotentialEvaluation/SumOfProductOfPolynomialSums.hpp"
+#include "SlhaManagement/SlhaUpdatePropagator.hpp"
+#include "BasicFunctions/PolynomialTerm.hpp"
+#include "BasicFunctions/PolynomialSum.hpp"
+#include "BasicFunctions/ProductOfPolynomialSums.hpp"
+#include "BasicFunctions/SumOfProductOfPolynomialSums.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -180,7 +184,7 @@ namespace VevaciousPlusPlus
     startHessian.resize( numberOfVariables );
     minimumScale = slhaManager.LowestBlockScale();
     maximumScale = slhaManager.HighestBlockScale();
-    for( unsigned int whichIndex( 0 );
+    for( size_t whichIndex( 0 );
          whichIndex < numberOfVariables;
          ++whichIndex )
     {
@@ -255,13 +259,13 @@ namespace VevaciousPlusPlus
       std::vector< std::vector< std::complex< double > > >& destinationMatrix )
   {
     destinationMatrix.resize( targetHessian.size() );
-    for( unsigned int constraintIndex( 0 );
+    for( size_t constraintIndex( 0 );
          constraintIndex < targetHessian.size();
          ++constraintIndex )
     {
       destinationMatrix[ constraintIndex ].resize(
                                      targetHessian[ constraintIndex ].size() );
-      for( unsigned int variableIndex( 0 );
+      for( size_t variableIndex( 0 );
            variableIndex < targetHessian[ constraintIndex ].size();
            ++variableIndex )
       {

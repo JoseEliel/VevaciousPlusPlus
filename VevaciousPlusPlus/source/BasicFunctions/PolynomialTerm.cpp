@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "BasicFunctions/PolynomialTerm.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -91,7 +91,7 @@ namespace VevaciousPlusPlus
       currentCoefficient = (-currentCoefficient);
     }
     returnStream << currentCoefficient;
-    for( unsigned int whichField( 0 );
+    for( size_t whichField( 0 );
          whichField < fieldPowersByIndex.size();
          ++whichField )
     {
@@ -112,7 +112,7 @@ namespace VevaciousPlusPlus
     << "isValid = " << isValid << std::endl
     << "coefficientConstant = " << coefficientConstant << std::endl
     << "fieldProductByIndex = {";
-    for( std::vector< unsigned int >::const_iterator
+    for( std::vector< size_t >::const_iterator
          fieldIndex( fieldProductByIndex.begin() );
          fieldIndex < fieldProductByIndex.end();
          ++fieldIndex )
@@ -150,7 +150,7 @@ namespace VevaciousPlusPlus
     {
       stringBuilder << " * " << (*runningParameter)->PythonParameterName();
     }
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldPowersByIndex.size();
          ++fieldIndex )
     {

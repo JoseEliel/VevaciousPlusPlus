@@ -8,7 +8,7 @@
 #ifndef MINUITMANAGER_HPP_
 #define MINUITMANAGER_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/FunctionMinimum.h"

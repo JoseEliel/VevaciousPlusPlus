@@ -8,9 +8,9 @@
 #ifndef COMPLEXMASSMATRIX_HPP_
 #define COMPLEXMASSMATRIX_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "MassesSquaredFromMatrix.hpp"
-#include "../PolynomialSum.hpp"
+#include "BasicFunctions/PolynomialSum.hpp"
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
@@ -20,7 +20,7 @@ namespace VevaciousPlusPlus
                        public MassesSquaredFromMatrix< std::complex< double > >
   {
   public:
-    SymmetricComplexMassMatrix( unsigned int const numberOfElements,
+    SymmetricComplexMassMatrix( size_t const numberOfElements,
                     std::map< std::string, std::string > const& attributeMap );
     SymmetricComplexMassMatrix( SymmetricComplexMassMatrix const& copySource );
     SymmetricComplexMassMatrix();
@@ -30,7 +30,7 @@ namespace VevaciousPlusPlus
 
     // This allows access to the pair of polynomial sums for a given index.
     std::pair< PolynomialSum, PolynomialSum >&
-    ElementAt( unsigned int const elementIndex )
+    ElementAt( size_t const elementIndex )
     { return matrixElements[ elementIndex ]; }
 
     std::vector< std::pair< PolynomialSum, PolynomialSum > > const&

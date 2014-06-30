@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/ParameterFunctionoids/UnaryOperationFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {

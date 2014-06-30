@@ -8,8 +8,8 @@
 #ifndef CONSTANTFUNCTIONOID_HPP_
 #define CONSTANTFUNCTIONOID_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "CommonIncludes.hpp"
+#include "../ParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {

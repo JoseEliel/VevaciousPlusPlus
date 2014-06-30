@@ -5,13 +5,13 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
-                                               unsigned int const numberOfRows,
+                                                     size_t const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
     MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
                                                        attributeMap ),
@@ -49,14 +49,14 @@ namespace VevaciousPlusPlus
   Eigen::MatrixXcd ComplexMassSquaredMatrix::CurrentValues(
                         std::vector< double > const& fieldConfiguration ) const
   {
-    unsigned int rowsTimesLength( 0 );
+    size_t rowsTimesLength( 0 );
     Eigen::MatrixXcd valuesMatrix( numberOfRows,
                                    numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      for( unsigned int columnIndex( 0 );
+      for( size_t columnIndex( 0 );
            columnIndex < rowIndex;
            ++columnIndex )
       {
@@ -90,14 +90,14 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const logarithmOfScale ) const
   {
-    unsigned int rowsTimesLength( 0 );
+    size_t rowsTimesLength( 0 );
     Eigen::MatrixXcd valuesMatrix( numberOfRows,
                                    numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      for( unsigned int columnIndex( 0 );
+      for( size_t columnIndex( 0 );
            columnIndex < rowIndex;
            ++columnIndex )
       {

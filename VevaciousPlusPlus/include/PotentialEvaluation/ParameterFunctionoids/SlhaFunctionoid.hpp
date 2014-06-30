@@ -8,10 +8,10 @@
 #ifndef SLHAFUNCTIONOID_HPP_
 #define SLHAFUNCTIONOID_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "CommonIncludes.hpp"
+#include "../ParameterFunctionoid.hpp"
 #include "Eigen/Dense"
-#include "../SimplePolynomial.hpp"
+#include "BasicFunctions/SimplePolynomial.hpp"
 
 
 namespace VevaciousPlusPlus

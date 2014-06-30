@@ -5,18 +5,17 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   Hom4ps2Runner::Hom4ps2Runner( PolynomialGradientTargetSystem& targetSystem,
-                                std::string const& pathToHom4ps2,
-                                std::string const homotopyType ) :
+                                std::string const& xmlArguments ) :
     HomotopyContinuationSolver( targetSystem ),
     targetSystem( targetSystem ),
-    pathToHom4ps2( pathToHom4ps2 ),
-    homotopyType( homotopyType ),
+    pathToHom4ps2( "./" ),
+    homotopyType( "2" ),
     variableNamer( 4,
                    '0',
                    6,
@@ -26,7 +25,23 @@ namespace VevaciousPlusPlus
     variableNames(),
     nameToIndexMap()
   {
-    // This constructor is just an initialization list.
+    BOL::AsciiXmlParser argumentParser;
+    argumentParser.loadString( xmlArguments );
+    // The <ConstructorArguments> for this class should have child elements
+    // <PathToHom4ps2> and <Hom4ps2Argument>.
+    while( argumentParser.readNextElement() )
+    {
+      if( argumentParser.currentElementNameMatches( "PathToHom4ps2" ) )
+      {
+        pathToHom4ps2.assign(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches( "Hom4ps2Argument" ) )
+      {
+        homotopyType.assign(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+    }
   }
 
   Hom4ps2Runner::~Hom4ps2Runner()
@@ -35,10 +50,10 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This uses HOM4PS2 to fill purelyRealSolutionSets with all the extrema of
+  // This uses HOM4PS2 to fill startingPoints with all the extrema of
   // targetSystem.TargetPolynomialGradient().
-  void Hom4ps2Runner::FindTreeLevelExtrema(
-                 std::vector< std::vector< double > >& purelyRealSolutionSets )
+  void Hom4ps2Runner::operator()(
+                         std::vector< std::vector< double > >& startingPoints )
   {
     char originalWorkingDirectory[ PATH_MAX ];
     if( NULL == getcwd( originalWorkingDirectory,
@@ -82,7 +97,7 @@ namespace VevaciousPlusPlus
     // At this point, we are in the directory with hom4ps2 & data.roots, so
     // now we fill purelyRealSolutionSets.
     ParseHom4ps2Output( "./data.roots",
-                        purelyRealSolutionSets );
+                        startingPoints );
 
     // Now we return to the original working directory so as to avoid confusing
     // the user.
@@ -99,7 +114,7 @@ namespace VevaciousPlusPlus
   Hom4ps2Runner::WriteHom4p2Input( std::string const& hom4ps2InputFilename )
   {
     variableNames.clear();
-    for( unsigned int whichVariable( 0 );
+    for( size_t whichVariable( 0 );
          whichVariable < targetSystem.TargetSystem().size();
          ++whichVariable )
     {
@@ -174,9 +189,9 @@ namespace VevaciousPlusPlus
     // At this point, the line "The order of variables :" should have been
     // found. If it hasn't, the file is malformed, but we carry on regardless,
     // looking for the variables in order:
-    unsigned int numberOfVariables( variableNames.size() );
-    std::vector< unsigned int > indexOrder( numberOfVariables );
-    unsigned int whichVariable( 0 );
+    size_t numberOfVariables( variableNames.size() );
+    std::vector< size_t > indexOrder( numberOfVariables );
+    size_t whichVariable( 0 );
     while( tadpoleSolutionsFile.readNextNonEmptyLineOfFileWithoutComment(
                                                                  lineString ) )
     {
@@ -195,7 +210,7 @@ namespace VevaciousPlusPlus
     /*std::cout << std::endl << "debugging:"
     << std::endl
     << "indexOrder = ";
-    for( std::vector< unsigned int >::iterator
+    for( std::vector< size_t >::iterator
          whichIndex( indexOrder.begin() );
          whichIndex < indexOrder.end();
          ++whichIndex )
@@ -217,8 +232,8 @@ namespace VevaciousPlusPlus
 
     std::vector< std::complex< double > >
     candidateRealSolution( numberOfVariables );
-    unsigned int solutionIndex;
-    for( unsigned int complexIndex( 0 );
+    size_t solutionIndex;
+    for( size_t complexIndex( 0 );
          complexIndex < complexSolutions.size();
          ++complexIndex )
     {

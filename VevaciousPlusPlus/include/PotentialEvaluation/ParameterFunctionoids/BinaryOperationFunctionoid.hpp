@@ -8,8 +8,8 @@
 #ifndef PLUSMINUSFUNCTIONOID_HPP_
 #define PLUSMINUSFUNCTIONOID_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "CommonIncludes.hpp"
+#include "../ParameterFunctionoid.hpp"
 
 
 namespace VevaciousPlusPlus

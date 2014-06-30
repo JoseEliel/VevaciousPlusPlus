@@ -8,7 +8,7 @@
 #ifndef MODIFIEDBOUNCEFORMINUIT_HPP_
 #define MODIFIEDBOUNCEFORMINUIT_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "BounceActionForMinuit.hpp"
 
 namespace VevaciousPlusPlus

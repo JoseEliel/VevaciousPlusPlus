@@ -8,9 +8,9 @@
 #ifndef PARAMETERFUNCTIONOIDS_HPP_
 #define PARAMETERFUNCTIONOIDS_HPP_
 
+#include "ParameterFunctionoid.hpp"
 #include "ParameterFunctionoids/BinaryOperationFunctionoid.hpp"
 #include "ParameterFunctionoids/ConstantFunctionoid.hpp"
-#include "ParameterFunctionoids/ParameterFunctionoid.hpp"
 #include "ParameterFunctionoids/SlhaFunctionoid.hpp"
 #include "ParameterFunctionoids/UnaryOperationFunctionoid.hpp"
 

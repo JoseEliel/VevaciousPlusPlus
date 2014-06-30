@@ -8,9 +8,10 @@
 #ifndef BOUNCEWITHSPLINES_HPP_
 #define BOUNCEWITHSPLINES_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialEvaluation.hpp"
-#include "../PotentialMinimization.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "PotentialMinimization/MinuitMinimization.hpp"
 #include "TunnelingCalculator.hpp"
 
 namespace VevaciousPlusPlus

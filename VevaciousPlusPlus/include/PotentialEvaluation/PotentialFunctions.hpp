@@ -8,9 +8,9 @@
 #ifndef POTENTIALFUNCTIONS_HPP_
 #define POTENTIALFUNCTIONS_HPP_
 
+#include "PotentialFunction.hpp"
 #include "PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
-#include "PotentialFunctions/PotentialFunction.hpp"
 #include "PotentialFunctions/IWritesPythonPotential.hpp"
 #include "PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 

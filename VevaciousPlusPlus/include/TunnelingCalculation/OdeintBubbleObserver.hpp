@@ -8,7 +8,7 @@
 #ifndef ODEINTBUBBLEOBSERVER_HPP_
 #define ODEINTBUBBLEOBSERVER_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "BubbleRadialValueDescription.hpp"
 
 namespace VevaciousPlusPlus
