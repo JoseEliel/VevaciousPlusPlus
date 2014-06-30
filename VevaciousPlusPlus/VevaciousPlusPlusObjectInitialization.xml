@@ -131,7 +131,7 @@
          If <ClassType> is "CosmoTransitionsRunner", then
          <ConstructorArguments> must also give the path to the CosmoTransitions
          directory (where pathDeformation.py is) by <PathToCosmotransitions>,
-         while "BounceAlongPathWithThreshold" needs <PotentialFit> and
+         while "BounceAlongPathWithThreshold" needs <BouncePotentialFit> and
          <PathFinder>. -->
     <ClassType>
       MinuitBounceActionMinimizer
@@ -149,7 +149,7 @@
       <PathToCosmotransitions>
         /Users/oleary/BOL/machine-specific/CosmoTransitions2/
       </PathToCosmotransitions>
-      <PotentialFit>
+      <BouncePotentialFit>
         <!-- This is how the potential energy density is parameterized along
              the tunneling path: it is a fit to a set of potential energy
              densities at a set of values for the path parameterization
@@ -179,11 +179,10 @@
              the bubble would have a thin wall, as did quadratic splines
              without the extra care to have special cases for the first and
              last segments. -->
-          QuadraticSplinePath
         <NumberOfNodesForPotentialFit>
           8
         </NumberOfNodesForPotentialFit>
-      </PotentialFit>
+      </BouncePotentialFit>
       <PathFinder>
         <ClassType>
         <!-- The valid options for this version of VevaciousPlusPlus are:
@@ -212,6 +211,19 @@
           MinuitNodePotentialMinimizer
         </ClassType>
         <ConstructorArguments>
+          <NumberOfPotentialSamplePoints>
+            <!-- If using "MinuitPathBounceMinimizer", this gives the number of
+                 nodes used to fit the potential along the tunneling path for
+                 the bounce action calculation. If using
+                 "MinuitPathPotentialMinimizer", this gives the number of nodes
+                 at which the potential will be evaluated for the sum, though
+                 if <PathParameterization> has a larger number in
+                 <ConstructorArguments><NumberOfVaryingNodes>, that will be
+                 used instead. If using "MinuitNodePotentialMinimizer", this
+                 number is ignored, as the number of nodes will be taken from
+                 <ConstructorArguments><NumberOfVaryingNodes> in
+                 <PathParameterization>. -->
+          </NumberOfPotentialSamplePoints>
           <PathParameterization>
             <ClassType>
               <!-- The valid options for this version of VevaciousPlusPlus are:

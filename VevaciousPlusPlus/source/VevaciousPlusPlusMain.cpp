@@ -34,31 +34,34 @@ int main( int argumentCount,
   // - BounceActionTunneler
   //   * can be CosmotransitionsRunner or BounceAlongPathWithThreshold
   // -- BounceAlongPathWithThreshold
-  //    ** has BounceActionCalculator< PathType >
+  //    ** has BounceActionCalculator
   //    ** has PathFinder
-  // --- BounceActionCalculator< PathType >
+  // --- BounceActionCalculator
   //     *** double operator( TunnelPath const& tunnelPath )
   //     *** has PathType pathPotential
   //     *** has PathType pathForce
   // --- PathFinder
   //     *** can be MinuitPathBounceMinimizer or MinuitPathPotentialMinimizer
+  //         or MinuitNodePotentialMinimizer
   //     *** has TunnelPath currentPath with getter
   //     *** constructor sets initial currentPath (default straight)
   // ---- MinuitPathBounceMinimizer
-  //      **** has BounceActionCalculator< PathType >, maybe with different
-  //           resolution to that of currentPath and to that of owning
+  //      **** has BounceActionCalculator, maybe with different resolution to
+  //           that of currentPath and to that of owning
   //           BounceAlongPathWithThreshold
   // ---- MinuitPathPotentialMinimizer
   //      **** uses TunnelPath::DefaultNodes() if resolution <= 0
+  // ---- MinuitNodePotentialMinimizer
+  //      **** needs currentPath to be a PathFromNodesOnPlanes
   // ---- TunnelPath
   //      **** virtual std::vector< std::vector< double > > DefaultNodes()
   //      **** virtual std::vector< double > FieldValues( double const p )
   //      **** virtual std::vector< double > FieldSlopes( double const p )
   //      **** virtual std::vector< double >
   //           FieldSecondDerivatives( double const p )
-  //      **** can be PathFromNodes< PathType > (or maybe later
+  //      **** can be PathFromNodesOnPlanes< PathType > (or maybe later
   //           PathFromPolynomialCoefficients [reference field linear in p?]?)
-  // ----- PathFromNodes< PathType >
+  // ----- PathFromNodesOnPlanes< PathType >
   //       ***** has NodesFromParameters
   //       ***** has FieldsFromNodes< PathType >
   //       ***** has std::vector< PathType > fieldValues
