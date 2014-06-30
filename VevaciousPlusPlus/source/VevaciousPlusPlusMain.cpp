@@ -164,10 +164,9 @@ int main( int argumentCount,
 
   // Create the VevaciousTwo object, telling it where to find its settings,
   // such as the model to use and the way to calculate the tunneling time.
-  VevaciousPlusPlus::VevaciousPlusPlus vevaciousPlusPlus( argumentParser,
-                                                       runningParameterManager,
-                                                          potentialMinimizer,
-                                                        *tunnelingCalculator );
+  VevaciousPlusPlus::VevaciousPlusPlus
+  vevaciousPlusPlus( argumentParser.fromTag( "InitializationFile",
+                         "./bin/VevaciousPlusPlusObjectInitialization.xml" ) );
 
   // Solve a parameter point, if one was given directly with the <slha> tag:
   std::string slhaFile( argumentParser.fromTag( "slha",
@@ -182,10 +181,10 @@ int main( int argumentCount,
 
   // Solve a directory full of parameter points, if one was given with the
   // <InputFolder> tag.
-  std::string inputFolder(  argumentParser.fromTag( "InputFolder",
-                                                       "" ) );
-  std::string outputFolder(  argumentParser.fromTag( "OutputFolder",
-                                                        "" ) );
+  std::string inputFolder( argumentParser.fromTag( "InputFolder",
+                                                   "" ) );
+  std::string outputFolder( argumentParser.fromTag( "OutputFolder",
+                                                    "" ) );
   // debugging:
   /**/std::cout << std::endl << "debugging:"
   << std::endl
