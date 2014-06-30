@@ -14,18 +14,28 @@
 #      license.
 #
  -->
+
+<!-- Quick start: if you just want to change the model (i.e. the potential in
+     terms of a set of fields), change
+     <PotentialClass><ConstructorArguments><ModelFile> to the name of the file
+     with the model in it (such as ./ModelFiles/TwoHiggsDoublet.vin or
+     ./ModelFiles/RestrictedToRealVevsRealMssm.vin). Almost everything else is
+     for tweaking the way in which the (meta)stability is calculated, such as
+     the resolution of the tunneling path, or whether thermal tunneling is
+     skipped, and so on. -->
  
   <PotentialClass>
-    <!-- Currently ClassType must be either FixedScaleOneLoopPotential or
-         RgeImprovedOneLoopPotential. Both are classes that construct the
+    <!-- Currently <ClassType> must be either "FixedScaleOneLoopPotential" or
+         "RgeImprovedOneLoopPotential". Both are classes that construct the
          potential energy density from a tree-level polynomial with one-loop
          corrections in the form of a polynomial of finite parts of
          counterterms along with the usual corrections from mass-squared
          eigenvalues in form m^4 ( ln[m^2/Q^2] - constant ), and thus both need
-         ConstructorArguments to give the model file in ModelFile. Optionally,
-         whether or not tree-level saddle points and maxima can be used as
-         valid starting points for gradient-based minimization can be set in
-         RollOnlyMinima within ConstructorArguments (defaulting to false). -->
+         <ConstructorArguments> to give the model file in <ModelFile>.
+         Optionally, whether or not tree-level saddle points and maxima can be
+         used as valid starting points for gradient-based minimization can be
+         set in <RollOnlyMinima> within <ConstructorArguments> (defaulting to
+         false). -->
     <ClassType>
       FixedScaleOneLoopPotential
     </ClassType>
@@ -62,18 +72,18 @@
   </PotentialClass>
   
   <MinimizerClass>
-    <!-- Currently ClassType must be GradientFromStartingPoints, and
-         ConstructorArguments must give the StartingPointFinderClass and
-         GradientMinimizerClass components. -->
+    <!-- Currently <ClassType> must be "GradientFromStartingPoints", and
+         <ConstructorArguments> must give the <StartingPointFinderClass> and
+         <GradientMinimizerClass> components. -->
     <ClassType>
       GradientFromStartingPoints
     </ClassType>
     <ConstructorArguments>
       <StartingPointFinderClass>
-        <!-- Currently ClassType must be Hom4ps2Runner, and
-             ConstructorArguments must give the path to the directory with the
-             hom4ps2 executable by PathToHom4ps2 and the argument for the
-              executable by Hom4ps2Argument. -->
+        <!-- Currently <ClassType> must be "Hom4ps2Runner", and
+             <ConstructorArguments> must give the path to the directory with
+             the hom4ps2 executable by <PathToHom4ps2> and the argument for the
+              executable by <Hom4ps2Argument>. -->
         <ClassType>
           Hom4ps2Runner
         </ClassType>
@@ -94,8 +104,8 @@
         </ConstructorArguments>
       </StartingPointFinderClass>
       <GradientMinimizerClass>
-        <!-- Currently ClassType must be MinuitPotentialMinimizer and
-             ConstructorArguments must give MinimaSeparationThreshold. -->
+        <!-- Currently <ClassType> must be "MinuitPotentialMinimizer" and
+             <ConstructorArguments> must have <MinimaSeparationThreshold>. -->
         <ClassType>
           MinuitPotentialMinimizer
         </ClassType>
@@ -115,19 +125,22 @@
   </MinimizerClass>
   
   <TunnelingClass>
-    <!-- Currently ClassType must be either MinuitBounceActionMinimizer or
-         CosmoTransitionsRunner, both needing ConstructorArguments to have
-         child elements TunnelingStrategy and SurvivalProbabilityThreshold.
-         CosmoTransitionsRunner requires ConstructorArguments to also give the
-         path to the CosmoTransitions directory (where pathDeformation.py is)
-         by a child element PathToCosmotransitions. -->
+    <!-- Currently <ClassType> must be either "BounceAlongPathWithThreshold" or
+         "CosmoTransitionsRunner", both needing <ConstructorArguments> to have
+         child elements <TunnelingStrategy> and <SurvivalProbabilityThreshold>.
+         If <ClassType> is "CosmoTransitionsRunner", then
+         <ConstructorArguments> must also give the path to the CosmoTransitions
+         directory (where pathDeformation.py is) by <PathToCosmotransitions>,
+         while "BounceAlongPathWithThreshold" needs <PotentialFit> and
+         <PathFinder>. -->
     <ClassType>
       MinuitBounceActionMinimizer
     </ClassType>
     <ConstructorArguments>
       <TunnelingStrategy>
-        <!-- Valid options: NoTunneling, JustQuantum, JustThermal,
-                            ThermalThenQuantum, QuantumThenThermal -->
+        <!-- Valid options: "NoTunneling", "JustQuantum", "JustThermal",
+                            "ThermalThenQuantum", or "QuantumThenThermal"
+             (no quote marks in actual element). -->
         JustQuantum
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
@@ -136,6 +149,148 @@
       <PathToCosmotransitions>
         /Users/oleary/BOL/machine-specific/CosmoTransitions2/
       </PathToCosmotransitions>
+      <PotentialFit>
+        <!-- This is how the potential energy density is parameterized along
+             the tunneling path: it is a fit to a set of potential energy
+             densities at a set of values for the path parameterization
+             variable. The number of nodes for this fit is given by
+             <NumberOfNodesForPotentialFit> (excluding the false vacuum and
+             true vacuum, so if "3" were given, the potential would be fitted
+             to 5 points: the false vacuum, the true vacuum, and 3 intermediate
+             points), while the way the potential is interpolated is given by
+             <InterpolationStyle>. -->
+        <NumberOfNodesForPotentialFit>
+          8
+        </NumberOfNodesForPotentialFit>
+        <InterpolationStyle>
+          <!-- The only valid option for this version of VevaciousPlusPlus is
+               "QuadraticSplinePath" (approximated as quadratic polynomials
+               between nodes, with continuous slope between the spline
+               segments).
+               The first and last spline segments (i.e. the segments with a
+               vacuum at one end) are taken as being in the form p^2 + const,
+               where p is the distance from the vacuum end of the segment in
+               the path parameterization variable, so the vacua are proper
+               minima. Unfortunately it is crucial that the approximation in
+               the neighborhoods of the vacua have the properties that the
+               slope vanishes exactly at the vacuum, decreasing monotonically
+               as the distance from the vacuum decreases, and that very small
+               distances from the vacua are resolved precisely. If not, the
+               undershoot/overshoot method implemented in VevaciousPlusPlus
+               will break down, as the "particle" might get stuck close to the
+               true vacuum if the slope resolves to zero instead of 10^-12,
+               for example. A polynomial of degree NumberOfNodesForPotentialFit
+               really failed in our test cases where the bubble would have a
+               thin wall, as did quadratic splines without the extra care to
+               have special cases for the first and last segments. -->
+          QuadraticSplinePath
+        </InterpolationStyle>
+      </PotentialFit>
+      <PathFinder>
+        <ClassType>
+        <!-- The valid options for this version of VevaciousPlusPlus are:
+             "MinuitPathBounceMinimizer" (minimizing the bounce action along
+             the tunneling path directly),
+             "MinuitPathPotentialMinimizer" (minimizing the sum of values of
+             the potential over a set of points along the tunneling path), or
+             "MinuitNodePotentialMinimizer" (minimizing the potential over a
+             set of points along the tunneling path on a node-by-node basis.
+             Both "MinuitPathPotentialMinimizer" and
+             "MinuitNodePotentialMinimizer" are close to the algorithm followed
+             by CosmoTransitions. The difference between
+             "MinuitPathPotentialMinimizer" and "MinuitNodePotentialMinimizer"
+             is that the former can take a path parameterized in such a way
+             that varying any parameter affects the whole path, while the
+             latter requires that varying any parameter only varies the path in
+             a very localized region, so that the sampled potential values are
+             independent. The advantage of the latter is that it then reduces
+             the minimization in an (n*f)-dimensional space, where there are n
+             nodes with f free parameters per node, to n independent
+             minimizations in an f-dimensional space. If using
+             "MinuitNodePotentialMinimizer", <ConstructorArguments> here must
+             have "PathFromNodesOnParallelPlanes" or
+             "PathFromNodesOnBisectingPlanes" in
+             <PathParameterization><ClassType>. -->
+          MinuitNodePotentialMinimizer
+        </ClassType>
+        <ConstructorArguments>
+          <PathParameterization>
+            <ClassType>
+              <!-- The valid options for this version of VevaciousPlusPlus are:
+                   "PathFromNodesOnParallelPlanes",
+                   "PathFromNodesOnBisectingPlanes", or
+                   "PathFromPolynomialCoefficients". The parameterization of
+                   the first two is such that the field with greatest
+                   difference between the false vacuum and true vacuum is taken
+                   as the reference field, and the parameterization is (n*f)
+                   values, where there are n varying nodes between the vacua
+                   and f fields other than the reference field, so each node is
+                   parameterized as a vector in the hyperplane where the
+                   reference field has zero value. If using
+                   "PathFromNodesOnParallelPlanes", that plane is then rotated
+                   to be perpendicular to a vector going from false vacuum to
+                   true vacuum, and then the node gets a multiple of that
+                   vector, so the nodes end up on a series of parallel planes
+                   between the vacua. The procedure if using
+                   "PathFromNodesOnBisectingPlanes" is similar, except the
+                   planes are those that bisect the vector between nodes: first
+                   a node on a plane bisecting the vector between the vacua is
+                   calculated, then a node between that node and the false
+                   vacuum is calculated such that it lies on a plane
+                   perpendicular to the vector from the false vacuum to the
+                   node just calculated, and another node between the node just
+                   calculated and the true vacuum in a similar manner is
+                   calculated. If using "PathFromPolynomialCoefficients", then
+                   the parameterization is a set of coefficients for
+                   polynomials describing the dependence of the fields on the
+                   auxiliary value p giving the distance along the path from
+                   the false vacuum to the true vacuum, such that the reference
+                   field is always linear in p, while the linear term
+                   coefficients for the other fields are implicit such that the
+                   true vacuum is reached at p = 1, so the coefficients
+                   actually varied are those of the quadratic terms for each
+                   field but the reference field, followed by a set of
+                   coefficients for the cubic terms, and so on. -->
+              PathFromNodesOnParallelPlanes
+            </ClassType>
+            <ConstructorArguments>
+              <NumberOfCoefficientsPerVaryingField>
+                <!-- This is only used by "PathFromPolynomialCoefficients", and
+                     is ignored by "PathFromNodesOnParallelPlanes" and
+                     "PathFromNodesOnBisectingPlanes". -->
+                3
+              </NumberOfCoefficientsPerVaryingField>
+              <NumberOfVaryingNodes>
+                <!-- This is only used by "PathFromNodesOnParallelPlanes" and
+                     "PathFromNodesOnBisectingPlanes", and is ignored by
+                     "PathFromPolynomialCoefficients". This is taken as a lower
+                     bound by "PathFromNodesOnBisectingPlanes", as it requires
+                     a number that is one less than an integer power of two
+                     (so: 1, 3, 7, 15, 31, ...) and the lowest (2^n)-1 >= the
+                     number given here will be taken. -->
+                7
+              </NumberOfVaryingNodes>
+              <InterpolationStyle>
+                <!-- This is only used by "PathFromNodesOnParallelPlanes" and
+                     "PathFromNodesOnBisectingPlanes", and is ignored by
+                     "PathFromPolynomialCoefficients".
+                     The valid options for this version of VevaciousPlusPlus
+                     are:
+                     "PolynomialPath" (a single polynomial fit of degree (n+1),
+                     with n = the number given by NumberOfVaryingNodes),
+                     "LinearSplinePath" (approximated as a straight line
+                     between the nodes), or
+                     "QuadraticSplinePath" (approximated as quadratic
+                     polynomials between nodes, with continuous slope between
+                     the spline segments; the first segment is taken as linear
+                     and each subsequent segment is constructed to have slope
+                     continuous with its previous segment). -->
+                LinearSplinePath
+              </InterpolationStyle>
+            </ConstructorArguments>
+          </PathParameterization>
+        </ConstructorArguments>
+      </PathFinder>
     </ConstructorArguments>
   </TunnelingClass>
 
