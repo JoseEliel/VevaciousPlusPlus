@@ -100,7 +100,7 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  $(BOUNCEACTIONTUNNELING)/TunnelPath.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
- source/VersionInformation.cpp
+ source/VersionInformation.cpp \
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/
