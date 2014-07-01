@@ -53,8 +53,8 @@ namespace VevaciousPlusPlus
     // propagating the push to the set of dependent SlhaUpdatePropagators.
     virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
 
-    virtual PolynomialGradientTargetSystem*
-    GetHomotopyContinuationTargetSystem()
+    virtual PolynomialGradientTargetSystem const*
+    GetHomotopyContinuationTargetSystem() const
     { return &homotopyContinuationTargetSystem; }
 
 

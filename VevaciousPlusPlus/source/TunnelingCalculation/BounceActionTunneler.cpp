@@ -1,28 +1,30 @@
 /*
- * BounceWithSplines.cpp
+ * BounceActionTunneler.cpp
  *
  *  Created on: Feb 25, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "TunnelingCalculation/BounceActionTunneler.hpp"
 
 namespace VevaciousPlusPlus
 {
-  double const BounceWithSplines::maximumPowerOfNaturalExponent(
+
+  double const BounceActionTunneler::maximumPowerOfNaturalExponent(
                            log( 0.5 * std::numeric_limits< double >::max() ) );
   double const
-  BounceWithSplines::hBarInGigaElectronVoltSeconds( 6.58211928E-25 );
-  double const BounceWithSplines::ageOfKnownUniverseInSeconds( 4.3E+17 );
-  double const BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts(
-                                 BounceWithSplines::ageOfKnownUniverseInSeconds
-                          / BounceWithSplines::hBarInGigaElectronVoltSeconds );
-  double const BounceWithSplines::fourVolumeOfKnownUniverseOverGevFourth(
-                BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts
-              * BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts
-              * BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts
-           * BounceWithSplines::ageOfKnownUniverseInInverseGigaElectronVolts );
-  double const BounceWithSplines::lnOfThermalIntegrationFactor( 244.53 );
+  BounceActionTunneler::hBarInGigaElectronVoltSeconds( 6.58211928E-25 );
+  double const BounceActionTunneler::ageOfKnownUniverseInSeconds( 4.3E+17 );
+  double const
+  BounceActionTunneler::ageOfKnownUniverseInInverseGigaElectronVolts(
+                              BounceActionTunneler::ageOfKnownUniverseInSeconds
+                       / BounceActionTunneler::hBarInGigaElectronVoltSeconds );
+  double const BounceActionTunneler::fourVolumeOfKnownUniverseOverGevFourth(
+             BounceActionTunneler::ageOfKnownUniverseInInverseGigaElectronVolts
+           * BounceActionTunneler::ageOfKnownUniverseInInverseGigaElectronVolts
+           * BounceActionTunneler::ageOfKnownUniverseInInverseGigaElectronVolts
+        * BounceActionTunneler::ageOfKnownUniverseInInverseGigaElectronVolts );
+  double const BounceActionTunneler::lnOfThermalIntegrationFactor( 244.53 );
 // Based on correspondence with Alexander Kusenko and discussion with Bjoern
 // Garbrecht:
 // Taking [decay width per horizon]
@@ -69,32 +71,67 @@ namespace VevaciousPlusPlus
 // S_3(T_dom) or T_dom.
 
 
-  BounceWithSplines::BounceWithSplines( PotentialFunction& potentialFunction,
-                                     TunnelingStrategy const tunnelingStrategy,
-                                  double const survivalProbabilityThreshold ) :
-    TunnelingCalculator( potentialFunction,
-                         tunnelingStrategy,
-                         survivalProbabilityThreshold ),
+  BounceActionTunneler::BounceActionTunneler(
+                                          PotentialFunction& potentialFunction,
+                                            std::string const& xmlArguments ) :
+    TunnelingCalculator( potentialFunction ),
     potentialFunction( potentialFunction ),
-    potentialForMinuit( potentialFunction ),
-    thermalMinimumMinuit( potentialForMinuit ),
+    thermalPotentialMinimizer( potentialFunction ),
     evaporationMinimum(),
     criticalMinimum(),
-    criticalRatherThanEvaporation( true ),
-    thresholdSeparationSquared( NAN )
+    criticalRatherThanEvaporation( true )
   {
-    // This constructor is just an initialization list.
+    BOL::AsciiXmlParser argumentParser;
+    argumentParser.loadString( xmlArguments );
+    while( argumentParser.readNextElement() )
+    {
+      if( argumentParser.currentElementNameMatches( "TunnelingStrategy" ) )
+      {
+        std::string tunnelingStrategyString(
+                            argumentParser.getTrimmedCurrentElementContent() );
+        if( ( tunnelingStrategyString.compare( "DefaultTunneling" ) == 0 )
+            ||
+            ( tunnelingStrategyString.compare( "ThermalThenQuantum" ) == 0 ) )
+        {
+          tunnelingStrategy = ThermalThenQuantum;
+        }
+        else if( tunnelingStrategyString.compare( "QuantumThenThermal" ) == 0 )
+        {
+          tunnelingStrategy = QuantumThenThermal;
+        }
+        else if( tunnelingStrategyString.compare( "JustThermal" ) == 0 )
+        {
+          tunnelingStrategy = JustThermal;
+        }
+        else if( tunnelingStrategyString.compare( "JustQuantum" ) == 0 )
+        {
+          tunnelingStrategy = JustQuantum;
+        }
+        else if( ( tunnelingStrategyString.compare( "NoTunneling" ) == 0 )
+                 ||
+                 ( tunnelingStrategyString.compare( "None" ) == 0 ) )
+        {
+          tunnelingStrategy = NoTunneling;
+        }
+      }
+      else if( argumentParser.currentElementNameMatches(
+                                             "SurvivalProbabilityThreshold" ) )
+      {
+        survivalProbabilityThreshold = BOL::StringParser::stringToDouble(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+    }
   }
 
-  BounceWithSplines::~BounceWithSplines()
+  BounceActionTunneler::~BounceActionTunneler()
   {
-    // This does nothing.
+    delete thermalPotentialMinimizer;
   }
 
 
   // This decides what virtual tunneling calculation functions to call based
   // on tunnelingStrategy.
-  void BounceWithSplines::CalculateTunneling(
+  void BounceActionTunneler::CalculateTunneling(
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
@@ -156,7 +193,7 @@ namespace VevaciousPlusPlus
 
   // This sets quantumSurvivalProbability and quantumLifetimeInSeconds
   // appropriately.
-  void BounceWithSplines::CalculateQuantumTunneling(
+  void BounceActionTunneler::CalculateQuantumTunneling(
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
@@ -233,7 +270,7 @@ namespace VevaciousPlusPlus
   // givenVacuum to the field origin becomes impossible if
   // criticalRatherThanEvaporation is true or the temperature at which
   // givenVacuum evaporates if false.
-  double BounceWithSplines::CriticalOrEvaporationTemperature(
+  double BounceActionTunneler::CriticalOrEvaporationTemperature(
                                                double const potentialAtOrigin )
   {
     PotentialMinimum* minimumPointer( NULL );
@@ -293,7 +330,7 @@ namespace VevaciousPlusPlus
     double justAboveTemperature( temperatureGuess + temperatureGuess );
     // We aim to be within a factor of 2^( -7 ) of the critical temperature,
     // hence 7 iterations of this loop.
-    for( unsigned int narrowingStep( 0 );
+    for( size_t narrowingStep( 0 );
          narrowingStep < 7;
          ++narrowingStep )
     {
@@ -318,10 +355,10 @@ namespace VevaciousPlusPlus
   // This returns true if the temperature is below that at which
   // evaporationMinimum is no longer separated from the field origin by an
   // energy barrier.
-  bool BounceWithSplines::BelowEvaporationTemperature(
+  bool BounceActionTunneler::BelowEvaporationTemperature(
                                                 double const temperatureGuess )
   {
-    unsigned int const numberOfSteps( 3 );
+    size_t const numberOfSteps( 3 );
     double const stepFraction( 1.0 / (double)numberOfSteps );
     std::vector< double >
     fieldConfiguration( potentialFunction.FieldValuesOrigin() );
@@ -332,11 +369,11 @@ namespace VevaciousPlusPlus
     // to evaporationMinimum. If the potential ever goes down on the way, there
     // is an energy barrier, so we note that we are below the evaporation
     // temperature.
-    for( unsigned int whichStep( 1 );
+    for( size_t whichStep( 1 );
          whichStep <= numberOfSteps;
          ++whichStep )
     {
-      for( unsigned int fieldIndex( 0 );
+      for( size_t fieldIndex( 0 );
            fieldIndex < fieldConfiguration.size();
            ++fieldIndex )
       {
@@ -367,5 +404,52 @@ namespace VevaciousPlusPlus
     return false;
   }
 
+  // This ensures that thermalSurvivalProbability is set correctly from
+  // logOfMinusLogOfThermalProbability.
+  void BounceActionTunneler::SetThermalSurvivalProbability()
+  {
+    if( logOfMinusLogOfThermalProbability >= maximumPowerOfNaturalExponent )
+    {
+      std::cout
+      << std::endl
+      << "Warning! The calculated bounce action was so large and positive that"
+      << " exponentiating it would result in an overflow error, so setting the"
+      << " survival probability to 0.";
+      std::cout << std::endl;
+      thermalSurvivalProbability = 0.0;
+    }
+    else if( logOfMinusLogOfThermalProbability
+             <= -maximumPowerOfNaturalExponent )
+    {
+      std::cout
+      << std::endl
+      << "Warning! The calculated bounce action was so large and negative that"
+      << " exponentiating it would result in an overflow error, so setting the"
+      << " survival probability to 1.";
+      std::cout << std::endl;
+      thermalSurvivalProbability = 1.0;
+    }
+    else if( exp( logOfMinusLogOfThermalProbability )
+             >= maximumPowerOfNaturalExponent )
+    {
+      std::cout
+      << std::endl
+      << "Warning! The calculated integrated decay width was so large and"
+      << " positive that exponentiating it would result in an overflow error,"
+      << " so setting the survival probability to 0.";
+      std::cout << std::endl;
+      thermalSurvivalProbability = 0.0;
+    }
+    else
+    {
+      thermalSurvivalProbability
+      = exp( -exp( logOfMinusLogOfThermalProbability ) );
+    }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "thermalSurvivalProbability = " << thermalSurvivalProbability;
+    std::cout << std::endl;/**/
+  }
 
 } /* namespace VevaciousPlusPlus */

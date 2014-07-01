@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/CosmoTransitionsRunner.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -15,18 +15,24 @@ namespace VevaciousPlusPlus
   CosmoTransitionsRunner::CosmoTransitionsRunner(
                                        IWritesPythonPotential& pythonPotential,
                                           PotentialFunction& potentialFunction,
-                                     TunnelingStrategy const tunnelingStrategy,
-                                     double const survivalProbabilityThreshold,
-                                     std::string const& pathToCosmotransitions,
-                                  unsigned int const resolutionOfDsbVacuum ) :
-    BounceWithSplines( potentialFunction,
-                       tunnelingStrategy,
-                       survivalProbabilityThreshold ),
+                                            std::string const& xmlArguments ) :
+    BounceActionTunneler( potentialFunction,
+                          xmlArguments ),
     pythonPotential( pythonPotential ),
-    pathToCosmotransitions( pathToCosmotransitions ),
-    resolutionOfDsbVacuum( resolutionOfDsbVacuum )
+    pathToCosmotransitions( "./cosmoTransitions/" ),
+    resolutionOfDsbVacuum( 10 )
   {
-    // This constructor is just an initialization list.
+    BOL::AsciiXmlParser argumentParser;
+    argumentParser.loadString( xmlArguments );
+    while( argumentParser.readNextElement() )
+    {
+      if( argumentParser.currentElementNameMatches(
+                                                   "PathToCosmotransitions" ) )
+      {
+        pathToCosmotransitions.assign(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+    }
   }
 
   CosmoTransitionsRunner::~CosmoTransitionsRunner()
@@ -41,7 +47,8 @@ namespace VevaciousPlusPlus
   // from falseVacuum to trueVacuum at temperature tunnelingTemperature. It
   // does so by writing and running a Python program using the potential from
   // pythonPotentialFilename for CosmoTransitions to use to calculate the
-  // bounce action at tunnelingTemperature.
+  // bounce action at tunnelingTemperature. The vacua are assumed to already be
+  // the minima at tunnelingTemperature.
   double
   CosmoTransitionsRunner::BounceAction( PotentialMinimum const& falseVacuum,
                                         PotentialMinimum const& trueVacuum,
@@ -60,7 +67,7 @@ namespace VevaciousPlusPlus
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VevaciousPlusPlus::versionString << "\n"
+    << VersionInformation::currentVersion << "\n"
     "from __future__ import division\n"
     "import sys\n"
     "import math\n"
@@ -214,10 +221,10 @@ namespace VevaciousPlusPlus
     }
 
     criticalRatherThanEvaporation = false;
-    thresholdSeparationSquared = ( 0.05 * 0.05 * falseVacuum.LengthSquared() );
-    evaporationMinimum = falseVacuum;
     double const
-    falseEvaporationTemperature( CriticalOrEvaporationTemperature(
+    thresholdSeparationSquared( 0.05 * 0.05 * falseVacuum.LengthSquared() );
+    evaporationMinimum = falseVacuum;
+    double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(
                                                          potentialAtOrigin ) );
 
     // Next we find a set of true and false vacua at a series of temperatures
@@ -227,9 +234,8 @@ namespace VevaciousPlusPlus
     criticalMinimum = trueVacuum;
     // We need the temperature where tunneling from the true vacuum to the
     // field origin becomes impossible.
-    double const
-    criticalTunnelingTemperature( CriticalOrEvaporationTemperature(
-                                                         potentialAtOrigin ) );
+    double const criticalTunnelingTemperature(
+                       CriticalOrEvaporationTemperature( potentialAtOrigin ) );
     // We are going to fit a function that diverges at
     // criticalTunnelingTemperature, so we shouldn't pick a point too close to
     // close to the divergence.
@@ -258,9 +264,9 @@ namespace VevaciousPlusPlus
            ++whichNode )
       {
         fitTemperatures[ whichNode ] = currentTemperature;
-        potentialForMinuit.SetTemperature( currentTemperature );
+        thermalPotentialMinimizer.SetTemperature( currentTemperature );
         fitFalseVacua[ whichNode ] = potentialFunction.DsbFieldValues();
-        fitTrueVacua[ whichNode ] = thermalMinimumMinuit(
+        fitTrueVacua[ whichNode ] = thermalPotentialMinimizer(
                             trueVacuum.FieldConfiguration() ).VariableValues();
         currentTemperature += stepTemperature;
       }
@@ -278,10 +284,10 @@ namespace VevaciousPlusPlus
            ++whichNode )
       {
         fitTemperatures[ whichNode ] = currentTemperature;
-        potentialForMinuit.SetTemperature( currentTemperature );
-        fitFalseVacua[ whichNode ] = thermalMinimumMinuit(
+        thermalPotentialMinimizer.SetTemperature( currentTemperature );
+        fitFalseVacua[ whichNode ] = thermalPotentialMinimizer(
                            falseVacuum.FieldConfiguration() ).VariableValues();
-        fitTrueVacua[ whichNode ] = thermalMinimumMinuit(
+        fitTrueVacua[ whichNode ] = thermalPotentialMinimizer(
                             trueVacuum.FieldConfiguration() ).VariableValues();
         currentTemperature += stepTemperature;
       }
@@ -299,7 +305,7 @@ namespace VevaciousPlusPlus
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VevaciousPlusPlus::versionString << "\n"
+    << VersionInformation::currentVersion << "\n"
     "from __future__ import division\n"
     "import sys\n"
     "import math\n"
@@ -469,12 +475,15 @@ namespace VevaciousPlusPlus
     ThermalActionFitter thermalActionFitter( fitTemperatures,
                                              fittedActions,
                                              criticalTunnelingTemperature );
-    MinuitManager directPathMinimizer( thermalActionFitter );
-    MinuitMinimum
-    directPathMinimum( directPathMinimizer( std::vector< double >( 1,
-                                  ( 0.5 * criticalTunnelingTemperature ) ) ) );
+    ROOT::Minuit2::MnMigrad
+    fittedThermalActionMinimizer( thermalActionFitter,
+                                  std::vector< double >( 1,
+                                      ( 0.5 * criticalTunnelingTemperature ) ),
+                                  std::vector< double >( 1,
+                                     ( 0.05 * criticalTunnelingTemperature ) ),
+                                  1 );
     dominantTemperatureInGigaElectronVolts
-    = directPathMinimum.VariableValues()[ 0 ];
+    = fittedThermalActionMinimizer().UserParameters().Value( 0 );
 
     std::cout
     << std::endl
@@ -484,55 +493,17 @@ namespace VevaciousPlusPlus
 
     // Finally we allow CosmoTransitions to calculate the action at our best
     // guess of the optimal tunneling temperature with full path deformation.
-    double thermalAction( BounceAction( falseVacuum,
-                                        trueVacuum,
+    thermalPotentialMinimizer.SetTemperature(
+                                      dominantTemperatureInGigaElectronVolts );
+    double thermalAction( BounceAction(
+                 thermalPotentialMinimizer( falseVacuum.FieldConfiguration() ),
+                  thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
                                     dominantTemperatureInGigaElectronVolts ) );
     logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor
                                           - ( thermalAction
                                      / dominantTemperatureInGigaElectronVolts )
                                           - log( thermalAction ) );
-    if( logOfMinusLogOfThermalProbability >= maximumPowerOfNaturalExponent )
-    {
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and positive that"
-      << " exponentiating it would result in an overflow error, so setting the"
-      << " survival probability to 0.";
-      std::cout << std::endl;
-      thermalSurvivalProbability = 0.0;
-    }
-    else if( logOfMinusLogOfThermalProbability
-             <= -maximumPowerOfNaturalExponent )
-    {
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and negative that"
-      << " exponentiating it would result in an overflow error, so setting the"
-      << " survival probability to 1.";
-      std::cout << std::endl;
-      thermalSurvivalProbability = 1.0;
-    }
-    else if( exp( logOfMinusLogOfThermalProbability )
-             >= maximumPowerOfNaturalExponent )
-    {
-      std::cout
-      << std::endl
-      << "Warning! The calculated integrated decay width was so large and"
-      << " positive that exponentiating it would result in an overflow error,"
-      << " so setting the survival probability to 0.";
-      std::cout << std::endl;
-      thermalSurvivalProbability = 0.0;
-    }
-    else
-    {
-      thermalSurvivalProbability
-      = exp( -exp( logOfMinusLogOfThermalProbability ) );
-    }
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "thermalSurvivalProbability = " << thermalSurvivalProbability;
-    std::cout << std::endl;/**/
+    SetThermalSurvivalProbability();
   }
 
 } /* namespace VevaciousPlusPlus */

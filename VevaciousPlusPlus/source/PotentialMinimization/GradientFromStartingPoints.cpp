@@ -12,8 +12,8 @@ namespace VevaciousPlusPlus
 
   GradientFromStartingPoints::GradientFromStartingPoints(
                                     PotentialFunction const* potentialFunction,
-                                            std::string const& xmlArguments,
-                                            SlhaManager& slhaManager ) :
+                                               std::string const& xmlArguments,
+                                                   SlhaManager& slhaManager ) :
     startingPointFinder( NULL ),
     gradientMinimizer( NULL ),
     startingPoints(),
@@ -45,7 +45,7 @@ namespace VevaciousPlusPlus
         if( startingPointFinderClass.compare( "Hom4ps2Runner" ) == 0 )
         {
           startingPointFinder = new Hom4ps2Runner(
-                   *(potentialFunction->GetHomotopyContinuationTargetSystem()),
+                  *(potentialFunction->GetHomotopyContinuationTargetSystem()),
                        innerArgumentParser.getTrimmedCurrentElementContent() );
         }
         else
@@ -101,7 +101,8 @@ namespace VevaciousPlusPlus
 
   GradientFromStartingPoints::~GradientFromStartingPoints()
   {
-    // This does nothing.
+    delete gradientMinimizer;
+    delete startingPointFinder;
   }
 
 

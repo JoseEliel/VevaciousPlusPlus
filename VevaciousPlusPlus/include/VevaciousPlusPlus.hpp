@@ -19,9 +19,6 @@ namespace VevaciousPlusPlus
   class VevaciousPlusPlus
   {
   public:
-    static std::string const versionString;
-    static std::string const citationString;
-
     VevaciousPlusPlus( std::string const& initializationFileName );
 
     VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,

@@ -9,9 +9,11 @@
 #define GRADIENTFROMSTARTINGPOINTS_HPP_
 
 #include "StartingPointFinder.hpp"
-#include "GradientMinimizerClass.hpp"
+#include "GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "SlhaManagement/SlhaManager.hpp"
+#include "HomotopyContinuation/Hom4ps2Runner.hpp"
+#include "GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 
 namespace VevaciousPlusPlus
 {

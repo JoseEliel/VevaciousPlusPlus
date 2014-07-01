@@ -199,11 +199,11 @@ namespace VevaciousPlusPlus
   // index in fieldsAssumedPositive are negative (allowing for a small amount
   // of numerical jitter) or if any of the fields with index in
   // fieldsAssumedNegitive are positive ( also allowing for a small amount of
-  // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and the solution does
-  // not correspond to a minimum (rather than just an extremum) of
-  // potentialPolynomial.
+  // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and
+  // the solution does not correspond to a minimum (rather than just an
+  // extremum) of potentialPolynomial.
   bool PolynomialGradientTargetSystem::AllowedSolution(
-                           std::vector< double > const& solutionConfiguration )
+                     std::vector< double > const& solutionConfiguration ) const
   {
     // debugging:
     /*std::cout << std::endl << "debugging:"

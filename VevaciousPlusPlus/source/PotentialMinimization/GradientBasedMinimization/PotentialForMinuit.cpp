@@ -5,8 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialMinimization/MinuitMinimization/PotentialForMinuit.hpp"
-#include <omp.h>
+#include "PotentialMinimization/GradientBasedMinimization/PotentialForMinuit.hpp"
 
 namespace VevaciousPlusPlus
 {

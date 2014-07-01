@@ -9,26 +9,23 @@
 #define COSMOTRANSITIONSRUNNER_HPP_
 
 #include "CommonIncludes.hpp"
-#include "PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
+#include "VersionInformation.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialEvaluation/PotentialFunctions/IWritesPythonPotential.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "BounceWithSplines.hpp"
-#include "PotentialMinimization/MinuitMinimization.hpp"
+#include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
 
 
 namespace VevaciousPlusPlus
 {
 
-  class CosmoTransitionsRunner : public BounceWithSplines
+  class CosmoTransitionsRunner : public BounceActionTunneler
   {
   public:
     CosmoTransitionsRunner( IWritesPythonPotential& pythonPotential,
                             PotentialFunction& potentialFunction,
-                            TunnelingStrategy const tunnelingStrategy,
-                            double const survivalProbabilityThreshold,
-                            std::string const& pathToCosmotransitions,
-                            unsigned int const resolutionOfDsbVacuum = 10 );
+                            std::string const& xmlArguments );
     virtual
     ~CosmoTransitionsRunner();
 
@@ -42,8 +39,8 @@ namespace VevaciousPlusPlus
     static std::string pythonPotentialFilenameBase;
 
     IWritesPythonPotential& pythonPotential;
-    std::string const pathToCosmotransitions;
-    size_t const resolutionOfDsbVacuum;
+    std::string pathToCosmotransitions;
+    size_t resolutionOfDsbVacuum;
 
 
     // This creates a Python file with the potential in a form that can be used
@@ -57,7 +54,8 @@ namespace VevaciousPlusPlus
     // tunneling from falseVacuum to trueVacuum at temperature
     // tunnelingTemperature. It does so by writing and running a Python program
     // using the potential from pythonPotentialFilename for CosmoTransitions to
-    // use to calculate the bounce action at tunnelingTemperature.
+    // use to calculate the bounce action at tunnelingTemperature. The vacua
+    // are assumed to already be the minima at tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
                                  double const tunnelingTemperature ) const;

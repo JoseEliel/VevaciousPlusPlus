@@ -23,7 +23,7 @@ namespace VevaciousPlusPlus
     ~PotentialFunction();
 
 
-    unsigned int NumberOfFieldVariables() const
+    size_t NumberOfFieldVariables() const
     { return numberOfFields; }
 
     std::vector< std::string > const& FieldNames() const{ return fieldNames; }
@@ -45,7 +45,9 @@ namespace VevaciousPlusPlus
     // corrections.
     virtual double
     QuickApproximation( std::vector< double > const& fieldConfiguration,
-                        double const temperatureValue = 0.0 );
+                        double const temperatureValue = 0.0 )
+    { return (*this)( fieldConfiguration,
+                      temperatureValue ); }
 
     // This should return the square of the scale (in GeV^2) relevant to
     // tunneling between the given minima for this potential.
@@ -56,7 +58,7 @@ namespace VevaciousPlusPlus
     // This is for ease of getting the index of a field of a given name. It
     // returns the largest possible unsigned int (-1 should tick over to that)
     // if fieldName was not found.
-    unsigned int FieldIndex( std::string const& fieldName ) const;
+    size_t FieldIndex( std::string const& fieldName ) const;
 
     std::vector< double > const& DsbFieldValues() const
     { return dsbFieldValueInputs; }
@@ -73,13 +75,13 @@ namespace VevaciousPlusPlus
 
     // This should give out a pointer to the PolynomialGradientTargetSystem
     // appropriate to this potential, if it has one.
-    virtual PolynomialGradientTargetSystem*
-    GetHomotopyContinuationTargetSystem(){ return NULL; }
+    virtual PolynomialGradientTargetSystem const*
+    GetHomotopyContinuationTargetSystem() const{ return NULL; }
 
 
   protected:
     std::vector< std::string > fieldNames;
-    unsigned int numberOfFields;
+    size_t numberOfFields;
     std::vector< double > dsbFieldValueInputs;
   };
 
@@ -91,7 +93,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "{";
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldConfiguration.size();
          ++fieldIndex )
     {
@@ -106,21 +108,13 @@ namespace VevaciousPlusPlus
     return stringBuilder.str();
   }
 
-  inline double PotentialFunction::QuickApproximation(
-                               std::vector< double > const& fieldConfiguration,
-                                                double const temperatureValue )
-  {
-    return (*this)( fieldConfiguration,
-                    temperatureValue );
-  }
-
   // This is for ease of getting the index of a field of a given name. It
   // returns the largest possible unsigned int (-1 should tick over to that) if
   // fieldName was not found.
-  inline unsigned int
+  inline size_t
   PotentialFunction::FieldIndex( std::string const& fieldName ) const
   {
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {

@@ -66,18 +66,19 @@ namespace VevaciousPlusPlus
     // destinationVector.
     virtual void HomotopyContinuationSystemValues(
                    std::vector< std::complex< double > > solutionConfiguration,
-                    std::vector< std::complex< double > >& destinationVector );
+              std::vector< std::complex< double > >& destinationVector ) const;
 
     // This is the real-valued version of the above.
     virtual void HomotopyContinuationSystemValues(
                                    std::vector< double > solutionConfiguration,
-                                    std::vector< double >& destinationVector );
+                              std::vector< double >& destinationVector ) const;
 
     // This evaluates the derivatives of the target system and places the
     // values in destinationMatrix.
     virtual void HomotopyContinuationSystemGradients(
                    std::vector< std::complex< double > > solutionConfiguration,
-     std::vector< std::vector< std::complex< double > > >& destinationMatrix );
+        std::vector< std::vector< std::complex< double > > >& destinationMatrix
+                                                                       ) const;
 
     // This sets startSystem[ variableIndex ] to be a polynomial of degree
     // highestDegreeOfTargetSystem with solutions given by
@@ -140,11 +141,11 @@ namespace VevaciousPlusPlus
     // index in fieldsAssumedPositive are negative (allowing for a small amount
     // of numerical jitter) or if any of the fields with index in
     // fieldsAssumedNegitive are positive ( also allowing for a small amount of
-    // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and the solution does
-    // not correspond to a minimum (rather than just an extremum) of
-    // potentialPolynomial.
-    virtual bool
-    AllowedSolution( std::vector< double > const& solutionConfiguration );
+    // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and
+    // the solution does not correspond to a minimum (rather than just an
+    // extremum) of potentialPolynomial.
+    virtual bool AllowedSolution(
+                   std::vector< double > const& solutionConfiguration ) const;
 
     // This fills targetSystem from potentialPolynomial.
     virtual void
@@ -160,7 +161,7 @@ namespace VevaciousPlusPlus
     // This returns the 2nd derivative matrix of potentialPolynomial with
     // respect to its fields.
     virtual Eigen::MatrixXd FieldHessianOfPotential(
-                          std::vector< double > const& solutionConfiguration );
+                    std::vector< double > const& solutionConfiguration ) const;
   };
 
 
@@ -199,7 +200,7 @@ namespace VevaciousPlusPlus
   inline void
   PolynomialGradientTargetSystem::HomotopyContinuationSystemValues(
                    std::vector< std::complex< double > > solutionConfiguration,
-                     std::vector< std::complex< double > >& destinationVector )
+               std::vector< std::complex< double > >& destinationVector ) const
   {
     destinationVector.resize( targetSystem.size() );
     for( size_t whichIndex( 0 );
@@ -239,7 +240,7 @@ namespace VevaciousPlusPlus
   inline void
   PolynomialGradientTargetSystem::HomotopyContinuationSystemValues(
                                    std::vector< double > solutionConfiguration,
-                                     std::vector< double >& destinationVector )
+                               std::vector< double >& destinationVector ) const
   {
     destinationVector.resize( targetSystem.size() );
     for( size_t whichIndex( 0 );
@@ -256,7 +257,8 @@ namespace VevaciousPlusPlus
   inline void
   PolynomialGradientTargetSystem::HomotopyContinuationSystemGradients(
                    std::vector< std::complex< double > > solutionConfiguration,
-      std::vector< std::vector< std::complex< double > > >& destinationMatrix )
+        std::vector< std::vector< std::complex< double > > >& destinationMatrix
+                                                                        ) const
   {
     destinationMatrix.resize( targetHessian.size() );
     for( size_t constraintIndex( 0 );
@@ -341,7 +343,7 @@ namespace VevaciousPlusPlus
   // respect to its fields.
   inline Eigen::MatrixXd
   PolynomialGradientTargetSystem::FieldHessianOfPotential(
-                           std::vector< double > const& solutionConfiguration )
+                     std::vector< double > const& solutionConfiguration ) const
   {
     Eigen::MatrixXd hessianMatrix( numberOfFields,
                                    numberOfFields );

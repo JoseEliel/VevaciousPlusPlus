@@ -1,29 +1,29 @@
 /*
- * BounceWithSplines.hpp
+ * BounceActionTunneler.hpp
  *
  *  Created on: Feb 25, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef BOUNCEWITHSPLINES_HPP_
-#define BOUNCEWITHSPLINES_HPP_
+#ifndef BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
+#define BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 
 #include "CommonIncludes.hpp"
-#include "PotentialEvaluation/PotentialFunctions/PotentialFunction.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "PotentialMinimization/MinuitMinimization.hpp"
+#include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include "TunnelingCalculator.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class BounceWithSplines : public TunnelingCalculator
+
+  class BounceActionTunneler : public TunnelingCalculator
   {
   public:
-    BounceWithSplines( PotentialFunction& potentialFunction,
-                       TunnelingStrategy const tunnelingStrategy,
-                       double const survivalProbabilityThreshold );
+    BounceActionTunneler( PotentialFunction& potentialFunction,
+                          std::string const& xmlArguments );
     virtual
-    ~BounceWithSplines();
+    ~BounceActionTunneler();
 
 
     // This decides what virtual tunneling calculation functions to call based
@@ -40,12 +40,10 @@ namespace VevaciousPlusPlus
     static double const fourVolumeOfKnownUniverseOverGevFourth;
     static double const lnOfThermalIntegrationFactor;
     PotentialFunction const& potentialFunction;
-    PotentialForMinuit potentialForMinuit;
-    MinuitManager thermalMinimumMinuit;
+    MinuitPotentialMinimizer thermalPotentialMinimizer;
     PotentialMinimum evaporationMinimum;
     PotentialMinimum criticalMinimum;
     bool criticalRatherThanEvaporation;
-    double thresholdSeparationSquared;
 
     // This is a hook to allow for derived classes to prepare things common to
     // both quantum and thermal tunneling. By default, it does nothing.
@@ -55,6 +53,7 @@ namespace VevaciousPlusPlus
     // over four dimensions (for zero temperature) or the dimensionful bounce
     // action integrated over three dimensions (for non-zero temperature) for
     // tunneling from falseVacuum to trueVacuum at temperature
+    // tunnelingTemperature. The vacua are assumed to already be the minima at
     // tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
@@ -103,6 +102,10 @@ namespace VevaciousPlusPlus
     { return ( resolutionOfDsbVacuum
               * (size_t)(sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
                                / falseVacuum.LengthSquared() ) ) ); }
+
+    // This ensures that thermalSurvivalProbability is set correctly from
+    // logOfMinusLogOfThermalProbability.
+    void SetThermalSurvivalProbability();
   };
 
 
@@ -110,11 +113,11 @@ namespace VevaciousPlusPlus
 
   // This returns true if the temperature is below that at which tunneling
   // from the field origin to criticalMinimum becomes impossible.
-  inline bool BounceWithSplines::BelowCriticalTemperature(
+  inline bool BounceActionTunneler::BelowCriticalTemperature(
                                                 double const temperatureGuess )
   {
-    potentialForMinuit.SetTemperature( temperatureGuess );
-    return ( potentialFunction( thermalMinimumMinuit(
+    thermalPotentialMinimizer.SetTemperature( temperatureGuess );
+    return ( potentialFunction( thermalPotentialMinimizer(
                        criticalMinimum.FieldConfiguration() ).VariableValues(),
                                 temperatureGuess )
              < potentialFunction( potentialFunction.FieldValuesOrigin(),
@@ -124,7 +127,7 @@ namespace VevaciousPlusPlus
   // This returns the result of BelowCriticalTemperature( temperatureGuess )
   // if criticalRatherThanEvaporation is true, otherwise the result of
   // BelowEvaporationTemperature( temperatureGuess ).
-  inline bool BounceWithSplines::BelowCriticalOrEvaporation(
+  inline bool BounceActionTunneler::BelowCriticalOrEvaporation(
                                                 double const temperatureGuess )
   {
     if( criticalRatherThanEvaporation )
@@ -138,4 +141,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* BOUNCEWITHSPLINES_HPP_ */
+#endif /* BOUNCEACTIONTUNNELINGCALCULATOR_HPP_ */

@@ -47,14 +47,15 @@
       </ModelFile>
       <RollOnlyMinima>
         <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if true
-             then the starting points for MINUIT are only the subset of
-             solutions from the homotopy continuation solutions which also are
-             minima of the tree-level potential (so discarding tree-level
-             maxima and saddle points). This should only be used if you are
-             sure that the tree-level minima suffice to find every one-loop
-             minimum with MINUIT, and it will only speed up this part of the
-             run, while under usual circumstances it is the tunneling
-             calculation which is the bottleneck. -->
+             then the starting points for gradient-based minimization are only
+             the subset of solutions from the homotopy continuation solutions
+             which also are minima of the tree-level potential (so discarding
+             tree-level maxima and saddle points). This should only be used if
+             you are sure that the tree-level minima suffice to find every
+             one-loop minimum by following the steepest descent, and it will
+             only speed up this part of the run, while under usual
+             circumstances it is the tunneling calculation which is the
+             bottleneck. -->
         true
       </RollOnlyMinima>
       <ScaleRangeMinimumFactor>
@@ -64,7 +65,7 @@
            to Q= 1000.0, the maximum scale would be pushed up to 2460.0; in
            contrast, if the number here were 2.0, the maximum scale would
            remain 1000.0 as opposed to 2.0 * 246.0 = 492.0 (for purposes of
-           restricting MINUIT from rolling too far away from the region of
+           restricting Minuit2 from rolling too far away from the region of
            validity, for example).
         10.0
       </ScaleRangeMinimumFactor>
@@ -112,15 +113,26 @@
           MinuitPotentialMinimizer
         </ClassType>
         <ConstructorArguments>
-          <MinimaSeparationThreshold>
-            <!-- The number here is the threshold fraction for considering
-                 minima to be numerically distinct. For example, if this number
-                 were 0.1, any minima separated by less than 10% of the shorter
-                 of the 2 Euclidean lengths in field space would be considered
-                 to be the same minimum that was almost reached twice without
-                 getting the exact same minimum. -->
+          <!-- The initial step sizes for Minuit2 will be equal to the
+               starting point scaled by the number given in
+               <InitialStepSizeFraction>, or equal to the number given in
+               <MinimumInitialStepSize>, whichever is larger (so a starting
+               value of 0 will still have an initial step size given by the
+               number in <MinimumInitialStepSize>, for example). -->
+          <InitialStepSizeFraction>
             0.1
-          </MinimaSeparationThreshold>
+          </InitialStepSizeFraction>
+          <MinimumInitialStepSize>
+            1.0
+          </MinimumInitialStepSize>
+          <MinuitStrategy>
+            <!-- The number given here is given to Minuit2 to decide how
+                 precise it tries to be, through more or less calls of the
+                 function to be minimized. The default is 1, while 0 emphasizes
+                 making less function calls, and 2 emphasizes more accuracy
+                 through more function calls. -->
+            1
+          </MinuitStrategy>
         </ConstructorArguments>
       </GradientMinimizerClass>
       <ExtremumSeparationThresholdFraction>
@@ -163,7 +175,7 @@
          <ConstructorArguments> must also give the path to the CosmoTransitions
          directory (where pathDeformation.py is) by <PathToCosmotransitions>,
          while "BounceAlongPathWithThreshold" needs <BouncePotentialFit> and
-         <PathFinder>. -->
+         <BouncePathFinder>. -->
     <ClassType>
       MinuitBounceActionMinimizer
     </ClassType>
@@ -214,7 +226,7 @@
           8
         </NumberOfNodesForPotentialFit>
       </BouncePotentialFit>
-      <PathFinder>
+      <TunnelPathFinder>
         <ClassType>
         <!-- The valid options for this version of VevaciousPlusPlus are:
              "MinuitPathBounceMinimizer" (minimizing the bounce action along
@@ -331,7 +343,7 @@
             </ConstructorArguments>
           </PathParameterization>
         </ConstructorArguments>
-      </PathFinder>
+      </TunnelPathFinder>
     </ConstructorArguments>
   </TunnelingClass>
 

@@ -35,11 +35,13 @@ INCLUDES=-I./include/ \
 CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
-MASSESSQUAREDCALCULATORS=source/PotentialEvaluation/MassesSquaredCalculators/
-PARAMETERFUNCTIONOIDS=source/PotentialEvaluation/ParameterFunctionoids/
-POTENTIALFUNCTIONS=source/PotentialEvaluation/PotentialFunctions/
-HOMOTOPYCONTINUATION=source/PotentialMinimization/HomotopyContinuation/
-MINUITMINIMIZATION=source/PotentialMinimization/MinuitMinimization/
+MASSESSQUAREDCALCULATORS= source/PotentialEvaluation/MassesSquaredCalculators/
+PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
+POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
+POTENTIALEVALUATION= source/PotentialMinimization/
+HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
+GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
+BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
 SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  source/PotentialEvaluation/BasicFunctions/PolynomialTerm.cpp \
  source/PotentialEvaluation/BasicFunctions/ProductOfPolynomialSums.cpp \
@@ -68,30 +70,37 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \
  $(HOMOTOPYCONTINUATION)/PolynomialGradientTargetSystem.cpp \
- $(MINUITMINIMIZATION)/MinuitManager.cpp \
- $(MINUITMINIMIZATION)/MinuitMinimum.cpp \
- $(MINUITMINIMIZATION)/PotentialForMinuit.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/MinuitMinimum.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  source/PotentialMinimization/GradientFromStartingPoints.cpp \
  source/PotentialMinimization/GradientMinimizer.cpp \
- source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
- source/PotentialMinimization/HomotopyContinuationAndMinuit.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/PotentialMinimization/StartingPointFinder.cpp \
- source/TunnelingCalculation/BounceActionForMinuit.cpp \
- source/TunnelingCalculation/BounceWithSplines.cpp \
- source/TunnelingCalculation/BubbleProfile.cpp \
- source/TunnelingCalculation/BubbleRadialValueDescription.cpp \
- source/TunnelingCalculation/CosmoTransitionsRunner.cpp \
- source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
- source/TunnelingCalculation/ModifiedBounceForMinuit.cpp \
- source/TunnelingCalculation/OdeintBubbleDerivatives.cpp \
- source/TunnelingCalculation/OdeintBubbleObserver.cpp \
- source/TunnelingCalculation/PathFieldsAndPotential.cpp \
- source/TunnelingCalculation/PathFromNodes.cpp \
- source/TunnelingCalculation/SplinePotential.cpp \
- source/TunnelingCalculation/ThermalActionFitter.cpp \
+ source/TunnelingCalculation/BounceActionTunneler.cpp \
+ $(BOUNCEACTIONTUNNELING)/BounceActionCalculator.cpp \
+ $(BOUNCEACTIONTUNNELING)/BounceActionForMinuit.cpp \
+ $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
+ $(BOUNCEACTIONTUNNELING)/BouncePathFinder.cpp \
+ $(BOUNCEACTIONTUNNELING)/BubbleProfile.cpp \
+ $(BOUNCEACTIONTUNNELING)/BubbleRadialValueDescription.cpp \
+ $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
+ $(BOUNCEACTIONTUNNELING)/MinuitBounceActionMinimizer.cpp \
+ $(BOUNCEACTIONTUNNELING)/MinuitNodePotentialMinimizer.cpp \
+ $(BOUNCEACTIONTUNNELING)/MinuitPathBounceMinimizer.cpp \
+ $(BOUNCEACTIONTUNNELING)/MinuitPathPotentialMinimizer.cpp \
+ $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
+ $(BOUNCEACTIONTUNNELING)/OdeintBubbleDerivatives.cpp \
+ $(BOUNCEACTIONTUNNELING)/OdeintBubbleObserver.cpp \
+ $(BOUNCEACTIONTUNNELING)/OvershootUndershootOnSpline.cpp \
+ $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
+ $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \
+ $(BOUNCEACTIONTUNNELING)/SplinePotential.cpp \
+ $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
+ $(BOUNCEACTIONTUNNELING)/TunnelPath.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
+ source/VersionInformation.cpp
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/

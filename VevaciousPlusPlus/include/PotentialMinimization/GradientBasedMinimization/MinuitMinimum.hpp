@@ -39,6 +39,7 @@ namespace VevaciousPlusPlus
     // This is mainly for debugging.
     std::string AsDebuggingString() const;
 
+
   protected:
     std::vector< double > variableValues;
     std::vector< double > variableErrors;
