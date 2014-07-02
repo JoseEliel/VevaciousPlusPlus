@@ -20,7 +20,9 @@ namespace VevaciousPlusPlus
                           xmlArguments ),
     pythonPotential( pythonPotential ),
     pathToCosmotransitions( "./cosmoTransitions/" ),
-    resolutionOfDsbVacuum( 10 )
+    resolutionOfDsbVacuum( 20 ),
+    maxInnerLoops( 10 ),
+    maxOuterLoops( 10 )
   {
     BOL::AsciiXmlParser argumentParser;
     argumentParser.loadString( xmlArguments );
@@ -30,6 +32,21 @@ namespace VevaciousPlusPlus
                                                    "PathToCosmotransitions" ) )
       {
         pathToCosmotransitions.assign(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches( "PathResolution" ) )
+      {
+        resolutionOfDsbVacuum = BOL::StringParser::stringToInt(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches( "MaxInnerLoops" ) )
+      {
+        maxInnerLoops = BOL::StringParser::stringToInt(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches( "MaxOuterLoops" ) )
+      {
+        maxOuterLoops = BOL::StringParser::stringToInt(
                             argumentParser.getTrimmedCurrentElementContent() );
       }
     }
@@ -105,13 +122,11 @@ namespace VevaciousPlusPlus
       pythonFile << *fieldValue;
     }
     pythonFile << " ] ]\n"
-    "tunnelPathPoints = " << TunnelPathResolution( falseVacuum,
-                                                   trueVacuum,
-                                                resolutionOfDsbVacuum ) << "\n"
+    "tunnelPathPoints = " << resolutionOfDsbVacuum << "\n"
     "\n"
     "# CosmoTransitions nests a loop within a loop to do its deformations:\n"
-    "innerLoopMaxDeformations = 7\n"
-    "outerLoopMaxDeformations = 7\n";
+    "innerLoopMaxDeformations = " << maxInnerLoops << "\n"
+    "outerLoopMaxDeformations = " << maxOuterLoops << "\n";
     int tunnelingSymmetryDimensionMinusOne( 3 );
     std::string underlyingPotential( "JustLoopCorrectedPotential" );
     if( tunnelingTemperature > 0.0 )
@@ -221,8 +236,6 @@ namespace VevaciousPlusPlus
     }
 
     criticalRatherThanEvaporation = false;
-    double const
-    thresholdSeparationSquared( 0.05 * 0.05 * falseVacuum.LengthSquared() );
     evaporationMinimum = falseVacuum;
     double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(
                                                          potentialAtOrigin ) );
@@ -317,10 +330,7 @@ namespace VevaciousPlusPlus
     "import pathDeformation as CTPD\n"
     "ctVersionString = getattr( CTPD, \"__version__\", \"1\" )\n"
     "ctMajorVersion = int( ctVersionString.split( \'.\' )[ 0 ] )\n"
-    "tunnelPathPoints = "
-    << TunnelPathResolution( falseVacuum,
-                             trueVacuum,
-                             resolutionOfDsbVacuum ) << "\n"
+    "tunnelPathPoints = " << resolutionOfDsbVacuum << "\n"
     "\n"
     "# CosmoTransitions nests a loop within a loop to do its deformations:\n"
     "innerLoopMaxDeformations = 0\n"
@@ -495,8 +505,21 @@ namespace VevaciousPlusPlus
     // guess of the optimal tunneling temperature with full path deformation.
     thermalPotentialMinimizer.SetTemperature(
                                       dominantTemperatureInGigaElectronVolts );
-    double thermalAction( BounceAction(
-                 thermalPotentialMinimizer( falseVacuum.FieldConfiguration() ),
+    // We assume that dominantTemperatureInGigaElectronVolts is high enough
+    // that tunneling will be out of the field origin, as the DSB vacuum proper
+    // has evaporated at this temperature.
+    PotentialMinimum thermalFalseVacuum( potentialFunction.FieldValuesOrigin(),
+                      potentialFunction( potentialFunction.FieldValuesOrigin(),
+                                    dominantTemperatureInGigaElectronVolts ) );
+    if( dominantTemperatureInGigaElectronVolts < falseEvaporationTemperature )
+    {
+      // If the DSB vacuum has not evaporated, we find out where it is exactly
+      // so that it can be tunneled out of.
+      thermalFalseVacuum
+      = thermalPotentialMinimizer( falseVacuum.FieldConfiguration() );
+    }
+
+    double thermalAction( BounceAction( thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
                                     dominantTemperatureInGigaElectronVolts ) );
     logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor

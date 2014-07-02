@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/MinuitBounceActionMinimizer.hpp"
 
 namespace VevaciousPlusPlus
 {

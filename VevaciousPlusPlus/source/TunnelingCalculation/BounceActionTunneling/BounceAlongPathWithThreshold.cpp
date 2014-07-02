@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   BounceAlongPathWithThreshold::BounceAlongPathWithThreshold(
-                                          PotentialFunction& potentialFunction,
+                                    PotentialFunction const& potentialFunction,
                                             std::string const& xmlArguments ) :
     BounceActionTunneler( potentialFunction,
                           xmlArguments ),
@@ -23,7 +23,8 @@ namespace VevaciousPlusPlus
     BOL::AsciiXmlParser outerArgumentParser;
     BOL::AsciiXmlParser innerArgumentParser;
     outerArgumentParser.loadString( xmlArguments );
-    size_t numberOfNodesForPotentialFit( 15 );
+    std::string actionCalculatorType( "BubbleShootingOnSpline" );
+    std::string actionCalculatorArguments( "" );
     std::string pathFinderType( "MinuitNodePotentialMinimizer" );
     std::string pathFinderArguments( "" );
     while( outerArgumentParser.readNextElement() )
@@ -34,7 +35,10 @@ namespace VevaciousPlusPlus
         innerArgumentParser.loadString(
                        outerArgumentParser.getTrimmedCurrentElementContent() );
         innerArgumentParser.readNextElement();
-        numberOfNodesForPotentialFit = BOL::StringParser::stringToInt(
+        actionCalculatorType.assign(
+                       innerArgumentParser.getTrimmedCurrentElementContent() );
+        innerArgumentParser.readNextElement();
+        actionCalculatorArguments.assign(
                        innerArgumentParser.getTrimmedCurrentElementContent() );
       }
       else if( outerArgumentParser.currentElementNameMatches(
@@ -65,8 +69,11 @@ namespace VevaciousPlusPlus
       pathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
                                                      pathFinderArguments );
     }
-    actionCalculator = new OvershootUndershootOnSpline( potentialFunction,
-                                                numberOfNodesForPotentialFit );
+    if( actionCalculatorType.compare( "BubbleShootingOnSpline" ) == 0 )
+    {
+      actionCalculator = new BubbleShootingOnSpline( potentialFunction,
+                                                   actionCalculatorArguments );
+    }
   }
 
   BounceAlongPathWithThreshold::~BounceAlongPathWithThreshold()

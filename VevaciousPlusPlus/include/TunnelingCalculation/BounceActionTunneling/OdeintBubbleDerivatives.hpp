@@ -9,7 +9,7 @@
 #define ODEINTBUBBLEDERIVATIVES_HPP_
 
 #include "CommonIncludes.hpp"
-#include "PotentialEvaluation/SimplePolynomial.hpp"
+#include "BasicFunctions/SimplePolynomial.hpp"
 #include "BubbleRadialValueDescription.hpp"
 
 namespace VevaciousPlusPlus
@@ -18,8 +18,8 @@ namespace VevaciousPlusPlus
   class OdeintBubbleDerivatives
   {
   public:
-    OdeintBubbleDerivatives(
-                        PathFieldsAndPotential const& pathFieldsAndPotential );
+    OdeintBubbleDerivatives( SplinePotential const& pathPotential,
+                             TunnelPath const& tunnelPath );
     virtual
     ~OdeintBubbleDerivatives();
 
@@ -32,12 +32,39 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SplinePotential const& potentialSpline;
-    std::vector< SimplePolynomial > const& firstDerivatives;
-    size_t const numberOfFields;
-    std::vector< SimplePolynomial > secondDerivatives;
-    double const dampingFactor;
+    SplinePotential const& pathPotential;
+    TunnelPath const& tunnelPath;
+    double dampingFactor;
   };
+
+
+
+
+  // This is in the form required for the Boost odeint package.
+  inline void OdeintBubbleDerivatives::operator()(
+                      std::vector< double > const& auxiliaryAndFirstDerivative,
+                              std::vector< double >& firstAndSecondDerivatives,
+                                            double const radialValue )
+  {
+    double const auxiliaryValue( auxiliaryAndFirstDerivative[ 0 ] );
+    // This cheats if there has already been an overshoot, to try to avoid the
+    // integration going to small step sizes to resolve the oscillations of the
+    // field going off to infinity.
+    if( auxiliaryValue < 0.0 )
+    {
+      firstAndSecondDerivatives[ 0 ] = 0.0;
+      firstAndSecondDerivatives[ 1 ] = 0.0;
+      return;
+    }
+    double const auxiliaryDerivative( auxiliaryAndFirstDerivative[ 1 ] );
+    firstAndSecondDerivatives[ 0 ] = auxiliaryDerivative;
+    firstAndSecondDerivatives[ 1 ]
+     = ( ( ( pathPotential.FirstDerivative( auxiliaryValue )
+             - ( tunnelPath.SlopeDotAcceleration( auxiliaryValue )
+                 * auxiliaryDerivative * auxiliaryDerivative ) )
+           / tunnelPath.SlopeSquared( auxiliaryValue ) )
+         - ( ( dampingFactor * auxiliaryDerivative ) / radialValue ) );
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* ODEINTBUBBLEDERIVATIVES_HPP_ */

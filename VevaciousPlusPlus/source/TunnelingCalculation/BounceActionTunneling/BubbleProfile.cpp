@@ -5,22 +5,23 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/TunnelingCalculation.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {
   double const BubbleProfile::auxiliaryPrecisionResolution( 1.0e-6 );
 
-  BubbleProfile::BubbleProfile(
-                          PathFieldsAndPotential const& pathFieldsAndPotential,
+  BubbleProfile::BubbleProfile( SplinePotential const& pathPotential,
+                                TunnelPath const& tunnelPath,
                                 double const initialIntegrationStepSize,
                                 double const initialIntegrationEndRadius ) :
     auxiliaryProfile(),
     odeintProfile( 1,
                    BubbleRadialValueDescription() ),
-    pathFieldsAndPotential( pathFieldsAndPotential ),
-    pathPotential( pathFieldsAndPotential.PotentialApproximation() ),
-    bubbleDerivatives( pathFieldsAndPotential ),
+    pathPotential( pathPotential ),
+    tunnelPath( tunnelPath ),
+    bubbleDerivatives( pathPotential,
+                       tunnelPath ),
     bubbleObserver( odeintProfile ),
     integrationStepSize( initialIntegrationStepSize ),
     integrationStartRadius( initialIntegrationStepSize ),
@@ -29,14 +30,16 @@ namespace VevaciousPlusPlus
     overshootAuxiliary( NAN ),
     initialAuxiliary( NAN ),
     initialConditions( 2 ),
-    twoPlusTwiceDampingFactor( 2.0 * ( pathFieldsAndPotential.DampingFactor()
-                                       + 1.0 ) ),
+    twoPlusTwiceDampingFactor( 8.0 ),
     shootingThresholdSquared( NAN ),
     shootAttemptsLeft( 0 ),
     worthIntegratingFurther( true ),
     currentShotGoodEnough( false )
   {
-    // This constructor is just an initialization list.
+    if( tunnelPath.NonZeroTemperature() )
+    {
+      twoPlusTwiceDampingFactor = 6.0;
+    }
   }
 
   BubbleProfile::~BubbleProfile()
@@ -52,8 +55,8 @@ namespace VevaciousPlusPlus
   // value gave an undershoot or an overshoot, or until the auxiliary value
   // at the largest radial value is within shootingThreshold of 0.
   std::vector< BubbleRadialValueDescription > const&
-  BubbleProfile::DampedProfile( size_t const undershootOvershootAttempts,
-                                double const shootingThreshold )
+  BubbleProfile::operator()( size_t const undershootOvershootAttempts,
+                             double const shootingThreshold )
   {
     shootAttemptsLeft = undershootOvershootAttempts;
     shootingThresholdSquared = ( shootingThreshold * shootingThreshold );
@@ -141,14 +144,11 @@ namespace VevaciousPlusPlus
         // that r is small and that we can expand out p(r) as p_0 + p_2 r^2,
         // which gives the same result as in the else statement complementary
         // to this branch, but here dV/dp = 2 * (p-p_0) * d^2V/dp^2.
-        double const
-        initialPositiveAuxiliary( pathPotential.DefiniteOvershootAuxiliary()
-                                  + initialAuxiliary );
-        double const
-        scaledSecondDerivative( pathFieldsAndPotential.PotentialApproximation(
-                            ).SecondDerivativeNearPathPanic( initialAuxiliary )
-                              / pathFieldsAndPotential.FieldDerivativesSquared(
-                                                  initialPositiveAuxiliary ) );
+        double const initialPositiveAuxiliary( initialAuxiliary
+                                + pathPotential.DefiniteOvershootAuxiliary() );
+        double const scaledSecondDerivative(
+                pathPotential.SecondDerivativeNearPathPanic( initialAuxiliary )
+                       / tunnelPath.SlopeSquared( initialPositiveAuxiliary ) );
         double const
         initialQuadraticCoefficient( 2.0 * initialAuxiliary
                                          * scaledSecondDerivative );
@@ -194,16 +194,16 @@ namespace VevaciousPlusPlus
           double scaledRadius( std::max( log( minimumScaledSlope ),
                               ( inverseRadialScale * integrationStepSize ) ) );
           double scaledSlope( sinhOrBesselScaledSlope(
-                                   pathFieldsAndPotential.NonZeroTemperature(),
+                                               tunnelPath.NonZeroTemperature(),
                                                        scaledRadius ) );
           while( ( scaledSlope > ( 2.0 * minimumScaledSlope ) )
                  &&
                  ( scaledSlope > auxiliaryPrecisionResolution ) )
           {
             scaledRadius *= 0.5;
-            scaledSlope = sinhOrBesselScaledSlope(
-                                   pathFieldsAndPotential.NonZeroTemperature(),
-                                                   scaledRadius );
+            scaledSlope
+            = sinhOrBesselScaledSlope( tunnelPath.NonZeroTemperature(),
+                                       scaledRadius );
             // debugging:
             /*std::cout << std::endl << "debugging:"
             << std::endl
@@ -215,9 +215,9 @@ namespace VevaciousPlusPlus
           {
             scaledRadius = std::min( ( 2.0 * scaledRadius ),
                                      ( scaledRadius + 1.0 ) );
-            scaledSlope = sinhOrBesselScaledSlope(
-                                   pathFieldsAndPotential.NonZeroTemperature(),
-                                                   scaledRadius );
+            scaledSlope
+            = sinhOrBesselScaledSlope( tunnelPath.NonZeroTemperature(),
+                                       scaledRadius );
             // debugging:
             /*std::cout << std::endl << "debugging:"
             << std::endl
@@ -231,7 +231,7 @@ namespace VevaciousPlusPlus
           // larger than auxiliaryPrecisionResolution and thus the numeric
           // integration should be able to proceed normally.
           double sinhOrBesselPart( NAN );
-          if( pathFieldsAndPotential.NonZeroTemperature() )
+          if( tunnelPath.NonZeroTemperature() )
           {
             sinhOrBesselPart = ( sinh( scaledRadius ) / scaledRadius );
           }
@@ -263,7 +263,7 @@ namespace VevaciousPlusPlus
         // If we're not starting in the last segment, we should not be
         // suffering from any of the problems due to having to roll very slowly
         // for a long r.
-        double const initialPotentialDerivative(pathPotential.FirstDerivative(
+        double const initialPotentialDerivative( pathPotential.FirstDerivative(
                                                           initialAuxiliary ) );
 
         // debugging:
@@ -277,8 +277,7 @@ namespace VevaciousPlusPlus
 
         double const initialQuadraticCoefficient ( initialPotentialDerivative
                                                   / ( twoPlusTwiceDampingFactor
-                              * pathFieldsAndPotential.FieldDerivativesSquared(
-                                                        initialAuxiliary ) ) );
+                             * tunnelPath.SlopeSquared( initialAuxiliary ) ) );
 
         integrationStartRadius = ( -auxiliaryPrecisionResolution
                      / ( initialQuadraticCoefficient * integrationStepSize ) );
@@ -426,21 +425,29 @@ namespace VevaciousPlusPlus
     // vacuum.
     if( worthIntegratingFurther )
     {
+      std::vector< double > falseConfiguration( tunnelPath.NumberOfFields() );
+      tunnelPath.PutOnPathAt( falseConfiguration,
+                              0.0 );
+      std::vector< double > currentConfiguration( falseConfiguration.size() );
+      tunnelPath.PutOnPathAt( currentConfiguration,
+                              auxiliaryProfile.back().auxiliaryValue );
+      std::vector< double > initialConfiguration( falseConfiguration.size() );
+      tunnelPath.PutOnPathAt( initialConfiguration,
+                              initialAuxiliary );
       double initialDistanceSquared( 0.0 );
       double currentDistanceSquared( 0.0 );
       double fieldDifference( 0.0 );
       double falseVacuumField( 0.0 );
       double const currentAuxiliary( auxiliaryProfile.back().auxiliaryValue );
-      for( std::vector< SimplePolynomial >::const_iterator
-           fieldValue( pathFieldsAndPotential.FieldPath().begin() );
-           fieldValue < pathFieldsAndPotential.FieldPath().end();
-           ++fieldValue )
+      for( size_t fieldIndex( 0 );
+           fieldIndex < tunnelPath.NumberOfFields();
+           ++fieldIndex )
       {
-        falseVacuumField = fieldValue->CoefficientVector().front();
-        fieldDifference = ( (*fieldValue)( currentAuxiliary )
+        falseVacuumField = falseConfiguration[ fieldIndex ];
+        fieldDifference = ( currentConfiguration[ fieldIndex ]
                             - falseVacuumField );
         currentDistanceSquared += ( fieldDifference * fieldDifference );
-        fieldDifference = ( (*fieldValue)( initialAuxiliary )
+        fieldDifference = ( initialConfiguration[ fieldIndex ]
                             - falseVacuumField );
         initialDistanceSquared += ( fieldDifference * fieldDifference );
       }

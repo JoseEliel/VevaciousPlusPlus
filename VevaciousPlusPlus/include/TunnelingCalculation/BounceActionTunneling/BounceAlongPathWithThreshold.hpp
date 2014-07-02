@@ -10,6 +10,10 @@
 
 #include "CommonIncludes.hpp"
 #include "../BounceActionTunneler.hpp"
+#include "BubbleShootingOnSpline.hpp"
+#include "MinuitPathBounceMinimizer.hpp"
+#include "MinuitPathPotentialMinimizer.hpp"
+#include "MinuitNodePotentialMinimizer.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -17,7 +21,7 @@ namespace VevaciousPlusPlus
   class BounceAlongPathWithThreshold : public BounceActionTunneler
   {
   public:
-    BounceAlongPathWithThreshold( PotentialFunction& potentialFunction,
+    BounceAlongPathWithThreshold( PotentialFunction const& potentialFunction,
                                   std::string const& xmlArguments );
     virtual
     ~BounceAlongPathWithThreshold();
@@ -61,6 +65,8 @@ namespace VevaciousPlusPlus
                                             PotentialMinimum const& trueVacuum,
                                       double const tunnelingTemperature ) const
   {
+    actionCalculator->ResetVacua( falseVacuum,
+                                  trueVacuum );
     if( tunnelingTemperature <= 0.0 )
     {
       double const squareRootOfSolitonicFactor(

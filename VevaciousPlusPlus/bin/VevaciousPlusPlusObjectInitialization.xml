@@ -189,18 +189,49 @@
       <SurvivalProbabilityThreshold>
         0.01
       </SurvivalProbabilityThreshold>
+      <!-- The following elements are read only if <ClassType> is
+           "CosmoTransitionsRunner", and are ignored if <ClassType> is
+           "BounceAlongPathWithThreshold". -->
       <PathToCosmotransitions>
         /Users/oleary/BOL/machine-specific/CosmoTransitions2/
       </PathToCosmotransitions>
+      <PathResolution>
+        <!-- This is the number of nodes along the path between the false
+             vacuum and the true vacuum that CosmoTransitions uses. If not
+             given, 100 is used as the default. -->
+        100
+      </PathResolution>
+      <MaxInnerLoops>
+        <!-- This is the number of iterations of the inner loop that
+             CosmoTransitions is allowed. The inner loop adjusts the path along
+             the normal force directions. If not given, 10 is used as the
+             default. -->
+        10
+      </MaxInnerLoops>
+      <MaxOuterLoops>
+        <!-- This is the number of iterations of the outer loop that
+             CosmoTransitions is allowed. The outer loop adjusts the
+             1-dimensional bounce action along the path then runs the inner
+             loop. If not given, 10 is used as the default. -->
+        10
+      </MaxOuterLoops>
+      <!-- End of set of elements only read if <ClassType> is
+           "CosmoTransitionsRunner". -->
+      <!-- The following elements are read only if <ClassType> is
+           "BounceAlongPathWithThreshold", and are ignored if <ClassType> is
+           "CosmoTransitionsRunner". -->
       <BouncePotentialFit>
-        <!-- This is how the potential energy density is parameterized along
-             the tunneling path: it is a fit to a set of potential energy
-             densities at a set of values for the path parameterization
-             variable. The number of nodes for this fit is given by
-             <NumberOfNodesForPotentialFit> (excluding the false vacuum and
-             true vacuum, so if "3" were given, the potential would be fitted
-             to 5 points: the false vacuum, the true vacuum, and 3 intermediate
-             points).
+        <!-- Currently the only valid option for <ClassType> is
+             "BubbleShootingOnSpline", which implements the Coleman
+             undershoot-overshoot method on a tunneling path from the true
+             vacuum to the false vacuum, parameterizing the potential along the
+             tunneling path by a fit to a set of potential energy densities at
+             a set of values for the path parameterization variable. The number
+             of nodes for this fit is given by
+             <ConstructorArguments><NumberOfNodesForPotentialFit> (excluding
+             the false vacuum and true vacuum, so if "3" were given, the
+             potential would be fitted to 5 points: the false vacuum, the true
+             vacuum, and 3 intermediate points).
              
              Currently, the way the potential is interpolated is fixed to being
              approximated as quadratic polynomials between nodes, with
@@ -222,9 +253,28 @@
              the bubble would have a thin wall, as did quadratic splines
              without the extra care to have special cases for the first and
              last segments. -->
-        <NumberOfNodesForPotentialFit>
-          8
-        </NumberOfNodesForPotentialFit>
+        <ClassType>
+          BubbleShootingOnSpline
+        </ClassType>
+        <ConstructorArguments>
+          <NumberOfNodesForPotentialFit>
+            8
+          </NumberOfNodesForPotentialFit>
+          <NumberShootAttemptsAllowed>
+            <!-- This is the number of shoot attempts allowed to try to find
+                 the perfect shot before moving on with the best shot so far to
+                 calculate the bounce action. -->
+            32
+          </NumberShootAttemptsAllowed>
+          <RadialResolution>
+            <!-- The initial step size in 1/GeV for numerically integrating the
+                 bubble's equations of motion is given by the number given here
+                 divided by the largest energy scale from the potential (from
+                 among the Euclidean lengths of the vacua and the tunneling
+                 scale given by the PotentialFunction object). -->
+            0.05
+          </RadialResolution>
+        </ConstructorArguments>
       </BouncePotentialFit>
       <TunnelPathFinder>
         <ClassType>
@@ -344,6 +394,8 @@
           </PathParameterization>
         </ConstructorArguments>
       </TunnelPathFinder>
+      <!-- End of set of elements only read if <ClassType> is
+           "BounceAlongPathWithThreshold". -->
     </ConstructorArguments>
   </TunnelingClass>
 

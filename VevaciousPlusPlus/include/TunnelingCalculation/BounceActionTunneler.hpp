@@ -20,7 +20,7 @@ namespace VevaciousPlusPlus
   class BounceActionTunneler : public TunnelingCalculator
   {
   public:
-    BounceActionTunneler( PotentialFunction& potentialFunction,
+    BounceActionTunneler( PotentialFunction const& potentialFunction,
                           std::string const& xmlArguments );
     virtual
     ~BounceActionTunneler();
@@ -95,13 +95,11 @@ namespace VevaciousPlusPlus
     // This returns a number of points which should be appropriate for
     // resolving the potential to the extent that there are
     // resolutionOfDsbVacuum points between the field origin and the false
-    // vacuum.
+    // vacuum (if the false vacuum is not the field origin: if it is, just
+    // resolutionOfDsbVacuum is returned).
     size_t TunnelPathResolution( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 size_t const resolutionOfDsbVacuum ) const
-    { return ( resolutionOfDsbVacuum
-              * (size_t)(sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
-                               / falseVacuum.LengthSquared() ) ) ); }
+                                 size_t const resolutionOfDsbVacuum ) const;
 
     // This ensures that thermalSurvivalProbability is set correctly from
     // logOfMinusLogOfThermalProbability.
@@ -137,6 +135,29 @@ namespace VevaciousPlusPlus
     else
     {
       return BelowEvaporationTemperature( temperatureGuess );
+    }
+  }
+
+  // This returns a number of points which should be appropriate for
+  // resolving the potential to the extent that there are
+  // resolutionOfDsbVacuum points between the field origin and the false
+  // vacuum (if the false vacuum is not the field origin: if it is, just
+  // resolutionOfDsbVacuum is returned).
+  inline size_t BounceActionTunneler::TunnelPathResolution(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                     size_t const resolutionOfDsbVacuum ) const
+  {
+    double const falseVacuumLengthSquared( falseVacuum.LengthSquared() );
+    if( falseVacuumLengthSquared > 0.0 )
+    {
+      return ( resolutionOfDsbVacuum
+               * (size_t)(sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
+                                / falseVacuumLengthSquared ) ) );
+    }
+    else
+    {
+      return resolutionOfDsbVacuum;
     }
   }
 

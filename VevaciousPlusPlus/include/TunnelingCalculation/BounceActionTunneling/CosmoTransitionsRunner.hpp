@@ -41,6 +41,8 @@ namespace VevaciousPlusPlus
     IWritesPythonPotential& pythonPotential;
     std::string pathToCosmotransitions;
     size_t resolutionOfDsbVacuum;
+    size_t maxInnerLoops;
+    size_t maxOuterLoops;
 
 
     // This creates a Python file with the potential in a form that can be used

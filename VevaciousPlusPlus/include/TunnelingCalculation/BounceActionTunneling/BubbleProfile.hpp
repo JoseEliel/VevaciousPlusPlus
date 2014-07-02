@@ -11,8 +11,9 @@
 #include "CommonIncludes.hpp"
 #include "boost/numeric/odeint/integrate/integrate.hpp"
 #include "boost/math/special_functions/bessel.hpp"
-#include "PotentialEvaluation/SimplePolynomial.hpp"
-#include "PathFieldsAndPotential.hpp"
+#include "BasicFunctions/SimplePolynomial.hpp"
+#include "SplinePotential.hpp"
+#include "TunnelPath.hpp"
 #include "OdeintBubbleDerivatives.hpp"
 #include "OdeintBubbleObserver.hpp"
 
@@ -22,7 +23,8 @@ namespace VevaciousPlusPlus
   class BubbleProfile
   {
   public:
-    BubbleProfile( PathFieldsAndPotential const& pathFieldsAndPotential,
+    BubbleProfile( SplinePotential const& potentialApproximation,
+                   TunnelPath const& tunnelPath,
                    double const initialIntegrationStepSize,
                    double const initialIntegrationEndRadius );
     virtual
@@ -36,8 +38,8 @@ namespace VevaciousPlusPlus
     // value gave an undershoot or an overshoot, or until the auxiliary value
     // at the largest radial value is within shootingThreshold of 0.
     std::vector< BubbleRadialValueDescription > const&
-    DampedProfile( size_t const undershootOvershootAttempts,
-                   double const shootingThreshold );
+    operator()( size_t const undershootOvershootAttempts,
+                double const shootingThreshold );
 
     // This returns the value that the auxiliary variable should have at the
     // center of the bubble.
@@ -49,8 +51,8 @@ namespace VevaciousPlusPlus
 
     std::vector< BubbleRadialValueDescription > auxiliaryProfile;
     std::vector< BubbleRadialValueDescription > odeintProfile;
-    PathFieldsAndPotential const& pathFieldsAndPotential;
     SplinePotential const& pathPotential;
+    TunnelPath const& tunnelPath;
     OdeintBubbleDerivatives bubbleDerivatives;
     OdeintBubbleObserver bubbleObserver;
     double integrationStepSize;
@@ -60,7 +62,7 @@ namespace VevaciousPlusPlus
     double overshootAuxiliary;
     double initialAuxiliary;
     std::vector< double > initialConditions;
-    double const twoPlusTwiceDampingFactor;
+    double twoPlusTwiceDampingFactor;
     double shootingThresholdSquared;
     size_t shootAttemptsLeft;
     bool worthIntegratingFurther;
@@ -102,7 +104,10 @@ namespace VevaciousPlusPlus
     {
       return ( pathPotential.DefiniteOvershootAuxiliary() + initialAuxiliary );
     }
-    return initialAuxiliary;
+    else
+    {
+      return initialAuxiliary;
+    }
   }
 
   // This performs the integration based on what is in initialConditions. It
@@ -114,13 +119,6 @@ namespace VevaciousPlusPlus
   inline void BubbleProfile::ShootFromInitialConditions()
   {
     odeintProfile.clear();
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "BubbleProfile::ShootFromInitialConditions() called.";
-    std::cout << std::endl;
-    size_t integrationSteps =*/
     boost::numeric::odeint::integrate( bubbleDerivatives,
                                        initialConditions,
                                        integrationStartRadius,
@@ -129,21 +127,6 @@ namespace VevaciousPlusPlus
                                        bubbleObserver );
 
     RecordFromOdeintProfile();
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl << "integrationSteps = " << integrationSteps
-    << ", bubble profile:" << std::endl;
-    for( std::vector< BubbleRadialValueDescription >::const_iterator
-         bubbleBit( auxiliaryProfile.begin() );
-         bubbleBit < auxiliaryProfile.end();
-         ++bubbleBit )
-    {
-      std::cout << "r = " << bubbleBit->radialValue << ", p = "
-      << bubbleBit->auxiliaryValue << ", dp/dr = "
-      << bubbleBit->auxiliarySlope << std::endl;
-    }
-    std::cout << std::endl;*/
   }
 
   // This returns the slope of the solution for the bubble equation of motion

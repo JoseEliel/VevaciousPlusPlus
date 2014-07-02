@@ -83,6 +83,7 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceActionForMinuit.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  $(BOUNCEACTIONTUNNELING)/BouncePathFinder.cpp \
+ $(BOUNCEACTIONTUNNELING)/BubbleShootingOnSpline.cpp \
  $(BOUNCEACTIONTUNNELING)/BubbleProfile.cpp \
  $(BOUNCEACTIONTUNNELING)/BubbleRadialValueDescription.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
@@ -93,7 +94,6 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
  $(BOUNCEACTIONTUNNELING)/OdeintBubbleDerivatives.cpp \
  $(BOUNCEACTIONTUNNELING)/OdeintBubbleObserver.cpp \
- $(BOUNCEACTIONTUNNELING)/OvershootUndershootOnSpline.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \
  $(BOUNCEACTIONTUNNELING)/SplinePotential.cpp \

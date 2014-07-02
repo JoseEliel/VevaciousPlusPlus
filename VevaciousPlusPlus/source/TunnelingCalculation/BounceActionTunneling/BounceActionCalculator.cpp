@@ -5,20 +5,21 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/TunnelingCalculation/BounceActionTunneling/BounceActionCalculator.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/BounceActionCalculator.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  BounceActionCalculator::BounceActionCalculator()
+  BounceActionCalculator::BounceActionCalculator(
+                                 PotentialFunction const& potentialFunction ) :
+    potentialFunction( potentialFunction )
   {
-    // TODO Auto-generated constructor stub
-
+    // This constructor is just an initialization list.
   }
 
   BounceActionCalculator::~BounceActionCalculator()
   {
-    // TODO Auto-generated destructor stub
+    // This does nothing.
   }
 
 } /* namespace VevaciousPlusPlus */
