@@ -247,33 +247,66 @@ namespace VevaciousPlusPlus
     << "After last shell, bounceAction = " << bounceAction;
     std::cout << std::endl;*/
 
-    // If the bubble profile satisfies its equations of motion, at large r, we
-    // can ignore the damping term and linearize the fields around the false
-    // vacuum, which should be in the form of a quadratic near the minimum.
-    // Thus we get that d^2f/dr^2 = d^2V/df^2 f for a field f, which is solved
-    // by f being proportional to exp(-r). Therefore the kinetic term decays
-    // like e^( 2 - ((2 r)/r_n) ) while the potential term decays as
-    // e^( 1 - (r/r_n) ), with r_n being the largest r given by
-    // auxiliaryProfile. The integrals given by Mathematica from r_n to
-    // infinity are:
-    // r^2 e(-r/r_n) -> 5 r_n^3 / e
-    // r^3 e(-r/r_n) -> 16 r_n^4 / e
-    // r^2 e(-(2r)/r_n) -> (5/4) r_n^3 / e^2
-    // r^3 e(-(2r)/r_n) -> (19/8) r_n^4 / e^2
-    // Hence the potential term integrates to 5 r_n^3 V(r_n)
-    // and 16 r_n^4 V(r_n) for the thermal and quantum cases respectively, and
-    // the kinetic term to (5/4) r_n^3 * [kinetic term at r_n] or
-    // (19/8) r_n^4 * [kinetic term at r_n] respectively.
+    // Near the false vacuum at p = 0, the potential should be of the form
+    // constant + p^2 * (d^2V/dp^2) / 2, so the bubble equations of motion can
+    // be linearized to
+    // [d^2/dr^2 + ([damping factor]/r) d/dr - ((d^2V/dp^2)/(|df/dp|^2))] p = 0
+    // assuming that dp/dr is small enough that we can neglect the
+    // (dp/dr)^2 (df/dp).(d^2f/dp^2) part of (df/dp).(d^2f/dr^2).
+    // The solution for p for the quantum case of [damping factor] = 3 which
+    // tends to 0 as r tends to infinity is proportional to ( K[1,(b*r)] / r ),
+    // where K is the modified Bessel function of the 2nd kind and
+    // b^2 = (d^2V/dp^2)/(|df/dp|^2)).
+    // The solution for p for the thermal case of [damping factor] = 2 which
+    // tends to 0 as r tends to infinity is ( exp[b(R-r)] R p(R) / r ).
+    // The integrals of the potential term from R to infinity both in the
+    // quantum case and in the thermal case can be done, yielding that the
+    // potential integral is equal to the value of the potential term at R
+    // times a factor (R^3 / b) * ( K[2, (b R)] / K[1, (b R)] ) for the quantum
+    // case or (R / b^2 ) * ( 1 + b R ) for the thermal case.
+    // The thermal kinetic term can also be integrated, yielding the value of
+    // the kinetic term at R times a factor
+    // ( R^3 * [ ( 1 + [(b R)/2] ) / ( 1 + b R )^2 ] ).
+    // Unfortunately the quantum kinetic term cannot be integrated in a closed
+    // form (in the sense that we have easy access to a numeric value), so we
+    // consider the case where R is so large that the damping term can be
+    // neglected, and get that d^2f/dr^2 = f d^2V/df^2 for a field f, which is
+    // solved by f being proportional to exp(-r). Therefore the kinetic term
+    // decays like e^( 2 - ((2 r)/R) ). The integral from R to infinity is
+    // r^3 e(-(2r)/R) -> (19/8) R^4 / e^2, which combines with the e^2 from
+    // e^( 2 - ((2 r)/R) ) to give the factor as simply 2.375 R^4.
+    // (All solutions found with Mathematica 8.)
+
+    // This is b in the mathematics above.
+    double const
+    inverseScale( sqrt( potentialApproximation.SecondDerivative( 0.0 ) ) );
+    double const scaledRadius( inverseScale * nextRadius );
+
     if( nonZeroTemperature )
     {
-      bounceAction += ( 5.0 * nextRadius * nextRadius * nextRadius
-          * ( potentialTerm + ( 0.25 * kineticTerm ) ) );
+      // Potential term: (R / b^2 ) * ( 1 + b R ).
+      // Kinetic term: ( R^3 * [ ( 1 + [(b R)/2] ) / ( 1 + b R )^2 ] ).
+      double const onePlusRatio( 1.0 + scaledRadius );
+      bounceAction
+      += ( nextRadius
+           * ( ( ( potentialTerm * onePlusRatio )
+                 / ( inverseScale * inverseScale ) )
+               + ( ( kineticTerm * nextRadius * nextRadius
+                     * ( 1.0 + ( 0.5 * scaledRadius ) ) )
+                   / ( onePlusRatio * onePlusRatio ) ) ) );
     }
     else
     {
+      // Potential term: (R^3 / b) * ( K[2, (b R)] / K[1, (b R)] ).
+      // Kinetic term: (19/8) R^4.
       bounceAction
-      += ( nextRadius * nextRadius * nextRadius * nextRadius
-          * ( ( 16.0 * potentialTerm ) + ( 2.375 * kineticTerm ) ) );
+      += ( nextRadius * nextRadius * nextRadius
+           * ( ( ( potentialTerm * boost::math::cyl_bessel_k( (int)2,
+                                                            scaledRadius ) )
+                 / ( inverseScale * boost::math::cyl_bessel_k( (int)1,
+                                                             scaledRadius ) ) )
+
+               + ( 2.375 * kineticTerm * nextRadius ) ) );
     }
 
     // debugging:

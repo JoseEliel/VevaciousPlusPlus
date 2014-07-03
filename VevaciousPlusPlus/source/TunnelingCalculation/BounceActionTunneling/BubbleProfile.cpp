@@ -127,7 +127,7 @@ namespace VevaciousPlusPlus
       {
         // If we're in the last segment, we go with a full solution of the
         // equation linearized in p:
-        // [d^2/dr^2 + (dampingFactor/d) d/dr - ((d^2V/dp^2)/(|df/dp|^2)] p = 0
+        // [d^2/dr^2 + (dampingFactor/r)d/dr - ((d^2V/dp^2)/(|df/dp|^2))] p = 0
         // assuming that p is close enough to a minimum that dV/dp is
         // proportional to p and that dp/dr is small enough that we can neglect
         // the (dp/dr)^2 (df/dp).(d^2f/dp^2) part of (df/dp).(d^2f/dr^2).
