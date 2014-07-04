@@ -15,9 +15,17 @@ namespace VevaciousPlusPlus
   {
   public:
     TunnelPath( size_t numberOfFields );
-    virtual
-    ~TunnelPath();
+    virtual ~TunnelPath();
 
+
+    // This should set the path based on the set of numbers given by
+    // pathParameterization.
+    virtual void
+    SetPath( std::vector< double > const& pathParameterization ) = 0;
+
+    void SetTemperature( double const temperatureValue )
+    { this->temperatureValue = temperatureValue;
+      nonZeroTemperature = ( temperatureValue > 0.0 ); }
 
     size_t NumberOfFields() const{ return numberOfFields; }
 
@@ -36,10 +44,8 @@ namespace VevaciousPlusPlus
     // auxiliary, evaluated at auxiliaryValue.
     double SlopeDotAcceleration( double const auxiliaryValue ) const = 0;
 
-    //
     double TemperatureValue() const{ return temperatureValue; }
 
-    //
     bool NonZeroTemperature() const{ return nonZeroTemperature; }
 
     // This is for debugging.
@@ -51,10 +57,6 @@ namespace VevaciousPlusPlus
 
   protected:
     size_t numberOfFields;
-
-    void SetTemperature( double const temperatureValue )
-    { this->temperatureValue = temperatureValue;
-      nonZeroTemperature = ( temperatureValue > 0.0 ); }
 
 
   private:

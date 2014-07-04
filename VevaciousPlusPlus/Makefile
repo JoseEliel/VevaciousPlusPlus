@@ -92,10 +92,15 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONTUNNELING)/MinuitPathBounceMinimizer.cpp \
  $(BOUNCEACTIONTUNNELING)/MinuitPathPotentialMinimizer.cpp \
  $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
+ $(BOUNCEACTIONTUNNELING)/NodesFromParameterization.cpp \
+ $(BOUNCEACTIONTUNNELING)/NodesOnBisectingPlanes.cpp \
+ $(BOUNCEACTIONTUNNELING)/NodesOnParallelPlanes.cpp \
+ $(BOUNCEACTIONTUNNELING)/NodesOnPlanes.cpp \
  $(BOUNCEACTIONTUNNELING)/OdeintBubbleDerivatives.cpp \
  $(BOUNCEACTIONTUNNELING)/OdeintBubbleObserver.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \
+ $(BOUNCEACTIONTUNNELING)/PolynomialPathThroughNodes.cpp \
  $(BOUNCEACTIONTUNNELING)/SplinePotential.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  $(BOUNCEACTIONTUNNELING)/TunnelPath.cpp \
