@@ -14,20 +14,46 @@
 namespace VevaciousPlusPlus
 {
 
-  class NodesOnParallelPlanes
+  class NodesOnParallelPlanes : public NodesOnPlanes
   {
   public:
-    NodesOnParallelPlanes();
+    NodesOnParallelPlanes( std::vector< double > const& falseVacuum,
+                           std::vector< double > const& trueVacuum,
+                           size_t const numberOfIntermediateNodes );
     virtual ~NodesOnParallelPlanes();
 
 
-    // This sets up all the nodes based on the numbers given in
-    // pathParameterization as a sequence of nodes, repeatedly calling
-    // SetOneNode with a subvector of pathParameterization.
-    virtual void
-    SetAllNodes( std::vector< double > const& pathParameterization );
-
   protected:
+    // This takes nodeParameterization as a vector in the plane with field
+    // referenceField = 0 and projects it onto the plane perpendicular to the
+    // difference vector between the vacua, and adds that to nodeVector.
+    virtual void
+    AddTransformedNode( std::vector< double > const& nodeVector,
+                        std::vector< double > const& startNode,
+                        std::vector< double > const& endNode,
+                     std::vector< double > const& nodeParameterization ) const;
+
+    // This returns the false vacuum node as the false-vacuum-side node of the
+    // pair of nodes from which the node at adjustmentOrderIndex should be set.
+    std::vector< double > const&
+    FalseSideNode( size_t const adjustmentOrderIndex,
+                   std::vector< std::vector< double > > const& nodeSet
+                                                            = pathNodes ) const
+    { return nodeSet.front(); }
+
+    // This returns the true vacuum node as the true-vacuum-side node of the
+    // pair of nodes from which the node at adjustmentOrderIndex should be set.
+    std::vector< double > const&
+    TrueSideNode( size_t const adjustmentOrderIndex,
+                  std::vector< std::vector< double > > const& nodeSet
+                                                       = pathNodes ) const
+    { return nodeSet.back(); }
+
+    // This returns the fraction along the difference vector between the vacua
+    // that nodeIndex corresponds to.
+    double ShiftFraction( size_t const nodeIndex ) const
+    { return ( (double)nodeIndex
+               / (double)( numberOfIntermediateNodes + 1 ) ); }
   };
 
 } /* namespace VevaciousPlusPlus */

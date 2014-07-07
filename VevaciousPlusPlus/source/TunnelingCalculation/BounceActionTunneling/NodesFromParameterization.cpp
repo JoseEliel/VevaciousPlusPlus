@@ -16,10 +16,13 @@ namespace VevaciousPlusPlus
                                      size_t const numberOfIntermediateNodes ) :
     numberOfFields( falseVacuum.size() ),
     numberOfIntermediateNodes( numberOfIntermediateNodes ),
-    falseVacuum( falseVacuum ),
-    trueVacuum( trueVacuum )
+    pathNodes( numberOfIntermediateNodes,
+               std::vector< double >( numberOfFields ) ),
+    zeroParameterization( ( numberOfFields - 1 ),
+                          0.0 )
   {
-    // This constructor is just an initialization list.
+    pathNodes.front() = falseVacuum;
+    pathNodes.back() = trueVacuum;
   }
 
   NodesFromParameterization::~NodesFromParameterization()

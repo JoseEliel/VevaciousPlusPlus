@@ -17,8 +17,7 @@ namespace VevaciousPlusPlus
                                trueVacuum,
                                numberOfIntermediateNodes ),
     referenceField( 0 ),
-    zeroParameterization( ( falseVacuum.size() - 1 ),
-                          0.0 )
+    numberOfParametersPerNode( numberOfFields - 1 )
   {
     // We choose referenceField to be the index of the field with largest
     // magnitude of difference between the vacua.

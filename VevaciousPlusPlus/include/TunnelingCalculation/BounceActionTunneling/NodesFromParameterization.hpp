@@ -22,61 +22,62 @@ namespace VevaciousPlusPlus
     virtual ~NodesFromParameterization();
 
 
-    // This return all the nodes based on the numbers given in
+    // This should return all the nodes based on the numbers given in
     // pathParameterization. The nodes returned should be ordered in the
     // sequence that they are visited in the path from the false vacuum to the
     // true vacuum, with front() being the false vacuum and back() being the
     // true vacuum.
     virtual std::vector< std::vector< double > >
-    PathNodes( std::vector< double > const& pathParameterization ) const = 0;
+    PathNodeSet( std::vector< double > const& pathParameterization ) const = 0;
 
     // This throws an exception by default, but can be over-ridden.
-    virtual std::vector< double > PathNode( size_t const nodeIndex,
-                      std::vector< double > const& nodeParameterization ) const
+    virtual std::vector< double >
+    NodeProposal( size_t const adjustmentOrderIndex,
+                  std::vector< double > const& nodeParameterization ) const
     { throw std::out_of_range( "No functionality to set just one node in"
                                " NodesFromParameterization base class!" ); }
+
+    // This sets pathNodes[ adjustmentOrderIndex ] to be nodeAsVector as long
+    // as adjustmentOrderIndex is >= 1 and <= numberOfIntermediateNodes so that
+    // it doesn't try to overwrite the vacua or anything out of the range of
+    // pathNodes, throwing an out-of-range exception otherwise. It can be
+    // over-ridden if necessary.
+    virtual void SetNodeInAdjustmentOrder( size_t const adjustmentOrderIndex,
+                                   std::vector< double > const& nodeAsVector );
 
 
   protected:
     size_t numberOfFields;
     size_t numberOfIntermediateNodes;
-    std::vector< double > const& falseVacuum;
-    std::vector< double > const& trueVacuum;
-
-
-    // This should return the transformation of nodeInPlane as a vector with
-    // numberOfFields components into a vector perpendicular to vector
-    // difference (endNode - startNode).
-    virtual std::vector< double >
-    TransformNodeInPlane( std::vector< double > const& startNode,
-                          std::vector< double > const& endNode,
-                          std::vector< double > const& nodeInPlane ) const = 0;
+    std::vector< std::vector< double > > pathNodes;
+    std::vector< double > zeroParameterization;
   };
 
 
 
 
-  // This sets pathNodes[ nodeIndex ] to be the vector sum of startNode plus
-  // shiftFraction times the difference between startNode and endNode, plus
-  // nodeInPlane rotated to be perpendicular to the difference between
-  // startNode and endNode.
-  inline std::vector< double > NodesOnPlanes::ProjectPerpendicularToAndShift(
-                                        std::vector< double > const& startNode,
-                                          std::vector< double > const& endNode,
-                                      std::vector< double > const& nodeInPlane,
-                                             double const shiftFraction ) const
+  // This sets pathNodes[ adjustmentOrderIndex ] to be nodeAsVector as long
+  // as adjustmentOrderIndex is >= 1 and <= numberOfIntermediateNodes so that
+  // it doesn't try to overwrite the vacua or anything out of the range of
+  // pathNodes, throwing an out-of-range exception otherwise. It can be
+  // over-ridden if necessary.
+  inline void
+  NodesOnPlanes::SetNodeInAdjustmentOrder( size_t const adjustmentOrderIndex,
+                                    std::vector< double > const& nodeAsVector )
   {
-    std::vector< double > returnNode( TransformNodeInPlane( startNode,
-                                                            endNode,
-                                                            nodeInPlane ) );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
+    if( ( adjustmentOrderIndex > 0 )
+        &&
+        ( adjustmentOrderIndex < ( pathNodes.size() - 1 ) ) )
     {
-      returnNode += ( ( 1.0 - shiftFraction ) * startNode[ fieldIndex ]
-                      + ( shiftFraction * endNode[ fieldIndex ] ) );
+      pathNodes[ adjustmentOrderIndex ] = nodeAsVector;
     }
-    return returnNode;
+    else
+    {
+      std::stringstream errorStream;
+      errorStream << "Can only set nodes 1 to " << numberOfIntermediateNodes
+      << ", not node " << adjustmentOrderIndex << "!";
+      throw std::out_of_range( errorStream.str() );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

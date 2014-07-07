@@ -56,7 +56,7 @@ namespace VevaciousPlusPlus
       Eigen::MatrixXd scaleDependenceMatrix( numberOfScales,
                                              numberOfScales );
       Eigen::VectorXd scaleDependenceVector( numberOfScales );
-      for( unsigned int whichScale( 0 );
+      for( size_t whichScale( 0 );
            whichScale < numberOfScales;
            ++whichScale )
       {
@@ -67,7 +67,7 @@ namespace VevaciousPlusPlus
                                0 ) = 1.0;
         scaleDependenceMatrix( whichScale,
                                1 ) = logarithmOfScale;
-        for( unsigned int whichPower( 2 );
+        for( size_t whichPower( 2 );
              whichPower < numberOfScales;
              ++whichPower )
         {
