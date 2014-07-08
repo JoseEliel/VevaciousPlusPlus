@@ -22,13 +22,14 @@ namespace VevaciousPlusPlus
     virtual ~NodesFromParameterization();
 
 
-    // This should return all the nodes based on the numbers given in
-    // pathParameterization. The nodes returned should be ordered in the
-    // sequence that they are visited in the path from the false vacuum to the
-    // true vacuum, with front() being the false vacuum and back() being the
-    // true vacuum.
-    virtual std::vector< std::vector< double > >
-    PathNodeSet( std::vector< double > const& pathParameterization ) const = 0;
+    // This should put all the nodes based on the numbers given in
+    // pathParameterization into pathNodes, ordered in the sequence that they
+    // are visited in the path from the false vacuum to the true vacuum, with
+    // pathNodes.front() being the false vacuum and pathNodes.back() being the
+    // true vacuum. (It would be nice to just return a new vector, but we're
+    // avoiding relying on C++11-compliant compilers.)
+    virtual void PathNodeSet( std::vector< std::vector< double > >& pathNodes,
+                 std::vector< double > const& pathParameterization ) const = 0;
 
     // This throws an exception by default, but can be over-ridden.
     virtual std::vector< double >
@@ -44,6 +45,11 @@ namespace VevaciousPlusPlus
     // over-ridden if necessary.
     virtual void SetNodeInAdjustmentOrder( size_t const adjustmentOrderIndex,
                                    std::vector< double > const& nodeAsVector );
+
+    size_t NumberOfVaryingNodes() const{ return numberOfIntermediateNodes; }
+
+    virtual size_t NumberOfPathNodes() const
+    { return ( numberOfIntermediateNodes + 2 ); }
 
 
   protected:

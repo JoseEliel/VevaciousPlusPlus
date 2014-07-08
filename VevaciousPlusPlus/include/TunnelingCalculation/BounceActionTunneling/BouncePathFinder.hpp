@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include "TunnelPathFactory.hpp"
 #include "TunnelPath.hpp"
 
 namespace VevaciousPlusPlus
@@ -30,7 +31,7 @@ namespace VevaciousPlusPlus
                            PotentialMinimum const& trueVacuum ) = 0;
 
     // This returns what should be the best path so far.
-    TunnelPath const& CurrentPath() const{ return currentPath; }
+    virtual TunnelPath const& CurrentPath() const{ return *currentPath; }
 
     // This returns true if the last reset or path improvement did not meet
     // the criterion the derived class has that the path cannot be improved any
@@ -47,8 +48,15 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    TunnelPath currentPath;
     bool pathCanBeImproved;
+
+
+    void SetCurrentPathPointer( TunnelPath* currentPath )
+    { delete this->currentPath; this->currentPath = currentPath; }
+
+
+  private:
+    TunnelPath* currentPath;
   };
 
 } /* namespace VevaciousPlusPlus */

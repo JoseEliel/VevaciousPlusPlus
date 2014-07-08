@@ -24,14 +24,16 @@ namespace VevaciousPlusPlus
     ~NodesOnPlanes();
 
 
-    // This returns all the nodes based on the numbers given in
-    // pathParameterization, ordered in the sequence that they are visited in
-    // the path from the false vacuum to the true vacuum, with front() being
-    // the false vacuum and back() being the true vacuum.
-    std::vector< std::vector< double > >
-    PathNodeSet( std::vector< double > const& pathParameterization ) const;
+    // This puts all the nodes based on the numbers given in
+    // pathParameterization into pathNodes, ordered in the sequence that they
+    // are visited in the path from the false vacuum to the true vacuum, with
+    // pathNodes.front() being the false vacuum and pathNodes.back() being the
+    // true vacuum. (It would be nice to just return a new vector, but we're
+    // avoiding relying on C++11-compliant compilers.)
+    void PathNodeSet( std::vector< std::vector< double > >& pathNodes,
+                     std::vector< double > const& pathParameterization ) const;
 
-    // This returns the vector which would represent the node at
+    // This sets nodeVector to be the vector which would represent the node at
     // pathNodes[ adjustmentOrderIndex ] if it were to be set based on
     // nodeParameterization and the rest of the nodes in pathNodes, unless it
     // would mean moving the true vacuum or false vacuum, in which case an
@@ -40,9 +42,14 @@ namespace VevaciousPlusPlus
     // nodeParameterization being taken to be a vector on a plane with the
     // field with index referenceField being zero, through
     // ProjectPerpendicularToAndShift.
-    virtual std::vector< double >
-    NodeProposal( size_t const adjustmentOrderIndex,
-                  std::vector< double > const& nodeParameterization ) const;
+    virtual void NodeProposal( std::vector< double >& nodeVector,
+                               size_t const adjustmentOrderIndex,
+                      std::vector< double > const& nodeParameterization ) const
+    { TransformPerpendicularToAndShift( nodeVector,
+                                        FalseSideNode( adjustmentOrderIndex ),
+                                        TrueSideNode( adjustmentOrderIndex ),
+                                        nodeParameterization,
+                                     ShiftFraction( adjustmentOrderIndex ) ); }
 
 
   protected:
@@ -92,14 +99,17 @@ namespace VevaciousPlusPlus
 
 
 
-  // This returns all the nodes based on the numbers given in
-  // pathParameterization, ordered in the sequence that they are visited in
-  // the path from the false vacuum to the true vacuum, with front() being
-  // the false vacuum and back() being the true vacuum.
-  std::vector< std::vector< double > > NodesOnPlanes::PathNodeSet(
+  // This puts all the nodes based on the numbers given in
+  // pathParameterization into pathNodes, ordered in the sequence that they
+  // are visited in the path from the false vacuum to the true vacuum, with
+  // pathNodes.front() being the false vacuum and pathNodes.back() being the
+  // true vacuum. (It would be nice to just return a new vector, but we're
+  // avoiding relying on C++11-compliant compilers.)
+  void
+  NodesOnPlanes::PathNodeSet( std::vector< std::vector< double > >& pathNodes,
                       std::vector< double > const& pathParameterization ) const
   {
-    std::vector< std::vector< double > > nodeSet( pathNodes );
+    pathNodes = this->pathNodes;
     std::vector< double > nodeParameterization( numberOfParametersPerNode );
     std::vector< double >::const_iterator
     currentParameterizationStart( pathParameterization.begin() );
@@ -109,36 +119,13 @@ namespace VevaciousPlusPlus
     {
       nodeParameterization.assign( currentParameterizationStart,
                 ( currentParameterizationStart + numberOfParametersPerNode ) );
-      TransformPerpendicularToAndShift( nodeSet[ nodeIndex ],
+      TransformPerpendicularToAndShift( pathNodes[ nodeIndex ],
                                         FalseSideNode( nodeIndex ),
                                         TrueSideNode( nodeIndex ),
                                         nodeParameterization,
                                         ShiftFraction( nodeIndex ) );
       currentParameterizationStart += numberOfParametersPerNode;
     }
-    return nodeSet;
-  }
-
-  // This returns the vector which would represent the node at
-  // pathNodes[ adjustmentOrderIndex ] if it were to be set based on
-  // nodeParameterization and the rest of the nodes in pathNodes, unless it
-  // would mean moving the true vacuum or false vacuum, in which case an
-  // exception is thrown. The node is set to be on a plane perpendicular to
-  // two other nodes (decided by the derived class), by
-  // nodeParameterization being taken to be a vector on a plane with the
-  // field with index referenceField being zero, through
-  // ProjectPerpendicularToAndShift.
-  inline std::vector< double >
-  NodesOnPlanes::NodeProposal( size_t const adjustmentOrderIndex,
-                      std::vector< double > const& nodeParameterization ) const
-  {
-    std::vector< double > returnVector( numberOfFields );
-    TransformPerpendicularToAndShift( returnVector,
-                                      FalseSideNode( adjustmentOrderIndex ),
-                                      TrueSideNode( adjustmentOrderIndex ),
-                                      nodeParameterization,
-                                      ShiftFraction( adjustmentOrderIndex ) );
-    return returnVector;
   }
 
 

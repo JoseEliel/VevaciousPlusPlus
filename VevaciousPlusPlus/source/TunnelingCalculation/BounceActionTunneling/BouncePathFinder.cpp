@@ -10,15 +10,16 @@
 namespace VevaciousPlusPlus
 {
 
-  BouncePathFinder::BouncePathFinder()
+  BouncePathFinder::BouncePathFinder() :
+    pathCanBeImproved( true ),
+    currentPath( NULL )
   {
-    // TODO Auto-generated constructor stub
-
+    // This constructor is just an initialization list.
   }
 
   BouncePathFinder::~BouncePathFinder()
   {
-    // TODO Auto-generated destructor stub
+    delete currentPath;
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -10,15 +10,18 @@
 namespace VevaciousPlusPlus
 {
 
-  TunnelPath::TunnelPath()
+  TunnelPath::TunnelPath( size_t const numberOfFields,
+                          double const temperatureValue ) :
+    numberOfFields( numberOfFields ),
+    temperatureValue( temperatureValue ),
+    nonZeroTemperature( temperatureValue > 0.0 )
   {
-    // TODO Auto-generated constructor stub
-
+    // This constructor is just an initialization list.
   }
 
   TunnelPath::~TunnelPath()
   {
-    // TODO Auto-generated destructor stub
+    // This does nothing.
   }
 
 } /* namespace VevaciousPlusPlus */
