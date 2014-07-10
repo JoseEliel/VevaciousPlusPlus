@@ -1,12 +1,12 @@
 /*
- * PolynomialPathThroughNodes.hpp
+ * PolynomialThroughNodes.hpp
  *
  *  Created on: Jul 4, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef POLYNOMIALPATHTHROUGHNODES_HPP_
-#define POLYNOMIALPATHTHROUGHNODES_HPP_
+#ifndef POLYNOMIALTHROUGHNODES_HPP_
+#define POLYNOMIALTHROUGHNODES_HPP_
 
 #include "CommonIncludes.hpp"
 #include "TunnelPath.hpp"
@@ -16,14 +16,14 @@
 namespace VevaciousPlusPlus
 {
 
-  class PolynomialPathThroughNodes : public TunnelPath
+  class PolynomialThroughNodes : public TunnelPath
   {
   public:
-    PolynomialPathThroughNodes(
-                       std::vector< std::vector< double > > const& pathNodes,
-                                double const pathTemperature,
-                                Eigen::MatrixXd const& pathStepsInverse );
-    virtual ~PolynomialPathThroughNodes();
+    PolynomialThroughNodes(
+                         std::vector< std::vector< double > > const& pathNodes,
+                            double const pathTemperature,
+                            Eigen::MatrixXd const& pathStepsInverse );
+    virtual ~PolynomialThroughNodes();
 
 
     // This fills fieldConfiguration with the values that the fields
@@ -56,7 +56,7 @@ namespace VevaciousPlusPlus
 
   // This fills fieldConfiguration with the values that the fields
   // should have when the path auxiliary is given by auxiliaryValue.
-  inline void PolynomialPathThroughNodes::PutOnPathAt(
+  inline void PolynomialThroughNodes::PutOnPathAt(
                                      std::vector< double >& fieldConfiguration,
                                             double const auxiliaryValue ) const
   {
@@ -72,7 +72,7 @@ namespace VevaciousPlusPlus
   // This returns the dot product with itself of the derivative of the
   // field vector with respect to the path auxiliary evaluated at
   // auxiliaryValue.
-  inline double PolynomialPathThroughNodes::SlopeSquared(
+  inline double PolynomialThroughNodes::SlopeSquared(
                                             double const auxiliaryValue ) const
   {
     double returnValue( 0.0 );
@@ -90,8 +90,8 @@ namespace VevaciousPlusPlus
   // This returns the dot product of the first derivative of the field
   // vector with the second derivative, both with respect to the path
   // auxiliary, evaluated at auxiliaryValue.
-  inline double PolynomialPathThroughNodes::SlopeDotAcceleration(
-      double const auxiliaryValue ) const
+  inline double PolynomialThroughNodes::SlopeDotAcceleration(
+                                            double const auxiliaryValue ) const
   {
     double returnValue( 0.0 );
     for( size_t fieldIndex( 0 );
@@ -105,4 +105,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* POLYNOMIALPATHTHROUGHNODES_HPP_ */
+#endif /* POLYNOMIALTHROUGHNODES_HPP_ */

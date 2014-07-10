@@ -28,9 +28,14 @@ namespace VevaciousPlusPlus
     }
   }
 
-  MinuitMinimum::~MinuitMinimum()
+  MinuitMinimum::MinuitMinimum( std::vector< double > const& variableValues,
+                                std::vector< double > const& variableErrors ) :
+    variableValues( variableValues ),
+    variableErrors( variableErrors ),
+    functionValue( NAN ),
+    functionError( NAN )
   {
-    // This does nothing.
+    // This constructor is just an initialization list.
   }
 
   MinuitMinimum::MinuitMinimum() :
@@ -40,6 +45,20 @@ namespace VevaciousPlusPlus
     functionError( NAN )
   {
     // This constructor is just an initialization list.
+  }
+
+  MinuitMinimum::MinuitMinimum( MinuitMinimum const& copySource ) :
+    variableValues( copySource.variableValues ),
+    variableErrors( copySource.variableErrors ),
+    functionValue( copySource.functionValue ),
+    functionError( copySource.functionError )
+  {
+    // This constructor is just an initialization list.
+  }
+
+  MinuitMinimum::~MinuitMinimum()
+  {
+    // This does nothing.
   }
 
 } /* namespace VevaciousPlusPlus */

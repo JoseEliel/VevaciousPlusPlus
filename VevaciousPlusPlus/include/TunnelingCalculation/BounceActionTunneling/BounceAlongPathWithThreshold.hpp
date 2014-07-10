@@ -34,61 +34,26 @@ namespace VevaciousPlusPlus
     size_t thermalIntegrationResolution;
 
 
-    // This should return either the dimensionless bounce action integrated
-    // over four dimensions (for zero temperature) or the dimensionful bounce
-    // action integrated over three dimensions (for non-zero temperature) for
+    // This returns either the dimensionless bounce action integrated over four
+    // dimensions (for zero temperature) or the dimensionful bounce action
+    // integrated over three dimensions (for non-zero temperature) for
     // tunneling from falseVacuum to trueVacuum at temperature
-    // tunnelingTemperature.
+    // tunnelingTemperature, or an upper bound if the upper bound drops below
+    // actionThreshold during the course of the calculation. The vacua are
+    // assumed to already be the minima at tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
                                  double const tunnelingTemperature ) const;
 
-    // This should set thermalSurvivalProbability and
-    // dominantTemperatureInGigaElectronVolts appropriately.
+    // This sets thermalSurvivalProbability by numerically integrating from the
+    // critical temperature for tunneling to be possible down to T = 0 unless
+    // the integral already passes a threshold, and sets
+    // dominantTemperatureInGigaElectronVolts to be the temperature with the
+    // lowest survival probability.
     virtual void
     CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
                                PotentialMinimum const& trueVacuum );
   };
-
-
-
-
-  // This returns either the dimensionless bounce action integrated over four
-  // dimensions (for zero temperature) or the dimensionful bounce action
-  // integrated over three dimensions (for non-zero temperature) for tunneling
-  // from falseVacuum to trueVacuum at temperature tunnelingTemperature, or an
-  // upper bound if the upper bound drops below actionThreshold during the
-  // course of the calculation. The vacua are assumed to already be the minima
-  // at tunnelingTemperature.
-  inline double BounceAlongPathWithThreshold::BounceAction(
-                                           PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
-                                      double const tunnelingTemperature ) const
-  {
-    actionCalculator->ResetVacua( falseVacuum,
-                                  trueVacuum );
-    if( tunnelingTemperature <= 0.0 )
-    {
-      double const squareRootOfSolitonicFactor(
-                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
-                                                                trueVacuum ) );
-      actionThreshold = log( -( squareRootOfSolitonicFactor
-                                * squareRootOfSolitonicFactor
-                                * fourVolumeOfKnownUniverseOverGevFourth )
-                              / log( survivalProbabilityThreshold ) );
-    }
-    pathFinder->SetVacua( falseVacuum,
-                          trueVacuum );
-    double bounceAction( (*actionCalculator)( pathFinder->CurrentPath() ) );
-    while( ( bounceAction > actionThreshold )
-           &&
-           pathFinder->PathCanBeImproved() )
-    {
-      pathFinder->ImprovePath();
-      bounceAction = (*actionCalculator)( pathFinder->CurrentPath() );
-    }
-    return bounceAction;
-  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* BOUNCEALONGPATHWITHTHRESHOLD_HPP_ */

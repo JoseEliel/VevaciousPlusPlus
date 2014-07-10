@@ -1,16 +1,16 @@
 /*
- * PolynomialPathThroughNodesFactory.cpp
+ * PolynomialThroughNodesFactory.cpp
  *
  *  Created on: Jul 8, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/PolynomialPathThroughNodesFactory.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/PolynomialThroughNodesFactory.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  PolynomialPathThroughNodesFactory::PolynomialPathThroughNodesFactory(
+  PolynomialThroughNodesFactory::PolynomialThroughNodesFactory(
                                       std::vector< double > const& falseVacuum,
                                        std::vector< double > const& trueVacuum,
                                             std::string const& xmlArguments ) :
@@ -61,7 +61,7 @@ namespace VevaciousPlusPlus
     pathStepsInverse = pathSteps.inverse();
   }
 
-  PolynomialPathThroughNodesFactory::~PolynomialPathThroughNodesFactory()
+  PolynomialThroughNodesFactory::~PolynomialThroughNodesFactory()
   {
     // This does nothing.
   }

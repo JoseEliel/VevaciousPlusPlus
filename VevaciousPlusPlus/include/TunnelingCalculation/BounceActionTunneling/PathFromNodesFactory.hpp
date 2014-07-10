@@ -18,11 +18,15 @@ namespace VevaciousPlusPlus
   class PathFromNodesFactory : public TunnelPathFactory
   {
   public:
-    PathFromNodesFactory( std::vector< double > const& falseVacuum,
-                          std::vector< double > const& trueVacuum,
-                          std::string const& xmlArguments );
+    PathFromNodesFactory( std::string const& xmlArguments );
     virtual ~PathFromNodesFactory();
 
+
+    // This does something.
+    void SetVacua( PotentialMinimum const& falseVacuum,
+                   PotentialMinimum const& trueVacuum,
+                   TunnelPath const* startingPath = NULL,
+                   double const pathTemperature = 0.0 );
 
     // This gets the nodes from nodesFromParameterization and then calls
     // operator()( std::vector< std::vector< double > > const& pathNodes ).

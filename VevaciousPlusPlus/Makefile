@@ -87,8 +87,9 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONTUNNELING)/BubbleProfile.cpp \
  $(BOUNCEACTIONTUNNELING)/BubbleRadialValueDescription.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
- $(BOUNCEACTIONTUNNELING)/LinearSplinePathThroughNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/LinearSplinePathThroughNodesFactory.cpp \
+ $(BOUNCEACTIONTUNNELING)/LinearSplinePathSegment.cpp \
+ $(BOUNCEACTIONTUNNELING)/LinearSplineThroughNodes.cpp \
+ $(BOUNCEACTIONTUNNELING)/LinearSplineThroughNodesFactory.cpp \
  $(BOUNCEACTIONTUNNELING)/MinuitBounceActionMinimizer.cpp \
  $(BOUNCEACTIONTUNNELING)/MinuitNodePotentialMinimizer.cpp \
  $(BOUNCEACTIONTUNNELING)/MinuitPathBounceMinimizer.cpp \
@@ -103,10 +104,10 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFromNodesFactory.cpp \
- $(BOUNCEACTIONTUNNELING)/PolynomialPathThroughNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/PolynomialPathThroughNodesFactory.cpp \
- $(BOUNCEACTIONTUNNELING)/QuadraticSplinePathThroughNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/QuadraticSplinePathThroughNodesFactory.cpp \
+ $(BOUNCEACTIONTUNNELING)/PolynomialThroughNodes.cpp \
+ $(BOUNCEACTIONTUNNELING)/PolynomialThroughNodesFactory.cpp \
+ $(BOUNCEACTIONTUNNELING)/QuadraticSplineThroughNodes.cpp \
+ $(BOUNCEACTIONTUNNELING)/QuadraticSplineThroughNodesFactory.cpp \
  $(BOUNCEACTIONTUNNELING)/SplinePotential.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  $(BOUNCEACTIONTUNNELING)/TunnelPath.cpp \

@@ -15,8 +15,16 @@ namespace VevaciousPlusPlus
   {
   public:
     TunnelPath( size_t const numberOfFields,
+                std::vector< double > const& pathParameterization,
                 double const temperatureValue = 0.0 );
     virtual ~TunnelPath();
+
+
+    std::vector< double >&
+    PathParameterization(){ return pathParameterization; }
+
+    std::vector< double > const&
+    PathParameterization() const{ return pathParameterization; }
 
     size_t NumberOfFields() const{ return numberOfFields; }
 
@@ -48,6 +56,7 @@ namespace VevaciousPlusPlus
 
   protected:
     size_t const numberOfFields;
+    std::vector< double > pathParameterization;
 
     void SetTemperature( double const temperatureValue )
     { this->temperatureValue = temperatureValue;

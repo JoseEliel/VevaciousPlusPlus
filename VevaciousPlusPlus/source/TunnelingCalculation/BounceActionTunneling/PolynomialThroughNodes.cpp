@@ -1,16 +1,16 @@
 /*
- * PolynomialPathThroughNodes.cpp
+ * PolynomialThroughNodes.cpp
  *
  *  Created on: Jul 4, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/PolynomialPathThroughNodes.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/PolynomialThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  PolynomialPathThroughNodes::PolynomialPathThroughNodes(
+  PolynomialThroughNodes::PolynomialThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
                                                   double const pathTemperature,
                                     Eigen::MatrixXd const& pathStepsInverse ) :
@@ -56,14 +56,14 @@ namespace VevaciousPlusPlus
     }
   }
 
-  PolynomialPathThroughNodes::~PolynomialPathThroughNodes()
+  PolynomialThroughNodes::~PolynomialThroughNodes()
   {
     // This does nothing.
   }
 
 
   // This is for debugging.
-  std::string PolynomialPathThroughNodes::AsDebuggingString() const
+  std::string PolynomialThroughNodes::AsDebuggingString() const
   {
     std::stringstream returnStream;
     returnStream

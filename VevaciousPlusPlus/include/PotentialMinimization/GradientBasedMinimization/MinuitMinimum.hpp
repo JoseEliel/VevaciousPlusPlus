@@ -21,11 +21,14 @@ namespace VevaciousPlusPlus
   public:
     MinuitMinimum( size_t numberOfVariables,
                    ROOT::Minuit2::FunctionMinimum const& minuitMinimum );
-    virtual
-    ~MinuitMinimum();
+    MinuitMinimum( std::vector< double > const& variableValues,
+                   std::vector< double > const& variableErrors );
+    MinuitMinimum();
+    MinuitMinimum( MinuitMinimum const& copySource );
+    virtual ~MinuitMinimum();
 
-    std::vector< double >& VariableValues()
-    { return variableValues; }
+
+    std::vector< double >& VariableValues(){ return variableValues; }
     std::vector< double > const& VariableValues() const
     { return variableValues; }
 
@@ -45,8 +48,6 @@ namespace VevaciousPlusPlus
     std::vector< double > variableErrors;
     double functionValue;
     double functionError;
-
-    MinuitMinimum();
   };
 
 

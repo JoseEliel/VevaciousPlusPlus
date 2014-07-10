@@ -26,9 +26,11 @@ namespace VevaciousPlusPlus
 
     // This should reset the BouncePathFinder so that it sets up currentPath as
     // its initial path between the given vacua. It should also reset
-    // pathCanBeImproved.
-    virtual void SetVacua( PotentialMinimum const& falseVacuum,
-                           PotentialMinimum const& trueVacuum ) = 0;
+    // pathCanBeImproved and set pathTemperature appropriately.
+    virtual void SetInitialPath( PotentialMinimum const& falseVacuum,
+                                 PotentialMinimum const& trueVacuum,
+                                 TunnelPath const* startingPath = NULL,
+                                 double const pathTemperature = 0.0 ) = 0;
 
     // This returns what should be the best path so far.
     virtual TunnelPath const& CurrentPath() const{ return *currentPath; }
@@ -48,9 +50,13 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    double pathTemperature;
     bool pathCanBeImproved;
 
 
+    // This would be unnecessary if we were to require a C++11-compliant
+    // compiler, because then currentPath could be a
+    // std::unique_ptr< TunnelPath > and memory management would be automatic.
     void SetCurrentPathPointer( TunnelPath* currentPath )
     { delete this->currentPath; this->currentPath = currentPath; }
 

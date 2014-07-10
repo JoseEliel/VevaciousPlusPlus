@@ -51,6 +51,21 @@ namespace VevaciousPlusPlus
                                         nodeParameterization,
                                      ShiftFraction( adjustmentOrderIndex ) ); }
 
+    // If the derived class can vary one node at a time, this should set
+    // nodeParameterization to be the sub-vector of pathParameterization which
+    // parameterizes the node at index nodeIndex. This throws an exception by
+    // default.
+    virtual void ExtractSingleNodeParameterization(
+                                   std::vector< double >& nodeParameterization,
+                                                    size_t const nodeIndex,
+                     std::vector< double > const& pathParameterization ) const;
+
+    // If the derived class can vary one node at a time, this should set
+    // nodeParameterization to be appropriate for a set of initial step sizes
+    // for Minuit2. This throws an exception by default.
+    virtual void
+    SetInitialStepSizes( std::vector< double >& nodeParameterization ) const;
+
 
   protected:
     size_t referenceField;

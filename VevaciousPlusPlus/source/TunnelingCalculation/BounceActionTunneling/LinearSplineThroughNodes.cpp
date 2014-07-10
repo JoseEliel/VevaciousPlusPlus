@@ -1,16 +1,16 @@
 /*
- * LinearSplinePathThroughNodes.cpp
+ * LinearSplineThroughNodes.cpp
  *
  *  Created on: Jul 8, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/LinearSplinePathThroughNodes.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/LinearSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  LinearSplinePathThroughNodes::LinearSplinePathThroughNodes(
+  LinearSplineThroughNodes::LinearSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
                                                double const pathTemperature ) :
     TunnelPath( pathNodes.front().size(),
@@ -49,9 +49,9 @@ namespace VevaciousPlusPlus
     }
   }
 
-  LinearSplinePathThroughNodes::~LinearSplinePathThroughNodes()
+  LinearSplineThroughNodes::~LinearSplineThroughNodes()
   {
-    // TODO Auto-generated destructor stub
+    // This does nothing.
   }
 
 } /* namespace VevaciousPlusPlus */

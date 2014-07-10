@@ -11,8 +11,6 @@ namespace VevaciousPlusPlus
 {
 
   PathFromNodesFactory::PathFromNodesFactory(
-                                      std::vector< double > const& falseVacuum,
-                                       std::vector< double > const& trueVacuum,
                                             std::string const& xmlArguments ) :
     TunnelPathFactory( trueVacuum.size() ),
     nodesFromParameterization( NULL )

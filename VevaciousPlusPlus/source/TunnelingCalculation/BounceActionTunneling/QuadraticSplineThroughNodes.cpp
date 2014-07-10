@@ -1,16 +1,16 @@
 /*
- * QuadraticSplinePathThroughNodes.cpp
+ * QuadraticSplineThroughNodes.cpp
  *
  *  Created on: Jul 8, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/QuadraticSplinePathThroughNodes.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/QuadraticSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  QuadraticSplinePathThroughNodes::QuadraticSplinePathThroughNodes(
+  QuadraticSplineThroughNodes::QuadraticSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
                                                double const pathTemperature ) :
     TunnelPath( pathNodes.front().size(),
@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
     }
   }
 
-  QuadraticSplinePathThroughNodes::~QuadraticSplinePathThroughNodes()
+  QuadraticSplineThroughNodes::~QuadraticSplineThroughNodes()
   {
     // This does nothing.
   }

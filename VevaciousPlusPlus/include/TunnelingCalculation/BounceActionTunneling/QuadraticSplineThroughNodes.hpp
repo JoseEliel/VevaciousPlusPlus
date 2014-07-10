@@ -1,12 +1,12 @@
 /*
- * QuadraticSplinePathThroughNodes.hpp
+ * QuadraticSplineThroughNodes.hpp
  *
  *  Created on: Jul 8, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef QUADRATICSPLINEPATHTHROUGHNODES_HPP_
-#define QUADRATICSPLINEPATHTHROUGHNODES_HPP_
+#ifndef QUADRATICSPLINETHROUGHNODES_HPP_
+#define QUADRATICSPLINETHROUGHNODES_HPP_
 
 #include "CommonIncludes.hpp"
 #include "TunnelPath.hpp"
@@ -16,13 +16,13 @@
 namespace VevaciousPlusPlus
 {
 
-  class QuadraticSplinePathThroughNodes : public TunnelPath
+  class QuadraticSplineThroughNodes : public TunnelPath
   {
   public:
-    QuadraticSplinePathThroughNodes(
+    QuadraticSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
-                                     double const pathTemperature );
-    virtual ~QuadraticSplinePathThroughNodes();
+                                 double const pathTemperature );
+    virtual ~QuadraticSplineThroughNodes();
 
 
     // This fills fieldConfiguration with the values that the fields
@@ -64,7 +64,7 @@ namespace VevaciousPlusPlus
 
   // This fills fieldConfiguration with the values that the fields
   // should have when the path auxiliary is given by auxiliaryValue.
-  inline void QuadraticSplinePathThroughNodes::PutOnPathAt(
+  inline void QuadraticSplineThroughNodes::PutOnPathAt(
                                      std::vector< double >& fieldConfiguration,
                                             double const auxiliaryValue ) const
   {
@@ -77,7 +77,7 @@ namespace VevaciousPlusPlus
   // This returns the dot product with itself of the derivative of the
   // field vector with respect to the path auxiliary evaluated at
   // auxiliaryValue.
-  double QuadraticSplinePathThroughNodes::SlopeSquared(
+  double QuadraticSplineThroughNodes::SlopeSquared(
                                             double const auxiliaryValue ) const
   {
     std::pair< size_t, double > const
@@ -89,7 +89,7 @@ namespace VevaciousPlusPlus
   // This returns the dot product of the first derivative of the field
   // vector with the second derivative, both with respect to the path
   // auxiliary, evaluated at auxiliaryValue.
-  double QuadraticSplinePathThroughNodes::SlopeDotAcceleration(
+  double QuadraticSplineThroughNodes::SlopeDotAcceleration(
                                             double const auxiliaryValue ) const
   {
     std::pair< size_t, double > const
@@ -102,7 +102,7 @@ namespace VevaciousPlusPlus
   // auxiliaryValue along with the value of the auxiliary value along the
   // segment.
   inline std::pair< size_t, double >
-  QuadraticSplinePathThroughNodes::SegmentAuxiliary(
+  QuadraticSplineThroughNodes::SegmentAuxiliary(
                                             double const auxiliaryValue ) const
   {
     size_t const segmentIndex( auxiliaryValue * inverseSegmentLength );
@@ -111,7 +111,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is for debugging.
-  inline std::string QuadraticSplinePathThroughNodes::AsDebuggingString() const
+  inline std::string QuadraticSplineThroughNodes::AsDebuggingString() const
   {
     std::stringstream returnStream;
     returnStream << "{ ";
@@ -131,4 +131,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* QUADRATICSPLINEPATHTHROUGHNODES_HPP_ */
+#endif /* QUADRATICSPLINETHROUGHNODES_HPP_ */

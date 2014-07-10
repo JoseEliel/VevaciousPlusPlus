@@ -1,12 +1,12 @@
 /*
- * LinearSplinePathThroughNodes.hpp
+ * LinearSplineThroughNodes.hpp
  *
  *  Created on: Jul 8, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef LINEARSPLINEPATHTHROUGHNODES_HPP_
-#define LINEARSPLINEPATHTHROUGHNODES_HPP_
+#ifndef LINEARSPLINETHROUGHNODES_HPP_
+#define LINEARSPLINETHROUGHNODES_HPP_
 
 #include "CommonIncludes.hpp"
 #include "TunnelPath.hpp"
@@ -14,13 +14,13 @@
 namespace VevaciousPlusPlus
 {
 
-  class LinearSplinePathThroughNodes : public TunnelPath
+  class LinearSplineThroughNodes : public TunnelPath
   {
   public:
-    LinearSplinePathThroughNodes(
+    LinearSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
-                                  double const pathTemperature );
-    virtual ~LinearSplinePathThroughNodes();
+                              double const pathTemperature );
+    virtual ~LinearSplineThroughNodes();
 
 
     // This fills fieldConfiguration with the values that the fields
@@ -49,10 +49,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    // We store the path in QuadraticSplinePathSegments, but keep the quadratic
-    // coefficients zero and don't use the QuadraticSplinePathSegment functions
-    // for the slope or its rate of change.
-    std::vector< QuadraticSplinePathSegment > pathSegments;
+    std::vector< LinearSplinePathSegment > pathSegments;
 
 
     // This gives the index for which path segment is correct for
@@ -67,7 +64,7 @@ namespace VevaciousPlusPlus
 
   // This fills fieldConfiguration with the values that the fields
   // should have when the path auxiliary is given by auxiliaryValue.
-  inline void LinearSplinePathThroughNodes::PutOnPathAt(
+  inline void LinearSplineThroughNodes::PutOnPathAt(
                                      std::vector< double >& fieldConfiguration,
                                             double const auxiliaryValue ) const
   {
@@ -93,7 +90,7 @@ namespace VevaciousPlusPlus
   // auxiliaryValue along with the value of the auxiliary value along the
   // segment.
   inline std::pair< size_t, double >
-  LinearSplinePathThroughNodes::SegmentAuxiliary(
+  LinearSplineThroughNodes::SegmentAuxiliary(
                                             double const auxiliaryValue ) const
   {
     if( auxiliaryValue < 0.0 )
@@ -118,7 +115,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is for debugging.
-  inline std::string LinearSplinePathThroughNodes::AsDebuggingString() const
+  inline std::string LinearSplineThroughNodes::AsDebuggingString() const
   {
     std::stringstream returnStream;
     returnStream << "{ ";
@@ -140,4 +137,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* LINEARSPLINEPATHTHROUGHNODES_HPP_ */
+#endif /* LINEARSPLINETHROUGHNODES_HPP_ */

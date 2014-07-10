@@ -82,8 +82,49 @@ namespace VevaciousPlusPlus
     delete pathFinder;
   }
 
-  // This should set thermalSurvivalProbability and
-  // dominantTemperatureInGigaElectronVolts appropriately.
+
+  // This returns either the dimensionless bounce action integrated over four
+  // dimensions (for zero temperature) or the dimensionful bounce action
+  // integrated over three dimensions (for non-zero temperature) for tunneling
+  // from falseVacuum to trueVacuum at temperature tunnelingTemperature, or an
+  // upper bound if the upper bound drops below actionThreshold during the
+  // course of the calculation. The vacua are assumed to already be the minima
+  // at tunnelingTemperature.
+  double BounceAlongPathWithThreshold::BounceAction(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                      double const tunnelingTemperature ) const
+  {
+    actionCalculator->ResetVacua( falseVacuum,
+                                  trueVacuum );
+    if( tunnelingTemperature <= 0.0 )
+    {
+      double const squareRootOfSolitonicFactor(
+                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
+                                                                trueVacuum ) );
+      actionThreshold = log( -( squareRootOfSolitonicFactor
+                                * squareRootOfSolitonicFactor
+                                * fourVolumeOfKnownUniverseOverGevFourth )
+                              / log( survivalProbabilityThreshold ) );
+    }
+    pathFinder->SetInitialPath( falseVacuum,
+                          trueVacuum );
+    double bounceAction( (*actionCalculator)( pathFinder->CurrentPath() ) );
+    while( ( bounceAction > actionThreshold )
+           &&
+           pathFinder->PathCanBeImproved() )
+    {
+      pathFinder->ImprovePath();
+      bounceAction = (*actionCalculator)( pathFinder->CurrentPath() );
+    }
+    return bounceAction;
+  }
+
+  // This sets thermalSurvivalProbability by numerically integrating from the
+  // critical temperature for tunneling to be possible down to T = 0 unless
+  // the integral already passes a threshold, and sets
+  // dominantTemperatureInGigaElectronVolts to be the temperature with the
+  // lowest survival probability.
   void BounceAlongPathWithThreshold::CalculateThermalTunneling(
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
