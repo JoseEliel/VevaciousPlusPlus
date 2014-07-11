@@ -16,8 +16,8 @@
  -->
  
   <InitializationFile>
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/bin/VevaciousPlusPlusObjectInitialization.xml -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/bin/VevaciousPlusPlusObjectInitialization.xml
+  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml -->
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml
   </InitializationFile>
   
   <slha>

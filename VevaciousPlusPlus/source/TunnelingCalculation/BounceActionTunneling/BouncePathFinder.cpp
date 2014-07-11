@@ -11,6 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   BouncePathFinder::BouncePathFinder() :
+    pathTemperature( 0.0 ),
     pathCanBeImproved( true ),
     currentPath( NULL )
   {

@@ -33,6 +33,13 @@ namespace VevaciousPlusPlus
     void PathNodeSet( std::vector< std::vector< double > >& pathNodes,
                      std::vector< double > const& pathParameterization ) const;
 
+    // This sets pathParameterization to be the set of zero nodes in planes,
+    // and initialStepSizes to be the same size, with each element being half
+    // the Euclidean length of the difference between the vacua in field space.
+    virtual void SetInitialParameterizationAndStepSizes(
+                                   std::vector< double >& pathParameterization,
+                               std::vector< double >& initialStepSizes ) const;
+
     // This sets nodeVector to be the vector which would represent the node at
     // pathNodes[ adjustmentOrderIndex ] if it were to be set based on
     // nodeParameterization and the rest of the nodes in pathNodes, unless it
@@ -51,20 +58,21 @@ namespace VevaciousPlusPlus
                                         nodeParameterization,
                                      ShiftFraction( adjustmentOrderIndex ) ); }
 
-    // If the derived class can vary one node at a time, this should set
-    // nodeParameterization to be the sub-vector of pathParameterization which
-    // parameterizes the node at index nodeIndex. This throws an exception by
-    // default.
+    // This sets nodeParameterization to be the sub-vector of
+    // pathParameterization which parameterizes the node at index nodeIndex.
     virtual void ExtractSingleNodeParameterization(
                                    std::vector< double >& nodeParameterization,
                                                     size_t const nodeIndex,
-                     std::vector< double > const& pathParameterization ) const;
+                     std::vector< double > const& pathParameterization ) const
+    { nodeParameterization.assign( ( pathParameterization.begin()
+                                 + ( nodeIndex * numberOfParametersPerNode ) ),
+                                   ( pathParameterization.begin()
+                     + ( ( nodeIndex + 1 ) * numberOfParametersPerNode ) ) ); }
 
-    // If the derived class can vary one node at a time, this should set
-    // nodeParameterization to be appropriate for a set of initial step sizes
-    // for Minuit2. This throws an exception by default.
-    virtual void
-    SetInitialStepSizes( std::vector< double >& nodeParameterization ) const;
+    // This sets nodeParameterization to be appropriate for a set of initial
+    // step sizes for Minuit2. This throws an exception by default.
+    virtual void SetSingleNodeStepSizes(
+                               std::vector< double >& initialStepSizes ) const;
 
 
   protected:
@@ -143,6 +151,48 @@ namespace VevaciousPlusPlus
     }
   }
 
+  // This sets pathParameterization to be the set of zero nodes in planes,
+  // and initialStepSizes to be the same size, with each element being half
+  // the Euclidean length of the difference between the vacua in field space.
+  inline void NodesOnPlanes::SetInitialParameterizationAndStepSizes(
+                                  std::vector< double >& pathParameterization,
+                                std::vector< double >& initialStepSizes ) const
+  {
+    pathParameterization.assign( ( numberOfIntermediateNodes
+                                   * numberOfParametersPerNode ),
+                                 0.0 );
+    double fieldLengthSquared( 0.0 );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      double const fieldDifference( pathNodes.back()[ fieldIndex ]
+                                    - pathNodes.front()[ fieldIndex ] );
+      fieldLengthSquared += ( fieldDifference * fieldDifference );
+    }
+    initialStepSizes.assign( ( numberOfIntermediateNodes
+                               * numberOfParametersPerNode ),
+                              ( 0.5 * sqrt( fieldLengthSquared ) ) );
+  }
+
+  // This sets nodeParameterization to be numberOfParametersPerNode elements,
+  // each being half the Euclidean length of the difference between the vacua
+  // in field space.
+  inline void NodesOnPlanes::SetSingleNodeStepSizes(
+                                std::vector< double >& initialStepSizes ) const
+  {
+    double fieldLengthSquared( 0.0 );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      double const fieldDifference( pathNodes.back()[ fieldIndex ]
+                                    - pathNodes.front()[ fieldIndex ] );
+      fieldLengthSquared += ( fieldDifference * fieldDifference );
+    }
+    initialStepSizes.assign( numberOfParametersPerNode,
+                             ( 0.5 * sqrt( fieldLengthSquared ) ) );
+  }
 
   // This sets nodeVector to be the vector sum of startNode plus
   // shiftFraction times the difference between startNode and endNode, plus

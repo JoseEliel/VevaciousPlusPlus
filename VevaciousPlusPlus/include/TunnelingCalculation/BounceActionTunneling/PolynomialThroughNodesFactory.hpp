@@ -18,9 +18,7 @@ namespace VevaciousPlusPlus
   class PolynomialThroughNodesFactory : public PathFromNodesFactory
   {
   public:
-    PolynomialThroughNodesFactory( std::vector< double > const& falseVacuum,
-                                   std::vector< double > const& trueVacuum,
-                                   std::string const& xmlArguments );
+    PolynomialThroughNodesFactory( std::string const& xmlArguments );
     virtual ~PolynomialThroughNodesFactory();
 
 

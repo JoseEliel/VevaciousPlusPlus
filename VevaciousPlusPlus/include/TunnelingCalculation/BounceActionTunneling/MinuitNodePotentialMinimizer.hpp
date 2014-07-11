@@ -12,9 +12,13 @@
 #include "BouncePathFinder.hpp"
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
 #include "PathFromNodesFactory.hpp"
 #include "NodesFromParameterization.hpp"
+#include "LinearSplineThroughNodesFactory.hpp"
+#include "QuadraticSplineThroughNodesFactory.hpp"
+#include "PolynomialThroughNodesFactory.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -23,7 +27,8 @@ namespace VevaciousPlusPlus
                                        public ROOT::Minuit2::FCNBase
   {
   public:
-    MinuitNodePotentialMinimizer();
+    MinuitNodePotentialMinimizer( PotentialFunction const& potentialFunction,
+                                  std::string const& xmlArguments );
     virtual ~MinuitNodePotentialMinimizer();
 
 
@@ -60,7 +65,6 @@ namespace VevaciousPlusPlus
     PotentialFunction const& potentialFunction;
     PathFromNodesFactory* pathFactory;
     NodesFromParameterization* pathNodes;
-    double pathTemperature;
     std::vector< MinuitMinimum > currentMinuitResults;
     size_t movesPerNodePerImprovement;
     unsigned int minuitStrategy;

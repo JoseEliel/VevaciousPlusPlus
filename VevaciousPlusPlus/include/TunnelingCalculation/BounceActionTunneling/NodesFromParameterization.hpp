@@ -31,6 +31,13 @@ namespace VevaciousPlusPlus
     virtual void PathNodeSet( std::vector< std::vector< double > >& pathNodes,
                  std::vector< double > const& pathParameterization ) const = 0;
 
+    // This should set pathParameterization to be the default initial
+    // parameterization for the derived class, and initialStepSizes to be the
+    // default initial step sizes that would suit Minuit2.
+    virtual void SetInitialParameterizationAndStepSizes(
+                                   std::vector< double >& pathParameterization,
+                           std::vector< double >& initialStepSizes ) const = 0;
+
     // If the derived class can vary one node at a time, this should set
     // nodeVector to be what the node at index adjustmentOrderIndex would be
     // for the parameterization nodeParameterization. This throws an exception
@@ -56,7 +63,7 @@ namespace VevaciousPlusPlus
     // nodeParameterization to be appropriate for a set of initial step sizes
     // for Minuit2. This throws an exception by default.
     virtual void
-    SetInitialStepSizes( std::vector< double >& nodeParameterization ) const
+    SetSingleNodeStepSizes( std::vector< double >& initialStepSizes ) const
     { throw std::out_of_range( "No functionality to set just one node in"
                                " NodesFromParameterization base class!" ); }
 

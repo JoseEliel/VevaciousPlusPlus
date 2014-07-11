@@ -10,19 +10,58 @@
 namespace VevaciousPlusPlus
 {
 
-  MinuitNodePotentialMinimizer::MinuitNodePotentialMinimizer() :
+  MinuitNodePotentialMinimizer::MinuitNodePotentialMinimizer(
+                                    PotentialFunction const& potentialFunction,
+                                           std::string const& xmlArguments  ) :
     BouncePathFinder(),
     ROOT::Minuit2::FCNBase(),
+    potentialFunction( potentialFunction ),
     pathFactory( NULL ),
     pathNodes( NULL ),
-    currentMinuitResults()
+    currentMinuitResults(),
+    movesPerNodePerImprovement( 100 ),
+    minuitStrategy( 1 ),
+    minuitToleranceFraction( 1.0 ),
+    currentMinuitTolerance( NAN ),
+    currentNodeIndex( 0 )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "MinuitNodePotentialMinimizer::MinuitNodePotentialMinimizer()";
-    std::cout << std::endl;/**/
-    NEEDS A LOT OF WORK HERE!
+    BOL::AsciiXmlParser outerArgumentParser;
+    BOL::AsciiXmlParser innerArgumentParser;
+    outerArgumentParser.loadString( xmlArguments );
+    std::string pathFactoryType( "PathFromNodes" );
+    std::string pathFactoryArguments( "" );
+    while( outerArgumentParser.readNextElement() )
+    {
+      if( outerArgumentParser.currentElementNameMatches(
+                                                     "PathParameterization" ) )
+      {
+        // There should only be <ClassType> followed by <ConstructorArguments>.
+        innerArgumentParser.loadString(
+                       outerArgumentParser.getTrimmedCurrentElementContent() );
+        innerArgumentParser.readNextElement();
+        pathFactoryType.assign(
+                       innerArgumentParser.getTrimmedCurrentElementContent() );
+        innerArgumentParser.readNextElement();
+        pathFactoryArguments.assign(
+                       innerArgumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( outerArgumentParser.currentElementNameMatches(
+                                                           "MinuitStrategy" ) )
+      {
+        minuitStrategy
+        = BOL::StringParser::stringToInt(
+                       outerArgumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( outerArgumentParser.currentElementNameMatches(
+                                                          "MinuitTolerance" ) )
+      {
+        minuitToleranceFraction
+        = BOL::StringParser::stringToDouble(
+                       outerArgumentParser.getTrimmedCurrentElementContent() );
+      }
+    }
+    OK, move all this newing to the VevaciousPlusPlus ctor...
+    pathNodes = &(pathFactory->NodesFromParameterization());
   }
 
   MinuitNodePotentialMinimizer::~MinuitNodePotentialMinimizer()
@@ -68,13 +107,13 @@ namespace VevaciousPlusPlus
     currentMinuitTolerance = ( minuitToleranceFraction
                                * ( falseVacuum.PotentialValue()
                                    - trueVacuum.PotentialValue() ) );
+    std::vector< double > nodeParameterization;
     std::vector< double > initialStepSizes;
-    pathNodes->SetInitialStepSizes( initialStepSizes );
+    pathNodes->SetSingleNodeStepSizes( initialStepSizes );
 
     // Now we note all the new positions of the nodes, in field space and also
     // by parameterization.
     currentMinuitResults.clear();
-    std::vector< double > nodeParameterization;
     for( size_t nodeIndex( 1 );
          nodeIndex <= pathNodes->NumberOfVaryingNodes();
          ++nodeIndex )

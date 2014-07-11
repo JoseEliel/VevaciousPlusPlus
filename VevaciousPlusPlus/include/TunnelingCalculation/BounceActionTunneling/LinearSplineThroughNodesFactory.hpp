@@ -18,9 +18,7 @@ namespace VevaciousPlusPlus
   class LinearSplineThroughNodesFactory
   {
   public:
-    LinearSplineThroughNodesFactory( std::vector< double > const& falseVacuum,
-                                     std::vector< double > const& trueVacuum,
-                                     std::string const& xmlArguments );
+    LinearSplineThroughNodesFactory( std::string const& xmlArguments );
     virtual ~LinearSplineThroughNodesFactory();
 
 

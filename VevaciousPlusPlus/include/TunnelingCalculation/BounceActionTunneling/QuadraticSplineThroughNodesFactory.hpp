@@ -18,10 +18,7 @@ namespace VevaciousPlusPlus
   class QuadraticSplineThroughNodesFactory
   {
   public:
-    QuadraticSplineThroughNodesFactory(
-                                      std::vector< double > const& falseVacuum,
-                                       std::vector< double > const& trueVacuum,
-                                        std::string const& xmlArguments );
+    QuadraticSplineThroughNodesFactory( std::string const& xmlArguments );
     virtual ~QuadraticSplineThroughNodesFactory();
 
 

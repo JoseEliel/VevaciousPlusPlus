@@ -8,6 +8,18 @@
 #ifndef MINUITPATHPOTENTIALMINIMIZER_HPP_
 #define MINUITPATHPOTENTIALMINIMIZER_HPP_
 
+#include "CommonIncludes.hpp"
+#include "BouncePathFinder.hpp"
+#include "Minuit2/FCNBase.h"
+#include "Minuit2/MnMigrad.h"
+#include "PotentialEvaluation/PotentialFunction.hpp"
+#include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
+#include "PathFromNodesFactory.hpp"
+#include "NodesFromParameterization.hpp"
+#include "LinearSplineThroughNodesFactory.hpp"
+#include "QuadraticSplineThroughNodesFactory.hpp"
+#include "PolynomialThroughNodesFactory.hpp"
+
 namespace VevaciousPlusPlus
 {
 

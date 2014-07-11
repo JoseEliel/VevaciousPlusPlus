@@ -10,9 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  PathFromNodesFactory::PathFromNodesFactory(
+  PathFromNodesFactory::PathFromNodesFactory( size_t numberOfFields,
                                             std::string const& xmlArguments ) :
-    TunnelPathFactory( trueVacuum.size() ),
+    TunnelPathFactory( numberOfFields ),
     nodesFromParameterization( NULL )
   {
     BOL::AsciiXmlParser argumentParser;
@@ -36,15 +36,13 @@ namespace VevaciousPlusPlus
     }
     if( nodeParameterizationType.compare( "NodesOnParallelPlanes" ) == 0 )
     {
-      nodesFromParameterization = new NodesOnParallelPlanes( falseVacuum,
-                                                             trueVacuum,
+      nodesFromParameterization = new NodesOnParallelPlanes(
                                                         numberOfVaryingNodes );
     }
     else if( nodeParameterizationType.compare( "NodesOnBisectingPlanes" )
              == 0 )
     {
-      nodesFromParameterization = new NodesOnBisectingPlanes( falseVacuum,
-                                                              trueVacuum,
+      nodesFromParameterization = new NodesOnBisectingPlanes(
                                                         numberOfVaryingNodes );
     }
     else

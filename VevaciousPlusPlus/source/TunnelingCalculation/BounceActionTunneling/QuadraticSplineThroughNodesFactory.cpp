@@ -11,12 +11,8 @@ namespace VevaciousPlusPlus
 {
 
   QuadraticSplineThroughNodesFactory::QuadraticSplineThroughNodesFactory(
-                                      std::vector< double > const& falseVacuum,
-                                       std::vector< double > const& trueVacuum,
                                             std::string const& xmlArguments ) :
-    PathFromNodesFactory( falseVacuum,
-                          trueVacuum,
-                          xmlArguments )
+    PathFromNodesFactory( xmlArguments )
   {
     // This constructor is just an initialization list.
   }

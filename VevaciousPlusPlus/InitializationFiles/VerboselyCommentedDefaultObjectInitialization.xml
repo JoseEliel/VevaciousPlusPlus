@@ -258,7 +258,7 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfNodesForPotentialFit>
-            8
+            30
           </NumberOfNodesForPotentialFit>
           <NumberShootAttemptsAllowed>
             <!-- This is the number of shoot attempts allowed to try to find
@@ -298,9 +298,8 @@
              nodes with f free parameters per node, to n independent
              minimizations in an f-dimensional space. If using
              "MinuitNodePotentialMinimizer", <ConstructorArguments> here must
-             have "PathFromNodesOnParallelPlanes" or
-             "PathFromNodesOnBisectingPlanes" in
-             <PathParameterization><ClassType>. -->
+             have "LinearSplineThroughNodes", "QuadraticSplineThroughNodes", or
+             "PolynomialThroughNodes" in <PathParameterization><ClassType>. -->
           MinuitNodePotentialMinimizer
         </ClassType>
         <ConstructorArguments>
@@ -317,44 +316,47 @@
                  <ConstructorArguments><NumberOfVaryingNodes> in
                  <PathParameterization>. -->
           </NumberOfPotentialSamplePoints>
+          <MinuitStrategy>
+            <!-- The number given here is given to Minuit2 to decide how
+                 precise it tries to be, through more or less calls of the
+                 function to be minimized. The default is 1, while 0 emphasizes
+                 making less function calls, and 2 emphasizes more accuracy
+                 through more function calls. -->
+            1
+          </MinuitStrategy>
+          <MinuitTolerance>
+            <!-- The number given here is a fraction to multiply Minuit2's
+                 default 0.001 to yield the tolerance fraction, which is the
+                 fraction of the value of the function at a point which is
+                 used to compare to the estimated ("vertical") distance to the
+                 minimum. For example, if 0.5 is given, then as soon as Minuit2
+                 estimates that it is at a point with function value within
+                 0.0005 of what it estimates is the value at the minimum, it
+                 considers its minimization complete. -->
+            0.5
+          </MinuitTolerance>
           <PathParameterization>
             <ClassType>
               <!-- The valid options for this version of VevaciousPlusPlus are:
-                   "PathFromNodesOnParallelPlanes",
-                   "PathFromNodesOnBisectingPlanes", or
-                   "PathFromPolynomialCoefficients". The parameterization of
-                   the first two is such that the field with greatest
-                   difference between the false vacuum and true vacuum is taken
-                   as the reference field, and the parameterization is (n*f)
-                   values, where there are n varying nodes between the vacua
-                   and f fields other than the reference field, so each node is
-                   parameterized as a vector in the hyperplane where the
-                   reference field has zero value. If using
-                   "PathFromNodesOnParallelPlanes", that plane is then rotated
-                   to be perpendicular to a vector going from false vacuum to
-                   true vacuum, and then the node gets a multiple of that
-                   vector, so the nodes end up on a series of parallel planes
-                   between the vacua. The procedure if using
-                   "PathFromNodesOnBisectingPlanes" is similar, except the
-                   planes are those that bisect the vector between nodes: first
-                   a node on a plane bisecting the vector between the vacua is
-                   calculated, then a node between that node and the false
-                   vacuum is calculated such that it lies on a plane
-                   perpendicular to the vector from the false vacuum to the
-                   node just calculated, and another node between the node just
-                   calculated and the true vacuum in a similar manner is
-                   calculated. If using "PathFromPolynomialCoefficients", then
-                   the parameterization is a set of coefficients for
-                   polynomials describing the dependence of the fields on the
-                   auxiliary value p giving the distance along the path from
-                   the false vacuum to the true vacuum, such that the reference
-                   field is always linear in p, while the linear term
-                   coefficients for the other fields are implicit such that the
-                   true vacuum is reached at p = 1, so the coefficients
-                   actually varied are those of the quadratic terms for each
-                   field but the reference field, followed by a set of
-                   coefficients for the cubic terms, and so on. -->
-              PathFromNodesOnParallelPlanes
+                   "PathFromNodes" or "PathFromPolynomialCoefficients". The
+                   parameterization of the first is that the parameterization
+                   sets up a set of nodes in field space between the vacua,
+                   then a parameterization of the fields which goes through the
+                   nodes from the false vacuum to the true vacuum is generated
+                   as the tunneling path. The parameterization of the second is
+                   that the field with greatest difference between the vacua is
+                   chosen as a reference and then parameterized as a constant
+                   plus a linear term in a path auxiliary variable, and the
+                   other fields are parameterized as polynomials in the path
+                   auxiliary. The coefficients are given in sets of
+                   (number of fields - 1) for the varying fields, each set
+                   corresponding to a higher power of the path auxiliary. For
+                   example, if there are 4 varying fields, then the
+                   parameterization is a vector of sets of 3 coefficients, the
+                   first 3 being the quadratic coefficients, the 2nd 3 being
+                   the cubic coefficients, and so on, until each field has
+                   NumberOfCoefficientsPerVaryingField coefficients. -->
+              PathFromNodes
             </ClassType>
             <ConstructorArguments>
               <NumberOfCoefficientsPerVaryingField>
@@ -373,9 +375,43 @@
                      number given here will be taken. -->
                 7
               </NumberOfVaryingNodes>
+              <NodeParameterizationStyle>
+                <!-- This is only used by "PathFromNodes" and is ignored by
+                     "PathFromPolynomialCoefficients".
+                     The current valid options are "NodesOnParallelPlanes" or
+                     "NodesOnBisectingPlanes". Both take the field with
+                     greatest difference between the false vacuum and true
+                     vacuum as the reference field, and each node is
+                     parameterized as a vector in the hyperplane where the
+                     reference field has zero value. If using
+                     "NodesOnParallelPlanes", that vector is then projected
+                     to be perpendicular to a vector going from false vacuum to
+                     true vacuum, and then the node gets a multiple of that
+                     vector, so the nodes end up on a series of parallel planes
+                     between the vacua. The procedure if using
+                     "NodesOnBisectingPlanes" is similar, except the planes are
+                     those that bisect the vector between nodes: first a node
+                     on a plane bisecting the vector between the vacua is
+                     calculated, then a node between that node and the false
+                     vacuum is calculated such that it lies on a plane
+                     perpendicular to the vector from the false vacuum to the
+                     node just calculated, and another node between the node
+                     just calculated and the true vacuum in a similar manner is
+                     calculated. Also, since the vector between nodes may end
+                     up on the parameterized node plane, the nodes are rotated
+                     to be perpendicular rather than projected (in general
+                     there are many possible rotations: here a consistent set
+                     of orthogonal vectors is built from the vector between the
+                     nodes, taking initially the first two non-reference fields
+                     and making them orthogonal to the vector, with the rest of
+                     the components set to zero, then another vector orthogonal
+                     to both vectors is taken with the third non-reference
+                     field, keeping the remaining components non-zero, and so
+                     on. -->
+                NodesOnParallelPlanes
+              </NodeParameterizationStyle>
               <InterpolationStyle>
-                <!-- This is only used by "PathFromNodesOnParallelPlanes" and
-                     "PathFromNodesOnBisectingPlanes", and is ignored by
+                <!-- This is only used by "PathFromNodes" and is ignored by
                      "PathFromPolynomialCoefficients".
                      The valid options for this version of VevaciousPlusPlus
                      are:
@@ -389,7 +425,7 @@
                      and each subsequent segment is constructed to have slope
                      continuous with its previous segment). -->
                 LinearSplinePath
-              </InterpolationStyle>
+              </InterpolationStyle>              
             </ConstructorArguments>
           </PathParameterization>
         </ConstructorArguments>
