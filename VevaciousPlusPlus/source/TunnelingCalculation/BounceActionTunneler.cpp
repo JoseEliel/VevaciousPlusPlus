@@ -9,7 +9,6 @@
 
 namespace VevaciousPlusPlus
 {
-
   double const BounceActionTunneler::maximumPowerOfNaturalExponent(
                            log( 0.5 * std::numeric_limits< double >::max() ) );
   double const
@@ -125,7 +124,7 @@ namespace VevaciousPlusPlus
 
   BounceActionTunneler::~BounceActionTunneler()
   {
-    delete thermalPotentialMinimizer;
+    // This does nothing.
   }
 
 

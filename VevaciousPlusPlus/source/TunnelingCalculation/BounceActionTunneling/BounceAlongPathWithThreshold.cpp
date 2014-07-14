@@ -11,68 +11,31 @@ namespace VevaciousPlusPlus
 {
 
   BounceAlongPathWithThreshold::BounceAlongPathWithThreshold(
-                                    PotentialFunction const& potentialFunction,
+                                          PotentialFunction& potentialFunction,
+                                                 BouncePathFinder* pathFinder,
+                                      BounceActionCalculator* actionCalculator,
                                             std::string const& xmlArguments ) :
     BounceActionTunneler( potentialFunction,
                           xmlArguments ),
-    pathFinder( NULL ),
-    actionCalculator( NULL ),
+    pathFinder( pathFinder ),
+    actionCalculator( actionCalculator ),
     actionThreshold( NAN ),
     thermalIntegrationResolution( 5 )
   {
-    BOL::AsciiXmlParser outerArgumentParser;
-    BOL::AsciiXmlParser innerArgumentParser;
-    outerArgumentParser.loadString( xmlArguments );
-    std::string actionCalculatorType( "BubbleShootingOnSpline" );
-    std::string actionCalculatorArguments( "" );
-    std::string pathFinderType( "MinuitNodePotentialMinimizer" );
-    std::string pathFinderArguments( "" );
-    while( outerArgumentParser.readNextElement() )
+    BOL::AsciiXmlParser argumentParser;
+    argumentParser.loadString( xmlArguments );
+    while( argumentParser.readNextElement() )
     {
-      if( outerArgumentParser.currentElementNameMatches(
-                                                       "BouncePotentialFit" ) )
+      if( argumentParser.currentElementNameMatches(
+                                             "ThermalIntegrationResolution" ) )
       {
-        innerArgumentParser.loadString(
-                       outerArgumentParser.getTrimmedCurrentElementContent() );
-        innerArgumentParser.readNextElement();
-        actionCalculatorType.assign(
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-        innerArgumentParser.readNextElement();
-        actionCalculatorArguments.assign(
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
+        thermalIntegrationResolution
+        = BOL::StringParser::stringToInt(
+                            argumentParser.getTrimmedCurrentElementContent() );
+        // Since there's only one argument that this constructor needs to read,
+        // we break out of the reading loop once it is found.
+        break;
       }
-      else if( outerArgumentParser.currentElementNameMatches(
-                                                         "TunnelPathFinder" ) )
-      {
-        innerArgumentParser.loadString(
-                       outerArgumentParser.getTrimmedCurrentElementContent() );
-        innerArgumentParser.readNextElement();
-        pathFinderType.assign(
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-        innerArgumentParser.readNextElement();
-        pathFinderArguments.assign(
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
-    if( pathFinderType.compare( "MinuitPathBounceMinimizer" ) == 0 )
-    {
-      pathFinder = new MinuitPathBounceMinimizer( potentialFunction,
-                                                  pathFinderArguments );
-    }
-    else if( pathFinderType.compare( "MinuitPathPotentialMinimizer" ) == 0 )
-    {
-      pathFinder = new MinuitPathPotentialMinimizer( potentialFunction,
-                                                     pathFinderArguments );
-    }
-    else if( pathFinderType.compare( "MinuitNodePotentialMinimizer" ) == 0 )
-    {
-      pathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
-                                                     pathFinderArguments );
-    }
-    if( actionCalculatorType.compare( "BubbleShootingOnSpline" ) == 0 )
-    {
-      actionCalculator = new BubbleShootingOnSpline( potentialFunction,
-                                                   actionCalculatorArguments );
     }
   }
 

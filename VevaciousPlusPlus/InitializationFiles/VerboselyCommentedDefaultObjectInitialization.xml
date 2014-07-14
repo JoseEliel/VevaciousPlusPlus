@@ -220,6 +220,11 @@
       <!-- The following elements are read only if <ClassType> is
            "BounceAlongPathWithThreshold", and are ignored if <ClassType> is
            "CosmoTransitionsRunner". -->
+      <ThermalIntegrationResolution>
+        <!-- This is the number of temperatures summed over for thermal decay
+             width integrations. -->
+        5
+      </ThermalIntegrationResolution>
       <BouncePotentialFit>
         <!-- Currently the only valid option for <ClassType> is
              "BubbleShootingOnSpline", which implements the Coleman

@@ -9,94 +9,18 @@
 
 namespace VevaciousPlusPlus
 {
-
   GradientFromStartingPoints::GradientFromStartingPoints(
-                                    PotentialFunction const* potentialFunction,
-                                               std::string const& xmlArguments,
-                                                   SlhaManager& slhaManager ) :
-    startingPointFinder( NULL ),
-    gradientMinimizer( NULL ),
+                                      StartingPointFinder* startingPointFinder,
+                                          GradientMinimizer* gradientMinimizer,
+                              double const extremumSeparationThresholdFraction,
+                               double const nonDsbRollingToDsbScalingFactor ) :
+    startingPointFinder( startingPointFinder ),
+    gradientMinimizer( gradientMinimizer ),
     startingPoints(),
-    extremumSeparationThresholdFraction( 0.05 ),
-    nonDsbRollingToDsbScalingFactor( 10.0 )
+    extremumSeparationThresholdFraction( extremumSeparationThresholdFraction ),
+    nonDsbRollingToDsbScalingFactor( nonDsbRollingToDsbScalingFactor )
   {
-    BOL::AsciiXmlParser outerArgumentParser;
-    outerArgumentParser.loadString( xmlArguments );
-    BOL::AsciiXmlParser innerArgumentParser;
-    std::string startingPointFinderClass;
-    std::string gradientMinimizerClass;
-    // The <ConstructorArguments> for this class should have child elements
-    // <StartingPointFinderClass> and <GradientMinimizerClass>, and optionally
-    // <ExtremumSeparationThresholdFraction> and
-    // <NonDsbRollingToDsbScalingFactor>.
-    while( outerArgumentParser.readNextElement() )
-    {
-      if( outerArgumentParser.currentElementNameMatches(
-                                                 "StartingPointFinderClass" ) )
-      {
-        innerArgumentParser.loadString(
-                       outerArgumentParser.getTrimmedCurrentElementContent() );
-        // <StartingPointFinderClass> should have child elements <ClassName>
-        // and <ConstructorArguments>.
-        innerArgumentParser.readNextElement();
-        startingPointFinderClass.assign(
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-        innerArgumentParser.readNextElement();
-        if( startingPointFinderClass.compare( "Hom4ps2Runner" ) == 0 )
-        {
-          startingPointFinder = new Hom4ps2Runner(
-                  *(potentialFunction->GetHomotopyContinuationTargetSystem()),
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-        }
-        else
-        {
-          std::stringstream errorStream;
-          errorStream
-          << "<StartingPointFinderClass> was not a recognized form! The only"
-          << " type currently valid is \"Hom4ps2Runner\".";
-          throw std::runtime_error( errorStream.str() );
-        }
-      }
-      else if( outerArgumentParser.currentElementNameMatches(
-                                                   "GradientMinimizerClass" ) )
-      {
-        innerArgumentParser.loadString(
-                       outerArgumentParser.getTrimmedCurrentElementContent() );
-        // <GradientMinimizerClass> should have child elements <ClassName>
-        // and <ConstructorArguments>.
-        innerArgumentParser.readNextElement();
-        gradientMinimizerClass.assign(
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-        innerArgumentParser.readNextElement();
-        if( gradientMinimizerClass.compare( "MinuitPotentialMinimizer" ) == 0 )
-        {
-          gradientMinimizer = new MinuitPotentialMinimizer( *potentialFunction,
-                       innerArgumentParser.getTrimmedCurrentElementContent() );
-        }
-        else
-        {
-          std::stringstream errorStream;
-          errorStream
-          << "<GradientMinimizerClass> was not a recognized form! The only"
-          << " type currently valid is \"MinuitPotentialMinimizer\".";
-          throw std::runtime_error( errorStream.str() );
-        }
-      }
-      else if( outerArgumentParser.currentElementNameMatches(
-                                      "ExtremumSeparationThresholdFraction" ) )
-      {
-        extremumSeparationThresholdFraction
-        = BOL::StringParser::stringToDouble(
-                       outerArgumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( outerArgumentParser.currentElementNameMatches(
-                                          "NonDsbRollingToDsbScalingFactor" ) )
-      {
-        nonDsbRollingToDsbScalingFactor
-        = BOL::StringParser::stringToDouble(
-                       outerArgumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
+    // This constructor is just an initialization list.
   }
 
   GradientFromStartingPoints::~GradientFromStartingPoints()

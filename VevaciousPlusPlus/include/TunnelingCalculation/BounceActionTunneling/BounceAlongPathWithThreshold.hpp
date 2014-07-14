@@ -17,14 +17,17 @@
 
 namespace VevaciousPlusPlus
 {
-
+  // This class takes memory management ownership of the components given to
+  // the constructor as pointers! It'd be nice to use std::unique_ptrs, but we
+  // are stubbornly sticking to allowing non-C++11-compliant compilers.
   class BounceAlongPathWithThreshold : public BounceActionTunneler
   {
   public:
-    BounceAlongPathWithThreshold( PotentialFunction const& potentialFunction,
+    BounceAlongPathWithThreshold( PotentialFunction& potentialFunction,
+                                  BouncePathFinder* pathFinder,
+                                  BounceActionCalculator* actionCalculator,
                                   std::string const& xmlArguments );
-    virtual
-    ~BounceAlongPathWithThreshold();
+    virtual ~BounceAlongPathWithThreshold();
 
 
   protected:

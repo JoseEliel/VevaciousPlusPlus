@@ -9,333 +9,443 @@
 
 namespace VevaciousPlusPlus
 {
-
-  VevaciousPlusPlus::VevaciousPlusPlus(
-                                  std::string const& initializationFileName ) :
-    potentialFunction( NULL ),
-    potentialFunctionDeleter( NULL ),
-    runningParameterManager(),
-    potentialMinimizer( NULL ),
-    potentialMinimizerDeleter( NULL ),
-    tunnelingCalculator( NULL ),
-    tunnelingCalculatorDeleter( NULL ),
-    currentTime()
-  {
-    BOL::AsciiXmlParser fileParser;
-    BOL::AsciiXmlParser elementParser;
-    fileParser.openRootElementOfFile( initializationFileName );
-    while( fileParser.readNextElement() )
-    {
-      elementParser.loadString( fileParser.getTrimmedCurrentElementContent() );
-      if( fileParser.currentElementNameMatches( "PotentialClass" ) )
-      {
-        // <PotentialClass> should have child elements <ClassType> and
-        // <ConstructorArguments>.
-        elementParser.readNextElement();
-        std::string
-        potentialClass( elementParser.getTrimmedCurrentElementContent() );
-        elementParser.readNextElement();
-        std::string constructorArguments(
-                             elementParser.getTrimmedCurrentElementContent() );
-        if( potentialClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
-        {
-          potentialFunction
-          = new FixedScaleOneLoopPotential( constructorArguments,
-                                            runningParameterManager );
-        }
-        else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
-        {
-          potentialFunction
-          = new RgeImprovedOneLoopPotential( constructorArguments,
-                                             runningParameterManager );
-        }
-        else
-        {
-          std::stringstream errorStream;
-          errorStream
-          << "<PotentialClass> was not a recognized form! The only types"
-          << " currently valid are \"FixedScaleOneLoopPotential\" and"
-          << " \"RgeImprovedOneLoopPotential\".";
-          throw std::runtime_error( errorStream.str() );
-        }
-        potentialFunctionDeleter = potentialFunction;
-      }
-      else if( fileParser.currentElementNameMatches( "MinimizerClass" ) )
-      {
-        // <MinimizerClass> should have child elements <ClassName> and
-        // <ConstructorArguments>.
-        elementParser.readNextElement();
-        std::string minimizerClass(
-                             elementParser.getTrimmedCurrentElementContent() );
-        elementParser.readNextElement();
-        std::string constructorArguments(
-                             elementParser.getTrimmedCurrentElementContent() );
-        if( minimizerClass.compare( "GradientFromStartingPoints" ) == 0 )
-        {
-          potentialMinimizer
-          = new GradientFromStartingPoints( potentialFunction,
-                                            constructorArguments,
-                                            runningParameterManager );
-        }
-        else
-        {
-          std::stringstream errorStream;
-          errorStream
-          << "<MinimizerClass> was not a recognized form! The only type"
-          << " currently valid is \"GradientFromStartingPoints\".";
-          throw std::runtime_error( errorStream.str() );
-        }
-        potentialMinimizerDeleter = potentialMinimizer;
-      }
-    }
-
-
-    VevaciousPlusPlus::HomotopyContinuationSolver*
-    homotopyContinuationSolver( NULL );
-
-    std::string homotopyContinuationClass(
-                             argumentParser.fromTag( "HomotopyContinuationClass",
-                                       "BasicPolynomialHomotopyContinuation" ) );
-    if( homotopyContinuationClass.compare(
-                                   "BasicPolynomialHomotopyContinuation" ) == 0 )
-    {
-      homotopyContinuationSolver
-      = new VevaciousPlusPlus::BasicPolynomialHomotopyContinuation(
-                         potentialFunction->HomotopyContinuationTargetSystem() );
-
-      std::cout
-      << std::endl
-      << "Created BasicPolynomialHomotopyContinuation, but this does not yet"
-      << " work...";
-      std::cout << std::endl;
-    }
-    else if( homotopyContinuationClass.compare( "Hom4ps2Runner" ) == 0 )
-    {
-      std::string pathToHom4ps2( argumentParser.fromTag( "PathToHom4ps2",
-                                                         "./HOM4PS2/" ) );
-      homotopyContinuationSolver
-      = new VevaciousPlusPlus::Hom4ps2Runner(
-                           potentialFunction->HomotopyContinuationTargetSystem(),
-                                              pathToHom4ps2,
-                                       argumentParser.fromTag( "Hom4ps2Argument",
-                                                               "2" ) );
-
-      std::cout
-      << std::endl
-      << "Created Hom4ps2Runner to run " << pathToHom4ps2 << "/hom4ps2";
-      std::cout << std::endl;
-    }
-    else
-    {
-      std::cout
-      << std::endl
-      << "HomotopyContinuationClass was not a recognized form! The only"
-      << " currently-valid types are \"BasicPolynomialHomotopyContinuation\""
-      << " (not yet implemented, sorry!) and \"Hom4ps2Runner\". Aborting!";
-      std::cout << std::endl;
-
-      return EXIT_FAILURE;
-    }
-
-    // Now the HomotopyContinuationAndGradient object can be constructed:
-    VevaciousPlusPlus::HomotopyContinuationAndMinuit
-    potentialMinimizer( *potentialFunction,
-                        *homotopyContinuationSolver,
-                       BOL::StringParser::stringToDouble( argumentParser.fromTag(
-                                                     "MinimaSeparationThreshold",
-                                                                     "0.1" ) ) );
-
-
-    std::string
-    tunnelingStrategyAsString( argumentParser.fromTag( "TunnelingStrategy",
-                                                       "DefaultTunneling" ) );
-    VevaciousPlusPlus::TunnelingCalculator::TunnelingStrategy
-    tunnelingStrategy( VevaciousPlusPlus::TunnelingCalculator::NotSet );
-    if( ( tunnelingStrategyAsString.compare( "DefaultTunneling" ) == 0 )
-        ||
-        ( tunnelingStrategyAsString.compare( "ThermalThenQuantum" ) == 0 ) )
-    {
-      tunnelingStrategy
-      = VevaciousPlusPlus::TunnelingCalculator::ThermalThenQuantum;
-    }
-    else if( tunnelingStrategyAsString.compare( "QuantumThenThermal" ) == 0 )
-    {
-      tunnelingStrategy
-      = VevaciousPlusPlus::TunnelingCalculator::QuantumThenThermal;
-    }
-    else if( tunnelingStrategyAsString.compare( "JustThermal" ) == 0 )
-    {
-      tunnelingStrategy
-      = VevaciousPlusPlus::TunnelingCalculator::JustThermal;
-    }
-    else if( tunnelingStrategyAsString.compare( "JustQuantum" ) == 0 )
-    {
-      tunnelingStrategy
-      = VevaciousPlusPlus::TunnelingCalculator::JustQuantum;
-    }
-    else if( ( tunnelingStrategyAsString.compare( "NoTunneling" ) == 0 )
-             ||
-             ( tunnelingStrategyAsString.compare( "None" ) == 0 ) )
-    {
-      tunnelingStrategy
-      = VevaciousPlusPlus::TunnelingCalculator::NoTunneling;
-    }
-    else
-    {
-      std::cout
-      << std::endl
-      << "TunnelingStrategy was not a recognized form! The only currently-valid"
-      << " types are \"DefaultTunneling\" (=\"ThermalThenQuantum\"),"
-      << " \"ThermalThenQuantum\", \"QuantumThenThermal\", \"JustThermal\","
-      << " \"JustQuantum\", \"NoTunneling\", and \"None\" ( =\"NoTunneling\")."
-      << " Aborting!";
-      std::cout << std::endl;
-
-      return EXIT_FAILURE;
-    }
-    std::cout
-    << std::endl
-    << "Tunneling strategy is " << tunnelingStrategyAsString;
-    std::cout << std::endl;
-
-    std::string survivalProbabilityThresholdAsString(
-                          argumentParser.fromTag( "SurvivalProbabilityThreshold",
-                                                  "0.01" ) );
-    double survivalProbabilityThreshold( -1.0 );
-    bool validInput( BOL::StringParser::stringIsDouble(
-                                            survivalProbabilityThresholdAsString,
-                                                survivalProbabilityThreshold ) );
-    if( !validInput
-        ||
-        ( survivalProbabilityThreshold <= 0.0 )
-        ||
-        ( survivalProbabilityThreshold >= 1.0 ) )
-    {
-      std::cout
-      << std::endl
-      << "SurvivalProbabilityThreshold was not a number between 0.0 and 1.0 but"
-      << " was " << survivalProbabilityThresholdAsString << "."
-      << " Aborting!";
-      std::cout << std::endl;
-
-      return EXIT_FAILURE;
-    }
-
-
-    VevaciousPlusPlus::TunnelingCalculator*
-    tunnelingCalculator( NULL );
-
-    std::string tunnelingClass( argumentParser.fromTag( "TunnelingClass",
-                                               "MinuitBounceActionMinimizer" ) );
-
-    if( tunnelingClass.compare( "MinuitBounceActionMinimizer" ) == 0 )
-    {
-      std::string numberOfNodesString(
-                       argumentParser.fromTag( "NumberOfMinuitNodesForTunneling",
-                                               "10" ) );
-      double numberOfNodesDouble( -1.0 );
-      validInput = BOL::StringParser::stringIsDouble( numberOfNodesString,
-                                                      numberOfNodesDouble );
-      if( !validInput
-          ||
-          !( numberOfNodesDouble >= 1.0 ) )
-      {
-        std::cout
-        << std::endl
-        << "NumberOfMinuitNodesForTunneling was not a number > 1, but was "
-        << numberOfNodesString << "."
-        << " Aborting!";
-        std::cout << std::endl;
-
-        return EXIT_FAILURE;
-      }
-
-      std::string initialStepSizeString(
-             argumentParser.fromTag( "InitialMinuitStepSizeFractionForTunneling",
-                                     "0.1" ) );
-      double initialStepSize( -1.0 );
-      validInput = BOL::StringParser::stringIsDouble( initialStepSizeString,
-                                                      initialStepSize );
-      if( !validInput
-          ||
-          !( initialStepSize > 0.0 ) )
-      {
-        std::cout
-        << std::endl
-        << "NumberOfMinuitNodesForTunneling was not a number > 0, but was "
-        << initialStepSizeString << "."
-        << " Aborting!";
-        std::cout << std::endl;
-
-        return EXIT_FAILURE;
-      }
-
-      tunnelingCalculator
-      = new VevaciousPlusPlus::MinuitBounceActionMinimizer( *potentialFunction,
-                                                            tunnelingStrategy,
-                                                    survivalProbabilityThreshold,
-                                                     (size_t)numberOfNodesDouble,
-                                                            initialStepSize );
-
-      std::cout
-      << std::endl
-      << "Created MinuitBounceActionMinimizer, but this does not yet"
-      << " work...";
-      std::cout << std::endl;
-      std::cout << std::endl;
-    }
-    else if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
-    {
-      std::string
-      pathToCosmotransitions( argumentParser.fromTag( "PathToCosmotransitions",
-                                                 "./CosmoTransitions-1.0.2/" ) );
-      tunnelingCalculator
-      = new VevaciousPlusPlus::CosmoTransitionsRunner( *potentialFunction,
-                                                       *potentialFunction,
-                                                       tunnelingStrategy,
-                                                    survivalProbabilityThreshold,
-                                                       pathToCosmotransitions );
-
-      std::cout
-      << std::endl
-      << "Created CosmoTransitionsRunner from " << modelFile;
-      std::cout << std::endl;
-    }
-    else
-    {
-      std::cout
-      << std::endl
-      << "TunnelingClass was not a recognized form! The only currently-valid"
-      << " types are \"MinuitBounceActionMinimizer\" (not yet implemented,"
-      << " sorry!)  and \"CosmoTransitionsRunner\". Aborting!";
-      std::cout << std::endl;
-
-      return EXIT_FAILURE;
-    }
-
-  }
-
-  VevaciousPlusPlus::VevaciousPlusPlus( BOL::ArgumentParser& argumentParser,
-                                        SlhaManager& slhaManager,
+  // This is the constructor for those who know what they are doing, to allow
+  // the main function of the program to decide the components and pass them
+  // in to the constructor, allowing for custom components without having to
+  // edit the VevaciousPlusPlus files. Those wishing to just use the default
+  // possibilities can use the other constructor, which takes the name of an
+  // initialization file, and then creates the components based on the data
+  // in that file. Since this constructor leaves deleterForPotentialFunction,
+  // deleterForPotentialMinimizer, and deleterForPotentialMinimizer all as
+  // NULL, and no other function sets them, there should be no problem with
+  // the destructor calling delete on these pointers, as they do not get set to
+  // point at the addresses of the given components.
+  VevaciousPlusPlus::VevaciousPlusPlus( SlhaManager& slhaManager,
                                         PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
     potentialFunction( NULL ),
-    potentialFunctionDeleter( NULL ),
+    deleterForPotentialFunction( NULL ),
     runningParameterManager(),
     potentialMinimizer( &potentialMinimizer ),
-    potentialMinimizerDeleter( NULL ),
+    deleterForPotentialMinimizer( NULL ),
     tunnelingCalculator( &tunnelingCalculator ),
-    tunnelingCalculatorDeleter( NULL ),
+    deleterForTunnelingCalculator( NULL ),
     currentTime()
   {
     // This constructor is just an initialization list.
   }
 
+  VevaciousPlusPlus::VevaciousPlusPlus(
+                                  std::string const& initializationFileName ) :
+    potentialFunction( NULL ),
+    deleterForPotentialFunction( NULL ),
+    runningParameterManager(),
+    potentialMinimizer( NULL ),
+    deleterForPotentialMinimizer( NULL ),
+    tunnelingCalculator( NULL ),
+    deleterForTunnelingCalculator( NULL ),
+    currentTime()
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "NEED TO ENSURE THAT ALL HEADERS ARE PROPERLY INCLUDED!";
+    std::cout << std::endl;/**/
+    PotentialFromPolynomialAndMasses* potentialFromPolynomialAndMasses( NULL );
+    std::string potentialClass( "FixedScaleOneLoopPotential" );
+    std::string potentialArguments( "" );
+    std::string minimizerClass( "GradientFromStartingPoints" );
+    std::string minimizerArguments( "" );
+    std::string tunnelingClass( "BounceAlongPathWithThreshold" );
+    std::string tunnelingArguments( "" );
+    BOL::AsciiXmlParser fileParser;
+    fileParser.openRootElementOfFile( initializationFileName );
+    while( fileParser.readNextElement() )
+    {
+      if( fileParser.currentElementNameMatches( "PotentialClass" ) )
+      {
+        BOL::AsciiXmlParser oneNestedParser;
+        oneNestedParser.loadString(
+                                fileParser.getTrimmedCurrentElementContent() );
+        while( oneNestedParser.readNextElement() )
+        {
+          if( oneNestedParser.currentElementNameMatches( "ClassType" ) )
+          {
+            potentialClass.assign(
+                           oneNestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( oneNestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+          {
+            potentialArguments.assign(
+                         oneNestedParser.getTrimmedCurrentElementContent() );
+          }
+        }
+      }
+      else if( fileParser.currentElementNameMatches( "MinimizerClass" ) )
+      {
+        BOL::AsciiXmlParser oneNestedParser;
+        oneNestedParser.loadString(
+                                fileParser.getTrimmedCurrentElementContent() );
+        while( oneNestedParser.readNextElement() )
+        {
+          if( oneNestedParser.currentElementNameMatches( "ClassType" ) )
+          {
+            minimizerClass.assign(
+                           oneNestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( oneNestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+          {
+            minimizerArguments.assign(
+                         oneNestedParser.getTrimmedCurrentElementContent() );
+          }
+        }
+      }
+      else if( fileParser.currentElementNameMatches( "TunnelingClass" ) )
+      {
+        BOL::AsciiXmlParser oneNestedParser;
+        oneNestedParser.loadString(
+                                fileParser.getTrimmedCurrentElementContent() );
+        while( oneNestedParser.readNextElement() )
+        {
+          if( oneNestedParser.currentElementNameMatches( "ClassType" ) )
+          {
+            tunnelingClass.assign(
+                           oneNestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( oneNestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+          {
+            tunnelingArguments.assign(
+                         oneNestedParser.getTrimmedCurrentElementContent() );
+          }
+        }
+      }
+    }
+
+    // Now we know the overall picture of what components to set up.
+    // ALL SUB-COMPONENTS FOR potentialMinimizer AND tunnelingCalculator ARE
+    // MEMORY-MANAGED BY THE COMPONENTS! The VevaciousPlusPlus destructor only
+    // deletes deleterForTunnelingCalculator, deleterForPotentialMinimizer, and
+    // deleterForPotentialFunction, while this constructor is allocating much
+    // more memory than that.
+
+    // First the potential function:
+    if( potentialClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
+    {
+      potentialFromPolynomialAndMasses
+      = new FixedScaleOneLoopPotential( potentialArguments,
+                                        runningParameterManager );
+    }
+    else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
+    {
+      potentialFromPolynomialAndMasses
+      = new RgeImprovedOneLoopPotential( potentialArguments,
+                                         runningParameterManager );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<PotentialClass> was not a recognized form! The only types"
+      << " currently valid are \"FixedScaleOneLoopPotential\" and"
+      << " \"RgeImprovedOneLoopPotential\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+    potentialFunction = (PotentialFunction*)potentialFromPolynomialAndMasses;
+    deleterForPotentialFunction = potentialFunction;
+
+    // Next the potential minimizer:
+    if( minimizerClass.compare( "GradientFromStartingPoints" ) == 0 )
+    {
+      // We need to assemble the components for a GradientFromStartingPoints
+      // object: a StartingPointFinder and a GradientMinimizer. We need to find
+      // out what derived classes to actually use.
+      BOL::AsciiXmlParser elementParser;
+      elementParser.loadString( minimizerArguments );
+      StartingPointFinder* startingPointFinder( NULL );
+      std::string startingPointFinderClass( "Hom4ps2Runner" );
+      std::string startingPointFinderArguments( "" );
+      GradientMinimizer* gradientMinimizer( NULL );
+      std::string gradientMinimizerClass( "MinuitPotentialMinimizer" );
+      std::string gradientMinimizerArguments( "" );
+      double extremumSeparationThresholdFraction( 0.05 );
+      double nonDsbRollingToDsbScalingFactor( 10.0 );
+
+      // The <ConstructorArguments> for this class should have child elements
+      // <StartingPointFinderClass> and <GradientMinimizerClass>, and
+      // optionally <ExtremumSeparationThresholdFraction> and
+      // <NonDsbRollingToDsbScalingFactor>.
+      while( elementParser.readNextElement() )
+      {
+        if( elementParser.currentElementNameMatches(
+                                                 "StartingPointFinderClass" ) )
+        {
+          // <StartingPointFinderClass> should have child elements <ClassName>
+          // and <ConstructorArguments>.
+          BOL::AsciiXmlParser nestedParser;
+          nestedParser.loadString(
+                             elementParser.getTrimmedCurrentElementContent() );
+          while( nestedParser.readNextElement() )
+          {
+            if( nestedParser.currentElementNameMatches( "ClassType" ) )
+            {
+              startingPointFinderClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            }
+            else if( nestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+            {
+              startingPointFinderArguments.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            }
+          }
+        }
+        else if( elementParser.currentElementNameMatches(
+                                                   "GradientMinimizerClass" ) )
+        {
+          // <GradientMinimizerClass> should have child elements <ClassName>
+          // and <ConstructorArguments>.
+          BOL::AsciiXmlParser nestedParser;
+          nestedParser.loadString(
+                             elementParser.getTrimmedCurrentElementContent() );
+          while( nestedParser.readNextElement() )
+          {
+            if( nestedParser.currentElementNameMatches( "ClassType" ) )
+            {
+              gradientMinimizerClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            }
+            else if( nestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+            {
+              gradientMinimizerArguments.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            }
+          }
+        }
+        else if( elementParser.currentElementNameMatches(
+                                      "ExtremumSeparationThresholdFraction" ) )
+        {
+          extremumSeparationThresholdFraction
+          = BOL::StringParser::stringToDouble(
+                           elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches(
+                                          "NonDsbRollingToDsbScalingFactor" ) )
+        {
+          nonDsbRollingToDsbScalingFactor
+          = BOL::StringParser::stringToDouble(
+                           elementParser.getTrimmedCurrentElementContent() );
+        }
+      }
+
+      if( startingPointFinderClass.compare( "Hom4ps2Runner" ) == 0 )
+      {
+        startingPointFinder = new Hom4ps2Runner(
+          potentialFromPolynomialAndMasses->HomotopyContinuationTargetSystem(),
+                                              startingPointFinderArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<StartingPointFinderClass> was not a recognized form! The only"
+        << " type currently valid is \"Hom4ps2Runner\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+
+      if( gradientMinimizerClass.compare( "MinuitPotentialMinimizer" ) == 0 )
+      {
+        gradientMinimizer = new MinuitPotentialMinimizer( *potentialFunction,
+                                                  gradientMinimizerArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<GradientMinimizerClass> was not a recognized form! The only type"
+        << " currently valid is \"MinuitPotentialMinimizer\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+
+      // Now we have the components for potentialMinimizer:
+      potentialMinimizer
+      = new GradientFromStartingPoints( startingPointFinder,
+                                        gradientMinimizer,
+                                        extremumSeparationThresholdFraction,
+                                        nonDsbRollingToDsbScalingFactor );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<MinimizerClass> was not a recognized form! The only type"
+      << " currently valid is \"GradientFromStartingPoints\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+    deleterForPotentialMinimizer = potentialMinimizer;
+
+    // Next the tunneling calculator:
+    if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
+    {
+      tunnelingCalculator
+      = new CosmoTransitionsRunner( *potentialFromPolynomialAndMasses,
+                                    *potentialFunction,
+                                    tunnelingArguments );
+    }
+    else if( tunnelingClass.compare( "BounceAlongPathWithThreshold" ) == 0 )
+    {
+      // We need to assemble the components for a BounceAlongPathWithThreshold
+      // object: a BounceActionCalculator and a BouncePathFinder. We need to
+      // find out what derived classes to actually use.
+      BOL::AsciiXmlParser elementParser;
+      elementParser.loadString( tunnelingArguments );
+      BounceActionCalculator* bounceActionCalculator( NULL );
+      std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
+      std::string bouncePotentialFitArguments( "" );
+      BouncePathFinder* bouncePathFinder( NULL );
+      std::string tunnelPathFinderClass( "MinuitNodePotentialMinimizer" );
+      std::string tunnelPathFinderArguments( "" );
+
+      // The <ConstructorArguments> for this class should have child elements
+      // <BouncePotentialFit> and <TunnelPathFinder>.
+      while( elementParser.readNextElement() )
+      {
+        if( elementParser.currentElementNameMatches( "BouncePotentialFit" ) )
+        {
+          // <BouncePotentialFit> should have child elements <ClassName> and
+          // <ConstructorArguments>.
+          BOL::AsciiXmlParser nestedParser;
+          nestedParser.loadString(
+                             elementParser.getTrimmedCurrentElementContent() );
+          while( nestedParser.readNextElement() )
+          {
+            if( nestedParser.currentElementNameMatches( "ClassType" ) )
+            {
+              bouncePotentialFitClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            }
+            else if( nestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+            {
+              bouncePotentialFitArguments.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            }
+          }
+        }
+        else if( elementParser.currentElementNameMatches(
+                                                         "TunnelPathFinder" ) )
+        {
+          // <TunnelPathFinder> should have child elements <ClassName> and
+          // <ConstructorArguments>.
+          BOL::AsciiXmlParser nestedParser;
+          nestedParser.loadString(
+                           elementParser.getTrimmedCurrentElementContent() );
+          while( nestedParser.readNextElement() )
+          {
+            if( nestedParser.currentElementNameMatches( "ClassType" ) )
+            {
+              tunnelPathFinderClass.assign(
+                           nestedParser.getTrimmedCurrentElementContent() );
+            }
+            else if( nestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+            {
+              tunnelPathFinderArguments.assign(
+                           nestedParser.getTrimmedCurrentElementContent() );
+            }
+          }
+        }
+      }
+
+      if( bouncePotentialFitClass.compare( "BubbleShootingOnSpline" ) == 0 )
+      {
+        bounceActionCalculator = new BubbleShootingOnSpline( potentialFunction,
+                                                 bouncePotentialFitArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<BouncePotentialFit> was not a recognized form! The only type"
+        << " currently valid is \"BubbleShootingOnSpline\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+
+      if( tunnelPathFinderClass.compare( "MinuitNodePotentialMinimizer" )
+          == 0 )
+      {
+        // <TunnelPathFinder> should have child elements <ClassName> and
+        // <ConstructorArguments>.
+        BOL::AsciiXmlParser twoNestedParser;
+        twoNestedParser.loadString(
+                         elementParser.getTrimmedCurrentElementContent() );
+        while( twoNestedParser.readNextElement() )
+        {
+          if( twoNestedParser.currentElementNameMatches( "ClassType" ) )
+          {
+            tunnelPathFinderClass.assign(
+                         twoNestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( twoNestedParser.currentElementNameMatches(
+                                                   "ConstructorArguments" ) )
+          {
+            tunnelPathFinderArguments.assign(
+                         twoNestedParser.getTrimmedCurrentElementContent() );
+          }
+        }
+        bouncePathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
+                                                   tunnelPathFinderArguments );
+      }
+      else if( tunnelPathFinderClass.compare( "MinuitPathBounceMinimizer" )
+               == 0 )
+      {
+        bouncePathFinder = new MinuitPathBounceMinimizer( potentialFunction,
+                                                   tunnelPathFinderArguments );
+      }
+      else if( tunnelPathFinderClass.compare( "MinuitPathPotentialMinimizer" )
+               == 0 )
+      {
+        bouncePathFinder = new MinuitPathPotentialMinimizer( potentialFunction,
+                                                   tunnelPathFinderArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<TunnelPathFinder> was not a recognized form! The only types"
+        << " currently valid are \"MinuitNodePotentialMinimizer\","
+        << " \"MinuitPathBounceMinimizer\", or"
+        << " \"MinuitPathPotentialMinimizer\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+
+      // Now we have the components for tunnelingCalculator:
+      tunnelingCalculator
+      = new BounceAlongPathWithThreshold( (*potentialFunction),
+                                          bounceActionCalculator,
+                                          bouncePathFinder,
+                                          tunnelingArguments );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<TunnelingClass> was not a recognized form! The only types"
+      << " currently valid are \"BounceAlongPathWithThreshold\" or"
+      << " \"CosmoTransitionsRunner\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+    deleterForTunnelingCalculator = tunnelingCalculator;
+  }
+
   VevaciousPlusPlus::~VevaciousPlusPlus()
   {
-    delete tunnelingCalculatorDeleter;
-    delete potentialMinimizerDeleter;
-    delete potentialFunctionDeleter;
+    delete deleterForTunnelingCalculator;
+    delete deleterForPotentialMinimizer;
+    delete deleterForPotentialFunction;
   }
 
 
@@ -389,10 +499,10 @@ namespace VevaciousPlusPlus
     xmlFile << "<VevaciousResults>\n"
     "  <ReferenceData>\n"
     "     <VevaciousVersion>\n"
-    "       " << versionString << "\n"
+    "       " << VersionInformation::currentVersion << "\n"
     "     </VevaciousVersion>\n"
     "     <CitationArticle>\n"
-    "       " << citationString << "\n"
+    "       " << VersionInformation::currentCitation << "\n"
     "     </CitationArticle>\n"
     "     <ResultTimestamp>\n"
     "       "
@@ -493,7 +603,8 @@ namespace VevaciousPlusPlus
     // of '\n' characters ending the file.
     outputFile << "\n"
     "BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus\n"
-    "# version " << versionString << ", documented in " << citationString
+    "# version " << VersionInformation::currentVersion << ", documented in "
+    << VersionInformation::currentCitation
     << "\n"
     "# Results written " << std::string( ctime( &currentTime ) )
     << "# [index] [verdict int]\n"

@@ -17,15 +17,17 @@
 
 namespace VevaciousPlusPlus
 {
-
+  // This class takes memory management ownership of the components given to
+  // the constructor as pointers! It'd be nice to use std::unique_ptrs, but we
+  // are stubbornly sticking to allowing non-C++11-compliant compilers.
   class GradientFromStartingPoints : public PotentialMinimizer
   {
   public:
-    GradientFromStartingPoints( PotentialFunction const* potentialFunction,
-                                std::string const& xmlArguments,
-                                SlhaManager& slhaManager );
-    virtual
-    ~GradientFromStartingPoints();
+    GradientFromStartingPoints( StartingPointFinder* startingPointFinder,
+                                GradientMinimizer* gradientMinimizer,
+                              double const extremumSeparationThresholdFraction,
+                                double const nonDsbRollingToDsbScalingFactor );
+    virtual ~GradientFromStartingPoints();
 
 
     // This uses startingPointFinder to find the starting points for

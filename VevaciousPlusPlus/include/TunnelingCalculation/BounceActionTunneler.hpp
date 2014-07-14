@@ -20,16 +20,20 @@ namespace VevaciousPlusPlus
   class BounceActionTunneler : public TunnelingCalculator
   {
   public:
-    BounceActionTunneler( PotentialFunction const& potentialFunction,
+    BounceActionTunneler( PotentialFunction& potentialFunction,
                           std::string const& xmlArguments );
-    virtual
-    ~BounceActionTunneler();
+    virtual ~BounceActionTunneler();
 
 
     // This decides what virtual tunneling calculation functions to call based
     // on tunnelingStrategy.
     virtual void CalculateTunneling( PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum );
+
+
+    // This doesn't do anything here.
+    virtual void
+    UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
 
 
   protected:
