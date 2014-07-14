@@ -28,6 +28,8 @@ namespace VevaciousPlusPlus
   {
   public:
     MinuitNodePotentialMinimizer( PotentialFunction const& potentialFunction,
+                                  PathFromNodesFactory* pathFactory,
+                                  NodesFromParameterization* pathNodes,
                                   std::string const& xmlArguments );
     virtual ~MinuitNodePotentialMinimizer();
 

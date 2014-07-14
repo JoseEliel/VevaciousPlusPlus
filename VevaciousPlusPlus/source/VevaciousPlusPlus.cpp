@@ -126,10 +126,10 @@ namespace VevaciousPlusPlus
 
     // Now we know the overall picture of what components to set up.
     // ALL SUB-COMPONENTS FOR potentialMinimizer AND tunnelingCalculator ARE
-    // MEMORY-MANAGED BY THE COMPONENTS! The VevaciousPlusPlus destructor only
-    // deletes deleterForTunnelingCalculator, deleterForPotentialMinimizer, and
-    // deleterForPotentialFunction, while this constructor is allocating much
-    // more memory than that.
+    // MEMORY-MANAGED BY THE COMPONENTS THEMSELVES! The VevaciousPlusPlus
+    // destructor only deletes deleterForTunnelingCalculator,
+    // deleterForPotentialMinimizer, and deleterForPotentialFunction, while
+    // this constructor is allocating much more memory than that.
 
     // First the potential function:
     if( potentialClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
@@ -374,42 +374,79 @@ namespace VevaciousPlusPlus
         throw std::runtime_error( errorStream.str() );
       }
 
-      if( tunnelPathFinderClass.compare( "MinuitNodePotentialMinimizer" )
-          == 0 )
+      if( ( tunnelPathFinderClass.compare( "MinuitNodePotentialMinimizer" )
+            == 0 )
+          ||
+          ( tunnelPathFinderClass.compare( "MinuitPathBounceMinimizer" )
+            == 0 )
+          ||
+          ( tunnelPathFinderClass.compare( "MinuitPathPotentialMinimizer" )
+            == 0 ) )
       {
-        // <TunnelPathFinder> should have child elements <ClassName> and
-        // <ConstructorArguments>.
-        BOL::AsciiXmlParser twoNestedParser;
-        twoNestedParser.loadString(
-                         elementParser.getTrimmedCurrentElementContent() );
-        while( twoNestedParser.readNextElement() )
+        size_t numberOfPotentialSamplePoints( 15 );
+        unsigned int minuitStrategy( 1 );
+        double minuitTolerance( 0.5 );
+        std::string pathParameterizationClass( "PathFromNodes" );
+        std::string pathParameterizationArguments( "" );
+
+        BOL::AsciiXmlParser nestedParser;
+        nestedParser.loadString(
+                             elementParser.getTrimmedCurrentElementContent() );
+        while( nestedParser.readNextElement() )
         {
-          if( twoNestedParser.currentElementNameMatches( "ClassType" ) )
+          if( nestedParser.currentElementNameMatches(
+                                            "NumberOfPotentialSamplePoints" ) )
           {
-            tunnelPathFinderClass.assign(
-                         twoNestedParser.getTrimmedCurrentElementContent() );
+            numberOfPotentialSamplePoints = BOL::StringParser::stringToInt(
+                              nestedParser.getTrimmedCurrentElementContent() );
           }
-          else if( twoNestedParser.currentElementNameMatches(
-                                                   "ConstructorArguments" ) )
+          else if( nestedParser.currentElementNameMatches( "MinuitStrategy" ) )
           {
-            tunnelPathFinderArguments.assign(
-                         twoNestedParser.getTrimmedCurrentElementContent() );
+            minuitStrategy = BOL::StringParser::stringToInt(
+                              nestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( nestedParser.currentElementNameMatches( "MinuitTolerance" ) )
+          {
+            minuitTolerance = BOL::StringParser::stringToDouble(
+                              nestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( nestedParser.currentElementNameMatches(
+                                                     "PathParameterization" ) )
+          {
+            BOL::AsciiXmlParser doublyNestedParser;
+            doublyNestedParser.loadString(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            while( doublyNestedParser.readNextElement() )
+            {
+              if( doublyNestedParser.currentElementNameMatches( "ClassType" ) )
+              {
+                pathParameterizationClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+              }
+              else if( doublyNestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+              {
+                pathParameterizationArguments.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+              }
+            }
           }
         }
-        bouncePathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
-                                                   tunnelPathFinderArguments );
-      }
-      else if( tunnelPathFinderClass.compare( "MinuitPathBounceMinimizer" )
-               == 0 )
-      {
-        bouncePathFinder = new MinuitPathBounceMinimizer( potentialFunction,
-                                                   tunnelPathFinderArguments );
-      }
-      else if( tunnelPathFinderClass.compare( "MinuitPathPotentialMinimizer" )
-               == 0 )
-      {
-        bouncePathFinder = new MinuitPathPotentialMinimizer( potentialFunction,
-                                                   tunnelPathFinderArguments );
+
+        // We still need to extract the type of path parameterization.
+        nestedParser.loadString( pathParameterizationArguments );
+        if( pathParameterizationClass.compare(
+                                      "PathFromPolynomialCoefficients" ) == 0 )
+        {
+          // placeholder:
+          /**/std::cout << std::endl
+          << "Placeholder: "
+          << "DO SOMETHING HERE! NULL POINTER ABOUT TO CAUSE SEG FAULT!";
+          std::cout << std::endl;/**/
+        }
+        bouncePathFinder = NULL;
+        // bouncePathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
+        //                                           tunnelPathFinderArguments );
       }
       else
       {

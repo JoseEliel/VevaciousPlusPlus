@@ -320,6 +320,7 @@
                  number is ignored, as the number of nodes will be taken from
                  <ConstructorArguments><NumberOfVaryingNodes> in
                  <PathParameterization>. -->
+            15
           </NumberOfPotentialSamplePoints>
           <MinuitStrategy>
             <!-- The number given here is given to Minuit2 to decide how
@@ -430,7 +431,7 @@
                      and each subsequent segment is constructed to have slope
                      continuous with its previous segment). -->
                 LinearSplinePath
-              </InterpolationStyle>              
+              </InterpolationStyle>
             </ConstructorArguments>
           </PathParameterization>
         </ConstructorArguments>
