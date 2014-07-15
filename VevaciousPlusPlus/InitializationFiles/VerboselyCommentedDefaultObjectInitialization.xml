@@ -189,6 +189,22 @@
       <SurvivalProbabilityThreshold>
         0.01
       </SurvivalProbabilityThreshold>
+      <CriticalTemperatureAccuracy>
+        <!-- This option gives the accuracy to which the critical and
+             evaporation temperatures will be calculated if necessary, in that
+             the temperature used will be within 2^-(the number given here) of
+             the exact value. -->
+        7
+      </CriticalTemperatureAccuracy>
+      <EvaporationBarrierResolution>
+        <!-- This option gives the resolution of the energy barrier between the
+             field configuration of the DSB vacuum at zero temperature and the
+             field origin, which is evaluated at different temperatures to see
+             if there is a positive energy barrier: if not, the DSB vacuum is
+             deemed to have "evaporated" and tunneling out of the DSB vacuum is
+             substituted with tunneling out of the field origin. -->
+        3
+      </EvaporationBarrierResolution>
       <!-- The following elements are read only if <ClassType> is
            "CosmoTransitionsRunner", and are ignored if <ClassType> is
            "BounceAlongPathWithThreshold". -->
@@ -304,24 +320,27 @@
              minimizations in an f-dimensional space. If using
              "MinuitNodePotentialMinimizer", <ConstructorArguments> here must
              have "LinearSplineThroughNodes", "QuadraticSplineThroughNodes", or
-             "PolynomialThroughNodes" in <PathParameterization><ClassType>. -->
+             "PolynomialThroughNodes" in <PathParameterization><ClassType>.
+             (There is a good reason why there is no option to have a
+             "MinuitNodeBounceMinimizer": calculating the bounce action
+             requires knowing the whole path, so there is nothing to be gained
+             by looking at a single node at a time, and Minuit2 will vary each
+             node on its own anyway as part of the process of varying the whole
+             path.) -->
           MinuitNodePotentialMinimizer
         </ClassType>
         <ConstructorArguments>
-          <NumberOfPotentialSamplePoints>
-            <!-- If using "MinuitPathBounceMinimizer", this gives the number of
-                 nodes used to fit the potential along the tunneling path for
-                 the bounce action calculation. If using
-                 "MinuitPathPotentialMinimizer", this gives the number of nodes
-                 at which the potential will be evaluated for the sum, though
-                 if <PathParameterization> has a larger number in
-                 <ConstructorArguments><NumberOfVaryingNodes>, that will be
-                 used instead. If using "MinuitNodePotentialMinimizer", this
-                 number is ignored, as the number of nodes will be taken from
-                 <ConstructorArguments><NumberOfVaryingNodes> in
-                 <PathParameterization>. -->
-            15
-          </NumberOfPotentialSamplePoints>
+          <MovesPerImprovement>
+            <!-- If using "MinuitPathBounceMinimizer" or
+                 "MinuitPathPotentialMinimizer", this is the number of function
+                 calls that Minuit2 is allowed to make to improve the path
+                 before the bounce action along the path is checked against the
+                 threshold. If using "MinuitNodePotentialMinimizer", this gives
+                 the number of moves per node used by a single iterator of path
+                 improvement (before checking to see if the action has dropped
+                 below the threshold). -->
+            100
+          </MovesPerImprovement>
           <MinuitStrategy>
             <!-- The number given here is given to Minuit2 to decide how
                  precise it tries to be, through more or less calls of the
@@ -341,6 +360,44 @@
                  considers its minimization complete. -->
             0.5
           </MinuitTolerance>
+          <NumberOfPotentialSamplePoints>
+            <!-- If using "MinuitPathBounceMinimizer", this gives the number of
+                 nodes used to fit the potential along the tunneling path for
+                 the bounce action calculation. If using
+                 "MinuitPathPotentialMinimizer", this gives the number of nodes
+                 at which the potential will be evaluated for the sum, though
+                 if <PathParameterization> has a larger number in
+                 <ConstructorArguments><NumberOfVaryingNodes>, that will be
+                 used instead. If using "MinuitNodePotentialMinimizer", this
+                 number is ignored, as the number of nodes will be taken from
+                 <ConstructorArguments><NumberOfVaryingNodes> in
+                 <PathParameterization>. -->
+            15
+          </NumberOfPotentialSamplePoints>
+          <BouncePotentialFit>
+            <!-- This is used by "MinuitPathBounceMinimizer" and is ignored by
+                 the other options. It has the same possibilities as the
+                 element of the same name under
+                 <TunnelingClass><ConstructorArguments>. The numbers given here
+                 allow for the path finding code to use a lower-resolution
+                 version to try to find the path more quickly while still
+                 allowing an accurate evaluation of the bounce action along the
+                 final path. -->
+            <ClassType>
+              BubbleShootingOnSpline
+            </ClassType>
+            <ConstructorArguments>
+              <NumberOfNodesForPotentialFit>
+                8
+              </NumberOfNodesForPotentialFit>
+              <NumberShootAttemptsAllowed>
+                16
+              </NumberShootAttemptsAllowed>
+              <RadialResolution>
+                0.05
+              </RadialResolution>
+            </ConstructorArguments>
+          </BouncePotentialFit>
           <PathParameterization>
             <ClassType>
               <!-- The valid options for this version of VevaciousPlusPlus are:

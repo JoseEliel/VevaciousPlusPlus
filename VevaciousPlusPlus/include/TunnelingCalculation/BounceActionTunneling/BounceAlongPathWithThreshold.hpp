@@ -9,11 +9,10 @@
 #define BOUNCEALONGPATHWITHTHRESHOLD_HPP_
 
 #include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "../BounceActionTunneler.hpp"
-#include "BubbleShootingOnSpline.hpp"
-#include "MinuitPathBounceMinimizer.hpp"
-#include "MinuitPathPotentialMinimizer.hpp"
-#include "MinuitNodePotentialMinimizer.hpp"
+#include "BounceActionEvaluation/BouncePathFinder.hpp"
+#include "BounceActionEvaluation/BounceActionCalculator.hpp"
 
 namespace VevaciousPlusPlus
 {

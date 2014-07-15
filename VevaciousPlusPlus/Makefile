@@ -35,6 +35,8 @@ INCLUDES=-I./include/ \
 CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
+BOUNCEACTIONPATHFINDING= source/BounceActionEvaluation/BounceActionPathFinding/
+PATHPARAMETERIZATION= source/BounceActionEvaluation/PathParameterization/
 MASSESSQUAREDCALCULATORS= source/PotentialEvaluation/MassesSquaredCalculators/
 PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
@@ -42,11 +44,39 @@ POTENTIALEVALUATION= source/PotentialMinimization/
 HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
-SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
- source/PotentialEvaluation/BasicFunctions/PolynomialTerm.cpp \
- source/PotentialEvaluation/BasicFunctions/ProductOfPolynomialSums.cpp \
- source/PotentialEvaluation/BasicFunctions/SimplePolynomial.cpp \
- source/PotentialEvaluation/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
+SOURCES= source/BasicFunctions/PolynomialSum.cpp \
+ source/BasicFunctions/PolynomialTerm.cpp \
+ source/BasicFunctions/ProductOfPolynomialSums.cpp \
+ source/BasicFunctions/SimplePolynomial.cpp \
+ source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
+ source/BounceActionEvaluation/BounceActionCalculator.cpp \
+ $(BOUNCEACTIONPATHFINDING)/FullPathVaryingMinuit.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitNodePotentialMinimizer.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitPathBounceMinimizer.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitPathPotentialMinimizer.cpp \
+ $(BOUNCEACTIONPATHFINDING)/SingleNodeVaryingMinuit.cpp \
+ source/BounceActionEvaluation/BubbleProfile.cpp \
+ source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
+ source/BounceActionEvaluation/BubbleShootingOnSpline.cpp \
+ source/BounceActionEvaluation/OdeintBubbleDerivatives.cpp \
+ source/BounceActionEvaluation/OdeintBubbleObserver.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplineThroughNodesFactory.cpp \
+ $(PATHPARAMETERIZATION)/NodesFromParameterization.cpp \
+ $(PATHPARAMETERIZATION)/NodesOnBisectingPlanes.cpp \
+ $(PATHPARAMETERIZATION)/NodesOnParallelPlanes.cpp \
+ $(PATHPARAMETERIZATION)/NodesOnPlanes.cpp \
+ $(PATHPARAMETERIZATION)/PathFromNodesFactory.cpp \
+ $(PATHPARAMETERIZATION)/PolynomialThroughNodes.cpp \
+ $(PATHPARAMETERIZATION)/PolynomialThroughNodesFactory.cpp \
+ $(PATHPARAMETERIZATION)/QuadraticSplinePathSegment.cpp \
+ $(PATHPARAMETERIZATION)/QuadraticSplineThroughNodes.cpp \
+ $(PATHPARAMETERIZATION)/QuadraticSplineThroughNodesFactory.cpp \
+ $(PATHPARAMETERIZATION)/TunnelPath.cpp \
+ $(PATHPARAMETERIZATION)/TunnelPathFactory.cpp \
+ source/BounceActionEvaluation/SplinePotential.cpp \
  source/PotentialEvaluation/MassesSquaredCalculator.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
@@ -79,39 +109,15 @@ SOURCES= source/PotentialEvaluation/BasicFunctions/PolynomialSum.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/PotentialMinimization/StartingPointFinder.cpp \
  source/TunnelingCalculation/BounceActionTunneler.cpp \
- $(BOUNCEACTIONTUNNELING)/BounceActionCalculator.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceActionForMinuit.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  $(BOUNCEACTIONTUNNELING)/BouncePathFinder.cpp \
- $(BOUNCEACTIONTUNNELING)/BubbleShootingOnSpline.cpp \
- $(BOUNCEACTIONTUNNELING)/BubbleProfile.cpp \
- $(BOUNCEACTIONTUNNELING)/BubbleRadialValueDescription.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
- $(BOUNCEACTIONTUNNELING)/LinearSplinePathSegment.cpp \
- $(BOUNCEACTIONTUNNELING)/LinearSplineThroughNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/LinearSplineThroughNodesFactory.cpp \
  $(BOUNCEACTIONTUNNELING)/MinuitBounceActionMinimizer.cpp \
- $(BOUNCEACTIONTUNNELING)/MinuitNodePotentialMinimizer.cpp \
- $(BOUNCEACTIONTUNNELING)/MinuitPathBounceMinimizer.cpp \
- $(BOUNCEACTIONTUNNELING)/MinuitPathPotentialMinimizer.cpp \
  $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
- $(BOUNCEACTIONTUNNELING)/NodesFromParameterization.cpp \
- $(BOUNCEACTIONTUNNELING)/NodesOnBisectingPlanes.cpp \
- $(BOUNCEACTIONTUNNELING)/NodesOnParallelPlanes.cpp \
- $(BOUNCEACTIONTUNNELING)/NodesOnPlanes.cpp \
- $(BOUNCEACTIONTUNNELING)/OdeintBubbleDerivatives.cpp \
- $(BOUNCEACTIONTUNNELING)/OdeintBubbleObserver.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/PathFromNodesFactory.cpp \
- $(BOUNCEACTIONTUNNELING)/PolynomialThroughNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/PolynomialThroughNodesFactory.cpp \
- $(BOUNCEACTIONTUNNELING)/QuadraticSplineThroughNodes.cpp \
- $(BOUNCEACTIONTUNNELING)/QuadraticSplineThroughNodesFactory.cpp \
- $(BOUNCEACTIONTUNNELING)/SplinePotential.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
- $(BOUNCEACTIONTUNNELING)/TunnelPath.cpp \
- $(BOUNCEACTIONTUNNELING)/TunnelPathFactory.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
  source/VersionInformation.cpp \
  source/VevaciousPlusPlus.cpp

@@ -16,7 +16,6 @@
 #include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
 
-
 namespace VevaciousPlusPlus
 {
 
@@ -26,8 +25,7 @@ namespace VevaciousPlusPlus
     CosmoTransitionsRunner( IWritesPythonPotential& pythonPotential,
                             PotentialFunction& potentialFunction,
                             std::string const& xmlArguments );
-    virtual
-    ~CosmoTransitionsRunner();
+    virtual ~CosmoTransitionsRunner();
 
 
     // This doesn't do anything here.

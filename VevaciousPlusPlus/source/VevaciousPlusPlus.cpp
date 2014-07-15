@@ -384,10 +384,13 @@ namespace VevaciousPlusPlus
             == 0 ) )
       {
         size_t numberOfPotentialSamplePoints( 15 );
+        size_t movesPerImprovement( 100 );
         unsigned int minuitStrategy( 1 );
         double minuitTolerance( 0.5 );
         std::string pathParameterizationClass( "PathFromNodes" );
         std::string pathParameterizationArguments( "" );
+        std::string pathBouncePotentialFitClass( "BubbleShootingOnSpline" );
+        std::string pathBouncePotentialFitArguments( "" );
 
         BOL::AsciiXmlParser nestedParser;
         nestedParser.loadString(
@@ -395,9 +398,9 @@ namespace VevaciousPlusPlus
         while( nestedParser.readNextElement() )
         {
           if( nestedParser.currentElementNameMatches(
-                                            "NumberOfPotentialSamplePoints" ) )
+                                                      "MovesPerImprovement" ) )
           {
-            numberOfPotentialSamplePoints = BOL::StringParser::stringToInt(
+            movesPerImprovement = BOL::StringParser::stringToInt(
                               nestedParser.getTrimmedCurrentElementContent() );
           }
           else if( nestedParser.currentElementNameMatches( "MinuitStrategy" ) )
@@ -405,10 +408,38 @@ namespace VevaciousPlusPlus
             minuitStrategy = BOL::StringParser::stringToInt(
                               nestedParser.getTrimmedCurrentElementContent() );
           }
-          else if( nestedParser.currentElementNameMatches( "MinuitTolerance" ) )
+          else if( nestedParser.currentElementNameMatches(
+                                                          "MinuitTolerance" ) )
           {
             minuitTolerance = BOL::StringParser::stringToDouble(
                               nestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( nestedParser.currentElementNameMatches(
+                                            "NumberOfPotentialSamplePoints" ) )
+          {
+            numberOfPotentialSamplePoints = BOL::StringParser::stringToInt(
+                              nestedParser.getTrimmedCurrentElementContent() );
+          }
+          else if( nestedParser.currentElementNameMatches(
+                                                       "BouncePotentialFit" ) )
+          {
+            BOL::AsciiXmlParser doublyNestedParser;
+            doublyNestedParser.loadString(
+                              nestedParser.getTrimmedCurrentElementContent() );
+            while( doublyNestedParser.readNextElement() )
+            {
+              if( doublyNestedParser.currentElementNameMatches( "ClassType" ) )
+              {
+                pathBouncePotentialFitClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+              }
+              else if( doublyNestedParser.currentElementNameMatches(
+                                                     "ConstructorArguments" ) )
+              {
+                pathBouncePotentialFitArguments.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+              }
+            }
           }
           else if( nestedParser.currentElementNameMatches(
                                                      "PathParameterization" ) )

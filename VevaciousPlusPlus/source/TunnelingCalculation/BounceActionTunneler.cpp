@@ -78,7 +78,9 @@ namespace VevaciousPlusPlus
     thermalPotentialMinimizer( potentialFunction ),
     evaporationMinimum(),
     criticalMinimum(),
-    criticalRatherThanEvaporation( true )
+    criticalRatherThanEvaporation( true ),
+    temperatureAccuracy( 7 ),
+    evaporationResolution( 3 )
   {
     BOL::AsciiXmlParser argumentParser;
     argumentParser.loadString( xmlArguments );
@@ -117,6 +119,18 @@ namespace VevaciousPlusPlus
                                              "SurvivalProbabilityThreshold" ) )
       {
         survivalProbabilityThreshold = BOL::StringParser::stringToDouble(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches(
+                                              "CriticalTemperatureAccuracy" ) )
+      {
+        temperatureAccuracy = BOL::StringParser::stringToInt(
+                            argumentParser.getTrimmedCurrentElementContent() );
+      }
+      else if( argumentParser.currentElementNameMatches(
+                                             "EvaporationBarrierResolution" ) )
+      {
+        evaporationResolution = BOL::StringParser::stringToInt(
                             argumentParser.getTrimmedCurrentElementContent() );
       }
     }
@@ -327,10 +341,11 @@ namespace VevaciousPlusPlus
     // value which we should return.
     double justBelowTemperature( temperatureGuess );
     double justAboveTemperature( temperatureGuess + temperatureGuess );
-    // We aim to be within a factor of 2^( -7 ) of the critical temperature,
-    // hence 7 iterations of this loop.
+    // We aim to be within a factor of 2^( -temperatureAccuracy ) of the
+    // critical temperature,
+    // hence temperatureAccuracy iterations of this loop.
     for( size_t narrowingStep( 0 );
-         narrowingStep < 7;
+         narrowingStep < temperatureAccuracy;
          ++narrowingStep )
     {
       temperatureGuess = sqrt( justBelowTemperature * justAboveTemperature );
@@ -357,8 +372,7 @@ namespace VevaciousPlusPlus
   bool BounceActionTunneler::BelowEvaporationTemperature(
                                                 double const temperatureGuess )
   {
-    size_t const numberOfSteps( 3 );
-    double const stepFraction( 1.0 / (double)numberOfSteps );
+    double const stepFraction( 1.0 / (double)evaporationResolution );
     std::vector< double >
     fieldConfiguration( potentialFunction.FieldValuesOrigin() );
     double lastPotentialValue( potentialFunction( fieldConfiguration,
@@ -369,7 +383,7 @@ namespace VevaciousPlusPlus
     // is an energy barrier, so we note that we are below the evaporation
     // temperature.
     for( size_t whichStep( 1 );
-         whichStep <= numberOfSteps;
+         whichStep <= evaporationResolution;
          ++whichStep )
     {
       for( size_t fieldIndex( 0 );

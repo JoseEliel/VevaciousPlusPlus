@@ -9,9 +9,9 @@
 #define BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 
 #include "CommonIncludes.hpp"
+#include "SlhaManagement/SlhaManager.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include "TunnelingCalculator.hpp"
 
 namespace VevaciousPlusPlus
@@ -32,8 +32,7 @@ namespace VevaciousPlusPlus
 
 
     // This doesn't do anything here.
-    virtual void
-    UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
+    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
 
 
   protected:
@@ -43,11 +42,14 @@ namespace VevaciousPlusPlus
     static double const ageOfKnownUniverseInInverseGigaElectronVolts;
     static double const fourVolumeOfKnownUniverseOverGevFourth;
     static double const lnOfThermalIntegrationFactor;
+
     PotentialFunction const& potentialFunction;
     MinuitPotentialMinimizer thermalPotentialMinimizer;
     PotentialMinimum evaporationMinimum;
     PotentialMinimum criticalMinimum;
     bool criticalRatherThanEvaporation;
+    size_t temperatureAccuracy;
+    size_t evaporationResolution;
 
     // This is a hook to allow for derived classes to prepare things common to
     // both quantum and thermal tunneling. By default, it does nothing.
