@@ -21,7 +21,10 @@ namespace VevaciousPlusPlus
   {
   public:
     BounceActionTunneler( PotentialFunction& potentialFunction,
-                          std::string const& xmlArguments );
+                TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
+                          double const survivalProbabilityThreshold,
+                          size_t const temperatureAccuracy,
+                          size_t const evaporationResolution );
     virtual ~BounceActionTunneler();
 
 
@@ -44,12 +47,12 @@ namespace VevaciousPlusPlus
     static double const lnOfThermalIntegrationFactor;
 
     PotentialFunction const& potentialFunction;
+    size_t const temperatureAccuracy;
+    size_t const evaporationResolution;
     MinuitPotentialMinimizer thermalPotentialMinimizer;
     PotentialMinimum evaporationMinimum;
     PotentialMinimum criticalMinimum;
     bool criticalRatherThanEvaporation;
-    size_t temperatureAccuracy;
-    size_t evaporationResolution;
 
     // This is a hook to allow for derived classes to prepare things common to
     // both quantum and thermal tunneling. By default, it does nothing.

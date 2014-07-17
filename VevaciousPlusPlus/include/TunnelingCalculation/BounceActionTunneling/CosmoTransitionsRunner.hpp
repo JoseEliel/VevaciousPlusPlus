@@ -24,7 +24,14 @@ namespace VevaciousPlusPlus
   public:
     CosmoTransitionsRunner( IWritesPythonPotential& pythonPotential,
                             PotentialFunction& potentialFunction,
-                            std::string const& xmlArguments );
+                TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
+                            double const survivalProbabilityThreshold,
+                            size_t const temperatureAccuracy,
+                            size_t const evaporationResolution,
+                            std::string const& pathToCosmotransitions,
+                            size_t const resolutionOfDsbVacuum,
+                            size_t const maxInnerLoops,
+                            size_t const maxOuterLoops );
     virtual ~CosmoTransitionsRunner();
 
 
@@ -37,10 +44,10 @@ namespace VevaciousPlusPlus
     static std::string pythonPotentialFilenameBase;
 
     IWritesPythonPotential& pythonPotential;
-    std::string pathToCosmotransitions;
-    size_t resolutionOfDsbVacuum;
-    size_t maxInnerLoops;
-    size_t maxOuterLoops;
+    std::string const pathToCosmotransitions;
+    size_t const resolutionOfDsbVacuum;
+    size_t const maxInnerLoops;
+    size_t const maxOuterLoops;
 
 
     // This creates a Python file with the potential in a form that can be used

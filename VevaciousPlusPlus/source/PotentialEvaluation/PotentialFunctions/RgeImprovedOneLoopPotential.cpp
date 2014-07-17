@@ -11,9 +11,13 @@ namespace VevaciousPlusPlus
 {
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-                                               std::string const& xmlArguments,
+                                              std::string const& modelFilename,
+                                          double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFromPolynomialAndMasses( xmlArguments,
+    PotentialFromPolynomialAndMasses( modelFilename,
+                                      scaleRangeMinimumFactor,
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       runningParameterManager ),
     logarithmOfMinimumRenormalizationScale( NAN ),
     logarithmOfMaximumRenormalizationScale( NAN ),

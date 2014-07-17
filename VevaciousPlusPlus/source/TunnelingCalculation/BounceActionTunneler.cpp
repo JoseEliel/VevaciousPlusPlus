@@ -72,68 +72,22 @@ namespace VevaciousPlusPlus
 
   BounceActionTunneler::BounceActionTunneler(
                                           PotentialFunction& potentialFunction,
-                                            std::string const& xmlArguments ) :
-    TunnelingCalculator( potentialFunction ),
+                TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
+                                     double const survivalProbabilityThreshold,
+                                              size_t const temperatureAccuracy,
+                                         size_t const evaporationResolution ) :
+    TunnelingCalculator( potentialFunction,
+                         tunnelingStrategy,
+                         survivalProbabilityThreshold ),
     potentialFunction( potentialFunction ),
+    temperatureAccuracy( temperatureAccuracy ),
+    evaporationResolution( evaporationResolution ),
     thermalPotentialMinimizer( potentialFunction ),
     evaporationMinimum(),
     criticalMinimum(),
-    criticalRatherThanEvaporation( true ),
-    temperatureAccuracy( 7 ),
-    evaporationResolution( 3 )
+    criticalRatherThanEvaporation( true )
   {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches( "TunnelingStrategy" ) )
-      {
-        std::string tunnelingStrategyString(
-                            argumentParser.getTrimmedCurrentElementContent() );
-        if( ( tunnelingStrategyString.compare( "DefaultTunneling" ) == 0 )
-            ||
-            ( tunnelingStrategyString.compare( "ThermalThenQuantum" ) == 0 ) )
-        {
-          tunnelingStrategy = ThermalThenQuantum;
-        }
-        else if( tunnelingStrategyString.compare( "QuantumThenThermal" ) == 0 )
-        {
-          tunnelingStrategy = QuantumThenThermal;
-        }
-        else if( tunnelingStrategyString.compare( "JustThermal" ) == 0 )
-        {
-          tunnelingStrategy = JustThermal;
-        }
-        else if( tunnelingStrategyString.compare( "JustQuantum" ) == 0 )
-        {
-          tunnelingStrategy = JustQuantum;
-        }
-        else if( ( tunnelingStrategyString.compare( "NoTunneling" ) == 0 )
-                 ||
-                 ( tunnelingStrategyString.compare( "None" ) == 0 ) )
-        {
-          tunnelingStrategy = NoTunneling;
-        }
-      }
-      else if( argumentParser.currentElementNameMatches(
-                                             "SurvivalProbabilityThreshold" ) )
-      {
-        survivalProbabilityThreshold = BOL::StringParser::stringToDouble(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches(
-                                              "CriticalTemperatureAccuracy" ) )
-      {
-        temperatureAccuracy = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches(
-                                             "EvaporationBarrierResolution" ) )
-      {
-        evaporationResolution = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
+    // This constructor is just an initialization list.
   }
 
   BounceActionTunneler::~BounceActionTunneler()

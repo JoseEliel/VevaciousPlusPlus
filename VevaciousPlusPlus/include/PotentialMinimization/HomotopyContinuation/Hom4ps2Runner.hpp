@@ -20,9 +20,9 @@ namespace VevaciousPlusPlus
   {
   public:
     Hom4ps2Runner( PolynomialGradientTargetSystem& targetSystem,
-                   std::string const& xmlArguments );
-    virtual
-    ~Hom4ps2Runner();
+                   std::string const& pathToHom4ps2,
+                   std::string const& homotopyType );
+    virtual ~Hom4ps2Runner();
 
 
     // This uses HOM4PS2 to fill startingPoints with all the extrema of
@@ -33,8 +33,8 @@ namespace VevaciousPlusPlus
 
   protected:
     PolynomialGradientTargetSystem& targetSystem;
-    std::string pathToHom4ps2;
-    std::string homotopyType;
+    std::string const pathToHom4ps2;
+    std::string const homotopyType;
     BOL::StringParser variableNamer;
     std::vector< std::complex< long double > > complexSolutions;
     std::vector< std::string > variableNames;

@@ -26,8 +26,7 @@ namespace VevaciousPlusPlus
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
                               bool const treeLevelMinimaOnlyAsValidSolutions );
-    virtual
-    ~FieldPolynomialsWithScale();
+    virtual ~FieldPolynomialsWithScale();
 
 
     // This returns the first numberOfFields entries in

@@ -64,61 +64,61 @@ namespace VevaciousPlusPlus
     {
       if( fileParser.currentElementNameMatches( "PotentialClass" ) )
       {
-        BOL::AsciiXmlParser oneNestedParser;
-        oneNestedParser.loadString(
+        BOL::AsciiXmlParser elementParser;
+        elementParser.loadString(
                                 fileParser.getTrimmedCurrentElementContent() );
-        while( oneNestedParser.readNextElement() )
+        while( elementParser.readNextElement() )
         {
-          if( oneNestedParser.currentElementNameMatches( "ClassType" ) )
+          if( elementParser.currentElementNameMatches( "ClassType" ) )
           {
             potentialClass.assign(
-                           oneNestedParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           }
-          else if( oneNestedParser.currentElementNameMatches(
+          else if( elementParser.currentElementNameMatches(
                                                      "ConstructorArguments" ) )
           {
             potentialArguments.assign(
-                         oneNestedParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           }
         }
       }
       else if( fileParser.currentElementNameMatches( "MinimizerClass" ) )
       {
-        BOL::AsciiXmlParser oneNestedParser;
-        oneNestedParser.loadString(
+        BOL::AsciiXmlParser elementParser;
+        elementParser.loadString(
                                 fileParser.getTrimmedCurrentElementContent() );
-        while( oneNestedParser.readNextElement() )
+        while( elementParser.readNextElement() )
         {
-          if( oneNestedParser.currentElementNameMatches( "ClassType" ) )
+          if( elementParser.currentElementNameMatches( "ClassType" ) )
           {
             minimizerClass.assign(
-                           oneNestedParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           }
-          else if( oneNestedParser.currentElementNameMatches(
+          else if( elementParser.currentElementNameMatches(
                                                      "ConstructorArguments" ) )
           {
             minimizerArguments.assign(
-                         oneNestedParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           }
         }
       }
       else if( fileParser.currentElementNameMatches( "TunnelingClass" ) )
       {
-        BOL::AsciiXmlParser oneNestedParser;
-        oneNestedParser.loadString(
+        BOL::AsciiXmlParser elementParser;
+        elementParser.loadString(
                                 fileParser.getTrimmedCurrentElementContent() );
-        while( oneNestedParser.readNextElement() )
+        while( elementParser.readNextElement() )
         {
-          if( oneNestedParser.currentElementNameMatches( "ClassType" ) )
+          if( elementParser.currentElementNameMatches( "ClassType" ) )
           {
             tunnelingClass.assign(
-                           oneNestedParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           }
-          else if( oneNestedParser.currentElementNameMatches(
+          else if( elementParser.currentElementNameMatches(
                                                      "ConstructorArguments" ) )
           {
             tunnelingArguments.assign(
-                         oneNestedParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           }
         }
       }
@@ -131,17 +131,59 @@ namespace VevaciousPlusPlus
     // deleterForPotentialMinimizer, and deleterForPotentialFunction, while
     // this constructor is allocating much more memory than that.
 
-    // First the potential function:
+    // First the potential function: since the only options are both derived
+    // from PotentialFromPolynomialAndMasses with no specific extra arguments,
+    // we extract them from the XML here.
+
+
+    BOL::AsciiXmlParser elementParser;
+    elementParser.loadString( potentialArguments );
+    std::string modelFilename( "./ModelFiles/SM.vin" );
+    double scaleRangeMinimumFactor( 10.0 );
+    bool treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false );
+    while( elementParser.readNextElement() )
+    {
+      if( elementParser.currentElementNameMatches( "ModelFile" ) )
+      {
+        modelFilename.assign(
+                             elementParser.getTrimmedCurrentElementContent() );
+      }
+      else if( elementParser.currentElementNameMatches( "RollOnlyMinima" ) )
+      {
+        std::string rollOnlyMinima(
+                             elementParser.getTrimmedCurrentElementContent() );
+        BOL::StringParser::transformToLowercase( rollOnlyMinima );
+        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions
+        = ( rollOnlyMinima.compare( "true" ) == 0 );
+        if( !treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions
+            &&
+            ( rollOnlyMinima.compare( "yes" ) == 0 ) )
+        {
+          treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions = true;
+        }
+      }
+      else if( elementParser.currentElementNameMatches(
+                                                  "ScaleRangeMinimumFactor" ) )
+      {
+        scaleRangeMinimumFactor = BOL::StringParser::stringToDouble(
+                             elementParser.getTrimmedCurrentElementContent() );
+      }
+    }
+
     if( potentialClass.compare( "FixedScaleOneLoopPotential" ) == 0 )
     {
       potentialFromPolynomialAndMasses
-      = new FixedScaleOneLoopPotential( potentialArguments,
+      = new FixedScaleOneLoopPotential( modelFilename,
+                                        scaleRangeMinimumFactor,
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                         runningParameterManager );
     }
     else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
     {
       potentialFromPolynomialAndMasses
-      = new RgeImprovedOneLoopPotential( potentialArguments,
+      = new RgeImprovedOneLoopPotential( modelFilename,
+                                         scaleRangeMinimumFactor,
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                          runningParameterManager );
     }
     else
@@ -153,7 +195,7 @@ namespace VevaciousPlusPlus
       << " \"RgeImprovedOneLoopPotential\".";
       throw std::runtime_error( errorStream.str() );
     }
-    potentialFunction = (PotentialFunction*)potentialFromPolynomialAndMasses;
+    potentialFunction = potentialFromPolynomialAndMasses;
     deleterForPotentialFunction = potentialFunction;
 
     // Next the potential minimizer:
@@ -162,7 +204,6 @@ namespace VevaciousPlusPlus
       // We need to assemble the components for a GradientFromStartingPoints
       // object: a StartingPointFinder and a GradientMinimizer. We need to find
       // out what derived classes to actually use.
-      BOL::AsciiXmlParser elementParser;
       elementParser.loadString( minimizerArguments );
       StartingPointFinder* startingPointFinder( NULL );
       std::string startingPointFinderClass( "Hom4ps2Runner" );
@@ -243,9 +284,29 @@ namespace VevaciousPlusPlus
 
       if( startingPointFinderClass.compare( "Hom4ps2Runner" ) == 0 )
       {
+        elementParser.loadString( startingPointFinderArguments );
+        // The <ConstructorArguments> for this class should have child elements
+        // <PathToHom4ps2> and <Hom4ps2Argument>.
+        std::string pathToHom4ps2( "./HOM4PS2/" );
+        std::string homotopyType( "2" );
+        while( elementParser.readNextElement() )
+        {
+          if( elementParser.currentElementNameMatches( "PathToHom4ps2" ) )
+          {
+            pathToHom4ps2.assign(
+                            elementParser.getTrimmedCurrentElementContent() );
+          }
+          else if( elementParser.currentElementNameMatches(
+                                                          "Hom4ps2Argument" ) )
+          {
+            homotopyType.assign(
+                            elementParser.getTrimmedCurrentElementContent() );
+          }
+        }
         startingPointFinder = new Hom4ps2Runner(
           potentialFromPolynomialAndMasses->HomotopyContinuationTargetSystem(),
-                                              startingPointFinderArguments );
+                                                 pathToHom4ps2,
+                                                 homotopyType );
       }
       else
       {
@@ -258,8 +319,35 @@ namespace VevaciousPlusPlus
 
       if( gradientMinimizerClass.compare( "MinuitPotentialMinimizer" ) == 0 )
       {
+        elementParser.loadString( gradientMinimizerArguments );
+        double errorFraction( 0.1 );
+        double errorMinimum( 1.0 );
+        unsigned int minuitStrategy( 1 );
+        while( elementParser.readNextElement() )
+        {
+          if( elementParser.currentElementNameMatches(
+                                                  "InitialStepSizeFraction" ) )
+          {
+            errorFraction = BOL::StringParser::stringToDouble(
+                            elementParser.getTrimmedCurrentElementContent() );
+          }
+          else if( elementParser.currentElementNameMatches(
+                                                   "MinimumInitialStepSize" ) )
+          {
+            errorMinimum = BOL::StringParser::stringToDouble(
+                            elementParser.getTrimmedCurrentElementContent() );
+          }
+          else if( elementParser.currentElementNameMatches(
+                                                           "MinuitStrategy" ) )
+          {
+            minuitStrategy = BOL::StringParser::stringToInt(
+                            elementParser.getTrimmedCurrentElementContent() );
+          }
+        }
         gradientMinimizer = new MinuitPotentialMinimizer( *potentialFunction,
-                                                  gradientMinimizerArguments );
+                                                          errorFraction,
+                                                          errorMinimum,
+                                                          minuitStrategy );
       }
       else
       {
@@ -288,32 +376,105 @@ namespace VevaciousPlusPlus
     deleterForPotentialMinimizer = potentialMinimizer;
 
     // Next the tunneling calculator:
-    if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
+    if( ( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
+        ||
+        ( tunnelingClass.compare( "BounceAlongPathWithThreshold" ) == 0 ) )
     {
-      tunnelingCalculator
-      = new CosmoTransitionsRunner( *potentialFromPolynomialAndMasses,
-                                    *potentialFunction,
-                                    tunnelingArguments );
-    }
-    else if( tunnelingClass.compare( "BounceAlongPathWithThreshold" ) == 0 )
-    {
-      // We need to assemble the components for a BounceAlongPathWithThreshold
-      // object: a BounceActionCalculator and a BouncePathFinder. We need to
-      // find out what derived classes to actually use.
-      BOL::AsciiXmlParser elementParser;
       elementParser.loadString( tunnelingArguments );
+      TunnelingCalculator::TunnelingStrategy
+      tunnelingStrategy( TunnelingCalculator::TunnelingStrategy::JustThermal );
+      double survivalProbabilityThreshold;
+      size_t temperatureAccuracy( 7 );
+      size_t evaporationResolution( 3 );
+      std::string pathToCosmotransitions( "./cosmoTransitions/" );
+      size_t resolutionOfDsbVacuum( 20 );
+      size_t maxInnerLoops( 10 );
+      size_t maxOuterLoops( 10 );
       BounceActionCalculator* bounceActionCalculator( NULL );
       std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
       std::string bouncePotentialFitArguments( "" );
       BouncePathFinder* bouncePathFinder( NULL );
       std::string tunnelPathFinderClass( "MinuitNodePotentialMinimizer" );
       std::string tunnelPathFinderArguments( "" );
-
-      // The <ConstructorArguments> for this class should have child elements
-      // <BouncePotentialFit> and <TunnelPathFinder>.
       while( elementParser.readNextElement() )
       {
-        if( elementParser.currentElementNameMatches( "BouncePotentialFit" ) )
+        if( elementParser.currentElementNameMatches( "TunnelingStrategy" ) )
+        {
+          std::string tunnelingStrategyString(
+                             elementParser.getTrimmedCurrentElementContent() );
+          if( ( tunnelingStrategyString.compare( "DefaultTunneling" ) == 0 )
+              ||
+              ( tunnelingStrategyString.compare( "ThermalThenQuantum" )
+                == 0 ) )
+          {
+            tunnelingStrategy
+            = TunnelingCalculator::TunnelingStrategy::ThermalThenQuantum;
+          }
+          else if( tunnelingStrategyString.compare( "QuantumThenThermal" )
+                   == 0 )
+          {
+            tunnelingStrategy
+            = TunnelingCalculator::TunnelingStrategy::QuantumThenThermal;
+          }
+          else if( tunnelingStrategyString.compare( "JustThermal" ) == 0 )
+          {
+            tunnelingStrategy
+            = TunnelingCalculator::TunnelingStrategy::JustThermal;
+          }
+          else if( tunnelingStrategyString.compare( "JustQuantum" ) == 0 )
+          {
+            tunnelingStrategy
+            = TunnelingCalculator::TunnelingStrategy::JustQuantum;
+          }
+          else if( ( tunnelingStrategyString.compare( "NoTunneling" ) == 0 )
+                   ||
+                   ( tunnelingStrategyString.compare( "None" ) == 0 ) )
+          {
+            tunnelingStrategy
+            = TunnelingCalculator::TunnelingStrategy::NoTunneling;
+          }
+        }
+        else if( elementParser.currentElementNameMatches(
+                                             "SurvivalProbabilityThreshold" ) )
+        {
+          survivalProbabilityThreshold = BOL::StringParser::stringToDouble(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches(
+                                              "CriticalTemperatureAccuracy" ) )
+        {
+          temperatureAccuracy = BOL::StringParser::stringToInt(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches(
+                                             "EvaporationBarrierResolution" ) )
+        {
+          evaporationResolution = BOL::StringParser::stringToInt(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches(
+                                                   "PathToCosmotransitions" ) )
+        {
+          pathToCosmotransitions.assign(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches( "PathResolution" ) )
+        {
+          resolutionOfDsbVacuum = BOL::StringParser::stringToInt(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches( "MaxInnerLoops" ) )
+        {
+          maxInnerLoops = BOL::StringParser::stringToInt(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches( "MaxOuterLoops" ) )
+        {
+          maxOuterLoops = BOL::StringParser::stringToInt(
+                             elementParser.getTrimmedCurrentElementContent() );
+        }
+        else if( elementParser.currentElementNameMatches(
+                                                       "BouncePotentialFit" ) )
         {
           // <BouncePotentialFit> should have child elements <ClassName> and
           // <ConstructorArguments>.
@@ -342,160 +503,179 @@ namespace VevaciousPlusPlus
           // <ConstructorArguments>.
           BOL::AsciiXmlParser nestedParser;
           nestedParser.loadString(
-                           elementParser.getTrimmedCurrentElementContent() );
+                             elementParser.getTrimmedCurrentElementContent() );
           while( nestedParser.readNextElement() )
           {
             if( nestedParser.currentElementNameMatches( "ClassType" ) )
             {
               tunnelPathFinderClass.assign(
-                           nestedParser.getTrimmedCurrentElementContent() );
+                              nestedParser.getTrimmedCurrentElementContent() );
             }
             else if( nestedParser.currentElementNameMatches(
                                                      "ConstructorArguments" ) )
             {
               tunnelPathFinderArguments.assign(
-                           nestedParser.getTrimmedCurrentElementContent() );
+                              nestedParser.getTrimmedCurrentElementContent() );
             }
           }
         }
       }
 
-      if( bouncePotentialFitClass.compare( "BubbleShootingOnSpline" ) == 0 )
+      if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
       {
-        bounceActionCalculator = new BubbleShootingOnSpline( potentialFunction,
-                                                 bouncePotentialFitArguments );
+        tunnelingCalculator
+        = new CosmoTransitionsRunner( *potentialFromPolynomialAndMasses,
+                                      *potentialFunction,
+                                      tunnelingArguments );
       }
-      else
+      else if( tunnelingClass.compare( "BounceAlongPathWithThreshold" ) == 0 )
       {
-        std::stringstream errorStream;
-        errorStream
-        << "<BouncePotentialFit> was not a recognized form! The only type"
-        << " currently valid is \"BubbleShootingOnSpline\".";
-        throw std::runtime_error( errorStream.str() );
-      }
+        // We need to assemble the components for a
+        // BounceAlongPathWithThreshold object: a BounceActionCalculator and a
+        // BouncePathFinder. We need to find out what derived classes to
+        // actually use.
+        if( bouncePotentialFitClass.compare( "BubbleShootingOnSpline" ) == 0 )
+        {
+          HERE! FIX ARGUMENTS!
+          bounceActionCalculator
+          = new BubbleShootingOnSpline( potentialFunction,
+                                        bouncePotentialFitArguments );
+        }
+        else
+        {
+          std::stringstream errorStream;
+          errorStream
+          << "<BouncePotentialFit> was not a recognized form! The only type"
+          << " currently valid is \"BubbleShootingOnSpline\".";
+          throw std::runtime_error( errorStream.str() );
+        }
 
-      if( ( tunnelPathFinderClass.compare( "MinuitNodePotentialMinimizer" )
-            == 0 )
-          ||
-          ( tunnelPathFinderClass.compare( "MinuitPathBounceMinimizer" )
-            == 0 )
-          ||
-          ( tunnelPathFinderClass.compare( "MinuitPathPotentialMinimizer" )
-            == 0 ) )
-      {
-        size_t numberOfPotentialSamplePoints( 15 );
-        size_t movesPerImprovement( 100 );
-        unsigned int minuitStrategy( 1 );
-        double minuitTolerance( 0.5 );
-        std::string pathParameterizationClass( "PathFromNodes" );
-        std::string pathParameterizationArguments( "" );
-        std::string pathBouncePotentialFitClass( "BubbleShootingOnSpline" );
-        std::string pathBouncePotentialFitArguments( "" );
+        if( ( tunnelPathFinderClass.compare( "MinuitNodePotentialMinimizer" )
+              == 0 )
+            ||
+            ( tunnelPathFinderClass.compare( "MinuitPathBounceMinimizer" )
+              == 0 )
+            ||
+            ( tunnelPathFinderClass.compare( "MinuitPathPotentialMinimizer" )
+              == 0 ) )
+        {
+          size_t numberOfPotentialSamplePoints( 15 );
+          size_t movesPerImprovement( 100 );
+          unsigned int minuitStrategy( 1 );
+          double minuitTolerance( 0.5 );
+          std::string pathParameterizationClass( "PathFromNodes" );
+          std::string pathParameterizationArguments( "" );
+          std::string pathBouncePotentialFitClass( "BubbleShootingOnSpline" );
+          std::string pathBouncePotentialFitArguments( "" );
 
-        BOL::AsciiXmlParser nestedParser;
-        nestedParser.loadString(
+          BOL::AsciiXmlParser nestedParser;
+          nestedParser.loadString(
                              elementParser.getTrimmedCurrentElementContent() );
-        while( nestedParser.readNextElement() )
-        {
-          if( nestedParser.currentElementNameMatches(
+          while( nestedParser.readNextElement() )
+          {
+            if( nestedParser.currentElementNameMatches(
                                                       "MovesPerImprovement" ) )
-          {
-            movesPerImprovement = BOL::StringParser::stringToInt(
+            {
+              movesPerImprovement = BOL::StringParser::stringToInt(
                               nestedParser.getTrimmedCurrentElementContent() );
-          }
-          else if( nestedParser.currentElementNameMatches( "MinuitStrategy" ) )
-          {
-            minuitStrategy = BOL::StringParser::stringToInt(
+            }
+            else if( nestedParser.currentElementNameMatches(
+                                                           "MinuitStrategy" ) )
+            {
+              minuitStrategy = BOL::StringParser::stringToInt(
                               nestedParser.getTrimmedCurrentElementContent() );
-          }
-          else if( nestedParser.currentElementNameMatches(
+            }
+            else if( nestedParser.currentElementNameMatches(
                                                           "MinuitTolerance" ) )
-          {
-            minuitTolerance = BOL::StringParser::stringToDouble(
+            {
+              minuitTolerance = BOL::StringParser::stringToDouble(
                               nestedParser.getTrimmedCurrentElementContent() );
-          }
-          else if( nestedParser.currentElementNameMatches(
+            }
+            else if( nestedParser.currentElementNameMatches(
                                             "NumberOfPotentialSamplePoints" ) )
-          {
-            numberOfPotentialSamplePoints = BOL::StringParser::stringToInt(
+            {
+              numberOfPotentialSamplePoints = BOL::StringParser::stringToInt(
                               nestedParser.getTrimmedCurrentElementContent() );
-          }
-          else if( nestedParser.currentElementNameMatches(
+            }
+            else if( nestedParser.currentElementNameMatches(
                                                        "BouncePotentialFit" ) )
-          {
-            BOL::AsciiXmlParser doublyNestedParser;
-            doublyNestedParser.loadString(
-                              nestedParser.getTrimmedCurrentElementContent() );
-            while( doublyNestedParser.readNextElement() )
             {
-              if( doublyNestedParser.currentElementNameMatches( "ClassType" ) )
-              {
-                pathBouncePotentialFitClass.assign(
+              BOL::AsciiXmlParser doublyNestedParser;
+              doublyNestedParser.loadString(
                               nestedParser.getTrimmedCurrentElementContent() );
-              }
-              else if( doublyNestedParser.currentElementNameMatches(
+              while( doublyNestedParser.readNextElement() )
+              {
+                if( doublyNestedParser.currentElementNameMatches(
+                                                                "ClassType" ) )
+                {
+                  pathBouncePotentialFitClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+                }
+                else if( doublyNestedParser.currentElementNameMatches(
                                                      "ConstructorArguments" ) )
-              {
-                pathBouncePotentialFitArguments.assign(
+                {
+                  pathBouncePotentialFitArguments.assign(
                               nestedParser.getTrimmedCurrentElementContent() );
+                }
               }
             }
-          }
-          else if( nestedParser.currentElementNameMatches(
+            else if( nestedParser.currentElementNameMatches(
                                                      "PathParameterization" ) )
-          {
-            BOL::AsciiXmlParser doublyNestedParser;
-            doublyNestedParser.loadString(
-                              nestedParser.getTrimmedCurrentElementContent() );
-            while( doublyNestedParser.readNextElement() )
             {
-              if( doublyNestedParser.currentElementNameMatches( "ClassType" ) )
-              {
-                pathParameterizationClass.assign(
+              BOL::AsciiXmlParser doublyNestedParser;
+              doublyNestedParser.loadString(
                               nestedParser.getTrimmedCurrentElementContent() );
-              }
-              else if( doublyNestedParser.currentElementNameMatches(
+              while( doublyNestedParser.readNextElement() )
+              {
+                if( doublyNestedParser.currentElementNameMatches(
+                                                                "ClassType" ) )
+                {
+                  pathParameterizationClass.assign(
+                              nestedParser.getTrimmedCurrentElementContent() );
+                }
+                else if( doublyNestedParser.currentElementNameMatches(
                                                      "ConstructorArguments" ) )
-              {
-                pathParameterizationArguments.assign(
+                {
+                  pathParameterizationArguments.assign(
                               nestedParser.getTrimmedCurrentElementContent() );
+                }
               }
             }
           }
-        }
 
-        // We still need to extract the type of path parameterization.
-        nestedParser.loadString( pathParameterizationArguments );
-        if( pathParameterizationClass.compare(
+          // We still need to extract the type of path parameterization.
+          nestedParser.loadString( pathParameterizationArguments );
+          if( pathParameterizationClass.compare(
                                       "PathFromPolynomialCoefficients" ) == 0 )
-        {
-          // placeholder:
-          /**/std::cout << std::endl
-          << "Placeholder: "
-          << "DO SOMETHING HERE! NULL POINTER ABOUT TO CAUSE SEG FAULT!";
-          std::cout << std::endl;/**/
+          {
+            // placeholder:
+            /**/std::cout << std::endl
+            << "Placeholder: "
+            << "DO SOMETHING HERE! NULL POINTER ABOUT TO CAUSE SEG FAULT!";
+            std::cout << std::endl;/**/
+          }
+          bouncePathFinder = NULL;
+          // bouncePathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
+          //                                           tunnelPathFinderArguments );
         }
-        bouncePathFinder = NULL;
-        // bouncePathFinder = new MinuitNodePotentialMinimizer( potentialFunction,
-        //                                           tunnelPathFinderArguments );
-      }
-      else
-      {
-        std::stringstream errorStream;
-        errorStream
-        << "<TunnelPathFinder> was not a recognized form! The only types"
-        << " currently valid are \"MinuitNodePotentialMinimizer\","
-        << " \"MinuitPathBounceMinimizer\", or"
-        << " \"MinuitPathPotentialMinimizer\".";
-        throw std::runtime_error( errorStream.str() );
-      }
+        else
+        {
+          std::stringstream errorStream;
+          errorStream
+          << "<TunnelPathFinder> was not a recognized form! The only types"
+          << " currently valid are \"MinuitNodePotentialMinimizer\","
+          << " \"MinuitPathBounceMinimizer\", or"
+          << " \"MinuitPathPotentialMinimizer\".";
+          throw std::runtime_error( errorStream.str() );
+        }
 
-      // Now we have the components for tunnelingCalculator:
-      tunnelingCalculator
-      = new BounceAlongPathWithThreshold( (*potentialFunction),
-                                          bounceActionCalculator,
-                                          bouncePathFinder,
-                                          tunnelingArguments );
+        // Now we have the components for tunnelingCalculator:
+        tunnelingCalculator
+        = new BounceAlongPathWithThreshold( (*potentialFunction),
+                                            bounceActionCalculator,
+                                            bouncePathFinder,
+                                            tunnelingArguments );
+      }
     }
     else
     {

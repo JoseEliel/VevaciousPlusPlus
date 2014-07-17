@@ -24,13 +24,10 @@ namespace VevaciousPlusPlus
   {
   public:
     MinuitPotentialMinimizer( PotentialFunction const& potentialFunction,
-                              std::string const& xmlArguments );
-    MinuitPotentialMinimizer( PotentialFunction const& potentialFunction,
                               double const errorFraction = 0.1,
                               double const errorMinimum = 1.0,
                               unsigned int const minuitStrategy = 1 );
-    virtual
-    ~MinuitPotentialMinimizer();
+    virtual ~MinuitPotentialMinimizer();
 
 
     // This performs a Minuit2 migrad() minimization but puts the result in the
@@ -52,9 +49,9 @@ namespace VevaciousPlusPlus
 
   protected:
     ROOT::Minuit2::FCNBase& minimizationFunction;
-    double errorFraction;
-    double errorMinimum;
-    unsigned int minuitStrategy;
+    double const errorFraction;
+    double const errorMinimum;
+    unsigned int const minuitStrategy;
   };
 
 } /* namespace VevaciousPlusPlus */

@@ -20,8 +20,10 @@ namespace VevaciousPlusPlus
   class FixedScaleOneLoopPotential : public PotentialFromPolynomialAndMasses
   {
   public:
-    FixedScaleOneLoopPotential( std::string const& xmlArguments,
-                            RunningParameterManager& runningParameterManager );
+    FixedScaleOneLoopPotential( std::string const& modelFilename,
+                                double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                           RunningParameterManager& runningParameterManager );
     FixedScaleOneLoopPotential(
           PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
     virtual

@@ -35,7 +35,9 @@ namespace VevaciousPlusPlus
                                                       "NegativeByConvention" );
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
-                                               std::string const& xmlArguments,
+                                              std::string const& modelFilename,
+                                          double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
@@ -56,42 +58,12 @@ namespace VevaciousPlusPlus
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
     needToUpdateHomotopyContinuation( false ),
-    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
-    scaleRangeMinimumFactor( 10.0 ),
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
+                     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
+    scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
     fieldsAssumedPositive(),
     fieldsAssumedNegative()
   {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    std::string modelFilename;
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches( "ModelFile" ) )
-      {
-        modelFilename.assign(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "RollOnlyMinima" ) )
-      {
-        std::string rollOnlyMinima(
-                            argumentParser.getTrimmedCurrentElementContent() );
-        BOL::StringParser::transformToLowercase( rollOnlyMinima );
-        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions
-        = ( rollOnlyMinima.compare( "true" ) == 0 );
-        if( !treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions
-            &&
-            ( rollOnlyMinima.compare( "yes" ) == 0 ) )
-        {
-          treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions = true;
-        }
-      }
-      else if( argumentParser.currentElementNameMatches(
-                                                  "ScaleRangeMinimumFactor" ) )
-      {
-        scaleRangeMinimumFactor = BOL::StringParser::stringToDouble(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
     BOL::VectorlikeArray< std::string > elementLines;
@@ -527,7 +499,7 @@ namespace VevaciousPlusPlus
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VevaciousPlusPlus::versionString << "\n"
+    << VersionInformation::currentVersion << "\n"
     "from __future__ import division\n"
     "import math\n"
     "import numpy\n"

@@ -11,11 +11,12 @@ namespace VevaciousPlusPlus
 {
 
   Hom4ps2Runner::Hom4ps2Runner( PolynomialGradientTargetSystem& targetSystem,
-                                std::string const& xmlArguments ) :
+                                std::string const& pathToHom4ps2,
+                                std::string const& homotopyType ) :
     HomotopyContinuationSolver( targetSystem ),
     targetSystem( targetSystem ),
-    pathToHom4ps2( "./" ),
-    homotopyType( "2" ),
+    pathToHom4ps2( pathToHom4ps2 ),
+    homotopyType( homotopyType ),
     variableNamer( 4,
                    '0',
                    6,
@@ -25,23 +26,7 @@ namespace VevaciousPlusPlus
     variableNames(),
     nameToIndexMap()
   {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    // The <ConstructorArguments> for this class should have child elements
-    // <PathToHom4ps2> and <Hom4ps2Argument>.
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches( "PathToHom4ps2" ) )
-      {
-        pathToHom4ps2.assign(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "Hom4ps2Argument" ) )
-      {
-        homotopyType.assign(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
+    // This constructor is just an initialization list.
   }
 
   Hom4ps2Runner::~Hom4ps2Runner()

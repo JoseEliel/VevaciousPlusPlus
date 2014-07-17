@@ -12,39 +12,6 @@ namespace VevaciousPlusPlus
 
   MinuitPotentialMinimizer::MinuitPotentialMinimizer(
                                     PotentialFunction const& potentialFunction,
-                                            std::string const& xmlArguments ) :
-    GradientMinimizer( potentialFunction ),
-    minimizationFunction( potentialFunction ),
-    errorFraction( NAN ),
-    errorMinimum( NAN ),
-    minuitStrategy( 1 )
-  {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches(
-                                                  "InitialStepSizeFraction" ) )
-      {
-        errorFraction = BOL::StringParser::stringToDouble(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches(
-                                                   "MinimumInitialStepSize" ) )
-      {
-        errorMinimum = BOL::StringParser::stringToDouble(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "MinuitStrategy" ) )
-      {
-        minuitStrategy = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
-  }
-
-  MinuitPotentialMinimizer::MinuitPotentialMinimizer(
-                                    PotentialFunction const& potentialFunction,
                                                     double const errorFraction,
                                                     double const errorMinimum ,
                                           unsigned int const minuitStrategy ) :

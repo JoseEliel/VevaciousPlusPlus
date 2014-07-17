@@ -15,7 +15,7 @@
 #include "BasicFunctions/PolynomialSum.hpp"
 #include "../MassesSquaredCalculators.hpp"
 #include "../ThermalFunctions.hpp"
-#include "PotentialMinimization/HomotopyContinuation.hpp"
+#include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 #include "IWritesPythonPotential.hpp"
 
 namespace VevaciousPlusPlus
@@ -24,10 +24,11 @@ namespace VevaciousPlusPlus
                                            public IWritesPythonPotential
   {
   public:
-    PotentialFromPolynomialAndMasses( std::string const& xmlArguments,
+    PotentialFromPolynomialAndMasses( std::string const& modelFilename,
+                                      double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                             RunningParameterManager& runningParameterManager );
-    virtual
-    ~PotentialFromPolynomialAndMasses();
+    virtual ~PotentialFromPolynomialAndMasses();
 
 
     // This writes the potential as
@@ -74,8 +75,8 @@ namespace VevaciousPlusPlus
     std::vector< RealMassesSquaredMatrix > vectorMassSquaredMatrices;
     double vectorMassCorrectionConstant;
     bool needToUpdateHomotopyContinuation;
-    bool treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions;
-    double scaleRangeMinimumFactor;
+    bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions;
+    double const scaleRangeMinimumFactor;
     std::vector< size_t > fieldsAssumedPositive;
     std::vector< size_t > fieldsAssumedNegative;
 

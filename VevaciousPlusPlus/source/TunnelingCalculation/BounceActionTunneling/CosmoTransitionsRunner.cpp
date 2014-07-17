@@ -15,41 +15,26 @@ namespace VevaciousPlusPlus
   CosmoTransitionsRunner::CosmoTransitionsRunner(
                                        IWritesPythonPotential& pythonPotential,
                                           PotentialFunction& potentialFunction,
-                                            std::string const& xmlArguments ) :
+                TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
+                                     double const survivalProbabilityThreshold,
+                                              size_t const temperatureAccuracy,
+                                            size_t const evaporationResolution,
+                                     std::string const& pathToCosmotransitions,
+                                            size_t const resolutionOfDsbVacuum,
+                                                  size_t const maxInnerLoops,
+                                                 size_t const maxOuterLoops ) :
     BounceActionTunneler( potentialFunction,
-                          xmlArguments ),
+                          tunnelingStrategy,
+                          survivalProbabilityThreshold,
+                          temperatureAccuracy,
+                          evaporationResolution ),
     pythonPotential( pythonPotential ),
-    pathToCosmotransitions( "./cosmoTransitions/" ),
-    resolutionOfDsbVacuum( 20 ),
-    maxInnerLoops( 10 ),
-    maxOuterLoops( 10 )
+    pathToCosmotransitions( pathToCosmotransitions ),
+    resolutionOfDsbVacuum( resolutionOfDsbVacuum ),
+    maxInnerLoops( maxInnerLoops ),
+    maxOuterLoops( maxOuterLoops )
   {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches(
-                                                   "PathToCosmotransitions" ) )
-      {
-        pathToCosmotransitions.assign(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "PathResolution" ) )
-      {
-        resolutionOfDsbVacuum = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "MaxInnerLoops" ) )
-      {
-        maxInnerLoops = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "MaxOuterLoops" ) )
-      {
-        maxOuterLoops = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
+    // This constructor is just an initialization list.
   }
 
   CosmoTransitionsRunner::~CosmoTransitionsRunner()

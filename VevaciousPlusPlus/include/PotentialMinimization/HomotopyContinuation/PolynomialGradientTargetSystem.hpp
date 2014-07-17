@@ -145,7 +145,7 @@ namespace VevaciousPlusPlus
     // the solution does not correspond to a minimum (rather than just an
     // extremum) of potentialPolynomial.
     virtual bool AllowedSolution(
-                   std::vector< double > const& solutionConfiguration ) const;
+                    std::vector< double > const& solutionConfiguration ) const;
 
     // This fills targetSystem from potentialPolynomial.
     virtual void
