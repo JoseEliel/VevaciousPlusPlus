@@ -20,9 +20,11 @@ namespace VevaciousPlusPlus
     NodesOnPlanes( std::vector< double > const& falseVacuum,
                    std::vector< double > const& trueVacuum,
                    size_t const numberOfIntermediateNodes );
-    virtual
-    ~NodesOnPlanes();
+    virtual ~NodesOnPlanes();
 
+    // This does something.
+    void SetVacua( PotentialMinimum const& falseVacuum,
+                   PotentialMinimum const& trueVacuum );
 
     // This puts all the nodes based on the numbers given in
     // pathParameterization into pathNodes, ordered in the sequence that they

@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "TunnelPath.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -21,6 +22,11 @@ namespace VevaciousPlusPlus
                        std::vector< double > const& zeroParameterization );
     virtual ~TunnelPathFactory();
 
+
+    // This should reset the TunnelPathFactory so that it will produce
+    // TunnelPath*s that parameterize the path between the given vacua.
+    virtual void SetVacua( PotentialMinimum const& falseVacuum,
+                           PotentialMinimum const& trueVacuum ) = 0;
 
     // This should return a pointer to an appropriate derived class instance.
     // The calling code is responsible for memory management! (It'd be great to

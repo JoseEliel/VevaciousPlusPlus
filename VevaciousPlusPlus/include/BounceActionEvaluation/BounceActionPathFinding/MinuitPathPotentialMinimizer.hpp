@@ -19,23 +19,28 @@ namespace VevaciousPlusPlus
   class MinuitPathPotentialMinimizer : public FullPathVaryingMinuit
   {
   public:
-    MinuitPathPotentialMinimizer( TunnelPathFactory* pathFactory,
+    MinuitPathPotentialMinimizer( TunnelPathFactory* const pathFactory,
                                   PotentialFunction const& potentialFunction,
-                                  std::string const& xmlArguments );
+                                  size_t const numberOfPotentialSamplePoints,
+                                  size_t const movesPerImprovement = 100,
+                                  unsigned int const minuitStrategy = 1,
+                                  double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitPathPotentialMinimizer();
 
 
     // It may seem unwise to have this object call Minuit on itself, but really
     // it's just a handy way of keeping the minimization function within the
-    // class that ends up finding its minimum. In this case,
-    // nodeParameterization is just the parameterization of the node.
+    // class that ends up finding its minimum. The temperature is set by
+    // SetInitialPath.
     virtual double
     operator()( std::vector< double > const& pathParameterization ) const;
 
 
   protected:
     PotentialFunction const& potentialFunction;
-    size_t numberOfPotentialSamplePoints;
+    size_t const numberOfPotentialSamplePoints;
+    size_t const numberOfFields;
+    double const pathSegmentSize;
   };
 
 
@@ -43,14 +48,26 @@ namespace VevaciousPlusPlus
 
   // It may seem unwise to have this object call Minuit on itself, but really
   // it's just a handy way of keeping the minimization function within the
-  // class that ends up finding its minimum. The node index is set by
-  // ImprovePath before the Minuit minimization and the temperature is set by
+  // class that ends up finding its minimum. The temperature is set by
   // SetInitialPath.
-  inline double MinuitPathBounceMinimizer::operator()(
+  inline double MinuitPathPotentialMinimizer::operator()(
                       std::vector< double > const& pathParameterization ) const
   {
-    return (*bounceActionCalculator)( (*pathFactory)( pathParameterization,
-                                                      pathTemperature ) );
+    double potentialSum( 0.0 );
+    TunnelPath* tunnelPath( (*pathFactory)( pathParameterization,
+                                            pathTemperature ) );
+    std::vector< double > fieldConfiguration( numberOfFields );
+    for( size_t sampleIndex( 0 );
+         sampleIndex < numberOfPotentialSamplePoints;
+         ++sampleIndex )
+    {
+      tunnelPath->PutOnPathAt( fieldConfiguration,
+                               (double)( sampleIndex + 1 ) * pathSegmentSize );
+      potentialSum += potentialFunction( fieldConfiguration,
+                                         pathTemperature );
+    }
+    delete tunnelPath;
+    return potentialSum;
   }
 
 } /* namespace VevaciousPlusPlus */

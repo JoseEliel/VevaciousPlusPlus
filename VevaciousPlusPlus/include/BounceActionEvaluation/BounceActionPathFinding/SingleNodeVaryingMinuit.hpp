@@ -23,8 +23,10 @@ namespace VevaciousPlusPlus
   {
   public:
     SingleNodeVaryingMinuit( PotentialFunction const& potentialFunction,
-                             PathFromNodesFactory* pathFactory,
-                             std::string const& xmlArguments );
+                             PathFromNodesFactory* const pathFactory,
+                             size_t const movesPerImprovement = 100,
+                             unsigned int const minuitStrategy = 1,
+                             double const minuitToleranceFraction = 0.5 );
     virtual ~SingleNodeVaryingMinuit();
 
 
@@ -44,7 +46,7 @@ namespace VevaciousPlusPlus
 
   protected:
     PotentialFunction const& potentialFunction;
-    PathFromNodesFactory* pathFactory;
+    PathFromNodesFactory* const pathFactory;
     NodesFromParameterization& pathNodes;
     std::vector< MinuitMinimum > currentMinuitResults;
     size_t currentNodeIndex;

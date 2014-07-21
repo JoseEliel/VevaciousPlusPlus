@@ -11,6 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "PathFromNodesFactory.hpp"
 #include "QuadraticSplineThroughNodes.hpp"
+#include "NodesFromParameterization.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -18,7 +19,8 @@ namespace VevaciousPlusPlus
   class QuadraticSplineThroughNodesFactory : public PathFromNodesFactory
   {
   public:
-    QuadraticSplineThroughNodesFactory( std::string const& xmlArguments );
+    QuadraticSplineThroughNodesFactory( size_t const numberOfFields,
+                  NodesFromParameterization* const nodesFromParameterization );
     virtual ~QuadraticSplineThroughNodesFactory();
 
 

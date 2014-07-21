@@ -13,8 +13,12 @@ namespace VevaciousPlusPlus
   SingleNodeVaryingMinuit::SingleNodeVaryingMinuit(
                                     PotentialFunction const& potentialFunction,
                                              PathFromNodesFactory* pathFactory,
-                                           std::string const& xmlArguments  ) :
-    MinuitPathFinder( xmlArguments ),
+                                              size_t const movesPerImprovement,
+                                             unsigned int const minuitStrategy,
+                                       double const minuitToleranceFraction ) :
+    MinuitPathFinder( movesPerImprovement,
+                      minuitStrategy,
+                      minuitToleranceFraction ),
     potentialFunction( potentialFunction ),
     pathFactory( pathFactory ),
     pathNodes( pathFactory->NodesFromParameterization() ),
@@ -39,6 +43,8 @@ namespace VevaciousPlusPlus
                                            TunnelPath const* startingPath,
                                            double const pathTemperature )
   {
+    pathFactory->SetVacua( falseVacuum,
+                           trueVacuum );
     this->pathTemperature = pathTemperature;
     // First we need the initial parameterization of the path: either provided,
     // or the default "zero parameterization".

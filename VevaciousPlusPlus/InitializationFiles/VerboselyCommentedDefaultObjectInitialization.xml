@@ -86,7 +86,7 @@
         <!-- Currently <ClassType> must be "Hom4ps2Runner", and
              <ConstructorArguments> must give the path to the directory with
              the hom4ps2 executable by <PathToHom4ps2> and the argument for the
-              executable by <Hom4ps2Argument>. -->
+             executable by <Hom4ps2Argument>. -->
         <ClassType>
           Hom4ps2Runner
         </ClassType>
@@ -361,17 +361,19 @@
             0.5
           </MinuitTolerance>
           <NumberOfPotentialSamplePoints>
-            <!-- If using "MinuitPathBounceMinimizer", this gives the number of
-                 nodes used to fit the potential along the tunneling path for
-                 the bounce action calculation. If using
-                 "MinuitPathPotentialMinimizer", this gives the number of nodes
-                 at which the potential will be evaluated for the sum, though
-                 if <PathParameterization> has a larger number in
+            <!-- If using "MinuitPathPotentialMinimizer", this gives the number
+                 of nodes at which the potential will be evaluated for the sum,
+                 though if <PathParameterization> has a larger number in
                  <ConstructorArguments><NumberOfVaryingNodes>, that will be
-                 used instead. If using "MinuitNodePotentialMinimizer", this
-                 number is ignored, as the number of nodes will be taken from
+                 used instead. If using "MinuitNodePotentialMinimizer" or
+                 "MinuitPathBounceMinimizer", this number is ignored, as the
+                 number of nodes will be taken from
                  <ConstructorArguments><NumberOfVaryingNodes> in
-                 <PathParameterization>. -->
+                 <PathParameterization>
+                 or <BouncePotentialFit><NumberOfNodesForPotentialFit> in
+                 <BouncePotentialFit> within
+                 <TunnelPathFinder><ConstructorArguments> (not the XML element
+                 within <TunnelingClass><ConstructorArguments>). -->
             15
           </NumberOfPotentialSamplePoints>
           <BouncePotentialFit>
@@ -422,10 +424,25 @@
               PathFromNodes
             </ClassType>
             <ConstructorArguments>
-              <NumberOfCoefficientsPerVaryingField>
+              <NumberOfCoefficientsPerVaryingFieldBeyondLinear>
                 <!-- This is only used by "PathFromPolynomialCoefficients", and
                      is ignored by "PathFromNodesOnParallelPlanes" and
-                     "PathFromNodesOnBisectingPlanes". -->
+                     "PathFromNodesOnBisectingPlanes". It is the number of
+                     coefficients for terms with powers of the path auxiliary
+                     variable above 1. For example, 3 here would mean that each
+                     field would be parameterized as a polynomial of degree 4:
+                     c_0 + c_1 p + c_2 p^2 + c_3 p^3 + c_4 p^4, except for the
+                     reference field, which is the field with largest
+                     difference between values at the true vacuum and the false
+                     vacuum, which is always held to a linear function of p
+                     (if it were allowed to be the same degree as the other
+                     fields, there would be an infinite degeneracy in path
+                     parameterizations along the lines of this example: all
+                     fields with the only non-zero coefficients being the
+                     constant term and the quadratic term gives exactly the
+                     same path as only the constant and the linear term being
+                     non-zero, and so on, as the ratio of the fields is the
+                     same in each case). -->
                 3
               </NumberOfCoefficientsPerVaryingField>
               <NumberOfVaryingNodes>

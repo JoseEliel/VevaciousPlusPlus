@@ -23,7 +23,9 @@ namespace VevaciousPlusPlus
   {
   public:
     BubbleShootingOnSpline( PotentialFunction const& potentialFunction,
-                            std::string const& xmlArguments );
+                            size_t const numberOfPotentialSegments,
+                            double const lengthScaleResolution,
+                            size_t const shootAttempts );
     virtual ~BubbleShootingOnSpline();
 
 
@@ -57,12 +59,12 @@ namespace VevaciousPlusPlus
   protected:
     static double const radiusDifferenceThreshold;
 
-    size_t numberOfPotentialSegments;
-    double lengthScaleResolution;
+    size_t const numberOfPotentialSegments;
+    double const lengthScaleResolution;
     double radialStepSize;
     double estimatedRadialMaximum;
-    size_t shootAttempts;
-    double auxiliaryThreshold;
+    size_t const shootAttempts;
+    double const auxiliaryThreshold;
 
 
     // This returns a spline polynomial approximation of the potential along

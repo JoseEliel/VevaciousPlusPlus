@@ -11,8 +11,10 @@ namespace VevaciousPlusPlus
 {
 
   PolynomialThroughNodesFactory::PolynomialThroughNodesFactory(
-                                            std::string const& xmlArguments ) :
-    PathFromNodesFactory( xmlArguments ),
+                                                   size_t const numberOfFields,
+                 NodesFromParameterization* const nodesFromParameterization ) :
+    PathFromNodesFactory( numberOfFields,
+                          nodesFromParameterization ),
     pathStepsInverse()
   {
     size_t const

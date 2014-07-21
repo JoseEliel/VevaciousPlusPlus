@@ -20,8 +20,10 @@ namespace VevaciousPlusPlus
   class FullPathVaryingMinuit : public MinuitPathFinder
   {
   public:
-    FullPathVaryingMinuit( TunnelPathFactory* pathFactory,
-                           std::string const& xmlArguments );
+    FullPathVaryingMinuit( TunnelPathFactory* const pathFactory,
+                           size_t const movesPerImprovement = 100,
+                           unsigned int const minuitStrategy = 1,
+                           double const minuitToleranceFraction = 0.5 );
     virtual ~FullPathVaryingMinuit();
 
 
@@ -40,12 +42,42 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    TunnelPathFactory* pathFactory;
+    TunnelPathFactory* const pathFactory;
     MinuitMinimum currentMinuitResult;
   };
 
 
 
+
+  // This resets the BouncePathFinder so that it sets up currentPath as its
+  // initial path between the given vacua. It also resets pathCanBeImproved
+  // and sets pathTemperature appropriately.
+  inline void
+  FullPathVaryingMinuit::SetInitialPath( PotentialMinimum const& falseVacuum,
+                                         PotentialMinimum const& trueVacuum,
+                                         TunnelPath const* startingPath,
+                                         double const pathTemperature )
+  {
+    pathFactory->SetVacua( falseVacuum,
+                           trueVacuum );
+    this->pathTemperature = pathTemperature;
+    // First we need the initial parameterization of the path: either provided,
+    // or the default zero parameterization; then we can set the current path.
+    std::vector< double > const*
+    pathParameterization( &(pathFactory->ZeroParameterization()) );
+    if( startingPath != NULL )
+    {
+      pathParameterization = &(startingPath->PathParameterization());
+    }
+    SetCurrentPathPointer( (*pathFactory)( *pathParameterization,
+                                           pathTemperature ) );
+    // However, we still need to set up the initial state for Minuit.
+    currentMinuitTolerance = ( minuitToleranceFraction
+                               * ( falseVacuum.PotentialValue()
+                                   - trueVacuum.PotentialValue() ) );
+    currentMinuitResult = MinuitMinimum( *pathParameterization,
+                                         pathFactory->InitialStepSizes() );
+  }
 
   // This allows Minuit2 to adjust the full path a set number of times to try
   // to minimize the sum of potentials at a set of nodes or bounce action

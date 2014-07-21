@@ -25,7 +25,11 @@ namespace VevaciousPlusPlus
     BounceAlongPathWithThreshold( PotentialFunction& potentialFunction,
                                   BouncePathFinder* pathFinder,
                                   BounceActionCalculator* actionCalculator,
-                                  std::string const& xmlArguments );
+                TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
+                                  double const survivalProbabilityThreshold,
+                                  size_t const temperatureAccuracy,
+                                  size_t const evaporationResolution,
+                                  size_t const thermalIntegrationResolution );
     virtual ~BounceAlongPathWithThreshold();
 
 

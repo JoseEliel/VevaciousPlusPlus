@@ -13,40 +13,18 @@ namespace VevaciousPlusPlus
 
   BubbleShootingOnSpline::BubbleShootingOnSpline(
                                     PotentialFunction const& potentialFunction,
-                                            std::string const& xmlArguments ) :
+                                        size_t const numberOfPotentialSegments,
+                                            double const lengthScaleResolution,
+                                                 size_t const shootAttempts ) :
     BounceActionCalculator( potentialFunction ),
-    numberOfPotentialSegments( 16 ),
-    lengthScaleResolution( 0.05 ),
+    numberOfPotentialSegments( numberOfPotentialSegments ),
+    lengthScaleResolution( lengthScaleResolution ),
     radialStepSize( NAN ),
     estimatedRadialMaximum( NAN ),
-    shootAttempts( 32 ),
+    shootAttempts( shootAttempts ),
     auxiliaryThreshold( 1.0E-6 )
   {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    size_t numberOfNodesForPotentialFit( 15 );
-    std::string pathFinderType( "MinuitNodePotentialMinimizer" );
-    std::string pathFinderArguments( "" );
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches(
-                                             "NumberOfNodesForPotentialFit" ) )
-      {
-        numberOfPotentialSegments = ( 1 + BOL::StringParser::stringToInt(
-                          argumentParser.getTrimmedCurrentElementContent() ) );
-      }
-      else if( argumentParser.currentElementNameMatches(
-                                               "NumberShootAttemptsAllowed" ) )
-      {
-        shootAttempts = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-      else if( argumentParser.currentElementNameMatches( "RadialResolution" ) )
-      {
-        lengthScaleResolution = BOL::StringParser::stringToDouble(
-                            argumentParser.getTrimmedCurrentElementContent() );
-      }
-    }
+    // This constructor is just an initialization list.
   }
 
   BubbleShootingOnSpline::~BubbleShootingOnSpline()
@@ -72,8 +50,8 @@ namespace VevaciousPlusPlus
                                  radialStepSize,
                                  estimatedRadialMaximum );
     std::vector< BubbleRadialValueDescription > const&
-    auxiliaryProfile( bubbleProfile ( shootAttempts,
-                                      auxiliaryThreshold ) );
+    auxiliaryProfile( bubbleProfile( shootAttempts,
+                                     auxiliaryThreshold ) );
 
     // We have a set of radial values r_i, path auxiliary values p(r_i), and
     // slopes dp/dr|_{r=r_i}, and can easily evaluate a set of "bounce action

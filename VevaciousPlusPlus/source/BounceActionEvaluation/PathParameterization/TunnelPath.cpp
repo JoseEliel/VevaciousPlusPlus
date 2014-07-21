@@ -12,11 +12,11 @@ namespace VevaciousPlusPlus
 
   TunnelPath::TunnelPath( size_t const numberOfFields,
                           std::vector< double > const& pathParameterization,
-                          double const temperatureValue ) :
+                          double const pathTemperature ) :
     numberOfFields( numberOfFields ),
     pathParameterization( pathParameterization ),
-    temperatureValue( temperatureValue ),
-    nonZeroTemperature( temperatureValue > 0.0 )
+    pathTemperature( pathTemperature ),
+    nonZeroTemperature( pathTemperature > 0.0 )
   {
     // This constructor is just an initialization list.
   }

@@ -16,11 +16,15 @@ namespace VevaciousPlusPlus
   class NodesFromParameterization
   {
   public:
-    NodesFromParameterization( std::vector< double > const& falseVacuum,
-                               std::vector< double > const& trueVacuum,
+    NodesFromParameterization( size_t const numberOfFields,
                                size_t const numberOfIntermediateNodes );
     virtual ~NodesFromParameterization();
 
+
+    // This resets the NodesFromParameterization so that it will produce
+    // TunnelPath*s that parameterize the path between the given vacua.
+    virtual void SetVacua( PotentialMinimum const& falseVacuum,
+                           PotentialMinimum const& trueVacuum );
 
     // This should put all the nodes based on the numbers given in
     // pathParameterization into pathNodes, ordered in the sequence that they
@@ -105,6 +109,18 @@ namespace VevaciousPlusPlus
 
 
 
+  // This resets the NodesFromParameterization so that it will produce
+  // TunnelPath*s that parameterize the path between the given vacua.
+  inline void
+  NodesFromParameterization::SetVacua( PotentialMinimum const& falseVacuum,
+                                       PotentialMinimum const& trueVacuum )
+  {
+    pathNodes.front() = falseVacuum;
+    pathNodes.back() = trueVacuum;
+    SetInitialParameterizationAndStepSizes( zeroParameterization,
+                                            initialStepSizes );
+  }
+
   // This sets pathNodes[ adjustmentOrderIndex ] to be nodeAsVector as long
   // as adjustmentOrderIndex is >= 1 and <= numberOfIntermediateNodes so that
   // it doesn't try to overwrite the vacua or anything out of the range of
@@ -112,8 +128,8 @@ namespace VevaciousPlusPlus
   // over-ridden if necessary, for example if the order in which the nodes
   // should be adjusted is different from the order they are visited on the
   // path.
-  inline void
-  NodesOnPlanes::SetNodeInAdjustmentOrder( size_t const adjustmentOrderIndex,
+  inline void NodesFromParameterization::SetNodeInAdjustmentOrder(
+                                             size_t const adjustmentOrderIndex,
                                     std::vector< double > const& nodeAsVector )
   {
     if( ( adjustmentOrderIndex > 0 )

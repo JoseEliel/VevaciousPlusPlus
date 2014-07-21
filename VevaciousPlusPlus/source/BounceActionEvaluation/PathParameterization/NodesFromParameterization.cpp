@@ -11,10 +11,9 @@ namespace VevaciousPlusPlus
 {
 
   NodesFromParameterization::NodesFromParameterization(
-                                      std::vector< double > const& falseVacuum,
-                                       std::vector< double > const& trueVacuum,
+                                                   size_t const numberOfFields,
                                      size_t const numberOfIntermediateNodes ) :
-    numberOfFields( falseVacuum.size() ),
+    numberOfFields( numberOfFields ),
     numberOfIntermediateNodes( numberOfIntermediateNodes ),
     pathNodes( numberOfIntermediateNodes,
                std::vector< double >( numberOfFields ) ),
@@ -22,10 +21,7 @@ namespace VevaciousPlusPlus
                           0.0 ),
     initialStepSizes( zeroParameterization )
   {
-    pathNodes.front() = falseVacuum;
-    pathNodes.back() = trueVacuum;
-    SetInitialParameterizationAndStepSizes( zeroParameterization,
-                                            initialStepSizes );
+    // This constructor is just an initialization list.
   }
 
   NodesFromParameterization::~NodesFromParameterization()

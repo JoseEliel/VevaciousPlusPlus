@@ -69,6 +69,8 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(PATHPARAMETERIZATION)/NodesOnParallelPlanes.cpp \
  $(PATHPARAMETERIZATION)/NodesOnPlanes.cpp \
  $(PATHPARAMETERIZATION)/PathFromNodesFactory.cpp \
+ $(PATHPARAMETERIZATION)/PolynomialPathFromCoefficients.cpp \
+ $(PATHPARAMETERIZATION)/PolynomialsFromCoefficientsFactory.cpp \
  $(PATHPARAMETERIZATION)/PolynomialThroughNodes.cpp \
  $(PATHPARAMETERIZATION)/PolynomialThroughNodesFactory.cpp \
  $(PATHPARAMETERIZATION)/QuadraticSplinePathSegment.cpp \

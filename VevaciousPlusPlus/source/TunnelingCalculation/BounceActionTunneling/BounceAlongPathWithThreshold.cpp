@@ -12,31 +12,24 @@ namespace VevaciousPlusPlus
 
   BounceAlongPathWithThreshold::BounceAlongPathWithThreshold(
                                           PotentialFunction& potentialFunction,
-                                                 BouncePathFinder* pathFinder,
-                                      BounceActionCalculator* actionCalculator,
-                                            std::string const& xmlArguments ) :
+                                            BouncePathFinder* const pathFinder,
+                                BounceActionCalculator* const actionCalculator,
+                TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
+                                     double const survivalProbabilityThreshold,
+                                              size_t const temperatureAccuracy,
+                                            size_t const evaporationResolution,
+                                  size_t const thermalIntegrationResolution ) :
     BounceActionTunneler( potentialFunction,
-                          xmlArguments ),
+                          tunnelingStrategy,
+                          survivalProbabilityThreshold,
+                          temperatureAccuracy,
+                          evaporationResolution ),
     pathFinder( pathFinder ),
     actionCalculator( actionCalculator ),
     actionThreshold( NAN ),
-    thermalIntegrationResolution( 5 )
+    thermalIntegrationResolution( thermalIntegrationResolution )
   {
-    BOL::AsciiXmlParser argumentParser;
-    argumentParser.loadString( xmlArguments );
-    while( argumentParser.readNextElement() )
-    {
-      if( argumentParser.currentElementNameMatches(
-                                             "ThermalIntegrationResolution" ) )
-      {
-        thermalIntegrationResolution
-        = BOL::StringParser::stringToInt(
-                            argumentParser.getTrimmedCurrentElementContent() );
-        // Since there's only one argument that this constructor needs to read,
-        // we break out of the reading loop once it is found.
-        break;
-      }
-    }
+    // This constructor is just an initialization list.
   }
 
   BounceAlongPathWithThreshold::~BounceAlongPathWithThreshold()

@@ -11,11 +11,15 @@ namespace VevaciousPlusPlus
 {
 
   MinuitPathBounceMinimizer::MinuitPathBounceMinimizer(
-                                                TunnelPathFactory* pathFactory,
-                                BounceActionCalculator* bounceActionCalculator,
-                                           std::string const& xmlArguments  ) :
+                                          TunnelPathFactory* const pathFactory,
+                          BounceActionCalculator* const bounceActionCalculator,
+                                              size_t const movesPerImprovement,
+                                             unsigned int const minuitStrategy,
+                                       double const minuitToleranceFraction ) :
     FullPathVaryingMinuit( pathFactory,
-                           xmlArguments ),
+                           movesPerImprovement,
+                           minuitStrategy,
+                           minuitToleranceFraction ),
     bounceActionCalculator( bounceActionCalculator )
   {
     // This constructor is just an initialization list.

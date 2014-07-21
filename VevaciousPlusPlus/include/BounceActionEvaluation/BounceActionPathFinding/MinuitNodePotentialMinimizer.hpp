@@ -18,9 +18,11 @@ namespace VevaciousPlusPlus
   class MinuitNodePotentialMinimizer : public SingleNodeVaryingMinuit
   {
   public:
-    MinuitNodePotentialMinimizer( PotentialFunction const& potentialFunction,
-                                  PathFromNodesFactory* pathFactory,
-                                  std::string const& xmlArguments );
+    MinuitNodePotentialMinimizer( PathFromNodesFactory* const pathFactory,
+                                  PotentialFunction const& potentialFunction,
+                                  size_t const movesPerImprovement = 100,
+                                  unsigned int const minuitStrategy = 1,
+                                  double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitNodePotentialMinimizer();
 
     // It may seem unwise to have this object call Minuit on itself, but really

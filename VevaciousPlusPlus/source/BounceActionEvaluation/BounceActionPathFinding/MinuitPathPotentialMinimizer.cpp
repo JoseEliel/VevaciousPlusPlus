@@ -11,13 +11,20 @@ namespace VevaciousPlusPlus
 {
 
   MinuitPathPotentialMinimizer::MinuitPathPotentialMinimizer(
-                                                TunnelPathFactory* pathFactory,
+                                          TunnelPathFactory* const pathFactory,
                                     PotentialFunction const& potentialFunction,
-                                           std::string const& xmlArguments  ) :
+                                    size_t const numberOfPotentialSamplePoints,
+                                              size_t const movesPerImprovement,
+                                             unsigned int const minuitStrategy,
+                                      double const minuitToleranceFraction  ) :
     FullPathVaryingMinuit( pathFactory,
-                           xmlArguments ),
+                           movesPerImprovement,
+                           minuitStrategy,
+                           minuitToleranceFraction ),
     potentialFunction( potentialFunction ),
-    numberOfPotentialSamplePoints( 15 )
+    numberOfPotentialSamplePoints( numberOfPotentialSamplePoints ),
+    numberOfFields( potentialFunction.NumberOfFieldVariables() ),
+    pathSegmentSize( 1.0 / (double)( numberOfPotentialSamplePoints + 1 ) )
   {
     // This constructor is just an initialization list.
   }

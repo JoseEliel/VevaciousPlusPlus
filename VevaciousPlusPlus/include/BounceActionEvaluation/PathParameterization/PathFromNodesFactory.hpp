@@ -11,6 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "TunnelPathFactory.hpp"
 #include "NodesFromParameterization.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -18,17 +19,18 @@ namespace VevaciousPlusPlus
   class PathFromNodesFactory : public TunnelPathFactory
   {
   public:
-    PathFromNodesFactory( size_t numberOfFields,
-                          NodesFromParameterization* nodesFromParameterization,
-                          std::string const& xmlArguments );
+    PathFromNodesFactory( size_t const numberOfFields,
+                        NodesFromParameterization* nodesFromParameterization );
     virtual ~PathFromNodesFactory();
 
 
-    // This does something.
-    void SetVacua( PotentialMinimum const& falseVacuum,
-                   PotentialMinimum const& trueVacuum,
-                   TunnelPath const* startingPath = NULL,
-                   double const pathTemperature = 0.0 );
+
+    // This resets nodesFromParameterization so that it will produce
+    // TunnelPath*s that parameterize the path between the given vacua.
+    virtual void SetVacua( PotentialMinimum const& falseVacuum,
+                           PotentialMinimum const& trueVacuum )
+    { nodesFromParameterization->SetVacua( falseVacuum,
+                                           trueVacuum ); }
 
     // This gets the nodes from nodesFromParameterization and then calls
     // operator()( std::vector< std::vector< double > > const& pathNodes ).

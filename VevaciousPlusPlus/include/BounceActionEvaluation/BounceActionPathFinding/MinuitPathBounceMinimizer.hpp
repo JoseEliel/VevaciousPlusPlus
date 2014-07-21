@@ -19,22 +19,24 @@ namespace VevaciousPlusPlus
   class MinuitPathBounceMinimizer : public FullPathVaryingMinuit
   {
   public:
-    MinuitPathBounceMinimizer( TunnelPathFactory* pathFactory,
-                               BounceActionCalculator* bounceActionCalculator,
-                               std::string const& xmlArguments );
+    MinuitPathBounceMinimizer( TunnelPathFactory* const pathFactory,
+                          BounceActionCalculator* const bounceActionCalculator,
+                               size_t const movesPerImprovement = 100,
+                               unsigned int const minuitStrategy = 1,
+                               double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitPathBounceMinimizer();
 
 
     // It may seem unwise to have this object call Minuit on itself, but really
     // it's just a handy way of keeping the minimization function within the
-    // class that ends up finding its minimum. In this case,
-    // nodeParameterization is just the parameterization of the node.
+    // class that ends up finding its minimum. The temperature is set by
+    // SetInitialPath.
     virtual double
     operator()( std::vector< double > const& pathParameterization ) const;
 
 
   protected:
-    BounceActionCalculator* bounceActionCalculator;
+    BounceActionCalculator* const bounceActionCalculator;
   };
 
 
@@ -42,14 +44,16 @@ namespace VevaciousPlusPlus
 
   // It may seem unwise to have this object call Minuit on itself, but really
   // it's just a handy way of keeping the minimization function within the
-  // class that ends up finding its minimum. The node index is set by
-  // ImprovePath before the Minuit minimization and the temperature is set by
+  // class that ends up finding its minimum. The temperature is set by
   // SetInitialPath.
   inline double MinuitPathBounceMinimizer::operator()(
                       std::vector< double > const& pathParameterization ) const
   {
-    return (*bounceActionCalculator)( (*pathFactory)( pathParameterization,
-                                                      pathTemperature ) );
+    TunnelPath* tunnelPath( (*pathFactory)( pathParameterization,
+                                            pathTemperature ) );
+    double const bounceAction( (*bounceActionCalculator)( tunnelPath ) );
+    delete tunnelPath;
+    return bounceAction;
   }
 
 } /* namespace VevaciousPlusPlus */

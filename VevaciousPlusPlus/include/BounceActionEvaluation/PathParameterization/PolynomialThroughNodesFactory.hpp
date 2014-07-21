@@ -11,6 +11,8 @@
 #include "CommonIncludes.hpp"
 #include "PathFromNodesFactory.hpp"
 #include "PolynomialThroughNodes.hpp"
+#include "NodesFromParameterization.hpp"
+#include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
 {
@@ -18,7 +20,8 @@ namespace VevaciousPlusPlus
   class PolynomialThroughNodesFactory : public PathFromNodesFactory
   {
   public:
-    PolynomialThroughNodesFactory( std::string const& xmlArguments );
+    PolynomialThroughNodesFactory( size_t const numberOfFields,
+                  NodesFromParameterization* const nodesFromParameterization );
     virtual ~PolynomialThroughNodesFactory();
 
 
