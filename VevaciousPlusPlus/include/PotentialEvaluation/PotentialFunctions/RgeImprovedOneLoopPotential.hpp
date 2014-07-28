@@ -27,8 +27,7 @@ namespace VevaciousPlusPlus
                             RunningParameterManager& runningParameterManager );
     RgeImprovedOneLoopPotential(
     PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );
-    virtual
-    ~RgeImprovedOneLoopPotential();
+    virtual ~RgeImprovedOneLoopPotential();
 
 
     // This returns the energy density in GeV^4 of the potential for a state

@@ -10,7 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "TunnelPath.hpp"
+#include "PathParameterization/TunnelPath.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -51,7 +51,7 @@ namespace VevaciousPlusPlus
   {
     TunnelPath* tunnelPath( (*pathFactory)( pathParameterization,
                                             pathTemperature ) );
-    double const bounceAction( (*bounceActionCalculator)( tunnelPath ) );
+    double const bounceAction( (*bounceActionCalculator)( *tunnelPath ) );
     delete tunnelPath;
     return bounceAction;
   }

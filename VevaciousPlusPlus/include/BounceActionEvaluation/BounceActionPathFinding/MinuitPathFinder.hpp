@@ -9,7 +9,7 @@
 #define MINUITPATHFINDER_HPP_
 
 #include "CommonIncludes.hpp"
-#include "BouncePathFinder.hpp"
+#include "../BouncePathFinder.hpp"
 #include "Minuit2/FCNBase.h"
 
 namespace VevaciousPlusPlus

@@ -32,25 +32,26 @@ namespace VevaciousPlusPlus
 
     // This should fill fieldConfiguration with the values that the fields
     // should have when the path auxiliary is given by auxiliaryValue.
-    void PutOnPathAt( std::vector< double >& fieldConfiguration,
-                      double const auxiliaryValue ) const = 0;
+    virtual void PutOnPathAt( std::vector< double >& fieldConfiguration,
+                              double const auxiliaryValue ) const = 0;
 
     // This should return the dot product with itself of the derivative of the
     // field vector with respect to the path auxiliary evaluated at
     // auxiliaryValue.
-    double SlopeSquared( double const auxiliaryValue ) const = 0;
+    virtual double SlopeSquared( double const auxiliaryValue ) const = 0;
 
     // This should return the dot product of the first derivative of the field
     // vector with the second derivative, both with respect to the path
     // auxiliary, evaluated at auxiliaryValue.
-    double SlopeDotAcceleration( double const auxiliaryValue ) const = 0;
+    virtual double
+    SlopeDotAcceleration( double const auxiliaryValue ) const = 0;
 
     double TemperatureValue() const{ return pathTemperature; }
 
     bool NonZeroTemperature() const{ return nonZeroTemperature; }
 
     // This is for debugging.
-    std::string AsDebuggingString() const = 0;
+    virtual std::string AsDebuggingString() const = 0;
 
     // This is for debugging.
     std::string FieldsString( double const auxiliaryValue ) const;

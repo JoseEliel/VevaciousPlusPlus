@@ -12,7 +12,7 @@
 #include "MinuitPathFinder.hpp"
 #include "Minuit2/MnMigrad.h"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
-#include "TunnelPathFactory.hpp"
+#include "../PathParameterization/TunnelPathFactory.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -88,7 +88,8 @@ namespace VevaciousPlusPlus
                                       currentMinuitResult.VariableValues(),
                                       currentMinuitResult.VariableErrors(),
                                       minuitStrategy );
-    MinuitMinimum minuitMinimum( mnMigrad( movesPerImprovement,
+    MinuitMinimum minuitMinimum( currentMinuitResult.VariableValues().size(),
+                                 mnMigrad( movesPerImprovement,
                                            currentMinuitTolerance ) );
     currentMinuitResult = minuitMinimum;
     SetCurrentPathPointer( (*pathFactory)( minuitMinimum.VariableValues(),

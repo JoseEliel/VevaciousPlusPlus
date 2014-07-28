@@ -11,6 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "SlhaManagement/SlhaUpdatePropagator.hpp"
+#include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -19,8 +20,7 @@ namespace VevaciousPlusPlus
   public:
     PotentialFunction( SlhaManager& slhaManager );
     PotentialFunction( PotentialFunction const& copySource );
-    virtual
-    ~PotentialFunction();
+    virtual ~PotentialFunction();
 
 
     size_t NumberOfFieldVariables() const

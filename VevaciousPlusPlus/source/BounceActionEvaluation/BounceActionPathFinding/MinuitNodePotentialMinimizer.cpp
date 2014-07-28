@@ -16,9 +16,11 @@ namespace VevaciousPlusPlus
                                               size_t const movesPerImprovement,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
-    MinuitPathFinder( movesPerImprovement,
-                      minuitStrategy,
-                      minuitToleranceFraction )
+    SingleNodeVaryingMinuit( potentialFunction,
+                             pathFactory,
+                             movesPerImprovement,
+                             minuitStrategy,
+                             minuitToleranceFraction )
   {
     // This constructor is just an initialization list.
   }

@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
                       minuitToleranceFraction ),
     potentialFunction( potentialFunction ),
     pathFactory( pathFactory ),
-    pathNodes( pathFactory->NodesFromParameterization() ),
+    pathNodes( pathFactory->GetNodesFromParameterization() ),
     currentMinuitResults(),
     currentNodeIndex( 0 )
   {

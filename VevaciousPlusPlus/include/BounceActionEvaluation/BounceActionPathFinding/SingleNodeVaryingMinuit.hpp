@@ -13,8 +13,8 @@
 #include "Minuit2/MnMigrad.h"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
-#include "PathFromNodesFactory.hpp"
-#include "NodesFromParameterization.hpp"
+#include "../PathParameterization/PathFromNodesFactory.hpp"
+#include "../PathParameterization/NodesFromParameterization.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -71,8 +71,10 @@ namespace VevaciousPlusPlus
                                         nodeState.VariableValues(),
                                         nodeState.VariableErrors(),
                                         minuitStrategy );
-      MinuitMinimum minuitMinimum( mnMigrad( movesPerImprovement,
-                                             currentMinuitTolerance ) );
+      MinuitMinimum
+      minuitMinimum( currentMinuitResults.front().VariableValues().size(),
+                     mnMigrad( movesPerImprovement,
+                               currentMinuitTolerance ) );
       currentMinuitResults[ nodeIndex - 1 ] = minuitMinimum;
       pathNodes.SetNodeInAdjustmentOrder( nodeIndex,
                                           minuitMinimum.VariableValues() );

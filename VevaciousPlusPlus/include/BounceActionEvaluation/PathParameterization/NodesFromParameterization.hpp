@@ -115,8 +115,8 @@ namespace VevaciousPlusPlus
   NodesFromParameterization::SetVacua( PotentialMinimum const& falseVacuum,
                                        PotentialMinimum const& trueVacuum )
   {
-    pathNodes.front() = falseVacuum;
-    pathNodes.back() = trueVacuum;
+    pathNodes.front() = falseVacuum.FieldConfiguration();
+    pathNodes.back() = trueVacuum.FieldConfiguration();
     SetInitialParameterizationAndStepSizes( zeroParameterization,
                                             initialStepSizes );
   }

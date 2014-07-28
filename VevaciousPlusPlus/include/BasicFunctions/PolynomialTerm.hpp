@@ -9,7 +9,7 @@
 #define POLYNOMIALTERM_HPP_
 
 #include "CommonIncludes.hpp"
-#include "ParameterFunctionoids.hpp"
+#include "PotentialEvaluation/ParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -19,8 +19,7 @@ namespace VevaciousPlusPlus
   public:
     PolynomialTerm();
     PolynomialTerm( PolynomialTerm const& copySource );
-    virtual
-    ~PolynomialTerm();
+    virtual ~PolynomialTerm();
 
 
     // This multiplies the relevant field values with the coefficient and the

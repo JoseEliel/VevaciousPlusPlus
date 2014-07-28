@@ -70,7 +70,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    RunningParameterManager runningParameterManager;
+    SlhaManager* slhaManager;
+    SlhaManager* deleterForSlhaManager;
     PotentialFromPolynomialAndMasses* potentialFunction;
     PotentialFromPolynomialAndMasses* deleterForPotentialFunction;
     PotentialMinimizer* potentialMinimizer;

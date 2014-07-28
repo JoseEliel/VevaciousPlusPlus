@@ -34,6 +34,12 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
+  PotentialMinimum::PotentialMinimum( PotentialMinimum const& copySource ) :
+    MinuitMinimum( copySource )
+  {
+    // This constructor is just an initialization list.
+  }
+
   PotentialMinimum::~PotentialMinimum()
   {
     // This does nothing.

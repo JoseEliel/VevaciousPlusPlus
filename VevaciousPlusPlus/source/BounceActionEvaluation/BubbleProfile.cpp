@@ -438,7 +438,6 @@ namespace VevaciousPlusPlus
       double currentDistanceSquared( 0.0 );
       double fieldDifference( 0.0 );
       double falseVacuumField( 0.0 );
-      double const currentAuxiliary( auxiliaryProfile.back().auxiliaryValue );
       for( size_t fieldIndex( 0 );
            fieldIndex < tunnelPath.NumberOfFields();
            ++fieldIndex )

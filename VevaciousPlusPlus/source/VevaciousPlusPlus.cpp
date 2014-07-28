@@ -23,7 +23,8 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::VevaciousPlusPlus( SlhaManager& slhaManager,
                                         PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
-    runningParameterManager(),
+    slhaManager( &slhaManager ),
+    deleterForSlhaManager( NULL ),
     potentialFunction( NULL ),
     deleterForPotentialFunction( NULL ),
     potentialMinimizer( &potentialMinimizer ),
@@ -44,7 +45,8 @@ namespace VevaciousPlusPlus
   // compilers.
   VevaciousPlusPlus::VevaciousPlusPlus(
                                   std::string const& initializationFileName ) :
-    runningParameterManager(),
+    slhaManager( new RunningParameterManager() ),
+    deleterForSlhaManager( slhaManager ),
     potentialFunction( NULL ),
     deleterForPotentialFunction( NULL ),
     potentialMinimizer( NULL ),
@@ -186,7 +188,7 @@ namespace VevaciousPlusPlus
       = new FixedScaleOneLoopPotential( modelFilename,
                                         scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
-                                        runningParameterManager );
+                                        *slhaManager );
     }
     else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
     {
@@ -194,7 +196,7 @@ namespace VevaciousPlusPlus
       = new RgeImprovedOneLoopPotential( modelFilename,
                                          scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
-                                         runningParameterManager );
+                                         *slhaManager );
     }
     else
     {
@@ -916,6 +918,7 @@ namespace VevaciousPlusPlus
     delete deleterForTunnelingCalculator;
     delete deleterForPotentialMinimizer;
     delete deleterForPotentialFunction;
+    delete deleterForSlhaManager;
   }
 
 
@@ -930,7 +933,7 @@ namespace VevaciousPlusPlus
     BOL::BasicTimer stageTimer;
     BOL::BasicTimer totalTimer;
 
-    runningParameterManager.UpdateSlhaData( parameterFilename );
+    slhaManager->UpdateSlhaData( parameterFilename );
     potentialMinimizer->FindMinima( 0.0 );
 
     time( &currentTime );

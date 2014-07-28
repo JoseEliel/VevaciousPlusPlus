@@ -20,8 +20,8 @@ namespace VevaciousPlusPlus
                       double const potentialDepth );
     PotentialMinimum( MinuitMinimum const& minuitMinimum );
     PotentialMinimum();
-    virtual
-    ~PotentialMinimum();
+    PotentialMinimum( PotentialMinimum const& copySource );
+    virtual ~PotentialMinimum();
 
 
     // This returns the sum of the squares of the differences in the field

@@ -26,8 +26,7 @@ namespace VevaciousPlusPlus
                            RunningParameterManager& runningParameterManager );
     FixedScaleOneLoopPotential(
           PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
-    virtual
-    ~FixedScaleOneLoopPotential();
+    virtual ~FixedScaleOneLoopPotential();
 
 
     // This returns the energy density in GeV^4 of the potential for a state

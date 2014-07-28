@@ -18,8 +18,7 @@ namespace VevaciousPlusPlus
   public:
     PolynomialSum();
     PolynomialSum( PolynomialSum const& copySource );
-    virtual
-    ~PolynomialSum();
+    virtual ~PolynomialSum();
 
 
     // This evaluates the sum of polynomial terms for the given field values,

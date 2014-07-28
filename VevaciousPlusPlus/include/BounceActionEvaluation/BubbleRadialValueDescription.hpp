@@ -8,6 +8,8 @@
 #ifndef BUBBLERADIALVALUEDESCRIPTION_HPP_
 #define BUBBLERADIALVALUEDESCRIPTION_HPP_
 
+#include "CommonIncludes.hpp"
+
 namespace VevaciousPlusPlus
 {
 

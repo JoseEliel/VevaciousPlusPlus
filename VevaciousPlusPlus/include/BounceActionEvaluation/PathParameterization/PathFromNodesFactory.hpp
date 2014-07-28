@@ -47,7 +47,7 @@ namespace VevaciousPlusPlus
     operator()( std::vector< std::vector< double > > const& pathNodes,
                 double const pathTemperature = 0.0 ) const = 0;
 
-    NodesFromParameterization& NodesFromParameterization()
+    NodesFromParameterization& GetNodesFromParameterization()
     { return *nodesFromParameterization; }
 
 
