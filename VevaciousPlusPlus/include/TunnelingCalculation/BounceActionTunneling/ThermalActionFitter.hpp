@@ -25,8 +25,7 @@ namespace VevaciousPlusPlus
     ThermalActionFitter( std::vector< double > const& fitTemperatures,
                          std::vector< double > const& fittedActions,
                          double const criticalTemperature );
-    virtual
-    ~ThermalActionFitter();
+    virtual ~ThermalActionFitter();
 
 
     // This implements operator() for FCNBase, the function that MINUIT will
@@ -39,6 +38,7 @@ namespace VevaciousPlusPlus
     // This implements Up() for FCNBase just to stick to a basic value.
     virtual double Up() const { return 1.0; }
 
+
   protected:
     std::vector< double > fitCoefficients;
     double const criticalTemperature;
@@ -48,7 +48,7 @@ namespace VevaciousPlusPlus
 
 
   // This implements operator() for FCNBase, the function that MINUIT will
-  // minimize. It actually returns ( ( S / T ) - ln( S ) ) for a fitted
+  // minimize. It actually returns ( ( S / T ) + ln( S ) ) for a fitted
   // action S for the temperature T which should be the only element of
   // temperatureVector.
   inline double ThermalActionFitter::operator()(
@@ -73,7 +73,7 @@ namespace VevaciousPlusPlus
     }
     fittedAction
     = ( fittedAction / ( temperatureDifference * temperatureDifference ) );
-    return ( ( fittedAction / temperatureVector[ 0 ] ) - log( fittedAction ) );
+    return ( ( fittedAction / temperatureVector[ 0 ] ) + log( fittedAction ) );
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -114,9 +114,6 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/TunnelingCalculation/BounceActionTunneler.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
- $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
- $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
- $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
  source/VersionInformation.cpp \
