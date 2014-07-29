@@ -56,6 +56,7 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathPotentialMinimizer.cpp \
  $(BOUNCEACTIONPATHFINDING)/SingleNodeVaryingMinuit.cpp \
+ source/BounceActionEvaluation/BouncePathFinder.cpp \
  source/BounceActionEvaluation/BubbleProfile.cpp \
  source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
  source/BounceActionEvaluation/BubbleShootingOnSpline.cpp \
@@ -92,10 +93,10 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
+ source/PotentialEvaluation/ThermalFunctions.cpp \
  source/SlhaManagement/RunningParameterManager.cpp \
  source/SlhaManagement/SlhaManager.cpp \
  source/SlhaManagement/SlhaUpdatePropagator.cpp \
- source/PotentialEvaluation/ThermalFunctions.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
@@ -112,7 +113,6 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/PotentialMinimization/StartingPointFinder.cpp \
  source/TunnelingCalculation/BounceActionTunneler.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
- $(BOUNCEACTIONTUNNELING)/BouncePathFinder.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
  $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \

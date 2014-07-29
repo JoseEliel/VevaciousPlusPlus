@@ -50,8 +50,9 @@ namespace VevaciousPlusPlus
     // First we find the temperature at which the DSB vacuum evaporates, and
     // possibly exclude the parameter point based on DSB being less deep than
     // origin.
-    double const potentialAtOrigin( potentialFunction(
-                                     potentialFunction.FieldValuesOrigin() ) );
+    std::vector< double > const&
+    fieldOrigin( potentialFunction.FieldValuesOrigin() );
+    double const potentialAtOrigin( potentialFunction( fieldOrigin ) );
     if( potentialFunction( falseVacuum.FieldConfiguration() )
         > potentialAtOrigin )
     {
@@ -66,17 +67,9 @@ namespace VevaciousPlusPlus
       thermalSurvivalProbability = 0.0;
       return;
     }
-    double survivalExponent( 0.0 );
-    double const
-    thresholdSeparationSquared( 0.05 * 0.05 * falseVacuum.LengthSquared() );
 
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "Sort out case where DSB doesn't evaporate for appropriate tunneling"
-    << " temperature!";
-    std::cout << std::endl;/**/
-
+    // We note the temperatures where the DSB vacuum evaporates and where
+    // tunneling from the true vacuum to the field origin becomes impossible :
     criticalRatherThanEvaporation = false;
     evaporationMinimum = falseVacuum;
     double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(
@@ -84,21 +77,29 @@ namespace VevaciousPlusPlus
 
     criticalRatherThanEvaporation = true;
     criticalMinimum = trueVacuum;
-    // We need the temperature where tunneling from the true vacuum to the
-    // field origin becomes impossible.
     double const criticalTunnelingTemperature(
                        CriticalOrEvaporationTemperature( potentialAtOrigin ) );
 
 
-
+    // Now we start at almost the critical temperature, and sum up for
+    // decreasing temperatures:
+    double survivalExponent( 0.0 );
     double const temperatureStep( criticalTunnelingTemperature
                               / (double)( thermalIntegrationResolution + 1 ) );
     double
     currentTemperature( criticalTunnelingTemperature - temperatureStep );
-    double bounceOverTemperature( BounceAction(
-                 thermalPotentialMinimizer( falseVacuum.FieldConfiguration() ),
+    thermalPotentialMinimizer.SetTemperature( currentTemperature );
+    PotentialMinimum thermalFalseVacuum( potentialFunction.FieldValuesOrigin(),
+                                         potentialAtOrigin );
+    if( currentTemperature < falseEvaporationTemperature )
+    {
+      thermalFalseVacuum = thermalPotentialMinimizer(
+                                            falseVacuum.FieldConfiguration() );
+    }
+    double bounceOverTemperature( BoundedBounceAction( thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
-                                                currentTemperature )
+                                                       currentTemperature,
+                                                 lnOfThermalIntegrationFactor )
                                   / currentTemperature );
     if( bounceOverTemperature < maximumPowerOfNaturalExponent )
     {
@@ -120,18 +121,29 @@ namespace VevaciousPlusPlus
         break;
       }
       currentTemperature -= temperatureStep;
+      thermalPotentialMinimizer.SetTemperature( currentTemperature );
+      if( currentTemperature >= falseEvaporationTemperature )
+      {
+        thermalFalseVacuum = PotentialMinimum( fieldOrigin,
+                                               potentialFunction( fieldOrigin,
+                                                        currentTemperature ) );
+      }
+      else
+      {
+        thermalFalseVacuum = thermalPotentialMinimizer(
+                                            falseVacuum.FieldConfiguration() );
+      }
       // If the bounce action from the next step is sufficiently small, then
       // the contribution to survivalExponent could make survivalExponent >
       // thresholdExponent, which would mean that the survival probability is
       // definitely lower than survivalProbabilityThreshold.
       double const actionThreshold( currentTemperature
-          * log( temperatureStep / ( ( thresholdExponent - survivalExponent )
-                               * currentTemperature * currentTemperature) ) );
-      bounceOverTemperature = ( BoundedBounceAction(
-                 thermalPotentialMinimizer( falseVacuum.FieldConfiguration() ),
+            * log( temperatureStep / ( ( thresholdExponent - survivalExponent )
+                                * currentTemperature * currentTemperature) ) );
+      bounceOverTemperature = ( BoundedBounceAction( thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
-                                              currentTemperature,
-                                              actionThreshold )
+                                                     currentTemperature,
+                                                     actionThreshold )
                                 / currentTemperature );
 
       if( bounceOverTemperature < maximumPowerOfNaturalExponent )
