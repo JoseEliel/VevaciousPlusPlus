@@ -57,7 +57,6 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
-    needToUpdateHomotopyContinuation( false ),
     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
     scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
@@ -807,11 +806,10 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
-    needToUpdateHomotopyContinuation( false ),
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
     scaleRangeMinimumFactor( NAN ),
     fieldsAssumedPositive(),
-    fieldsAssumedNegative(),
-    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false )
+    fieldsAssumedNegative()
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -843,13 +841,11 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices( copySource.fermionMassSquaredMatrices ),
     vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
     vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant ),
-    needToUpdateHomotopyContinuation(
-                                 copySource.needToUpdateHomotopyContinuation ),
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
+          copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
     scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
     fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
-    fieldsAssumedNegative( copySource.fieldsAssumedNegative ),
-    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
-           copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
+    fieldsAssumedNegative( copySource.fieldsAssumedNegative )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
@@ -1517,9 +1513,8 @@ namespace VevaciousPlusPlus
     }
     returnStream << std::endl
     << "vectorMassCorrectionConstant = " << vectorMassCorrectionConstant
-    << std::endl << "needToUpdateHomotopyContinuation = "
-    << needToUpdateHomotopyContinuation << std::endl
-    << "scaleRangeMinimumFactor = " << scaleRangeMinimumFactor << std::endl;
+    << std::endl << "scaleRangeMinimumFactor = " << scaleRangeMinimumFactor
+    << std::endl;
     return returnStream.str();
   }
 

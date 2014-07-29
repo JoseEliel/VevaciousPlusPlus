@@ -9,7 +9,7 @@
 #define HOMOTOPYCONTINUATIONSOLVER_HPP_
 
 #include "CommonIncludes.hpp"
-#include "StartingPointFinder.hpp"
+#include "../StartingPointFinder.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
 
 

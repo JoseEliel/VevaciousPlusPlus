@@ -92,9 +92,9 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
- source/PotentialEvaluation/SlhaManagement/RunningParameterManager.cpp \
- source/PotentialEvaluation/SlhaManagement/SlhaManager.cpp \
- source/PotentialEvaluation/SlhaManagement/SlhaUpdatePropagator.cpp \
+ source/SlhaManagement/RunningParameterManager.cpp \
+ source/SlhaManagement/SlhaManager.cpp \
+ source/SlhaManagement/SlhaUpdatePropagator.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \

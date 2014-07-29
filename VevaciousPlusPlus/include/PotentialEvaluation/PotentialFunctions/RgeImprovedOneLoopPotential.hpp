@@ -14,6 +14,7 @@
 #include "SlhaManagement/SlhaManager.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include "PotentialMinimization/HomotopyContinuation/FieldPolynomialsWithScale.hpp"
 
 namespace VevaciousPlusPlus
 {
