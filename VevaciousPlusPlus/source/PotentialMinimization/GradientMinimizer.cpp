@@ -12,8 +12,7 @@ namespace VevaciousPlusPlus
 
   GradientMinimizer::GradientMinimizer(
                                  PotentialFunction const& potentialFunction ) :
-    potentialFunction( potentialFunction ),
-    minimizationTemperature( NAN )
+    potentialFunction( potentialFunction )
   {
     // This constructor is just an initialization list.
   }

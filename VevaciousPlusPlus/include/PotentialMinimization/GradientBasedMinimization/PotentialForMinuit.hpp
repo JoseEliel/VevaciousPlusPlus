@@ -20,8 +20,7 @@ namespace VevaciousPlusPlus
   {
   public:
     PotentialForMinuit( PotentialFunction const& minimizationFunction );
-    virtual
-    ~PotentialForMinuit();
+    virtual ~PotentialForMinuit();
 
 
     // This implements operator() for FCNBase, the function that MINUIT will

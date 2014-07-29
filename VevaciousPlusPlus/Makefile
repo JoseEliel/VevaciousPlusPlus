@@ -111,11 +111,9 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/PotentialMinimization/StartingPointFinder.cpp \
  source/TunnelingCalculation/BounceActionTunneler.cpp \
- $(BOUNCEACTIONTUNNELING)/BounceActionForMinuit.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  $(BOUNCEACTIONTUNNELING)/BouncePathFinder.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
- $(BOUNCEACTIONTUNNELING)/MinuitBounceActionMinimizer.cpp \
  $(BOUNCEACTIONTUNNELING)/ModifiedBounceForMinuit.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFieldsAndPotential.cpp \
  $(BOUNCEACTIONTUNNELING)/PathFromNodes.cpp \

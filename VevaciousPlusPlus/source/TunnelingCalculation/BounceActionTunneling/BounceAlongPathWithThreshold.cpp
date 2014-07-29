@@ -26,7 +26,6 @@ namespace VevaciousPlusPlus
                           evaporationResolution ),
     pathFinder( pathFinder ),
     actionCalculator( actionCalculator ),
-    actionThreshold( NAN ),
     thermalIntegrationResolution( thermalIntegrationResolution )
   {
     // This constructor is just an initialization list.
@@ -39,43 +38,6 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This returns either the dimensionless bounce action integrated over four
-  // dimensions (for zero temperature) or the dimensionful bounce action
-  // integrated over three dimensions (for non-zero temperature) for tunneling
-  // from falseVacuum to trueVacuum at temperature tunnelingTemperature, or an
-  // upper bound if the upper bound drops below actionThreshold during the
-  // course of the calculation. The vacua are assumed to already be the minima
-  // at tunnelingTemperature.
-  double BounceAlongPathWithThreshold::BounceAction(
-                                           PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
-                                      double const tunnelingTemperature ) const
-  {
-    actionCalculator->ResetVacua( falseVacuum,
-                                  trueVacuum );
-    if( tunnelingTemperature <= 0.0 )
-    {
-      double const squareRootOfSolitonicFactor(
-                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
-                                                                trueVacuum ) );
-      actionThreshold = log( -( squareRootOfSolitonicFactor
-                                * squareRootOfSolitonicFactor
-                                * fourVolumeOfKnownUniverseOverGevFourth )
-                              / log( survivalProbabilityThreshold ) );
-    }
-    pathFinder->SetInitialPath( falseVacuum,
-                          trueVacuum );
-    double bounceAction( (*actionCalculator)( pathFinder->CurrentPath() ) );
-    while( ( bounceAction > actionThreshold )
-           &&
-           pathFinder->PathCanBeImproved() )
-    {
-      pathFinder->ImprovePath();
-      bounceAction = (*actionCalculator)( pathFinder->CurrentPath() );
-    }
-    return bounceAction;
-  }
-
   // This sets thermalSurvivalProbability by numerically integrating from the
   // critical temperature for tunneling to be possible down to T = 0 unless
   // the integral already passes a threshold, and sets
@@ -85,8 +47,6 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
-    double survivalExponent( 0.0 );
-
     // First we find the temperature at which the DSB vacuum evaporates, and
     // possibly exclude the parameter point based on DSB being less deep than
     // origin.
@@ -106,18 +66,31 @@ namespace VevaciousPlusPlus
       thermalSurvivalProbability = 0.0;
       return;
     }
-    criticalRatherThanEvaporation = false;
+    double survivalExponent( 0.0 );
     double const
     thresholdSeparationSquared( 0.05 * 0.05 * falseVacuum.LengthSquared() );
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "Sort out case where DSB doesn't evaporate for appropriate tunneling"
+    << " temperature!";
+    std::cout << std::endl;/**/
+
+    criticalRatherThanEvaporation = false;
     evaporationMinimum = falseVacuum;
     double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(
                                                          potentialAtOrigin ) );
+
     criticalRatherThanEvaporation = true;
     criticalMinimum = trueVacuum;
     // We need the temperature where tunneling from the true vacuum to the
     // field origin becomes impossible.
     double const criticalTunnelingTemperature(
                        CriticalOrEvaporationTemperature( potentialAtOrigin ) );
+
+
+
     double const temperatureStep( criticalTunnelingTemperature
                               / (double)( thermalIntegrationResolution + 1 ) );
     double
@@ -151,13 +124,14 @@ namespace VevaciousPlusPlus
       // the contribution to survivalExponent could make survivalExponent >
       // thresholdExponent, which would mean that the survival probability is
       // definitely lower than survivalProbabilityThreshold.
-      actionThreshold = ( currentTemperature
+      double const actionThreshold( currentTemperature
           * log( temperatureStep / ( ( thresholdExponent - survivalExponent )
                                * currentTemperature * currentTemperature) ) );
-      bounceOverTemperature = ( BounceAction(
+      bounceOverTemperature = ( BoundedBounceAction(
                  thermalPotentialMinimizer( falseVacuum.FieldConfiguration() ),
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
-                                              currentTemperature )
+                                              currentTemperature,
+                                              actionThreshold )
                                 / currentTemperature );
 
       if( bounceOverTemperature < maximumPowerOfNaturalExponent )

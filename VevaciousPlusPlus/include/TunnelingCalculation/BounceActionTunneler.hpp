@@ -9,10 +9,11 @@
 #define BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 
 #include "CommonIncludes.hpp"
-#include "SlhaManagement/SlhaManager.hpp"
-#include "PotentialEvaluation/PotentialFunction.hpp"
-#include "PotentialMinimization/PotentialMinimum.hpp"
 #include "TunnelingCalculator.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
+#include "SlhaManagement/SlhaManager.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 
 namespace VevaciousPlusPlus
 {

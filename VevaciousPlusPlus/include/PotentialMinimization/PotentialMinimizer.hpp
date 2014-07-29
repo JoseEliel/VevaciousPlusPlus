@@ -18,8 +18,7 @@ namespace VevaciousPlusPlus
   {
   public:
     PotentialMinimizer( PotentialFunction const& potentialFunction );
-    virtual
-    ~PotentialMinimizer();
+    virtual ~PotentialMinimizer();
 
 
     // This should find all the minima of the potential evaluated at a
@@ -82,30 +81,6 @@ namespace VevaciousPlusPlus
     IsNotPhaseRotationOfDsbVacuum( PotentialMinimum const& comparisonMinimum,
                                    double const thresholdDistance ) const;
   };
-
-
-
-
-  // This returns false if the vector of the absolute values of the fields of
-  // comparisonMinimum lies within a hypercube of side thresholdDistance
-  // centered on dsbVacuum.
-  inline bool PotentialMinimizer::IsNotPhaseRotationOfDsbVacuum(
-                                     PotentialMinimum const& comparisonMinimum,
-                                         double const thresholdDistance ) const
-  {
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < dsbVacuum.FieldConfiguration().size();
-         ++fieldIndex )
-    {
-      if( fabs( fabs( dsbVacuum.FieldConfiguration()[ fieldIndex ] )
-               - fabs( comparisonMinimum.FieldConfiguration()[ fieldIndex ] ) )
-          > thresholdDistance )
-      {
-        return true;
-      }
-    }
-    return false;
-  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* POTENTIALMINIMIZER_HPP_ */

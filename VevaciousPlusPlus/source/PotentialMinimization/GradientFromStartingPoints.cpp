@@ -10,10 +10,12 @@
 namespace VevaciousPlusPlus
 {
   GradientFromStartingPoints::GradientFromStartingPoints(
-                                      StartingPointFinder* startingPointFinder,
-                                          GradientMinimizer* gradientMinimizer,
+                                    PotentialFunction const& potentialFunction,
+                                StartingPointFinder* const startingPointFinder,
+                                    GradientMinimizer* const gradientMinimizer,
                               double const extremumSeparationThresholdFraction,
                                double const nonDsbRollingToDsbScalingFactor ) :
+    PotentialMinimizer( potentialFunction ),
     startingPointFinder( startingPointFinder ),
     gradientMinimizer( gradientMinimizer ),
     startingPoints(),

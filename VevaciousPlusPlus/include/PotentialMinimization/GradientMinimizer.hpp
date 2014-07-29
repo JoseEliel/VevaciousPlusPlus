@@ -19,8 +19,7 @@ namespace VevaciousPlusPlus
   {
   public:
     GradientMinimizer( PotentialFunction const& potentialFunction );
-    virtual
-    ~GradientMinimizer();
+    virtual ~GradientMinimizer();
 
 
     // This should find the minimum using startingPoint as a starting point,
@@ -28,13 +27,13 @@ namespace VevaciousPlusPlus
     virtual PotentialMinimum
     operator()( std::vector< double > const& startingPoint ) const = 0;
 
-    void SetTemperature( double const minimizationTemperature )
-    { this->minimizationTemperature = minimizationTemperature; }
+    // This should ensure that the minimizations are calculated at the given
+    // temperature.
+    virtual void SetTemperature( double const minimizationTemperature ) = 0;
 
 
   protected:
     PotentialFunction const& potentialFunction;
-    double minimizationTemperature;
   };
 
 } /* namespace VevaciousPlusPlus */

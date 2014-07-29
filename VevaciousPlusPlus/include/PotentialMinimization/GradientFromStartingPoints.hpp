@@ -8,6 +8,7 @@
 #ifndef GRADIENTFROMSTARTINGPOINTS_HPP_
 #define GRADIENTFROMSTARTINGPOINTS_HPP_
 
+#include "PotentialMinimizer.hpp"
 #include "StartingPointFinder.hpp"
 #include "GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
@@ -23,8 +24,9 @@ namespace VevaciousPlusPlus
   class GradientFromStartingPoints : public PotentialMinimizer
   {
   public:
-    GradientFromStartingPoints( StartingPointFinder* startingPointFinder,
-                                GradientMinimizer* gradientMinimizer,
+    GradientFromStartingPoints( PotentialFunction const& potentialFunction,
+                                StartingPointFinder* const startingPointFinder,
+                                GradientMinimizer* const gradientMinimizer,
                               double const extremumSeparationThresholdFraction,
                                 double const nonDsbRollingToDsbScalingFactor );
     virtual ~GradientFromStartingPoints();

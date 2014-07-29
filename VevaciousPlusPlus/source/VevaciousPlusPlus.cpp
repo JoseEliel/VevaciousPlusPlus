@@ -373,7 +373,8 @@ namespace VevaciousPlusPlus
       }
 
       // Now we have the components for potentialMinimizer:
-      potentialMinimizer = new GradientFromStartingPoints( startingPointFinder,
+      potentialMinimizer = new GradientFromStartingPoints( potentialFunction,
+                                                           startingPointFinder,
                                                            gradientMinimizer,
                                            extremumSeparationThresholdFraction,
                                              nonDsbRollingToDsbScalingFactor );

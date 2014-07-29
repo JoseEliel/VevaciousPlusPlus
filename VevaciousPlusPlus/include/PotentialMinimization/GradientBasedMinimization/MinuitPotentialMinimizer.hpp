@@ -38,6 +38,11 @@ namespace VevaciousPlusPlus
     { return PotentialMinimum( MinuitMinimum( startingPoint.size(),
                                               RunMigrad( startingPoint ) ) ); }
 
+    // This ensures that the minimizations are calculated at the given
+    // temperature.
+    virtual void SetTemperature( double const minimizationTemperature )
+    { minimizationFunction.SetTemperature( minimizationTemperature ); }
+
     // This sets up a ROOT::Minuit2::MnMigrad instance and runs its operator().
     // The initial step sizes are set to be the values of startingPoint
     // multiplied by errorFraction, absolute values taken. Any step size less
@@ -48,7 +53,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    ROOT::Minuit2::FCNBase& minimizationFunction;
+    PotentialForMinuit minimizationFunction;
     double const errorFraction;
     double const errorMinimum;
     unsigned int const minuitStrategy;
