@@ -38,10 +38,6 @@ namespace VevaciousPlusPlus
     // C++ code. It uses the purely virtual function SetScaleInPythonFunction.
     virtual void WriteAsPython( std::string const pythonFilename ) const;
 
-    // This gives out a PolynomialGradientTargetSystem reference while setting
-    // needToUpdateHomotopyContinuation to true.
-    PolynomialGradientTargetSystem& HomotopyContinuationTargetSystem();
-
     // This is for debugging.
     std::string AsDebuggingString() const;
 
@@ -74,7 +70,6 @@ namespace VevaciousPlusPlus
     std::vector< ComplexMassSquaredMatrix > fermionMassSquaredMatrices;
     std::vector< RealMassesSquaredMatrix > vectorMassSquaredMatrices;
     double vectorMassCorrectionConstant;
-    bool needToUpdateHomotopyContinuation;
     bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions;
     double const scaleRangeMinimumFactor;
     std::vector< size_t > fieldsAssumedPositive;
@@ -173,15 +168,6 @@ namespace VevaciousPlusPlus
 
 
 
-
-  // This gives out a PolynomialGradientTargetSystem reference while setting
-  // needToUpdateHomotopyContinuation to true.
-  inline PolynomialGradientTargetSystem&
-  PotentialFromPolynomialAndMasses::HomotopyContinuationTargetSystem()
-  {
-    needToUpdateHomotopyContinuation = true;
-    return GetHomotopyContinuationTargetSystem();
-  }
 
   // This puts all index brackets into a consistent form.
   inline std::string PotentialFromPolynomialAndMasses::FormatVariable(

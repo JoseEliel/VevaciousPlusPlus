@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/OdeintBubbleObserver.hpp"
+#include "BounceActionEvaluation/OdeintBubbleObserver.hpp"
 
 namespace VevaciousPlusPlus
 {

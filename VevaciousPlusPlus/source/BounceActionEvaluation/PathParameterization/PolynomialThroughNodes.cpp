@@ -12,9 +12,11 @@ namespace VevaciousPlusPlus
 
   PolynomialThroughNodes::PolynomialThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
+                             std::vector< double > const& pathParameterization,
                                                   double const pathTemperature,
                                     Eigen::MatrixXd const& pathStepsInverse ) :
     TunnelPath( pathNodes.front().size(),
+                pathParameterization,
                 pathTemperature ),
     fieldPolynomials( numberOfFields ),
     firstDerivatives( numberOfFields ),

@@ -22,10 +22,6 @@ namespace VevaciousPlusPlus
                    size_t const numberOfIntermediateNodes );
     virtual ~NodesOnPlanes();
 
-    // This does something.
-    void SetVacua( PotentialMinimum const& falseVacuum,
-                   PotentialMinimum const& trueVacuum );
-
     // This puts all the nodes based on the numbers given in
     // pathParameterization into pathNodes, ordered in the sequence that they
     // are visited in the path from the false vacuum to the true vacuum, with
@@ -55,8 +51,10 @@ namespace VevaciousPlusPlus
                                size_t const adjustmentOrderIndex,
                       std::vector< double > const& nodeParameterization ) const
     { TransformPerpendicularToAndShift( nodeVector,
-                                        FalseSideNode( adjustmentOrderIndex ),
-                                        TrueSideNode( adjustmentOrderIndex ),
+                                        FalseSideNode( adjustmentOrderIndex,
+                                                       pathNodes ),
+                                        TrueSideNode( adjustmentOrderIndex,
+                                                      pathNodes ),
                                         nodeParameterization,
                                      ShiftFraction( adjustmentOrderIndex ) ); }
 
@@ -86,7 +84,7 @@ namespace VevaciousPlusPlus
     // given by nodeParameterization along with startNode and endNode to
     // nodeVector.
     virtual void
-    AddTransformedNode( std::vector< double > const& nodeVector,
+    AddTransformedNode( std::vector< double >& nodeVector,
                         std::vector< double > const& startNode,
                         std::vector< double > const& endNode,
                  std::vector< double > const& nodeParameterization ) const = 0;
@@ -103,22 +101,20 @@ namespace VevaciousPlusPlus
 
     // This should return the false-vacuum-side node of the pair of nodes
     // from which the node at adjustmentOrderIndex should be set.
-    std::vector< double > const&
+    virtual std::vector< double > const&
     FalseSideNode( size_t const adjustmentOrderIndex,
-                   std::vector< std::vector< double > > const& nodeSet
-                                                       = pathNodes ) const = 0;
+               std::vector< std::vector< double > > const& nodeSet ) const = 0;
 
     // This should return the true-vacuum-side node of the pair of nodes
     // from which the node at nodeIndex should be set.
-    std::vector< double > const&
+    virtual std::vector< double > const&
     TrueSideNode( size_t const adjustmentOrderIndex,
-                  std::vector< std::vector< double > > const& nodeSet
-                                                       = pathNodes ) const = 0;
+               std::vector< std::vector< double > > const& nodeSet ) const = 0;
 
     // This should return the fraction along the node difference vector that
     // the rotated plane should be shifted appropriate for
     // pathNodes[ nodeIndex ].
-    double ShiftFraction( size_t const nodeIndex ) const = 0;
+    virtual double ShiftFraction( size_t const nodeIndex ) const = 0;
   };
 
 
@@ -145,8 +141,10 @@ namespace VevaciousPlusPlus
       nodeParameterization.assign( currentParameterizationStart,
                 ( currentParameterizationStart + numberOfParametersPerNode ) );
       TransformPerpendicularToAndShift( pathNodes[ nodeIndex ],
-                                        FalseSideNode( nodeIndex ),
-                                        TrueSideNode( nodeIndex ),
+                                        FalseSideNode( nodeIndex,
+                                                       pathNodes ),
+                                        TrueSideNode( nodeIndex,
+                                                      pathNodes ),
                                         nodeParameterization,
                                         ShiftFraction( nodeIndex ) );
       currentParameterizationStart += numberOfParametersPerNode;

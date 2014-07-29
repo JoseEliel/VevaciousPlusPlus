@@ -24,6 +24,7 @@ namespace VevaciousPlusPlus
                                 std::vector< double > const& endNode,
                                 double const segmentAuxiliaryLength );
     QuadraticSplinePathSegment( QuadraticSplinePathSegment const& copySource );
+    QuadraticSplinePathSegment();
     virtual ~QuadraticSplinePathSegment();
 
 
@@ -50,11 +51,11 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    size_t const numberOfFields;
+    size_t numberOfFields;
     std::vector< double > fieldConstants;
     std::vector< double > fieldLinears;
     std::vector< double > fieldQuadratics;
-    double const segmentAuxiliaryLength;
+    double segmentAuxiliaryLength;
   };
 
 

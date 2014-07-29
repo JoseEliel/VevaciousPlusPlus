@@ -23,8 +23,9 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      fieldLinears = ( ( endNode[ fieldIndex ] - startNode[ fieldIndex ] )
-                       / segmentAuxiliaryLength );
+      fieldLinears[ fieldIndex ]
+      = ( ( endNode[ fieldIndex ] - startNode[ fieldIndex ] )
+          / segmentAuxiliaryLength );
     }
   }
 
@@ -38,6 +39,14 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
+  LinearSplinePathSegment::LinearSplinePathSegment() :
+    numberOfFields( 0 ),
+    fieldConstants(),
+    fieldLinears(),
+    segmentAuxiliaryLength( NAN )
+  {
+    // This constructor is just an initialization list.
+  }
 
   LinearSplinePathSegment::~LinearSplinePathSegment()
   {

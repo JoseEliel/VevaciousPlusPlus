@@ -13,8 +13,7 @@ namespace VevaciousPlusPlus
   NodesOnPlanes::NodesOnPlanes( std::vector< double > const& falseVacuum,
                                 std::vector< double > const& trueVacuum,
                                 size_t const numberOfIntermediateNodes ) :
-    NodesFromParameterization( falseVacuum,
-                               trueVacuum,
+    NodesFromParameterization( trueVacuum.size(),
                                numberOfIntermediateNodes ),
     referenceField( 0 ),
     numberOfParametersPerNode( numberOfFields - 1 )

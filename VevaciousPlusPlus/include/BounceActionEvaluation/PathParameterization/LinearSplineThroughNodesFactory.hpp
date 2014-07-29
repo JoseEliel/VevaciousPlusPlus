@@ -30,8 +30,10 @@ namespace VevaciousPlusPlus
     // the requirements not including a C++11-compliant compiler.)
     virtual TunnelPath*
     operator()( std::vector< std::vector< double > > const& pathNodes,
+                std::vector< double > const& pathParameterization,
                 double const pathTemperature = 0.0 ) const
     { return new LinearSplineThroughNodes( pathNodes,
+                                           pathParameterization,
                                            pathTemperature ); }
   };
 

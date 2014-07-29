@@ -9,6 +9,7 @@
 #define NODESFROMPARAMETERIZATION_HPP_
 
 #include "CommonIncludes.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -41,6 +42,15 @@ namespace VevaciousPlusPlus
     virtual void SetInitialParameterizationAndStepSizes(
                                    std::vector< double >& pathParameterization,
                            std::vector< double >& initialStepSizes ) const = 0;
+
+    // This could construct a parameterization from the given nodes if
+    // necessary, but right now it's not necessary, so passing in an empty
+    // vector is sufficient for the cases where the TunnelPath is being created
+    // directly from a set of nodes rather than a parameterization setting up a
+    // set of nodes which then creates the TunnelPath.
+    virtual std::vector< double > ParameterizationForNodes(
+                  std::vector< std::vector< double > > const& pathNodes ) const
+    { return std::vector< double >( 0 ); }
 
     // If the derived class can vary one node at a time, this should set
     // nodeVector to be what the node at index adjustmentOrderIndex would be

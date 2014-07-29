@@ -86,7 +86,7 @@ namespace VevaciousPlusPlus
   // given by nodeParameterization along with startNode and endNode to
   // nodeVector.
   void NodesOnBisectingPlanes::AddTransformedNode(
-                                       std::vector< double > const& nodeVector,
+                                             std::vector< double >& nodeVector,
                                         std::vector< double > const& startNode,
                                           std::vector< double > const& endNode,
                       std::vector< double > const& nodeParameterization ) const

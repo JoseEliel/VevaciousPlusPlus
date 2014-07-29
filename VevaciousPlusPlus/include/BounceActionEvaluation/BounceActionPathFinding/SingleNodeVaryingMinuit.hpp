@@ -52,36 +52,5 @@ namespace VevaciousPlusPlus
     size_t currentNodeIndex;
   };
 
-
-
-
-  // This allows Minuit2 to move each node a set number of times to try to
-  // minimize the potential at that node or bounce action along the adjusted
-  // path, and then sets the path from the set of nodes.
-  inline void SingleNodeVaryingMinuit::ImprovePath()
-  {
-    for( size_t nodeIndex( 1 );
-         nodeIndex <= pathNodes.NumberOfVaryingNodes();
-         ++nodeIndex )
-    {
-      // We have to set which node Minuit will vary in each iteration.
-      currentNodeIndex = nodeIndex;
-      MinuitMinimum const& nodeState( currentMinuitResults[ nodeIndex - 1 ] );
-      ROOT::Minuit2::MnMigrad mnMigrad( (*this),
-                                        nodeState.VariableValues(),
-                                        nodeState.VariableErrors(),
-                                        minuitStrategy );
-      MinuitMinimum
-      minuitMinimum( currentMinuitResults.front().VariableValues().size(),
-                     mnMigrad( movesPerImprovement,
-                               currentMinuitTolerance ) );
-      currentMinuitResults[ nodeIndex - 1 ] = minuitMinimum;
-      pathNodes.SetNodeInAdjustmentOrder( nodeIndex,
-                                          minuitMinimum.VariableValues() );
-    }
-    SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),
-                                           pathTemperature ) );
-  }
-
 } /* namespace VevaciousPlusPlus */
 #endif /* SINGLENODEVARYINGMINUIT_HPP_ */

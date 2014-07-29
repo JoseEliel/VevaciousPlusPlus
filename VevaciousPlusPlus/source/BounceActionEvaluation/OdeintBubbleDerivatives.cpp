@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/OdeintBubbleDerivatives.hpp"
+#include "BounceActionEvaluation/OdeintBubbleDerivatives.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "TunnelPath.hpp"
+#include "LinearSplinePathSegment.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -19,6 +20,7 @@ namespace VevaciousPlusPlus
   public:
     LinearSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
+                             std::vector< double > const& pathParameterization,
                               double const pathTemperature );
     virtual ~LinearSplineThroughNodes();
 

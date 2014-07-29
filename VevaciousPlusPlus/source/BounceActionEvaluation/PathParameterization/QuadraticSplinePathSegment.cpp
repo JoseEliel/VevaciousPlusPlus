@@ -47,8 +47,9 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      fieldLinears = ( ( endNode[ fieldIndex ] - startNode[ fieldIndex ] )
-                       / segmentAuxiliaryLength );
+      fieldLinears[ fieldIndex ]
+      = ( ( endNode[ fieldIndex ] - startNode[ fieldIndex ] )
+          / segmentAuxiliaryLength );
       fieldQuadratics[ fieldIndex ] = 0.0;
     }
   }
@@ -60,6 +61,16 @@ namespace VevaciousPlusPlus
     fieldLinears( copySource.fieldLinears ),
     fieldQuadratics( copySource.fieldQuadratics ),
     segmentAuxiliaryLength( copySource.segmentAuxiliaryLength )
+  {
+    // This constructor is just an initialization list.
+  }
+
+  QuadraticSplinePathSegment::QuadraticSplinePathSegment() :
+    numberOfFields( 0 ),
+    fieldConstants(),
+    fieldLinears(),
+    fieldQuadratics(),
+    segmentAuxiliaryLength( NAN )
   {
     // This constructor is just an initialization list.
   }

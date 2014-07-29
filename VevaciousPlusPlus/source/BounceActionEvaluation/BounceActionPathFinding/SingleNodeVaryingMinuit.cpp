@@ -65,6 +65,7 @@ namespace VevaciousPlusPlus
                            *pathParameterization );
     // Now we can set the current path.
     SetCurrentPathPointer( (*pathFactory)( nodeSet,
+                                 pathNodes.ParameterizationForNodes( nodeSet ),
                                            pathTemperature ) );
     // However, we still need to set up the initial states for Minuit as well
     // as ensure that pathNodes records the nodes too, so that we can vary the
@@ -91,6 +92,35 @@ namespace VevaciousPlusPlus
       currentMinuitResults.push_back( MinuitMinimum( nodeParameterization,
                                                      initialStepSizes ) );
     }
+  }
+
+  // This allows Minuit2 to move each node a set number of times to try to
+  // minimize the potential at that node or bounce action along the adjusted
+  // path, and then sets the path from the set of nodes.
+  void SingleNodeVaryingMinuit::ImprovePath()
+  {
+    for( size_t nodeIndex( 1 );
+         nodeIndex <= pathNodes.NumberOfVaryingNodes();
+         ++nodeIndex )
+    {
+      // We have to set which node Minuit will vary in each iteration.
+      currentNodeIndex = nodeIndex;
+      MinuitMinimum const& nodeState( currentMinuitResults[ nodeIndex - 1 ] );
+      ROOT::Minuit2::MnMigrad mnMigrad( (*this),
+                                        nodeState.VariableValues(),
+                                        nodeState.VariableErrors(),
+                                        minuitStrategy );
+      MinuitMinimum
+      minuitMinimum( currentMinuitResults.front().VariableValues().size(),
+                     mnMigrad( movesPerImprovement,
+                               currentMinuitTolerance ) );
+      currentMinuitResults[ nodeIndex - 1 ] = minuitMinimum;
+      pathNodes.SetNodeInAdjustmentOrder( nodeIndex,
+                                          minuitMinimum.VariableValues() );
+    }
+    SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),
+                   pathNodes.ParameterizationForNodes( pathNodes.PathNodes() ),
+                                           pathTemperature ) );
   }
 
 } /* namespace VevaciousPlusPlus */

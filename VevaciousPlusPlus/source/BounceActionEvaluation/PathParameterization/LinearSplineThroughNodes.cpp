@@ -12,8 +12,10 @@ namespace VevaciousPlusPlus
 
   LinearSplineThroughNodes::LinearSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
+                             std::vector< double > const& pathParameterization,
                                                double const pathTemperature ) :
     TunnelPath( pathNodes.front().size(),
+                pathParameterization,
                 pathTemperature ),
     pathSegments( pathNodes.size() - 1 )
   {
@@ -43,8 +45,8 @@ namespace VevaciousPlusPlus
          ++segmentIndex )
     {
       pathSegments[ segmentIndex ]
-      = QuadraticSplinePathSegment( pathNodes[ segmentIndex ],
-                                    pathNodes[ segmentIndex + 1 ],
+      = LinearSplinePathSegment( pathNodes[ segmentIndex ],
+                                 pathNodes[ segmentIndex + 1 ],
                      ( segmentLengths[ segmentIndex ] * inverseTotalLength ) );
     }
   }

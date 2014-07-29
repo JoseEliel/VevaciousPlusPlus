@@ -39,32 +39,29 @@ namespace VevaciousPlusPlus
     // This should add the perpendicular component from the parameterization
     // given by nodeParameterization along with startNode and endNode to
     // nodeVector.
-    virtual void
-    AddTransformedNode( std::vector< double > const& nodeVector,
-                        std::vector< double > const& startNode,
-                        std::vector< double > const& endNode,
+    virtual void AddTransformedNode( std::vector< double >& nodeVector,
+                                     std::vector< double > const& startNode,
+                                     std::vector< double > const& endNode,
                      std::vector< double > const& nodeParameterization ) const;
 
     // This should return the false-vacuum-side node of the pair of nodes
     // from which the node at adjustmentOrderIndex should be set.
-    std::vector< double > const&
+    virtual std::vector< double > const&
     FalseSideNode( size_t const adjustmentOrderIndex,
-                   std::vector< std::vector< double > > const& nodeSet
-                                                            = pathNodes ) const
+                   std::vector< std::vector< double > > const& nodeSet ) const
     { return nodeSet[ sideNodeIndices[ adjustmentOrderIndex ].first ]; }
 
     // This should return the true-vacuum-side node of the pair of nodes
     // from which the node at nodeIndex should be set.
-    std::vector< double > const&
+    virtual std::vector< double > const&
     TrueSideNode( size_t const adjustmentOrderIndex,
-                  std::vector< std::vector< double > > const& nodeSet
-                                                       = pathNodes ) const
+                  std::vector< std::vector< double > > const& nodeSet ) const
     { return nodeSet[ sideNodeIndices[ adjustmentOrderIndex].second ]; }
 
     // This should return the fraction along the node difference vector that
     // the rotated plane should be shifted appropriate for
     // pathNodes[ nodeIndex ].
-    double ShiftFraction( size_t const nodeIndex ) const{ return 0.5; }
+    virtual double ShiftFraction( size_t const nodeIndex ) const{ return 0.5; }
   };
 
 } /* namespace VevaciousPlusPlus */

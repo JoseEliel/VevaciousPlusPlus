@@ -12,8 +12,10 @@ namespace VevaciousPlusPlus
 
   QuadraticSplineThroughNodes::QuadraticSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
+                             std::vector< double > const& pathParameterization,
                                                double const pathTemperature ) :
     TunnelPath( pathNodes.front().size(),
+                pathParameterization,
                 pathTemperature ),
     numberOfSegments( pathNodes.size() - 1 ),
     inverseSegmentLength( 1.0 / (double)numberOfSegments ),

@@ -17,9 +17,10 @@ namespace VevaciousPlusPlus
   {
   public:
     LinearSplinePathSegment( std::vector< double > const& startNode,
-                                std::vector< double > const& endNode,
-                                double const segmentAuxiliaryLength );
+                             std::vector< double > const& endNode,
+                             double const segmentAuxiliaryLength );
     LinearSplinePathSegment( LinearSplinePathSegment const& copySource );
+    LinearSplinePathSegment();
     virtual ~LinearSplinePathSegment();
 
 
@@ -37,8 +38,9 @@ namespace VevaciousPlusPlus
     double SlopeDotAcceleration( double const segmentAuxiliary ) const
     { return 0.0; }
 
-    // This returns the slope at the end of the segment.
-    std::vector< double > EndSlope() const{ return fieldLinears.back(); }
+    // This returns the slope at the end of the segment, which in this case is
+    // the same as the slope everywhere in the segment.
+    std::vector< double > EndSlope() const{ return fieldLinears; }
 
     double SegmentLength() const{ return segmentAuxiliaryLength; }
 
@@ -47,10 +49,10 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    size_t const numberOfFields;
+    size_t numberOfFields;
     std::vector< double > fieldConstants;
     std::vector< double > fieldLinears;
-    double const segmentAuxiliaryLength;
+    double segmentAuxiliaryLength;
   };
 
 

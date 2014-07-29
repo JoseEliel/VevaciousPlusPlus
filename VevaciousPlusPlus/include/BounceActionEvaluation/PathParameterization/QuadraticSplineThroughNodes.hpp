@@ -21,6 +21,7 @@ namespace VevaciousPlusPlus
   public:
     QuadraticSplineThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
+                             std::vector< double > const& pathParameterization,
                                  double const pathTemperature );
     virtual ~QuadraticSplineThroughNodes();
 

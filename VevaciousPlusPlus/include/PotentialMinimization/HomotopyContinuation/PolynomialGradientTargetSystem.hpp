@@ -30,8 +30,7 @@ namespace VevaciousPlusPlus
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
                               bool const treeLevelMinimaOnlyAsValidSolutions );
-    virtual
-    ~PolynomialGradientTargetSystem();
+    virtual ~PolynomialGradientTargetSystem();
 
 
     // This fills targetSystem, startSystem, targetHessian, and startHessian
@@ -42,8 +41,7 @@ namespace VevaciousPlusPlus
     // for variableIndex from 0 to ( numberOfVariables - 1 ). SetStartSystem
     // is public, so special ranges for particular variables can be given to
     // over-write the values given by this function.
-    virtual void
-    UpdateSelfForNewSlha( SlhaManager const& slhaManager );
+    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
 
     std::vector< PolynomialSum > const& TargetSystem() const
     { return targetSystem; }

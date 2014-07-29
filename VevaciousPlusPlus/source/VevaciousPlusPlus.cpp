@@ -318,7 +318,7 @@ namespace VevaciousPlusPlus
           }
         }
         startingPointFinder = new Hom4ps2Runner(
-          potentialFromPolynomialAndMasses->HomotopyContinuationTargetSystem(),
+                   *(potentialFunction->GetHomotopyContinuationTargetSystem()),
                                                  pathToHom4ps2,
                                                  homotopyType );
       }
@@ -396,7 +396,7 @@ namespace VevaciousPlusPlus
       elementParser.loadString( tunnelingArguments );
       TunnelingCalculator::TunnelingStrategy
       tunnelingStrategy( TunnelingCalculator::TunnelingStrategy::JustThermal );
-      double survivalProbabilityThreshold;
+      double survivalProbabilityThreshold( 0.1 );
       size_t temperatureAccuracy( 7 );
       size_t evaporationResolution( 3 );
       std::string pathToCosmotransitions( "./cosmoTransitions/" );
@@ -451,6 +451,17 @@ namespace VevaciousPlusPlus
         {
           survivalProbabilityThreshold = BOL::StringParser::stringToDouble(
                              elementParser.getTrimmedCurrentElementContent() );
+          if( !( ( survivalProbabilityThreshold > 0.0 )
+                 &&
+                 ( survivalProbabilityThreshold < 1.0 ) ) )
+          {
+            std::stringstream errorStream;
+            errorStream
+            << "<SurvivalProbabilityThreshold> must be greater than 0.0 and"
+            << " less than 1.0 to be valid! Instead, the XML element gave \""
+            << elementParser.getTrimmedCurrentElementContent() << "\".";
+            throw std::runtime_error( errorStream.str() );
+          }
         }
         else if( elementParser.currentElementNameMatches(
                                               "CriticalTemperatureAccuracy" ) )

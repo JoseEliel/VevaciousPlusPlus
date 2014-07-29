@@ -30,8 +30,8 @@ namespace VevaciousPlusPlus
   // This takes nodeParameterization as a vector in the plane with field
   // referenceField = 0 and projects it onto the plane perpendicular to the
   // difference vector between the vacua, and adds that to nodeVector.
-  void NodesOnParallelPlanes::AddTransformedNode(
-                                       std::vector< double > const& nodeVector,
+  void
+  NodesOnParallelPlanes::AddTransformedNode( std::vector< double >& nodeVector,
                                         std::vector< double > const& startNode,
                                           std::vector< double > const& endNode,
                       std::vector< double > const& nodeParameterization ) const

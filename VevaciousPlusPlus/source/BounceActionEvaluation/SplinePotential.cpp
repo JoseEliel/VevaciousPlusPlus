@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/TunnelingCalculation.hpp"
+#include "BounceActionEvaluation/SplinePotential.hpp"
 
 namespace VevaciousPlusPlus
 {

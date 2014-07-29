@@ -21,6 +21,7 @@ namespace VevaciousPlusPlus
   public:
     PolynomialThroughNodes(
                          std::vector< std::vector< double > > const& pathNodes,
+                            std::vector< double > const& pathParameterization,
                             double const pathTemperature,
                             Eigen::MatrixXd const& pathStepsInverse );
     virtual ~PolynomialThroughNodes();
