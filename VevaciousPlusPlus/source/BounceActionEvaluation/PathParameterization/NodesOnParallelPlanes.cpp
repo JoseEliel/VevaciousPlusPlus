@@ -10,12 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  NodesOnParallelPlanes::NodesOnParallelPlanes(
-                                      std::vector< double > const& falseVacuum,
-                                       std::vector< double > const& trueVacuum,
+  NodesOnParallelPlanes::NodesOnParallelPlanes( size_t const numberOfFields,
                                      size_t const numberOfIntermediateNodes ) :
-    NodesOnPlanes( falseVacuum,
-                   trueVacuum,
+    NodesOnPlanes( numberOfFields,
                    numberOfIntermediateNodes )
   {
     // This constructor is just an initialization list.

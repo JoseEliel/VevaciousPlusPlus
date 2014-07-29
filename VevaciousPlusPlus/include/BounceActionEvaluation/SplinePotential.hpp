@@ -18,8 +18,7 @@ namespace VevaciousPlusPlus
   public:
     SplinePotential( double const minimumFalseVacuumConcavity = 1.0e-6 );
     SplinePotential( SplinePotential const& copySource );
-    virtual
-    ~SplinePotential();
+    virtual ~SplinePotential();
 
 
     // This returns the value of the potential at auxiliaryValue, by finding

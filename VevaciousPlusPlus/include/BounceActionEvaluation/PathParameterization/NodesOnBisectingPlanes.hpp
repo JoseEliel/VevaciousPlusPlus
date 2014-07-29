@@ -18,8 +18,7 @@ namespace VevaciousPlusPlus
   class NodesOnBisectingPlanes : public NodesOnPlanes
   {
   public:
-    NodesOnBisectingPlanes( std::vector< double > const& falseVacuum,
-                            std::vector< double > const& trueVacuum,
+    NodesOnBisectingPlanes( size_t const numberOfFields,
                             size_t const numberOfIntermediateNodes );
     virtual ~NodesOnBisectingPlanes();
 

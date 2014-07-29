@@ -17,10 +17,15 @@ namespace VevaciousPlusPlus
   class NodesOnPlanes : public NodesFromParameterization
   {
   public:
-    NodesOnPlanes( std::vector< double > const& falseVacuum,
-                   std::vector< double > const& trueVacuum,
+    NodesOnPlanes( size_t const numberOfFields,
                    size_t const numberOfIntermediateNodes );
     virtual ~NodesOnPlanes();
+
+
+    // This resets the NodesFromParameterization so that it will produce
+    // TunnelPath*s that parameterize the path between the given vacua.
+    virtual void SetVacua( PotentialMinimum const& falseVacuum,
+                           PotentialMinimum const& trueVacuum );
 
     // This puts all the nodes based on the numbers given in
     // pathParameterization into pathNodes, ordered in the sequence that they
@@ -126,7 +131,7 @@ namespace VevaciousPlusPlus
   // pathNodes.front() being the false vacuum and pathNodes.back() being the
   // true vacuum. (It would be nice to just return a new vector, but we're
   // avoiding relying on C++11-compliant compilers.)
-  void
+  inline void
   NodesOnPlanes::PathNodeSet( std::vector< std::vector< double > >& pathNodes,
                       std::vector< double > const& pathParameterization ) const
   {

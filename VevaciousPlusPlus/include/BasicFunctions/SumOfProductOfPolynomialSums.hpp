@@ -20,8 +20,7 @@ namespace VevaciousPlusPlus
     SumOfProductOfPolynomialSums();
     SumOfProductOfPolynomialSums(
                               SumOfProductOfPolynomialSums const& copySource );
-    virtual
-    ~SumOfProductOfPolynomialSums();
+    virtual ~SumOfProductOfPolynomialSums();
 
 
     // This returns the sum of operator() on each of the

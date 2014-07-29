@@ -17,8 +17,7 @@ namespace VevaciousPlusPlus
   class NodesOnParallelPlanes : public NodesOnPlanes
   {
   public:
-    NodesOnParallelPlanes( std::vector< double > const& falseVacuum,
-                           std::vector< double > const& trueVacuum,
+    NodesOnParallelPlanes( size_t const numberOfFields,
                            size_t const numberOfIntermediateNodes );
     virtual ~NodesOnParallelPlanes();
 

@@ -75,8 +75,8 @@ namespace VevaciousPlusPlus
 
     // This should give out a pointer to the PolynomialGradientTargetSystem
     // appropriate to this potential, if it has one.
-    virtual PolynomialGradientTargetSystem const*
-    GetHomotopyContinuationTargetSystem() const{ return NULL; }
+    virtual PolynomialGradientTargetSystem* HomotopyContinuationTargetSystem()
+    { return NULL; }
 
 
   protected:

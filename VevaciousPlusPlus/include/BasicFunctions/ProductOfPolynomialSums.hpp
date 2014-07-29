@@ -19,8 +19,7 @@ namespace VevaciousPlusPlus
   public:
     ProductOfPolynomialSums();
     ProductOfPolynomialSums( ProductOfPolynomialSums const& copySource );
-    virtual
-    ~ProductOfPolynomialSums();
+    virtual ~ProductOfPolynomialSums();
 
 
     // This returns the product of operator() on each of the PolynomialSums in

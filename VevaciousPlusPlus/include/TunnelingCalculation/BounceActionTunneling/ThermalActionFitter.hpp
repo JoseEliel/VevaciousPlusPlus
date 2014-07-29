@@ -29,7 +29,7 @@ namespace VevaciousPlusPlus
 
 
     // This implements operator() for FCNBase, the function that MINUIT will
-    // minimize. It actually returns ( ( S / T ) - ln( S ) ) for a fitted
+    // minimize. It actually returns ( ( S / T ) + ln( S ) ) for a fitted
     // action S for the temperature T which should be the only element of
     // temperatureVector.
     virtual double

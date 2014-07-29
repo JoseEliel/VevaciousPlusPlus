@@ -10,12 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  NodesOnBisectingPlanes::NodesOnBisectingPlanes(
-                                      std::vector< double > const& falseVacuum,
-                                       std::vector< double > const& trueVacuum,
+  NodesOnBisectingPlanes::NodesOnBisectingPlanes( size_t const numberOfFields,
                                      size_t const numberOfIntermediateNodes ) :
-    NodesOnPlanes( falseVacuum,
-                   trueVacuum,
+    NodesOnPlanes( numberOfFields,
                    numberOfIntermediateNodes ),
     adjustmentOrder(),
     sideNodeIndices()
@@ -32,10 +29,8 @@ namespace VevaciousPlusPlus
     }
     --(this->numberOfIntermediateNodes);
 
-    // We ensure that pathNodes has the correct size and that pathNodes.back()
-    // has trueVacuum.
+    // We ensure that pathNodes has the correct size.
     pathNodes.resize( this->numberOfIntermediateNodes + 2 );
-    pathNodes.back() = trueVacuum;
 
     // We need to set up the order in which the nodes will be set. The middle
     // node is set first, based on the vacua at the ends of pathNodes, then

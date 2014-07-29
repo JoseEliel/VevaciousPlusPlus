@@ -8,6 +8,8 @@
 #ifndef VERSIONINFORMATION_HPP_
 #define VERSIONINFORMATION_HPP_
 
+#include <string>
+
 namespace VevaciousPlusPlus
 {
 

@@ -45,8 +45,8 @@ namespace VevaciousPlusPlus
   // compilers.
   VevaciousPlusPlus::VevaciousPlusPlus(
                                   std::string const& initializationFileName ) :
-    slhaManager( new RunningParameterManager() ),
-    deleterForSlhaManager( slhaManager ),
+    slhaManager( NULL ),
+    deleterForSlhaManager( NULL ),
     potentialFunction( NULL ),
     deleterForPotentialFunction( NULL ),
     potentialMinimizer( NULL ),
@@ -55,11 +55,10 @@ namespace VevaciousPlusPlus
     deleterForTunnelingCalculator( NULL ),
     currentTime()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "NEED TO ENSURE THAT ALL HEADERS ARE PROPERLY INCLUDED!";
-    std::cout << std::endl;/**/
+    RunningParameterManager*
+    runningParameterManager( new RunningParameterManager() );
+    slhaManager = runningParameterManager;
+    deleterForSlhaManager = slhaManager;
     PotentialFromPolynomialAndMasses* potentialFromPolynomialAndMasses( NULL );
     std::string potentialClass( "FixedScaleOneLoopPotential" );
     std::string potentialArguments( "" );
@@ -188,7 +187,7 @@ namespace VevaciousPlusPlus
       = new FixedScaleOneLoopPotential( modelFilename,
                                         scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
-                                        *slhaManager );
+                                        *runningParameterManager );
     }
     else if( potentialClass.compare( "RgeImprovedOneLoopPotential" ) == 0 )
     {
@@ -196,7 +195,7 @@ namespace VevaciousPlusPlus
       = new RgeImprovedOneLoopPotential( modelFilename,
                                          scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
-                                         *slhaManager );
+                                         *runningParameterManager );
     }
     else
     {
@@ -318,7 +317,7 @@ namespace VevaciousPlusPlus
           }
         }
         startingPointFinder = new Hom4ps2Runner(
-                   *(potentialFunction->GetHomotopyContinuationTargetSystem()),
+                      *(potentialFunction->HomotopyContinuationTargetSystem()),
                                                  pathToHom4ps2,
                                                  homotopyType );
       }
@@ -373,7 +372,7 @@ namespace VevaciousPlusPlus
       }
 
       // Now we have the components for potentialMinimizer:
-      potentialMinimizer = new GradientFromStartingPoints( potentialFunction,
+      potentialMinimizer = new GradientFromStartingPoints( *potentialFunction,
                                                            startingPointFinder,
                                                            gradientMinimizer,
                                            extremumSeparationThresholdFraction,
@@ -396,7 +395,7 @@ namespace VevaciousPlusPlus
     {
       elementParser.loadString( tunnelingArguments );
       TunnelingCalculator::TunnelingStrategy
-      tunnelingStrategy( TunnelingCalculator::TunnelingStrategy::JustThermal );
+      tunnelingStrategy( TunnelingCalculator::JustThermal );
       double survivalProbabilityThreshold( 0.1 );
       size_t temperatureAccuracy( 7 );
       size_t evaporationResolution( 3 );
@@ -420,31 +419,27 @@ namespace VevaciousPlusPlus
               ( tunnelingStrategyString.compare( "ThermalThenQuantum" )
                 == 0 ) )
           {
-            tunnelingStrategy
-            = TunnelingCalculator::TunnelingStrategy::ThermalThenQuantum;
+            tunnelingStrategy = TunnelingCalculator::ThermalThenQuantum;
           }
           else if( tunnelingStrategyString.compare( "QuantumThenThermal" )
                    == 0 )
           {
             tunnelingStrategy
-            = TunnelingCalculator::TunnelingStrategy::QuantumThenThermal;
+            = TunnelingCalculator::QuantumThenThermal;
           }
           else if( tunnelingStrategyString.compare( "JustThermal" ) == 0 )
           {
-            tunnelingStrategy
-            = TunnelingCalculator::TunnelingStrategy::JustThermal;
+            tunnelingStrategy = TunnelingCalculator::JustThermal;
           }
           else if( tunnelingStrategyString.compare( "JustQuantum" ) == 0 )
           {
-            tunnelingStrategy
-            = TunnelingCalculator::TunnelingStrategy::JustQuantum;
+            tunnelingStrategy = TunnelingCalculator::JustQuantum;
           }
           else if( ( tunnelingStrategyString.compare( "NoTunneling" ) == 0 )
                    ||
                    ( tunnelingStrategyString.compare( "None" ) == 0 ) )
           {
-            tunnelingStrategy
-            = TunnelingCalculator::TunnelingStrategy::NoTunneling;
+            tunnelingStrategy = TunnelingCalculator::NoTunneling;
           }
         }
         else if( elementParser.currentElementNameMatches(
@@ -606,7 +601,7 @@ namespace VevaciousPlusPlus
             }
           }
           bounceActionCalculator
-          = new BubbleShootingOnSpline( potentialFunction,
+          = new BubbleShootingOnSpline( *potentialFunction,
                                         numberOfPotentialSegmentsForBounce,
                                         lengthScaleResolutionForBounce,
                                         shootAttemptsForBounce );
@@ -756,12 +751,16 @@ namespace VevaciousPlusPlus
               if( nodeParameterizationStyle.compare( "NodesOnParallelPlanes" )
                   == 0 )
               {
-                nodesFromParameterization = new NodesOnParallelPlanes;
+                nodesFromParameterization
+                = new NodesOnParallelPlanes( numberOfFields,
+                                             numberOfVaryingNodes );
               }
               else if( nodeParameterizationStyle.compare(
                                               "NodesOnBisectingPlanes" ) == 0 )
               {
-                nodesFromParameterization = new NodesOnBisectingPlanes;
+                nodesFromParameterization
+                = new NodesOnBisectingPlanes( numberOfFields,
+                                              numberOfVaryingNodes );
               }
               else
               {
@@ -806,7 +805,7 @@ namespace VevaciousPlusPlus
             {
               bouncePathFinder
               = new MinuitNodePotentialMinimizer( pathFromNodesFactory,
-                                                  potentialFunction,
+                                                  *potentialFunction,
                                                   movesPerImprovement,
                                                   minuitStrategy,
                                                   minuitToleranceFraction );
@@ -816,7 +815,7 @@ namespace VevaciousPlusPlus
             {
               bouncePathFinder
               = new MinuitPathPotentialMinimizer( tunnelPathFactory,
-                                                  potentialFunction,
+                                                  *potentialFunction,
                                                  numberOfPotentialSamplePoints,
                                                   movesPerImprovement,
                                                   minuitStrategy,
@@ -859,11 +858,10 @@ namespace VevaciousPlusPlus
                 }
                 bouncePathFinder
                 = new MinuitPathBounceMinimizer( tunnelPathFactory,
-                                 new BubbleShootingOnSpline( potentialFunction,
+                                new BubbleShootingOnSpline( *potentialFunction,
                                             numberOfPotentialSegmentsForBounce,
                                                 lengthScaleResolutionForBounce,
                                                       shootAttemptsForBounce ),
-                                                 numberOfPotentialSamplePoints,
                                                  movesPerImprovement,
                                                  minuitStrategy,
                                                  minuitToleranceFraction );
@@ -903,9 +901,9 @@ namespace VevaciousPlusPlus
 
         // Now we have the components for tunnelingCalculator:
         tunnelingCalculator
-        = new BounceAlongPathWithThreshold( (*potentialFunction),
-                                            bounceActionCalculator,
+        = new BounceAlongPathWithThreshold( *potentialFunction,
                                             bouncePathFinder,
+                                            bounceActionCalculator,
                                             tunnelingStrategy,
                                             survivalProbabilityThreshold,
                                             temperatureAccuracy,

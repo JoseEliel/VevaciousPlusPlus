@@ -78,7 +78,7 @@ namespace VevaciousPlusPlus
   // This returns the dot product with itself of the derivative of the
   // field vector with respect to the path auxiliary evaluated at
   // auxiliaryValue.
-  double QuadraticSplineThroughNodes::SlopeSquared(
+  inline double QuadraticSplineThroughNodes::SlopeSquared(
                                             double const auxiliaryValue ) const
   {
     std::pair< size_t, double > const
@@ -90,7 +90,7 @@ namespace VevaciousPlusPlus
   // This returns the dot product of the first derivative of the field
   // vector with the second derivative, both with respect to the path
   // auxiliary, evaluated at auxiliaryValue.
-  double QuadraticSplineThroughNodes::SlopeDotAcceleration(
+  inline double QuadraticSplineThroughNodes::SlopeDotAcceleration(
                                             double const auxiliaryValue ) const
   {
     std::pair< size_t, double > const

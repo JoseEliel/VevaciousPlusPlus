@@ -10,17 +10,31 @@
 namespace VevaciousPlusPlus
 {
 
-  NodesOnPlanes::NodesOnPlanes( std::vector< double > const& falseVacuum,
-                                std::vector< double > const& trueVacuum,
+  NodesOnPlanes::NodesOnPlanes( size_t const numberOfFields,
                                 size_t const numberOfIntermediateNodes ) :
-    NodesFromParameterization( trueVacuum.size(),
+    NodesFromParameterization( numberOfFields,
                                numberOfIntermediateNodes ),
     referenceField( 0 ),
     numberOfParametersPerNode( numberOfFields - 1 )
   {
+    // This constructor is just an initialization list.
+  }
+
+  NodesOnPlanes::~NodesOnPlanes()
+  {
+    // This does nothing.
+  }
+
+
+  // This resets the NodesFromParameterization so that it will produce
+  // TunnelPath*s that parameterize the path between the given vacua.
+  void NodesOnPlanes::SetVacua( PotentialMinimum const& falseVacuum,
+                                PotentialMinimum const& trueVacuum )
+  {
     // We choose referenceField to be the index of the field with largest
     // magnitude of difference between the vacua.
-    double largestDifference( trueVacuum.front() - falseVacuum.front() );
+    double largestDifference( trueVacuum.VariableValues().front()
+                              - falseVacuum.VariableValues().front() );
     if( largestDifference < 0.0 )
     {
       largestDifference = -largestDifference;
@@ -31,7 +45,8 @@ namespace VevaciousPlusPlus
          ++fieldIndex )
     {
       currentDifference
-      = ( trueVacuum[ fieldIndex ] - falseVacuum[ fieldIndex ] );
+      = ( trueVacuum.VariableValues()[ fieldIndex ]
+          - falseVacuum.VariableValues()[ fieldIndex ] );
       if( currentDifference < 0.0 )
       {
         currentDifference = -currentDifference;
@@ -42,11 +57,10 @@ namespace VevaciousPlusPlus
         largestDifference = currentDifference;
       }
     }
-  }
-
-  NodesOnPlanes::~NodesOnPlanes()
-  {
-    // This does nothing.
+    pathNodes.front() = falseVacuum.FieldConfiguration();
+    pathNodes.back() = trueVacuum.FieldConfiguration();
+    SetInitialParameterizationAndStepSizes( zeroParameterization,
+                                            initialStepSizes );
   }
 
 } /* namespace VevaciousPlusPlus */

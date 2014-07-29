@@ -28,8 +28,7 @@ namespace VevaciousPlusPlus
                       size_t const leadingPower = 0,
                       size_t extraEmptyEntriesAtConstruction = 0 );
     SimplePolynomial( SimplePolynomial const& copySource );
-    virtual
-    ~SimplePolynomial();
+    virtual ~SimplePolynomial();
 
 
     // This returns the sum of coefficientVector[ p ] * inputValue^p over p.

@@ -490,7 +490,7 @@ namespace VevaciousPlusPlus
   // def PotentialFunction( fv ): return ...
   // in pythonFilename for fv being an array of floating-point numbers in the
   // same order as they are for the field configurations as internal to this
-  // C++ code. It uses the purely virtual function SetScaleInPythonFunction.
+  // C++ code. It uses the virtual function SetScaleForPythonPotentialCall.
   void PotentialFromPolynomialAndMasses::WriteAsPython(
                                        std::string const pythonFilename ) const
   {
@@ -512,7 +512,8 @@ namespace VevaciousPlusPlus
     "# of the thermal functions so will be add zero.\n"
     "# Renormalization scale Q given as Q^(-2):\n"
     "invQSq = -1.0\n"
-    "# Q is set later, and may be set for each evaluation of the potential.\n"
+    "# The scale is set later (implicitly through invQSq), and may be set\n"
+    "# for each evaluation of the potential.\n"
     "\n" << ThermalFunctions::JFunctionsAsPython()
     << "\n"
     "\n" << runningParameters.RunningParametersAsPython()
