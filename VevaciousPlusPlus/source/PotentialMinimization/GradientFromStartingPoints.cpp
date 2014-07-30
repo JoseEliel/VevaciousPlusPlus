@@ -9,6 +9,7 @@
 
 namespace VevaciousPlusPlus
 {
+
   GradientFromStartingPoints::GradientFromStartingPoints(
                                     PotentialFunction const& potentialFunction,
                                 StartingPointFinder* const startingPointFinder,
@@ -32,17 +33,31 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This uses startingPointFinder to find the starting points for
-  // gradientMinimizer, then uses gradientMinimizer to minimize the potential
-  // at a temperature given by minimizationTemperature, recording the found
-  // minima in foundMinima. It also sets dsbVacuum, and records the minima
-  // lower than dsbVacuum in panicVacua, and of those, it sets panicVacuum to
-  // be the minimum in panicVacua closest to dsbVacuum.
+  // This first sets dsbVacuum from the input recorded in
+  // potentialFunction.DsbFieldValues() using gradientMinimizer, then uses
+  // startingPointFinder to find the starting points for gradientMinimizer,
+  // then uses gradientMinimizer to minimize the potential at a temperature
+  // given by minimizationTemperature, recording the found minima in
+  // foundMinima. It also records the minima lower than dsbVacuum in
+  // panicVacua, and of those, it sets panicVacuum to be the minimum in
+  // panicVacua closest to dsbVacuum.
   void GradientFromStartingPoints::FindMinima(
                                          double const minimizationTemperature )
   {
-    (*startingPointFinder)( startingPoints );
     gradientMinimizer->SetTemperature( minimizationTemperature );
+    std::cout
+    << std::endl
+    << "DSB vacuum input: "
+    << potentialFunction.FieldConfigurationAsMathematica(
+                                          potentialFunction.DsbFieldValues() );
+    std::cout << std::endl;
+    dsbVacuum = (*gradientMinimizer)( potentialFunction.DsbFieldValues() );
+    std::cout
+    << "Rolled to: "
+    << dsbVacuum.AsMathematica( potentialFunction.FieldNames() );
+    std::cout << std::endl;
+
+    (*startingPointFinder)( startingPoints );
     double const
     thresholdSepartionSquared( ( extremumSeparationThresholdFraction
                                  * extremumSeparationThresholdFraction

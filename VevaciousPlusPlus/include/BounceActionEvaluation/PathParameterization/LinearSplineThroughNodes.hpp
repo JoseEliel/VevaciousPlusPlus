@@ -85,7 +85,7 @@ namespace VevaciousPlusPlus
     // last segment. Auxiliary values outside the range get put on the
     // extensions of the first or last segment appropriately.
     pathSegments[ segmentIndex ].PutOnSegment( fieldConfiguration,
-                                pathSegments[ segmentIndex ].SegmentLength() );
+                                               segmentAuxiliary );
   }
 
   // This gives the index for which path segment is correct for

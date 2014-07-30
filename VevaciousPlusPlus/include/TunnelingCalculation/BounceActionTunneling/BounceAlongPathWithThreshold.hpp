@@ -127,6 +127,24 @@ namespace VevaciousPlusPlus
     pathFinder->SetInitialPath( falseVacuum,
                                 trueVacuum );
     double bounceAction( (*actionCalculator)( pathFinder->CurrentPath() ) );
+
+    // debugging:
+    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
+    std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Initial straight path being plotted in " << straightPathPicture << ".";
+    std::cout << std::endl;
+    std::vector< std::string > fieldColors;
+    fieldColors.push_back( "red" );
+    fieldColors.push_back( "brown" );
+    fieldColors.push_back( "blue" );
+    fieldColors.push_back( "purple" );
+    fieldColors.push_back( "green" );
+    fieldColors.push_back( "cyan" );
+    actionCalculator->PlotBounceConfiguration( pathFinder->CurrentPath(),
+                                               fieldColors,
+                                               straightPathPicture );/**/
+
     while( ( bounceAction > actionThreshold )
            &&
            pathFinder->PathCanBeImproved() )
@@ -134,6 +152,17 @@ namespace VevaciousPlusPlus
       pathFinder->ImprovePath();
       bounceAction = (*actionCalculator)( pathFinder->CurrentPath() );
     }
+
+    // debugging:
+    /**/std::string finalPathPicture( "FinalBubbleProfile.eps" );
+    std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Final deformed path being plotted in " << finalPathPicture << ".";
+    std::cout << std::endl;
+    actionCalculator->PlotBounceConfiguration( pathFinder->CurrentPath(),
+                                               fieldColors,
+                                               finalPathPicture );/**/
+
     return bounceAction;
   }
 

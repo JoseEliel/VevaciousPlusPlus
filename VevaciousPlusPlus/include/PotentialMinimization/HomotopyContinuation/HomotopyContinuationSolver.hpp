@@ -21,8 +21,7 @@ namespace VevaciousPlusPlus
   public:
     HomotopyContinuationSolver(
        HomotopyContinuationTargetSystem const& homotopyContinuationPotential );
-    virtual
-    ~HomotopyContinuationSolver();
+    virtual ~HomotopyContinuationSolver();
 
 
     // This should find all the extrema of homotopyContinuationPotential and

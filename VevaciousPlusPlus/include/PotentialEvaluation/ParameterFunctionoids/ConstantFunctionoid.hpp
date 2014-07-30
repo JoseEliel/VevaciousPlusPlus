@@ -20,8 +20,7 @@ namespace VevaciousPlusPlus
     ConstantFunctionoid( double const constantValue,
                          std::string const& creationString,
                          std::string const& pythonParameterName );
-    virtual
-    ~ConstantFunctionoid();
+    virtual ~ConstantFunctionoid();
 
 
     // This returns the value of the functionoid for the given logarithm of the

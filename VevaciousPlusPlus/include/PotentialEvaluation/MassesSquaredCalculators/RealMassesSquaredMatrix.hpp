@@ -23,8 +23,7 @@ namespace VevaciousPlusPlus
                     std::map< std::string, std::string > const& attributeMap );
     RealMassesSquaredMatrix( RealMassesSquaredMatrix const& copySource );
     RealMassesSquaredMatrix();
-    virtual
-    ~RealMassesSquaredMatrix();
+    virtual ~RealMassesSquaredMatrix();
 
 
     // This allows access to the polynomial sum for a given index.

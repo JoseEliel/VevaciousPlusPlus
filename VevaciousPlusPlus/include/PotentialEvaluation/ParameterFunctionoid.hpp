@@ -19,8 +19,7 @@ namespace VevaciousPlusPlus
     ParameterFunctionoid( std::string const& creationString,
                           std::string const& pythonParameterName,
                           double const currentValue = 0.0 );
-    virtual
-    ~ParameterFunctionoid();
+    virtual ~ParameterFunctionoid();
 
 
     // This returns the value of the functionoid based on the last update.

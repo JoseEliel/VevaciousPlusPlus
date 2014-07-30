@@ -67,7 +67,7 @@ namespace VevaciousPlusPlus
   {
     double returnDouble( 0.0 );
     double fieldDifference( 0.0 );
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {

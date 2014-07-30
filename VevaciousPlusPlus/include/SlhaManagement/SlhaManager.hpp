@@ -19,8 +19,7 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaManager();
-    virtual
-    ~SlhaManager();
+    virtual ~SlhaManager();
 
 
     void UpdateSlhaData( std::string const& slhaFilename );

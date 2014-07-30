@@ -1,50 +1,27 @@
 <VevaciousResults>
   <ReferenceData>
      <VevaciousVersion>
-       1.0.00.alpha.003
+       1.0.00.alpha001
      </VevaciousVersion>
      <CitationArticle>
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-       Thu Jun 26 10:53:08 2014
+       Wed Jul 30 11:06:45 2014
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
-    metastable
+    stable
   </StableOrMetastable>
   <DsbVacuum>
     <FieldValues>
-      5.21259 <!-- Hd -->
-      233.835 <!-- Hu -->
-      0 <!-- Q[1,3] -->
-      0 <!-- U[3] -->
+      nan <!-- Hd -->
+      nan <!-- Hu -->
+      nan <!-- Q[1,3] -->
+      nan <!-- U[3] -->
     </FieldValues>
     <RelativeDepth>
-      -5.43026e+07 <!-- Potential in GeV^4 minus value for all fields = 0 -->
+      nan <!-- Potential in GeV^4 minus value for all fields = 0 -->
     </RelativeDepth>
   </DsbVacuum>
-  <PanicVacuum>
-    <FieldValues>
-      2131.59 <!-- Hd -->
-      2401.58 <!-- Hu -->
-      -2088.98 <!-- Q[1,3] -->
-      -2204.86 <!-- U[3] -->
-    </FieldValues>
-    <RelativeDepth>
-      -2.1479e+12 <!-- Potential in GeV^4 minus value for all fields = 0 -->
-    </RelativeDepth>
-  </PanicVacuum>
-  <ZeroTemperatureDsbSurvival>
-    <DsbSurvivalProbability>
-      0
-    </DsbSurvivalProbability>
-    <LogOfMinusLogOfDsbSurvival>
-      -429.876 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
-    </LogOfMinusLogOfDsbSurvival>
-    <DsbLifetime>
-      1 <!-- in seconds; age of observed Universe is 4.3E+17s -->
-    </DsbLifetime>
-  </ZeroTemperatureDsbSurvival>
-  <!-- Survival probability at non-zero temperatures not calculated. -->
 </VevaciousResults>

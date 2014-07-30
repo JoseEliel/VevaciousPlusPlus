@@ -28,8 +28,7 @@ namespace VevaciousPlusPlus
                     std::map< std::string, std::string > const& attributeMap );
     MassesSquaredCalculator( MassesSquaredCalculator const& copySource );
     MassesSquaredCalculator();
-    virtual
-    ~MassesSquaredCalculator();
+    virtual ~MassesSquaredCalculator();
 
 
     // This should return the masses-squared, with all functionoids evaluated

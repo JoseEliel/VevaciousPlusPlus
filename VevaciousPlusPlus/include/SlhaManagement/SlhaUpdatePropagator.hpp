@@ -20,14 +20,12 @@ namespace VevaciousPlusPlus
   public:
     SlhaUpdatePropagator( SlhaUpdatePropagator& previousPropagator );
     SlhaUpdatePropagator( SlhaManager& slhaManager );
-    virtual
-    ~SlhaUpdatePropagator();
+    virtual ~SlhaUpdatePropagator();
 
 
     // This should perform all relevant updates for the new SLHA data except
     // for propagating the push to the set of dependent SlhaUpdatePropagators.
-    virtual void
-    UpdateSelfForNewSlha( SlhaManager const& slhaManager ) = 0;
+    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager ) = 0;
 
     virtual void respondToPush( SlhaManager const& slhaManager )
     { UpdateSelfForNewSlha( slhaManager ); updateObservers( slhaManager ); }

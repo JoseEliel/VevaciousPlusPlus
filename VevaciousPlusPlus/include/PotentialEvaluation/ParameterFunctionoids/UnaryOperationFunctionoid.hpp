@@ -22,8 +22,7 @@ namespace VevaciousPlusPlus
                               ParameterFunctionoid* const functionoidPointer,
                               std::string const& creationString,
                               std::string const& pythonParameterName );
-    virtual
-    ~UnaryOperationFunctionoid();
+    virtual ~UnaryOperationFunctionoid();
 
 
     // This returns the value of the functionoid for the given logarithm of the

@@ -30,8 +30,7 @@ namespace VevaciousPlusPlus
     TunnelingCalculator( SlhaUpdatePropagator& slhaUpdatePropagator,
                          TunnelingStrategy const tunnelingStrategy = NotSet,
                          double const survivalProbabilityThreshold = 0.01 );
-    virtual
-    ~TunnelingCalculator();
+    virtual ~TunnelingCalculator();
 
 
     // This should try to find the most accurate survival probability for

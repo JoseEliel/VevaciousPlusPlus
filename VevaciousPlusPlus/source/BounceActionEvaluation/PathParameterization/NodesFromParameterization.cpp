@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
                                      size_t const numberOfIntermediateNodes ) :
     numberOfFields( numberOfFields ),
     numberOfIntermediateNodes( numberOfIntermediateNodes ),
-    pathNodes( numberOfIntermediateNodes,
+    pathNodes( ( numberOfIntermediateNodes + 2 ),
                std::vector< double >( numberOfFields ) ),
     zeroParameterization( ( numberOfFields - 1 ),
                           0.0 ),

@@ -24,8 +24,7 @@ namespace VevaciousPlusPlus
                     std::map< std::string, std::string > const& attributeMap );
     SymmetricComplexMassMatrix( SymmetricComplexMassMatrix const& copySource );
     SymmetricComplexMassMatrix();
-    virtual
-    ~SymmetricComplexMassMatrix();
+    virtual ~SymmetricComplexMassMatrix();
 
 
     // This allows access to the pair of polynomial sums for a given index.

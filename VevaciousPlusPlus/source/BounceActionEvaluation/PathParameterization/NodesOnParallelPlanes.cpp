@@ -36,7 +36,7 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "NodesOnParallelPlanes::AddTransformedNode( nodeVector = {";
+    << "NodesOnParallelPlanes::AddTransformedNode( nodeVector = { ";
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -47,7 +47,7 @@ namespace VevaciousPlusPlus
       }
       std::cout << nodeVector[ fieldIndex ];
     }
-    std::cout << " }, startNode = {";
+    std::cout << " }, startNode = { ";
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -58,7 +58,7 @@ namespace VevaciousPlusPlus
       }
       std::cout << startNode[ fieldIndex ];
     }
-    std::cout << " }, endNode = {";
+    std::cout << " }, endNode = { ";
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -69,7 +69,7 @@ namespace VevaciousPlusPlus
       }
       std::cout << endNode[ fieldIndex ];
     }
-    std::cout << " }, nodeParameterization = {";
+    std::cout << " }, nodeParameterization = { ";
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfParametersPerNode;
          ++fieldIndex )

@@ -80,11 +80,11 @@ namespace VevaciousPlusPlus
     // enough that the integration would take too long to find an overshoot or
     // undershoot, or that the shot was dead on.
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "BubbleProfile::DampedProfile(" << undershootOvershootAttempts << ", "
+    << "BubbleProfile::operator( " << undershootOvershootAttempts << ", "
     << shootingThreshold << " ) called:";
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
     while( !currentShotGoodEnough
            &&
            ( shootAttemptsLeft > 0 ) )
@@ -152,8 +152,15 @@ namespace VevaciousPlusPlus
         double const
         initialQuadraticCoefficient( 2.0 * initialAuxiliary
                                          * scaledSecondDerivative );
+
+        // Because the potential is simply 2 minima with a maximum in between
+        // (either originally so or truncated to it), and because
+        // undershootAuxiliary is already past the maximum, the slope of the
+        // potential at initialAuxiliary must be negative (in this case, a
+        // negative initialAuxiliary times a positive second derivative), hence
+        // the negative numerator.
         integrationStartRadius = ( -auxiliaryPrecisionResolution
-                     / ( initialQuadraticCoefficient * integrationStepSize ) );
+               / ( 2.0 * initialQuadraticCoefficient * integrationStepSize ) );
 
         // debugging:
         /*std::cout << "in last segment. undershootAuxiliary = "
@@ -275,12 +282,17 @@ namespace VevaciousPlusPlus
         << "), initialPotentialDerivative = " << initialPotentialDerivative;
         std::cout << std::endl;*/
 
-        double const initialQuadraticCoefficient ( initialPotentialDerivative
+        double const initialQuadraticCoefficient( initialPotentialDerivative
                                                   / ( twoPlusTwiceDampingFactor
                              * tunnelPath.SlopeSquared( initialAuxiliary ) ) );
 
+        // Because the potential is simply 2 minima with a maximum in between
+        // (either originally so or truncated to it), and because
+        // undershootAuxiliary is already past the maximum, the slope of the
+        // potential at initialAuxiliary must be negative, hence the negative
+        // numerator.
         integrationStartRadius = ( -auxiliaryPrecisionResolution
-                     / ( initialQuadraticCoefficient * integrationStepSize ) );
+               / ( 2.0 * initialQuadraticCoefficient * integrationStepSize ) );
 
         initialConditions[ 0 ] = ( initialAuxiliary
                                    + ( initialQuadraticCoefficient
@@ -335,7 +347,7 @@ namespace VevaciousPlusPlus
     // too long.
 
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "Final bubble profile:" << std::endl;
     for( std::vector< BubbleRadialValueDescription >::const_iterator
@@ -345,11 +357,10 @@ namespace VevaciousPlusPlus
     {
       std::cout << "r = " << bubbleBit->radialValue << ", p = "
       << bubbleBit->auxiliaryValue << ", dp/dr = " << bubbleBit->auxiliarySlope
-      << ", "
-      << pathFieldsAndPotential.FieldsString( bubbleBit->auxiliaryValue )
+      << ", " << tunnelPath.FieldsString( bubbleBit->auxiliaryValue )
       << std::endl;
     }
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
 
     return auxiliaryProfile;
   }

@@ -9,7 +9,11 @@
 #define RUNNINGPARAMETERMANAGER_HPP_
 
 #include "CommonIncludes.hpp"
-#include "PotentialEvaluation/ParameterFunctionoids.hpp"
+#include "../PotentialEvaluation/ParameterFunctionoid.hpp"
+#include "../PotentialEvaluation/ParameterFunctionoids/BinaryOperationFunctionoid.hpp"
+#include "../PotentialEvaluation/ParameterFunctionoids/ConstantFunctionoid.hpp"
+#include "../PotentialEvaluation/ParameterFunctionoids/SlhaFunctionoid.hpp"
+#include "../PotentialEvaluation/ParameterFunctionoids/UnaryOperationFunctionoid.hpp"
 #include "SlhaManager.hpp"
 
 namespace VevaciousPlusPlus
@@ -26,8 +30,7 @@ namespace VevaciousPlusPlus
 
 
     RunningParameterManager();
-    virtual
-    ~RunningParameterManager();
+    virtual ~RunningParameterManager();
 
 
     // This adds to the list of SLHA blocks that will be read in when updating
@@ -153,5 +156,6 @@ namespace VevaciousPlusPlus
     stringBuilder << "rp" << parameterFunctionoidPointers.size();
     return stringBuilder.str();
   }
+
 } /* namespace VevaciousPlusPlus */
 #endif /* RUNNINGPARAMETERMANAGER_HPP_ */

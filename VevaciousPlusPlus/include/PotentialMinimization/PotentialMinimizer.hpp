@@ -23,7 +23,7 @@ namespace VevaciousPlusPlus
 
     // This should find all the minima of the potential evaluated at a
     // temperature given by minimizationTemperature, and record them in
-    // foundMinima. It should also set dsbVacuum (which is assumed to not have
+    // foundMinima. It should first set dsbVacuum (which is assumed to not have
     // been updated directly by the SLHA manager yet; also it may be that the
     // SLHA data only gives the approximate position of the DSB minimum for
     // potentialFunction which may not be as high an order approximation as the

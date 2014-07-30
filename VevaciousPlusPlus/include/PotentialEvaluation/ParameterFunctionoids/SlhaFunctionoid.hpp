@@ -23,8 +23,7 @@ namespace VevaciousPlusPlus
     SlhaFunctionoid( std::string const& indexString,
                      std::string const& creationString,
                      std::string const& pythonParameterName );
-    virtual
-    ~SlhaFunctionoid();
+    virtual ~SlhaFunctionoid();
 
 
     void SetBlockPointer(

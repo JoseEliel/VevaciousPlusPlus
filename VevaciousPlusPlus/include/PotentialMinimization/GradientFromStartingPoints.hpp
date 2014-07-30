@@ -32,12 +32,12 @@ namespace VevaciousPlusPlus
     virtual ~GradientFromStartingPoints();
 
 
-    // This uses startingPointFinder to find the starting points for
-    // gradientMinimizer to minimize potentialFunction, evaluated at a
-    // temperature given by minimizationTemperature, and records the found
-    // minima in foundMinima. It also sets dsbVacuum (using
-    // polynomialPotential.DsbFieldValues() as a starting point for
-    // gradientMinimizer), and records the minima lower than dsbVacuum in
+    // This first sets dsbVacuum from the input recorded in
+    // potentialFunction.DsbFieldValues() using gradientMinimizer, then uses
+    // startingPointFinder to find the starting points for gradientMinimizer,
+    // then uses gradientMinimizer to minimize the potential at a temperature
+    // given by minimizationTemperature, recording the found minima in
+    // foundMinima. It also records the minima lower than dsbVacuum in
     // panicVacua, and of those, it sets panicVacuum to be the minimum in
     // panicVacua closest to dsbVacuum.
     virtual void FindMinima( double const minimizationTemperature = 0.0 );

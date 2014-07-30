@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
     totalNumberOfNodes( nodesFromParameterization->NumberOfPathNodes() );
     double const stepSize( 1.0 / (double)( totalNumberOfNodes - 1 ) );
     Eigen::MatrixXd pathSteps( totalNumberOfNodes,
-                               numberOfFields );
+                               totalNumberOfNodes );
     for( size_t rowIndex( 0 );
          rowIndex < totalNumberOfNodes;
          ++rowIndex )
@@ -30,25 +30,25 @@ namespace VevaciousPlusPlus
                  0 ) = 1.0;
     }
     for( size_t columnIndex( 1 );
-         columnIndex < numberOfFields;
+         columnIndex < totalNumberOfNodes;
          ++columnIndex )
     {
       pathSteps( 0,
                  columnIndex ) = 0.0;
     }
     for( size_t columnIndex( 1 );
-         columnIndex < numberOfFields;
+         columnIndex < totalNumberOfNodes;
          ++columnIndex )
     {
-      pathSteps( 0,
-                 ( numberOfFields - 1 ) ) = 1.0;
+      pathSteps( ( totalNumberOfNodes - 1 ),
+                 columnIndex ) = 1.0;
     }
     for( size_t rowIndex( 1 );
          rowIndex < ( totalNumberOfNodes - 1 );
          ++rowIndex )
     {
       for( size_t columnIndex( 1 );
-           columnIndex < numberOfFields;
+           columnIndex < totalNumberOfNodes;
            ++columnIndex )
       {
         pathSteps( rowIndex,
@@ -57,6 +57,13 @@ namespace VevaciousPlusPlus
       }
     }
     pathStepsInverse = pathSteps.inverse();
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "pathSteps = " << std::endl << pathSteps << std::endl
+    << "pathStepsInverse = " << std::endl << pathStepsInverse;
+    std::cout << std::endl;*/
   }
 
   PolynomialThroughNodesFactory::~PolynomialThroughNodesFactory()

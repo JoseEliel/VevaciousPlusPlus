@@ -21,8 +21,7 @@ namespace VevaciousPlusPlus
   public:
     BasicPolynomialHomotopyContinuation(
                      HomotopyContinuationTargetSystem& polynomialPotential );
-    virtual
-    ~BasicPolynomialHomotopyContinuation();
+    virtual ~BasicPolynomialHomotopyContinuation();
 
 
     // This should find all the extrema of homotopyContinuationPotential and

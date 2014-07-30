@@ -132,21 +132,23 @@ namespace VevaciousPlusPlus
                                               double const segmentStart ) const
   {
     std::stringstream returnStream;
-    returnStream << "( UnitStep[ x - " << segmentStart << " ] * ( ";
+    returnStream << "{ ";
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
       if( fieldIndex > 0 )
       {
-        returnStream << "," << std::endl;
+        returnStream << "," << std::endl << " ";
       }
-      returnStream << fieldConstants[ fieldIndex ] << " + ( "
-      << fieldLinears[ fieldIndex ] << " * ( x - " << segmentStart
-      << " ) ) + ( " << fieldQuadratics[ fieldIndex ] << " * ( x - "
-      << segmentStart << " )^2 ) ) * UnitStep[ "
-      << ( segmentStart + segmentAuxiliaryLength ) << " - x ] )";
+      returnStream << "( UnitStep[ x - " << segmentStart << " ] * ( "
+      << fieldConstants[ fieldIndex ] << " + ( " << fieldLinears[ fieldIndex ]
+      << " * ( x - " << segmentStart << " ) ) + ( "
+      << fieldQuadratics[ fieldIndex ] << " * ( x - " << segmentStart
+      << " )^2 ) ) * UnitStep[ " << ( segmentStart + segmentAuxiliaryLength )
+      << " - x ] )";
     }
+    returnStream << " }";
     return returnStream.str();
   }
 

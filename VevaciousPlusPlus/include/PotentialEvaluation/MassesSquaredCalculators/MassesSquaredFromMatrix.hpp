@@ -25,8 +25,7 @@ namespace VevaciousPlusPlus
                     std::map< std::string, std::string > const& attributeMap );
     MassesSquaredFromMatrix( MassesSquaredFromMatrix const& copySource );
     MassesSquaredFromMatrix();
-    virtual
-    ~MassesSquaredFromMatrix();
+    virtual ~MassesSquaredFromMatrix();
 
 
     // This returns the eigenvalues of the matrix, with all functionoids
@@ -94,8 +93,6 @@ namespace VevaciousPlusPlus
   {
     // This does nothing.
   }
-
-
 
   // This returns the eigenvalues of the matrix, with all functionoids
   // evaluated at the last scale which was used to update them.

@@ -90,7 +90,7 @@ namespace VevaciousPlusPlus
   // is given by lengthScaleResolution divided by the largest energy scale.
   inline void
   BubbleShootingOnSpline::ResetVacua( PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum )
+                                      PotentialMinimum const& trueVacuum )
   {
     double currentEnergySquared(
                 potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,

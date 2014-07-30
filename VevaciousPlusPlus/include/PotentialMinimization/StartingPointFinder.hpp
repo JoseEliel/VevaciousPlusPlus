@@ -17,8 +17,7 @@ namespace VevaciousPlusPlus
   {
   public:
     StartingPointFinder();
-    virtual
-    ~StartingPointFinder();
+    virtual ~StartingPointFinder();
 
 
     // This should find all the starting points for the gradient-based
