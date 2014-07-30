@@ -286,20 +286,28 @@ namespace VevaciousPlusPlus
     {
       // Potential term: (R^3 / b) * ( K[2, (b R)] / K[1, (b R)] ).
       // Kinetic term: (19/8) R^4.
-      bounceAction
-      += ( nextRadius * nextRadius * nextRadius
-           * ( ( ( potentialTerm * boost::math::cyl_bessel_k( (int)2,
-                                                            scaledRadius ) )
-                 / ( inverseScale * boost::math::cyl_bessel_k( (int)1,
-                                                             scaledRadius ) ) )
-
-               + ( 2.375 * kineticTerm * nextRadius ) ) );
+      // The ratio of the Bessel functions tends to 1 quite quickly (for values
+      // of bR > 100, the ratio is within 1.5% of 1) while the actual Bessel
+      // functions drop very quickly and can easily have overflow errors in the
+      // exponent.
+      double potentialTimesFactor( potentialTerm / inverseScale );
+      if( scaledRadius < 100.0 )
+      {
+        potentialTimesFactor *= ( boost::math::cyl_bessel_k( (int)2,
+                                                             scaledRadius )
+                                 / boost::math::cyl_bessel_k( (int)1,
+                                                              scaledRadius ) );
+      }
+      bounceAction += ( nextRadius * nextRadius * nextRadius
+                        * ( potentialTimesFactor
+                            + ( 2.375 * kineticTerm * nextRadius ) ) );
     }
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "After exponents to infinity, bounceAction = " << bounceAction;
+    << "After Bessel or exponent functions to infinity, bounceAction = "
+    << bounceAction;
     std::cout << std::endl;/**/
 
     // debugging:

@@ -127,7 +127,7 @@ namespace VevaciousPlusPlus
   // slope at that point.
   double SplinePotential::SecondDerivative( double const auxiliaryValue ) const
   {
-    if( ( auxiliaryValue <= 0.0 )
+    if( ( auxiliaryValue < 0.0 )
         ||
         ( auxiliaryValue >= definiteOvershootAuxiliary ) )
     {
