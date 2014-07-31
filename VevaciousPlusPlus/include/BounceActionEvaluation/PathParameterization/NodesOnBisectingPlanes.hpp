@@ -23,16 +23,17 @@ namespace VevaciousPlusPlus
     virtual ~NodesOnBisectingPlanes();
 
 
-    // This over-rides the base version so that the nodes are updated in the
-    // order of dependence.
-    virtual void SetNodeInAdjustmentOrder( size_t const adjustmentOrderIndex,
-                                   std::vector< double > const& nodeAsVector )
-    { pathNodes[ adjustmentOrder[ adjustmentOrderIndex ] ] = nodeAsVector; }
-
-
   protected:
     std::vector< size_t > adjustmentOrder;
     std::vector< std::pair< size_t, size_t > > sideNodeIndices;
+
+
+    // This just assumes that the nodes can be adjusted in the order which they
+    // are visited in along the path, but can be over-ridden in derived
+    // classes. (It also calls ValidAdjustmentIndex before returning the
+    // index.)
+    virtual size_t
+    PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const;
 
 
     // This should add the perpendicular component from the parameterization
@@ -62,6 +63,19 @@ namespace VevaciousPlusPlus
     // pathNodes[ nodeIndex ].
     virtual double ShiftFraction( size_t const nodeIndex ) const{ return 0.5; }
   };
+
+
+
+
+  // This just assumes that the nodes can be adjusted in the order which they
+  // are visited in along the path, but can be over-ridden in derived
+  // classes.
+  inline size_t NodesOnBisectingPlanes::PathIndexFromAdjustmentIndex(
+                                      size_t const adjustmentOrderIndex ) const
+  {
+    ValidAdjustmentIndex( adjustmentOrderIndex );
+    return adjustmentOrder[ adjustmentOrderIndex ];
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* NODESONBISECTINGPLANES_HPP_ */

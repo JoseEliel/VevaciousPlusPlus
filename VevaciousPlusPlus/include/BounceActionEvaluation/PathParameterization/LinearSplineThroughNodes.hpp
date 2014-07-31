@@ -124,17 +124,17 @@ namespace VevaciousPlusPlus
     std::stringstream returnStream;
     returnStream << "{ ";
     double cumulativeAuxiliary( 0.0 );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
+    for( size_t segmentIndex( 0 );
+         segmentIndex < pathSegments.size();
+         ++segmentIndex )
     {
-      if( fieldIndex > 0 )
+      if( segmentIndex > 0 )
       {
         returnStream << "," << std::endl;
       }
       returnStream
-      << pathSegments[ fieldIndex ].AsDebuggingString( cumulativeAuxiliary );
-      cumulativeAuxiliary += pathSegments[ fieldIndex ].SegmentLength();
+      << pathSegments[ segmentIndex ].AsDebuggingString( cumulativeAuxiliary );
+      cumulativeAuxiliary += pathSegments[ segmentIndex ].SegmentLength();
     }
     returnStream << " }";
     return returnStream.str();

@@ -190,7 +190,7 @@
               <InterpolationStyle>
                 <!-- "PolynomialPath", "LinearSplinePath", or
                      "QuadraticSplinePath" -->
-                PolynomialPath
+                LinearSplinePath
               </InterpolationStyle>
             </ConstructorArguments>
           </PathParameterization>

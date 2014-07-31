@@ -84,7 +84,7 @@ namespace VevaciousPlusPlus
          nodeIndex <= pathNodes.NumberOfVaryingNodes();
          ++nodeIndex )
     {
-      pathNodes.SetNodeInAdjustmentOrder( nodeIndex,
+      pathNodes.SetNodeInAdjustmentOrderFromNodeVector( nodeIndex,
                                           nodeSet[ nodeIndex ] );
       pathNodes.ExtractSingleNodeParameterization( nodeParameterization,
                                                    nodeIndex,
@@ -115,8 +115,8 @@ namespace VevaciousPlusPlus
                      mnMigrad( movesPerImprovement,
                                currentMinuitTolerance ) );
       currentMinuitResults[ nodeIndex - 1 ] = minuitMinimum;
-      pathNodes.SetNodeInAdjustmentOrder( nodeIndex,
-                                          minuitMinimum.VariableValues() );
+      pathNodes.SetNodeInAdjustmentOrderFromParameterization( nodeIndex,
+                                              minuitMinimum.VariableValues() );
     }
     SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),
                    pathNodes.ParameterizationForNodes( pathNodes.PathNodes() ),
