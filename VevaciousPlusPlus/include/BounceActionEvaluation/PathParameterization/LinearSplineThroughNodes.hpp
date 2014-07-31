@@ -32,10 +32,11 @@ namespace VevaciousPlusPlus
 
     // This returns the dot product with itself of the derivative of the
     // field vector with respect to the path auxiliary evaluated at
-    // auxiliaryValue. This is 1.0 by construction (constant "speed" along
+    // auxiliaryValue. This is constant by construction (constant "speed" along
     // straight segments with infinitesimal circle segments between straight
     // segments, where the "acceleration" is perpendicular to the "velocity".)
-    double SlopeSquared( double const auxiliaryValue ) const{ return 1.0; }
+    double SlopeSquared( double const auxiliaryValue ) const
+    { return slopeSquared; }
 
     // This returns the dot product of the first derivative of the field
     // vector with the second derivative, both with respect to the path
@@ -52,6 +53,7 @@ namespace VevaciousPlusPlus
 
   protected:
     std::vector< LinearSplinePathSegment > pathSegments;
+    double slopeSquared;
 
 
     // This gives the index for which path segment is correct for
