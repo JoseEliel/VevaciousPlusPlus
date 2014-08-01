@@ -92,6 +92,12 @@ namespace VevaciousPlusPlus
                 + ( 2.0 * segmentAuxiliary * fieldQuadratics[ fieldIndex ] ) );
       returnValue += ( slopeValue * slopeValue );
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "QuadraticSplinePathSegment::SlopeSquared( " << segmentAuxiliary
+    << " ) returning " << returnValue;
+    std::cout << std::endl;/**/
     return returnValue;
   }
 

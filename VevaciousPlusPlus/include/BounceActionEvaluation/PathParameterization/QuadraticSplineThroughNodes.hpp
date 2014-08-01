@@ -106,7 +106,15 @@ namespace VevaciousPlusPlus
   QuadraticSplineThroughNodes::SegmentAuxiliary(
                                             double const auxiliaryValue ) const
   {
-    size_t const segmentIndex( auxiliaryValue * inverseSegmentLength );
+    size_t segmentIndex( auxiliaryValue * inverseSegmentLength );
+    if( auxiliaryValue < 0.0 )
+    {
+      segmentIndex = 0;
+    }
+    else if( segmentIndex >= pathSegments.size() )
+    {
+      segmentIndex = ( pathSegments.size() - 1 );
+    }
     return std::make_pair( segmentIndex,
         ( ( auxiliaryValue * inverseSegmentLength ) - (double)segmentIndex ) );
   }
@@ -114,18 +122,19 @@ namespace VevaciousPlusPlus
   // This is for debugging.
   inline std::string QuadraticSplineThroughNodes::AsDebuggingString() const
   {
+    double const segmentLength( 1.0 / inverseSegmentLength );
     std::stringstream returnStream;
     returnStream << "{ ";
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
+    for( size_t segmentIndex( 0 );
+         segmentIndex < pathSegments.size();
+         ++segmentIndex )
     {
-      if( fieldIndex > 0 )
+      if( segmentIndex > 0 )
       {
         returnStream << "," << std::endl;
       }
-      returnStream << pathSegments[ fieldIndex ].AsDebuggingString(
-                                   (double)fieldIndex / inverseSegmentLength );
+      returnStream << pathSegments[ segmentIndex ].AsDebuggingString(
+                                        (double)segmentIndex * segmentLength );
     }
     returnStream << " }";
     return returnStream.str();

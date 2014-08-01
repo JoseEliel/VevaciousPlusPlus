@@ -181,7 +181,7 @@
                 3
               </NumberOfCoefficientsPerVaryingField>
               <NumberOfVaryingNodes>
-                100
+                15
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->

@@ -99,7 +99,8 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "this->AsDebuggingString() = " << this->AsDebuggingString();
+    << "slopeSquared = " << slopeSquared << ", this->AsDebuggingString() = "
+    << this->AsDebuggingString();
     std::cout << std::endl;/**/
   }
 
