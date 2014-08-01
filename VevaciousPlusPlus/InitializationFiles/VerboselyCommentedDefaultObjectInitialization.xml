@@ -279,7 +279,7 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfNodesForPotentialFit>
-            30
+            100
           </NumberOfNodesForPotentialFit>
           <NumberShootAttemptsAllowed>
             <!-- This is the number of shoot attempts allowed to try to find
@@ -358,7 +358,7 @@
                  estimates that it is at a point with function value within
                  0.0005 of what it estimates is the value at the minimum, it
                  considers its minimization complete. -->
-            0.5
+            0.1
           </MinuitTolerance>
           <NumberOfPotentialSamplePoints>
             <!-- If using "MinuitPathPotentialMinimizer", this gives the number
@@ -503,7 +503,11 @@
                      polynomials between nodes, with continuous slope between
                      the spline segments; the first segment is taken as linear
                      and each subsequent segment is constructed to have slope
-                     continuous with its previous segment). -->
+                     continuous with its previous segment).
+                     Unfortunately, "PolynomialPath" performs poorly, as it
+                     tends to make very wiggly paths which leads to very high
+                     bounce actions due to the derivative term, so it is NOT
+                     recommended! -->
                 LinearSplinePath
               </InterpolationStyle>
             </ConstructorArguments>

@@ -18,10 +18,10 @@ namespace VevaciousPlusPlus
                 pathParameterization,
                 pathTemperature ),
     numberOfSegments( pathNodes.size() - 1 ),
-    inverseSegmentLength( 1.0 / (double)numberOfSegments ),
+    inverseSegmentLength( (double)numberOfSegments ),
     pathSegments( numberOfSegments )
   {
-    double const segmentLength( (double)numberOfSegments );
+    double const segmentLength( 1.0 / (double)numberOfSegments );
     pathSegments.front() = QuadraticSplinePathSegment( pathNodes.front(),
                                                        pathNodes[ 1 ],
                                                        segmentLength );

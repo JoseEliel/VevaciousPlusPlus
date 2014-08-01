@@ -144,7 +144,7 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfNodesForPotentialFit>
-            30
+            100
           </NumberOfNodesForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
@@ -162,13 +162,13 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfPotentialSamplePoints>
-            10
+            100
           </NumberOfPotentialSamplePoints>
           <MinuitStrategy>
             1
           </MinuitStrategy>
           <MinuitTolerance>
-            0.5
+            0.1
           </MinuitTolerance>
           <PathParameterization>
             <ClassType>
@@ -181,7 +181,7 @@
                 3
               </NumberOfCoefficientsPerVaryingField>
               <NumberOfVaryingNodes>
-                15
+                100
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
@@ -189,7 +189,8 @@
               </NodeParameterizationStyle>
               <InterpolationStyle>
                 <!-- "PolynomialPath", "LinearSplinePath", or
-                     "QuadraticSplinePath" -->
+                     "QuadraticSplinePath" . "PolynomialPath" is NOT
+                     recommended! -->
                 LinearSplinePath
               </InterpolationStyle>
             </ConstructorArguments>

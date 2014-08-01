@@ -99,6 +99,7 @@ namespace VevaciousPlusPlus
   // path, and then sets the path from the set of nodes.
   void SingleNodeVaryingMinuit::ImprovePath()
   {
+    pathCanBeImproved = false;
     for( size_t nodeIndex( 1 );
          nodeIndex <= pathNodes.NumberOfVaryingNodes();
          ++nodeIndex )
@@ -117,6 +118,10 @@ namespace VevaciousPlusPlus
       currentMinuitResults[ nodeIndex - 1 ] = minuitMinimum;
       pathNodes.SetNodeInAdjustmentOrderFromParameterization( nodeIndex,
                                               minuitMinimum.VariableValues() );
+      if( !(minuitMinimum.IsValidMinimum()) )
+      {
+        pathCanBeImproved = true;
+      }
     }
     SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),
                    pathNodes.ParameterizationForNodes( pathNodes.PathNodes() ),

@@ -38,6 +38,8 @@ namespace VevaciousPlusPlus
     double FunctionValue() const{ return functionValue; }
     double FunctionError() const{ return functionError; }
 
+    bool IsValidMinimum() const{ return isValidMinimum; }
+
 
     // This is mainly for debugging.
     std::string AsDebuggingString() const;
@@ -48,6 +50,7 @@ namespace VevaciousPlusPlus
     std::vector< double > variableErrors;
     double functionValue;
     double functionError;
+    bool isValidMinimum;
   };
 
 

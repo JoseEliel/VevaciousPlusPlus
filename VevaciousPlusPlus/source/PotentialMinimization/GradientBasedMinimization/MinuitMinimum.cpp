@@ -15,7 +15,8 @@ namespace VevaciousPlusPlus
     variableValues( numberOfVariables ),
     variableErrors( numberOfVariables ),
     functionValue( minuitMinimum.Fval() ),
-    functionError( minuitMinimum.Edm() )
+    functionError( minuitMinimum.Edm() ),
+    isValidMinimum( minuitMinimum.IsValid() )
   {
     for( size_t variableIndex( 0 );
          variableIndex < numberOfVariables;
@@ -33,7 +34,8 @@ namespace VevaciousPlusPlus
     variableValues( variableValues ),
     variableErrors( variableErrors ),
     functionValue( NAN ),
-    functionError( NAN )
+    functionError( NAN ),
+    isValidMinimum( false )
   {
     // This constructor is just an initialization list.
   }
@@ -42,7 +44,8 @@ namespace VevaciousPlusPlus
     variableValues(),
     variableErrors(),
     functionValue( NAN ),
-    functionError( NAN )
+    functionError( NAN ),
+    isValidMinimum( false )
   {
     // This constructor is just an initialization list.
   }
@@ -51,7 +54,8 @@ namespace VevaciousPlusPlus
     variableValues( copySource.variableValues ),
     variableErrors( copySource.variableErrors ),
     functionValue( copySource.functionValue ),
-    functionError( copySource.functionError )
+    functionError( copySource.functionError ),
+    isValidMinimum( copySource.isValidMinimum )
   {
     // This constructor is just an initialization list.
   }
