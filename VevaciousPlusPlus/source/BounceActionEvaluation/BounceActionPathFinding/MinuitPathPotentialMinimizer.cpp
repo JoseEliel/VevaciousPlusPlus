@@ -24,7 +24,8 @@ namespace VevaciousPlusPlus
     potentialFunction( potentialFunction ),
     numberOfPotentialSamplePoints( numberOfPotentialSamplePoints ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
-    pathSegmentSize( 1.0 / (double)( numberOfPotentialSamplePoints + 1 ) )
+    pathSegmentSize( 1.0
+                 / static_cast< double >( numberOfPotentialSamplePoints + 1 ) )
   {
     // This constructor is just an initialization list.
   }

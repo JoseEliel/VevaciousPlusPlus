@@ -326,7 +326,8 @@ namespace VevaciousPlusPlus
   bool BounceActionTunneler::BelowEvaporationTemperature(
                                                 double const temperatureGuess )
   {
-    double const stepFraction( 1.0 / (double)evaporationResolution );
+    double const stepFraction( 1.0
+                            / static_cast< double >( evaporationResolution ) );
     std::vector< double >
     fieldConfiguration( potentialFunction.FieldValuesOrigin() );
     double lastPotentialValue( potentialFunction( fieldConfiguration,
@@ -345,7 +346,7 @@ namespace VevaciousPlusPlus
            ++fieldIndex )
       {
         fieldConfiguration[ fieldIndex ]
-        = ( (double)whichStep * stepFraction
+        = ( whichStep * stepFraction
             * evaporationMinimum.FieldConfiguration()[ fieldIndex ] );
       }
       currentPotentialValue = potentialFunction( fieldConfiguration,

@@ -137,13 +137,13 @@ namespace VevaciousPlusPlus
     else if( numberOfNonZeroStartValues > 1 )
     {
       double upperPower( 0.0 );
-      double const
-      powerDivisor( 1.0 / (double)( numberOfNonZeroStartValues - 1 ) );
+      double const powerDivisor( 1.0
+                   / static_cast< double >( numberOfNonZeroStartValues - 1 ) );
       for( size_t valueIndex( 0 );
            valueIndex < numberOfNonZeroStartValues;
            ++valueIndex )
       {
-        upperPower = ( ((double)valueIndex) * powerDivisor );
+        upperPower = ( valueIndex * powerDivisor );
         startValue.real() = ( pow( lowerEndOfStartValues,
                                    ( 1.0 - upperPower ) )
                               * pow( upperEndOfStartValues,

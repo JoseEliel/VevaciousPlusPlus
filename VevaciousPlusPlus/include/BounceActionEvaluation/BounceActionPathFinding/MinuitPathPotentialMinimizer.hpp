@@ -62,7 +62,7 @@ namespace VevaciousPlusPlus
          ++sampleIndex )
     {
       tunnelPath->PutOnPathAt( fieldConfiguration,
-                               (double)( sampleIndex + 1 ) * pathSegmentSize );
+                               ( ( sampleIndex + 1 ) * pathSegmentSize ) );
       potentialSum += potentialFunction( fieldConfiguration,
                                          pathTemperature );
     }

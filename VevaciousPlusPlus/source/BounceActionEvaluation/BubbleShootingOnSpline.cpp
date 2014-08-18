@@ -440,15 +440,15 @@ namespace VevaciousPlusPlus
          splinePoint < numberOfPotentialSegments;
          ++splinePoint )
     {
-      auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( (double)splinePoint
+      auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( splinePoint
                                           * boost::math::double_constants::pi )
-                                     / (double)numberOfPotentialSegments ) ) );
+                    / static_cast< double >( numberOfPotentialSegments ) ) ) );
       // The above might run into numerical precision issues if too many spline
       // segments are asked for, but it's probably OK up to even 10^5 segments
       // (cos(0.0) - cos(10^(-5)) = 5E-11 which should still be well-resolved
       // by doubles).
-      //auxiliaryValue
-      //= ( (double)splinePoint /(double)numberOfSplinesInPotential );
+      // auxiliaryValue = ( static_cast< double >( splinePoint )
+      //               / static_cast< double >( numberOfSplinesInPotential ) );
       tunnelPath.PutOnPathAt( fieldConfiguration,
                               auxiliaryValue );
 

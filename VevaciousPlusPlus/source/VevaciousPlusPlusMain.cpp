@@ -152,9 +152,8 @@ int main( int argumentCount,
        vdStep < 13;
        ++vdStep )
   {
-    testConfiguration[ 0 ] = ( 0.1
-                               * (double)vdStep
-                               * std::max( 1.0,
+    testConfiguration[ 0 ]
+    = ( 0.1 * vdStep * std::max( 1.0,
                                  fixedScalePotential.DsbFieldValues()[ 0 ] ) );
     if( testConfiguration.size() > 1 )
     {
@@ -162,9 +161,8 @@ int main( int argumentCount,
            vuStep < 13;
            ++vuStep )
       {
-        testConfiguration[ 1 ] = ( 0.1
-                                   * (double)vuStep
-                                   * std::max( 1.0,
+        testConfiguration[ 1 ]
+        = ( 0.1 * vuStep * std::max( 1.0,
                                  fixedScalePotential.DsbFieldValues()[ 1 ] ) );
         std::cout << "For "
         << fixedScalePotential.FieldConfigurationAsMathematica(

@@ -224,9 +224,9 @@ namespace VevaciousPlusPlus
     {
       solutionIndex = ( complexIndex % numberOfVariables );
       candidateRealSolution[ indexOrder[ solutionIndex ] ].real()
-      = (double)(complexSolutions[ complexIndex ].real());
+      = complexSolutions[ complexIndex ].real();
       candidateRealSolution[ indexOrder[ solutionIndex ] ].imag()
-      = (double)(complexSolutions[ complexIndex ].imag());
+      = complexSolutions[ complexIndex ].imag();
       if( solutionIndex == ( numberOfVariables - 1 ) )
       {
         targetSystem.AppendPureRealSolutionAndValidSignFlips(

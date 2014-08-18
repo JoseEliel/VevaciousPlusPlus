@@ -48,6 +48,7 @@ namespace VevaciousPlusPlus
   protected:
     size_t const numberOfSegments;
     double const inverseSegmentLength;
+    double const segmentLength;
     // The segments are of equal length, so we jump straight to the correct
     // segment for the various functions.
     std::vector< QuadraticSplinePathSegment > pathSegments;
@@ -116,7 +117,7 @@ namespace VevaciousPlusPlus
       segmentIndex = ( pathSegments.size() - 1 );
     }
     return std::make_pair( segmentIndex,
-        ( ( auxiliaryValue * inverseSegmentLength ) - (double)segmentIndex ) );
+                       ( auxiliaryValue - ( segmentIndex * segmentLength ) ) );
   }
 
   // This is for debugging.
@@ -134,7 +135,7 @@ namespace VevaciousPlusPlus
         returnStream << "," << std::endl;
       }
       returnStream << pathSegments[ segmentIndex ].AsDebuggingString(
-                                        (double)segmentIndex * segmentLength );
+                                                segmentIndex * segmentLength );
     }
     returnStream << " }";
     return returnStream.str();

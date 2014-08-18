@@ -362,7 +362,8 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                         elementLines,
                                         '\n');
-        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        int numberOfRows(
+                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
         if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
         {
           throw std::runtime_error( "Number of elements for"
@@ -398,7 +399,8 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                         elementLines,
                                         '\n');
-        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        int numberOfRows(
+                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
         if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
         {
           throw std::runtime_error( "Number of elements for"
@@ -426,7 +428,8 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                         elementLines,
                                         '\n');
-        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        int numberOfRows(
+                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
         if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
         {
           throw std::runtime_error( "Number of elements for"

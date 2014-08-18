@@ -123,7 +123,7 @@ namespace VevaciousPlusPlus
          ++whichPower )
     {
       coefficientVector[ whichPower - 1 ]
-      = ( (double)whichPower * integralCoefficients[ whichPower ] );
+      = ( whichPower * integralCoefficients[ whichPower ] );
     }
   }
 

@@ -19,7 +19,8 @@ namespace VevaciousPlusPlus
   {
     size_t const
     totalNumberOfNodes( nodesFromParameterization->NumberOfPathNodes() );
-    double const stepSize( 1.0 / (double)( totalNumberOfNodes - 1 ) );
+    double const stepSize( 1.0
+                           / static_cast< double >( totalNumberOfNodes - 1 ) );
     Eigen::MatrixXd pathSteps( totalNumberOfNodes,
                                totalNumberOfNodes );
     for( size_t rowIndex( 0 );
@@ -52,7 +53,7 @@ namespace VevaciousPlusPlus
            ++columnIndex )
       {
         pathSteps( rowIndex,
-                   columnIndex ) = pow( ( (double)rowIndex * stepSize ),
+                   columnIndex ) = pow( ( rowIndex * stepSize ),
                                         columnIndex );
       }
     }

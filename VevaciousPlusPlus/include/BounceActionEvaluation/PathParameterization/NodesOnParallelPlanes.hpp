@@ -48,8 +48,8 @@ namespace VevaciousPlusPlus
     // This returns the fraction along the difference vector between the vacua
     // that nodeIndex corresponds to.
     virtual double ShiftFraction( size_t const nodeIndex ) const
-    { return ( (double)nodeIndex
-               / (double)( numberOfIntermediateNodes + 1 ) ); }
+    { return ( static_cast<double>( nodeIndex )
+               / static_cast<double>( numberOfIntermediateNodes + 1 ) ); }
   };
 
 } /* namespace VevaciousPlusPlus */

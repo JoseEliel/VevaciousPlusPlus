@@ -255,7 +255,7 @@ namespace VevaciousPlusPlus
       double const lowestFitTemperature( 1.1 * falseEvaporationTemperature );
       double const
       stepTemperature( ( highestFitTemperature - lowestFitTemperature )
-                       / (double)( nodesForFit - 1 ) );
+                       / static_cast< double >( nodesForFit - 1 ) );
       double currentTemperature( lowestFitTemperature );
       for( size_t whichNode( 0 );
            whichNode < nodesForFit;
@@ -275,7 +275,7 @@ namespace VevaciousPlusPlus
       double const lowestFitTemperature( 1.0 );
       double const
       stepTemperature( ( highestFitTemperature - lowestFitTemperature )
-                       / (double)( nodesForFit - 1 ) );
+                       / static_cast< double >( nodesForFit - 1 ) );
       double currentTemperature( lowestFitTemperature );
       for( size_t whichNode( 0 );
            whichNode < nodesForFit;

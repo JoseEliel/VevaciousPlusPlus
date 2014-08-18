@@ -85,7 +85,7 @@ namespace VevaciousPlusPlus
     // decreasing temperatures:
     double survivalExponent( 0.0 );
     double const temperatureStep( criticalTunnelingTemperature
-                              / (double)( thermalIntegrationResolution + 1 ) );
+                 / static_cast< double >( thermalIntegrationResolution + 1 ) );
     double
     currentTemperature( criticalTunnelingTemperature - temperatureStep );
     thermalPotentialMinimizer.SetTemperature( currentTemperature );
