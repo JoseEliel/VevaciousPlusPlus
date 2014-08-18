@@ -15,7 +15,8 @@ namespace VevaciousPlusPlus
     NodesOnPlanes( numberOfFields,
                    numberOfIntermediateNodes ),
     adjustmentOrder(),
-    sideNodeIndices()
+    sideNodeIndices(),
+    rotationMatrices()
   {
     // We ensure that the number of intermediate nodes is one less than an
     // integer power of two, using the argument numberOfIntermediateNodes as a

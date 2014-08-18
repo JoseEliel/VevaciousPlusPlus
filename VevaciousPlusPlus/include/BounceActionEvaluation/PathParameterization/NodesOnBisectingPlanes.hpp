@@ -26,6 +26,7 @@ namespace VevaciousPlusPlus
   protected:
     std::vector< size_t > adjustmentOrder;
     std::vector< std::pair< size_t, size_t > > sideNodeIndices;
+    std::vector< Eigen::MatrixXd > rotationMatrices;
 
 
     // This just assumes that the nodes can be adjusted in the order which they
