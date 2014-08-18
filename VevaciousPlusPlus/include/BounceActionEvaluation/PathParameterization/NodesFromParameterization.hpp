@@ -86,7 +86,7 @@ namespace VevaciousPlusPlus
     // be nodeAsVector as long as the index is valid. (If the adjustment order
     // is different from the order the path visits the nodes in,
     // PathIndexFromAdjustmentIndex can account for that.)
-    void
+    virtual void
     SetNodeInAdjustmentOrderFromNodeVector( size_t const adjustmentOrderIndex,
                                     std::vector< double > const& nodeAsVector )
     { pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ]

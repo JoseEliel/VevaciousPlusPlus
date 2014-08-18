@@ -29,10 +29,13 @@ namespace VevaciousPlusPlus
   // difference vector between the vacua, and adds that to nodeVector.
   void
   NodesOnParallelPlanes::AddTransformedNode( std::vector< double >& nodeVector,
-                                        std::vector< double > const& startNode,
-                                          std::vector< double > const& endNode,
+                                             size_t const adjustmentOrderIndex,
                       std::vector< double > const& nodeParameterization ) const
   {
+    std::vector< double > const&
+    startNode( FalseSideNode( adjustmentOrderIndex ) );
+    std::vector< double > const&
+    endNode( TrueSideNode( adjustmentOrderIndex ) );
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl

@@ -30,8 +30,10 @@ namespace VevaciousPlusPlus
     }
     --(this->numberOfIntermediateNodes);
 
-    // We ensure that pathNodes has the correct size.
+    // We ensure that pathNodes and rotationMatrices have the correct size.
     pathNodes.resize( this->numberOfIntermediateNodes + 2 );
+    rotationMatrices.resize( this->numberOfIntermediateNodes );
+    // There are only rotation matrices for the variable nodes.
 
     // We need to set up the order in which the nodes will be set. The middle
     // node is set first, based on the vacua at the ends of pathNodes, then
@@ -78,13 +80,11 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This should add the perpendicular component from the parameterization
-  // given by nodeParameterization along with startNode and endNode to
-  // nodeVector.
+  // This adds the perpendicular component from the parameterization given by
+  // nodeParameterization along with adjustmentOrderIndex to nodeVector.
   void NodesOnBisectingPlanes::AddTransformedNode(
                                              std::vector< double >& nodeVector,
-                                        std::vector< double > const& startNode,
-                                          std::vector< double > const& endNode,
+                                             size_t const adjustmentOrderIndex,
                       std::vector< double > const& nodeParameterization ) const
   {
     // The process is to create a vector with numberOfFields components out of
@@ -93,6 +93,7 @@ namespace VevaciousPlusPlus
     // axis to align with (endNode - startNode). There is not a unique rotation
     // if numberOfFields is larger than two, so we choose the easiest thing to
     // implement and keep it consistent.
+
     Eigen::VectorXd nodeInPlane( numberOfFields );
     nodeInPlane( referenceField ) = 0.0;
     for( size_t fieldIndex( 0 );
@@ -105,14 +106,35 @@ namespace VevaciousPlusPlus
       }
       else if( fieldIndex > referenceField )
       {
-        nodeInPlane( fieldIndex )
-        = nodeParameterization[ fieldIndex - 1 ];
+        nodeInPlane( fieldIndex ) = nodeParameterization[ fieldIndex - 1 ];
       }
     }
-    // We create the rotation matrix from normalized vectors orthogonal to
-    // (endNode - startNode).
-    Eigen::MatrixXd rotationMatrix( numberOfFields,
-                                    numberOfFields );
+
+    Eigen::VectorXd rotatedNode( rotationMatrices[ adjustmentOrderIndex ]
+                                                   * nodeInPlane );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      nodeVector[ fieldIndex ] += rotatedNode( fieldIndex );
+    }
+  }
+
+  // This sets rotationMatrices[ adjustmentOrderIndex ] to be a matrix that
+  // rotates the vector difference
+  // ( TrueSideNode[ adjustmentOrderIndex, pathNodes ]
+  //   - FalseSideNode[ adjustmentOrderIndex, pathNodes ] ) to lie along the
+  // axis of referenceField.
+  void NodesOnBisectingPlanes::UpdateRotationMatrix(
+                                            size_t const adjustmentOrderIndex )
+  {
+    std::vector< double > const&
+    startNode( FalseSideNode( adjustmentOrderIndex,
+                              pathNodes ) );
+    std::vector< double > const& endNode( TrueSideNode( adjustmentOrderIndex,
+                                                        pathNodes ) );
+    Eigen::MatrixXd&
+    rotationMatrix( rotationMatrices[ adjustmentOrderIndex ] );
     double firstDifference( endNode.front() - startNode.back() );
     for( size_t columnIndex( 0 );
          columnIndex < numberOfFields;
@@ -192,11 +214,11 @@ namespace VevaciousPlusPlus
       squaredSum += nextSquare;
       nextSquare = ( denominatorValue * denominatorValue );
       inverseLengthSquared = ( 1.0
-                               / ( squaredSum
-                                   * ( 1.0 + ( squaredSum / nextSquare ) ) ) );
+          / ( squaredSum
+              * ( 1.0 + ( squaredSum / nextSquare ) ) ) );
       for( size_t rowIndex( 0 );
-           rowIndex <= columnIndex;
-           ++rowIndex )
+          rowIndex <= columnIndex;
+          ++rowIndex )
       {
         rotationMatrix( rowIndex,
                         columnNormalizationIndex ) *= inverseLengthSquared;
@@ -229,7 +251,7 @@ namespace VevaciousPlusPlus
     << std::endl << referenceVector;
     std::cout << std::endl
     << "rotationMatrix * referenceVector ="
-    << std::endl << ( rotationMatrix * nodeInPlane );
+    << std::endl << ( rotationMatrix * referenceVector );
     std::cout << std::endl
     << "endNode - startNode = { ";
     for( size_t fieldIndex( 0 );
@@ -244,14 +266,6 @@ namespace VevaciousPlusPlus
     }
     std::cout << " }";
     std::cout << std::endl;/**/
-
-    Eigen::VectorXd rotatedNode( rotationMatrix * nodeInPlane );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      nodeVector[ fieldIndex ] += rotatedNode( fieldIndex );
-    }
   }
 
 } /* namespace VevaciousPlusPlus */

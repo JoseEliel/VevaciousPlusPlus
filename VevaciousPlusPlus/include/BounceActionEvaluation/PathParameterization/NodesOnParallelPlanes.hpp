@@ -27,8 +27,7 @@ namespace VevaciousPlusPlus
     // referenceField = 0 and projects it onto the plane perpendicular to the
     // difference vector between the vacua, and adds that to nodeVector.
     virtual void AddTransformedNode( std::vector< double >& nodeVector,
-                                     std::vector< double > const& startNode,
-                                     std::vector< double > const& endNode,
+                                     size_t const adjustmentOrderIndex,
                      std::vector< double > const& nodeParameterization ) const;
 
     // This returns the false vacuum node as the false-vacuum-side node of the
