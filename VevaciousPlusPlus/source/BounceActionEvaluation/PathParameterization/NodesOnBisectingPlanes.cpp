@@ -32,6 +32,7 @@ namespace VevaciousPlusPlus
 
     // We ensure that pathNodes and rotationMatrices have the correct size.
     pathNodes.resize( this->numberOfIntermediateNodes + 2 );
+    sideNodeIndices.resize( pathNodes.size() );
     rotationMatrices.resize( this->numberOfIntermediateNodes );
     // There are only rotation matrices for the variable nodes.
 
@@ -66,9 +67,9 @@ namespace VevaciousPlusPlus
         size_t const
         currentIndex( segmentSize * ( 1 + ( 2 * whichSegment ) ) );
         adjustmentOrder.push_back( currentIndex );
-        sideNodeIndices.push_back(
-                                std::make_pair( ( currentIndex - segmentSize ),
-                                            ( currentIndex + segmentSize ) ) );
+        sideNodeIndices[ currentIndex ].first = ( currentIndex - segmentSize );
+        sideNodeIndices[ currentIndex ].second
+        = ( currentIndex + segmentSize );
       }
       newSegmentsInSplit *= 2;
     }
@@ -81,10 +82,10 @@ namespace VevaciousPlusPlus
 
 
   // This adds the perpendicular component from the parameterization given by
-  // nodeParameterization along with adjustmentOrderIndex to nodeVector.
+  // nodeParameterization along with nodeIndex to nodeVector.
   void NodesOnBisectingPlanes::AddTransformedNode(
                                              std::vector< double >& nodeVector,
-                                             size_t const adjustmentOrderIndex,
+                                                   size_t const nodeIndex,
                       std::vector< double > const& nodeParameterization ) const
   {
     // The process is to create a vector with numberOfFields components out of
@@ -110,8 +111,7 @@ namespace VevaciousPlusPlus
       }
     }
 
-    Eigen::VectorXd rotatedNode( rotationMatrices[ adjustmentOrderIndex ]
-                                                   * nodeInPlane );
+    Eigen::VectorXd rotatedNode( rotationMatrices[ nodeIndex ] * nodeInPlane );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -120,21 +120,17 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This sets rotationMatrices[ adjustmentOrderIndex ] to be a matrix that
-  // rotates the vector difference
-  // ( TrueSideNode[ adjustmentOrderIndex, pathNodes ]
-  //   - FalseSideNode[ adjustmentOrderIndex, pathNodes ] ) to lie along the
-  // axis of referenceField.
-  void NodesOnBisectingPlanes::UpdateRotationMatrix(
-                                            size_t const adjustmentOrderIndex )
+  // This sets rotationMatrices[ nodeIndex ] to be a matrix that rotates the
+  // vector difference from FalseSideNode( nodeIndex, pathNodes ) ) to
+  // TrueSideNode( nodeIndex, pathNodes ) to lie along the axis of
+  // referenceField.
+  void NodesOnBisectingPlanes::UpdateRotationMatrix( size_t const nodeIndex )
   {
-    std::vector< double > const&
-    startNode( FalseSideNode( adjustmentOrderIndex,
-                              pathNodes ) );
-    std::vector< double > const& endNode( TrueSideNode( adjustmentOrderIndex,
+    std::vector< double > const& startNode( FalseSideNode( nodeIndex,
+                                                           pathNodes ) );
+    std::vector< double > const& endNode( TrueSideNode( nodeIndex,
                                                         pathNodes ) );
-    Eigen::MatrixXd&
-    rotationMatrix( rotationMatrices[ adjustmentOrderIndex ] );
+    Eigen::MatrixXd& rotationMatrix( rotationMatrices[ nodeIndex ] );
     double firstDifference( endNode.front() - startNode.back() );
     for( size_t columnIndex( 0 );
          columnIndex < numberOfFields;

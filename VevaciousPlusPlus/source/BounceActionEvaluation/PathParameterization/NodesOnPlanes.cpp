@@ -59,7 +59,7 @@ namespace VevaciousPlusPlus
     }
     pathNodes.front() = falseVacuum.FieldConfiguration();
     pathNodes.back() = trueVacuum.FieldConfiguration();
-    SetInitialParameterizationAndStepSizes( zeroParameterization,
+    SetInitialParameterizationAndStepSizes( zeroFullParameterization,
                                             initialStepSizes );
   }
 

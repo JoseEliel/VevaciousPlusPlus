@@ -185,7 +185,7 @@
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
-                NodesOnBisectingPlanes
+                NodesOnParallelPlanes
               </NodeParameterizationStyle>
               <InterpolationStyle>
                 <!-- "PolynomialPath", "LinearSplinePath", or

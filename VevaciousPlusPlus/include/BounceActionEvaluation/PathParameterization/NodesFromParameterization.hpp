@@ -53,11 +53,11 @@ namespace VevaciousPlusPlus
     { return std::vector< double >( 0 ); }
 
     // If the derived class can vary one node at a time, this should set
-    // nodeVector to be what the node at index adjustmentOrderIndex would be
-    // for the parameterization nodeParameterization. This throws an exception
-    // by default.
+    // nodeVector to be what the node at index nodeIndex would be for the
+    // parameterization nodeParameterization. This throws an exception by
+    // default.
     virtual void NodeProposal( std::vector< double >& nodeVector,
-                               size_t const adjustmentOrderIndex,
+                               size_t const nodeIndex,
                       std::vector< double > const& nodeParameterization ) const
     { throw std::out_of_range( "No functionality to set just one node in"
                                " NodesFromParameterization base class!" ); }
@@ -81,28 +81,34 @@ namespace VevaciousPlusPlus
     { throw std::out_of_range( "No functionality to set just one node in"
                                " NodesFromParameterization base class!" ); }
 
-    // This sets
-    // pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ] ] to
-    // be nodeAsVector as long as the index is valid. (If the adjustment order
-    // is different from the order the path visits the nodes in,
-    // PathIndexFromAdjustmentIndex can account for that.)
-    virtual void
-    SetNodeInAdjustmentOrderFromNodeVector( size_t const adjustmentOrderIndex,
-                                    std::vector< double > const& nodeAsVector )
-    { pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ]
-      = nodeAsVector; }
+    // This returns the value of the index corresponding to the start of the
+    // range of an index in adjustment order.
+    virtual size_t AdjustmentOrderStartIndex() const{ return 0; }
 
-    // This sets
-    // pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ] ] to
-    // be the node parameterized by nodeParameterization as long as the index
-    // is valid. (If the adjustment order is different from the order the path
-    // visits the nodes in, PathIndexFromAdjustmentIndex can account for that.)
-    void SetNodeInAdjustmentOrderFromParameterization(
-                                             size_t const adjustmentOrderIndex,
+    // This returns the value of the index corresponding to the end of the
+    // range of an index in adjustment order.
+    virtual size_t AdjustmentOrderEndIndex() const
+    { return ( numberOfIntermediateNodes - 1 ); }
+
+
+    // This sets pathNodes[ nodeIndex ] to be nodeAsVector. (If the adjustment
+    // order is different from the order the path visits the nodes in, the
+    // calling code can account for that by using
+    // PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) first.)
+    virtual void
+    SetNodeFromNodeVector( size_t const nodeIndex,
+                           std::vector< double > const& nodeAsVector )
+    { pathNodes[ nodeIndex ] = nodeAsVector; }
+
+    // This sets pathNodes[ nodeIndex ] to be the node parameterized by
+    // nodeParameterization. (If the adjustment order is different from the
+    // order the path visits the nodes in, the calling code can account for
+    // that by using PathIndexFromAdjustmentIndex( adjustmentOrderIndex )
+    // first.)
+    void SetNodeFromParameterization( size_t const nodeIndex,
                            std::vector< double > const& nodeParameterization )
-    { NodeProposal( pathNodes[ PathIndexFromAdjustmentIndex(
-                                                      adjustmentOrderIndex ) ],
-                    adjustmentOrderIndex,
+    { NodeProposal( pathNodes[ nodeIndex ],
+                    nodeIndex,
                     nodeParameterization ); }
 
     std::vector< std::vector< double > >const&
@@ -116,31 +122,35 @@ namespace VevaciousPlusPlus
     { return ( numberOfIntermediateNodes + 2 ); }
 
     std::vector< double > const& ZeroParameterization() const
-    { return zeroParameterization; }
+    { return zeroFullParameterization; }
+
+    std::vector< double > const& ZeroNodeParameterization() const
+    { return zeroNodeParameterization; }
 
     std::vector< double > const& InitialStepSizes() const
     { return initialStepSizes; }
+
+
+    // This just assumes that the nodes can be adjusted in the order which they
+    // are visited in along the path (skipping the false vacuum at the front of
+    // pathNodes), but can be over-ridden in derived classes.
+    virtual size_t
+    PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const
+    { return ( adjustmentOrderIndex + 1 ); }
+
+    // This just throws an exception if pathOrderIndex is out of the range of
+    // pathNodes, or if it would be for the front or back of pathNodes as then
+    // the vacua would be moved and that is not a good idea.
+    void ValidPathIndex( size_t const pathOrderIndex ) const;
 
 
   protected:
     size_t numberOfFields;
     size_t numberOfIntermediateNodes;
     std::vector< std::vector< double > > pathNodes;
-    std::vector< double > zeroParameterization;
+    std::vector< double > zeroFullParameterization;
+    std::vector< double > zeroNodeParameterization;
     std::vector< double > initialStepSizes;
-
-
-    // This just assumes that the nodes can be adjusted in the order which they
-    // are visited in along the path, but can be over-ridden in derived
-    // classes. (It also calls ValidAdjustmentIndex before returning the
-    // index.)
-    virtual size_t
-    PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const;
-
-    // This just throws an exception if adjustmentOrderIndex is out of the
-    // range of pathNodes, or if it would be for the front or back of pathNodes
-    // as then the vacua would be moved and that is not a good idea.
-    void ValidAdjustmentIndex( size_t const adjustmentOrderIndex ) const;
   };
 
 
@@ -154,33 +164,23 @@ namespace VevaciousPlusPlus
   {
     pathNodes.front() = falseVacuum.FieldConfiguration();
     pathNodes.back() = trueVacuum.FieldConfiguration();
-    SetInitialParameterizationAndStepSizes( zeroParameterization,
+    SetInitialParameterizationAndStepSizes( zeroFullParameterization,
                                             initialStepSizes );
   }
 
-  // This just assumes that the nodes can be adjusted in the order which they
-  // are visited in along the path, but can be over-ridden in derived
-  // classes.
-  inline size_t NodesFromParameterization::PathIndexFromAdjustmentIndex(
-                                      size_t const adjustmentOrderIndex ) const
+  // This just throws an exception if pathOrderIndex is out of the range of
+  // pathNodes, or if it would be for the front or back of pathNodes as then
+  // the vacua would be moved and that is not a good idea.
+  inline void NodesFromParameterization::ValidPathIndex(
+                                            size_t const pathOrderIndex ) const
   {
-    ValidAdjustmentIndex( adjustmentOrderIndex );
-    return adjustmentOrderIndex;
-  }
-
-  // This just throws an exception if adjustmentOrderIndex is out of the
-  // range of pathNodes, or if it would be for the front or back of pathNodes
-  // as then the vacua would be moved and that is not a good idea.
-  inline void NodesFromParameterization::ValidAdjustmentIndex(
-                                      size_t const adjustmentOrderIndex ) const
-  {
-    if( !( ( adjustmentOrderIndex > 0 )
+    if( !( ( pathOrderIndex > 0 )
            &&
-           ( adjustmentOrderIndex < ( pathNodes.size() - 1 ) ) ) )
+           ( pathOrderIndex <= numberOfIntermediateNodes ) ) )
     {
       std::stringstream errorStream;
-      errorStream << "Can only set nodes 1 to " << numberOfIntermediateNodes
-      << ", not node " << adjustmentOrderIndex << "!";
+      errorStream << "Can only set (in \"path order\") nodes 1 to "
+      << numberOfIntermediateNodes << ", not node " << pathOrderIndex << "!";
       throw std::out_of_range( errorStream.str() );
     }
   }

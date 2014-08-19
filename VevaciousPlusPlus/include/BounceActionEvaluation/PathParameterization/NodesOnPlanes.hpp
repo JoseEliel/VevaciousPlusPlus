@@ -44,21 +44,21 @@ namespace VevaciousPlusPlus
                                std::vector< double >& initialStepSizes ) const;
 
     // This sets nodeVector to be the vector which would represent the node at
-    // pathNodes[ adjustmentOrderIndex ] if it were to be set based on
+    // pathNodes[ nodeIndex ] if it were to be set based on
     // nodeParameterization and the rest of the nodes in pathNodes, unless it
     // would mean moving the true vacuum or false vacuum, in which case an
     // exception is thrown. The node is set to be on a plane perpendicular to
     // two other nodes (decided by the derived class), by
     // nodeParameterization being taken to be a vector on a plane with the
     // field with index referenceField being zero, through
-    // ProjectPerpendicularToAndShift.
+    // ProjectPerpendicularToAndShift(...).
     virtual void NodeProposal( std::vector< double >& nodeVector,
-                               size_t const adjustmentOrderIndex,
+                               size_t const nodeIndex,
                       std::vector< double > const& nodeParameterization ) const
     { TransformPerpendicularToAndShift( nodeVector,
-                                        adjustmentOrderIndex,
+                                        nodeIndex,
                                         nodeParameterization,
-                                     ShiftFraction( adjustmentOrderIndex ) ); }
+                                        ShiftFraction( nodeIndex ) ); }
 
     // This sets nodeParameterization to be the sub-vector of
     // pathParameterization which parameterizes the node at index nodeIndex.
@@ -83,42 +83,39 @@ namespace VevaciousPlusPlus
 
 
     // This should add the perpendicular component from the parameterization
-    // given by nodeParameterization along with adjustmentOrderIndex to
-    // nodeVector.
+    // given by nodeParameterization along with nodeIndex to nodeVector.
     virtual void
     AddTransformedNode( std::vector< double >& nodeVector,
-                        size_t const adjustmentOrderIndex,
+                        size_t const nodeIndex,
                  std::vector< double > const& nodeParameterization ) const = 0;
 
     // This sets nodeVector to be the vector sum of startNode plus
-    // shiftFraction times the difference between
-    // TrueSideNode[ adjustmentOrderIndex ] and
-    // FalseSideNode[ adjustmentOrderIndex ], plus the node given by
-    // nodeParameterization transformed to be perpendicular to the difference
-    // between TrueSideNode[ adjustmentOrderIndex ] and
-    // FalseSideNode[ adjustmentOrderIndex ].
+    // shiftFraction times the shift vector, which is the difference between
+    // TrueSideNode( nodeIndex, pathNodes ) and
+    // FalseSideNode( nodeIndex, pathNodes ), plus the node given by
+    // nodeParameterization transformed to be perpendicular to the shift
+    // vector.
     void TransformPerpendicularToAndShift( std::vector< double >& nodeVector,
-                                           size_t const adjustmentOrderIndex,
+                                           size_t const nodeIndex,
                              std::vector< double > const& nodeParameterization,
                                            double const shiftFraction ) const;
 
     // This should return the false-vacuum-side node of the pair of nodes
-    // from which the node at adjustmentOrderIndex should be set.
+    // from which the node at nodeIndex should be set.
     virtual std::vector< double > const&
-    FalseSideNode( size_t const adjustmentOrderIndex,
+    FalseSideNode( size_t const nodeIndex,
                std::vector< std::vector< double > > const& nodeSet ) const = 0;
 
     // This should return the true-vacuum-side node of the pair of nodes
     // from which the node at nodeIndex should be set.
     virtual std::vector< double > const&
-    TrueSideNode( size_t const adjustmentOrderIndex,
+    TrueSideNode( size_t const nodeIndex,
                std::vector< std::vector< double > > const& nodeSet ) const = 0;
 
     // This should return the fraction along the node difference vector that
     // the rotated plane should be shifted appropriate for
-    // pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ].
-    virtual double
-    ShiftFraction( size_t const adjustmentOrderIndex ) const = 0;
+    // pathNodes[ nodeIndex ].
+    virtual double ShiftFraction( size_t const nodeIndex ) const = 0;
 
     // This does nothing by default, but serves as a hook for derived classes.
     virtual void FinishUpdatingForNewVacua(){}
@@ -141,8 +138,8 @@ namespace VevaciousPlusPlus
     std::vector< double > nodeParameterization( numberOfParametersPerNode );
     std::vector< double >::const_iterator
     currentParameterizationStart( pathParameterization.begin() );
-    for( size_t adjustmentOrderIndex( 1 );
-         adjustmentOrderIndex <= numberOfIntermediateNodes;
+    for( size_t adjustmentOrderIndex( AdjustmentOrderStartIndex() );
+         adjustmentOrderIndex <= AdjustmentOrderEndIndex();
          ++adjustmentOrderIndex )
     {
       nodeParameterization.assign( currentParameterizationStart,
@@ -150,7 +147,7 @@ namespace VevaciousPlusPlus
       size_t const
       pathOrderIndex( PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) );
       TransformPerpendicularToAndShift( pathNodes[ pathOrderIndex ],
-                                        adjustmentOrderIndex,
+                                        pathOrderIndex,
                                         nodeParameterization,
                                         ShiftFraction( pathOrderIndex ) );
       currentParameterizationStart += numberOfParametersPerNode;
@@ -201,18 +198,45 @@ namespace VevaciousPlusPlus
   }
 
   // This sets nodeVector to be the vector sum of startNode plus
-  // shiftFraction times the difference between
-  // TrueSideNode[ adjustmentOrderIndex ] and
-  // FalseSideNode[ adjustmentOrderIndex ], plus the node given by
-  // nodeParameterization transformed to be perpendicular to the difference
-  // between TrueSideNode[ adjustmentOrderIndex ] and
-  // FalseSideNode[ adjustmentOrderIndex ].
+  // shiftFraction times the shift vector, which is the difference between
+  // TrueSideNode( nodeIndex, pathNodes ) and
+  // FalseSideNode( nodeIndex, pathNodes ), plus the node given by
+  // nodeParameterization transformed to be perpendicular to the shift
+  // vector.
   inline void NodesOnPlanes::TransformPerpendicularToAndShift(
                                              std::vector< double >& nodeVector,
-                                             size_t const adjustmentOrderIndex,
+                                                        size_t const nodeIndex,
                              std::vector< double > const& nodeParameterization,
                                              double const shiftFraction ) const
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnPlanes::TransformPerpendicularToAndShift( nodeVector = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < nodeVector.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeVector[ fieldIndex ];
+    }
+    std::cout << " }, nodeIndex = " << nodeIndex
+    << ", nodeParameterization = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < nodeParameterization.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeParameterization[ fieldIndex ];
+    }
+    std::cout << " }, shiftFraction = " << shiftFraction << " ) called.";
+    std::cout << std::endl;*/
     // We actually take the fraction along the straight line between nodes (the
     // "shift") before adding the perpendicular component.
     for( size_t fieldIndex( 0 );
@@ -220,15 +244,15 @@ namespace VevaciousPlusPlus
          ++fieldIndex )
     {
       nodeVector[ fieldIndex ]
-      = ( ( ( 1.0 - shiftFraction )
-            * FalseSideNode[ adjustmentOrderIndex ][ fieldIndex ] )
-          + ( shiftFraction
-              * TrueSideNode[ adjustmentOrderIndex ][ fieldIndex ] ) );
+      = ( ( ( 1.0 - shiftFraction ) * FalseSideNode( nodeIndex,
+                                                    pathNodes )[ fieldIndex ] )
+          + ( shiftFraction * TrueSideNode( nodeIndex,
+                                            pathNodes )[ fieldIndex ] ) );
     }
-    if( nodeParameterization != zeroParameterization )
+    if( nodeParameterization != zeroNodeParameterization )
     {
       AddTransformedNode( nodeVector,
-                          adjustmentOrderIndex,
+                          nodeIndex,
                           nodeParameterization );
     }
   }

@@ -29,15 +29,11 @@ namespace VevaciousPlusPlus
   // difference vector between the vacua, and adds that to nodeVector.
   void
   NodesOnParallelPlanes::AddTransformedNode( std::vector< double >& nodeVector,
-                                             size_t const adjustmentOrderIndex,
+                                             size_t const nodeIndex,
                       std::vector< double > const& nodeParameterization ) const
   {
-    std::vector< double > const&
-    startNode( FalseSideNode( adjustmentOrderIndex ) );
-    std::vector< double > const&
-    endNode( TrueSideNode( adjustmentOrderIndex ) );
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnParallelPlanes::AddTransformedNode( nodeVector = { ";
     for( size_t fieldIndex( 0 );
@@ -50,7 +46,28 @@ namespace VevaciousPlusPlus
       }
       std::cout << nodeVector[ fieldIndex ];
     }
-    std::cout << " }, startNode = { ";
+    std::cout << " }, nodeIndex = " << nodeIndex
+    << ", nodeParameterization = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfParametersPerNode;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeParameterization[ fieldIndex ];
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;*/
+    std::vector< double > const& startNode( FalseSideNode( nodeIndex,
+                                                           pathNodes ) );
+    std::vector< double > const& endNode( TrueSideNode( nodeIndex,
+                                                        pathNodes ) );
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "startNode = { ";
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -72,19 +89,8 @@ namespace VevaciousPlusPlus
       }
       std::cout << endNode[ fieldIndex ];
     }
-    std::cout << " }, nodeParameterization = { ";
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfParametersPerNode;
-         ++fieldIndex )
-    {
-      if( fieldIndex > 0 )
-      {
-        std::cout << ", ";
-      }
-      std::cout << nodeParameterization[ fieldIndex ];
-    }
-    std::cout << " } ) called.";
-    std::cout << std::endl;/**/
+    std::cout << " }.";
+    std::cout << std::endl;*/
     // Shorthand:
     // n = nodeVector
     // d = ( endNode - startNode )
@@ -126,7 +132,7 @@ namespace VevaciousPlusPlus
       }
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "endNode - startNode = { ";
     for( size_t fieldIndex( 0 );
@@ -177,7 +183,7 @@ namespace VevaciousPlusPlus
       std::cout << nodeVector[ fieldIndex ];
     }
     std::cout << " }";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

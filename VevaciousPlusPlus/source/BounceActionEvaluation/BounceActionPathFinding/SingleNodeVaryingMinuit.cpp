@@ -79,18 +79,20 @@ namespace VevaciousPlusPlus
 
     // Now we note all the new positions of the nodes, in field space and also
     // by parameterization.
-    currentMinuitResults.clear();
-    for( size_t nodeIndex( 1 );
-         nodeIndex <= pathNodes.NumberOfVaryingNodes();
-         ++nodeIndex )
+    currentMinuitResults.resize( nodeSet.size() );
+    for( size_t adjustmentIndex( pathNodes.AdjustmentOrderStartIndex() );
+         adjustmentIndex <= pathNodes.AdjustmentOrderEndIndex();
+         ++adjustmentIndex )
     {
-      pathNodes.SetNodeInAdjustmentOrderFromNodeVector( nodeIndex,
-                                          nodeSet[ nodeIndex ] );
+      size_t const
+      pathIndex( pathNodes.PathIndexFromAdjustmentIndex( adjustmentIndex ) );
+      pathNodes.SetNodeFromNodeVector( pathIndex,
+                                       nodeSet[ pathIndex ] );
       pathNodes.ExtractSingleNodeParameterization( nodeParameterization,
-                                                   nodeIndex,
+                                                   pathIndex,
                                                    *pathParameterization );
-      currentMinuitResults.push_back( MinuitMinimum( nodeParameterization,
-                                                     initialStepSizes ) );
+      currentMinuitResults[ pathIndex ] = MinuitMinimum( nodeParameterization,
+                                                         initialStepSizes );
     }
   }
 
@@ -99,25 +101,52 @@ namespace VevaciousPlusPlus
   // path, and then sets the path from the set of nodes.
   void SingleNodeVaryingMinuit::ImprovePath()
   {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "SingleNodeVaryingMinuit::ImprovePath() called.";
+    std::cout << std::endl;*/
+
     pathCanBeImproved = false;
-    for( size_t nodeIndex( 1 );
-         nodeIndex <= pathNodes.NumberOfVaryingNodes();
-         ++nodeIndex )
+    for( size_t adjustmentIndex( pathNodes.AdjustmentOrderStartIndex() );
+         adjustmentIndex <= pathNodes.AdjustmentOrderEndIndex();
+         ++adjustmentIndex )
     {
-      // We have to set which node Minuit will vary in each iteration.
-      currentNodeIndex = nodeIndex;
-      MinuitMinimum const& nodeState( currentMinuitResults[ nodeIndex - 1 ] );
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "adjustmentIndex = " << adjustmentIndex;
+      std::cout << std::endl;*/
+
+      currentNodeIndex
+      = pathNodes.PathIndexFromAdjustmentIndex( adjustmentIndex );
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "currentNodeIndex = " << currentNodeIndex;
+      std::cout << std::endl;*/
+
+      MinuitMinimum const&
+      nodeState( currentMinuitResults[ currentNodeIndex ] );
       ROOT::Minuit2::MnMigrad mnMigrad( (*this),
                                         nodeState.VariableValues(),
                                         nodeState.VariableErrors(),
                                         minuitStrategy );
       MinuitMinimum
-      minuitMinimum( currentMinuitResults.front().VariableValues().size(),
+      minuitMinimum( pathNodes.ZeroNodeParameterization().size(),
                      mnMigrad( movesPerImprovement,
                                currentMinuitTolerance ) );
-      currentMinuitResults[ nodeIndex - 1 ] = minuitMinimum;
-      pathNodes.SetNodeInAdjustmentOrderFromParameterization( nodeIndex,
-                                              minuitMinimum.VariableValues() );
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "minuitMinimum = " << minuitMinimum.AsDebuggingString();
+      std::cout << std::endl;*/
+
+      currentMinuitResults[ currentNodeIndex ] = minuitMinimum;
+      pathNodes.SetNodeFromParameterization( currentNodeIndex,
+                                             minuitMinimum.VariableValues() );
       if( !(minuitMinimum.IsValidMinimum()) )
       {
         pathCanBeImproved = true;

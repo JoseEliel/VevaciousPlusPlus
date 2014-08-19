@@ -23,13 +23,19 @@ namespace VevaciousPlusPlus
     virtual ~NodesOnBisectingPlanes();
 
 
-    // This sets
-    // pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ] ] to
-    // be nodeAsVector as long as the index is valid, and also updates the
-    // appropriate element of rotationMatrices.
-    virtual void
-    SetNodeInAdjustmentOrderFromNodeVector( size_t const adjustmentOrderIndex,
+    // This sets pathNodes[ nodeIndex ] to be nodeAsVector, and also updates
+    // the appropriate element of rotationMatrices.
+    virtual void SetNodeFromNodeVector( size_t const nodeIndex,
                                    std::vector< double > const& nodeAsVector );
+
+
+    // This returns the correct node index in path order corresponding to the
+    // index in adjustment order so that the middle node is moved 1st, then the
+    // nodes between the ends and the middle, and then the nodes in between
+    // those, and so on.
+    virtual size_t
+    PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const
+    { return adjustmentOrder[ adjustmentOrderIndex ]; }
 
 
   protected:
@@ -38,33 +44,25 @@ namespace VevaciousPlusPlus
     std::vector< Eigen::MatrixXd > rotationMatrices;
 
 
-    // This just assumes that the nodes can be adjusted in the order which they
-    // are visited in along the path, but can be over-ridden in derived
-    // classes. (It also calls ValidAdjustmentIndex before returning the
-    // index.)
-    virtual size_t
-    PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const;
-
-
     // This adds the perpendicular component from the parameterization given by
-    // nodeParameterization along with adjustmentOrderIndex to nodeVector.
+    // nodeParameterization along with nodeIndex to nodeVector.
     virtual void AddTransformedNode( std::vector< double >& nodeVector,
-                                     size_t const adjustmentOrderIndex,
+                                     size_t const nodeIndex,
                      std::vector< double > const& nodeParameterization ) const;
 
-    // This should return the false-vacuum-side node of the pair of nodes
-    // from which the node at adjustmentOrderIndex should be set.
+    // This returns the false-vacuum-side node of the pair of nodes from which
+    // the node at nodeIndex should be set.
     virtual std::vector< double > const&
-    FalseSideNode( size_t const adjustmentOrderIndex,
+    FalseSideNode( size_t const nodeIndex,
                    std::vector< std::vector< double > > const& nodeSet ) const
-    { return nodeSet[ sideNodeIndices[ adjustmentOrderIndex ].first ]; }
+    { return nodeSet[ sideNodeIndices[ nodeIndex ].first ]; }
 
-    // This should return the true-vacuum-side node of the pair of nodes
-    // from which the node at nodeIndex should be set.
+    // This returns the true-vacuum-side node of the pair of nodes from which
+    // the node at nodeIndex should be set.
     virtual std::vector< double > const&
-    TrueSideNode( size_t const adjustmentOrderIndex,
+    TrueSideNode( size_t const nodeIndex,
                   std::vector< std::vector< double > > const& nodeSet ) const
-    { return nodeSet[ sideNodeIndices[ adjustmentOrderIndex].second ]; }
+    { return nodeSet[ sideNodeIndices[ nodeIndex].second ]; }
 
     // This should return the fraction along the node difference vector that
     // the rotated plane should be shifted appropriate for
@@ -74,60 +72,48 @@ namespace VevaciousPlusPlus
     // This ensures that the rotation matrices are set up.
     virtual void FinishUpdatingForNewVacua();
 
-    // This sets rotationMatrices[ adjustmentOrderIndex ] to be a matrix that
-    // rotates the vector difference
-    // ( TrueSideNode[ adjustmentOrderIndex, pathNodes ]
-    //   - FalseSideNode[ adjustmentOrderIndex, pathNodes ] ) to lie along the
-    // axis of referenceField.
-    void UpdateRotationMatrix( size_t const adjustmentOrderIndex );
+    // This sets rotationMatrices[ nodeIndex ] to be a matrix that rotates the
+    // vector difference from FalseSideNode( nodeIndex, pathNodes ) ) to
+    // TrueSideNode( nodeIndex, pathNodes ) to lie along the axis of
+    // referenceField.
+    void UpdateRotationMatrix( size_t const nodeIndex );
   };
 
 
 
-  // This sets
-  // pathNodes[ PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) ] ] to
-  // be nodeAsVector as long as the index is valid, and also updates the
+  // This sets pathNodes[ nodeIndex ] to be nodeAsVector, and also updates the
   // appropriate elements of rotationMatrices.
-  inline void NodesOnBisectingPlanes::SetNodeInAdjustmentOrderFromNodeVector(
-                                             size_t const adjustmentOrderIndex,
+  inline void
+  NodesOnBisectingPlanes::SetNodeFromNodeVector( size_t const nodeIndex,
                                     std::vector< double > const& nodeAsVector )
   {
-    size_t const
-    pathIndex( PathIndexFromAdjustmentIndex( adjustmentOrderIndex ) );
-    pathNodes[ pathIndex ] = nodeAsVector;
-    for( size_t nodeIndex( 1 );
-         nodeIndex < ( pathNodes.size() - 1 );
-         ++nodeIndex )
+    pathNodes[ nodeIndex ] = nodeAsVector;
+    for( size_t sideIndex( 1 );
+         sideIndex < ( pathNodes.size() - 1 );
+         ++sideIndex )
     {
-      if( ( sideNodeIndices[ nodeIndex ].first == pathIndex )
+      if( ( sideNodeIndices[ sideIndex ].first == nodeIndex )
           ||
-          ( sideNodeIndices[ nodeIndex ].second == pathIndex ) )
+          ( sideNodeIndices[ sideIndex ].second == nodeIndex ) )
       {
-        UpdateRotationMatrix( nodeIndex );
+        UpdateRotationMatrix( sideIndex );
       }
     }
-  }
-
-
-  // This just assumes that the nodes can be adjusted in the order which they
-  // are visited in along the path, but can be over-ridden in derived
-  // classes.
-  inline size_t NodesOnBisectingPlanes::PathIndexFromAdjustmentIndex(
-                                      size_t const adjustmentOrderIndex ) const
-  {
-    ValidAdjustmentIndex( adjustmentOrderIndex );
-    return adjustmentOrder[ adjustmentOrderIndex ];
   }
 
   // This ensures that the rotation matrices are set up.
   inline void NodesOnBisectingPlanes::FinishUpdatingForNewVacua()
   {
-    UpdateRotationMatrix( 0 );
-    for( size_t matrixIndex( 1 );
+    UpdateRotationMatrix( PathIndexFromAdjustmentIndex( 0 ) );
+    for( size_t matrixIndex( 0 );
          matrixIndex < rotationMatrices.size();
          ++matrixIndex )
     {
-      rotationMatrices[ matrixIndex ] = rotationMatrices.front();
+      if( matrixIndex !=  PathIndexFromAdjustmentIndex( 0 ) )
+      {
+        rotationMatrices[ matrixIndex ]
+        = rotationMatrices[  PathIndexFromAdjustmentIndex( 0 ) ];
+      }
     }
   }
 

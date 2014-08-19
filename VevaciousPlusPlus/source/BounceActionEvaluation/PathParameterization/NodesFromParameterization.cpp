@@ -17,9 +17,12 @@ namespace VevaciousPlusPlus
     numberOfIntermediateNodes( numberOfIntermediateNodes ),
     pathNodes( ( numberOfIntermediateNodes + 2 ),
                std::vector< double >( numberOfFields ) ),
-    zeroParameterization( ( numberOfFields - 1 ),
-                          0.0 ),
-    initialStepSizes( zeroParameterization )
+    zeroFullParameterization( ( ( numberOfFields - 1 )
+                                * numberOfIntermediateNodes ),
+                              0.0 ),
+    zeroNodeParameterization( ( numberOfFields - 1 ),
+                              0.0 ),
+    initialStepSizes( zeroFullParameterization )
   {
     // This constructor is just an initialization list.
   }
