@@ -33,8 +33,30 @@ namespace VevaciousPlusPlus
     // We ensure that pathNodes and rotationMatrices have the correct size.
     pathNodes.resize( this->numberOfIntermediateNodes + 2 );
     sideNodeIndices.resize( pathNodes.size() );
-    rotationMatrices.resize( this->numberOfIntermediateNodes );
+    rotationMatrices.resize( pathNodes.size(),
+                             Eigen::MatrixXd( numberOfFields,
+                                              numberOfFields ) );
     // There are only rotation matrices for the variable nodes.
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnBisectingPlanes::NodesOnBisectingPlanes( numberOfFields = "
+    << numberOfFields << ", numberOfIntermediateNodes = "
+    << numberOfIntermediateNodes << " ) just made rotationMatrices: {"
+    << std::endl;
+    for( size_t matrixIndex( 0 );
+         matrixIndex < rotationMatrices.size();
+         ++matrixIndex )
+    {
+      if( matrixIndex > 0 )
+      {
+        std::cout << "-------------" << std::endl;
+      }
+      std::cout << rotationMatrices[ matrixIndex ] << std::endl;
+    }
+    std::cout << "}" << std::endl;
+    std::cout << std::endl;/**/
 
     // We need to set up the order in which the nodes will be set. The middle
     // node is set first, based on the vacua at the ends of pathNodes, then
@@ -126,12 +148,27 @@ namespace VevaciousPlusPlus
   // referenceField.
   void NodesOnBisectingPlanes::UpdateRotationMatrix( size_t const nodeIndex )
   {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "Actually, there is a conceptual problem with"
+    << " NodesOnBisectingPlanes::UpdateRotationMatrix( size_t const nodeIndex"
+    << " ): if any of the elements of the difference vector are zero, the"
+    << " rotation matrix will have 1/0 elements. This sucks.";
+    std::cout << std::endl;/**/
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnBisectingPlanes::UpdateRotationMatrix( nodeIndex = "
+    << nodeIndex << " ) called.";
+    std::cout << std::endl;/**/
     std::vector< double > const& startNode( FalseSideNode( nodeIndex,
                                                            pathNodes ) );
     std::vector< double > const& endNode( TrueSideNode( nodeIndex,
                                                         pathNodes ) );
     Eigen::MatrixXd& rotationMatrix( rotationMatrices[ nodeIndex ] );
-    double firstDifference( endNode.front() - startNode.back() );
+    double const firstDifference( endNode.front() - startNode.back() );
     for( size_t columnIndex( 0 );
          columnIndex < numberOfFields;
          ++columnIndex )
@@ -147,9 +184,7 @@ namespace VevaciousPlusPlus
                       referenceField )
       = ( endNode[ rowIndex ] - startNode[ rowIndex ] );
     }
-    double const firstElementSquared( firstDifference * firstDifference );
-    // We keep numeratorSquared as a negative number.
-    double numeratorSquared( 0.0 );
+    double sumOfElementSquares( 0.0 );
     for( size_t columnIndex( 0 );
          columnIndex < ( numberOfFields - 1 );
          ++columnIndex )
@@ -159,22 +194,31 @@ namespace VevaciousPlusPlus
       {
         ++columnInsertionIndex;
       }
-      numeratorSquared -= ( rotationMatrix( columnIndex,
-                                            referenceField )
-                            * rotationMatrix( columnIndex,
-                                              referenceField ) );
+      double const diagonalNumerator( rotationMatrix( columnIndex,
+                                                      referenceField ) );
+      double const inverseNextDiagonal( 1.0
+                                        / rotationMatrix( ( columnIndex + 1 ),
+                                                          referenceField ) );
+      sumOfElementSquares += ( diagonalNumerator * diagonalNumerator );
+      double const
+      inverseEuclideanLength( 1.0 / sqrt( sumOfElementSquares
+                                          * ( 1.0
+                                              + ( sumOfElementSquares
+                                                  * inverseNextDiagonal
+                                                 * inverseNextDiagonal ) ) ) );
       for( size_t rowIndex( 1 );
            rowIndex <= columnIndex;
            ++rowIndex )
       {
         rotationMatrix( rowIndex,
-                        columnInsertionIndex ) = rotationMatrix( rowIndex,
-                                                              referenceField );
+                        columnInsertionIndex ) = ( rotationMatrix( rowIndex,
+                                                              referenceField )
+                                                    * inverseEuclideanLength );
       }
       rotationMatrix( ( columnIndex + 1 ),
                       columnInsertionIndex )
-      = ( numeratorSquared / rotationMatrix( ( columnIndex + 1 ),
-                                             referenceField ) );
+      = ( ( -sumOfElementSquares * inverseNextDiagonal )
+          / inverseEuclideanLength );
       for( size_t rowIndex( columnIndex + 2 );
            rowIndex < numberOfFields;
            ++rowIndex )
@@ -183,44 +227,20 @@ namespace VevaciousPlusPlus
                         columnInsertionIndex ) = 0.0;
       }
     }
-    // At this point, the rows make a set of orthogonal vectors, but they are
-    // not normalized to unit length. Currently -numeratorSquared is the length
-    // of the first row, which is convenient.
-    double inverseLengthSquared( -1.0 / numeratorSquared );
+    // Finally we need to normalize the (referenceField)th column.
+    double const lastDiagonal( rotationMatrix( ( numberOfFields - 1 ),
+                                               referenceField ) );
+    sumOfElementSquares += ( lastDiagonal * lastDiagonal );
+    double const inverseEuclideanLength( 1.0 / sqrt( sumOfElementSquares ) );
     for( size_t rowIndex( 0 );
          rowIndex < numberOfFields;
          ++rowIndex )
     {
       rotationMatrix( rowIndex,
-                      referenceField ) *= inverseLengthSquared;
+                      referenceField ) *= inverseEuclideanLength;
     }
-    double squaredSum( 0.0 );
-    double nextSquare( firstElementSquared );
-    for( size_t columnIndex( 0 );
-         columnIndex < ( numberOfFields - 1 );
-         ++columnIndex )
-    {
-      size_t columnNormalizationIndex( columnIndex );
-      if( columnIndex >= referenceField )
-      {
-        ++columnNormalizationIndex;
-      }
-      double denominatorValue( rotationMatrix( ( columnIndex + 1 ),
-                                               referenceField ) );
-      squaredSum += nextSquare;
-      nextSquare = ( denominatorValue * denominatorValue );
-      inverseLengthSquared = ( 1.0
-          / ( squaredSum
-              * ( 1.0 + ( squaredSum / nextSquare ) ) ) );
-      for( size_t rowIndex( 0 );
-          rowIndex <= columnIndex;
-          ++rowIndex )
-      {
-        rotationMatrix( rowIndex,
-                        columnNormalizationIndex ) *= inverseLengthSquared;
-      }
-    }
-    // So now rotationMatrix is the rotation matrix that takes a vector aligned
+    // At this point, the rows make a set of unit length orthogonal vectors,
+    // so now rotationMatrix is the rotation matrix that takes a vector aligned
     // with the axis of field referenceField to (endNode - startNode).
 
     // debugging:

@@ -135,6 +135,25 @@ namespace VevaciousPlusPlus
         = rotationMatrices[  PathIndexFromAdjustmentIndex( 0 ) ];
       }
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnBisectingPlanes::FinishUpdatingForNewVacua() finished."
+    << " rotationMatrices = {"
+    << std::endl;
+    for( size_t matrixIndex( 0 );
+         matrixIndex < rotationMatrices.size();
+         ++matrixIndex )
+    {
+      if( matrixIndex > 0 )
+      {
+        std::cout << "-------------" << std::endl;
+      }
+      std::cout << rotationMatrices[ matrixIndex ] << std::endl;
+    }
+    std::cout << "}" << std::endl;
+    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */
