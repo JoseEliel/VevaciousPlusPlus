@@ -23,7 +23,8 @@ namespace VevaciousPlusPlus
     pathFactory( pathFactory ),
     pathNodes( pathFactory->GetNodesFromParameterization() ),
     currentMinuitResults(),
-    currentNodeIndex( 0 )
+    currentNodeIndex( 0 ),
+    currentlyTuning( false )
   {
     // This constructor is just an initialization list.
   }
@@ -107,7 +108,8 @@ namespace VevaciousPlusPlus
     << "SingleNodeVaryingMinuit::ImprovePath() called.";
     std::cout << std::endl;*/
 
-    pathCanBeImproved = false;
+    bool minuitConverged( true );
+
     for( size_t adjustmentIndex( pathNodes.AdjustmentOrderStartIndex() );
          adjustmentIndex <= pathNodes.AdjustmentOrderEndIndex();
          ++adjustmentIndex )
@@ -149,7 +151,20 @@ namespace VevaciousPlusPlus
                                              minuitMinimum.VariableValues() );
       if( !(minuitMinimum.IsValidMinimum()) )
       {
+        minuitConverged = false;
+      }
+    }
+    if( minuitConverged )
+    {
+      if( !currentlyTuning )
+      {
+        pathNodes.ConvertToTuningOrder();
+        currentlyTuning = true;
         pathCanBeImproved = true;
+      }
+      else
+      {
+        pathCanBeImproved = false;
       }
     }
     SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),

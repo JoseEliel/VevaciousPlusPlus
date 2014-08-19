@@ -37,6 +37,11 @@ namespace VevaciousPlusPlus
     PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const
     { return adjustmentOrder[ adjustmentOrderIndex ]; }
 
+    // This converts sideNodeIndices so that each node depends on its nearest
+    // neighbors for its bisection, rather than the initial set-up. It also
+    // updates rotationMatrices appropriately.
+    virtual void ConvertToTuningOrder();
+
 
   protected:
     std::vector< size_t > adjustmentOrder;
@@ -98,6 +103,21 @@ namespace VevaciousPlusPlus
       {
         UpdateRotationMatrix( sideIndex );
       }
+    }
+  }
+
+  // This converts sideNodeIndices so that each node depends on its nearest
+  // neighbors for its bisection, rather than the initial set-up. It also
+  // updates rotationMatrices appropriately.
+  inline void NodesOnBisectingPlanes::ConvertToTuningOrder()
+  {
+    for( size_t sideIndex( 1 );
+         sideIndex < ( pathNodes.size() - 1 );
+         ++sideIndex )
+    {
+      sideNodeIndices[ sideIndex ].first = ( sideIndex - 1 );
+      sideNodeIndices[ sideIndex ].second = ( sideIndex + 1 );
+      UpdateRotationMatrix( sideIndex );
     }
   }
 

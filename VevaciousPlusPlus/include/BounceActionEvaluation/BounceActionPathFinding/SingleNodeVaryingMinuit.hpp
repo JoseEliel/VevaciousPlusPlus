@@ -50,6 +50,7 @@ namespace VevaciousPlusPlus
     NodesFromParameterization& pathNodes;
     std::vector< MinuitMinimum > currentMinuitResults;
     size_t currentNodeIndex;
+    bool currentlyTuning;
   };
 
 } /* namespace VevaciousPlusPlus */

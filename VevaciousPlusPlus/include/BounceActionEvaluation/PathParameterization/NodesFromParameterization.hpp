@@ -90,6 +90,9 @@ namespace VevaciousPlusPlus
     virtual size_t AdjustmentOrderEndIndex() const
     { return ( numberOfIntermediateNodes - 1 ); }
 
+    // This does nothing by default, but is used by NodesOnBisectingPlanes to
+    // change around the node dependences.
+    virtual void ConvertToTuningOrder(){}
 
     // This sets pathNodes[ nodeIndex ] to be nodeAsVector. (If the adjustment
     // order is different from the order the path visits the nodes in, the
