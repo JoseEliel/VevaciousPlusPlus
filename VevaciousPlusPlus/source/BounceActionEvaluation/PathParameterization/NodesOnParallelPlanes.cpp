@@ -26,8 +26,8 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This takes nodeParameterization as a vector in the plane with field
-  // referenceField = 0 and projects it onto the plane perpendicular to the
+  // This takes nodeParameterization as a vector in the plane with the 0th
+  // field being 0.0 and projects it onto the plane perpendicular to the
   // difference vector between the vacua, and adds that to nodeVector.
   void
   NodesOnParallelPlanes::AddTransformedNode( std::vector< double >& nodeVector,
@@ -95,23 +95,9 @@ namespace VevaciousPlusPlus
     std::cout << " }.";
     std::cout << std::endl;/**/
 
-    Eigen::VectorXd nodeInParameterizationPlane( numberOfFields );
-    nodeInParameterizationPlane( 0 ) = 0.0;
-    for( size_t fieldIndex( 1 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      nodeInParameterizationPlane( fieldIndex )
-      = nodeParameterization[ fieldIndex - 1 ];
-    }
-    Eigen::VectorXd const
-    reflectedNode( reflectionMatrix * nodeInParameterizationPlane );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      nodeVector[ fieldIndex ] += reflectedNode( fieldIndex );
-    }
+    AddTransformOfParameterizedNode( nodeVector,
+                                     reflectionMatrix,
+                                     nodeParameterization );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -129,27 +115,12 @@ namespace VevaciousPlusPlus
     }
     std::cout << " }";
     std::cout << std::endl
-    << "node in plane = { ";
-    for( size_t fieldIndex( 0 );
+    << "node in plane = { 0.0";
+    for( size_t fieldIndex( 1 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      if( fieldIndex > 0 )
-      {
-        std::cout << ", ";
-      }
-      if( fieldIndex < referenceField )
-      {
-        std::cout << nodeParameterization[ fieldIndex ];
-      }
-      else if( fieldIndex == referenceField )
-      {
-        std::cout << "0.0";
-      }
-      else if( fieldIndex > referenceField )
-      {
-        std::cout << nodeParameterization[ fieldIndex - 1 ];
-      }
+      std::cout << ", " << nodeParameterization[ fieldIndex ];
     }
     std::cout << " }";
     std::cout << std::endl
@@ -240,6 +211,9 @@ namespace VevaciousPlusPlus
     // d = ( endNode - startNode )
     // p = vector in plane from nodeParameterization
     // n += p - d ( p.d / d.d )
+    size_t const referenceField( 0 );
+    // This variable was removed from the class, but this is to keep this old
+    // function working until I commit to removing it entirely.
     double dotProduct( 0.0 );
     double differenceSquared( 0.0 );
     for( size_t fieldIndex( 0 );

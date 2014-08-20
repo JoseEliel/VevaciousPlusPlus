@@ -128,7 +128,6 @@ namespace VevaciousPlusPlus
   // This ensures that the rotation matrices are set up.
   inline void NodesOnBisectingPlanes::FinishUpdatingForNewVacua()
   {
-    referenceField = 0;
     UpdateRotationMatrix( PathIndexFromAdjustmentIndex( 0 ) );
     for( size_t matrixIndex( 0 );
          matrixIndex < reflectionMatrices.size();

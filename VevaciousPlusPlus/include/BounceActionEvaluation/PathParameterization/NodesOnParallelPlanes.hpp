@@ -26,8 +26,9 @@ namespace VevaciousPlusPlus
   protected:
     Eigen::MatrixXd reflectionMatrix;
 
-    // This takes nodeParameterization as a vector in the plane with field
-    // referenceField = 0 and projects it onto the plane perpendicular to the
+
+    // This takes nodeParameterization as a vector in the plane with the 0th
+    // field being 0.0 and projects it onto the plane perpendicular to the
     // difference vector between the vacua, and adds that to nodeVector.
     virtual void AddTransformedNode( std::vector< double >& nodeVector,
                                      size_t const nodeIndex,
@@ -73,14 +74,16 @@ namespace VevaciousPlusPlus
   // This ensures that the reflection matrix is set up.
   inline void NodesOnParallelPlanes::FinishUpdatingForNewVacua()
   {
-    referenceField = 0;
     std::vector< double > vacuumDifference;
     SetAsVectorDifference( vacuumDifference,
                            pathNodes.front(),
                            pathNodes.back() );
     SetAsHouseholderReflectionFromAxisToVector( reflectionMatrix,
-                                                referenceField,
+                                                0,
                                                 vacuumDifference );
+    // For convenience, the 0th field is taken to be the 0.0 in the
+    // parameterization. Taking anything else would complicate the rest of the
+    // functions.
   }
 
 } /* namespace VevaciousPlusPlus */

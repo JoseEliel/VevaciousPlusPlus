@@ -118,22 +118,16 @@ namespace VevaciousPlusPlus
     // implement and keep it consistent.
 
     Eigen::VectorXd nodeInPlane( numberOfFields );
-    nodeInPlane( referenceField ) = 0.0;
-    for( size_t fieldIndex( 0 );
+    nodeInPlane( 0 ) = 0.0;
+    for( size_t fieldIndex( 1 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      if( fieldIndex < referenceField )
-      {
-        nodeInPlane( fieldIndex ) = nodeParameterization[ fieldIndex ];
-      }
-      else if( fieldIndex > referenceField )
-      {
-        nodeInPlane( fieldIndex ) = nodeParameterization[ fieldIndex - 1 ];
-      }
+      nodeInPlane( fieldIndex ) = nodeParameterization[ fieldIndex ];
     }
 
-    Eigen::VectorXd rotatedNode( reflectionMatrices[ nodeIndex ] * nodeInPlane );
+    Eigen::VectorXd
+    rotatedNode( reflectionMatrices[ nodeIndex ] * nodeInPlane );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -148,126 +142,46 @@ namespace VevaciousPlusPlus
   // referenceField.
   void NodesOnBisectingPlanes::UpdateRotationMatrix( size_t const nodeIndex )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "Actually, there is a conceptual problem with"
-    << " NodesOnBisectingPlanes::UpdateRotationMatrix( size_t const nodeIndex"
-    << " ): if any of the elements of the difference vector are zero, the"
-    << " rotation matrix will have 1/0 elements. This sucks.";
-    std::cout << std::endl;/**/
-
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnBisectingPlanes::UpdateRotationMatrix( nodeIndex = "
     << nodeIndex << " ) called.";
     std::cout << std::endl;/**/
+
+    std::vector< double > vacuumDifference;
+    SetAsVectorDifference( vacuumDifference,
+                           FalseSideNode( nodeIndex,
+                                          pathNodes ),
+                           TrueSideNode( nodeIndex,
+                                         pathNodes ) );
+    SetAsHouseholderReflectionFromAxisToVector(
+                                               reflectionMatrices[ nodeIndex ],
+                                                0,
+                                                vacuumDifference );
+    // For convenience, the 0th field is taken to be the 0.0 in the
+    // parameterization. Taking anything else would complicate the rest of the
+    // functions.
+
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl;
     std::vector< double > const& startNode( FalseSideNode( nodeIndex,
                                                            pathNodes ) );
     std::vector< double > const& endNode( TrueSideNode( nodeIndex,
                                                         pathNodes ) );
-    Eigen::MatrixXd& rotationMatrix( reflectionMatrices[ nodeIndex ] );
-    double const firstDifference( endNode.front() - startNode.back() );
-    for( size_t columnIndex( 0 );
-         columnIndex < numberOfFields;
-         ++columnIndex )
-    {
-      rotationMatrix( 0,
-                      columnIndex ) = firstDifference;
-    }
-    for( size_t rowIndex( 1 );
-         rowIndex < numberOfFields;
-         ++rowIndex )
-    {
-      rotationMatrix( rowIndex,
-                      referenceField )
-      = ( endNode[ rowIndex ] - startNode[ rowIndex ] );
-    }
-    double sumOfElementSquares( 0.0 );
-    for( size_t columnIndex( 0 );
-         columnIndex < ( numberOfFields - 1 );
-         ++columnIndex )
-    {
-      size_t columnInsertionIndex( columnIndex );
-      if( columnIndex >= referenceField )
-      {
-        ++columnInsertionIndex;
-      }
-      double const diagonalNumerator( rotationMatrix( columnIndex,
-                                                      referenceField ) );
-      double const inverseNextDiagonal( 1.0
-                                        / rotationMatrix( ( columnIndex + 1 ),
-                                                          referenceField ) );
-      sumOfElementSquares += ( diagonalNumerator * diagonalNumerator );
-      double const
-      inverseEuclideanLength( 1.0 / sqrt( sumOfElementSquares
-                                          * ( 1.0
-                                              + ( sumOfElementSquares
-                                                  * inverseNextDiagonal
-                                                 * inverseNextDiagonal ) ) ) );
-      for( size_t rowIndex( 1 );
-           rowIndex <= columnIndex;
-           ++rowIndex )
-      {
-        rotationMatrix( rowIndex,
-                        columnInsertionIndex ) = ( rotationMatrix( rowIndex,
-                                                              referenceField )
-                                                    * inverseEuclideanLength );
-      }
-      rotationMatrix( ( columnIndex + 1 ),
-                      columnInsertionIndex )
-      = ( ( -sumOfElementSquares * inverseNextDiagonal )
-          / inverseEuclideanLength );
-      for( size_t rowIndex( columnIndex + 2 );
-           rowIndex < numberOfFields;
-           ++rowIndex )
-      {
-        rotationMatrix( rowIndex,
-                        columnInsertionIndex ) = 0.0;
-      }
-    }
-    // Finally we need to normalize the (referenceField)th column.
-    double const lastDiagonal( rotationMatrix( ( numberOfFields - 1 ),
-                                               referenceField ) );
-    sumOfElementSquares += ( lastDiagonal * lastDiagonal );
-    double const inverseEuclideanLength( 1.0 / sqrt( sumOfElementSquares ) );
-    for( size_t rowIndex( 0 );
-         rowIndex < numberOfFields;
-         ++rowIndex )
-    {
-      rotationMatrix( rowIndex,
-                      referenceField ) *= inverseEuclideanLength;
-    }
-    // At this point, the rows make a set of unit length orthogonal vectors,
-    // so now rotationMatrix is the rotation matrix that takes a vector aligned
-    // with the axis of field referenceField to (endNode - startNode).
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "rotationMatrix ="
-    << std::endl << rotationMatrix;
-    Eigen::VectorXd referenceVector( numberOfFields );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      if( fieldIndex == referenceField )
-      {
-        referenceVector( fieldIndex ) = 1.0;
-      }
-      else
-      {
-        referenceVector( fieldIndex ) = 0.0;
-      }
-    }
+    Eigen::MatrixXd& reflectionMatrix( reflectionMatrices[ nodeIndex ] );
+    std::cout << "reflectionMatrix =" << std::endl << reflectionMatrix;
+    Eigen::VectorXd referenceVector( numberOfFields,
+                                     0.0 );
+    referenceVector( 0 ) = 1.0;
     std::cout << std::endl
     << "referenceVector ="
     << std::endl << referenceVector;
     std::cout << std::endl
-    << "rotationMatrix * referenceVector ="
-    << std::endl << ( rotationMatrix * referenceVector );
+    << "reflectionMatrix * referenceVector ="
+    << std::endl << ( reflectionMatrix * referenceVector );
     std::cout << std::endl
     << "endNode - startNode = { ";
     for( size_t fieldIndex( 0 );

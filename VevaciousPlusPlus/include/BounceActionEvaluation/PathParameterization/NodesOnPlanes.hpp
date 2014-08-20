@@ -78,7 +78,6 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    size_t referenceField;
     size_t numberOfParametersPerNode;
 
 
@@ -99,6 +98,13 @@ namespace VevaciousPlusPlus
                                            size_t const nodeIndex,
                              std::vector< double > const& nodeParameterization,
                                            double const shiftFraction ) const;
+
+    // This takes nodeParameterization as a vector in field space with 0th
+    // component being 0.0, applies transformationMatrix to it, and adds
+    // the result to targetVector.
+    void AddTransformOfParameterizedNode( std::vector< double >& targetVector,
+                                Eigen::MatrixXd const& transformationMatrix,
+                     std::vector< double > const& nodeParameterization ) const;
 
     // This should return the false-vacuum-side node of the pair of nodes
     // from which the node at nodeIndex should be set.
@@ -123,6 +129,18 @@ namespace VevaciousPlusPlus
 
 
 
+
+  // This resets the NodesFromParameterization so that it will produce
+  // TunnelPath*s that parameterize the path between the given vacua.
+  inline void NodesOnPlanes::SetVacua( PotentialMinimum const& falseVacuum,
+                                PotentialMinimum const& trueVacuum )
+  {
+    pathNodes.front() = falseVacuum.FieldConfiguration();
+    pathNodes.back() = trueVacuum.FieldConfiguration();
+    SetInitialParameterizationAndStepSizes( zeroFullParameterization,
+                                            initialStepSizes );
+    FinishUpdatingForNewVacua();
+  }
 
   // This puts all the nodes based on the numbers given in
   // pathParameterization into pathNodes, ordered in the sequence that they
@@ -254,6 +272,34 @@ namespace VevaciousPlusPlus
       AddTransformedNode( nodeVector,
                           nodeIndex,
                           nodeParameterization );
+    }
+  }
+
+
+  // This takes nodeParameterization as a vector in field space with 0th
+  // component being 0.0, applies transformationMatrix to it, and adds
+  // the result to targetVector.
+  inline void NodesOnPlanes::AddTransformOfParameterizedNode(
+                                           std::vector< double >& targetVector,
+                                   Eigen::MatrixXd const& transformationMatrix,
+                      std::vector< double > const& nodeParameterization ) const
+  {
+    Eigen::VectorXd nodeInParameterizationPlane( numberOfFields );
+    nodeInParameterizationPlane( 0 ) = 0.0;
+    for( size_t fieldIndex( 1 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      nodeInParameterizationPlane( fieldIndex )
+      = nodeParameterization[ fieldIndex - 1 ];
+    }
+    Eigen::VectorXd const
+    transformedNode( transformationMatrix * nodeInParameterizationPlane );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      targetVector[ fieldIndex ] += transformedNode( fieldIndex );
     }
   }
 
