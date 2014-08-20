@@ -9,6 +9,7 @@
 #define NODESFROMPARAMETERIZATION_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Eigen/Dense"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus

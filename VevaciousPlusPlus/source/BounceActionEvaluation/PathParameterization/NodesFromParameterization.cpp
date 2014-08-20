@@ -81,9 +81,9 @@ namespace VevaciousPlusPlus
 
     if( alreadyParallel )
     {
-      reflectionMatrix = ( Eigen::MatrixXd::Identity( numberOfFields,
-                                                      numberOfFields )
-                           * ( -1 ) );
+      reflectionMatrix = Eigen::MatrixXd::Identity( numberOfFields,
+                                                    numberOfFields );
+      reflectionMatrix( referenceAxis, referenceAxis ) = -1.0;
     }
     else
     {
@@ -95,9 +95,12 @@ namespace VevaciousPlusPlus
         targetLengthSquared += ( targetVector[ fieldIndex ]
                                  * targetVector[ fieldIndex ] );
       }
-      double targetNormalization( 1.0 / sqrt( targetLengthSquared ) );
-      double const inverseOfOneMinusDotProduct( 1.0
-                                   / ( 1.0 - targetVector[ referenceAxis ] ) );
+      double const targetNormalization( 1.0 / sqrt( targetLengthSquared ) );
+      double const
+      minusInverseOfOneMinusDotProduct( 1.0
+                                        / ( ( targetVector[ referenceAxis ]
+                                              * targetNormalization )
+                                            - 1.0 ) );
       reflectionMatrix = Eigen::MatrixXd::Zero( numberOfFields,
                                                 numberOfFields );
       for( size_t rowIndex( 0 );
@@ -121,25 +124,39 @@ namespace VevaciousPlusPlus
             columnIndexPart -= 1.0;
           }
           reflectionMatrix( rowIndex,
-                            columnIndex ) = ( -rowIndexPart * columnIndexPart
-                                              * inverseOfOneMinusDotProduct );
+                            columnIndex ) = ( rowIndexPart * columnIndexPart
+                                          * minusInverseOfOneMinusDotProduct );
           reflectionMatrix( columnIndex,
-                            rowIndex ) = ( -rowIndexPart * columnIndexPart
-                                              * inverseOfOneMinusDotProduct );
+                            rowIndex ) = ( rowIndexPart * columnIndexPart
+                                          * minusInverseOfOneMinusDotProduct );
           // The reflection matrix is symmetric, and we set the diagonal
           // elements outside this loop.
         }
         reflectionMatrix( rowIndex,
-                          rowIndex ) = ( 1.0 - ( rowIndexPart * rowIndexPart
-                                             * inverseOfOneMinusDotProduct ) );
+                          rowIndex ) = ( 1.0 + ( rowIndexPart * rowIndexPart
+                                        * minusInverseOfOneMinusDotProduct ) );
       }
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "reflectionMatrix set to" << std::endl;
+      std::cout << reflectionMatrix;
+      Eigen::VectorXd targetEigen( numberOfFields );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        targetEigen( fieldIndex ) = ( targetVector[ fieldIndex ]
+                                      * targetNormalization );
+      }
+      std::cout << std::endl;
+      std::cout << "targetEigen =" << std::endl;
+      std::cout << targetEigen;
+      std::cout << std::endl;
+      std::cout << "reflectionMatrix * targetEigen =" << std::endl;
+      std::cout << ( reflectionMatrix * targetEigen );
+      std::cout << std::endl;/**/
     }
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "reflectionMatrix set to" << std::endl;
-    std::cout << reflectionMatrix;
-    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

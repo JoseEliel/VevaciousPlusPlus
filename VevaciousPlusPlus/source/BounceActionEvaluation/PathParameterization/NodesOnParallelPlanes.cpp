@@ -13,7 +13,9 @@ namespace VevaciousPlusPlus
   NodesOnParallelPlanes::NodesOnParallelPlanes( size_t const numberOfFields,
                                      size_t const numberOfIntermediateNodes ) :
     NodesOnPlanes( numberOfFields,
-                   numberOfIntermediateNodes )
+                   numberOfIntermediateNodes ),
+    reflectionMatrix( numberOfFields,
+                      numberOfFields )
   {
     // This constructor is just an initialization list.
   }
@@ -30,6 +32,148 @@ namespace VevaciousPlusPlus
   void
   NodesOnParallelPlanes::AddTransformedNode( std::vector< double >& nodeVector,
                                              size_t const nodeIndex,
+                      std::vector< double > const& nodeParameterization ) const
+  {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnParallelPlanes::AddTransformedNode( nodeVector = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeVector[ fieldIndex ];
+    }
+    std::cout << " }, nodeIndex = " << nodeIndex
+    << ", nodeParameterization = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfParametersPerNode;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeParameterization[ fieldIndex ];
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;/**/
+
+    std::vector< double > const& startNode( FalseSideNode( nodeIndex,
+                                                           pathNodes ) );
+    std::vector< double > const& endNode( TrueSideNode( nodeIndex,
+                                                        pathNodes ) );
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "startNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << startNode[ fieldIndex ];
+    }
+    std::cout << " }, endNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << endNode[ fieldIndex ];
+    }
+    std::cout << " }.";
+    std::cout << std::endl;/**/
+
+    Eigen::VectorXd nodeInParameterizationPlane( numberOfFields );
+    nodeInParameterizationPlane( 0 ) = 0.0;
+    for( size_t fieldIndex( 1 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      nodeInParameterizationPlane( fieldIndex )
+      = nodeParameterization[ fieldIndex - 1 ];
+    }
+    Eigen::VectorXd const
+    reflectedNode( reflectionMatrix * nodeInParameterizationPlane );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      nodeVector[ fieldIndex ] += reflectedNode( fieldIndex );
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "endNode - startNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << ( endNode[ fieldIndex ] - startNode[ fieldIndex ] );
+    }
+    std::cout << " }";
+    std::cout << std::endl
+    << "node in plane = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      if( fieldIndex < referenceField )
+      {
+        std::cout << nodeParameterization[ fieldIndex ];
+      }
+      else if( fieldIndex == referenceField )
+      {
+        std::cout << "0.0";
+      }
+      else if( fieldIndex > referenceField )
+      {
+        std::cout << nodeParameterization[ fieldIndex - 1 ];
+      }
+    }
+    std::cout << " }";
+    std::cout << std::endl
+    << "transformed node = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeVector[ fieldIndex ];
+    }
+    std::cout << " }";
+    std::cout << std::endl;/**/
+  }
+
+  // This takes nodeParameterization as a vector in the plane with field
+  // referenceField = 0 and projects it onto the plane perpendicular to the
+  // difference vector between the vacua, and adds that to nodeVector.
+  void
+  NodesOnParallelPlanes::AddProjectedNode( std::vector< double >& nodeVector,
+                                           size_t const nodeIndex,
                       std::vector< double > const& nodeParameterization ) const
   {
     // debugging:

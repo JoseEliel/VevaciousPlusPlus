@@ -9,6 +9,7 @@
 #define NODESONPARALLELPLANES_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Eigen/Dense"
 #include "NodesOnPlanes.hpp"
 
 namespace VevaciousPlusPlus
@@ -23,6 +24,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    Eigen::MatrixXd reflectionMatrix;
+
     // This takes nodeParameterization as a vector in the plane with field
     // referenceField = 0 and projects it onto the plane perpendicular to the
     // difference vector between the vacua, and adds that to nodeVector.
@@ -49,7 +52,36 @@ namespace VevaciousPlusPlus
     virtual double ShiftFraction( size_t const nodeIndex ) const
     { return ( static_cast< double >( nodeIndex )
                / static_cast< double >( numberOfIntermediateNodes + 1 ) ); }
+
+    // This ensures that the reflection matrix is set up.
+    virtual void FinishUpdatingForNewVacua();
+
+
+    // This is the old version of AddTransformedNode, before moving to using
+    // the Householder reflection matrix.
+    // This takes nodeParameterization as a vector in the plane with field
+    // referenceField = 0 and projects it onto the plane perpendicular to the
+    // difference vector between the vacua, and adds that to nodeVector.
+    virtual void AddProjectedNode( std::vector< double >& nodeVector,
+                                   size_t const nodeIndex,
+                     std::vector< double > const& nodeParameterization ) const;
   };
+
+
+
+
+  // This ensures that the reflection matrix is set up.
+  inline void NodesOnParallelPlanes::FinishUpdatingForNewVacua()
+  {
+    referenceField = 0;
+    std::vector< double > vacuumDifference;
+    SetAsVectorDifference( vacuumDifference,
+                           pathNodes.front(),
+                           pathNodes.back() );
+    SetAsHouseholderReflectionFromAxisToVector( reflectionMatrix,
+                                                referenceField,
+                                                vacuumDifference );
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* NODESONPARALLELPLANES_HPP_ */
