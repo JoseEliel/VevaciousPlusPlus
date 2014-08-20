@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
                    numberOfIntermediateNodes ),
     adjustmentOrder(),
     sideNodeIndices(),
-    rotationMatrices()
+    reflectionMatrices()
   {
     // We ensure that the number of intermediate nodes is one less than an
     // integer power of two, using the argument numberOfIntermediateNodes as a
@@ -30,10 +30,10 @@ namespace VevaciousPlusPlus
     }
     --(this->numberOfIntermediateNodes);
 
-    // We ensure that pathNodes and rotationMatrices have the correct size.
+    // We ensure that pathNodes and reflectionMatrices have the correct size.
     pathNodes.resize( this->numberOfIntermediateNodes + 2 );
     sideNodeIndices.resize( pathNodes.size() );
-    rotationMatrices.resize( pathNodes.size(),
+    reflectionMatrices.resize( pathNodes.size(),
                              Eigen::MatrixXd( numberOfFields,
                                               numberOfFields ) );
     // There are only rotation matrices for the variable nodes.
@@ -46,14 +46,14 @@ namespace VevaciousPlusPlus
     << numberOfIntermediateNodes << " ) just made rotationMatrices: {"
     << std::endl;
     for( size_t matrixIndex( 0 );
-         matrixIndex < rotationMatrices.size();
+         matrixIndex < reflectionMatrices.size();
          ++matrixIndex )
     {
       if( matrixIndex > 0 )
       {
         std::cout << "-------------" << std::endl;
       }
-      std::cout << rotationMatrices[ matrixIndex ] << std::endl;
+      std::cout << reflectionMatrices[ matrixIndex ] << std::endl;
     }
     std::cout << "}" << std::endl;
     std::cout << std::endl;/**/
@@ -133,7 +133,7 @@ namespace VevaciousPlusPlus
       }
     }
 
-    Eigen::VectorXd rotatedNode( rotationMatrices[ nodeIndex ] * nodeInPlane );
+    Eigen::VectorXd rotatedNode( reflectionMatrices[ nodeIndex ] * nodeInPlane );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -142,7 +142,7 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This sets rotationMatrices[ nodeIndex ] to be a matrix that rotates the
+  // This sets reflectionMatrices[ nodeIndex ] to be a matrix that rotates the
   // vector difference from FalseSideNode( nodeIndex, pathNodes ) ) to
   // TrueSideNode( nodeIndex, pathNodes ) to lie along the axis of
   // referenceField.
@@ -167,7 +167,7 @@ namespace VevaciousPlusPlus
                                                            pathNodes ) );
     std::vector< double > const& endNode( TrueSideNode( nodeIndex,
                                                         pathNodes ) );
-    Eigen::MatrixXd& rotationMatrix( rotationMatrices[ nodeIndex ] );
+    Eigen::MatrixXd& rotationMatrix( reflectionMatrices[ nodeIndex ] );
     double const firstDifference( endNode.front() - startNode.back() );
     for( size_t columnIndex( 0 );
          columnIndex < numberOfFields;

@@ -24,7 +24,7 @@ namespace VevaciousPlusPlus
 
 
     // This sets pathNodes[ nodeIndex ] to be nodeAsVector, and also updates
-    // the appropriate element of rotationMatrices.
+    // the appropriate element of reflectionMatrices.
     virtual void SetNodeFromNodeVector( size_t const nodeIndex,
                                    std::vector< double > const& nodeAsVector );
 
@@ -39,14 +39,18 @@ namespace VevaciousPlusPlus
 
     // This converts sideNodeIndices so that each node depends on its nearest
     // neighbors for its bisection, rather than the initial set-up. It also
-    // updates rotationMatrices appropriately.
+    // updates reflectionMatrices appropriately.
     virtual void ConvertToTuningOrder();
 
 
   protected:
     std::vector< size_t > adjustmentOrder;
     std::vector< std::pair< size_t, size_t > > sideNodeIndices;
-    std::vector< Eigen::MatrixXd > rotationMatrices;
+    std::vector< Eigen::MatrixXd > reflectionMatrices;
+    // The nodes are parameterized as vectors perpendicular to the axis of the
+    // 0th field, which are then transformed by the Householder reflection that
+    // reflects the axis of the 0th field onto the vector of the difference
+    // between the nodes
 
 
     // This adds the perpendicular component from the parameterization given by
@@ -77,7 +81,7 @@ namespace VevaciousPlusPlus
     // This ensures that the rotation matrices are set up.
     virtual void FinishUpdatingForNewVacua();
 
-    // This sets rotationMatrices[ nodeIndex ] to be a matrix that rotates the
+    // This sets reflectionMatrices[ nodeIndex ] to be a matrix that rotates the
     // vector difference from FalseSideNode( nodeIndex, pathNodes ) ) to
     // TrueSideNode( nodeIndex, pathNodes ) to lie along the axis of
     // referenceField.
@@ -87,7 +91,7 @@ namespace VevaciousPlusPlus
 
 
   // This sets pathNodes[ nodeIndex ] to be nodeAsVector, and also updates the
-  // appropriate elements of rotationMatrices.
+  // appropriate elements of reflectionMatrices.
   inline void
   NodesOnBisectingPlanes::SetNodeFromNodeVector( size_t const nodeIndex,
                                     std::vector< double > const& nodeAsVector )
@@ -108,7 +112,7 @@ namespace VevaciousPlusPlus
 
   // This converts sideNodeIndices so that each node depends on its nearest
   // neighbors for its bisection, rather than the initial set-up. It also
-  // updates rotationMatrices appropriately.
+  // updates reflectionMatrices appropriately.
   inline void NodesOnBisectingPlanes::ConvertToTuningOrder()
   {
     for( size_t sideIndex( 1 );
@@ -126,13 +130,13 @@ namespace VevaciousPlusPlus
   {
     UpdateRotationMatrix( PathIndexFromAdjustmentIndex( 0 ) );
     for( size_t matrixIndex( 0 );
-         matrixIndex < rotationMatrices.size();
+         matrixIndex < reflectionMatrices.size();
          ++matrixIndex )
     {
       if( matrixIndex !=  PathIndexFromAdjustmentIndex( 0 ) )
       {
-        rotationMatrices[ matrixIndex ]
-        = rotationMatrices[  PathIndexFromAdjustmentIndex( 0 ) ];
+        reflectionMatrices[ matrixIndex ]
+        = reflectionMatrices[  PathIndexFromAdjustmentIndex( 0 ) ];
       }
     }
 
@@ -143,14 +147,14 @@ namespace VevaciousPlusPlus
     << " rotationMatrices = {"
     << std::endl;
     for( size_t matrixIndex( 0 );
-         matrixIndex < rotationMatrices.size();
+         matrixIndex < reflectionMatrices.size();
          ++matrixIndex )
     {
       if( matrixIndex > 0 )
       {
         std::cout << "-------------" << std::endl;
       }
-      std::cout << rotationMatrices[ matrixIndex ] << std::endl;
+      std::cout << reflectionMatrices[ matrixIndex ] << std::endl;
     }
     std::cout << "}" << std::endl;
     std::cout << std::endl;/**/

@@ -154,6 +154,20 @@ namespace VevaciousPlusPlus
     std::vector< double > zeroFullParameterization;
     std::vector< double > zeroNodeParameterization;
     std::vector< double > initialStepSizes;
+
+
+    // This sets differenceVector[i] = ( endVector[i] - startVector[i] ) for
+    // i running over all the indices of the vectors.
+    void SetAsVectorDifference( std::vector< double >& differenceVector,
+                                std::vector< double > const& startVector,
+                                std::vector< double > const& endVector ) const;
+
+    // This sets reflectionMatrix to be the Householder reflection which
+    // reflects the axis of field referenceAxis to lie along targetVector.
+    void SetAsHouseholderReflectionFromAxisToVector(
+                                             Eigen::MatrixXd& reflectionMatrix,
+                                                    size_t const referenceAxis,
+                                   std::vector< double > const& targetVector );
   };
 
 
@@ -186,6 +200,132 @@ namespace VevaciousPlusPlus
       << numberOfIntermediateNodes << ", not node " << pathOrderIndex << "!";
       throw std::out_of_range( errorStream.str() );
     }
+  }
+
+
+  // This sets differenceVector[i] = ( endVector[i] - startVector[i] ) for
+  // i running over all the indices of the vectors.
+  inline void NodesFromParameterization::SetAsVectorDifference(
+                                       std::vector< double >& differenceVector,
+                                      std::vector< double > const& startVector,
+                                 std::vector< double > const& endVector ) const
+  {
+    differenceVector = endVector;
+    for( size_t fieldIndex( 0 );
+         fieldIndex < startVector.size();
+         ++fieldIndex )
+    {
+      differenceVector[ fieldIndex ] -= startVector[ fieldIndex ];
+    }
+  }
+
+  // This sets reflectionMatrix to be the Householder reflection which
+  // reflects the axis of field referenceAxis to lie along targetVector.
+  inline void
+  NodesFromParameterization::SetAsHouseholderReflectionFromAxisToVector(
+                                             Eigen::MatrixXd& reflectionMatrix,
+                                                    size_t const referenceAxis,
+                                    std::vector< double > const& targetVector )
+  {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesFromParameterization::SetAsHouseholderReflectionFromAxisToVector("
+    << " reflectionMatrix = {";
+    std::cout << std::endl;
+    std::cout << reflectionMatrix;
+    std::cout << std::endl;
+    std::cout << "}, referenceAxis = " << referenceAxis
+    << ", targetVector = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < targetVector.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << targetVector[ fieldIndex ];
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;/**/
+
+    // First we check that targetVector doesn't already lie on referenceAxis.
+    bool alreadyParallel( true );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < targetVector.size();
+         ++fieldIndex )
+    {
+      if( ( fieldIndex != referenceAxis )
+          &&
+          ( targetVector[ fieldIndex ] != 0.0 ) )
+      {
+        alreadyParallel = false;
+        break;
+      }
+    }
+
+    if( alreadyParallel )
+    {
+      reflectionMatrix = ( Eigen::MatrixXd::Identity( numberOfFields,
+                                                      numberOfFields )
+                           * ( -1 ) );
+    }
+    else
+    {
+      double targetLengthSquared( 0.0 );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < targetVector.size();
+           ++fieldIndex )
+      {
+        targetLengthSquared += ( targetVector[ fieldIndex ]
+                                 * targetVector[ fieldIndex ] );
+      }
+      double targetNormalization( 1.0 / sqrt( targetLengthSquared ) );
+      double const inverseOfOneMinusDotProduct( 1.0
+                                   / ( 1.0 - targetVector[ referenceAxis ] ) );
+      reflectionMatrix = Eigen::MatrixXd::Zero( numberOfFields,
+                                                numberOfFields );
+      for( size_t rowIndex( 0 );
+           rowIndex < numberOfFields;
+           ++rowIndex )
+      {
+        double
+        rowIndexPart( targetVector[ rowIndex ] * targetNormalization );
+        if( rowIndex == referenceAxis )
+        {
+          rowIndexPart -= 1.0;
+        }
+        for( size_t columnIndex( rowIndex + 1 );
+             columnIndex < numberOfFields;
+             ++columnIndex )
+        {
+          double columnIndexPart( targetVector[ columnIndex ]
+                                  * targetNormalization );
+          if( columnIndex == referenceAxis )
+          {
+            columnIndexPart -= 1.0;
+          }
+          reflectionMatrix( rowIndex,
+                            columnIndex ) = ( -rowIndexPart * columnIndexPart
+                                              * inverseOfOneMinusDotProduct );
+          reflectionMatrix( columnIndex,
+                            rowIndex ) = ( -rowIndexPart * columnIndexPart
+                                              * inverseOfOneMinusDotProduct );
+          // The reflection matrix is symmetric, and we set the diagonal
+          // elements outside this loop.
+        }
+        reflectionMatrix( rowIndex,
+                          rowIndex ) = ( 1.0 - ( rowIndexPart * rowIndexPart
+                                             * inverseOfOneMinusDotProduct ) );
+      }
+    }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "reflectionMatrix set to" << std::endl;
+    std::cout << reflectionMatrix;
+    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */
