@@ -95,6 +95,61 @@ namespace VevaciousPlusPlus
       }
       newSegmentsInSplit *= 2;
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnBisectingPlanes::NodesOnBisectingPlanes( numberOfFields = "
+    << numberOfFields << ", numberOfIntermediateNodes = "
+    << numberOfIntermediateNodes << " ) finished."
+    << std::endl;
+    std::cout << "adjustmentOrder = { ";
+    for( size_t orderIndex( 0 );
+         orderIndex < adjustmentOrder.size();
+         ++orderIndex )
+    {
+      if( orderIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << adjustmentOrder[ orderIndex ];
+    }
+    std::cout << "}" << std::endl;
+    std::cout << "sideNodeIndices = { ";
+    for( size_t sideIndex( 0 );
+         sideIndex < sideNodeIndices.size();
+         ++sideIndex )
+    {
+      if( sideIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << "[ " << sideNodeIndices[ sideIndex ].first << ", "
+      << sideNodeIndices[ sideIndex ].second << " ]";
+    }
+    std::cout << "}" << std::endl;
+    std::cout << "pathNodes = { { ";
+    for( size_t nodeIndex( 0 );
+         nodeIndex < pathNodes.size();
+         ++nodeIndex )
+    {
+      if( nodeIndex > 0 )
+      {
+        std::cout << " }," << std::endl << "{ ";
+      }
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << pathNodes[ nodeIndex ][ fieldIndex ];
+      }
+    }
+    std::cout << " } }" << std::endl;
+    std::cout << std::endl;/**/
   }
 
   NodesOnBisectingPlanes::~NodesOnBisectingPlanes()
@@ -102,39 +157,6 @@ namespace VevaciousPlusPlus
     // This does nothing.
   }
 
-
-  // This adds the perpendicular component from the parameterization given by
-  // nodeParameterization along with nodeIndex to nodeVector.
-  void NodesOnBisectingPlanes::AddTransformedNode(
-                                             std::vector< double >& nodeVector,
-                                                   size_t const nodeIndex,
-                      std::vector< double > const& nodeParameterization ) const
-  {
-    // The process is to create a vector with numberOfFields components out of
-    // nodeParameterization which is in the appropriate plane, then rotate it
-    // by the rotation which we use consistently to rotate the referenceField
-    // axis to align with (endNode - startNode). There is not a unique rotation
-    // if numberOfFields is larger than two, so we choose the easiest thing to
-    // implement and keep it consistent.
-
-    Eigen::VectorXd nodeInPlane( numberOfFields );
-    nodeInPlane( 0 ) = 0.0;
-    for( size_t fieldIndex( 1 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      nodeInPlane( fieldIndex ) = nodeParameterization[ fieldIndex ];
-    }
-
-    Eigen::VectorXd
-    rotatedNode( reflectionMatrices[ nodeIndex ] * nodeInPlane );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      nodeVector[ fieldIndex ] += rotatedNode( fieldIndex );
-    }
-  }
 
   // This sets reflectionMatrices[ nodeIndex ] to be a matrix that rotates the
   // vector difference from FalseSideNode( nodeIndex, pathNodes ) ) to
@@ -181,6 +203,32 @@ namespace VevaciousPlusPlus
     std::cout << std::endl
     << "reflectionMatrix * referenceVector ="
     << std::endl << ( reflectionMatrix * referenceVector );
+    std::cout << std::endl
+    << "startNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << startNode[ fieldIndex ];
+    }
+    std::cout << " }";
+    std::cout << std::endl
+    << "endNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << endNode[ fieldIndex ];
+    }
+    std::cout << " }";
     std::cout << std::endl
     << "endNode - startNode = { ";
     for( size_t fieldIndex( 0 );

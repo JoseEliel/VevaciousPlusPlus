@@ -60,8 +60,6 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< double > >
     nodeSet( pathNodes.NumberOfPathNodes(),
              std::vector< double >( pathNodes.NumberOfFields() ) );
-    pathFactory->SetVacua( falseVacuum,
-                           trueVacuum );
     pathNodes.PathNodeSet( nodeSet,
                            *pathParameterization );
     // Now we can set the current path.

@@ -57,7 +57,10 @@ namespace VevaciousPlusPlus
     // nodeParameterization along with nodeIndex to nodeVector.
     virtual void AddTransformedNode( std::vector< double >& nodeVector,
                                      size_t const nodeIndex,
-                     std::vector< double > const& nodeParameterization ) const;
+                      std::vector< double > const& nodeParameterization ) const
+    { AddTransformOfParameterizedNode( nodeVector,
+                                       reflectionMatrices[ nodeIndex ],
+                                       nodeParameterization ); }
 
     // This returns the false-vacuum-side node of the pair of nodes from which
     // the node at nodeIndex should be set.
@@ -96,6 +99,24 @@ namespace VevaciousPlusPlus
   NodesOnBisectingPlanes::SetNodeFromNodeVector( size_t const nodeIndex,
                                     std::vector< double > const& nodeAsVector )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnBisectingPlanes::SetNodeFromNodeVector( nodeIndex = "
+    << nodeIndex << ", nodeAsVector = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeAsVector[ fieldIndex ];
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;/**/
+
     pathNodes[ nodeIndex ] = nodeAsVector;
     for( size_t sideIndex( 1 );
          sideIndex < ( pathNodes.size() - 1 );
@@ -133,12 +154,14 @@ namespace VevaciousPlusPlus
          matrixIndex < reflectionMatrices.size();
          ++matrixIndex )
     {
-      if( matrixIndex !=  PathIndexFromAdjustmentIndex( 0 ) )
+      if( matrixIndex != PathIndexFromAdjustmentIndex( 0 ) )
       {
         reflectionMatrices[ matrixIndex ]
-        = reflectionMatrices[  PathIndexFromAdjustmentIndex( 0 ) ];
+        = reflectionMatrices[ PathIndexFromAdjustmentIndex( 0 ) ];
       }
     }
+    PathNodeSet( pathNodes,
+                 zeroFullParameterization );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -157,6 +180,27 @@ namespace VevaciousPlusPlus
       std::cout << reflectionMatrices[ matrixIndex ] << std::endl;
     }
     std::cout << "}" << std::endl;
+    std::cout << "pathNodes = { { ";
+    for( size_t nodeIndex( 0 );
+         nodeIndex < pathNodes.size();
+         ++nodeIndex )
+    {
+      if( nodeIndex > 0 )
+      {
+        std::cout << " }," << std::endl << "{ ";
+      }
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << pathNodes[ nodeIndex ][ fieldIndex ];
+      }
+    }
+    std::cout << " } }" << std::endl;
     std::cout << std::endl;/**/
   }
 

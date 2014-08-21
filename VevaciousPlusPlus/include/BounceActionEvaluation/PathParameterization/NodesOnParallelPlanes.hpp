@@ -32,7 +32,10 @@ namespace VevaciousPlusPlus
     // difference vector between the vacua, and adds that to nodeVector.
     virtual void AddTransformedNode( std::vector< double >& nodeVector,
                                      size_t const nodeIndex,
-                     std::vector< double > const& nodeParameterization ) const;
+                      std::vector< double > const& nodeParameterization ) const
+    { AddTransformOfParameterizedNode( nodeVector,
+                                       reflectionMatrix,
+                                       nodeParameterization ); }
 
     // This returns the false vacuum node as the false-vacuum-side node of the
     // pair of nodes from which the node at nodeIndex should be set.
