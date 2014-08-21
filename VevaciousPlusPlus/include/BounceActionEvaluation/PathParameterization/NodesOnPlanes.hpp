@@ -285,7 +285,7 @@ namespace VevaciousPlusPlus
                       std::vector< double > const& nodeParameterization ) const
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnPlanes::AddTransformOfParameterizedNode( targetVector = { ";
     for( size_t fieldIndex( 0 );
@@ -326,7 +326,7 @@ namespace VevaciousPlusPlus
     std::cout << nodeDifference;
     std::cout << std::endl;
     std::cout << "}";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     Eigen::VectorXd nodeInParameterizationPlane( numberOfFields );
     nodeInParameterizationPlane( 0 ) = 0.0;
@@ -347,7 +347,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "nodeInParameterizationPlane = {" << std::endl;
     std::cout << nodeInParameterizationPlane;
@@ -364,7 +364,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
     std::cout << "}";
     std::cout << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

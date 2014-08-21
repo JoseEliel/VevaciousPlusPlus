@@ -42,7 +42,7 @@ namespace VevaciousPlusPlus
                                     std::vector< double > const& targetVector )
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesFromParameterization::SetAsHouseholderReflectionFromAxisToVector("
     << " reflectionMatrix = {";
@@ -62,7 +62,7 @@ namespace VevaciousPlusPlus
       std::cout << targetVector[ fieldIndex ];
     }
     std::cout << " } ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // First we check that targetVector doesn't already lie on referenceAxis.
     bool alreadyParallel( true );
@@ -137,7 +137,7 @@ namespace VevaciousPlusPlus
                                         * minusInverseOfOneMinusDotProduct ) );
       }
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "reflectionMatrix set to" << std::endl;
       std::cout << reflectionMatrix;
@@ -155,7 +155,7 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;
       std::cout << "reflectionMatrix * targetEigen =" << std::endl;
       std::cout << ( reflectionMatrix * targetEigen );
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
     }
   }
 

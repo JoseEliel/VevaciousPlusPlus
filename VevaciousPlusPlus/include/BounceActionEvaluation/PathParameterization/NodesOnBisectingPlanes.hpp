@@ -100,7 +100,7 @@ namespace VevaciousPlusPlus
                                     std::vector< double > const& nodeAsVector )
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnBisectingPlanes::SetNodeFromNodeVector( nodeIndex = "
     << nodeIndex << ", nodeAsVector = { ";
@@ -115,7 +115,7 @@ namespace VevaciousPlusPlus
       std::cout << nodeAsVector[ fieldIndex ];
     }
     std::cout << " } ) called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     pathNodes[ nodeIndex ] = nodeAsVector;
     for( size_t sideIndex( 1 );
@@ -164,7 +164,7 @@ namespace VevaciousPlusPlus
                  zeroFullParameterization );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnBisectingPlanes::FinishUpdatingForNewVacua() finished."
     << " rotationMatrices = {"
@@ -201,7 +201,7 @@ namespace VevaciousPlusPlus
       }
     }
     std::cout << " } }" << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

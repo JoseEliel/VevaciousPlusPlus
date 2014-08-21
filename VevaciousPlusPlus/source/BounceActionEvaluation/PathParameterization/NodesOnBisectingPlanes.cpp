@@ -31,15 +31,17 @@ namespace VevaciousPlusPlus
     --(this->numberOfIntermediateNodes);
 
     // We ensure that pathNodes and reflectionMatrices have the correct size.
-    pathNodes.resize( this->numberOfIntermediateNodes + 2 );
+    pathNodes.resize( ( this->numberOfIntermediateNodes + 2 ),
+                      std::vector< double >( numberOfFields,
+                                             0.0 ) );
     sideNodeIndices.resize( pathNodes.size() );
     reflectionMatrices.resize( pathNodes.size(),
-                             Eigen::MatrixXd( numberOfFields,
-                                              numberOfFields ) );
+                               Eigen::MatrixXd( numberOfFields,
+                                                numberOfFields ) );
     // There are only rotation matrices for the variable nodes.
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnBisectingPlanes::NodesOnBisectingPlanes( numberOfFields = "
     << numberOfFields << ", numberOfIntermediateNodes = "
@@ -56,7 +58,7 @@ namespace VevaciousPlusPlus
       std::cout << reflectionMatrices[ matrixIndex ] << std::endl;
     }
     std::cout << "}" << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // We need to set up the order in which the nodes will be set. The middle
     // node is set first, based on the vacua at the ends of pathNodes, then
@@ -97,7 +99,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "NodesOnBisectingPlanes::NodesOnBisectingPlanes( numberOfFields = "
     << numberOfFields << ", numberOfIntermediateNodes = "
@@ -149,7 +151,7 @@ namespace VevaciousPlusPlus
       }
     }
     std::cout << " } }" << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   NodesOnBisectingPlanes::~NodesOnBisectingPlanes()
@@ -164,13 +166,6 @@ namespace VevaciousPlusPlus
   // referenceField.
   void NodesOnBisectingPlanes::UpdateRotationMatrix( size_t const nodeIndex )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "NodesOnBisectingPlanes::UpdateRotationMatrix( nodeIndex = "
-    << nodeIndex << " ) called.";
-    std::cout << std::endl;/**/
-
     std::vector< double > vacuumDifference;
     SetAsVectorDifference( vacuumDifference,
                            FalseSideNode( nodeIndex,
@@ -185,9 +180,8 @@ namespace VevaciousPlusPlus
     // parameterization. Taking anything else would complicate the rest of the
     // functions.
 
-
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl;
     std::vector< double > const& startNode( FalseSideNode( nodeIndex,
                                                            pathNodes ) );
@@ -242,7 +236,7 @@ namespace VevaciousPlusPlus
       std::cout << ( endNode[ fieldIndex ] - startNode[ fieldIndex ] );
     }
     std::cout << " }";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

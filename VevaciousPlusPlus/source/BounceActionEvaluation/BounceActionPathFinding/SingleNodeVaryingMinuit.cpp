@@ -100,6 +100,14 @@ namespace VevaciousPlusPlus
   // path, and then sets the path from the set of nodes.
   void SingleNodeVaryingMinuit::ImprovePath()
   {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "SingleNodeVaryingMinuit::ImprovePath() needs to have a better check on"
+    << " whether the path can be improved or not. Probably some check on"
+    << " whether any of the nodes moved more than a certain tolerance with"
+    << " this pass.";
+    std::cout << std::endl;/**/
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl

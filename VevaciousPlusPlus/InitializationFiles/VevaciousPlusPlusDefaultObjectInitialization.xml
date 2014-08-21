@@ -168,7 +168,7 @@
             1
           </MinuitStrategy>
           <MinuitTolerance>
-            0.1
+            0.05
           </MinuitTolerance>
           <PathParameterization>
             <ClassType>
@@ -181,11 +181,14 @@
                 3
               </NumberOfCoefficientsPerVaryingField>
               <NumberOfVaryingNodes>
-                15
+              <!-- CAUTION! Minuit2 seems to try a point with a NAN co-ordinate
+                   if this is set higher than about 40. Sorry, but there's not
+                   really anything that we can do about that... -->
+                40
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
-                NodesOnBisectingPlanes
+                NodesOnParallelPlanes
               </NodeParameterizationStyle>
               <InterpolationStyle>
                 <!-- "PolynomialPath", "LinearSplinePath", or
