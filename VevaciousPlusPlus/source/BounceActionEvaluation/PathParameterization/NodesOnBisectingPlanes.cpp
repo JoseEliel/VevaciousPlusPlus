@@ -173,8 +173,7 @@ namespace VevaciousPlusPlus
                                                         pathNodes ) );
     Eigen::MatrixXd& reflectionMatrix( reflectionMatrices[ nodeIndex ] );
     std::cout << "reflectionMatrix =" << std::endl << reflectionMatrix;
-    Eigen::VectorXd referenceVector( numberOfFields,
-                                     0.0 );
+    Eigen::VectorXd referenceVector( Eigen::VectorXd::Zero( numberOfFields ) );
     referenceVector( 0 ) = 1.0;
     std::cout << std::endl
     << "referenceVector ="

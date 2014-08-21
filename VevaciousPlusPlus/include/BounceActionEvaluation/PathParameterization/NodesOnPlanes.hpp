@@ -284,6 +284,50 @@ namespace VevaciousPlusPlus
                                    Eigen::MatrixXd const& transformationMatrix,
                       std::vector< double > const& nodeParameterization ) const
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "NodesOnPlanes::AddTransformOfParameterizedNode( targetVector = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << targetVector[ fieldIndex ];
+    }
+    std::cout << " }, transformationMatrix = {" << std::endl;
+    std::cout << transformationMatrix;
+    std::cout << std::endl;
+    std::cout << "}, nodeParameterization = { ";
+    for( size_t parameterIndex( 0 );
+         parameterIndex < nodeParameterization.size();
+         ++parameterIndex )
+    {
+      if( parameterIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeParameterization[ parameterIndex ];
+    }
+    std::cout << " } ) called.";
+    std::cout << std::endl;
+    Eigen::VectorXd nodeDifference( numberOfFields );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      nodeDifference( fieldIndex ) = ( pathNodes.back()[ fieldIndex ]
+                                       - pathNodes.front()[ fieldIndex ] );
+    }
+    std::cout << "nodeDifference = {" << std::endl;
+    std::cout << nodeDifference;
+    std::cout << std::endl;
+    std::cout << "}";
+    std::cout << std::endl;/**/
+
     Eigen::VectorXd nodeInParameterizationPlane( numberOfFields );
     nodeInParameterizationPlane( 0 ) = 0.0;
     for( size_t fieldIndex( 1 );
@@ -301,6 +345,26 @@ namespace VevaciousPlusPlus
     {
       targetVector[ fieldIndex ] += transformedNode( fieldIndex );
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "nodeInParameterizationPlane = {" << std::endl;
+    std::cout << nodeInParameterizationPlane;
+    std::cout << std::endl;
+    std::cout << "}, transformedNode = {" << std::endl;
+    std::cout << transformedNode;
+    std::cout << std::endl;
+    std::cout << "}, nodeDifference.dot( transformedNode ) = "
+    << nodeDifference.dot( transformedNode ) << std::endl;
+    Eigen::VectorXd const
+    transformedNodeDifference( transformationMatrix * nodeDifference );
+    std::cout << "transformedNodeDifference = {" << std::endl;
+    std::cout << transformedNodeDifference;
+    std::cout << std::endl;
+    std::cout << "}";
+    std::cout << std::endl;
+    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */
