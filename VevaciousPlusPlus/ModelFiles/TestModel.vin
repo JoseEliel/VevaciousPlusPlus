@@ -299,13 +299,32 @@
     0.0
   </WeylFermionMassMatrix>
 
-  <ComplexWeylFermionMassSquaredMatrix
-   SpinType="WeylFermion" MultiplicityFactor="3" >
+  <!-- This is the same mass matrix, written as it would be for Dirac fermions,
+       which has exactly the same eigenvalues, just only 1 of each pair, so
+       MultiplicityFactor is doubled to account for this. However, the whole
+       things is commented out as we don't want to put in both the Weyl version
+       and the "Dirac" version of the same matrix.
+  <WeylFermionMassMatrix
+   SpinType="WeylFermion" MultiplicityFactor="6" >
     y[ 2, 2 ] * phi + i * IMYU[ 2, 2 ] * phi
     y[ 2, 3 ] * phi + I * IMYU[ 2, 3 ] * phi
     y[ 3, 2 ] * phi + j * IMYU[ 3, 2 ] * phi
     y[ 3, 3 ] * phi + J * IMYU[ 3, 3 ] * phi
+  </WeylFermionMassMatrix>
+  
+      Equally, we could put in the mass-squared matrix instead, again the Dirac
+      version having a factor 2 compared to the Weyl version, but without the
+      huge amount of zero entries. It might be more convenient one way or the
+      other (to provide M or M^2), but should give the same result and be about
+      as computationally intense either way.
+  <ComplexWeylFermionMassSquaredMatrix
+   SpinType="WeylFermion" MultiplicityFactor="6" >
+    y[ 2, 2 ]^2 * phi^2 + IMYU[ 2, 2 ]^2 * phi^2 + y[ 2, 3 ]^2 * phi^2 + IMYU[ 2, 3 ]^2 * phi^2
+    y[ 2, 2 ] * y[ 3, 2 ] * phi^2 + y[ 2, 2 ] * I * IMYU[ 3, 2 ] * phi^2 - i * IMYU[ 2, 2 ] * y[ 3, 2 ] * phi^2 + IMYU[ 2, 2 ] * IMYU[ 3, 2 ] * phi^2 + y[ 3, 3 ] * y[ 2, 3 ] * phi^2 - y[ 3, 3 ] * I * IMYU[ 2, 3 ] * phi^2 + i * IMYU[ 3, 3 ] * y[ 2, 3 ] * phi^2 + IMYU[ 3, 3 ] * IMYU[ 2, 3 ] * phi^2
+    y[ 2, 2 ] * y[ 3, 2 ] * phi^2 - y[ 2, 2 ] * I * IMYU[ 3, 2 ] * phi^2 + i * IMYU[ 2, 2 ] * y[ 3, 2 ] * phi^2 + IMYU[ 2, 2 ] * IMYU[ 3, 2 ] * phi^2 + y[ 3, 3 ] * y[ 2, 3 ] * phi^2 + y[ 3, 3 ] * I * IMYU[ 2, 3 ] * phi^2 - i * IMYU[ 3, 3 ] * y[ 2, 3 ] * phi^2 + IMYU[ 3, 3 ] * IMYU[ 2, 3 ] * phi^2
+    y[ 3, 3 ]^2 * phi^2 + IMYU[ 3, 3 ]^2 * phi^2 + y[ 3, 2 ]^2 * phi^2 + IMYU[ 3, 2 ]^2 * phi^2
   </ComplexWeylFermionMassSquaredMatrix>
+       Only one copy of this mass matrix! -->
   
   <RealBosonMassSquaredMatrix SpinType="GaugeBoson" MultiplicityFactor="1" >
     Sqrt2^2 * 0.25 * g[1]^2 * phi^2
