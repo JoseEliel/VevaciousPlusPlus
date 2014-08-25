@@ -45,28 +45,6 @@ namespace VevaciousPlusPlus
   inline double MinuitNodePotentialMinimizer::operator()(
                       std::vector< double > const& nodeParameterization ) const
   {
-    // debugging:
-    /**/if( currentNodeIndex == pathNodes.AdjustmentOrderEndIndex() )
-    {
-      std::cout << std::endl << "debugging:"
-      << std::endl
-      << "currentNodeIndex = " << currentNodeIndex
-      << ", nodeParameterization = { ";
-      for( std::vector< double >::const_iterator
-           minuitParameter( nodeParameterization.begin() );
-           minuitParameter < nodeParameterization.end();
-           ++minuitParameter )
-      {
-        if( minuitParameter > nodeParameterization.begin() )
-        {
-          std::cout << ", ";
-        }
-        std::cout << *minuitParameter;
-      }
-      std::cout << " }, NanParameterFromMinuit( nodeParameterization ) = "
-      << NanParameterFromMinuit( nodeParameterization );
-      std::cout << std::endl;
-    }/**/
     if( NanParameterFromMinuit( nodeParameterization ) )
     {
       return functionValueForNanInput;

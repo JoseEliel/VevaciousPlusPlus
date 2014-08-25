@@ -95,7 +95,64 @@ namespace VevaciousPlusPlus
     {
       thresholdSquared = ( nodeMoveThresholdSquared * trueSideSquared );
     }
-    return ( nodeMoveSquared < thresholdSquared );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "SingleNodeVaryingMinuit::NodeMovedMoreThanThreshold( minuitNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < minuitNode.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << minuitNode[ fieldIndex ];
+    }
+    std::cout << " } ) called. currentNodeIndex = " << currentNodeIndex
+    << ", currentNode = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < currentNode.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << currentNode[ fieldIndex ];
+    }
+    std::cout << " }, nodeVectors[ currentNodeIndex - 1 ] = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < nodeVectors[ currentNodeIndex - 1 ].size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeVectors[ currentNodeIndex - 1 ][ fieldIndex ];
+    }
+    std::cout << " }, nodeVectors[ currentNodeIndex + 1 ] = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < nodeVectors[ currentNodeIndex + 1 ].size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeVectors[ currentNodeIndex + 1 ][ fieldIndex ];
+    }
+    std::cout << " }, nodeMoveThresholdSquared = " << nodeMoveThresholdSquared
+    << ", nodeMoveSquared = " << nodeMoveSquared << ", falseSideSquared = "
+    << falseSideSquared << ", trueSideSquared = " << trueSideSquared
+    << ", thresholdSquared = " << thresholdSquared
+    << ", ( nodeMoveSquared > thresholdSquared ) = "
+    << ( nodeMoveSquared > thresholdSquared );
+    std::cout << std::endl;/**/
+
+    return ( nodeMoveSquared > thresholdSquared );
   }
 
   // This returns the sum of the squares of the differences of the elements

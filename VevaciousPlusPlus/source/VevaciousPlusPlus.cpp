@@ -706,7 +706,7 @@ namespace VevaciousPlusPlus
             else if( elementParser.currentElementNameMatches(
                                                     "NodeMovementThreshold" ) )
             {
-              nodeMovementThreshold = BOL::StringParser::stringToInt(
+              nodeMovementThreshold = BOL::StringParser::stringToDouble(
                              elementParser.getTrimmedCurrentElementContent() );
             }
           }
