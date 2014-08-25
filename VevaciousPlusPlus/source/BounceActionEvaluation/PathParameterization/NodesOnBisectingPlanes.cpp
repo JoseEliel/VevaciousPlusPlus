@@ -16,7 +16,8 @@ namespace VevaciousPlusPlus
                    numberOfIntermediateNodes ),
     adjustmentOrder(),
     sideNodeIndices(),
-    reflectionMatrices()
+    reflectionMatrices(),
+    inInitialSetupMode( true )
   {
     // We ensure that the number of intermediate nodes is one less than an
     // integer power of two, using the argument numberOfIntermediateNodes as a

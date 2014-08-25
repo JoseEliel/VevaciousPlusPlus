@@ -10,6 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
+  double const MinuitPathFinder::functionValueForNanInput(
+                                        std::numeric_limits< double >::max() );
+
   MinuitPathFinder::MinuitPathFinder( size_t const movesPerImprovement,
                                       unsigned int const minuitStrategy,
                                       double const minuitToleranceFraction ) :

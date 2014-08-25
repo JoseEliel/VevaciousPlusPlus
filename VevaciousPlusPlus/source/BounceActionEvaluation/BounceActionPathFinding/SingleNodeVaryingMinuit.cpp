@@ -15,7 +15,8 @@ namespace VevaciousPlusPlus
                                              PathFromNodesFactory* pathFactory,
                                               size_t const movesPerImprovement,
                                              unsigned int const minuitStrategy,
-                                       double const minuitToleranceFraction ) :
+                                          double const minuitToleranceFraction,
+                                             double const nodeMoveThreshold ) :
     MinuitPathFinder( movesPerImprovement,
                       minuitStrategy,
                       minuitToleranceFraction ),
@@ -24,7 +25,7 @@ namespace VevaciousPlusPlus
     pathNodes( pathFactory->GetNodesFromParameterization() ),
     currentMinuitResults(),
     currentNodeIndex( 0 ),
-    currentlyTuning( false )
+    nodeMoveThresholdSquared( nodeMoveThreshold * nodeMoveThreshold )
   {
     // This constructor is just an initialization list.
   }
@@ -114,7 +115,8 @@ namespace VevaciousPlusPlus
     << "SingleNodeVaryingMinuit::ImprovePath() called.";
     std::cout << std::endl;*/
 
-    bool minuitConverged( true );
+    bool pathConverged( true );
+    std::vector< double > minuitNode( pathNodes.NumberOfFields() );
 
     for( size_t adjustmentIndex( pathNodes.AdjustmentOrderStartIndex() );
          adjustmentIndex <= pathNodes.AdjustmentOrderEndIndex();
@@ -153,19 +155,42 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;*/
 
       currentMinuitResults[ currentNodeIndex ] = minuitMinimum;
-      pathNodes.SetNodeFromParameterization( currentNodeIndex,
-                                             minuitMinimum.VariableValues() );
-      if( !(minuitMinimum.IsValidMinimum()) )
+      pathNodes.NodeProposal( minuitNode,
+                              currentNodeIndex,
+                              minuitMinimum.VariableValues() );
+      // Now we check to see if the node from Minuit2 is inconsistent with the
+      // hope that this call of ImprovePath():
+      if( pathConverged )
       {
-        minuitConverged = false;
+        if( pathNodes.PreviousNodesDependOnSubsequentNodesInAdjustmentOrder() )
+        {
+          if( NodeMovedMoreThanThreshold( minuitNode ) )
+          {
+            pathConverged = false;
+          }
+        }
+        else
+        {
+          if( !(minuitMinimum.IsValidMinimum()) )
+          {
+            pathConverged = false;
+          }
+        }
+      }
+      // After possibly comparing the node from Minuit2 to the last values it
+      // had, it can be updated (as long as Minuit2 didn't go crazy and just
+      // try only NAN parameterizations):
+      if( !(NanParameterFromMinuit( minuitMinimum.VariableValues()) ) )
+      {
+        pathNodes.SetNodeFromNodeVector( currentNodeIndex,
+                                         minuitNode );
       }
     }
-    if( minuitConverged )
+    if( pathConverged )
     {
-      if( !currentlyTuning )
+      if( pathNodes.HasFurtherRefinementMode() )
       {
-        pathNodes.ConvertToTuningOrder();
-        currentlyTuning = true;
+        pathNodes.ConvertToRefinementOrder();
         pathCanBeImproved = true;
       }
       else

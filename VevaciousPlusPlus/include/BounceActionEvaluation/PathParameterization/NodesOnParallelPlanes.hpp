@@ -23,6 +23,11 @@ namespace VevaciousPlusPlus
     virtual ~NodesOnParallelPlanes();
 
 
+    // Each node is set completely independently of where the other nodes are.
+    virtual bool PreviousNodesDependOnSubsequentNodesInAdjustmentOrder() const
+    { return false; }
+
+
   protected:
     Eigen::MatrixXd reflectionMatrix;
 

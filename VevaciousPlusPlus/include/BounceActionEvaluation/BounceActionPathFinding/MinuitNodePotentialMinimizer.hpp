@@ -22,7 +22,8 @@ namespace VevaciousPlusPlus
                                   PotentialFunction const& potentialFunction,
                                   size_t const movesPerImprovement = 100,
                                   unsigned int const minuitStrategy = 1,
-                                  double const minuitToleranceFraction = 0.5 );
+                                  double const minuitToleranceFraction = 0.5,
+                                  double const nodeMoveThreshold = 0.01 );
     virtual ~MinuitNodePotentialMinimizer();
 
     // It may seem unwise to have this object call Minuit on itself, but really
@@ -44,6 +45,32 @@ namespace VevaciousPlusPlus
   inline double MinuitNodePotentialMinimizer::operator()(
                       std::vector< double > const& nodeParameterization ) const
   {
+    // debugging:
+    /**/if( currentNodeIndex == pathNodes.AdjustmentOrderEndIndex() )
+    {
+      std::cout << std::endl << "debugging:"
+      << std::endl
+      << "currentNodeIndex = " << currentNodeIndex
+      << ", nodeParameterization = { ";
+      for( std::vector< double >::iterator
+           minuitParameter( nodeParameterization.begin() );
+           minuitParameter < nodeParameterization.end();
+           ++minuitParameter )
+      {
+        if( minuitParameter > nodeParameterization.begin() )
+        {
+          std::cout << ", ";
+        }
+        std::cout << *minuitParameter;
+      }
+      std::cout << " }, NanParameterFromMinuit( nodeParameterization ) = "
+      << NanParameterFromMinuit( nodeParameterization );
+      std::cout << std::endl;
+    }/**/
+    if( NanParameterFromMinuit( nodeParameterization ) )
+    {
+      return functionValueForNanInput;
+    }
     std::vector< double > nodeVector( pathNodes.NumberOfFields() );
     pathNodes.NodeProposal( nodeVector,
                             currentNodeIndex,

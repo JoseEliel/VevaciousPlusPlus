@@ -36,11 +36,43 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    static double const functionValueForNanInput;
+
+
     size_t movesPerImprovement;
     unsigned int minuitStrategy;
     double minuitToleranceFraction;
     double currentMinuitTolerance;
+
+
+    // This returns true if any element of minuitParameterization appears to be
+    // a NAN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
+    bool NanParameterFromMinuit(
+                   std::vector< double > const& minuitParameterization ) const;
   };
+
+
+
+
+  // This returns true if any element of minuitParameterization appears to be
+  // a NAN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
+  inline bool MinuitPathFinder::NanParameterFromMinuit(
+                    std::vector< double > const& minuitParameterization ) const
+  {
+    for( std::vector< double >::iterator
+         minuitParameter( minuitParameterization.begin() );
+         minuitParameter < minuitParameterization.end();
+         ++minuitParameter )
+    {
+      if( !( *minuitParameter >= 0.0 )
+          &&
+          !( *minuitParameter < 0.0 ) )
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* MINUITPATHFINDER_HPP_ */

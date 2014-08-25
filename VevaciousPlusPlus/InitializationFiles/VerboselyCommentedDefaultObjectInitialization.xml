@@ -512,6 +512,9 @@
               </InterpolationStyle>
             </ConstructorArguments>
           </PathParameterization>
+          <NodeMovementThreshold>
+            0.01
+          </NodeMovementThreshold>
         </ConstructorArguments>
       </TunnelPathFinder>
       <!-- End of set of elements only read if <ClassType> is

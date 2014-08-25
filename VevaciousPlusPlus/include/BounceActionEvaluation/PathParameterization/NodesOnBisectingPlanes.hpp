@@ -37,10 +37,15 @@ namespace VevaciousPlusPlus
     PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const
     { return adjustmentOrder[ adjustmentOrderIndex ]; }
 
+    // This returns true if this NodesOnBisectingPlanes has not converted to
+    // its only refinement mode through ConvertToRefinementOrder(), false if
+    // it already has converted.
+    virtual bool HasFurtherRefinementMode() const{ return inInitialSetupMode; }
+
     // This converts sideNodeIndices so that each node depends on its nearest
     // neighbors for its bisection, rather than the initial set-up. It also
     // updates reflectionMatrices appropriately.
-    virtual void ConvertToTuningOrder();
+    virtual void ConvertToRefinementOrder();
 
 
   protected:
@@ -51,6 +56,7 @@ namespace VevaciousPlusPlus
     // 0th field, which are then transformed by the Householder reflection that
     // reflects the axis of the 0th field onto the vector of the difference
     // between the nodes
+    bool inInitialSetupMode;
 
 
     // This adds the perpendicular component from the parameterization given by
@@ -134,7 +140,7 @@ namespace VevaciousPlusPlus
   // This converts sideNodeIndices so that each node depends on its nearest
   // neighbors for its bisection, rather than the initial set-up. It also
   // updates reflectionMatrices appropriately.
-  inline void NodesOnBisectingPlanes::ConvertToTuningOrder()
+  inline void NodesOnBisectingPlanes::ConvertToRefinementOrder()
   {
     for( size_t sideIndex( 1 );
          sideIndex < ( pathNodes.size() - 1 );
@@ -144,6 +150,7 @@ namespace VevaciousPlusPlus
       sideNodeIndices[ sideIndex ].second = ( sideIndex + 1 );
       UpdateRotationMatrix( sideIndex );
     }
+    inInitialSetupMode = false;
   }
 
   // This ensures that the rotation matrices are set up.

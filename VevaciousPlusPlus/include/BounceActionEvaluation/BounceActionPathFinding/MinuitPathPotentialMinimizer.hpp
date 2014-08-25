@@ -53,6 +53,10 @@ namespace VevaciousPlusPlus
   inline double MinuitPathPotentialMinimizer::operator()(
                       std::vector< double > const& pathParameterization ) const
   {
+    if( NanParameterFromMinuit( pathParameterization ) )
+    {
+      return functionValueForNanInput;
+    }
     double potentialSum( 0.0 );
     TunnelPath* tunnelPath( (*pathFactory)( pathParameterization,
                                             pathTemperature ) );

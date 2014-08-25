@@ -15,12 +15,14 @@ namespace VevaciousPlusPlus
                                     PotentialFunction const& potentialFunction,
                                               size_t const movesPerImprovement,
                                              unsigned int const minuitStrategy,
-                                       double const minuitToleranceFraction ) :
+                                          double const minuitToleranceFraction,
+                                             double const nodeMoveThreshold ) :
     SingleNodeVaryingMinuit( potentialFunction,
                              pathFactory,
                              movesPerImprovement,
                              minuitStrategy,
-                             minuitToleranceFraction )
+                             minuitToleranceFraction,
+                             nodeMoveThreshold )
   {
     // This constructor is just an initialization list.
   }

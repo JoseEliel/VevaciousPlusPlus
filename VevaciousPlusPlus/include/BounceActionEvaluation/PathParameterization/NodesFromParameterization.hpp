@@ -91,9 +91,15 @@ namespace VevaciousPlusPlus
     virtual size_t AdjustmentOrderEndIndex() const
     { return ( numberOfIntermediateNodes - 1 ); }
 
+    // This returns false by default, but if a derived class has the
+    // possibility of converting itself to a mode where the path can be further
+    // refined, after say a coarse initial setup phase, then this should return
+    // true.
+    virtual bool HasFurtherRefinementMode() const{ return false; }
+
     // This does nothing by default, but is used by NodesOnBisectingPlanes to
     // change around the node dependences.
-    virtual void ConvertToTuningOrder(){}
+    virtual void ConvertToRefinementOrder(){}
 
     // This sets pathNodes[ nodeIndex ] to be nodeAsVector. (If the adjustment
     // order is different from the order the path visits the nodes in, the
@@ -134,7 +140,6 @@ namespace VevaciousPlusPlus
     std::vector< double > const& InitialStepSizes() const
     { return initialStepSizes; }
 
-
     // This just assumes that the nodes can be adjusted in the order which they
     // are visited in along the path (skipping the false vacuum at the front of
     // pathNodes), but can be over-ridden in derived classes.
@@ -146,6 +151,14 @@ namespace VevaciousPlusPlus
     // pathNodes, or if it would be for the front or back of pathNodes as then
     // the vacua would be moved and that is not a good idea.
     void ValidPathIndex( size_t const pathOrderIndex ) const;
+
+    // This returns true by default, but if a derived class is such that once a
+    // node is set in adjustment order, it doesn't matter what nodes are set
+    // afterwards, that set node won't need to be moved again based on where
+    // the subsequent nodes ended up, then the derived class should over-ride
+    // this to return false.
+    virtual bool PreviousNodesDependOnSubsequentNodesInAdjustmentOrder() const
+    { return true; }
 
 
   protected:

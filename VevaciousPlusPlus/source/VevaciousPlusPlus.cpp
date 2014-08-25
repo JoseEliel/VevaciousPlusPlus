@@ -632,6 +632,7 @@ namespace VevaciousPlusPlus
           std::string pathParameterizationArguments( "" );
           std::string pathBouncePotentialFitClass( "BubbleShootingOnSpline" );
           std::string pathBouncePotentialFitArguments( "" );
+          double nodeMovementThreshold( 0.01 );
 
           elementParser.loadString( tunnelPathFinderArguments );
           while( elementParser.readNextElement() )
@@ -701,6 +702,12 @@ namespace VevaciousPlusPlus
                               nestedParser.getTrimmedCurrentElementContent() );
                 }
               }
+            }
+            else if( elementParser.currentElementNameMatches(
+                                                    "NodeMovementThreshold" ) )
+            {
+              nodeMovementThreshold = BOL::StringParser::stringToInt(
+                             elementParser.getTrimmedCurrentElementContent() );
             }
           }
 
@@ -808,7 +815,8 @@ namespace VevaciousPlusPlus
                                                   *potentialFunction,
                                                   movesPerImprovement,
                                                   minuitStrategy,
-                                                  minuitToleranceFraction );
+                                                  minuitToleranceFraction,
+                                                  nodeMovementThreshold );
             }
             else if( tunnelPathFinderClass.compare(
                                         "MinuitPathPotentialMinimizer" ) == 0 )

@@ -26,7 +26,8 @@ namespace VevaciousPlusPlus
                              PathFromNodesFactory* const pathFactory,
                              size_t const movesPerImprovement = 100,
                              unsigned int const minuitStrategy = 1,
-                             double const minuitToleranceFraction = 0.5 );
+                             double const minuitToleranceFraction = 0.5,
+                             double const nodeMoveThreshold = 0.01 );
     virtual ~SingleNodeVaryingMinuit();
 
 
@@ -50,8 +51,70 @@ namespace VevaciousPlusPlus
     NodesFromParameterization& pathNodes;
     std::vector< MinuitMinimum > currentMinuitResults;
     size_t currentNodeIndex;
-    bool currentlyTuning;
+    double const nodeMoveThresholdSquared;
+
+
+    // This returns true if the distance between minuitNode and the node at
+    // currentNodeIndex (before updating the node) is greater than a threshold
+    // fraction times the smaller of the Euclidean lengths between the node at
+    // currentNodeIndex and its 2 nearest neighbors.
+    bool NodeMovedMoreThanThreshold(
+                               std::vector< double > const& minuitNode ) const;
+
+    // This returns the sum of the squares of the differences of the elements
+    // of firstVector and secondVector.
+    double
+    DifferenceEuclideanLengthSquared( std::vector< double > const& firstVector,
+                             std::vector< double > const& secondVector ) const;
   };
+
+
+
+
+  // This returns true if the distance between minuitNode and the node at
+  // currentNodeIndex (before updating the node) is greater than a threshold
+  // fraction times the smaller of the Euclidean lengths between the node at
+  // currentNodeIndex and its 2 nearest neighbors.
+  inline bool SingleNodeVaryingMinuit::NodeMovedMoreThanThreshold(
+                                std::vector< double > const& minuitNode ) const
+  {
+    std::vector< std::vector< double > > const&
+    nodeVectors( pathNodes.PathNodes() );
+    std::vector< double > const&
+    currentNode( nodeVectors[ currentNodeIndex ] );
+    double const nodeMoveSquared( DifferenceEuclideanLengthSquared( minuitNode,
+                                                               currentNode ) );
+    double const
+    falseSideSquared( DifferenceEuclideanLengthSquared( currentNode,
+                                       nodeVectors[ currentNodeIndex - 1 ] ) );
+    double const
+    trueSideSquared( DifferenceEuclideanLengthSquared( currentNode,
+                                       nodeVectors[ currentNodeIndex + 1 ] ) );
+    double thresholdSquared( nodeMoveThresholdSquared * falseSideSquared );
+    if( trueSideSquared < falseSideSquared )
+    {
+      thresholdSquared = ( nodeMoveThresholdSquared * trueSideSquared );
+    }
+    return ( nodeMoveSquared < thresholdSquared );
+  }
+
+  // This returns the sum of the squares of the differences of the elements
+  // of firstVector and secondVector.
+  inline double SingleNodeVaryingMinuit::DifferenceEuclideanLengthSquared(
+                                      std::vector< double > const& firstVector,
+                              std::vector< double > const& secondVector ) const
+  {
+    double lengthSquared( 0.0 );
+    for( size_t whichIndex( 0 );
+         whichIndex < firstVector.size();
+         ++whichIndex )
+    {
+      double const elementDifference( firstVector[ whichIndex ]
+                                      - secondVector[ whichIndex ] );
+      lengthSquared += ( elementDifference * elementDifference );
+    }
+    return lengthSquared;
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* SINGLENODEVARYINGMINUIT_HPP_ */
