@@ -49,6 +49,10 @@ namespace VevaciousPlusPlus
   inline double MinuitPathBounceMinimizer::operator()(
                       std::vector< double > const& pathParameterization ) const
   {
+    if( NanParameterFromMinuit( pathParameterization ) )
+    {
+      return functionValueForNanInput;
+    }
     TunnelPath* tunnelPath( (*pathFactory)( pathParameterization,
                                             pathTemperature ) );
     double const bounceAction( (*bounceActionCalculator)( *tunnelPath ) );

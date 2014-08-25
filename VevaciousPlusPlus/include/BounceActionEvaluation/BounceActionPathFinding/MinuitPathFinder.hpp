@@ -8,6 +8,7 @@
 #ifndef MINUITPATHFINDER_HPP_
 #define MINUITPATHFINDER_HPP_
 
+#include <limits>
 #include "CommonIncludes.hpp"
 #include "../BouncePathFinder.hpp"
 #include "Minuit2/FCNBase.h"
@@ -59,7 +60,7 @@ namespace VevaciousPlusPlus
   inline bool MinuitPathFinder::NanParameterFromMinuit(
                     std::vector< double > const& minuitParameterization ) const
   {
-    for( std::vector< double >::iterator
+    for( std::vector< double >::const_iterator
          minuitParameter( minuitParameterization.begin() );
          minuitParameter < minuitParameterization.end();
          ++minuitParameter )

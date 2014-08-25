@@ -8,6 +8,7 @@
 #ifndef BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 #define BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 
+#include <limits>
 #include "CommonIncludes.hpp"
 #include "TunnelingCalculator.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"

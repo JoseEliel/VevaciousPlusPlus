@@ -52,7 +52,7 @@ namespace VevaciousPlusPlus
       << std::endl
       << "currentNodeIndex = " << currentNodeIndex
       << ", nodeParameterization = { ";
-      for( std::vector< double >::iterator
+      for( std::vector< double >::const_iterator
            minuitParameter( nodeParameterization.begin() );
            minuitParameter < nodeParameterization.end();
            ++minuitParameter )
