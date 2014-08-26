@@ -184,10 +184,7 @@
                 3
               </NumberOfCoefficientsPerVaryingField>
               <NumberOfVaryingNodes>
-              <!-- CAUTION! Minuit2 seems to try a point with a NAN co-ordinate
-                   if this is set higher than about 40. Sorry, but there's not
-                   really anything that we can do about that... -->
-                15
+                31
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
@@ -209,7 +206,7 @@
                  node in question has moved more than this threshold since the
                  last attempt at improving the path, the path is flagged as not
                  yet having converged. -->
-            0.02
+            0.05
           </NodeMovementThreshold>
         </ConstructorArguments>
       </TunnelPathFinder>

@@ -37,15 +37,27 @@ namespace VevaciousPlusPlus
     PathIndexFromAdjustmentIndex( size_t const adjustmentOrderIndex ) const
     { return adjustmentOrder[ adjustmentOrderIndex ]; }
 
+    // This returns the value of the index corresponding to the end of the
+    // range of an index in adjustment order.
+    virtual size_t AdjustmentOrderEndIndex() const
+    { return ( adjustmentOrder.size() - 1 ); }
+
     // This returns true if this NodesOnBisectingPlanes has not converted to
     // its only refinement mode through ConvertToRefinementOrder(), false if
     // it already has converted.
     virtual bool HasFurtherRefinementMode() const{ return inInitialSetupMode; }
 
     // This converts sideNodeIndices so that each node depends on its nearest
-    // neighbors for its bisection, rather than the initial set-up. It also
-    // updates reflectionMatrices appropriately.
+    // neighbors for its bisection, rather than the initial set-up, and
+    // adjustmentOrder so that the nodes are visited from the nearest neighbor
+    // to the false vacuum along to the nearest neighbor of the true vacuum and
+    // then back. It also updates reflectionMatrices appropriately.
     virtual void ConvertToRefinementOrder();
+
+    // This returns false if it is in the initial setup mode, but if it is not,
+    // then previous nodes do depend on subsequent nodes, so it returns true.
+    virtual bool PreviousNodesDependOnSubsequentNodesInAdjustmentOrder() const
+    { return ( !inInitialSetupMode ); }
 
 
   protected:
@@ -138,17 +150,23 @@ namespace VevaciousPlusPlus
   }
 
   // This converts sideNodeIndices so that each node depends on its nearest
-  // neighbors for its bisection, rather than the initial set-up. It also
-  // updates reflectionMatrices appropriately.
+  // neighbors for its bisection, rather than the initial set-up, and
+  // adjustmentOrder so that the nodes are visited from the nearest neighbor
+  // to the false vacuum along to the nearest neighbor of the true vacuum and
+  // then back. It also updates reflectionMatrices appropriately.
   inline void NodesOnBisectingPlanes::ConvertToRefinementOrder()
   {
-    for( size_t sideIndex( 1 );
-         sideIndex < ( pathNodes.size() - 1 );
-         ++sideIndex )
+    adjustmentOrder.resize( ( 2 * numberOfIntermediateNodes ) - 1 );
+    for( size_t nodeIndex( 1 );
+         nodeIndex < ( pathNodes.size() - 1 );
+         ++nodeIndex )
     {
-      sideNodeIndices[ sideIndex ].first = ( sideIndex - 1 );
-      sideNodeIndices[ sideIndex ].second = ( sideIndex + 1 );
-      UpdateRotationMatrix( sideIndex );
+      sideNodeIndices[ nodeIndex ].first = ( nodeIndex - 1 );
+      sideNodeIndices[ nodeIndex ].second = ( nodeIndex + 1 );
+      UpdateRotationMatrix( nodeIndex );
+      adjustmentOrder[ nodeIndex - 1 ] = nodeIndex;
+      adjustmentOrder[ ( 2 * numberOfIntermediateNodes ) - nodeIndex - 1 ]
+      = nodeIndex;
     }
     inInitialSetupMode = false;
   }

@@ -170,6 +170,34 @@ namespace VevaciousPlusPlus
                                       - secondVector[ whichIndex ] );
       lengthSquared += ( elementDifference * elementDifference );
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "SingleNodeVaryingMinuit::DifferenceEuclideanLengthSquared( firstVector"
+    << " = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < firstVector.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << firstVector[ fieldIndex ];
+    }
+    std::cout << " }, secondVector = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < secondVector.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << secondVector[ fieldIndex ];
+    }
+    std::cout << " } ) about to return lengthSquared = " << lengthSquared;
+    std::cout << std::endl;/**/
     return lengthSquared;
   }
 
