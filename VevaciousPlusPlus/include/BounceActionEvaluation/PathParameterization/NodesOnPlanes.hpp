@@ -133,7 +133,7 @@ namespace VevaciousPlusPlus
   // This resets the NodesFromParameterization so that it will produce
   // TunnelPath*s that parameterize the path between the given vacua.
   inline void NodesOnPlanes::SetVacua( PotentialMinimum const& falseVacuum,
-                                PotentialMinimum const& trueVacuum )
+                                       PotentialMinimum const& trueVacuum )
   {
     pathNodes.front() = falseVacuum.FieldConfiguration();
     pathNodes.back() = trueVacuum.FieldConfiguration();

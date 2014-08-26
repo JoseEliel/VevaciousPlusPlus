@@ -28,9 +28,7 @@ namespace VevaciousPlusPlus
     // This resets nodesFromParameterization so that it will produce
     // TunnelPath*s that parameterize the path between the given vacua.
     virtual void SetVacua( PotentialMinimum const& falseVacuum,
-                           PotentialMinimum const& trueVacuum )
-    { nodesFromParameterization->SetVacua( falseVacuum,
-                                           trueVacuum ); }
+                           PotentialMinimum const& trueVacuum );
 
     // This gets the nodes from nodesFromParameterization and then calls
     // operator()( std::vector< std::vector< double > > const& pathNodes ).
@@ -58,6 +56,18 @@ namespace VevaciousPlusPlus
 
 
 
+
+
+  // This resets nodesFromParameterization so that it will produce
+  // TunnelPath*s that parameterize the path between the given vacua.
+  inline void
+  PathFromNodesFactory::SetVacua( PotentialMinimum const& falseVacuum,
+                                  PotentialMinimum const& trueVacuum )
+  {
+    nodesFromParameterization->SetVacua( falseVacuum,
+                                         trueVacuum );
+    initialStepSizes = nodesFromParameterization->InitialStepSizes();
+  }
 
   // This gets the nodes from nodesFromParameterization and then calls
   // operator()( std::vector< std::vector< double > > const& pathNodes ).
