@@ -71,6 +71,7 @@ namespace VevaciousPlusPlus
       << variableIndex << " ] = " << variableErrors[ variableIndex ]
       << std::endl;
     }
+    stringBuilder << "isValidMinimum = " << isValidMinimum << std::endl;
     return stringBuilder.str();
   }
 
