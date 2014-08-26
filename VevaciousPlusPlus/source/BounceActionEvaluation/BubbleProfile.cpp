@@ -376,7 +376,7 @@ namespace VevaciousPlusPlus
     // too long.
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "Final bubble profile:" << std::endl;
     for( std::vector< BubbleRadialValueDescription >::const_iterator
@@ -389,7 +389,7 @@ namespace VevaciousPlusPlus
       << ", " << tunnelPath.FieldsString( bubbleBit->auxiliaryValue )
       << std::endl;
     }
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     return auxiliaryProfile;
   }
