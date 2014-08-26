@@ -33,7 +33,11 @@ namespace VevaciousPlusPlus
     virtual void SetInitialPath( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
                                  TunnelPath const* startingPath = NULL,
-                                 double const pathTemperature = 0.0 );
+                                 double const pathTemperature = 0.0 )
+    { SetUpPathFactoryAndMinuit( falseVacuum,
+                                 trueVacuum,
+                                 startingPath,
+                                 pathTemperature ); }
 
     // This allows Minuit2 to adjust the full path a set number of times to try
     // to minimize the sum of potentials at a set of nodes or bounce action
@@ -44,19 +48,27 @@ namespace VevaciousPlusPlus
   protected:
     TunnelPathFactory* const pathFactory;
     MinuitMinimum currentMinuitResult;
+
+
+    // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
+    // currentMinuitResult to be appropriate for the initial path.
+    void SetUpPathFactoryAndMinuit( PotentialMinimum const& falseVacuum,
+                                    PotentialMinimum const& trueVacuum,
+                                    TunnelPath const* startingPath = NULL,
+                                    double const pathTemperature = 0.0 );
   };
 
 
 
 
-  // This resets the BouncePathFinder so that it sets up currentPath as its
-  // initial path between the given vacua. It also resets pathCanBeImproved
-  // and sets pathTemperature appropriately.
-  inline void
-  FullPathVaryingMinuit::SetInitialPath( PotentialMinimum const& falseVacuum,
-                                         PotentialMinimum const& trueVacuum,
-                                         TunnelPath const* startingPath,
-                                         double const pathTemperature )
+
+  // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
+  // currentMinuitResult to be appropriate for the initial path.
+  inline void FullPathVaryingMinuit::SetUpPathFactoryAndMinuit(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                                TunnelPath const* startingPath,
+                                                 double const pathTemperature )
   {
     pathFactory->SetVacua( falseVacuum,
                            trueVacuum );

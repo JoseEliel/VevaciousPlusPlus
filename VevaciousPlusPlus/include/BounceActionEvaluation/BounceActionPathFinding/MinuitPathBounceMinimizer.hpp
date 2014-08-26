@@ -35,6 +35,15 @@ namespace VevaciousPlusPlus
     operator()( std::vector< double > const& pathParameterization ) const;
 
 
+    // This resets the BouncePathFinder so that it sets up currentPath as its
+    // initial path between the given vacua. It also resets pathCanBeImproved
+    // and sets pathTemperature appropriately.
+    virtual void SetInitialPath( PotentialMinimum const& falseVacuum,
+                                 PotentialMinimum const& trueVacuum,
+                                 TunnelPath const* startingPath = NULL,
+                                 double const pathTemperature = 0.0 );
+
+
   protected:
     BounceActionCalculator* const bounceActionCalculator;
   };
@@ -58,6 +67,23 @@ namespace VevaciousPlusPlus
     double const bounceAction( (*bounceActionCalculator)( *tunnelPath ) );
     delete tunnelPath;
     return bounceAction;
+  }
+
+  // This resets the BouncePathFinder so that it sets up currentPath as its
+  // initial path between the given vacua. It also resets pathCanBeImproved
+  // and sets pathTemperature appropriately.
+  inline void MinuitPathBounceMinimizer::SetInitialPath(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                                TunnelPath const* startingPath,
+                                                 double const pathTemperature )
+  {
+    bounceActionCalculator->ResetVacua( falseVacuum,
+                                        trueVacuum );
+    SetUpPathFactoryAndMinuit( falseVacuum,
+                               trueVacuum,
+                               startingPath,
+                               pathTemperature );
   }
 
 } /* namespace VevaciousPlusPlus */

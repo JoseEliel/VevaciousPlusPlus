@@ -40,6 +40,18 @@ namespace VevaciousPlusPlus
     {
       twoPlusTwiceDampingFactor = 6.0;
     }
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "BubbleProfile::BubbleProfile( pathPotential =" << std::endl;
+    std::cout << pathPotential.AsDebuggingString() << std::endl;
+    std::cout << "tunnelPath =" << std::endl;
+    std::cout << tunnelPath.AsDebuggingString() << std::endl;
+    std::cout << "initialIntegrationStepSize = " << initialIntegrationStepSize
+    << std::endl;
+    std::cout << "initialIntegrationEndRadius = "
+    << initialIntegrationEndRadius << std::endl;
+    std::cout << std::endl;*/
   }
 
   BubbleProfile::~BubbleProfile()
@@ -80,11 +92,12 @@ namespace VevaciousPlusPlus
     // enough that the integration would take too long to find an overshoot or
     // undershoot, or that the shot was dead on.
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "BubbleProfile::operator( " << undershootOvershootAttempts << ", "
-    << shootingThreshold << " ) called:";
-    std::cout << std::endl;/**/
+    << shootingThreshold << " ) called. Initially, undershootAuxiliary = "
+    << undershootAuxiliary << ", overshootAuxiliary = " << overshootAuxiliary;
+    std::cout << std::endl;*/
     while( !currentShotGoodEnough
            &&
            ( shootAttemptsLeft > 0 ) )
@@ -114,6 +127,14 @@ namespace VevaciousPlusPlus
         initialAuxiliary
         = ( 0.5 * ( undershootAuxiliary + overshootAuxiliary ) );
       }
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "undershootAuxiliary = " << undershootAuxiliary
+      << ", overshootAuxiliary = " << overshootAuxiliary
+      << " -> initialAuxiliary = " << initialAuxiliary;
+      std::cout << std::endl;*/
 
       // We cannot start at r = 0, as the damping term is proportional to 1/r,
       // so the initial conditions are set by a Euler step assuming that near
@@ -300,6 +321,14 @@ namespace VevaciousPlusPlus
                                        * integrationStartRadius ) );
         initialConditions[ 1 ] = ( 2.0 * initialQuadraticCoefficient
                                        * integrationStartRadius );
+
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "initialQuadraticCoefficient = " << initialQuadraticCoefficient
+        << ", integrationStepSize = " << integrationStepSize
+        << ", integrationStartRadius = " << integrationStartRadius;
+        std::cout << std::endl;*/
       }
 
 
@@ -436,6 +465,12 @@ namespace VevaciousPlusPlus
     // vacuum.
     if( worthIntegratingFurther )
     {
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "worthIntegratingFurther = " << worthIntegratingFurther
+      << ", auxiliaryProfile.size() = " << auxiliaryProfile.size();
+      std::cout << std::endl;*/
       std::vector< double > falseConfiguration( tunnelPath.NumberOfFields() );
       tunnelPath.PutOnPathAt( falseConfiguration,
                               0.0 );

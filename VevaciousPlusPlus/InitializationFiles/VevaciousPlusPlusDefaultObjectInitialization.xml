@@ -158,7 +158,7 @@
         <ClassType>
         <!-- "MinuitPathBounceMinimizer", "MinuitPathPotentialMinimizer", or
              "MinuitNodePotentialMinimizer" -->
-          MinuitNodePotentialMinimizer
+          MinuitPathBounceMinimizer
         </ClassType>
         <ConstructorArguments>
           <MovesPerImprovement>
@@ -168,7 +168,7 @@
             1
           </MinuitStrategy>
           <MinuitTolerance>
-            0.001
+            0.1
           </MinuitTolerance>
           <NumberOfPotentialSamplePoints>
             100
@@ -184,7 +184,7 @@
                 3
               </NumberOfCoefficientsPerVaryingField>
               <NumberOfVaryingNodes>
-                31
+                15
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
