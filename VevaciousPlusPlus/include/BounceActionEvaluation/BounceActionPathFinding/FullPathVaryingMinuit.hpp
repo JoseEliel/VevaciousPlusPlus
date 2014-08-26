@@ -106,7 +106,7 @@ namespace VevaciousPlusPlus
     currentMinuitResult = minuitMinimum;
     SetCurrentPathPointer( (*pathFactory)( minuitMinimum.VariableValues(),
                                            pathTemperature ) );
-    pathCanBeImproved = minuitMinimum.IsValidMinimum();
+    pathCanBeImproved = !(minuitMinimum.IsValidMinimum());
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
