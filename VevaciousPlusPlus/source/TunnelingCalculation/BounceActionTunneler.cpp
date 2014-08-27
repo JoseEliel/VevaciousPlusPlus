@@ -175,27 +175,29 @@ namespace VevaciousPlusPlus
              / fourthRootOfSolitonicFactor ) - ( 0.25 * quantumAction ) );
     if( quantumAction >= maximumPowerOfNaturalExponent )
     {
-      quantumLifetimeInSeconds = 1.0;
-      quantumSurvivalProbability = 0.0;
+      quantumLifetimeInSeconds = 1.0E+100;
+      quantumSurvivalProbability = 1.0;
       std::cout
       << std::endl
       << "Warning! The calculated bounce action was so large and positive that"
       << " exponentiating it would result in an overflow error, so capping the"
       << " lifetime at " << quantumLifetimeInSeconds
-      << " and the survival probability at " << quantumSurvivalProbability;
+      << " seconds and the survival probability at "
+      << quantumSurvivalProbability;
       std::cout << std::endl;
       return;
     }
     else if( quantumAction <= -maximumPowerOfNaturalExponent )
     {
-      quantumLifetimeInSeconds = 1.0E+100;
-      quantumSurvivalProbability = 1.0;
+      quantumLifetimeInSeconds = 0.1;
+      quantumSurvivalProbability = 0.0;
       std::cout
       << std::endl
       << "Warning! The calculated bounce action was so large and negative that"
       << " exponentiating it would result in an overflow error, so capping the"
       << " lifetime at " << quantumLifetimeInSeconds
-      << " and the survival probability at " << quantumSurvivalProbability;
+      << " seconds and the survival probability at "
+      << quantumSurvivalProbability;
       std::cout << std::endl;
       return;
     }
