@@ -101,14 +101,6 @@ namespace VevaciousPlusPlus
   // path, and then sets the path from the set of nodes.
   void SingleNodeVaryingMinuit::ImprovePath()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "SingleNodeVaryingMinuit::ImprovePath() needs to have a better check on"
-    << " whether the path can be improved or not. Probably some check on"
-    << " whether any of the nodes moved more than a certain tolerance with"
-    << " this pass.";
-    std::cout << std::endl;/**/
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
@@ -179,11 +171,11 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "Before setting node [ " << currentNodeIndex << " ], pathConverged = "
       << pathConverged;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       // After possibly comparing the node from Minuit2 to the last values it
       // had, it can be updated (as long as Minuit2 didn't go crazy and just
@@ -196,19 +188,19 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "After checking every node, pathConverged = " << pathConverged;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     if( pathConverged )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "pathNodes.HasFurtherRefinementMode() = "
       << pathNodes.HasFurtherRefinementMode();
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       if( pathNodes.HasFurtherRefinementMode() )
       {
@@ -222,11 +214,11 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "After checking for further refinement mode, pathCanBeImproved = "
     << pathCanBeImproved;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),
                    pathNodes.ParameterizationForNodes( pathNodes.PathNodes() ),

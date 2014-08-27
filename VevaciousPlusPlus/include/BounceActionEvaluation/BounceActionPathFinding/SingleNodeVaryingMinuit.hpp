@@ -97,7 +97,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "SingleNodeVaryingMinuit::NodeMovedMoreThanThreshold( minuitNode = { ";
     for( size_t fieldIndex( 0 );
@@ -150,7 +150,7 @@ namespace VevaciousPlusPlus
     << ", thresholdSquared = " << thresholdSquared
     << ", ( nodeMoveSquared > thresholdSquared ) = "
     << ( nodeMoveSquared > thresholdSquared );
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     return ( nodeMoveSquared > thresholdSquared );
   }
@@ -171,7 +171,7 @@ namespace VevaciousPlusPlus
       lengthSquared += ( elementDifference * elementDifference );
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "SingleNodeVaryingMinuit::DifferenceEuclideanLengthSquared( firstVector"
     << " = { ";
@@ -197,7 +197,7 @@ namespace VevaciousPlusPlus
       std::cout << secondVector[ fieldIndex ];
     }
     std::cout << " } ) about to return lengthSquared = " << lengthSquared;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     return lengthSquared;
   }
 

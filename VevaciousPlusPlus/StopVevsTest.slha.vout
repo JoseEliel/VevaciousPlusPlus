@@ -7,7 +7,7 @@
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-       Tue Aug 26 17:35:17 2014
+       Wed Aug 27 16:33:40 2014
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
@@ -40,7 +40,7 @@
       0
     </DsbSurvivalProbability>
     <LogOfMinusLogOfDsbSurvival>
-      -507.353 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
+      -214.269 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
     </LogOfMinusLogOfDsbSurvival>
     <DsbLifetime>
       1 <!-- in seconds; age of observed Universe is 4.3E+17s -->
