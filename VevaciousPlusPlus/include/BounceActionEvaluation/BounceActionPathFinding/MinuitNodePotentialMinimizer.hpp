@@ -25,6 +25,7 @@ namespace VevaciousPlusPlus
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitNodePotentialMinimizer();
 
+
     // It may seem unwise to have this object call Minuit on itself, but really
     // it's just a handy way of keeping the minimization function within the
     // class that ends up finding its minimum. In this case,

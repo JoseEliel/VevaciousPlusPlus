@@ -30,18 +30,22 @@ namespace VevaciousPlusPlus
     virtual ~SingleNodeVaryingMinuit();
 
 
-    // This resets the BouncePathFinder so that it sets up currentPath as its
-    // initial path between the given vacua. It also resets pathCanBeImproved
-    // and sets pathTemperature appropriately.
-    virtual void SetInitialPath( PotentialMinimum const& falseVacuum,
-                                 PotentialMinimum const& trueVacuum,
-                                 TunnelPath const* startingPath = NULL,
-                                 double const pathTemperature = 0.0 );
+    // This resets the BouncePathFinder and return a pointer to an initial path
+    // between the given vacua, and the management of this memory is entirely
+    // up to the calling code (if we allowed ourselves to require a
+    // C++11-compliant compiler, this function would return a
+    // unique_ptr< TunnelPath >). It should also reset
+    // pathCanBeImproved and set pathTemperature appropriately.
+    virtual TunnelPath const*
+    SetInitialPath( PotentialMinimum const& falseVacuum,
+                    PotentialMinimum const& trueVacuum,
+                    TunnelPath const* startingPath = NULL,
+                    double const pathTemperature = 0.0 );
 
     // This allows Minuit2 to move each node a set number of times to try to
     // minimize the potential at that node, and then sets the path from the set
     // of nodes.
-    virtual void ImprovePath();
+    virtual TunnelPath const* ImprovePath();
 
 
   protected:

@@ -12,15 +12,14 @@ namespace VevaciousPlusPlus
 
   BouncePathFinder::BouncePathFinder() :
     pathTemperature( 0.0 ),
-    pathCanBeImproved( true ),
-    currentPath( NULL )
+    pathCanBeImproved( true )
   {
     // This constructor is just an initialization list.
   }
 
   BouncePathFinder::~BouncePathFinder()
   {
-    delete currentPath;
+    // This does nothing.
   }
 
 } /* namespace VevaciousPlusPlus */

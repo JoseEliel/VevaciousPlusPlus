@@ -178,4 +178,72 @@ namespace VevaciousPlusPlus
     SetThermalSurvivalProbability();
   }
 
+  // This returns either the dimensionless bounce action integrated over four
+  // dimensions (for zero temperature) or the dimensionful bounce action
+  // integrated over three dimensions (for non-zero temperature) for tunneling
+  // from falseVacuum to trueVacuum at temperature tunnelingTemperature, or an
+  // upper bound if the upper bound drops below actionThreshold during the
+  // course of the calculation. The vacua are assumed to already be the minima
+  // at tunnelingTemperature.
+  double BounceAlongPathWithThreshold::BoundedBounceAction(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                             double const tunnelingTemperature,
+                                           double const actionThreshold ) const
+  {
+    actionCalculator->ResetVacua( falseVacuum,
+                                  trueVacuum );
+    TunnelPath const* bestPath( pathFinder->SetInitialPath( falseVacuum,
+                                                            trueVacuum ) );
+    double bestBounceAction( (*actionCalculator)( *bestPath ) );
+
+    // debugging:
+    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
+    std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Initial straight path being plotted in " << straightPathPicture << ".";
+    std::cout << std::endl;
+    std::vector< std::string > fieldColors;
+    fieldColors.push_back( "red" );
+    fieldColors.push_back( "brown" );
+    fieldColors.push_back( "blue" );
+    fieldColors.push_back( "purple" );
+    fieldColors.push_back( "green" );
+    fieldColors.push_back( "cyan" );
+    actionCalculator->PlotBounceConfiguration( *bestPath,
+                                               fieldColors,
+                                               straightPathPicture );/**/
+
+    while( ( bestBounceAction > actionThreshold )
+           &&
+           pathFinder->PathCanBeImproved() )
+    {
+      TunnelPath const* currentPath( pathFinder->ImprovePath() );
+      double const currentBounceAction( (*actionCalculator)( *currentPath ) );
+      if( currentBounceAction < bestBounceAction )
+      {
+        bestBounceAction = currentBounceAction;
+        delete bestPath;
+        bestPath = currentPath;
+      }
+      else
+      {
+        delete currentPath;
+      }
+    }
+
+    // debugging:
+    /**/std::string finalPathPicture( "FinalBubbleProfile.eps" );
+    std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Final deformed path being plotted in " << finalPathPicture << ".";
+    std::cout << std::endl;
+    actionCalculator->PlotBounceConfiguration( *bestPath,
+                                               fieldColors,
+                                               finalPathPicture );/**/
+
+    delete bestPath;
+    return bestBounceAction;
+  }
+
 } /* namespace VevaciousPlusPlus */

@@ -35,10 +35,13 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This resets the BouncePathFinder so that it sets up currentPath as its
-  // initial path between the given vacua. It also resets pathCanBeImproved
-  // and sets pathTemperature appropriately.
-  void
+  // This resets the BouncePathFinder and return a pointer to an initial path
+  // between the given vacua, and the management of this memory is entirely
+  // up to the calling code (if we allowed ourselves to require a
+  // C++11-compliant compiler, this function would return a
+  // unique_ptr< TunnelPath >). It should also reset
+  // pathCanBeImproved and set pathTemperature appropriately.
+  TunnelPath const*
   SingleNodeVaryingMinuit::SetInitialPath( PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                                            TunnelPath const* startingPath,
@@ -55,17 +58,12 @@ namespace VevaciousPlusPlus
     {
       pathParameterization = &(startingPath->PathParameterization());
     }
-
     // Now we need the initial path node set.
     std::vector< std::vector< double > >
     nodeSet( pathNodes.NumberOfPathNodes(),
              std::vector< double >( pathNodes.NumberOfFields() ) );
     pathNodes.PathNodeSet( nodeSet,
                            *pathParameterization );
-    // Now we can set the current path.
-    SetCurrentPathPointer( (*pathFactory)( nodeSet,
-                                 pathNodes.ParameterizationForNodes( nodeSet ),
-                                           pathTemperature ) );
     // However, we still need to set up the initial states for Minuit as well
     // as ensure that pathNodes records the nodes too, so that we can vary the
     // nodes individually.
@@ -93,48 +91,24 @@ namespace VevaciousPlusPlus
       currentMinuitResults[ pathIndex ] = MinuitMinimum( nodeParameterization,
                                                          initialStepSizes );
     }
+    // Now we can create the current path.
+    return (*pathFactory)( nodeSet,
+                           pathNodes.ParameterizationForNodes( nodeSet ),
+                           pathTemperature );
   }
 
   // This allows Minuit2 to move each node a set number of times to try to
   // minimize the potential at that node or bounce action along the adjusted
   // path, and then sets the path from the set of nodes.
-  void SingleNodeVaryingMinuit::ImprovePath()
+  TunnelPath const* SingleNodeVaryingMinuit::ImprovePath()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "SingleNodeVaryingMinuit::ImprovePath() needs to have a better check on"
-    << " whether the path can be improved or not. Probably some check on"
-    << " whether any of the nodes moved more than a certain tolerance with"
-    << " this pass.";
-    std::cout << std::endl;/**/
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "SingleNodeVaryingMinuit::ImprovePath() called.";
-    std::cout << std::endl;*/
-
     bool minuitConverged( true );
-
     for( size_t adjustmentIndex( pathNodes.AdjustmentOrderStartIndex() );
          adjustmentIndex <= pathNodes.AdjustmentOrderEndIndex();
          ++adjustmentIndex )
     {
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "adjustmentIndex = " << adjustmentIndex;
-      std::cout << std::endl;*/
-
       currentNodeIndex
       = pathNodes.PathIndexFromAdjustmentIndex( adjustmentIndex );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "currentNodeIndex = " << currentNodeIndex;
-      std::cout << std::endl;*/
-
       MinuitMinimum const&
       nodeState( currentMinuitResults[ currentNodeIndex ] );
       ROOT::Minuit2::MnMigrad mnMigrad( (*this),
@@ -145,13 +119,6 @@ namespace VevaciousPlusPlus
       minuitMinimum( pathNodes.ZeroNodeParameterization().size(),
                      mnMigrad( movesPerImprovement,
                                currentMinuitTolerance ) );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "minuitMinimum = " << minuitMinimum.AsDebuggingString();
-      std::cout << std::endl;*/
-
       currentMinuitResults[ currentNodeIndex ] = minuitMinimum;
       pathNodes.SetNodeFromParameterization( currentNodeIndex,
                                              minuitMinimum.VariableValues() );
@@ -173,9 +140,9 @@ namespace VevaciousPlusPlus
         pathCanBeImproved = false;
       }
     }
-    SetCurrentPathPointer( (*pathFactory)( pathNodes.PathNodes(),
+    return (*pathFactory)( pathNodes.PathNodes(),
                    pathNodes.ParameterizationForNodes( pathNodes.PathNodes() ),
-                                           pathTemperature ) );
+                          pathTemperature );
   }
 
 } /* namespace VevaciousPlusPlus */

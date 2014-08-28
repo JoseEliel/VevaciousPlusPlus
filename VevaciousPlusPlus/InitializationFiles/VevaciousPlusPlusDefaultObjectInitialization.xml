@@ -184,11 +184,11 @@
               <!-- CAUTION! Minuit2 seems to try a point with a NAN co-ordinate
                    if this is set higher than about 40. Sorry, but there's not
                    really anything that we can do about that... -->
-                40
+                15
               </NumberOfVaryingNodes>
               <NodeParameterizationStyle>
                 <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
-                NodesOnParallelPlanes
+                NodesOnBisectingPlanes
               </NodeParameterizationStyle>
               <InterpolationStyle>
                 <!-- "PolynomialPath", "LinearSplinePath", or
