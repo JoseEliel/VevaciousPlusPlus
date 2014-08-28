@@ -12,6 +12,8 @@
 #include "MinuitPathFinder.hpp"
 #include "Minuit2/MnMigrad.h"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
+#include "../PathParameterization/NodesOnBisectingPlanes.hpp"
+#include "../PathParameterization/LinearSplineThroughNodesFactory.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -42,8 +44,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    TunnelPathFactory* const pathFactory;
-    MinuitMinimum currentMinuitResult;
+    LinearSplineThroughNodesFactory pathFactory;
+    std::vector< std::vector< double > > pathNodes;
 
 
     // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
