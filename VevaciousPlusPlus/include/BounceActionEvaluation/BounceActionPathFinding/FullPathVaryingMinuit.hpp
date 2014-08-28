@@ -30,19 +30,16 @@ namespace VevaciousPlusPlus
     // This resets the BouncePathFinder so that it sets up currentPath as its
     // initial path between the given vacua. It also resets pathCanBeImproved
     // and sets pathTemperature appropriately.
-    virtual void SetInitialPath( PotentialMinimum const& falseVacuum,
-                                 PotentialMinimum const& trueVacuum,
-                                 TunnelPath const* startingPath = NULL,
-                                 double const pathTemperature = 0.0 )
-    { SetUpPathFactoryAndMinuit( falseVacuum,
-                                 trueVacuum,
-                                 startingPath,
-                                 pathTemperature ); }
+    virtual TunnelPath const*
+    SetInitialPath( PotentialMinimum const& falseVacuum,
+                    PotentialMinimum const& trueVacuum,
+                    TunnelPath const* startingPath = NULL,
+                    double const pathTemperature = 0.0 );
 
     // This allows Minuit2 to adjust the full path a set number of times to try
     // to minimize the sum of potentials at a set of nodes or bounce action
     // along the adjusted path, and then sets the path.
-    virtual void ImprovePath();
+    virtual TunnelPath const* ImprovePath();
 
 
   protected:
@@ -61,14 +58,14 @@ namespace VevaciousPlusPlus
 
 
 
-
-  // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
-  // currentMinuitResult to be appropriate for the initial path.
-  inline void FullPathVaryingMinuit::SetUpPathFactoryAndMinuit(
-                                           PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
-                                                TunnelPath const* startingPath,
-                                                 double const pathTemperature )
+  // This resets the BouncePathFinder so that it sets up currentPath as its
+  // initial path between the given vacua. It also resets pathCanBeImproved
+  // and sets pathTemperature appropriately.
+  inline TunnelPath const*
+  FullPathVaryingMinuit::SetInitialPath( PotentialMinimum const& falseVacuum,
+                                         PotentialMinimum const& trueVacuum,
+                                         TunnelPath const* startingPath,
+                                         double const pathTemperature )
   {
     pathFactory->SetVacua( falseVacuum,
                            trueVacuum );
@@ -81,20 +78,20 @@ namespace VevaciousPlusPlus
     {
       pathParameterization = &(startingPath->PathParameterization());
     }
-    SetCurrentPathPointer( (*pathFactory)( *pathParameterization,
-                                           pathTemperature ) );
     // However, we still need to set up the initial state for Minuit.
     currentMinuitTolerance = ( minuitToleranceFraction
                                * ( falseVacuum.PotentialValue()
                                    - trueVacuum.PotentialValue() ) );
     currentMinuitResult = MinuitMinimum( *pathParameterization,
                                          pathFactory->InitialStepSizes() );
+    return (*pathFactory)( *pathParameterization,
+                           pathTemperature );
   }
 
   // This allows Minuit2 to adjust the full path a set number of times to try
   // to minimize the sum of potentials at a set of nodes or bounce action
   // along the adjusted path, and then sets the path.
-  inline void FullPathVaryingMinuit::ImprovePath()
+  inline TunnelPath const* FullPathVaryingMinuit::ImprovePath()
   {
     ROOT::Minuit2::MnMigrad mnMigrad( (*this),
                                       currentMinuitResult.VariableValues(),
@@ -104,16 +101,8 @@ namespace VevaciousPlusPlus
                                  mnMigrad( movesPerImprovement,
                                            currentMinuitTolerance ) );
     currentMinuitResult = minuitMinimum;
-    SetCurrentPathPointer( (*pathFactory)( minuitMinimum.VariableValues(),
-                                           pathTemperature ) );
-    pathCanBeImproved = !(minuitMinimum.IsValidMinimum());
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FullPathVaryingMinuit::ImprovePath() set currentMinuitResult to"
-    << std::endl;
-    std::cout << currentMinuitResult.AsDebuggingString() << std::endl;
-    std::cout << std::endl;/**/
+    return (*pathFactory)( minuitMinimum.VariableValues(),
+                           pathTemperature );
   }
 
 } /* namespace VevaciousPlusPlus */
