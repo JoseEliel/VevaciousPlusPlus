@@ -40,7 +40,7 @@ namespace VevaciousPlusPlus
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
-                    TunnelPath const* startingPath = NULL,
+                    // TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 );
 
     // This allows Minuit2 to move each node a set number of times to try to

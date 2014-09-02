@@ -45,7 +45,7 @@ namespace VevaciousPlusPlus
   TunnelPath const*
   SingleNodeVaryingMinuit::SetInitialPath( PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
-                                           TunnelPath const* startingPath,
+                                           // TunnelPath const* startingPath,
                                            double const pathTemperature )
   {
     pathFactory->SetVacua( falseVacuum,
@@ -55,10 +55,10 @@ namespace VevaciousPlusPlus
     // or the default "zero parameterization".
     std::vector< double > const*
     pathParameterization( &(pathFactory->ZeroParameterization()) );
-    if( startingPath != NULL )
+    /*if( startingPath != NULL )
     {
       pathParameterization = &(startingPath->PathParameterization());
-    }
+    }*/
     // Now we need the initial path node set.
     std::vector< std::vector< double > >
     nodeSet( pathNodes.NumberOfPathNodes(),

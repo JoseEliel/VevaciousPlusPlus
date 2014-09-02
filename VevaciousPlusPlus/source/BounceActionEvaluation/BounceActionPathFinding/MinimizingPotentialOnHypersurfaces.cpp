@@ -21,6 +21,7 @@ namespace VevaciousPlusPlus
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     pathNodes(),
+    currentNodeDifference(),
     reflectionMatrix( numberOfFields,
                       numberOfFields )
   {
@@ -32,43 +33,80 @@ namespace VevaciousPlusPlus
     // This does nothing.
   }
 
-
-  // This resets the BouncePathFinder so that it sets up currentPath as its
-  // initial path between the given vacua. It also resets pathCanBeImproved
-  // and sets pathTemperature appropriately.
-  TunnelPath const* MinimizingPotentialOnHypersurfaces::SetInitialPath(
-                                           PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
-                                                TunnelPath const* startingPath,
-                                                 double const pathTemperature )
+  // This sets up reflectionMatrix to be the Householder reflection matrix
+  // which reflects the axis of field 0 to be parallel to
+  // currentNodeDifference.
+  void MinimizingPotentialOnHypersurfaces::SetUpHouseholderReflection()
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "MinimizingPotentialOnHypersurfaces::ImprovePath()";
-    std::cout << std::endl;
-    return NULL;/**/
-
-    this->pathTemperature = pathTemperature;
+    // First we check that targetVector doesn't already lie on the axis of the
+    // field with index 0.
+    bool alreadyParallel( true );
+    for( size_t fieldIndex( 1 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( currentNodeDifference[ fieldIndex ] != 0.0 )
+      {
+        alreadyParallel = false;
+        break;
+      }
+    }
+    if( alreadyParallel )
+    {
+      reflectionMatrix = Eigen::MatrixXd::Identity( numberOfFields,
+                                                    numberOfFields );
+      reflectionMatrix( 0,
+                        0 ) = -1.0;
+    }
+    else
+    {
+      double targetLengthSquared( 0.0 );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        targetLengthSquared += ( currentNodeDifference[ fieldIndex ]
+                                 * currentNodeDifference[ fieldIndex ] );
+      }
+      double const targetNormalization( 1.0 / sqrt( targetLengthSquared ) );
+      double const minusInverseOfOneMinusDotProduct( 1.0 /
+              ( ( currentNodeDifference[ 0 ] * targetNormalization ) - 1.0 ) );
+      reflectionMatrix = Eigen::MatrixXd::Zero( numberOfFields,
+                                                numberOfFields );
+      for( size_t rowIndex( 0 );
+           rowIndex < numberOfFields;
+           ++rowIndex )
+      {
+        double rowIndexPart( currentNodeDifference[ rowIndex ]
+                             * targetNormalization );
+        if( rowIndex == 0 )
+        {
+          rowIndexPart -= 1.0;
+        }
+        for( size_t columnIndex( rowIndex + 1 );
+             columnIndex < numberOfFields;
+             ++columnIndex )
+        {
+          double columnIndexPart( currentNodeDifference[ columnIndex ]
+                                  * targetNormalization );
+          if( columnIndex == 0 )
+          {
+            columnIndexPart -= 1.0;
+          }
+          reflectionMatrix( rowIndex,
+                            columnIndex ) = ( rowIndexPart * columnIndexPart
+                                          * minusInverseOfOneMinusDotProduct );
+          reflectionMatrix( columnIndex,
+                            rowIndex ) = ( rowIndexPart * columnIndexPart
+                                          * minusInverseOfOneMinusDotProduct );
+          // The reflection matrix is symmetric, and we set the diagonal
+          // elements outside this loop.
+        }
+        reflectionMatrix( rowIndex,
+                          rowIndex ) = ( 1.0 + ( rowIndexPart * rowIndexPart
+                                        * minusInverseOfOneMinusDotProduct ) );
+      }
+    }
   }
 
-
-  // This sets up reflectionMatrix to be the Householder reflection matrix
-  // which reflects the axis of field 0 to be parallel to the difference
-  // between startNode and endNode.
-  void MinimizingPotentialOnHypersurfaces::SetUpHouseholderReflection( std::vector< double > const& startNode,
-                                   std::vector< double > const& endNode );
-
-  // This takes the numberOfFields-1-dimensional vector and prepends a 0 to
-  // make an numberOfFields-dimensional Eigen::VectorXd.
-  Eigen::VectorXd MinimizingPotentialOnHypersurfaces::UntransformedNode(
-                   std::vector< double > const& nodeParameterization ) const;
-
-
-  // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
-  // currentMinuitResult to be appropriate for the initial path.
-  void MinimizingPotentialOnHypersurfaces::SetUpPathFactoryAndMinuit( PotentialMinimum const& falseVacuum,
-                                  PotentialMinimum const& trueVacuum,
-                                  TunnelPath const* startingPath = NULL,
-                                  double const pathTemperature = 0.0 );
 } /* namespace VevaciousPlusPlus */

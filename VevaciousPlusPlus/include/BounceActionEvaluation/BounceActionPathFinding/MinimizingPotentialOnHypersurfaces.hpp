@@ -10,11 +10,10 @@
 
 #include "CommonIncludes.hpp"
 #include "MinuitPathFinder.hpp"
-#include "Minuit2/MnMigrad.h"
 #include "Eigen/Dense"
-#include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "../PathParameterization/LinearSplineThroughNodesFactory.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "../PathParameterization/LinearSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -30,13 +29,13 @@ namespace VevaciousPlusPlus
     virtual ~MinimizingPotentialOnHypersurfaces();
 
 
-    // This resets the BouncePathFinder so that it sets up currentPath as its
-    // initial path between the given vacua. It also resets pathCanBeImproved
-    // and sets pathTemperature appropriately.
+    // This sets the vacua to be those given, and resets the nodes to describe a
+    // straight path between the new vacua, as well as setting pathTemperature
+    // and currentMinuitTolerance appropriately.
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
-                    TunnelPath const* startingPath = NULL,
+                    // TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 );
 
     // This allows Minuit2 to adjust the full path a set number of times to try
@@ -56,14 +55,14 @@ namespace VevaciousPlusPlus
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     std::vector< std::vector< double > > pathNodes;
+    std::vector< double > currentNodeDifference;
     Eigen::MatrixXd reflectionMatrix;
 
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
-    // which reflects the axis of field 0 to be parallel to the difference
-    // between startNode and endNode.
-    void SetUpHouseholderReflection( std::vector< double > const& startNode,
-                                     std::vector< double > const& endNode );
+    // which reflects the axis of field 0 to be parallel to
+    // currentNodeDifference.
+    void SetUpHouseholderReflection();
 
     // This takes the numberOfFields-1-dimensional vector and prepends a 0 to
     // make an numberOfFields-dimensional Eigen::VectorXd.
@@ -73,11 +72,51 @@ namespace VevaciousPlusPlus
 
     // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
     // currentMinuitResult to be appropriate for the initial path.
-    void SetUpPathFactoryAndMinuit( PotentialMinimum const& falseVacuum,
-                                    PotentialMinimum const& trueVacuum,
-                                    TunnelPath const* startingPath = NULL,
-                                    double const pathTemperature = 0.0 );
+    virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
+                                      PotentialMinimum const& trueVacuum ) = 0;
   };
+
+
+
+
+  // This sets the vacua to be those given, and resets the nodes to describe a
+  // straight path between the new vacua, as well as setting pathTemperature
+  // and currentMinuitTolerance appropriately.
+  inline TunnelPath const* MinimizingPotentialOnHypersurfaces::SetInitialPath(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                             // TunnelPath const* startingPath,
+                                                 double const pathTemperature )
+  {
+    this->pathTemperature = pathTemperature;
+    currentMinuitTolerance = ( minuitToleranceFraction
+                               * ( falseVacuum.PotentialValue()
+                                   - trueVacuum.PotentialValue() ) );
+    SetNodesForInitialPath( falseVacuum,
+                            trueVacuum );
+    std::vector< std::vector< double > > straightPath( 2,
+                                            falseVacuum.FieldConfiguration() );
+    straightPath.back() = trueVacuum.FieldConfiguration();
+    return new LinearSplineThroughNodes( straightPath,
+                                         std::vector< double >( 0 ),
+                                         pathTemperature );
+  }
+
+  // This takes the numberOfFields-1-dimensional vector and prepends a 0 to
+  // make an numberOfFields-dimensional Eigen::VectorXd.
+  inline Eigen::VectorXd MinimizingPotentialOnHypersurfaces::UntransformedNode(
+                      std::vector< double > const& nodeParameterization ) const
+  {
+    Eigen::VectorXd untransformedNode( numberOfFields );
+    untransformedNode( 0 ) = 0.0;
+    for( size_t fieldIndex( 1 );
+        fieldIndex < numberOfFields;
+        ++fieldIndex )
+    {
+      untransformedNode( fieldIndex ) = nodeParameterization[ fieldIndex - 1 ];
+    }
+    return untransformedNode;
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* MINIMIZINGPOTENTIALONHYPERSURFACES_HPP_ */

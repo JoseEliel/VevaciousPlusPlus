@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
-                    TunnelPath const* startingPath = NULL,
+                    // TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 ) = 0;
 
     // This returns true if the last reset or path improvement did not meet

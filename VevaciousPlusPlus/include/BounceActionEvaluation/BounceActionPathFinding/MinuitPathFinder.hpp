@@ -43,7 +43,7 @@ namespace VevaciousPlusPlus
     size_t movesPerImprovement;
     unsigned int minuitStrategy;
     double minuitToleranceFraction;
-    // double currentMinuitTolerance;
+    double currentMinuitTolerance;
 
 
     // This returns true if any element of minuitParameterization appears to be

@@ -33,7 +33,7 @@ namespace VevaciousPlusPlus
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
-                    TunnelPath const* startingPath = NULL,
+                    // TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 );
 
     // This allows Minuit2 to adjust the full path a set number of times to try
@@ -64,7 +64,7 @@ namespace VevaciousPlusPlus
   inline TunnelPath const*
   FullPathVaryingMinuit::SetInitialPath( PotentialMinimum const& falseVacuum,
                                          PotentialMinimum const& trueVacuum,
-                                         TunnelPath const* startingPath,
+                                         // TunnelPath const* startingPath,
                                          double const pathTemperature )
   {
     pathFactory->SetVacua( falseVacuum,
@@ -74,10 +74,10 @@ namespace VevaciousPlusPlus
     // or the default zero parameterization; then we can set the current path.
     std::vector< double > const*
     pathParameterization( &(pathFactory->ZeroParameterization()) );
-    if( startingPath != NULL )
+    /*if( startingPath != NULL )
     {
       pathParameterization = &(startingPath->PathParameterization());
-    }
+    }*/
     // However, we still need to set up the initial state for Minuit.
     currentMinuitTolerance = ( minuitToleranceFraction
                                * ( falseVacuum.PotentialValue()
