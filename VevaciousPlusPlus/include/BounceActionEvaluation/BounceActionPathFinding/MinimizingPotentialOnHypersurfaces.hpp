@@ -14,6 +14,7 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"
+#include "MinuitBetweenPaths.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -35,7 +36,6 @@ namespace VevaciousPlusPlus
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
-                    // TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 );
 
 
@@ -43,12 +43,21 @@ namespace VevaciousPlusPlus
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     std::vector< std::vector< double > > pathNodes;
+    std::vector< std::vector< double > > straightPath;
     std::vector< double > currentParallelComponent;
     // This is the vector between the current 2 reference nodes, scaled to be
     // appropriate for the step from the false-side node under a
     // parameterization that is just a set of zeroes.
     Eigen::MatrixXd reflectionMatrix;
+    bool nodesConverged;
+    MinuitBetweenPaths pathAverager;
 
+
+    // This should move the nodes individually towards whatever the derived
+    // class considers to be the optimal tunneling path, by some amount, which
+    // is up to the derived class, but it should also note if it is finished
+    // moving the nodes around by setting nodesConverged to true.
+    virtual void ImproveNodes() = 0;
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
     // which reflects the axis of field 0 to be parallel to
@@ -75,7 +84,6 @@ namespace VevaciousPlusPlus
   inline TunnelPath const* MinimizingPotentialOnHypersurfaces::SetInitialPath(
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
-                                             // TunnelPath const* startingPath,
                                                  double const pathTemperature )
   {
     this->pathTemperature = pathTemperature;

@@ -59,12 +59,34 @@ namespace VevaciousPlusPlus
     // so that the next node will be closer to the true vacuum than the current
     // last node before the true vacuum. This vector is then scaled to be of
     // length stepSize.
-    std::vector< double >
+    Eigen::VectorXd
     StepVector( std::vector< double > const& nodeParameterization ) const;
   };
 
 
 
+
+  // It may seem unwise to have this object call Minuit on itself, but really
+  // it's just a handy way of keeping the minimization function within the
+  // class that ends up finding its minimum. In this case,
+  // nodeParameterization is just the parameterization of the node.
+  inline double MinimizingPotentialOnHemispheres::operator()(
+                      std::vector< double > const& nodeParameterization ) const
+  {
+    Eigen::VectorXd const stepVector( StepVector( nodeParameterization ) );
+    std::vector< double >
+    pointOnHemisphere( pathNodes[ pathNodes.size() - 2 ] );
+    // Now pointOnHemisphere is the last node on the path before the true
+    // vacuum.
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      pointOnHemisphere[ fieldIndex ] += ( 0.5 * stepVector( fieldIndex ) );
+    }
+    return potentialFunction( pointOnHemisphere,
+                              pathTemperature );
+  }
 
   // This sets pathNodes to just be the false vacuum node and the true vacuum
   // node, and also sets stepSize to be the distance between the vacua

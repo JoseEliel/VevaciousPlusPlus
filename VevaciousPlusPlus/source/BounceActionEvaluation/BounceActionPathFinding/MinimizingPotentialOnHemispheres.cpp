@@ -21,6 +21,7 @@ namespace VevaciousPlusPlus
                                         minuitStrategy,
                                         minuitToleranceFraction ),
     minimumNumberOfNodes( minimumNumberOfNodes ),
+    stepSize( NAN ),
     currentAngleScaling( NAN )
   {
     // This constructor is just an initialization list.
@@ -32,27 +33,16 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This allows Minuit2 to adjust the full path a set number of times to try
-  // to minimize the sum of potentials at a set of nodes or bounce action
-  // along the adjusted path, and then sets the path.
-  TunnelPath const* MinimizingPotentialOnHemispheres::ImprovePath()
-  {
-
-  }
-
-  // It may seem unwise to have this object call Minuit on itself, but really
-  // it's just a handy way of keeping the minimization function within the
-  // class that ends up finding its minimum. In this case,
-  // nodeParameterization is just the parameterization of the node.
-  double MinimizingPotentialOnHemispheres::operator()(
+  // This takes the parameterization as the components of a vector
+  // perpendicular to axis 0 which is then added to a unit vector along axis
+  // 0. This then could be scaled to give a unit vector within the hemisphere
+  // of positive field 0, but first the angle it makes with axis 0 is scaled
+  // so that the next node will be closer to the true vacuum than the current
+  // last node before the true vacuum. This vector is then scaled to be of
+  // length stepSize.
+  Eigen::VectorXd MinimizingPotentialOnHemispheres::StepVector(
                       std::vector< double > const& nodeParameterization ) const
   {
-    // The parameterization is taken as the components of a vector
-    // perpendicular to axis 0 which is then added to a unit vector along axis
-    // 0. This then could be scaled to give a unit vector within the hemisphere
-    // of positive field 0, but first the angle it makes with axis 0 is scaled
-    // so that the next node will be closer to the true vacuum than the current
-    // last node before the true vacuum.
     double tangentSquared( 0.0 );
     for( std::vector< double >::const_iterator
          nodeParameter( nodeParameterization.begin() );
@@ -61,24 +51,21 @@ namespace VevaciousPlusPlus
     {
       tangentSquared += ( (*nodeParameter) * (*nodeParameter) );
     }
+    double const parameterizationRadius( sqrt( tangentSquared ) );
     double const
-    scaledAngle( currentAngleScaling * atan( sqrt( tangentSquared ) ) );
-
-    Eigen::VectorXd const
-    untransformedNode( UntransformedNode( nodeParameterization ) );
-  }
-
-  // This takes the parameterization as the components of a vector
-  // perpendicular to axis 0 which is then added to a unit vector along axis
-  // 0. This then could be scaled to give a unit vector within the hemisphere
-  // of positive field 0, but first the angle it makes with axis 0 is scaled
-  // so that the next node will be closer to the true vacuum than the current
-  // last node before the true vacuum. This vector is then scaled to be of
-  // length stepSize.
-  std::vector< double > MinimizingPotentialOnHemispheres::StepVector(
-      std::vector< double > const& nodeParameterization ) const
-  {
-
+    scaledAngle( currentAngleScaling * atan( parameterizationRadius ) );
+    double const radialScaling( ( stepSize * sin( scaledAngle ) )
+                                / parameterizationRadius );
+    Eigen::VectorXd untransformedNode( numberOfFields );
+    untransformedNode( 0 ) = ( stepSize * cos( scaledAngle ) );
+    for( size_t fieldIndex( 1 );
+        fieldIndex < numberOfFields;
+        ++fieldIndex )
+    {
+      untransformedNode( fieldIndex )
+      = ( radialScaling * nodeParameterization[ fieldIndex - 1 ] );
+    }
+    return ( reflectionMatrix * untransformedNode );
   }
 
 } /* namespace VevaciousPlusPlus */

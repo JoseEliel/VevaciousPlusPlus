@@ -23,7 +23,8 @@ namespace VevaciousPlusPlus
     pathNodes(),
     currentParallelComponent(),
     reflectionMatrix( numberOfFields,
-                      numberOfFields )
+                      numberOfFields ),
+    nodesConverged( false )
   {
     // This constructor is just an initialization list.
   }
@@ -31,6 +32,62 @@ namespace VevaciousPlusPlus
   MinimizingPotentialOnHypersurfaces::~MinimizingPotentialOnHypersurfaces()
   {
     // This does nothing.
+  }
+
+
+
+  // This allows Minuit2 to adjust the full path a set number of times to try
+  // to minimize the sum of potentials at a set of nodes or bounce action
+  // along the adjusted path, and then sets the path.
+  TunnelPath const* MinimizingPotentialOnHypersurfaces::ImprovePath()
+  {
+    if( !nodesConverged )
+    {
+      ImproveNodes();
+      // If this call of ImproveNodes() was the last one for these vacua, we
+      // set up the straight path with as many nodes as pathNodes has, so that
+      // the final variation of the path between pathNodes and straightNodes
+      // can proceed.
+      if( nodesConverged )
+      {
+        // placeholder:
+        /**/std::cout << std::endl
+        << "Placeholder: "
+        << "This should go into pathAverager.UpdateNodes( ... )!";
+        std::cout << std::endl;/**/
+        straightPath.resize( pathNodes.size(),
+                             pathNodes.front() );
+        std::vector< double > straightNode( pathNodes.back() );
+        for( size_t fieldIndex( 0 );
+             fieldIndex < numberOfFields;
+             ++fieldIndex )
+        {
+          straightNode[ fieldIndex ] -= pathNodes.front()[ fieldIndex ];
+        }
+        double const straightFraction( 1.0
+                          / static_cast< double >( straightPath.size() - 1 ) );
+        for( size_t nodeIndex( 1 );
+             nodeIndex < ( straightPath.size() - 1 );
+             ++nodeIndex )
+        {
+          for( size_t fieldIndex( 0 );
+               fieldIndex < numberOfFields;
+               ++fieldIndex )
+          {
+            straightPath[ nodeIndex ][ fieldIndex ]
+            += ( nodeIndex * straightFraction * straightNode[ fieldIndex ] );
+          }
+        }
+        straightPath.back() = pathNodes.back();
+      }
+      return new LinearSplineThroughNodes( pathNodes,
+                                           std::vector< double >( 0 ),
+                                           pathTemperature );
+    }
+    else
+    {
+      return pathAverager.ImprovePath();
+    }
   }
 
   // This sets up reflectionMatrix to be the Householder reflection matrix

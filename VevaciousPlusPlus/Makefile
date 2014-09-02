@@ -53,6 +53,7 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONPATHFINDING)/FullPathVaryingMinuit.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnHemispheres.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnHypersurfaces.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitBetweenPaths.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitNodePotentialMinimizer.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathBounceMinimizer.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
