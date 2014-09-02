@@ -38,30 +38,21 @@ namespace VevaciousPlusPlus
                     // TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 );
 
-    // This allows Minuit2 to adjust the full path a set number of times to try
-    // to minimize the sum of potentials at a set of nodes or bounce action
-    // along the adjusted path, and then sets the path.
-    //virtual TunnelPath const* ImprovePath() = 0;
-
-    // It may seem unwise to have this object call Minuit on itself, but really
-    // it's just a handy way of keeping the minimization function within the
-    // class that ends up finding its minimum. In this case,
-    // nodeParameterization is just the parameterization of the node.
-    //virtual double
-    //operator()( std::vector< double > const& nodeParameterization ) const = 0;
-
 
   protected:
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     std::vector< std::vector< double > > pathNodes;
-    std::vector< double > currentNodeDifference;
+    std::vector< double > currentParallelComponent;
+    // This is the vector between the current 2 reference nodes, scaled to be
+    // appropriate for the step from the false-side node under a
+    // parameterization that is just a set of zeroes.
     Eigen::MatrixXd reflectionMatrix;
 
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
     // which reflects the axis of field 0 to be parallel to
-    // currentNodeDifference.
+    // currentParallelComponent.
     void SetUpHouseholderReflection();
 
     // This takes the numberOfFields-1-dimensional vector and prepends a 0 to
@@ -70,8 +61,7 @@ namespace VevaciousPlusPlus
                      std::vector< double > const& nodeParameterization ) const;
 
 
-    // This sets up pathFactory, pathTemperature, currentMinuitTolerance, and
-    // currentMinuitResult to be appropriate for the initial path.
+    // This should set up pathNodes for a new pair of
     virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
                                       PotentialMinimum const& trueVacuum ) = 0;
   };

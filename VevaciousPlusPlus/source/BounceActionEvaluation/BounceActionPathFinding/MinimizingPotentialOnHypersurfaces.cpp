@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     pathNodes(),
-    currentNodeDifference(),
+    currentParallelComponent(),
     reflectionMatrix( numberOfFields,
                       numberOfFields )
   {
@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
 
   // This sets up reflectionMatrix to be the Householder reflection matrix
   // which reflects the axis of field 0 to be parallel to
-  // currentNodeDifference.
+  // currentParallelComponent.
   void MinimizingPotentialOnHypersurfaces::SetUpHouseholderReflection()
   {
     // First we check that targetVector doesn't already lie on the axis of the
@@ -45,7 +45,7 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      if( currentNodeDifference[ fieldIndex ] != 0.0 )
+      if( currentParallelComponent[ fieldIndex ] != 0.0 )
       {
         alreadyParallel = false;
         break;
@@ -65,19 +65,19 @@ namespace VevaciousPlusPlus
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        targetLengthSquared += ( currentNodeDifference[ fieldIndex ]
-                                 * currentNodeDifference[ fieldIndex ] );
+        targetLengthSquared += ( currentParallelComponent[ fieldIndex ]
+                                 * currentParallelComponent[ fieldIndex ] );
       }
       double const targetNormalization( 1.0 / sqrt( targetLengthSquared ) );
       double const minusInverseOfOneMinusDotProduct( 1.0 /
-              ( ( currentNodeDifference[ 0 ] * targetNormalization ) - 1.0 ) );
+              ( ( currentParallelComponent[ 0 ] * targetNormalization ) - 1.0 ) );
       reflectionMatrix = Eigen::MatrixXd::Zero( numberOfFields,
                                                 numberOfFields );
       for( size_t rowIndex( 0 );
            rowIndex < numberOfFields;
            ++rowIndex )
       {
-        double rowIndexPart( currentNodeDifference[ rowIndex ]
+        double rowIndexPart( currentParallelComponent[ rowIndex ]
                              * targetNormalization );
         if( rowIndex == 0 )
         {
@@ -87,7 +87,7 @@ namespace VevaciousPlusPlus
              columnIndex < numberOfFields;
              ++columnIndex )
         {
-          double columnIndexPart( currentNodeDifference[ columnIndex ]
+          double columnIndexPart( currentParallelComponent[ columnIndex ]
                                   * targetNormalization );
           if( columnIndex == 0 )
           {
