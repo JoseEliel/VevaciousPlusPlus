@@ -19,9 +19,9 @@ namespace VevaciousPlusPlus
   {
   public:
     UnaryOperationFunctionoid( double (*unaryOperation)( double ),
-                              ParameterFunctionoid* const functionoidPointer,
-                              std::string const& creationString,
-                              std::string const& pythonParameterName );
+                               ParameterFunctionoid* const functionoidPointer,
+                               std::string const& creationString,
+                               std::string const& pythonParameterName );
     virtual ~UnaryOperationFunctionoid();
 
 

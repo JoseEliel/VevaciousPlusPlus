@@ -26,8 +26,8 @@ namespace VevaciousPlusPlus
     virtual ~SlhaFunctionoid();
 
 
-    void SetBlockPointer(
-                LHPC::SLHA::SparseManyIndexedBlock< double >* slhaBlock )
+    void
+    SetBlockPointer( LHPC::SLHA::SparseManyIndexedBlock< double >* slhaBlock )
     { this->slhaBlock = slhaBlock; }
 
     unsigned int NumberOfIndices() const{ return indexVector.size(); }
