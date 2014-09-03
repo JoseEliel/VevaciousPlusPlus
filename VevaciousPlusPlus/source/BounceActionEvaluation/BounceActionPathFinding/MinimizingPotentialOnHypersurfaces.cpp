@@ -50,35 +50,7 @@ namespace VevaciousPlusPlus
       // can proceed.
       if( nodesConverged )
       {
-        // placeholder:
-        /**/std::cout << std::endl
-        << "Placeholder: "
-        << "This should go into pathAverager.UpdateNodes( ... )!";
-        std::cout << std::endl;/**/
-        straightPath.resize( pathNodes.size(),
-                             pathNodes.front() );
-        std::vector< double > straightNode( pathNodes.back() );
-        for( size_t fieldIndex( 0 );
-             fieldIndex < numberOfFields;
-             ++fieldIndex )
-        {
-          straightNode[ fieldIndex ] -= pathNodes.front()[ fieldIndex ];
-        }
-        double const straightFraction( 1.0
-                          / static_cast< double >( straightPath.size() - 1 ) );
-        for( size_t nodeIndex( 1 );
-             nodeIndex < ( straightPath.size() - 1 );
-             ++nodeIndex )
-        {
-          for( size_t fieldIndex( 0 );
-               fieldIndex < numberOfFields;
-               ++fieldIndex )
-          {
-            straightPath[ nodeIndex ][ fieldIndex ]
-            += ( nodeIndex * straightFraction * straightNode[ fieldIndex ] );
-          }
-        }
-        straightPath.back() = pathNodes.back();
+        pathAverager.UpdateNodes( pathTemperature );
       }
       return new LinearSplineThroughNodes( pathNodes,
                                            std::vector< double >( 0 ),

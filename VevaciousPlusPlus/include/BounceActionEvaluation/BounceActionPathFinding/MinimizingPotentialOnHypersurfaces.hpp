@@ -43,7 +43,6 @@ namespace VevaciousPlusPlus
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
     std::vector< std::vector< double > > pathNodes;
-    std::vector< std::vector< double > > straightPath;
     std::vector< double > currentParallelComponent;
     // This is the vector between the current 2 reference nodes, scaled to be
     // appropriate for the step from the false-side node under a
