@@ -73,16 +73,334 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // This puts the content of the current element of xmlParser into
+    // contentDestination, trimmed of leading and trailing whitespace, if the
+    // element's name matches elementName.
+    static void
+    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+                                   std::string const& elementName,
+                                   std::string& contentDestination );
+
+    // This puts the content of the current element of xmlParser into
+    // contentDestination, interpreted as a double represented in ASCII, if the
+    // element's name matches elementName.
+    static void
+    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+                                   std::string const& elementName,
+                                   double& contentDestination );
+
+    // This puts the content of the current element of xmlParser into
+    // contentDestination, interpreted as an int represented in ASCII, if the
+    // element's name matches elementName.
+    static void
+    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+                                   std::string const& elementName,
+                                   int& contentDestination );
+
+    // This puts the content of the current element of xmlParser into
+    // contentDestination, interpreted as a bool represented by
+    // case-insensitive "yes/no" or "y/n" or "true/false" or "t/f" or "0/1",
+    // if the element's name matches elementName. If the element content
+    // doesn't match any valid input, contentDestination is left untouched.
+    static void
+    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+                                   std::string const& elementName,
+                                   bool& contentDestination );
+
+
+    // This reads the current element of outerParser and if its name matches
+    // elementName, it puts the contents of the child element <ClassType> into
+    // className and <ConstructorArguments> into constructorArguments, both
+    // stripped of whitespace.
+    static void ReadClassAndArguments( BOL::AsciiXmlParser const& outerParser,
+                                       std::string const& elementName,
+                                       std::string& className,
+                                       std::string& constructorArguments );
+
+    //
+    static TunnelingCalculator::TunnelingStrategy
+    InterpretTunnelingStrategy( std::string& tunnelingStrategy );
+
+    //
+    static void
+    CheckSurvivalProbabilityThreshold( double survivalProbabilityThreshold );
+
+
     SlhaManager* slhaManager;
-    SlhaManager* deleterForSlhaManager;
-    PotentialFromPolynomialAndMasses* potentialFunction;
-    PotentialFromPolynomialAndMasses* deleterForPotentialFunction;
+    RunningParameterManager* ownedSlhaManager;
+    PotentialFunction* potentialFunction;
+    PotentialFromPolynomialAndMasses* ownedPotentialFunction;
     PotentialMinimizer* potentialMinimizer;
-    PotentialMinimizer* deleterForPotentialMinimizer;
+    PotentialMinimizer* ownedPotentialMinimizer;
     TunnelingCalculator* tunnelingCalculator;
-    TunnelingCalculator* deleterForTunnelingCalculator;
+    TunnelingCalculator* ownedTunnelingCalculator;
     time_t currentTime;
+
+
+    // This decides on the derived class to use for ownedPotentialFunction and
+    // constructs it with the arguments parsed from constructorArguments.
+    PotentialFunction* SetUpPotentialFunction( std::string const& className,
+                                     std::string const& constructorArguments );
+
+    // This decides on the derived class to use for ownedPotentialMinimizer and
+    // constructs it with the arguments parsed from constructorArguments.
+    PotentialMinimizer* SetUpPotentialMinimizer( std::string const& className,
+                                     std::string const& constructorArguments );
+
+    //
+    PotentialMinimizer*
+    SetUpGradientFromStartingPoints( std::string const& constructorArguments );
+
+    //
+    StartingPointFinder*
+    SetUpHom4ps2Runner( std::string const& constructorArguments );
+
+    //
+    GradientMinimizer*
+    SetUpMinuitPotentialMinimizer( std::string const& constructorArguments );
+
+    //
+    TunnelingCalculator*
+    SetUpTunnelingCalculator( std::string const& className,
+                              std::string const& constructorArguments );
+
+    //
+    TunnelingCalculator*
+    SetUpCosmoTransitionsRunner( std::string const& constructorArguments );
+
+    //
+    TunnelingCalculator* SetUpBounceAlongPathWithThreshold(
+                                     std::string const& constructorArguments );
   };
+
+
+
+
+  // This puts the content of the current element of xmlParser into
+  // contentDestination, trimmed of leading and trailing whitespace, if the
+  // element's name matches elementName.
+  inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
+                                          BOL::AsciiXmlParser const& xmlParser,
+                                                std::string const& elementName,
+                                              std::string& contentDestination )
+  {
+    if( xmlParser.currentElementNameMatches( elementName ) )
+    {
+      contentDestination.assign( xmlParser.getTrimmedCurrentElementContent() );
+    }
+  }
+
+  // This puts the content of the current element of xmlParser into
+  // contentDestination, interpreted as a double represented in ASCII, if the
+  // element's name matches elementName.
+  inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
+                                          BOL::AsciiXmlParser const& xmlParser,
+                                                std::string const& elementName,
+                                                   double& contentDestination )
+  {
+    if( xmlParser.currentElementNameMatches( elementName ) )
+    {
+      contentDestination = BOL::StringParser::stringToDouble(
+                             ( xmlParser.getTrimmedCurrentElementContent() ) );
+    }
+  }
+
+  // This puts the content of the current element of xmlParser into
+  // contentDestination, interpreted as an int represented in ASCII, if the
+  // element's name matches elementName.
+  inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
+                                          BOL::AsciiXmlParser const& xmlParser,
+                                                std::string const& elementName,
+                                                      int& contentDestination )
+  {
+    if( xmlParser.currentElementNameMatches( elementName ) )
+    {
+      contentDestination = BOL::StringParser::stringToInt(
+                             ( xmlParser.getTrimmedCurrentElementContent() ) );
+    }
+  }
+
+  // This reads the current element of outerParser and if its name matches
+  // elementName, it puts the contents of the child element <ClassType> into
+  // className and <ConstructorArguments> into constructorArguments, both
+  // stripped of whitespace.
+  inline void VevaciousPlusPlus::ReadClassAndArguments(
+                                        BOL::AsciiXmlParser const& outerParser,
+                                                std::string const& elementName,
+                                                        std::string& className,
+                                            std::string& constructorArguments )
+  {
+    if( outerParser.currentElementNameMatches( elementName ) )
+    {
+      BOL::AsciiXmlParser innerParser;
+      innerParser.loadString( outerParser.getTrimmedCurrentElementContent() );
+      while( innerParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( innerParser,
+                                       "ClassType",
+                                       className );
+        InterpretElementIfNameMatches( innerParser,
+                                       "ConstructorArguments",
+                                       constructorArguments );
+      }
+    }
+  }
+
+  //
+  inline void VevaciousPlusPlus::CheckSurvivalProbabilityThreshold(
+                                          double survivalProbabilityThreshold )
+  {
+    if( !( ( survivalProbabilityThreshold > 0.0 )
+           &&
+           ( survivalProbabilityThreshold < 1.0 ) ) )
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<SurvivalProbabilityThreshold> must be greater than 0.0 and"
+      << " less than 1.0 to be valid! Instead, the XML element gave \""
+      << survivalProbabilityThreshold << "\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+  }
+
+  // This decides on the derived class to use for ownedPotentialMinimizer and
+  // constructs it with the arguments parsed from constructorArguments.
+  inline PotentialMinimizer*
+  VevaciousPlusPlus::SetUpPotentialMinimizer( std::string const& className,
+                                      std::string const& constructorArguments )
+  {
+    if( className.compare( "GradientFromStartingPoints" ) == 0 )
+    {
+      ownedPotentialMinimizer
+      = SetUpGradientFromStartingPoints( constructorArguments );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<MinimizerClass> was not a recognized form! The only type"
+      << " currently valid is \"GradientFromStartingPoints\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+    return ownedPotentialMinimizer;
+  }
+
+  //
+  inline StartingPointFinder* VevaciousPlusPlus::SetUpHom4ps2Runner(
+                                      std::string const& constructorArguments )
+  {
+    // The <ConstructorArguments> for this class should have child elements
+    // <PathToHom4ps2> and <Hom4ps2Argument>.
+    std::string pathToHom4ps2( "./HOM4PS2/" );
+    std::string homotopyType( "2" );
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "PathToHom4ps2",
+                                     pathToHom4ps2 );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "PathToHom4ps2",
+                                     homotopyType );
+    }
+    return new Hom4ps2Runner(
+                 *(ownedPotentialFunction->HomotopyContinuationTargetSystem()),
+                              pathToHom4ps2,
+                              homotopyType );
+  }
+
+  //
+  inline TunnelingCalculator* VevaciousPlusPlus::SetUpTunnelingCalculator(
+                                                  std::string const& className,
+                                      std::string const& constructorArguments )
+  {
+    if( className.compare( "CosmoTransitionsRunner" ) == 0 )
+    {
+      ownedTunnelingCalculator
+      = SetUpCosmoTransitionsRunner( constructorArguments );
+    }
+    else if( className.compare( "BounceAlongPathWithThreshold" ) == 0 )
+    {
+      ownedTunnelingCalculator
+      = SetUpBounceAlongPathWithThreshold( constructorArguments );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<TunnelingClass> was not a recognized form! The only types"
+      << " currently valid are \"BounceAlongPathWithThreshold\" or"
+      << " \"CosmoTransitionsRunner\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+    return ownedPotentialMinimizer;
+  }
+
+  //
+  TunnelingCalculator::TunnelingStrategy
+  InterpretTunnelingStrategy( std::string const& tunnelingStrategy );
+
+  //
+  TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
+                                      std::string const& constructorArguments )
+  {
+    // We need to assemble the components for a
+    // BounceAlongPathWithThreshold object: a BounceActionCalculator and a
+    // BouncePathFinder. We need to find out what derived classes to
+    // actually use.
+    BouncePathFinder* bouncePathFinder( NULL );
+    BounceActionCalculator* bounceActionCalculator( NULL );
+    std::string tunnelingStrategy( "ThermalThenQuantum" );
+    double survivalProbabilityThreshold( 0.1 );
+    int temperatureAccuracy( 7 );
+    int evaporationResolution( 3 );
+    int thermalIntegrationResolution( 5 );
+
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "TunnelingStrategy",
+                                     tunnelingStrategy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "SurvivalProbabilityThreshold",
+                                     survivalProbabilityThreshold );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "CriticalTemperatureAccuracy",
+                                     temperatureAccuracy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "EvaporationBarrierResolution",
+                                     evaporationResolution );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "ThermalIntegrationResolution",
+                                     thermalIntegrationResolution );
+
+
+
+      InterpretElementIfNameMatches( xmlParser,
+                                     "PathResolution",
+                                     resolutionOfDsbVacuum );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MaxInnerLoops",
+                                     maxInnerLoops );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MaxOuterLoops",
+                                     maxOuterLoops );
+    }
+
+
+    CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
+    return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
+                                             bouncePathFinder,
+                                             bounceActionCalculator,
+                               InterpretTunnelingStrategy( tunnelingStrategy ),
+                                             survivalProbabilityThreshold,
+                                             temperatureAccuracy,
+                                             evaporationResolution,
+                                             thermalIntegrationResolution );
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* VEVACIOUSPLUSPLUS_HPP_ */

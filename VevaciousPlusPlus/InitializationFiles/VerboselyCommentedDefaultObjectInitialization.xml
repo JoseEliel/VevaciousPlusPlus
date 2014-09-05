@@ -338,6 +338,48 @@
                "MinimizingPotentialOnBisections")) can be given to change
                default values. -->
           <NodePathRefinement>
+            <ClassType>
+              <!-- The valid options for this version of VevaciousPlusPlus are:
+                   "PathSeparateFieldAverager", or
+                   "PathPolynomialAverager", or "none" (or the absence of
+                   <NodePathRefinement> is equivalent to "none", which is here
+                   just as an easy way of turning off this option). -->
+              PathSeparateFieldAverager
+            </ClassType>
+            <ConstructorArguments>
+              <MovesPerImprovement>
+                100
+              </MovesPerImprovement>
+              <MinuitStrategy>
+                1
+              </MinuitStrategy>
+              <MinuitTolerance>
+                0.1
+              </MinuitTolerance>
+              <BounceCalculator>
+              <!-- See the comment for <BouncePotentialFit> under
+                   <TunnelingClass><ConstructorArguments> to learn about the
+                   options for a valid bounce action calculator. The calculator
+                   object built from these options is separate to that used
+                   directly by the BounceAlongPathWithThreshold object which
+                   uses that built from the <BouncePotentialFit> options under
+                   <TunnelingClass><ConstructorArguments>. -->
+                <ClassType>
+                  BubbleShootingOnSpline
+                </ClassType>
+                <ConstructorArguments>
+                  <NumberOfNodesForPotentialFit>
+                    100
+                  </NumberOfNodesForPotentialFit>
+                  <NumberShootAttemptsAllowed>
+                    32
+                  </NumberShootAttemptsAllowed>
+                  <RadialResolution>
+                    0.05
+                  </RadialResolution>
+                </ConstructorArguments>
+              </BounceCalculator>
+            </ConstructorArguments>
           </NodePathRefinement>
           <MinimumNumberOfNodes>
             <!-- If using "MinimizingPotentialOnHemispheres", the length
