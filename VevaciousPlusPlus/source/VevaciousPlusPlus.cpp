@@ -106,179 +106,8 @@ namespace VevaciousPlusPlus
     tunnelingCalculator = SetUpTunnelingCalculator( tunnelingClass,
                                                     tunnelingArguments );
 
-    if( ( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
-        ||
-        ( tunnelingClass.compare( "BounceAlongPathWithThreshold" ) == 0 ) )
-    {
-      elementParser.loadString( tunnelingArguments );
-      TunnelingCalculator::TunnelingStrategy
-      tunnelingStrategy( TunnelingCalculator::JustThermal );
-      double survivalProbabilityThreshold( 0.1 );
-      size_t temperatureAccuracy( 7 );
-      size_t evaporationResolution( 3 );
-      std::string pathToCosmotransitions( "./cosmoTransitions/" );
-      size_t resolutionOfDsbVacuum( 20 );
-      size_t maxInnerLoops( 10 );
-      size_t maxOuterLoops( 10 );
-      std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
-      std::string bouncePotentialFitArguments( "" );
-      std::string tunnelPathFinderClass( "MinuitNodePotentialMinimizer" );
-      std::string tunnelPathFinderArguments( "" );
-      size_t thermalIntegrationResolution( 5 );
-      while( elementParser.readNextElement() )
-      {
-        if( elementParser.currentElementNameMatches( "TunnelingStrategy" ) )
-        {
-          std::string tunnelingStrategyString(
-                             elementParser.getTrimmedCurrentElementContent() );
-          if( ( tunnelingStrategyString.compare( "DefaultTunneling" ) == 0 )
-              ||
-              ( tunnelingStrategyString.compare( "ThermalThenQuantum" )
-                == 0 ) )
-          {
-            tunnelingStrategy = TunnelingCalculator::ThermalThenQuantum;
-          }
-          else if( tunnelingStrategyString.compare( "QuantumThenThermal" )
-                   == 0 )
-          {
-            tunnelingStrategy
-            = TunnelingCalculator::QuantumThenThermal;
-          }
-          else if( tunnelingStrategyString.compare( "JustThermal" ) == 0 )
-          {
-            tunnelingStrategy = TunnelingCalculator::JustThermal;
-          }
-          else if( tunnelingStrategyString.compare( "JustQuantum" ) == 0 )
-          {
-            tunnelingStrategy = TunnelingCalculator::JustQuantum;
-          }
-          else if( ( tunnelingStrategyString.compare( "NoTunneling" ) == 0 )
-                   ||
-                   ( tunnelingStrategyString.compare( "None" ) == 0 ) )
-          {
-            tunnelingStrategy = TunnelingCalculator::NoTunneling;
-          }
-        }
-        else if( elementParser.currentElementNameMatches(
-                                             "SurvivalProbabilityThreshold" ) )
-        {
-          survivalProbabilityThreshold = BOL::StringParser::stringToDouble(
-                             elementParser.getTrimmedCurrentElementContent() );
-          if( !( ( survivalProbabilityThreshold > 0.0 )
-                 &&
-                 ( survivalProbabilityThreshold < 1.0 ) ) )
-          {
-            std::stringstream errorStream;
-            errorStream
-            << "<SurvivalProbabilityThreshold> must be greater than 0.0 and"
-            << " less than 1.0 to be valid! Instead, the XML element gave \""
-            << elementParser.getTrimmedCurrentElementContent() << "\".";
-            throw std::runtime_error( errorStream.str() );
-          }
-        }
-        else if( elementParser.currentElementNameMatches(
-                                              "CriticalTemperatureAccuracy" ) )
-        {
-          temperatureAccuracy = BOL::StringParser::stringToInt(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-        else if( elementParser.currentElementNameMatches(
-                                             "EvaporationBarrierResolution" ) )
-        {
-          evaporationResolution = BOL::StringParser::stringToInt(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-        else if( elementParser.currentElementNameMatches(
-                                                   "PathToCosmotransitions" ) )
-        {
-          pathToCosmotransitions.assign(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-        else if( elementParser.currentElementNameMatches( "PathResolution" ) )
-        {
-          resolutionOfDsbVacuum = BOL::StringParser::stringToInt(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-        else if( elementParser.currentElementNameMatches( "MaxInnerLoops" ) )
-        {
-          maxInnerLoops = BOL::StringParser::stringToInt(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-        else if( elementParser.currentElementNameMatches( "MaxOuterLoops" ) )
-        {
-          maxOuterLoops = BOL::StringParser::stringToInt(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-        else if( elementParser.currentElementNameMatches(
-                                                       "BouncePotentialFit" ) )
-        {
-          // <BouncePotentialFit> should have child elements <ClassName> and
-          // <ConstructorArguments>.
-          BOL::AsciiXmlParser nestedParser;
-          nestedParser.loadString(
-                             elementParser.getTrimmedCurrentElementContent() );
-          while( nestedParser.readNextElement() )
-          {
-            if( nestedParser.currentElementNameMatches( "ClassType" ) )
-            {
-              bouncePotentialFitClass.assign(
-                              nestedParser.getTrimmedCurrentElementContent() );
-            }
-            else if( nestedParser.currentElementNameMatches(
-                                                     "ConstructorArguments" ) )
-            {
-              bouncePotentialFitArguments.assign(
-                              nestedParser.getTrimmedCurrentElementContent() );
-            }
-          }
-        }
-        else if( elementParser.currentElementNameMatches(
-                                                         "TunnelPathFinder" ) )
-        {
-          // <TunnelPathFinder> should have child elements <ClassName> and
-          // <ConstructorArguments>.
-          BOL::AsciiXmlParser nestedParser;
-          nestedParser.loadString(
-                             elementParser.getTrimmedCurrentElementContent() );
-          while( nestedParser.readNextElement() )
-          {
-            if( nestedParser.currentElementNameMatches( "ClassType" ) )
-            {
-              tunnelPathFinderClass.assign(
-                              nestedParser.getTrimmedCurrentElementContent() );
-            }
-            else if( nestedParser.currentElementNameMatches(
-                                                     "ConstructorArguments" ) )
-            {
-              tunnelPathFinderArguments.assign(
-                              nestedParser.getTrimmedCurrentElementContent() );
-            }
-          }
-        }
-        else if( elementParser.currentElementNameMatches(
-                                             "ThermalIntegrationResolution" ) )
-        {
-          thermalIntegrationResolution
-          = BOL::StringParser::stringToInt(
-                             elementParser.getTrimmedCurrentElementContent() );
-        }
-      }
 
-      if( tunnelingClass.compare( "CosmoTransitionsRunner" ) == 0 )
-      {
-        tunnelingCalculator
-        = new CosmoTransitionsRunner( *potentialFromPolynomialAndMasses,
-                                      *potentialFunction,
-                                      tunnelingStrategy,
-                                      survivalProbabilityThreshold,
-                                      temperatureAccuracy,
-                                      evaporationResolution,
-                                      pathToCosmotransitions,
-                                      resolutionOfDsbVacuum,
-                                      maxInnerLoops,
-                                      maxOuterLoops );
-      }
-      else
+
       // if( tunnelingClass.compare( "BounceAlongPathWithThreshold" ) == 0 )
       // This is already true because of the outer if statement.
       {
@@ -1205,6 +1034,61 @@ namespace VevaciousPlusPlus
                                        resolutionOfDsbVacuum,
                                        maxInnerLoops,
                                        maxOuterLoops );
+  }
+
+  //
+  TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
+                                      std::string const& constructorArguments )
+  {
+    std::string tunnelPathFinderClass( "MinimizingPotentialOnHemispheres" );
+    std::string tunnelPathFinderArguments( "" );
+    std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
+    std::string bouncePotentialFitArguments( "" );
+    std::string tunnelingStrategy( "ThermalThenQuantum" );
+    double survivalProbabilityThreshold( 0.1 );
+    int temperatureAccuracy( 7 );
+    int evaporationResolution( 3 );
+    int thermalIntegrationResolution( 5 );
+
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "TunnelingStrategy",
+                                     tunnelingStrategy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "SurvivalProbabilityThreshold",
+                                     survivalProbabilityThreshold );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "CriticalTemperatureAccuracy",
+                                     temperatureAccuracy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "EvaporationBarrierResolution",
+                                     evaporationResolution );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "ThermalIntegrationResolution",
+                                     thermalIntegrationResolution );
+      ReadClassAndArguments( xmlParser,
+                             "BouncePotentialFit",
+                             bouncePotentialFitClass,
+                             bouncePotentialFitArguments );
+      ReadClassAndArguments( xmlParser,
+                             "TunnelPathFinder",
+                             tunnelPathFinderClass,
+                             tunnelPathFinderArguments );
+    }
+    CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
+    return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
+                                  SetUpBouncePathFinder( tunnelPathFinderClass,
+                                                   tunnelPathFinderArguments ),
+                          SetUpBounceActionCalculator( bouncePotentialFitClass,
+                                                 bouncePotentialFitArguments ),
+                               InterpretTunnelingStrategy( tunnelingStrategy ),
+                                             survivalProbabilityThreshold,
+                                             temperatureAccuracy,
+                                             evaporationResolution,
+                                             thermalIntegrationResolution );
   }
 
 } /* namespace VevaciousPlusPlus */

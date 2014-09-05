@@ -171,6 +171,26 @@ namespace VevaciousPlusPlus
     //
     TunnelingCalculator* SetUpBounceAlongPathWithThreshold(
                                      std::string const& constructorArguments );
+
+    //
+    BouncePathFinder* SetUpMinimizingPotentialOnHemispheres(
+                                     std::string const& constructorArguments );
+
+    //
+    BouncePathFinder* SetUpMinimizingPotentialOnBisections(
+                                     std::string const& constructorArguments );
+
+    //
+    BouncePathFinder* SetUpBouncePathFinder( std::string const& className,
+                                     std::string const& constructorArguments );
+    //
+    BounceActionCalculator*
+    SetUpBubbleShootingOnSpline( std::string const& constructorArguments );
+
+    //
+    BounceActionCalculator*
+    SetUpBounceActionCalculator( std::string const& className,
+                                 std::string const& constructorArguments );
   };
 
 
@@ -338,68 +358,47 @@ namespace VevaciousPlusPlus
   }
 
   //
-  TunnelingCalculator::TunnelingStrategy
-  InterpretTunnelingStrategy( std::string const& tunnelingStrategy );
-
-  //
-  TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
+  inline BouncePathFinder* VevaciousPlusPlus::SetUpBouncePathFinder(
+                                                  std::string const& className,
                                       std::string const& constructorArguments )
   {
-    // We need to assemble the components for a
-    // BounceAlongPathWithThreshold object: a BounceActionCalculator and a
-    // BouncePathFinder. We need to find out what derived classes to
-    // actually use.
-    BouncePathFinder* bouncePathFinder( NULL );
-    BounceActionCalculator* bounceActionCalculator( NULL );
-    std::string tunnelingStrategy( "ThermalThenQuantum" );
-    double survivalProbabilityThreshold( 0.1 );
-    int temperatureAccuracy( 7 );
-    int evaporationResolution( 3 );
-    int thermalIntegrationResolution( 5 );
-
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    if( className.compare( "MinimizingPotentialOnHemispheres" ) == 0 )
     {
-      InterpretElementIfNameMatches( xmlParser,
-                                     "TunnelingStrategy",
-                                     tunnelingStrategy );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "SurvivalProbabilityThreshold",
-                                     survivalProbabilityThreshold );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "CriticalTemperatureAccuracy",
-                                     temperatureAccuracy );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "EvaporationBarrierResolution",
-                                     evaporationResolution );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "ThermalIntegrationResolution",
-                                     thermalIntegrationResolution );
-
-
-
-      InterpretElementIfNameMatches( xmlParser,
-                                     "PathResolution",
-                                     resolutionOfDsbVacuum );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MaxInnerLoops",
-                                     maxInnerLoops );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MaxOuterLoops",
-                                     maxOuterLoops );
+      return SetUpMinimizingPotentialOnHemispheres( constructorArguments );
     }
+    else if( className.compare( "MinimizingPotentialOnBisections" ) == 0 )
+    {
+      return SetUpMinimizingPotentialOnBisections( constructorArguments );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<TunnelPathFinder> was not a recognized form! The only types"
+      << " currently valid are \"MinimizingPotentialOnHemispheres\" or"
+      << " \"MinimizingPotentialOnBisections\".";
+      throw std::runtime_error( errorStream.str() );
+    }
+    return ownedPotentialMinimizer;
+  }
 
-
-    CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
-    return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
-                                             bouncePathFinder,
-                                             bounceActionCalculator,
-                               InterpretTunnelingStrategy( tunnelingStrategy ),
-                                             survivalProbabilityThreshold,
-                                             temperatureAccuracy,
-                                             evaporationResolution,
-                                             thermalIntegrationResolution );
+  //
+  inline BounceActionCalculator*
+  VevaciousPlusPlus::SetUpBounceActionCalculator( std::string const& className,
+                                      std::string const& constructorArguments )
+  {
+    if( className.compare( "BubbleShootingOnSpline" ) == 0 )
+    {
+      return SetUpBubbleShootingOnSpline( constructorArguments );
+    }
+    else
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<BouncePotentialFit> was not a recognized form! The only type"
+      << " currently valid is \"BubbleShootingOnSpline\".";
+      throw std::runtime_error( errorStream.str() );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */
