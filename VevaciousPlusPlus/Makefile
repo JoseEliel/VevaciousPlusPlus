@@ -58,6 +58,8 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathBounceMinimizer.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathPotentialMinimizer.cpp \
+ $(BOUNCEACTIONPATHFINDING)/PathPolynomialAverager.cpp \
+ $(BOUNCEACTIONPATHFINDING)/PathSeparateFieldAverager.cpp \
  $(BOUNCEACTIONPATHFINDING)/SingleNodeVaryingMinuit.cpp \
  source/BounceActionEvaluation/BouncePathFinder.cpp \
  source/BounceActionEvaluation/BubbleProfile.cpp \

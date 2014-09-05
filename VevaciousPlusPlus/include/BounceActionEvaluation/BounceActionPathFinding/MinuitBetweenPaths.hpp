@@ -21,9 +21,11 @@ namespace VevaciousPlusPlus
   class MinuitBetweenPaths : public ROOT::Minuit2::FCNBase
   {
   public:
-    MinuitBetweenPaths( std::vector< std::vector< double > > const& curvedPath,
-                        double const pathTemperature,
-                  BounceActionCalculator const* const bounceActionCalculator );
+    MinuitBetweenPaths(
+                    BounceActionCalculator const* const bounceActionCalculator,
+                        unsigned int const minuitStrategy,
+                        double const minuitToleranceFraction,
+                        size_t const movesPerImprovement );
     virtual ~MinuitBetweenPaths();
 
 
@@ -51,11 +53,12 @@ namespace VevaciousPlusPlus
     // This sets up straightPath to go from curvedPath.front() to
     // curvedPath.back() in a straight line with as many nodes as curvedPath
     // has, as well as updating pathTemperature and currentMinuitTolerance.
-    void UpdateNodes( double const pathTemperature );
+    void UpdateNodes( std::vector< std::vector< double > > const& curvedPath,
+                      double const pathTemperature );
 
 
   protected:
-    std::vector< std::vector< double > > const& curvedPath;
+    std::vector< std::vector< double > > const* curvedPath;
     double pathTemperature;
     BounceActionCalculator const* const bounceActionCalculator;
     std::vector< std::vector< double > > straightPath;
@@ -63,20 +66,19 @@ namespace VevaciousPlusPlus
     size_t numberOfSegments;
     unsigned int const minuitStrategy;
     size_t const movesPerImprovement;
+    double const minuitToleranceFraction;
     double currentMinuitTolerance;
     MinuitMinimum currentMinuitResult;
 
 
-    // This takes minuitParameters as a pair of weightings and creates a node
-    // path of weighted averages of each node in curvedPath with the
-    // corresponding node in straightPath, where the weighting for the
-    // straightPath node is
-    // minuitParameters[ 0 ] + ( minuitParameters[ 1 ] * the fraction along the
-    // path of the node), and the weighting for the curvedPath node is
-    // 1.0 - the other weighting, then it returns the path of straight lines
-    // between the composed nodes.
+    // This should create a set of nodes based on minuitParameters, curvedPath,
+    // and straightPath, and return the path of straight lines between the
+    // composed nodes.
     TunnelPath const* PathForParameterization(
-                         std::vector< double > const& minuitParameters ) const;
+                     std::vector< double > const& minuitParameters ) const = 0;
+
+    // This should prepare currentMinuitResult based on the updated curvedPath.
+    void PrepareMinuitStartingPoint() = 0;
   };
 
 
