@@ -173,6 +173,10 @@ namespace VevaciousPlusPlus
                                      std::string const& constructorArguments );
 
     //
+    BouncePathFinder* SetUpBouncePathFinder( std::string const& className,
+                                     std::string const& constructorArguments );
+
+    //
     BouncePathFinder* SetUpMinimizingPotentialOnHemispheres(
                                      std::string const& constructorArguments );
 
@@ -181,16 +185,17 @@ namespace VevaciousPlusPlus
                                      std::string const& constructorArguments );
 
     //
-    BouncePathFinder* SetUpBouncePathFinder( std::string const& className,
+    MinuitBetweenPaths* SetUpPathRefiner( std::string const& className,
                                      std::string const& constructorArguments );
-    //
-    BounceActionCalculator*
-    SetUpBubbleShootingOnSpline( std::string const& constructorArguments );
 
     //
     BounceActionCalculator*
     SetUpBounceActionCalculator( std::string const& className,
                                  std::string const& constructorArguments );
+
+    //
+    BounceActionCalculator*
+    SetUpBubbleShootingOnSpline( std::string const& constructorArguments );
   };
 
 
@@ -399,6 +404,20 @@ namespace VevaciousPlusPlus
       << " currently valid is \"BubbleShootingOnSpline\".";
       throw std::runtime_error( errorStream.str() );
     }
+  }
+
+  //
+  inline MinuitBetweenPaths* VevaciousPlusPlus::SetUpPathRefiner(
+                                                  std::string const& className,
+                                      std::string const& constructorArguments )
+  {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "VevaciousPlusPlus::SetUpPathRefiner( \"" << className << "\", \""
+    << constructorArguments << "\" ) returning NULL.";
+    std::cout << std::endl;
+    return NULL;/**/
   }
 
 } /* namespace VevaciousPlusPlus */
