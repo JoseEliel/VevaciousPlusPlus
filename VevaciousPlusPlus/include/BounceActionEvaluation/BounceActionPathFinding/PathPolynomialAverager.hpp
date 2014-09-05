@@ -21,10 +21,10 @@ namespace VevaciousPlusPlus
   {
   public:
     PathPolynomialAverager( size_t const degreeOfPolynomial,
-                    BounceActionCalculator const* const bounceActionCalculator,
-                           unsigned int const minuitStrategy,
-                           double const minuitToleranceFraction,
-                           size_t const movesPerImprovement );
+                          BounceActionCalculator* const bounceActionCalculator,
+                            unsigned int const minuitStrategy,
+                            double const minuitToleranceFraction,
+                            size_t const movesPerImprovement );
     virtual ~PathPolynomialAverager();
 
 
@@ -37,7 +37,7 @@ namespace VevaciousPlusPlus
     // the corresponding node in straightPath, where the weighting for the
     // straightPath node is
     // minuitParameters[ 0 ] + ( minuitParameters[ 1 ] * the fraction along the
-    // path of the node) + ( minuitParameters[ 1 ] * that fraction squared )
+    // path of the node) + ( minuitParameters[ 2 ] * that fraction squared )
     // + ..., and the weighting for the curvedPath node is 1.0 - the other
     // weighting, then it returns the path of straight lines between the
     // composed nodes.

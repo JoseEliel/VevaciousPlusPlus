@@ -24,15 +24,16 @@ namespace VevaciousPlusPlus
   public:
     MinimizingPotentialOnHypersurfaces(
                                     PotentialFunction const& potentialFunction,
+                                        MinuitBetweenPaths* pathRefiner = NULL,
                                         size_t const movesPerImprovement = 100,
                                         unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinimizingPotentialOnHypersurfaces();
 
 
-    // This sets the vacua to be those given, and resets the nodes to describe a
-    // straight path between the new vacua, as well as setting pathTemperature
-    // and currentMinuitTolerance appropriately.
+    // This sets the vacua to be those given, and resets the nodes to describe
+    // a straight path between the new vacua, as well as setting
+    // pathTemperature and currentMinuitTolerance appropriately.
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
@@ -49,7 +50,7 @@ namespace VevaciousPlusPlus
     // parameterization that is just a set of zeroes.
     Eigen::MatrixXd reflectionMatrix;
     bool nodesConverged;
-    MinuitBetweenPaths pathAverager;
+    MinuitBetweenPaths* pathRefiner;
 
 
     // This should move the nodes individually towards whatever the derived

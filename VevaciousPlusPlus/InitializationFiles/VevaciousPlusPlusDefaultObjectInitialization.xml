@@ -156,9 +156,8 @@
       </BouncePotentialFit>
       <TunnelPathFinder>
         <ClassType>
-        <!-- "MinuitPathBounceMinimizer", "MinuitPathPotentialMinimizer", or
-             "MinuitNodePotentialMinimizer" -->
-          MinuitNodePotentialMinimizer
+        <!-- Only "MinimizingPotentialOnHemispheres" so far. -->
+          MinimizingPotentialOnHemispheres
         </ClassType>
         <ConstructorArguments>
           <MovesPerImprovement>

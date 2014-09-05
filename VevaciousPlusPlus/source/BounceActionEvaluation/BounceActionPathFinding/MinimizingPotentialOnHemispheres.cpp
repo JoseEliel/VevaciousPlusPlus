@@ -12,11 +12,13 @@ namespace VevaciousPlusPlus
 
   MinimizingPotentialOnHemispheres::MinimizingPotentialOnHemispheres(
                                     PotentialFunction const& potentialFunction,
+                                               MinuitBetweenPaths* pathRefiner,
                                              size_t const minimumNumberOfNodes,
                                               size_t const movesPerImprovement,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
     MinimizingPotentialOnHypersurfaces( potentialFunction,
+                                        pathRefiner,
                                         movesPerImprovement,
                                         minuitStrategy,
                                         minuitToleranceFraction ),

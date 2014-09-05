@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   PathSeparateFieldAverager::PathSeparateFieldAverager(
-                    BounceActionCalculator const* const bounceActionCalculator,
+                          BounceActionCalculator* const bounceActionCalculator,
                                              unsigned int const minuitStrategy,
                                           double const minuitToleranceFraction,
                                            size_t const movesPerImprovement ) :

@@ -225,7 +225,7 @@ namespace VevaciousPlusPlus
       std::string gradientMinimizerClass( "MinuitPotentialMinimizer" );
       std::string gradientMinimizerArguments( "" );
       double extremumSeparationThresholdFraction( 0.05 );
-      double nonDsbRollingToDsbScalingFactor( 10.0 );
+      double nonDsbRollingToDsbScalingFactor( 4.0 );
 
       // The <ConstructorArguments> for this class should have child elements
       // <StartingPointFinderClass> and <GradientMinimizerClass>, and

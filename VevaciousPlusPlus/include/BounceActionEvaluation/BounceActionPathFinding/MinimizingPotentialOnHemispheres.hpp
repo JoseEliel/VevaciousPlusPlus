@@ -20,6 +20,7 @@ namespace VevaciousPlusPlus
   public:
     MinimizingPotentialOnHemispheres(
                                     PotentialFunction const& potentialFunction,
+                                      MinuitBetweenPaths* pathRefiner,
                                       size_t const minimumNumberOfNodes,
                                       size_t const movesPerImprovement = 100,
                                       unsigned int const minuitStrategy = 1,

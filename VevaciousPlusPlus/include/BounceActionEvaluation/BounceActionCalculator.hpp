@@ -29,6 +29,17 @@ namespace VevaciousPlusPlus
     virtual void ResetVacua( PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum ){}
 
+    // This should prepare the BounceActionCalculator for a path or set of
+    // paths between the given vacua, possibly because it might need to set up
+    // things based on characteristic energy scales for example. By default it
+    // does nothing.
+    virtual void ResetVacua( std::vector< double > const& falseVacuum,
+                             std::vector< double > const& trueVacuum )
+    { ResetVacua( PotentialMinimum( falseVacuum,
+                                    potentialFunction( falseVacuum ) ),
+                  PotentialMinimum( trueVacuum,
+                                    potentialFunction( trueVacuum ) ) ); }
+
     // This should calculate the bounce action along the path given by
     // tunnelPath. Either S_4, the dimensionless quantum bounce action
     // integrated over four dimensions, or S_3(T), the dimensionful (in GeV)

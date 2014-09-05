@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
 #include "../BounceActionCalculator.hpp"
 #include "../PathParameterization/TunnelPath.hpp"
@@ -21,8 +22,7 @@ namespace VevaciousPlusPlus
   class MinuitBetweenPaths : public ROOT::Minuit2::FCNBase
   {
   public:
-    MinuitBetweenPaths(
-                    BounceActionCalculator const* const bounceActionCalculator,
+    MinuitBetweenPaths( BounceActionCalculator* const bounceActionCalculator,
                         unsigned int const minuitStrategy,
                         double const minuitToleranceFraction,
                         size_t const movesPerImprovement );
@@ -60,7 +60,7 @@ namespace VevaciousPlusPlus
   protected:
     std::vector< std::vector< double > > const* curvedPath;
     double pathTemperature;
-    BounceActionCalculator const* const bounceActionCalculator;
+    BounceActionCalculator* const bounceActionCalculator;
     std::vector< std::vector< double > > straightPath;
     size_t numberOfFields;
     size_t numberOfSegments;

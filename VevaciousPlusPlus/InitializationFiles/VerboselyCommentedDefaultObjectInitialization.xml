@@ -161,8 +161,8 @@
              sufficiently far away from the DSB minimum yet rolls there under
              gradient-based minimization, the starting point's field values are
              scaled up by the number given by this element, and used as a new
-             starting point. If not given, 10.0 is taken as the default. -->
-        10.0
+             starting point. If not given, 4.0 is taken as the default. -->
+        4.0
       </NonDsbRollingToDsbScalingFactor>
     </ConstructorArguments>
   </MinimizerClass>
@@ -177,7 +177,7 @@
          while "BounceAlongPathWithThreshold" needs <BouncePotentialFit> and
          <BouncePathFinder>. -->
     <ClassType>
-      MinuitBounceActionMinimizer
+      BounceAlongPathWithThreshold
     </ClassType>
     <ConstructorArguments>
       <TunnelingStrategy>
@@ -300,45 +300,62 @@
       <TunnelPathFinder>
         <ClassType>
         <!-- The valid options for this version of VevaciousPlusPlus are:
-             "MinuitPathBounceMinimizer" (minimizing the bounce action along
-             the tunneling path directly),
-             "MinuitPathPotentialMinimizer" (minimizing the sum of values of
-             the potential over a set of points along the tunneling path), or
-             "MinuitNodePotentialMinimizer" (minimizing the potential over a
-             set of points along the tunneling path on a node-by-node basis.
-             Both "MinuitPathPotentialMinimizer" and
-             "MinuitNodePotentialMinimizer" are close to the algorithm followed
-             by CosmoTransitions. The difference between
-             "MinuitPathPotentialMinimizer" and "MinuitNodePotentialMinimizer"
-             is that the former can take a path parameterized in such a way
-             that varying any parameter affects the whole path, while the
-             latter requires that varying any parameter only varies the path in
-             a very localized region, so that the sampled potential values are
-             independent. The advantage of the latter is that it then reduces
-             the minimization in an (n*f)-dimensional space, where there are n
-             nodes with f free parameters per node, to n independent
-             minimizations in an f-dimensional space. If using
-             "MinuitNodePotentialMinimizer", <ConstructorArguments> here must
-             have "LinearSplineThroughNodes", "QuadraticSplineThroughNodes", or
-             "PolynomialThroughNodes" in <PathParameterization><ClassType>.
-             (There is a good reason why there is no option to have a
-             "MinuitNodeBounceMinimizer": calculating the bounce action
-             requires knowing the whole path, so there is nothing to be gained
-             by looking at a single node at a time, and Minuit2 will vary each
-             node on its own anyway as part of the process of varying the whole
-             path.) -->
-          MinuitNodePotentialMinimizer
+             "MinimizingPotentialOnHemispheres" or
+             "MinimizingPotentialOnBisections". Both are based on
+             parameterizing the tunneling path in field space as a series of
+             nodes with straight interpolations between, and both aim to create
+             a path in field space where the force along the path is always
+             tangential to the path. This does NOT actually solve the equations
+             for the extremum of the bounce action which gives the decay width
+             of the false vacuum, but should be a good guess and certainly
+             gives a lower bound on the decay width.
+             The nodes for "MinimizingPotentialOnHemispheres" are chosen by
+             minimizing the potential on a hemisphere of fixed radius around
+             the false vacuum and then taking a step of twice this radius from
+             the false vacuum, giving a straight step which is parallel to the
+             force on its midpoint, then this node is used as the center of the
+             next hemisphere. (Well, the hemispheres are not actually
+             hemispheres, but rather hypersectors of hyperspheres subtended by
+             a polar angle slightly less than pi/2 so that each step gives a
+             node closer to the true vacuum than the last node.)
+             The nodes for "MinimizingPotentialOnBisections" are initially just
+             those on a straight line between the vacua, and then each node is
+             moved in a hyperplane which bisects the straight line between the
+             moving node's nearest neighbors until the potential in this
+             hyperplane is minimized. -->
+          MinimizingPotentialOnHemispheres
         </ClassType>
         <ConstructorArguments>
+          <!-- The arguments given here are all optional.
+               If <NodePathRefinement> is given, it will be used to construct a
+               MinuitBetweenPaths object that is used to try to improve the
+               path from the "no perpendicular force" path to a path which
+               might come closer to solving the equations of the maximal decay
+               width.
+               The other elements (<MinimumNumberOfNodes>,
+               <MovesPerImprovement>, <MinuitStrategy>, <MinuitTolerance>, and
+               <NodeMovementThreshold> (which is only used by
+               "MinimizingPotentialOnBisections")) can be given to change
+               default values. -->
+          <NodePathRefinement>
+          </NodePathRefinement>
+          <MinimumNumberOfNodes>
+            <!-- If using "MinimizingPotentialOnHemispheres", the length
+                 between nodes is the total length of the straight line between
+                 the vacua divided by (n+1), where n is the number given by
+                 this element, and thus the actual number of nodes used
+                 internally will be larger than n, unless the path ends up as
+                 exactly straight between the vacua.
+                 If using "MinimizingPotentialOnBisections", the lines between
+                 nodes are divided in half recursively, so the number of nodes
+                 will actually be ( (2^n) - 1) where a is the smallest integer
+                 such that 2^n > the number given here. -->
+            20
+          </MinimumNumberOfNodes>
           <MovesPerImprovement>
-            <!-- If using "MinuitPathBounceMinimizer" or
-                 "MinuitPathPotentialMinimizer", this is the number of function
-                 calls that Minuit2 is allowed to make to improve the path
-                 before the bounce action along the path is checked against the
-                 threshold. If using "MinuitNodePotentialMinimizer", this gives
-                 the number of moves per node used by a single iterator of path
-                 improvement (before checking to see if the action has dropped
-                 below the threshold). -->
+            <!-- This is the number of function calls that Minuit2 is allowed
+                 to make to improve the position of each node before the bounce
+                 action along the path is checked against the threshold. -->
             100
           </MovesPerImprovement>
           <MinuitStrategy>
@@ -360,158 +377,6 @@
                  considers its minimization complete. -->
             0.1
           </MinuitTolerance>
-          <NumberOfPotentialSamplePoints>
-            <!-- If using "MinuitPathPotentialMinimizer", this gives the number
-                 of nodes at which the potential will be evaluated for the sum,
-                 though if <PathParameterization> has a larger number in
-                 <ConstructorArguments><NumberOfVaryingNodes>, that will be
-                 used instead. If using "MinuitNodePotentialMinimizer" or
-                 "MinuitPathBounceMinimizer", this number is ignored, as the
-                 number of nodes will be taken from
-                 <ConstructorArguments><NumberOfVaryingNodes> in
-                 <PathParameterization>
-                 or <BouncePotentialFit><NumberOfNodesForPotentialFit> in
-                 <BouncePotentialFit> within
-                 <TunnelPathFinder><ConstructorArguments> (not the XML element
-                 within <TunnelingClass><ConstructorArguments>). -->
-            15
-          </NumberOfPotentialSamplePoints>
-          <BouncePotentialFit>
-            <!-- This is used by "MinuitPathBounceMinimizer" and is ignored by
-                 the other options. It has the same possibilities as the
-                 element of the same name under
-                 <TunnelingClass><ConstructorArguments>. The numbers given here
-                 allow for the path finding code to use a lower-resolution
-                 version to try to find the path more quickly while still
-                 allowing an accurate evaluation of the bounce action along the
-                 final path. -->
-            <ClassType>
-              BubbleShootingOnSpline
-            </ClassType>
-            <ConstructorArguments>
-              <NumberOfNodesForPotentialFit>
-                8
-              </NumberOfNodesForPotentialFit>
-              <NumberShootAttemptsAllowed>
-                16
-              </NumberShootAttemptsAllowed>
-              <RadialResolution>
-                0.05
-              </RadialResolution>
-            </ConstructorArguments>
-          </BouncePotentialFit>
-          <PathParameterization>
-            <ClassType>
-              <!-- The valid options for this version of VevaciousPlusPlus are:
-                   "PathFromNodes" or "PathFromPolynomialCoefficients". The
-                   parameterization of the first is that the parameterization
-                   sets up a set of nodes in field space between the vacua,
-                   then a parameterization of the fields which goes through the
-                   nodes from the false vacuum to the true vacuum is generated
-                   as the tunneling path. The parameterization of the second is
-                   that the field with greatest difference between the vacua is
-                   chosen as a reference and then parameterized as a constant
-                   plus a linear term in a path auxiliary variable, and the
-                   other fields are parameterized as polynomials in the path
-                   auxiliary. The coefficients are given in sets of
-                   (number of fields - 1) for the varying fields, each set
-                   corresponding to a higher power of the path auxiliary. For
-                   example, if there are 4 varying fields, then the
-                   parameterization is a vector of sets of 3 coefficients, the
-                   first 3 being the quadratic coefficients, the 2nd 3 being
-                   the cubic coefficients, and so on, until each field has
-                   NumberOfCoefficientsPerVaryingField coefficients. -->
-              PathFromNodes
-            </ClassType>
-            <ConstructorArguments>
-              <NumberOfCoefficientsPerVaryingFieldBeyondLinear>
-                <!-- This is only used by "PathFromPolynomialCoefficients", and
-                     is ignored by "PathFromNodesOnParallelPlanes" and
-                     "PathFromNodesOnBisectingPlanes". It is the number of
-                     coefficients for terms with powers of the path auxiliary
-                     variable above 1. For example, 3 here would mean that each
-                     field would be parameterized as a polynomial of degree 4:
-                     c_0 + c_1 p + c_2 p^2 + c_3 p^3 + c_4 p^4, except for the
-                     reference field, which is the field with largest
-                     difference between values at the true vacuum and the false
-                     vacuum, which is always held to a linear function of p
-                     (if it were allowed to be the same degree as the other
-                     fields, there would be an infinite degeneracy in path
-                     parameterizations along the lines of this example: all
-                     fields with the only non-zero coefficients being the
-                     constant term and the quadratic term gives exactly the
-                     same path as only the constant and the linear term being
-                     non-zero, and so on, as the ratio of the fields is the
-                     same in each case). -->
-                3
-              </NumberOfCoefficientsPerVaryingField>
-              <NumberOfVaryingNodes>
-                <!-- This is only used by "PathFromNodesOnParallelPlanes" and
-                     "PathFromNodesOnBisectingPlanes", and is ignored by
-                     "PathFromPolynomialCoefficients". This is taken as a lower
-                     bound by "PathFromNodesOnBisectingPlanes", as it requires
-                     a number that is one less than an integer power of two
-                     (so: 1, 3, 7, 15, 31, ...) and the lowest (2^n)-1 >= the
-                     number given here will be taken. -->
-                7
-              </NumberOfVaryingNodes>
-              <NodeParameterizationStyle>
-                <!-- This is only used by "PathFromNodes" and is ignored by
-                     "PathFromPolynomialCoefficients".
-                     The current valid options are "NodesOnParallelPlanes" or
-                     "NodesOnBisectingPlanes". Both take the field with
-                     greatest difference between the false vacuum and true
-                     vacuum as the reference field, and each node is
-                     parameterized as a vector in the hyperplane where the
-                     reference field has zero value. If using
-                     "NodesOnParallelPlanes", that vector is then projected
-                     to be perpendicular to a vector going from false vacuum to
-                     true vacuum, and then the node gets a multiple of that
-                     vector, so the nodes end up on a series of parallel planes
-                     between the vacua. The procedure if using
-                     "NodesOnBisectingPlanes" is similar, except the planes are
-                     those that bisect the vector between nodes: first a node
-                     on a plane bisecting the vector between the vacua is
-                     calculated, then a node between that node and the false
-                     vacuum is calculated such that it lies on a plane
-                     perpendicular to the vector from the false vacuum to the
-                     node just calculated, and another node between the node
-                     just calculated and the true vacuum in a similar manner is
-                     calculated. Also, since the vector between nodes may end
-                     up on the parameterized node plane, the nodes are rotated
-                     to be perpendicular rather than projected (in general
-                     there are many possible rotations: here a consistent set
-                     of orthogonal vectors is built from the vector between the
-                     nodes, taking initially the first two non-reference fields
-                     and making them orthogonal to the vector, with the rest of
-                     the components set to zero, then another vector orthogonal
-                     to both vectors is taken with the third non-reference
-                     field, keeping the remaining components non-zero, and so
-                     on. -->
-                NodesOnParallelPlanes
-              </NodeParameterizationStyle>
-              <InterpolationStyle>
-                <!-- This is only used by "PathFromNodes" and is ignored by
-                     "PathFromPolynomialCoefficients".
-                     The valid options for this version of VevaciousPlusPlus
-                     are:
-                     "PolynomialPath" (a single polynomial fit of degree (n+1),
-                     with n = the number given by NumberOfVaryingNodes),
-                     "LinearSplinePath" (approximated as a straight line
-                     between the nodes), or
-                     "QuadraticSplinePath" (approximated as quadratic
-                     polynomials between nodes, with continuous slope between
-                     the spline segments; the first segment is taken as linear
-                     and each subsequent segment is constructed to have slope
-                     continuous with its previous segment).
-                     Unfortunately, "PolynomialPath" performs poorly, as it
-                     tends to make very wiggly paths which leads to very high
-                     bounce actions due to the derivative term, so it is NOT
-                     recommended! -->
-                LinearSplinePath
-              </InterpolationStyle>
-            </ConstructorArguments>
-          </PathParameterization>
           <NodeMovementThreshold>
             0.01
           </NodeMovementThreshold>

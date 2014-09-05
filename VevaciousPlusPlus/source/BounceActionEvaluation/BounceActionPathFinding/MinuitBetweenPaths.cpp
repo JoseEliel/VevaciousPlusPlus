@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   MinuitBetweenPaths::MinuitBetweenPaths(
-                    BounceActionCalculator const* const bounceActionCalculator,
+                          BounceActionCalculator* const bounceActionCalculator,
                                           unsigned int const minuitStrategy,
                                           double const minuitToleranceFraction,
                                           size_t const movesPerImprovement ) :
@@ -33,7 +33,7 @@ namespace VevaciousPlusPlus
 
   MinuitBetweenPaths::~MinuitBetweenPaths()
   {
-    // This does nothing.
+    delete bounceActionCalculator;
   }
 
 
@@ -44,6 +44,8 @@ namespace VevaciousPlusPlus
                         std::vector< std::vector< double > > const& curvedPath,
                                         double const pathTemperature )
   {
+    bounceActionCalculator->ResetVacua( curvedPath.front(),
+                                        curvedPath.back() );
     this->curvedPath = &curvedPath;
     numberOfSegments = curvedPath.size();
     numberOfFields = curvedPath.front().size();

@@ -12,6 +12,7 @@ namespace VevaciousPlusPlus
 
   MinimizingPotentialOnHypersurfaces::MinimizingPotentialOnHypersurfaces(
                                     PotentialFunction const& potentialFunction,
+                                               MinuitBetweenPaths* pathRefiner,
                                               size_t const movesPerImprovement,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
@@ -24,14 +25,15 @@ namespace VevaciousPlusPlus
     currentParallelComponent(),
     reflectionMatrix( numberOfFields,
                       numberOfFields ),
-    nodesConverged( false )
+    nodesConverged( false ),
+    pathRefiner( pathRefiner )
   {
     // This constructor is just an initialization list.
   }
 
   MinimizingPotentialOnHypersurfaces::~MinimizingPotentialOnHypersurfaces()
   {
-    // This does nothing.
+    delete pathRefiner;
   }
 
 
@@ -50,7 +52,15 @@ namespace VevaciousPlusPlus
       // can proceed.
       if( nodesConverged )
       {
-        pathAverager.UpdateNodes( pathTemperature );
+        if( pathRefiner != NULL )
+        {
+          pathRefiner->UpdateNodes( pathNodes,
+                                    pathTemperature );
+        }
+        else
+        {
+          pathCanBeImproved = false;
+        }
       }
       return new LinearSplineThroughNodes( pathNodes,
                                            std::vector< double >( 0 ),
@@ -58,7 +68,16 @@ namespace VevaciousPlusPlus
     }
     else
     {
-      return pathAverager.ImprovePath();
+      if( pathRefiner != NULL )
+      {
+        return pathRefiner->ImprovePath();
+      }
+      else
+      {
+        return new LinearSplineThroughNodes( pathNodes,
+                                             std::vector< double >( 0 ),
+                                             pathTemperature );
+      }
     }
   }
 
