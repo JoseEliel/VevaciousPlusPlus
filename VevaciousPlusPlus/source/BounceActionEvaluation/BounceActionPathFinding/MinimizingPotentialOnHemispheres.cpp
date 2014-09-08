@@ -35,6 +35,49 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This sets up the nodes by minimizing the potential on a hypersector of a
+  // hypersphere of radius equal to ( 0.5 * stepSize ) from the last set node
+  // beginning with the false vacuum, facing the true vacuum, and then makes
+  // a step of length stepSize through this point on the hemisphere from the
+  // node to create a new node, which is then used as the center of the
+  // "hemisphere" for the next node. This continues until the direct distance
+  // to the true vacuum is less than stepSize, or until Minuit2 has exceeded
+  // movesPerImprovement function calls in total with this call of
+  // ImproveNodes(), and nodesConverged is set appropriately.
+  void MinimizingPotentialOnHemispheres::ImproveNodes()
+  {
+    size_t numberOfMovesSoFar( 0 );
+    while( numberOfMovesSoFar < movesPerImprovement )
+    {
+      pathNodes.push_back( pathNodes.back() );
+      std::vector< double >& centerNode( pathNodes[ pathNodes.size() - 2 ] );
+      std::vector< double >& currentNode( pathNodes[ pathNodes.size() - 1 ] );
+      SetParallelVector( centerNode,
+                         pathNodes.back() );
+      SetUpHouseholderReflection();
+      SetCurrentMinuitSteps();
+
+      ROOT::Minuit2::MnMigrad mnMigrad( *this,
+                                 std::vector< double >( ( numberOfFields - 1 ),
+                                                        0.0 ),
+                                        minuitInitialSteps,
+                                        minuitStrategy );
+      MinuitMinimum minuitResult( mnMigrad( movesPerImprovement,
+                                            currentMinuitTolerance ) );
+
+      Eigen::VectorXd const
+      stepVector( StepVector( minuitResult.VariableValues() ) );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        currentNode[ fieldIndex ] = ( centerNode[ fieldIndex ]
+                                      + stepVector( fieldIndex ) );
+      }
+      if( )
+    }
+  }
+
   // This takes the parameterization as the components of a vector
   // perpendicular to axis 0 which is then added to a unit vector along axis
   // 0. This then could be scaled to give a unit vector within the hemisphere

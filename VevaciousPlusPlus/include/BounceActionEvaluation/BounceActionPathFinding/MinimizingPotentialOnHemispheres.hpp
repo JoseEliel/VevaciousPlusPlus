@@ -27,12 +27,6 @@ namespace VevaciousPlusPlus
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinimizingPotentialOnHemispheres();
 
-
-    // This allows Minuit2 to adjust the full path a set number of times to try
-    // to minimize the sum of potentials at a set of nodes or bounce action
-    // along the adjusted path, and then sets the path.
-    virtual TunnelPath const* ImprovePath();
-
     // It may seem unwise to have this object call Minuit on itself, but really
     // it's just a handy way of keeping the minimization function within the
     // class that ends up finding its minimum. In this case,
@@ -46,6 +40,17 @@ namespace VevaciousPlusPlus
     double stepSize;
     double currentAngleScaling;
 
+
+    // This sets up the nodes by minimizing the potential on a hypersector of a
+    // hypersphere of radius equal to ( 0.5 * stepSize ) from the last set node
+    // beginning with the false vacuum, facing the true vacuum, and then makes
+    // a step of length stepSize through this point on the hemisphere from the
+    // node to create a new node, which is then used as the center of the
+    // "hemisphere" for the next node. This continues until the direct distance
+    // to the true vacuum is less than stepSize, or until Minuit2 has exceeded
+    // movesPerImprovement function calls in total with this call of
+    // ImproveNodes(), and nodesConverged is set appropriately.
+    virtual void ImproveNodes();
 
     // This sets pathNodes to just be the false vacuum node and the true vacuum
     // node, and also sets stepSize to be the distance between the vacua

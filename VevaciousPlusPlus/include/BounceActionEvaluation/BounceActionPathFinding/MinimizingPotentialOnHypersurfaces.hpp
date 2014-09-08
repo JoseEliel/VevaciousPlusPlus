@@ -40,6 +40,12 @@ namespace VevaciousPlusPlus
                     double const pathTemperature = 0.0 );
 
 
+    // This allows Minuit2 to adjust the full path a set number of times to try
+    // to minimize the sum of potentials at a set of nodes or bounce action
+    // along the adjusted path, and then sets the path.
+    virtual TunnelPath const* ImprovePath();
+
+
   protected:
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
@@ -51,6 +57,7 @@ namespace VevaciousPlusPlus
     Eigen::MatrixXd reflectionMatrix;
     bool nodesConverged;
     MinuitBetweenPaths* pathRefiner;
+    std::vector< double > minuitInitialSteps;
 
 
     // This should move the nodes individually towards whatever the derived
@@ -69,10 +76,27 @@ namespace VevaciousPlusPlus
     Eigen::VectorXd UntransformedNode(
                      std::vector< double > const& nodeParameterization ) const;
 
-
-    // This should set up pathNodes for a new pair of
+    // This should set up pathNodes for a new pair of vacua.
     virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
                                       PotentialMinimum const& trueVacuum ) = 0;
+
+    // This sets the components of currentParallelComponent to be the elements
+    // of endNode minus the values those elements have in startNode.
+    void SetParallelVector( std::vector< double > const& startNode,
+                            std::vector< double > const& endNode );
+
+    // This just sets the tolerance to be minuitToleranceFraction times the
+    // difference in potential between the vacua, but could be over-ridden if
+    // necessary.
+    virtual void
+    SetCurrentMinuitTolerance( PotentialMinimum const& falseVacuum,
+                               PotentialMinimum const& trueVacuum )
+    { currentMinuitTolerance = ( minuitToleranceFraction
+          * ( falseVacuum.PotentialValue() - trueVacuum.PotentialValue() ) ); }
+
+    // This just sets the elements of minuitInitialSteps to be 0.5 times the
+    // Euclidean length of currentParallelComponent.
+    virtual void SetCurrentMinuitSteps();
   };
 
 
@@ -87,11 +111,12 @@ namespace VevaciousPlusPlus
                                                  double const pathTemperature )
   {
     this->pathTemperature = pathTemperature;
-    currentMinuitTolerance = ( minuitToleranceFraction
-                               * ( falseVacuum.PotentialValue()
-                                   - trueVacuum.PotentialValue() ) );
     SetNodesForInitialPath( falseVacuum,
                             trueVacuum );
+    SetCurrentMinuitTolerance( falseVacuum,
+                               trueVacuum );
+    SetCurrentMinuitTolerance( falseVacuum,
+                               trueVacuum );
     std::vector< std::vector< double > > straightPath( 2,
                                             falseVacuum.FieldConfiguration() );
     straightPath.back() = trueVacuum.FieldConfiguration();
@@ -114,6 +139,37 @@ namespace VevaciousPlusPlus
       untransformedNode( fieldIndex ) = nodeParameterization[ fieldIndex - 1 ];
     }
     return untransformedNode;
+  }
+
+  // This sets the components of currentParallelComponent to be the elements
+  // of endNode minus the values those elements have in startNode.
+  inline void MinimizingPotentialOnHypersurfaces::SetParallelVector(
+                                        std::vector< double > const& startNode,
+                                         std::vector< double > const& endNode )
+  {
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      currentParallelComponent[ fieldIndex ] = ( endNode[ fieldIndex ]
+                                                 - startNode[ fieldIndex ] );
+    }
+  }
+
+  // This just sets the elements of minuitInitialSteps to be 0.5 times the
+  // Euclidean length of currentParallelComponent.
+  inline void MinimizingPotentialOnHypersurfaces::SetCurrentMinuitSteps()
+  {
+    double lengthSquared( 0.0 );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      lengthSquared += ( currentParallelComponent[ fieldIndex ]
+                         * currentParallelComponent[ fieldIndex ] );
+    }
+    minuitInitialSteps.assign( ( numberOfFields - 1 ),
+                               sqrt( lengthSquared ) );
   }
 
 } /* namespace VevaciousPlusPlus */
