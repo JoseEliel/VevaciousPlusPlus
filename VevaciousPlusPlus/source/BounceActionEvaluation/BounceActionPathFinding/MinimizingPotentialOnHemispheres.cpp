@@ -46,12 +46,18 @@ namespace VevaciousPlusPlus
   // ImproveNodes(), and nodesConverged is set appropriately.
   void MinimizingPotentialOnHemispheres::ImproveNodes()
   {
-    size_t numberOfMovesSoFar( 0 );
-    while( numberOfMovesSoFar < movesPerImprovement )
+    for( size_t numberOfMovesSoFar( 0 );
+         numberOfMovesSoFar < movesPerImprovement;
+         ++numberOfMovesSoFar )
     {
       pathNodes.push_back( pathNodes.back() );
-      std::vector< double >& centerNode( pathNodes[ pathNodes.size() - 2 ] );
-      std::vector< double >& currentNode( pathNodes[ pathNodes.size() - 1 ] );
+      // Now the true vacuum has been copied into
+      // pathNodes[ pathNodes.size() - 1 ], that means that we can overwrite
+      // pathNodes[ pathNodes.size() - 2 ] (which currently is a copy of the
+      // true vacuum) as the node just before the true vacuum, based on the
+      // node just before it, which is pathNodes[ pathNodes.size() - 3 ].
+      std::vector< double >& centerNode( pathNodes[ pathNodes.size() - 3 ] );
+      std::vector< double >& currentNode( pathNodes[ pathNodes.size() - 2 ] );
       SetParallelVector( centerNode,
                          pathNodes.back() );
       SetUpHouseholderReflection();
@@ -67,14 +73,26 @@ namespace VevaciousPlusPlus
 
       Eigen::VectorXd const
       stepVector( StepVector( minuitResult.VariableValues() ) );
+      double currentSquareDistanceToTrueVacuum( 0.0 );
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
         currentNode[ fieldIndex ] = ( centerNode[ fieldIndex ]
                                       + stepVector( fieldIndex ) );
+        currentSquareDistanceToTrueVacuum += ( currentNode[ fieldIndex ]
+                                               * currentNode[ fieldIndex ] );
       }
-      if( )
+      if( currentSquareDistanceToTrueVacuum <= ( stepSize * stepSize ) )
+      {
+        nodesConverged = true;
+        return;
+        // If currentNode is within stepSize of the true vacuum, we note that
+        // this stage of path improvement is over by setting nodesConverged to
+        // true, and then leaving the function immediately (rather than just
+        // breaking out of the loop, as nothing else needs to happen after the
+        // loop).
+      }
     }
   }
 

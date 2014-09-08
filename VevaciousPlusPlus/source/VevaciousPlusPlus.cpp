@@ -98,11 +98,11 @@ namespace VevaciousPlusPlus
     potentialFunction = SetUpPotentialFunction( potentialClass,
                                                 potentialArguments );
 
-    // Now the potential minimizer:
+    // Next the potential minimizer:
     potentialMinimizer = SetUpPotentialMinimizer( minimizerClass,
                                                   minimizerArguments );
 
-    // Next the tunneling calculator:
+    // Finally the tunneling calculator:
     tunnelingCalculator = SetUpTunnelingCalculator( tunnelingClass,
                                                     tunnelingArguments );
   }
