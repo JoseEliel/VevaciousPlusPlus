@@ -11,31 +11,26 @@
 #include "CommonIncludes.hpp"
 #include "VersionInformation.hpp"
 #include "SlhaManagement/RunningParameterManager.hpp"
-#include "PotentialMinimization/PotentialMinimizer.hpp"
-#include "TunnelingCalculation/TunnelingCalculator.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
+#include "PotentialMinimization/PotentialMinimizer.hpp"
+#include "PotentialMinimization/GradientFromStartingPoints.hpp"
 #include "PotentialMinimization/StartingPointFinder.hpp"
 #include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
 #include "PotentialMinimization/GradientMinimizer.hpp"
-#include "PotentialMinimization/GradientFromStartingPoints.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
+#include "TunnelingCalculation/TunnelingCalculator.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
+#include "BounceActionEvaluation/BouncePathFinder.hpp"
+// #include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnBisections.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnHemispheres.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitBetweenPaths.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
-#include "BounceActionEvaluation/BouncePathFinder.hpp"
-#include "BounceActionEvaluation/PathParameterization/NodesOnParallelPlanes.hpp"
-#include "BounceActionEvaluation/PathParameterization/NodesOnBisectingPlanes.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinuitNodePotentialMinimizer.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinuitPathBounceMinimizer.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinuitPathPotentialMinimizer.hpp"
-#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodesFactory.hpp"
-#include "BounceActionEvaluation/PathParameterization/PolynomialThroughNodesFactory.hpp"
-#include "BounceActionEvaluation/PathParameterization/QuadraticSplineThroughNodesFactory.hpp"
-#include "BounceActionEvaluation/PathParameterization/PolynomialsFromCoefficientsFactory.hpp"
+
 
 namespace VevaciousPlusPlus
 {
@@ -359,7 +354,7 @@ namespace VevaciousPlusPlus
       << " \"CosmoTransitionsRunner\".";
       throw std::runtime_error( errorStream.str() );
     }
-    return ownedPotentialMinimizer;
+    return ownedTunnelingCalculator;
   }
 
   //
