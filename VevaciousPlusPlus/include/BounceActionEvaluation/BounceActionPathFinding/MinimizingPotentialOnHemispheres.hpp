@@ -9,6 +9,7 @@
 #define MINIMIZINGPOTENTIALONHEMISPHERES_HPP_
 
 #include "CommonIncludes.hpp"
+#include "boost/math/constants/constants.hpp"
 #include "MinimizingPotentialOnHypersurfaces.hpp"
 
 namespace VevaciousPlusPlus
@@ -38,7 +39,9 @@ namespace VevaciousPlusPlus
   protected:
     size_t const minimumNumberOfNodes;
     double stepSize;
+    std::vector< double > const* currentHemisphereNode;
     double currentAngleScaling;
+    double currentDistanceToTrueVacuum;
 
 
     // This sets up the nodes by minimizing the potential on a hypersector of a
@@ -67,6 +70,20 @@ namespace VevaciousPlusPlus
     // length stepSize.
     Eigen::VectorXd
     StepVector( std::vector< double > const& nodeParameterization ) const;
+
+    // This sets currentAngleScaling to be the ratio of the maximum angle
+    // relative to currentParallelComponent that a step can take is asymptotic
+    // to pi/2 (so that every step must put its node closer to the true vacuum
+    // than the last node).
+    virtual void SetUpCurrentAngleScaling()
+    { currentAngleScaling = ( acos( stepSize / currentDistanceToTrueVacuum )
+                              / ( boost::math::double_constants::half_pi ) ); }
+
+    // This sets currentNode to be the vector sum of centerNode with stepVector
+    // and also updates currentDistanceToTrueVacuum.
+    virtual void UpdateNode( std::vector< double >& currentNode,
+                             std::vector< double > const& centerNode,
+                             Eigen::VectorXd const& stepVector );
   };
 
 
@@ -80,8 +97,7 @@ namespace VevaciousPlusPlus
                       std::vector< double > const& nodeParameterization ) const
   {
     Eigen::VectorXd const stepVector( StepVector( nodeParameterization ) );
-    std::vector< double >
-    pointOnHemisphere( pathNodes[ pathNodes.size() - 2 ] );
+    std::vector< double > pointOnHemisphere( *currentHemisphereNode );
     // Now pointOnHemisphere is the last node on the path before the true
     // vacuum.
     for( size_t fieldIndex( 0 );
@@ -104,8 +120,33 @@ namespace VevaciousPlusPlus
     pathNodes.resize( 2 );
     pathNodes.front() = falseVacuum.FieldConfiguration();
     pathNodes.back() = trueVacuum.FieldConfiguration();
-    stepSize = ( sqrt( trueVacuum.SquareDistanceTo( falseVacuum ) )
+    currentDistanceToTrueVacuum
+    = sqrt( trueVacuum.SquareDistanceTo( falseVacuum ) );
+    stepSize = ( currentDistanceToTrueVacuum
                  / static_cast< double >( minimumNumberOfNodes + 1 ) );
+  }
+
+  // This sets currentNode to be the vector sum of centerNode with stepVector
+  // and also updates currentDistanceToTrueVacuum.
+  inline void MinimizingPotentialOnHemispheres::UpdateNode(
+                                            std::vector< double >& currentNode,
+                                       std::vector< double > const& centerNode,
+                                            Eigen::VectorXd const& stepVector )
+  {
+    double currentSquareDistanceToTrueVacuum( 0.0 );
+    std::vector< double > const& trueVacuum( pathNodes.back() );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      currentNode[ fieldIndex ] = ( centerNode[ fieldIndex ]
+                                    + stepVector( fieldIndex ) );
+      double const differenceFromTrueVacuum( trueVacuum[ fieldIndex ]
+                                             - currentNode[ fieldIndex ] );
+      currentSquareDistanceToTrueVacuum += ( differenceFromTrueVacuum
+                                             * differenceFromTrueVacuum );
+    }
+    currentDistanceToTrueVacuum = sqrt( currentSquareDistanceToTrueVacuum );
   }
 
 } /* namespace VevaciousPlusPlus */

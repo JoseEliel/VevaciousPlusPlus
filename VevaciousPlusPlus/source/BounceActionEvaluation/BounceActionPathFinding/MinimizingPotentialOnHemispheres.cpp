@@ -24,7 +24,9 @@ namespace VevaciousPlusPlus
                                         minuitToleranceFraction ),
     minimumNumberOfNodes( minimumNumberOfNodes ),
     stepSize( NAN ),
-    currentAngleScaling( NAN )
+    currentHemisphereNode( NULL ),
+    currentAngleScaling( NAN ),
+    currentDistanceToTrueVacuum( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -46,6 +48,34 @@ namespace VevaciousPlusPlus
   // ImproveNodes(), and nodesConverged is set appropriately.
   void MinimizingPotentialOnHemispheres::ImproveNodes()
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "MinimizingPotentialOnHemispheres::ImproveNodes() called."
+    << " pathNodes = { { ";
+    for( std::vector< std::vector< double > >::iterator
+         pathNode( pathNodes.begin() );
+         pathNode < pathNodes.end();
+         ++pathNode )
+    {
+      if( pathNode > pathNodes.begin() )
+      {
+        std::cout << " }," << std::endl << "{ ";
+      }
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << (*pathNode)[ fieldIndex ];
+      }
+    }
+    std::cout << " } }";
+    std::cout << std::endl;/**/
+
     for( size_t numberOfMovesSoFar( 0 );
          numberOfMovesSoFar < movesPerImprovement;
          ++numberOfMovesSoFar )
@@ -56,12 +86,12 @@ namespace VevaciousPlusPlus
       // pathNodes[ pathNodes.size() - 2 ] (which currently is a copy of the
       // true vacuum) as the node just before the true vacuum, based on the
       // node just before it, which is pathNodes[ pathNodes.size() - 3 ].
-      std::vector< double >& centerNode( pathNodes[ pathNodes.size() - 3 ] );
-      std::vector< double >& currentNode( pathNodes[ pathNodes.size() - 2 ] );
-      SetParallelVector( centerNode,
+      currentHemisphereNode = &(pathNodes[ pathNodes.size() - 3 ]);
+      SetParallelVector( *currentHemisphereNode,
                          pathNodes.back() );
       SetUpHouseholderReflection();
       SetCurrentMinuitSteps();
+      SetUpCurrentAngleScaling();
 
       ROOT::Minuit2::MnMigrad mnMigrad( *this,
                                  std::vector< double >( ( numberOfFields - 1 ),
@@ -69,22 +99,73 @@ namespace VevaciousPlusPlus
                                         minuitInitialSteps,
                                         minuitStrategy );
       MinuitMinimum minuitResult( ( numberOfFields - 1 ),
-                                  mnMigrad( movesPerImprovement,
+                                  mnMigrad( 0,
                                             currentMinuitTolerance ) );
-
+      // We use 0 as the "maximum number of function calls" so that Minuit2
+      // uses the default number.
       Eigen::VectorXd const
       stepVector( StepVector( minuitResult.VariableValues() ) );
-      double currentSquareDistanceToTrueVacuum( 0.0 );
+      UpdateNode( pathNodes[ pathNodes.size() - 2 ],
+                  *currentHemisphereNode,
+                  StepVector( minuitResult.VariableValues() ) );
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "currentParallelComponent = { ";
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        currentNode[ fieldIndex ] = ( centerNode[ fieldIndex ]
-                                      + stepVector( fieldIndex ) );
-        currentSquareDistanceToTrueVacuum += ( currentNode[ fieldIndex ]
-                                               * currentNode[ fieldIndex ] );
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << currentParallelComponent[ fieldIndex ];
       }
-      if( currentSquareDistanceToTrueVacuum <= ( stepSize * stepSize ) )
+      std::cout << " }" << std::endl << "minuitResult = "
+      << minuitResult.AsDebuggingString() << std::endl << "reflectionMatrix ="
+      << std::endl << reflectionMatrix << std::endl
+      << "pathNodes[ pathNodes.size() - 2 ] = { ";
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << pathNodes[ pathNodes.size() - 2 ][ fieldIndex ];
+      }
+      std::cout << " }, currentDistanceToTrueVacuum = "
+      << currentDistanceToTrueVacuum << std::endl;
+      std:: cout << "*currentHemisphereNode = { ";
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << (*currentHemisphereNode)[ fieldIndex ];
+      }
+      std::cout << " }" << std::endl;
+      std::cout << "stepVector = { ";
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << stepVector( fieldIndex );
+      }
+      std::cout << " }";
+      std::cout << std::endl;/**/
+
+      if( currentDistanceToTrueVacuum <= stepSize )
       {
         nodesConverged = true;
         return;
@@ -107,6 +188,7 @@ namespace VevaciousPlusPlus
   Eigen::VectorXd MinimizingPotentialOnHemispheres::StepVector(
                       std::vector< double > const& nodeParameterization ) const
   {
+    Eigen::VectorXd untransformedNode( numberOfFields );
     double tangentSquared( 0.0 );
     for( std::vector< double >::const_iterator
          nodeParameter( nodeParameterization.begin() );
@@ -115,20 +197,56 @@ namespace VevaciousPlusPlus
     {
       tangentSquared += ( (*nodeParameter) * (*nodeParameter) );
     }
-    double const parameterizationRadius( sqrt( tangentSquared ) );
-    double const
-    scaledAngle( currentAngleScaling * atan( parameterizationRadius ) );
-    double const radialScaling( ( stepSize * sin( scaledAngle ) )
-                                / parameterizationRadius );
-    Eigen::VectorXd untransformedNode( numberOfFields );
-    untransformedNode( 0 ) = ( stepSize * cos( scaledAngle ) );
-    for( size_t fieldIndex( 1 );
-        fieldIndex < numberOfFields;
-        ++fieldIndex )
+    if( tangentSquared > 0.0 )
     {
-      untransformedNode( fieldIndex )
-      = ( radialScaling * nodeParameterization[ fieldIndex - 1 ] );
+      double const parameterizationRadius( sqrt( tangentSquared ) );
+      double const
+      scaledAngle( currentAngleScaling * atan( parameterizationRadius ) );
+      double const radialScaling( ( stepSize * sin( scaledAngle ) )
+                                  / parameterizationRadius );
+      untransformedNode( 0 ) = ( stepSize * cos( scaledAngle ) );
+      for( size_t fieldIndex( 1 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        untransformedNode( fieldIndex )
+        = ( radialScaling * nodeParameterization[ fieldIndex - 1 ] );
+      }
     }
+    else
+    {
+      untransformedNode( 0 ) = stepSize;
+      for( size_t fieldIndex( 1 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        untransformedNode( fieldIndex ) = 0.0;
+      }
+    }
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "MinimizingPotentialOnHemispheres::StepVector("
+    << " nodeParameterization = { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < ( numberOfFields - 1 );
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << nodeParameterization[ fieldIndex ];
+    }
+    std::cout << " } ) finishing. tangentSquared = " << tangentSquared
+    << ", currentAngleScaling = " << currentAngleScaling
+    << ", stepSize = " << stepSize
+    << ", untransformedNode =" << std::endl << untransformedNode
+    << ", about to return ( reflectionMatrix * untransformedNode ) ="
+    << std::endl << ( reflectionMatrix * untransformedNode );
+    std::cout << std::endl;*/
+
     return ( reflectionMatrix * untransformedNode );
   }
 

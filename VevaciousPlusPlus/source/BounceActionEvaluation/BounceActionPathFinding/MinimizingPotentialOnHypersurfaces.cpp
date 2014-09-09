@@ -22,7 +22,7 @@ namespace VevaciousPlusPlus
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     pathNodes(),
-    currentParallelComponent(),
+    currentParallelComponent( numberOfFields ),
     reflectionMatrix( numberOfFields,
                       numberOfFields ),
     nodesConverged( false ),

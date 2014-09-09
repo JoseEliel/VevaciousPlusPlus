@@ -197,8 +197,8 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "fix polynomial path from nodes: looks crazy after Minuit2" << std::endl
-  << "check full path action minimization" << std::endl
+  << "abandon path from minimizing potential on hemispheres?" << std::endl
+  << "write path through nodes on bisections" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
   std::cout << std::endl;

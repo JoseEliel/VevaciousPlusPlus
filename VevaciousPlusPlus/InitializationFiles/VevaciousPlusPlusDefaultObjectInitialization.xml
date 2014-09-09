@@ -165,10 +165,10 @@
           </NodePathRefinement>
           -->
           <MinimumNumberOfNodes>
-          10
+          100
           </MinimumNumberOfNodes>
           <MovesPerImprovement>
-            5
+            100
           </MovesPerImprovement>
           <MinuitStrategy>
             1
