@@ -68,7 +68,8 @@ namespace VevaciousPlusPlus
                                                         0.0 ),
                                         minuitInitialSteps,
                                         minuitStrategy );
-      MinuitMinimum minuitResult( mnMigrad( movesPerImprovement,
+      MinuitMinimum minuitResult( ( numberOfFields - 1 ),
+                                  mnMigrad( movesPerImprovement,
                                             currentMinuitTolerance ) );
 
       Eigen::VectorXd const

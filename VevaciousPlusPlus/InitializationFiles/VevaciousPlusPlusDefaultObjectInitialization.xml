@@ -160,8 +160,15 @@
           MinimizingPotentialOnHemispheres
         </ClassType>
         <ConstructorArguments>
+          <!--
+          <NodePathRefinement>
+          </NodePathRefinement>
+          -->
+          <MinimumNumberOfNodes>
+          10
+          </MinimumNumberOfNodes>
           <MovesPerImprovement>
-            100
+            5
           </MovesPerImprovement>
           <MinuitStrategy>
             1
@@ -169,43 +176,8 @@
           <MinuitTolerance>
             0.1
           </MinuitTolerance>
-          <NumberOfPotentialSamplePoints>
-            100
-          </NumberOfPotentialSamplePoints>
-          <PathParameterization>
-            <ClassType>
-              <!-- "PathFromNodes" or
-                   "PathFromPolynomialCoefficients" -->
-              PathFromNodes
-            </ClassType>
-            <ConstructorArguments>
-              <NumberOfCoefficientsPerVaryingField>
-                3
-              </NumberOfCoefficientsPerVaryingField>
-              <NumberOfVaryingNodes>
-                15
-              </NumberOfVaryingNodes>
-              <NodeParameterizationStyle>
-                <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
-                NodesOnBisectingPlanes
-              </NodeParameterizationStyle>
-              <InterpolationStyle>
-                <!-- "PolynomialPath", "LinearSplinePath", or
-                     "QuadraticSplinePath" . "PolynomialPath" is NOT
-                     recommended! -->
-                LinearSplinePath
-              </InterpolationStyle>
-            </ConstructorArguments>
-          </PathParameterization>
           <NodeMovementThreshold>
-            <!-- This is the fraction that is used for deciding whether the
-                 path has converged when using "MinuitNodePotentialMinimizer":
-                 the number given here is multiplied by the shorter Euclidean
-                 length between a node and its nearest neighbors, and if the
-                 node in question has moved more than this threshold since the
-                 last attempt at improving the path, the path is flagged as not
-                 yet having converged. -->
-            0.05
+            0.01
           </NodeMovementThreshold>
         </ConstructorArguments>
       </TunnelPathFinder>

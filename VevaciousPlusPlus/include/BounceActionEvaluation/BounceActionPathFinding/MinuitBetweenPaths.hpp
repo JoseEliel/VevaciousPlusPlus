@@ -10,6 +10,8 @@
 
 #include "CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
+#include "Minuit2/MnMigrad.h"
+#include "Minuit2/FunctionMinimum.h"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
 #include "../BounceActionCalculator.hpp"
@@ -74,11 +76,11 @@ namespace VevaciousPlusPlus
     // This should create a set of nodes based on minuitParameters, curvedPath,
     // and straightPath, and return the path of straight lines between the
     // composed nodes.
-    TunnelPath const* PathForParameterization(
+    virtual TunnelPath const* PathForParameterization(
                      std::vector< double > const& minuitParameters ) const = 0;
 
     // This should prepare currentMinuitResult based on the updated curvedPath.
-    void PrepareMinuitStartingPoint() = 0;
+    virtual void PrepareMinuitStartingPoint() = 0;
   };
 
 
@@ -90,7 +92,8 @@ namespace VevaciousPlusPlus
   inline double MinuitBetweenPaths::operator()(
                           std::vector< double > const& minuitParameters ) const
   {
-    TunnelPath* composedPath( PathForParameterization( minuitParameters ) );
+    TunnelPath const*
+    composedPath( PathForParameterization( minuitParameters ) );
     double const bounceAction( (*bounceActionCalculator)( *composedPath ) );
     delete composedPath;
     return bounceAction;

@@ -395,10 +395,10 @@
             20
           </MinimumNumberOfNodes>
           <MovesPerImprovement>
-            <!-- This is the number of function calls that Minuit2 is allowed
-                 to make to improve the position of each node before the bounce
-                 action along the path is checked against the threshold. -->
-            100
+            <!-- This is the number of nodes which can be moved for each call
+                 to improve the path before the bounce action along the path is
+                 checked against the threshold. -->
+            5
           </MovesPerImprovement>
           <MinuitStrategy>
             <!-- The number given here is given to Minuit2 to decide how

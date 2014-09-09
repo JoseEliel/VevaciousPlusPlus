@@ -21,7 +21,7 @@ namespace VevaciousPlusPlus
     slopeSquared( NAN )
   {
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "LinearSplineThroughNodes::LinearSplineThroughNodes( pathNodes = { ";
     for( size_t nodeIndex( 0 );
@@ -58,7 +58,7 @@ namespace VevaciousPlusPlus
     }
     std::cout << " }, pathTemperature = " << pathTemperature
     << " ) called.";
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
 
     std::vector< double > segmentLengths( pathSegments.size() );
     double totalLength( 0.0 );
@@ -97,11 +97,11 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "slopeSquared = " << slopeSquared << ", this->AsDebuggingString() = "
     << this->AsDebuggingString();
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
   }
 
   LinearSplineThroughNodes::~LinearSplineThroughNodes()
