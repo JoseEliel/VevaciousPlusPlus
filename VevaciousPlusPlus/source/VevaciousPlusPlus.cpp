@@ -57,7 +57,6 @@ namespace VevaciousPlusPlus
   {
     ownedSlhaManager = new RunningParameterManager();
     slhaManager = ownedSlhaManager;
-    PotentialFromPolynomialAndMasses* potentialFromPolynomialAndMasses( NULL );
     std::string potentialClass( "FixedScaleOneLoopPotential" );
     std::string potentialArguments( "" );
     std::string minimizerClass( "GradientFromStartingPoints" );

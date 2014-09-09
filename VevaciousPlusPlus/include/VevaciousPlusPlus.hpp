@@ -379,7 +379,6 @@ namespace VevaciousPlusPlus
       << " \"MinimizingPotentialOnBisections\".";
       throw std::runtime_error( errorStream.str() );
     }
-    return ownedPotentialMinimizer;
   }
 
   //
