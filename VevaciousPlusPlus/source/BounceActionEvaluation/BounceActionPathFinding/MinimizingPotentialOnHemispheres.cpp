@@ -9,6 +9,9 @@
 
 namespace VevaciousPlusPlus
 {
+  double const
+  MinimizingPotentialOnHemispheres::pathForceAlignmentForZeroForce(
+                                     -(std::numeric_limits< double >::max()) );
 
   MinimizingPotentialOnHemispheres::MinimizingPotentialOnHemispheres(
                                     PotentialFunction const& potentialFunction,
@@ -26,7 +29,9 @@ namespace VevaciousPlusPlus
     stepSize( NAN ),
     currentHemisphereNode( NULL ),
     currentAngleScaling( NAN ),
-    currentDistanceToTrueVacuum( NAN )
+    currentDistanceToTrueVacuum( NAN ),
+    headingToSaddlePoint( true ),
+    lastPotential( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -73,7 +78,8 @@ namespace VevaciousPlusPlus
         std::cout << (*pathNode)[ fieldIndex ];
       }
     }
-    std::cout << " } }";
+    std::cout << " } }, lastPotential = " << lastPotential
+    << ", headingToSaddlePoint = " << headingToSaddlePoint;
     std::cout << std::endl;/**/
 
     for( size_t numberOfMovesSoFar( 0 );
@@ -105,9 +111,20 @@ namespace VevaciousPlusPlus
       // uses the default number.
       Eigen::VectorXd const
       stepVector( StepVector( minuitResult.VariableValues() ) );
-      UpdateNode( pathNodes[ pathNodes.size() - 2 ],
+      std::vector< double >& currentNode( pathNodes[ pathNodes.size() - 2 ] );
+      UpdateNode( currentNode,
                   *currentHemisphereNode,
                   StepVector( minuitResult.VariableValues() ) );
+
+      // Now we check to see if we have gone over the saddle point, and note if
+      // we have so that we can just minimize the potential rather than the
+      // alignment for generating the rest of the path.
+      double const currentPotential( potentialFunction( currentNode ) );
+      if( currentPotential < lastPotential )
+      {
+        headingToSaddlePoint = false;
+      }
+      lastPotential = currentPotential;
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
@@ -162,8 +179,44 @@ namespace VevaciousPlusPlus
         }
         std::cout << stepVector( fieldIndex );
       }
-      std::cout << " }";
-      std::cout << std::endl;/**/
+      std::cout << " }, headingToSaddlePoint = " << headingToSaddlePoint
+      << ", potential of current node = " << lastPotential
+      << ", potential of last node = "
+      << potentialFunction( *currentHemisphereNode );
+      std::cout << std::endl;
+      std::vector< double > gradientPoint( *currentHemisphereNode );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        gradientPoint += ( 0.5 * stepVector( fieldIndex ) );
+      }
+      std::vector< double > forceVector;
+      potentialFunction.SetAsGradientAt( forceVector,
+                                         gradientPoint );
+      std::cout << "gradientPoint = { ";
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << gradientPoint[ fieldIndex ];
+      }
+      std::cout << "}, forceVector = { ";
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        if( fieldIndex > 0 )
+        {
+          std::cout << ", ";
+        }
+        std::cout << forceVector[ fieldIndex ];
+      }
+      std::cout << " }";/**/
 
       if( currentDistanceToTrueVacuum <= stepSize )
       {
@@ -248,6 +301,39 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;*/
 
     return ( reflectionMatrix * untransformedNode );
+  }
+
+  // This returns -(F.S)^2/(F.F), where F is the gradient of the
+  // potential at the pointOnHemisphere and S is stepVector. Essentially this
+  // is returning -1/(S.S) times the square of the cosine of the angle
+  // between the force and the path, and since stepVector is a fixed length,
+  // minimizing -(F.S)^2/(F.F) is equivalent to maximizing the alignment of
+  // the force with the path.
+  double MinimizingPotentialOnHemispheres::NegativeOfForcePathAlignment(
+                                std::vector< double > const& pointOnHemisphere,
+                                      Eigen::VectorXd const& stepVector ) const
+  {
+    std::vector< double > forceVector;
+    potentialFunction.SetAsGradientAt( forceVector,
+                                       pointOnHemisphere );
+    double pathDotForce( 0.0 );
+    double minusForceDotForce( 0.0 );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      pathDotForce += ( stepVector( fieldIndex ) * forceVector[ fieldIndex ] );
+      minusForceDotForce
+      -= ( forceVector[ fieldIndex ] * forceVector[ fieldIndex ] );
+    }
+    if( minusForceDotForce < 0.0 )
+    {
+      return ( ( pathDotForce * pathDotForce ) / minusForceDotForce );
+    }
+    else
+    {
+      return pathForceAlignmentForZeroForce;
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

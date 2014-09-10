@@ -8,6 +8,7 @@
 #ifndef MINIMIZINGPOTENTIALONHEMISPHERES_HPP_
 #define MINIMIZINGPOTENTIALONHEMISPHERES_HPP_
 
+#include <limits>
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "MinimizingPotentialOnHypersurfaces.hpp"
@@ -37,11 +38,15 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    static double const pathForceAlignmentForZeroForce;
+
     size_t const minimumNumberOfNodes;
     double stepSize;
     std::vector< double > const* currentHemisphereNode;
     double currentAngleScaling;
     double currentDistanceToTrueVacuum;
+    bool headingToSaddlePoint;
+    double lastPotential;
 
 
     // This sets up the nodes by minimizing the potential on a hypersector of a
@@ -84,6 +89,16 @@ namespace VevaciousPlusPlus
     virtual void UpdateNode( std::vector< double >& currentNode,
                              std::vector< double > const& centerNode,
                              Eigen::VectorXd const& stepVector );
+
+    // This returns -(F.S)^2/(F.F), where F is the gradient of the
+    // potential at the pointOnHemisphere and S is stepVector. Essentially this
+    // is returning -1/(S.S) times the square of the cosine of the angle
+    // between the force and the path, and since stepVector is a fixed length,
+    // minimizing -(F.S)^2/(F.F) is equivalent to maximizing the alignment of
+    // the force with the path.
+    double NegativeOfForcePathAlignment(
+                                std::vector< double > const& pointOnHemisphere,
+                                     Eigen::VectorXd const& stepVector ) const;
   };
 
 
@@ -106,8 +121,16 @@ namespace VevaciousPlusPlus
     {
       pointOnHemisphere[ fieldIndex ] += ( 0.5 * stepVector( fieldIndex ) );
     }
-    return potentialFunction( pointOnHemisphere,
-                              pathTemperature );
+    if( headingToSaddlePoint )
+    {
+      return NegativeOfForcePathAlignment( pointOnHemisphere,
+                                           stepVector );
+    }
+    else
+    {
+      return potentialFunction( pointOnHemisphere,
+                                pathTemperature );
+    }
   }
 
   // This sets pathNodes to just be the false vacuum node and the true vacuum
@@ -124,6 +147,8 @@ namespace VevaciousPlusPlus
     = sqrt( trueVacuum.SquareDistanceTo( falseVacuum ) );
     stepSize = ( currentDistanceToTrueVacuum
                  / static_cast< double >( minimumNumberOfNodes + 1 ) );
+    lastPotential = potentialFunction( falseVacuum.VariableValues() );
+    headingToSaddlePoint = true;
   }
 
   // This sets currentNode to be the vector sum of centerNode with stepVector
