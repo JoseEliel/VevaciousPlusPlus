@@ -189,7 +189,7 @@ namespace VevaciousPlusPlus
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        gradientPoint += ( 0.5 * stepVector( fieldIndex ) );
+        gradientPoint[ fieldIndex ] += ( 0.5 * stepVector( fieldIndex ) );
       }
       std::vector< double > forceVector;
       potentialFunction.SetAsGradientAt( forceVector,
