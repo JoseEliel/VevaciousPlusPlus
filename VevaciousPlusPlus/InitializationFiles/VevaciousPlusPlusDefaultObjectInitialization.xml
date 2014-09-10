@@ -165,7 +165,7 @@
           </NodePathRefinement>
           -->
           <MinimumNumberOfNodes>
-          10
+            10
           </MinimumNumberOfNodes>
           <MovesPerImprovement>
             10
@@ -174,7 +174,7 @@
             1
           </MinuitStrategy>
           <MinuitTolerance>
-            0.1
+            0.01
           </MinuitTolerance>
           <NodeMovementThreshold>
             0.01
