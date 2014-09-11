@@ -9,7 +9,6 @@
 
 namespace VevaciousPlusPlus
 {
-
   MinimizingPotentialOnHypersurfaces::MinimizingPotentialOnHypersurfaces(
                                     PotentialFunction const& potentialFunction,
                                                MinuitBetweenPaths* pathRefiner,
@@ -26,7 +25,9 @@ namespace VevaciousPlusPlus
     reflectionMatrix( numberOfFields,
                       numberOfFields ),
     nodesConverged( false ),
-    pathRefiner( pathRefiner )
+    pathRefiner( pathRefiner ),
+    nodeZeroParameterization( ( numberOfFields - 1 ),
+                              0.0 )
   {
     // This constructor is just an initialization list.
   }

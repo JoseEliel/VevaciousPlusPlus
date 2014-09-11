@@ -798,21 +798,13 @@ namespace VevaciousPlusPlus
                                      "NodeMovementThreshold",
                                      nodeMovementThreshold );
     }
-
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "This is all going to go wrong, because MinimizingPotentialOnBisections"
-    << " does not yet exist.";
-    std::cout << std::endl;/**/
-    return NULL;
-    /* new MinimizingPotentialOnBisections( *ownedPotentialFunction,
+    return new MinimizingPotentialOnBisections( *ownedPotentialFunction,
                                             SetUpPathRefiner( pathRefinerClass,
                                                         pathRefinerArguments ),
                                                  minimumNumberOfNodes,
                                                  movesPerImprovement,
                                                  minuitStrategy,
-                                                 minuitToleranceFraction );*/
+                                                 minuitToleranceFraction );
   }
 
   //

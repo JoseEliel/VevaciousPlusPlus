@@ -62,7 +62,7 @@ namespace VevaciousPlusPlus
 
     // This sets pathNodes to just be the false vacuum node and the true vacuum
     // node, and also sets stepSize to be the distance between the vacua
-    // divided by ( minimumNumberOfNodes + 1 )
+    // divided by ( minimumNumberOfNodes + 1 ).
     virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
                                          PotentialMinimum const& trueVacuum );
 
@@ -86,9 +86,9 @@ namespace VevaciousPlusPlus
 
     // This sets currentNode to be the vector sum of centerNode with stepVector
     // and also updates currentDistanceToTrueVacuum.
-    virtual void UpdateNode( std::vector< double >& currentNode,
-                             std::vector< double > const& centerNode,
-                             Eigen::VectorXd const& stepVector );
+    void UpdateNode( std::vector< double >& currentNode,
+                     std::vector< double > const& centerNode,
+                     Eigen::VectorXd const& stepVector );
 
     // This returns -(F.S)^2/(F.F), where F is the gradient of the
     // potential at the pointOnHemisphere and S is stepVector. Essentially this
@@ -135,7 +135,7 @@ namespace VevaciousPlusPlus
 
   // This sets pathNodes to just be the false vacuum node and the true vacuum
   // node, and also sets stepSize to be the distance between the vacua
-  // divided by ( minimumNumberOfNodes + 1 )
+  // divided by ( minimumNumberOfNodes + 1 ).
   inline void MinimizingPotentialOnHemispheres::SetNodesForInitialPath(
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
@@ -149,6 +149,7 @@ namespace VevaciousPlusPlus
                  / static_cast< double >( minimumNumberOfNodes + 1 ) );
     lastPotential = potentialFunction( falseVacuum.VariableValues() );
     headingToSaddlePoint = true;
+    nodesConverged = false;
   }
 
   // This sets currentNode to be the vector sum of centerNode with stepVector

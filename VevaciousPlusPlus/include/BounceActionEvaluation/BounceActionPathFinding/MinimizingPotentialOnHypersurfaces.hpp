@@ -58,6 +58,7 @@ namespace VevaciousPlusPlus
     bool nodesConverged;
     MinuitBetweenPaths* pathRefiner;
     std::vector< double > minuitInitialSteps;
+    std::vector< double > const nodeZeroParameterization;
 
 
     // This should move the nodes individually towards whatever the derived

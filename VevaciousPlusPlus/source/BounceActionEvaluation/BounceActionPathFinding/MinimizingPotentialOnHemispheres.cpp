@@ -100,8 +100,7 @@ namespace VevaciousPlusPlus
       SetUpCurrentAngleScaling();
 
       ROOT::Minuit2::MnMigrad mnMigrad( *this,
-                                 std::vector< double >( ( numberOfFields - 1 ),
-                                                        0.0 ),
+                                        nodeZeroParameterization,
                                         minuitInitialSteps,
                                         minuitStrategy );
       MinuitMinimum minuitResult( ( numberOfFields - 1 ),
