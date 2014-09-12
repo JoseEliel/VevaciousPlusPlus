@@ -197,8 +197,8 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "abandon path from minimizing potential on hemispheres?" << std::endl
-  << "write path through nodes on bisections" << std::endl
+  << "sort out thermal tunneling infinite loop" << std::endl
+  << "write MinuitBetweenPaths subclasses" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
   std::cout << std::endl;

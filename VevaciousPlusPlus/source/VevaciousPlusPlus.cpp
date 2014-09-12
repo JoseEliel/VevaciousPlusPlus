@@ -729,7 +729,6 @@ namespace VevaciousPlusPlus
     int maximumNumberOfNodes( 20 );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
-    double nodeMovementThreshold( 0.05 );
 
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
@@ -748,14 +747,10 @@ namespace VevaciousPlusPlus
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "NodeMovementThreshold",
-                                     nodeMovementThreshold );
     }
     return new MinimizingPotentialOnBisections( *ownedPotentialFunction,
                                             SetUpPathRefiner( pathRefinerClass,
                                                         pathRefinerArguments ),
-                                                nodeMovementThreshold,
                                                 minuitStrategy,
                                                 minuitToleranceFraction,
                                                 maximumNumberOfNodes );
