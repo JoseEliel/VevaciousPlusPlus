@@ -250,7 +250,8 @@ namespace VevaciousPlusPlus
     BOL::StringParser const slhaDoubleMaker( 9,
                                              ' ',
                                              9,
-                                             3 );
+                                             3,
+                                             "" );
     std::fstream outputFile( slhaFilename.c_str() );
     if( !(outputFile.good()) )
     {
