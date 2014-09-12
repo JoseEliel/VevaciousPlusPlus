@@ -196,6 +196,8 @@ namespace VevaciousPlusPlus
     TunnelPath const* bestPath( pathFinder->SetInitialPath( falseVacuum,
                                                             trueVacuum ) );
     double bestBounceAction( (*actionCalculator)( *bestPath ) );
+    double currentBounceAction( bestBounceAction );
+    double lastBounceAction( 2.0 * currentBounceAction );
 
     // debugging:
     /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
@@ -218,8 +220,10 @@ namespace VevaciousPlusPlus
            &&
            pathFinder->PathCanBeImproved() )
     {
-      TunnelPath const* currentPath( pathFinder->ImprovePath() );
-      double const currentBounceAction( (*actionCalculator)( *currentPath ) );
+      TunnelPath const* currentPath( pathFinder->ImprovePath(
+                                    currentBounceAction < lastBounceAction ) );
+      lastBounceAction = currentBounceAction;
+      currentBounceAction = (*actionCalculator)( *currentPath );
 
       if( currentBounceAction < bestBounceAction )
       {

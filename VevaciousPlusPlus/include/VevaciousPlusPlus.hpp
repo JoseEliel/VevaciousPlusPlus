@@ -26,7 +26,6 @@
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnBisections.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnHemispheres.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitBetweenPaths.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
@@ -169,10 +168,6 @@ namespace VevaciousPlusPlus
 
     //
     BouncePathFinder* SetUpBouncePathFinder( std::string const& className,
-                                     std::string const& constructorArguments );
-
-    //
-    BouncePathFinder* SetUpMinimizingPotentialOnHemispheres(
                                      std::string const& constructorArguments );
 
     //
@@ -362,11 +357,7 @@ namespace VevaciousPlusPlus
                                                   std::string const& className,
                                       std::string const& constructorArguments )
   {
-    if( className.compare( "MinimizingPotentialOnHemispheres" ) == 0 )
-    {
-      return SetUpMinimizingPotentialOnHemispheres( constructorArguments );
-    }
-    else if( className.compare( "MinimizingPotentialOnBisections" ) == 0 )
+    if( className.compare( "MinimizingPotentialOnBisections" ) == 0 )
     {
       return SetUpMinimizingPotentialOnBisections( constructorArguments );
     }
@@ -374,9 +365,8 @@ namespace VevaciousPlusPlus
     {
       std::stringstream errorStream;
       errorStream
-      << "<TunnelPathFinder> was not a recognized form! The only types"
-      << " currently valid are \"MinimizingPotentialOnHemispheres\" or"
-      << " \"MinimizingPotentialOnBisections\".";
+      << "<TunnelPathFinder> was not a recognized form! The only type"
+      << " currently valid is \"MinimizingPotentialOnBisections\".";
       throw std::runtime_error( errorStream.str() );
     }
   }

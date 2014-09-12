@@ -721,55 +721,12 @@ namespace VevaciousPlusPlus
   }
 
   //
-  BouncePathFinder* VevaciousPlusPlus::SetUpMinimizingPotentialOnHemispheres(
-                                      std::string const& constructorArguments )
-  {
-    std::string pathRefinerClass( "PathSeparateFieldAverager" );
-    std::string pathRefinerArguments( "" );
-    int minimumNumberOfNodes( 20 );
-    int movesPerImprovement( 100 );
-    int minuitStrategy( 1 );
-    double minuitToleranceFraction( 0.5 );
-
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
-    {
-      ReadClassAndArguments( xmlParser,
-                             "NodePathRefinement",
-                             pathRefinerClass,
-                             pathRefinerArguments );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MinimumNumberOfNodes",
-                                     minimumNumberOfNodes );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MovesPerImprovement",
-                                     movesPerImprovement );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MinuitStrategy",
-                                     minuitStrategy );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MinuitTolerance",
-                                     minuitToleranceFraction );
-    }
-
-    return new MinimizingPotentialOnHemispheres( *ownedPotentialFunction,
-                                            SetUpPathRefiner( pathRefinerClass,
-                                                        pathRefinerArguments ),
-                                                 minimumNumberOfNodes,
-                                                 movesPerImprovement,
-                                                 minuitStrategy,
-                                                 minuitToleranceFraction );
-  }
-
-  //
   BouncePathFinder* VevaciousPlusPlus::SetUpMinimizingPotentialOnBisections(
                                       std::string const& constructorArguments )
   {
     std::string pathRefinerClass( "PathSeparateFieldAverager" );
     std::string pathRefinerArguments( "" );
-    int minimumNumberOfNodes( 20 );
-    int movesPerImprovement( 100 );
+    int maximumNumberOfNodes( 20 );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
     double nodeMovementThreshold( 0.05 );
@@ -783,11 +740,8 @@ namespace VevaciousPlusPlus
                              pathRefinerClass,
                              pathRefinerArguments );
       InterpretElementIfNameMatches( xmlParser,
-                                     "MinimumNumberOfNodes",
-                                     minimumNumberOfNodes );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "MovesPerImprovement",
-                                     movesPerImprovement );
+                                     "MaximumNumberOfNodes",
+                                     maximumNumberOfNodes );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );
@@ -801,10 +755,10 @@ namespace VevaciousPlusPlus
     return new MinimizingPotentialOnBisections( *ownedPotentialFunction,
                                             SetUpPathRefiner( pathRefinerClass,
                                                         pathRefinerArguments ),
-                                                 minimumNumberOfNodes,
-                                                 movesPerImprovement,
-                                                 minuitStrategy,
-                                                 minuitToleranceFraction );
+                                                nodeMovementThreshold,
+                                                minuitStrategy,
+                                                minuitToleranceFraction,
+                                                maximumNumberOfNodes );
   }
 
   //

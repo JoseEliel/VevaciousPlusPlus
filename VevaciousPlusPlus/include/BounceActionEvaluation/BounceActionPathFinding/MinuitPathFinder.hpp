@@ -20,8 +20,7 @@ namespace VevaciousPlusPlus
                            public ROOT::Minuit2::FCNBase
   {
   public:
-    MinuitPathFinder( size_t const movesPerImprovement = 100,
-                      unsigned int const minuitStrategy = 1,
+    MinuitPathFinder( unsigned int const minuitStrategy = 1,
                       double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitPathFinder();
 
@@ -40,7 +39,6 @@ namespace VevaciousPlusPlus
     static double const functionValueForNanInput;
 
 
-    size_t movesPerImprovement;
     unsigned int minuitStrategy;
     double minuitToleranceFraction;
     double currentMinuitTolerance;

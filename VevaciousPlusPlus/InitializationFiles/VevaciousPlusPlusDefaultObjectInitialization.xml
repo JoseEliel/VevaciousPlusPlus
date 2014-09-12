@@ -165,9 +165,9 @@
           <NodePathRefinement>
           </NodePathRefinement>
           -->
-          <MinimumNumberOfNodes>
-            15
-          </MinimumNumberOfNodes>
+          <MaximumNumberOfNodes>
+            300
+          </MaximumNumberOfNodes>
           <MovesPerImprovement>
             10
           </MovesPerImprovement>

@@ -25,7 +25,6 @@ namespace VevaciousPlusPlus
     MinimizingPotentialOnHypersurfaces(
                                     PotentialFunction const& potentialFunction,
                                         MinuitBetweenPaths* pathRefiner = NULL,
-                                        size_t const movesPerImprovement = 100,
                                         unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinimizingPotentialOnHypersurfaces();
@@ -42,8 +41,12 @@ namespace VevaciousPlusPlus
 
     // This allows Minuit2 to adjust the full path a set number of times to try
     // to minimize the sum of potentials at a set of nodes or bounce action
-    // along the adjusted path, and then sets the path.
-    virtual TunnelPath const* ImprovePath();
+    // along the adjusted path, and then sets the path. Whether or not the last
+    // call of ImprovePath( ... ) lowered the bounce action is given by
+    // lastImprovementWorked, which can be used by a derived class to decide
+    // internally whether to change strategy.
+    virtual TunnelPath const*
+    ImprovePath( bool const lastImprovementWorked = true );
 
 
   protected:
@@ -64,8 +67,11 @@ namespace VevaciousPlusPlus
     // This should move the nodes individually towards whatever the derived
     // class considers to be the optimal tunneling path, by some amount, which
     // is up to the derived class, but it should also note if it is finished
-    // moving the nodes around by setting nodesConverged to true.
-    virtual void ImproveNodes() = 0;
+    // moving the nodes around by setting nodesConverged to true. Whether or
+    // not the last call of ImprovePath( ... ) lowered the bounce action is
+    // given by lastImprovementWorked, which can be used by a derived class to
+    // decide internally whether to change strategy.
+    virtual void ImproveNodes( bool const lastImprovementWorked = true ) = 0;
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
     // which reflects the axis of field 0 to be parallel to

@@ -13,23 +13,19 @@ namespace VevaciousPlusPlus
   MinimizingPotentialOnBisections::MinimizingPotentialOnBisections(
                                     PotentialFunction const& potentialFunction,
                                                MinuitBetweenPaths* pathRefiner,
-                                             size_t const minimumNumberOfNodes,
-                                            double const moveToleranceFraction,
-                                              size_t const movesPerImprovement,
                                              unsigned int const minuitStrategy,
-                                       double const minuitToleranceFraction ) :
+                                          double const minuitToleranceFraction,
+                                          size_t const maximumNumberOfNodes ) :
     MinimizingPotentialOnHypersurfaces( potentialFunction,
                                         pathRefiner,
-                                        movesPerImprovement,
                                         minuitStrategy,
                                         minuitToleranceFraction ),
-    minimumNumberOfNodes( minimumNumberOfNodes ),
-    moveToleranceFractionSquared( moveToleranceFraction
-                                  * moveToleranceFraction ),
+    maximumNumberOfNodes( maximumNumberOfNodes ),
     inSegmentSplittingStage( true ),
     finalNumberOfNodes( 0 ),
     segmentAuxiliaryLength( NAN ),
-    bisectionOrigin( numberOfFields )
+    bisectionOrigin( numberOfFields ),
+    lastNodes()
   {
     // This constructor is just an initialization list.
   }
@@ -39,6 +35,56 @@ namespace VevaciousPlusPlus
     // This does nothing.
   }
 
+
+  // This sets up the nodes by minimizing the potential on hyperplanes
+  // bisecting the vectors between pairs of nodes. In the first stage, the
+  // segment between the vacuum is bisected, forming 2 segments, between the
+  // false vacuum and the new node, and between the new node and the true
+  // vacuum. Next those segments are themselves bisected, then the next set
+  // of segments is bisected, and so on, until there are at least
+  // minimumNumberOfNodes nodes between the vacua. When there are enough
+  // nodes, the next stage begins, where the nodes form a path from splines,
+  // then the nodes are equally spaced along this path, and each is moved in
+  // the hyperplane bisecting the line between the node's nearest neighbors
+  // to minimize the potential at that node in the hyperplane. This continues
+  // until all of the nodes moved less than moveToleranceFraction times the
+  // average segment length.
+  void MinimizingPotentialOnBisections::ImproveNodes(
+                                             bool const lastImprovementWorked )
+  {
+    if( inSegmentSplittingStage )
+    {
+      if( lastImprovementWorked )
+      {
+        inSegmentSplittingStage = SplitSegments();
+        if( !inSegmentSplittingStage )
+        {
+          finalNumberOfNodes = pathNodes.size();
+          segmentAuxiliaryLength
+          = ( 1.0 / static_cast< double >( finalNumberOfNodes - 1 ) );
+        }
+      }
+      else
+      {
+        pathNodes = lastNodes;
+        inSegmentSplittingStage = false;
+        finalNumberOfNodes = pathNodes.size();
+        segmentAuxiliaryLength
+        = ( 1.0 / static_cast< double >( finalNumberOfNodes - 1 ) );
+        AdjustNodes();
+      }
+    }
+    else if( lastImprovementWorked )
+    {
+      AdjustNodes();
+    }
+    else
+    {
+      nodesConverged = true;
+      // This class doesn't bother trying any more refinement if its last
+      // attempt using nearest neighbors just made the bounce action bigger.
+    }
+  }
 
   // This sets up currentParallelComponent to be the vector from
   // falseSideNode to trueSideNode, and sets reflectionMatrix appropriately,
@@ -63,7 +109,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "MinimizingPotentialOnBisections::PlaceOnMinimumInBisection("
     << " nodeToSet = { ";
@@ -123,7 +169,7 @@ namespace VevaciousPlusPlus
       std::cout << currentParallelComponent[ fieldIndex ];
     }
     std::cout << " }";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     ROOT::Minuit2::MnMigrad mnMigrad( *this,
                                       nodeZeroParameterization,
@@ -132,13 +178,6 @@ namespace VevaciousPlusPlus
     MinuitMinimum minuitResult( ( numberOfFields - 1 ),
                                 mnMigrad( 0,
                                           currentMinuitTolerance ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "minuitResult =" << std::endl << minuitResult.AsDebuggingString();
-    std::cout << std::endl;/**/
-
     Eigen::VectorXd const transformedNode( reflectionMatrix
                         * UntransformedNode( minuitResult.VariableValues() ) );
     for( size_t fieldIndex( 0 );
@@ -150,7 +189,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "PlaceOnMinimumInBisection( ... ), finished, nodeToSet = { ";
     for( size_t fieldIndex( 0 );
@@ -164,14 +203,13 @@ namespace VevaciousPlusPlus
       std::cout << nodeToSet[ fieldIndex ];
     }
     std::cout << " }";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   // This forms a new path from splines through pathNodes, then adjusts the
   // nodes of pathNodes based on nodes chosen equally spaced along the path.
   void MinimizingPotentialOnBisections::AdjustNodes()
   {
-    nodesConverged = true;
     LinearSplineThroughNodes lastPath( pathNodes,
                                        std::vector< double >(),
                                        pathTemperature );
@@ -188,130 +226,12 @@ namespace VevaciousPlusPlus
       PlaceOnMinimumInBisection( pathNodes[ nodeIndex ],
                                  pathNodes[ nodeIndex - 1 ],
                                  nextNode );
-      if( NodeMovedBeyondThreshold( oldPosition,
-                                    pathNodes[ nodeIndex ],
-                                    pathNodes[ nodeIndex - 1 ] ) )
-      {
-        nodesConverged = false;
-      }
     }
     lastPath.PutOnPathAt( oldPosition,
                           ( 1.0 - segmentAuxiliaryLength ) );
     PlaceOnMinimumInBisection( pathNodes[ finalNumberOfNodes - 2 ],
                                pathNodes[ finalNumberOfNodes - 3 ],
                                pathNodes.back() );
-    if( NodeMovedBeyondThreshold( oldPosition,
-                                  pathNodes[ finalNumberOfNodes - 2 ],
-                                  pathNodes[ finalNumberOfNodes - 3 ] ) )
-    {
-      nodesConverged = false;
-    }
-  }
-
-  // This inserts a new node in between each pair of old nodes in pathNodes
-  // where the potential in the bisecting hyperplane is minimized. It returns
-  // true if the number of nodes between the vacua is now at least
-  // minimumNumberOfNodes.
-  bool MinimizingPotentialOnBisections::SplitSegments()
-  {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "MinimizingPotentialOnBisections::SplitSegments() called." << std::endl;
-    std::cout << "pathNodes = { { ";
-    for( std::vector< std::vector< double > >::const_iterator
-         pathNode( pathNodes.begin() );
-         pathNode < pathNodes.end();
-         ++pathNode )
-    {
-      if( pathNode > pathNodes.begin() )
-      {
-        std::cout << " }," << std::endl << "{ ";
-      }
-      for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfFields;
-           ++fieldIndex )
-      {
-        if( fieldIndex > 0 )
-        {
-          std::cout << ", ";
-        }
-        std::cout << (*pathNode)[ fieldIndex ];
-      }
-    }
-    std::cout << " } }";
-    std::cout << std::endl;/**/
-
-    std::vector< std::vector< double > > const lastNodes( pathNodes );
-    pathNodes.resize( ( ( 2 * lastNodes.size() ) - 1 ),
-                      lastNodes.back() );
-    // pathNodes.front() = lastNodes.front();
-    // This line is redundant because std::vector::resize( ... ) should not
-    // change what is in pathNodes up to the new size.
-    for( size_t nodeIndex( 1 );
-         nodeIndex < lastNodes.size();
-         ++nodeIndex )
-    {
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "nodeIndex = " << nodeIndex;
-      std::cout << " pathNodes = { { ";
-      for( std::vector< std::vector< double > >::const_iterator
-           pathNode( pathNodes.begin() );
-           pathNode < pathNodes.end();
-           ++pathNode )
-      {
-        if( pathNode > pathNodes.begin() )
-        {
-          std::cout << " }," << std::endl << "{ ";
-        }
-        for( size_t fieldIndex( 0 );
-             fieldIndex < pathNode->size();
-             ++fieldIndex )
-        {
-          if( fieldIndex > 0 )
-          {
-            std::cout << ", ";
-          }
-          std::cout << (*pathNode)[ fieldIndex ];
-        }
-      }
-      std::cout << " } }";
-      std::cout << std::endl;/**/
-
-      pathNodes[ 2 * nodeIndex ] = lastNodes[ nodeIndex ];
-      PlaceOnMinimumInBisection( pathNodes[ ( 2 * nodeIndex ) - 1 ],
-                                 lastNodes[ nodeIndex - 1 ],
-                                 lastNodes[ nodeIndex ] );
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl << "now pathNodes = { { ";
-      for( std::vector< std::vector< double > >::const_iterator
-           pathNode( pathNodes.begin() );
-           pathNode < pathNodes.end();
-           ++pathNode )
-      {
-        if( pathNode > pathNodes.begin() )
-        {
-          std::cout << " }," << std::endl << "{ ";
-        }
-        for( size_t fieldIndex( 0 );
-             fieldIndex < pathNode->size();
-             ++fieldIndex )
-        {
-          if( fieldIndex > 0 )
-          {
-            std::cout << ", ";
-          }
-          std::cout << (*pathNode)[ fieldIndex ];
-        }
-      }
-      std::cout << " } }";
-      std::cout << std::endl;/**/
-    }
-    return ( ( pathNodes.size() - 2 ) < minimumNumberOfNodes );
   }
 
 } /* namespace VevaciousPlusPlus */
