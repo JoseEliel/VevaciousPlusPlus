@@ -197,7 +197,9 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "sort out thermal tunneling infinite loop" << std::endl
+  << "thermal problem is that maximum radius is 1/minimum scale but minimum"
+  << " scale is distance to false vacuum which is at origin so maximum radius"
+  << " is 1/0. doh." << std::endl
   << "write MinuitBetweenPaths subclasses" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;

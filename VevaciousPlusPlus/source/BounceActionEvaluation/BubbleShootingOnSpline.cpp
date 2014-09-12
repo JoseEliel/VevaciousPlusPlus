@@ -453,12 +453,12 @@ namespace VevaciousPlusPlus
                               auxiliaryValue );
 
       // debugging:
-      /*std::cout << std::endl << "debugging:"
+      /**/std::cout << std::endl << "debugging:"
       << std::endl
       << "auxiliaryValue = " << auxiliaryValue << ", fieldConfiguration = "
       << potentialFunction.FieldConfigurationAsMathematica(
                                                           fieldConfiguration );
-      std::cout << std::endl;*/
+      std::cout << std::endl;/**/
 
       potentialApproximation.AddPoint( auxiliaryValue,
                                        ( potentialFunction( fieldConfiguration,
@@ -471,12 +471,12 @@ namespace VevaciousPlusPlus
                                                 tunnelPath.TemperatureValue() )
                                       - falseVacuumPotential );
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "BubbleShootingOnSpline::PotentialAlongPath( tunnelPath =" << std::endl
     << tunnelPath.AsDebuggingString() << " ) returning" << std::endl
     << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
     return potentialApproximation;
   }
 
