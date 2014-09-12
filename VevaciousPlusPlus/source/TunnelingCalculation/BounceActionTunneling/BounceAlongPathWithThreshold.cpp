@@ -194,7 +194,8 @@ namespace VevaciousPlusPlus
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum );
     TunnelPath const* bestPath( pathFinder->SetInitialPath( falseVacuum,
-                                                            trueVacuum ) );
+                                                            trueVacuum,
+                                                      tunnelingTemperature ) );
     double bestBounceAction( (*actionCalculator)( *bestPath ) );
     double currentBounceAction( bestBounceAction );
     double lastBounceAction( 2.0 * currentBounceAction );
