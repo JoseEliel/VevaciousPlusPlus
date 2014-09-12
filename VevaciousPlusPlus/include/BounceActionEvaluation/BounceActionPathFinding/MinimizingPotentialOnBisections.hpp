@@ -94,6 +94,28 @@ namespace VevaciousPlusPlus
   };
 
 
+
+
+  // It may seem unwise to have this object call Minuit on itself, but really
+  // it's just a handy way of keeping the minimization function within the
+  // class that ends up finding its minimum. In this case,
+  // nodeParameterization is just the parameterization of the node.
+  inline double MinimizingPotentialOnBisections::operator()(
+                      std::vector< double > const& nodeParameterization ) const
+  {
+    Eigen::VectorXd const transformedNode( reflectionMatrix
+                                 * UntransformedNode( nodeParameterization ) );
+    std::vector< double > fieldConfiguration( bisectionOrigin );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      fieldConfiguration[ fieldIndex ] += transformedNode( fieldIndex );
+    }
+    return potentialFunction( fieldConfiguration,
+                              pathTemperature );
+  }
+
   // This sets up the nodes by minimizing the potential on hyperplanes
   // bisecting the vectors between pairs of nodes. In the first stage, the
   // segment between the vacuum is bisected, forming 2 segments, between the
@@ -162,29 +184,6 @@ namespace VevaciousPlusPlus
     }
     return ( displacementSquared > ( comparisonSquared
                                      * moveToleranceFractionSquared ) );
-  }
-
-  // This inserts a new node in between each pair of old nodes in pathNodes
-  // where the potential in the bisecting hyperplane is minimized. It returns
-  // true if the number of nodes between the vacua is now at least
-  // minimumNumberOfNodes.
-  inline bool MinimizingPotentialOnBisections::SplitSegments()
-  {
-    std::vector< std::vector< double > > const lastNodes( pathNodes );
-    pathNodes.resize( ( 2 * lastNodes.size() ) - 1 );
-    // pathNodes.front() = lastNodes.front();
-    // This line is redundant because std::vector::resize( ... ) should not
-    // change what is in pathNodes up to the new size.
-    for( size_t nodeIndex( 1 );
-         nodeIndex < lastNodes.size();
-         ++nodeIndex )
-    {
-      pathNodes[ 2 * nodeIndex ] = lastNodes[ nodeIndex ];
-      PlaceOnMinimumInBisection( pathNodes[ ( 2 * nodeIndex ) - 1 ],
-                                 lastNodes[ nodeIndex - 1 ],
-                                 lastNodes[ nodeIndex ] );
-    }
-    return ( ( pathNodes.size() - 2 ) >= minimumNumberOfNodes );
   }
 
 } /* namespace VevaciousPlusPlus */

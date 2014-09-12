@@ -121,7 +121,7 @@
       <TunnelingStrategy>
         <!-- "NoTunneling", "JustQuantum", "JustThermal", "ThermalThenQuantum",
              or "QuantumThenThermal" -->
-        QuantumThenThermal
+        JustQuantum
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
@@ -156,8 +156,9 @@
       </BouncePotentialFit>
       <TunnelPathFinder>
         <ClassType>
-        <!-- Only "MinimizingPotentialOnHemispheres" so far. -->
-          MinimizingPotentialOnHemispheres
+        <!-- Only "MinimizingPotentialOnBisections" and may never have another
+             option. -->
+          MinimizingPotentialOnBisections
         </ClassType>
         <ConstructorArguments>
           <!--
@@ -165,7 +166,7 @@
           </NodePathRefinement>
           -->
           <MinimumNumberOfNodes>
-            10
+            15
           </MinimumNumberOfNodes>
           <MovesPerImprovement>
             10
