@@ -22,7 +22,6 @@ namespace VevaciousPlusPlus
     currentParallelComponent( numberOfFields ),
     reflectionMatrix( numberOfFields,
                       numberOfFields ),
-    nodesConverged( false ),
     pathRefiner( pathRefiner ),
     nodeZeroParameterization( ( numberOfFields - 1 ),
                               0.0 )
@@ -40,31 +39,16 @@ namespace VevaciousPlusPlus
   // This allows Minuit2 to adjust the full path a set number of times to try
   // to minimize the sum of potentials at a set of nodes or bounce action
   // along the adjusted path, and then sets the path. Whether or not the last
-  // call of ImprovePath( ... ) lowered the bounce action is given by
+  // call of TryToImprovePath( ... ) lowered the bounce action is given by
   // lastImprovementWorked, which can be used by a derived class to decide
-  // internally whether to change strategy.
-  TunnelPath const* MinimizingPotentialOnHypersurfaces::ImprovePath(
+  // internally whether to change strategy. If no improvement can be made, NULL
+  // is returned.
+  TunnelPath const* MinimizingPotentialOnHypersurfaces::TryToImprovePath(
                                              bool const lastImprovementWorked )
   {
-    if( !nodesConverged )
+    if( NodesCanStillBeImproved( lastImprovementWorked ) )
     {
-      ImproveNodes( lastImprovementWorked );
-      // If this call of ImproveNodes() was the last one for these vacua, we
-      // set up the straight path with as many nodes as pathNodes has, so that
-      // the final variation of the path between pathNodes and straightNodes
-      // can proceed.
-      if( nodesConverged )
-      {
-        if( pathRefiner != NULL )
-        {
-          pathRefiner->UpdateNodes( pathNodes,
-                                    pathTemperature );
-        }
-        else
-        {
-          pathCanBeImproved = false;
-        }
-      }
+      TryToImproveNodes();
       return new LinearSplineThroughNodes( pathNodes,
                                            nodeZeroParameterization,
                                            pathTemperature );
@@ -77,9 +61,7 @@ namespace VevaciousPlusPlus
       }
       else
       {
-        return new LinearSplineThroughNodes( pathNodes,
-                                             nodeZeroParameterization,
-                                             pathTemperature );
+        return NULL;
       }
     }
   }

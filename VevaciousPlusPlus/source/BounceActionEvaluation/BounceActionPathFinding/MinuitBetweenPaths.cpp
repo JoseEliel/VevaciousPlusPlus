@@ -19,9 +19,7 @@ namespace VevaciousPlusPlus
     curvedPath( NULL ),
     pathTemperature( NAN ),
     bounceActionCalculator( bounceActionCalculator ),
-    straightPath(),
     numberOfFields( 0 ),
-    numberOfSegments( 0 ),
     minuitStrategy( minuitStrategy ),
     movesPerImprovement( movesPerImprovement ),
     minuitToleranceFraction( minuitToleranceFraction ),
@@ -45,35 +43,11 @@ namespace VevaciousPlusPlus
                                         double const pathTemperature )
   {
     bounceActionCalculator->ResetVacua( curvedPath.front(),
-                                        curvedPath.back() );
+                                        curvedPath.back(),
+                                        pathTemperature );
     this->curvedPath = &curvedPath;
-    numberOfSegments = curvedPath.size();
     numberOfFields = curvedPath.front().size();
     this->pathTemperature = pathTemperature;
-    straightPath.resize( curvedPath.size(),
-                         curvedPath.front() );
-    std::vector< double > straightNode( curvedPath.back() );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      straightNode[ fieldIndex ] -= curvedPath.front()[ fieldIndex ];
-    }
-    double const straightFraction( 1.0
-                          / static_cast< double >( straightPath.size() - 1 ) );
-    for( size_t nodeIndex( 1 );
-         nodeIndex < ( straightPath.size() - 1 );
-         ++nodeIndex )
-    {
-      for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfFields;
-           ++fieldIndex )
-      {
-        straightPath[ nodeIndex ][ fieldIndex ]
-        += ( nodeIndex * straightFraction * straightNode[ fieldIndex ] );
-      }
-    }
-    straightPath.back() = curvedPath.back();
     LinearSplineThroughNodes comparisonPath( curvedPath,
                                              std::vector< double >( 0 ),
                                              pathTemperature );

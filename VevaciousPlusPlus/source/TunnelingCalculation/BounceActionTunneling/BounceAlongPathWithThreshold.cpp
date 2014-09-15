@@ -192,7 +192,8 @@ namespace VevaciousPlusPlus
                                            double const actionThreshold ) const
   {
     actionCalculator->ResetVacua( falseVacuum,
-                                  trueVacuum );
+                                  trueVacuum,
+                                  tunnelingTemperature );
     TunnelPath const* bestPath( pathFinder->SetInitialPath( falseVacuum,
                                                             trueVacuum,
                                                       tunnelingTemperature ) );
@@ -221,8 +222,12 @@ namespace VevaciousPlusPlus
            &&
            pathFinder->PathCanBeImproved() )
     {
-      TunnelPath const* currentPath( pathFinder->ImprovePath(
+      TunnelPath const* currentPath( pathFinder->TryToImprovePath(
                                     currentBounceAction < lastBounceAction ) );
+      if( currentPath == NULL )
+      {
+        break;
+      }
       lastBounceAction = currentBounceAction;
       currentBounceAction = (*actionCalculator)( *currentPath );
 
@@ -237,12 +242,24 @@ namespace VevaciousPlusPlus
         delete currentPath;
       }
 
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "Improved path bounce action = " << currentBounceAction
-      << ", lowest bounce action so far = " << bestBounceAction;
-      std::cout << std::endl;/**/
+      std::cout << std::endl
+      << "Improved path bounce action = " << currentBounceAction;
+      if( currentPath->NonZeroTemperature() )
+      {
+        std::cout << " GeV";
+      }
+      std::cout << ", lowest bounce action so far = " << bestBounceAction;
+      if( currentPath->NonZeroTemperature() )
+      {
+        std::cout << " GeV";
+      }
+      std::cout << ", threshold is " << actionThreshold;
+      if( currentPath->NonZeroTemperature() )
+      {
+        std::cout << " GeV";
+      }
+      std::cout << ".";
+      std::cout << std::endl;
     }
 
     // debugging:
@@ -254,6 +271,21 @@ namespace VevaciousPlusPlus
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                fieldColors,
                                                finalPathPicture );/**/
+
+    std::cout << std::endl
+    << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
+    << bestBounceAction;
+    if( bestPath->NonZeroTemperature() )
+    {
+      std::cout << " GeV";
+    }
+    std::cout << ", threshold is " << actionThreshold;
+    if( bestPath->NonZeroTemperature() )
+    {
+      std::cout << " GeV";
+    }
+    std::cout << ".";
+    std::cout << std::endl;
 
     delete bestPath;
     return bestBounceAction;

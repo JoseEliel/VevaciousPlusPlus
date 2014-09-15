@@ -310,22 +310,6 @@ namespace VevaciousPlusPlus
     << bounceAction;
     std::cout << std::endl;*/
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "bounce action = ";
-    if( tunnelPath.NonZeroTemperature() )
-    {
-      std::cout << ( bounceAction * 2.0 * boost::math::double_constants::pi )
-      << " GeV.";
-    }
-    else
-    {
-      std::cout << ( bounceAction * boost::math::double_constants::pi
-                                  * boost::math::double_constants::pi ) << ".";
-    }
-    std::cout << std::endl;/**/
-
     // The common factor of 1/2 is combined with the solid angle of
     // 2 pi^2 (quantum) or 4 pi (thermal):
     if( nonZeroTemperature )
@@ -453,12 +437,12 @@ namespace VevaciousPlusPlus
                               auxiliaryValue );
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "auxiliaryValue = " << auxiliaryValue << ", fieldConfiguration = "
       << potentialFunction.FieldConfigurationAsMathematica(
                                                           fieldConfiguration );
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       potentialApproximation.AddPoint( auxiliaryValue,
                                        ( potentialFunction( fieldConfiguration,

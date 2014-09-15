@@ -45,6 +45,11 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< double > > lastNodes;
 
 
+    // This should internally change the derived class's strategy based on
+    // whether or not the last attempt to improve the path lowered the bounce
+    // action successfully or not, and the return true if there are still
+    // improvements to try, false if there is no improvement to try.
+    virtual bool NodesCanStillBeImproved( bool const lastMoveDidImprove );
 
     // This sets up the nodes by minimizing the potential on hyperplanes
     // bisecting the vectors between pairs of nodes. In the first stage, the
@@ -59,7 +64,7 @@ namespace VevaciousPlusPlus
     // to minimize the potential at that node in the hyperplane. This continues
     // until all of the nodes moved less than moveToleranceFraction times the
     // average segment length.
-    virtual void ImproveNodes( bool const lastImprovementWorked = true );
+    virtual void TryToImproveNodes();
 
     // This sets pathNodes to just be the false vacuum node and the true vacuum
     // node, and also sets nodesConverged and inSegmentSplittingStage
@@ -108,6 +113,37 @@ namespace VevaciousPlusPlus
                               pathTemperature );
   }
 
+  // If this MinimizingPotentialOnBisections is still in the segment-splitting
+  // stage, it either returns true if the last move did lower the bounce action
+  // or it reverts to the last set of nodes, noting that it is no longer in the
+  // segment-splitting stage, and then returns true. If it is not in the
+  // segment-splitting stage when this function is called, then it returns true
+  // if the last move did lower the bounce action or false if it didn't, as
+  // iterating the improvement after it gets worse the first time seems to just
+  // usually make things worse without ever recovering.
+  inline bool MinimizingPotentialOnBisections::NodesCanStillBeImproved(
+                                                bool const lastMoveDidImprove )
+  {
+    if( inSegmentSplittingStage )
+    {
+      if( !lastMoveDidImprove
+          &&
+          ( pathNodes.size() > 3 ) )
+      {
+        pathNodes = lastNodes;
+        inSegmentSplittingStage = false;
+        finalNumberOfNodes = pathNodes.size();
+        segmentAuxiliaryLength
+        = ( 1.0 / static_cast< double >( finalNumberOfNodes - 1 ) );
+      }
+      return true;
+    }
+    else
+    {
+      return lastMoveDidImprove;
+    }
+  }
+
   // This sets pathNodes to just be the false vacuum node and the true vacuum
   // node, and also sets nodesConverged and inSegmentSplittingStage
   // appropriately.
@@ -119,7 +155,6 @@ namespace VevaciousPlusPlus
     pathNodes.front() = falseVacuum.FieldConfiguration();
     pathNodes.back() = trueVacuum.FieldConfiguration();
     lastNodes = pathNodes;
-    nodesConverged = false;
     inSegmentSplittingStage = true;
   }
 

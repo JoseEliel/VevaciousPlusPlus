@@ -51,7 +51,7 @@ namespace VevaciousPlusPlus
     // lastImprovementWorked, which might be used to decide whether to change
     // path improvement strategy internally in derived classes.
     virtual TunnelPath const*
-    ImprovePath( bool const lastImprovementWorked = true ) = 0;
+    TryToImprovePath( bool const lastImprovementWorked = true ) = 0;
 
 
   protected:

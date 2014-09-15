@@ -63,9 +63,7 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< double > > const* curvedPath;
     double pathTemperature;
     BounceActionCalculator* const bounceActionCalculator;
-    std::vector< std::vector< double > > straightPath;
     size_t numberOfFields;
-    size_t numberOfSegments;
     unsigned int const minuitStrategy;
     size_t const movesPerImprovement;
     double const minuitToleranceFraction;

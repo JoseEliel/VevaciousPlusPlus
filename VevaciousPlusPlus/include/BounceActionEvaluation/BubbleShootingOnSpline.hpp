@@ -29,13 +29,17 @@ namespace VevaciousPlusPlus
     virtual ~BubbleShootingOnSpline();
 
 
-    // This sets radialStepSize and estimatedRadialMaximum based on the lengths
-    // of the field vectors of the vacua and the tunneling scale from
-    // potentialFunction. The smallest energy scale is inverted to give a
-    // length which is used to set estimatedRadialMaximum, while radialStepSize
-    // is given by lengthScaleResolution divided by the largest energy scale.
+    // This sets radialStepSize to be lengthScaleResolution times the length
+    // scale of the problem, which is taken to be 1.0 divided by the energy
+    // scale. The energy scale is taken to be the square root of the scale
+    // returned by potentialFunction.ScaleSquaredRelevantToTunneling( ... ) or
+    // by tunnelingTemperature, whichever is larger. The maximum radius should
+    // by infinity, but we cannot integrate to infinity, so we choose
+    // estimatedRadialMaximum to be initially twice the length scale, as it
+    // gets extended over the course of the calculation anyway if necessary.
     virtual void ResetVacua( PotentialMinimum const& falseVacuum,
-                             PotentialMinimum const& trueVacuum );
+                             PotentialMinimum const& trueVacuum,
+                             double const tunnelingTemperature );
 
     // This sets up the bubble profile, numerically integrates the bounce
     // action over it, and then returns the bounce action along the path given
@@ -83,35 +87,25 @@ namespace VevaciousPlusPlus
 
 
 
-  // This sets radialStepSize and estimatedRadialMaximum based on the lengths
-  // of the field vectors of the vacua and the tunneling scale from
-  // potentialFunction. The smallest energy scale is inverted to give a
-  // length which is used to set estimatedRadialMaximum, while radialStepSize
-  // is given by lengthScaleResolution divided by the largest energy scale.
+  // This sets radialStepSize to be lengthScaleResolution times the length
+  // scale of the problem, which is taken to be 1.0 divided by the energy
+  // scale. The energy scale is taken to be the square root of the scale
+  // returned by potentialFunction.ScaleSquaredRelevantToTunneling( ... ) or
+  // by tunnelingTemperature, whichever is larger. The maximum radius should
+  // by infinity, but we cannot integrate to infinity, so we choose
+  // estimatedRadialMaximum to be initially twice the length scale, as it
+  // gets extended over the course of the calculation anyway if necessary.
   inline void
   BubbleShootingOnSpline::ResetVacua( PotentialMinimum const& falseVacuum,
-                                      PotentialMinimum const& trueVacuum )
+                                      PotentialMinimum const& trueVacuum,
+                                      double const tunnelingTemperature )
   {
-    double currentEnergySquared(
-                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
-                                                                trueVacuum ) );
-    double largestEnergySquared( trueVacuum.LengthSquared() );
-    double smallestEnergySquared( falseVacuum.LengthSquared() );
-    if( largestEnergySquared < smallestEnergySquared )
-    {
-      std::swap( largestEnergySquared,
-                 smallestEnergySquared );
-    }
-    if( smallestEnergySquared > currentEnergySquared )
-    {
-      smallestEnergySquared = currentEnergySquared;
-    }
-    else if( largestEnergySquared < currentEnergySquared )
-    {
-      largestEnergySquared = currentEnergySquared;
-    }
-    estimatedRadialMaximum = ( 1.0 / sqrt( smallestEnergySquared ) );
-    radialStepSize = ( lengthScaleResolution / sqrt( largestEnergySquared ) );
+    double const lengthScale( 1.0 / std::max( tunnelingTemperature,
+                       sqrt( potentialFunction.ScaleSquaredRelevantToTunneling(
+                                                                   falseVacuum,
+                                                            trueVacuum ) ) ) );
+    radialStepSize = ( lengthScaleResolution * lengthScale );
+    estimatedRadialMaximum = ( 2.0 * lengthScale );
   }
 
   // This evaluates the bounce action density at the given point on the

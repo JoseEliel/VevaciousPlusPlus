@@ -37,20 +37,29 @@ namespace VevaciousPlusPlus
   TunnelPath const* PathSeparateFieldAverager::PathForParameterization(
                           std::vector< double > const& minuitParameters ) const
   {
-    std::vector< std::vector< double > > composedPath( straightPath );
+    std::vector< std::vector< double > > composedPath( *curvedPath );
+    size_t const numberOfVaryingNodes( composedPath.size() - 2 );
+    double const segmentFractionStep( 1.0
+                         / static_cast< double >( numberOfVaryingNodes + 1 ) );
+    std::vector< double > const& falseVacuum( composedPath.front() );
+    std::vector< double > const& trueVacuum( composedPath.back() );
     for( size_t nodeIndex( 1 );
-         nodeIndex < numberOfSegments;
+         nodeIndex <= numberOfVaryingNodes;
          ++nodeIndex )
     {
-      std::vector< double > const& straightNode( straightPath[ nodeIndex ] );
+      double const trueStraightFraction( nodeIndex * segmentFractionStep );
+      double const falseStraightFraction( 1.0 - trueStraightFraction );
       std::vector< double > const& curvedNode( (*curvedPath)[ nodeIndex ] );
       std::vector< double >& currentNode( composedPath[ nodeIndex ] );
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
+        double const straightFieldValue(
+                          ( falseStraightFraction * falseVacuum[ fieldIndex ] )
+                       + ( trueStraightFraction * trueVacuum[ fieldIndex ] ) );
         currentNode[ fieldIndex ]
-        = ( ( minuitParameters[ fieldIndex ] * straightNode[ fieldIndex ] )
+        = ( ( minuitParameters[ fieldIndex ] * straightFieldValue )
             + ( ( 1.0 - minuitParameters[ fieldIndex ] )
                 * curvedNode[ fieldIndex ] ) );
       }

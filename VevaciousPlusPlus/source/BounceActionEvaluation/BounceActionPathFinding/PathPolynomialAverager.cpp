@@ -43,15 +43,18 @@ namespace VevaciousPlusPlus
   TunnelPath const* PathPolynomialAverager::PathForParameterization(
                           std::vector< double > const& minuitParameters ) const
   {
-    std::vector< std::vector< double > > composedPath( straightPath );
+    std::vector< std::vector< double > > composedPath( *curvedPath );
+    size_t const numberOfVaryingNodes( composedPath.size() - 2 );
+    double const segmentFractionStep( 1.0
+                         / static_cast< double >( numberOfVaryingNodes + 1 ) );
+    std::vector< double > const& falseVacuum( composedPath.front() );
+    std::vector< double > const& trueVacuum( composedPath.back() );
     for( size_t nodeIndex( 1 );
-         nodeIndex < numberOfSegments;
+         nodeIndex <= numberOfVaryingNodes;
          ++nodeIndex )
     {
-      std::vector< double > const& straightNode( straightPath[ nodeIndex ] );
-      std::vector< double > const& curvedNode( (*curvedPath)[ nodeIndex ] );
-      double const pathFraction( static_cast< double >( nodeIndex )
-                                 / static_cast< double >( numberOfSegments ) );
+      double const pathFraction( nodeIndex * segmentFractionStep );
+      double const falseStraightFraction( 1.0 - pathFraction );
       double straightFraction( minuitParameters[ 0 ] );
       for( size_t coefficientIndex( 1 );
            coefficientIndex <= degreeOfPolynomial;
@@ -67,9 +70,12 @@ namespace VevaciousPlusPlus
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
+        double const straightFieldValue(
+                          ( falseStraightFraction * falseVacuum[ fieldIndex ] )
+                               + ( pathFraction * trueVacuum[ fieldIndex ] ) );
         currentNode[ fieldIndex ]
-        = ( ( straightFraction * straightNode[ fieldIndex ] )
-            + ( curvedFraction * curvedNode[ fieldIndex ] ) );
+        = ( ( straightFraction * straightFieldValue )
+            + ( curvedFraction * currentNode[ fieldIndex ] ) );
       }
     }
     return new LinearSplineThroughNodes( composedPath,

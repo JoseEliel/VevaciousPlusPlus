@@ -41,7 +41,7 @@ namespace VevaciousPlusPlus
       twoPlusTwiceDampingFactor = 6.0;
     }
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "BubbleProfile::BubbleProfile( pathPotential =" << std::endl;
     std::cout << pathPotential.AsDebuggingString() << std::endl;
@@ -51,7 +51,7 @@ namespace VevaciousPlusPlus
     << std::endl;
     std::cout << "initialIntegrationEndRadius = "
     << initialIntegrationEndRadius << " ) called." << std::endl;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
   }
 
   BubbleProfile::~BubbleProfile()
@@ -92,14 +92,14 @@ namespace VevaciousPlusPlus
     // enough that the integration would take too long to find an overshoot or
     // undershoot, or that the shot was dead on.
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "BubbleProfile::operator( " << undershootOvershootAttempts << ", "
     << shootingThreshold << " ) called. Initially, undershootAuxiliary = "
     << undershootAuxiliary << ", overshootAuxiliary = " << overshootAuxiliary
     << ", integrationStartRadius = " << integrationStartRadius
     << ", integrationEndRadius = " << integrationEndRadius;
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
     while( !currentShotGoodEnough
            &&
            ( shootAttemptsLeft > 0 ) )
@@ -131,12 +131,12 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "undershootAuxiliary = " << undershootAuxiliary
       << ", overshootAuxiliary = " << overshootAuxiliary
       << " -> initialAuxiliary = " << initialAuxiliary;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       // We cannot start at r = 0, as the damping term is proportional to 1/r,
       // so the initial conditions are set by a Euler step assuming that near
@@ -186,14 +186,14 @@ namespace VevaciousPlusPlus
                / ( 2.0 * initialQuadraticCoefficient * integrationStepSize ) );
 
         // debugging:
-        /**/std::cout << "in last segment. undershootAuxiliary = "
+        /*std::cout << "in last segment. undershootAuxiliary = "
         << undershootAuxiliary << ", overshootAuxiliary = "
         << overshootAuxiliary << ", p = " << initialPositiveAuxiliary
         << " (" << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << -initialAuxiliary << "), initialQuadraticCoefficient = "
         << initialQuadraticCoefficient << ", integrationStartRadius = "
         << integrationStartRadius;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         if( integrationStartRadius <= integrationStepSize )
         {
@@ -207,11 +207,11 @@ namespace VevaciousPlusPlus
                                          * integrationStartRadius );
 
           // debugging:
-          /**/std::cout << std::endl << "debugging:"
+          /*std::cout << std::endl << "debugging:"
           << std::endl
           << "small enough integrationStartRadius = " << integrationStartRadius
           << " <= integrationStepSize = " << integrationStepSize;
-          std::cout << std::endl;/**/
+          std::cout << std::endl;*/
         }
         else
         {
@@ -235,11 +235,11 @@ namespace VevaciousPlusPlus
             = sinhOrBesselScaledSlope( tunnelPath.NonZeroTemperature(),
                                        scaledRadius );
             // debugging:
-            /**/std::cout << std::endl << "debugging:"
+            /*std::cout << std::endl << "debugging:"
             << std::endl
             << "at scaled r = " << scaledRadius << ", scaled slope = "
             << scaledSlope;
-            std::cout << std::endl;/**/
+            std::cout << std::endl;*/
           }
           while( scaledSlope < minimumScaledSlope )
           {
@@ -249,11 +249,11 @@ namespace VevaciousPlusPlus
             = sinhOrBesselScaledSlope( tunnelPath.NonZeroTemperature(),
                                        scaledRadius );
             // debugging:
-            /**/std::cout << std::endl << "debugging:"
+            /*std::cout << std::endl << "debugging:"
             << std::endl
             << "at scaled r = " << scaledRadius << ", scaled slope = "
             << scaledSlope;
-            std::cout << std::endl;/**/
+            std::cout << std::endl;*/
           }
           // At this point, the slope of p(r) at
           // r = inverseRadialScale * scaledSlope ) should be large enough that
@@ -278,14 +278,14 @@ namespace VevaciousPlusPlus
           = ( initialAuxiliary * inverseRadialScale * scaledSlope );
           integrationStartRadius = ( scaledRadius / inverseRadialScale );
           // debugging:
-          /**/std::cout << std::endl << "debugging:"
+          /*std::cout << std::endl << "debugging:"
           << std::endl
           << "needed to do Bessel/sinh approximation: inverseRadialScale = "
           << inverseRadialScale << ", minimumScaledSlope = "
           << minimumScaledSlope << ", scaledRadius = " << scaledRadius
           << ", scaledSlope = " << scaledSlope << ", sinhOrBesselPart = "
           << sinhOrBesselPart;
-          std::cout << std::endl;/**/
+          std::cout << std::endl;*/
         }
       }
       else
@@ -297,13 +297,13 @@ namespace VevaciousPlusPlus
                                                           initialAuxiliary ) );
 
         // debugging:
-        /**/std::cout << "not in last segment. undershootAuxiliary = "
+        /*std::cout << "not in last segment. undershootAuxiliary = "
         << undershootAuxiliary << ", overshootAuxiliary = "
         << overshootAuxiliary << ", trying p = " << initialAuxiliary << " ("
         << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << ( pathPotential.DefiniteOvershootAuxiliary() - initialAuxiliary )
         << "), initialPotentialDerivative = " << initialPotentialDerivative;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
 
         double const initialQuadraticCoefficient( initialPotentialDerivative
                                                   / ( twoPlusTwiceDampingFactor
@@ -325,12 +325,12 @@ namespace VevaciousPlusPlus
                                        * integrationStartRadius );
 
         // debugging:
-        /**/std::cout << std::endl << "debugging:"
+        /*std::cout << std::endl << "debugging:"
         << std::endl
         << "initialQuadraticCoefficient = " << initialQuadraticCoefficient
         << ", integrationStepSize = " << integrationStepSize
         << ", integrationStartRadius = " << integrationStartRadius;
-        std::cout << std::endl;/**/
+        std::cout << std::endl;*/
       }
 
 
@@ -340,7 +340,7 @@ namespace VevaciousPlusPlus
 
 
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "after Euler 1st step, initialConditions = { "
       << initialConditions[ 0 ] << ", " << initialConditions[ 1 ]
@@ -348,7 +348,7 @@ namespace VevaciousPlusPlus
       << ", integrationStartRadius = " << integrationStartRadius
       << ", integrationEndRadius = " << integrationEndRadius
       << ", shootAttemptsLeft = " << shootAttemptsLeft;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       ShootFromInitialConditions();
 

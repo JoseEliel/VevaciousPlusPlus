@@ -49,40 +49,15 @@ namespace VevaciousPlusPlus
   // to minimize the potential at that node in the hyperplane. This continues
   // until all of the nodes moved less than moveToleranceFraction times the
   // average segment length.
-  void MinimizingPotentialOnBisections::ImproveNodes(
-                                             bool const lastImprovementWorked )
+  void MinimizingPotentialOnBisections::TryToImproveNodes()
   {
     if( inSegmentSplittingStage )
     {
-      if( lastImprovementWorked )
-      {
-        inSegmentSplittingStage = SplitSegments();
-        if( !inSegmentSplittingStage )
-        {
-          finalNumberOfNodes = pathNodes.size();
-          segmentAuxiliaryLength
-          = ( 1.0 / static_cast< double >( finalNumberOfNodes - 1 ) );
-        }
-      }
-      else
-      {
-        pathNodes = lastNodes;
-        inSegmentSplittingStage = false;
-        finalNumberOfNodes = pathNodes.size();
-        segmentAuxiliaryLength
-        = ( 1.0 / static_cast< double >( finalNumberOfNodes - 1 ) );
-        AdjustNodes();
-      }
-    }
-    else if( lastImprovementWorked )
-    {
-      AdjustNodes();
+      inSegmentSplittingStage = SplitSegments();
     }
     else
     {
-      nodesConverged = true;
-      // This class doesn't bother trying any more refinement if its last
-      // attempt using nearest neighbors just made the bounce action bigger.
+      AdjustNodes();
     }
   }
 

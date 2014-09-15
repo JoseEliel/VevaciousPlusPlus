@@ -55,5 +55,6 @@ namespace VevaciousPlusPlus
                      std::vector< double >( numberOfFields,
                                             0.1 ) );
   }
+
 } /* namespace VevaciousPlusPlus */
 #endif /* PATHSEPARATEFIELDAVERAGER_HPP_ */

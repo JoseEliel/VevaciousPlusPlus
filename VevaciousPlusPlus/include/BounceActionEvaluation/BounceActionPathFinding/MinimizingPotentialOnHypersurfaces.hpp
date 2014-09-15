@@ -38,15 +38,15 @@ namespace VevaciousPlusPlus
                     PotentialMinimum const& trueVacuum,
                     double const pathTemperature = 0.0 );
 
-
     // This allows Minuit2 to adjust the full path a set number of times to try
     // to minimize the sum of potentials at a set of nodes or bounce action
     // along the adjusted path, and then sets the path. Whether or not the last
-    // call of ImprovePath( ... ) lowered the bounce action is given by
+    // call of TryToImprovePath( ... ) lowered the bounce action is given by
     // lastImprovementWorked, which can be used by a derived class to decide
-    // internally whether to change strategy.
+    // internally whether to change strategy. If no improvement can be made,
+    // NULL is returned.
     virtual TunnelPath const*
-    ImprovePath( bool const lastImprovementWorked = true );
+    TryToImprovePath( bool const lastImprovementWorked = true );
 
 
   protected:
@@ -58,20 +58,25 @@ namespace VevaciousPlusPlus
     // appropriate for the step from the false-side node under a
     // parameterization that is just a set of zeroes.
     Eigen::MatrixXd reflectionMatrix;
-    bool nodesConverged;
     MinuitBetweenPaths* pathRefiner;
     std::vector< double > minuitInitialSteps;
     std::vector< double > const nodeZeroParameterization;
 
 
+    // This should internally change the derived class's strategy based on
+    // whether or not the last attempt to improve the path lowered the bounce
+    // action successfully or not, and the return true if there are still
+    // improvements to try, false if there is no improvement to try.
+    virtual bool NodesCanStillBeImproved( bool const lastMoveDidImprove ) = 0;
+
     // This should move the nodes individually towards whatever the derived
     // class considers to be the optimal tunneling path, by some amount, which
     // is up to the derived class, but it should also note if it is finished
     // moving the nodes around by setting nodesConverged to true. Whether or
-    // not the last call of ImprovePath( ... ) lowered the bounce action is
+    // not the last call of TryToImprovePath( ... ) lowered the bounce action is
     // given by lastImprovementWorked, which can be used by a derived class to
     // decide internally whether to change strategy.
-    virtual void ImproveNodes( bool const lastImprovementWorked = true ) = 0;
+    virtual void TryToImproveNodes() = 0;
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
     // which reflects the axis of field 0 to be parallel to
@@ -120,8 +125,8 @@ namespace VevaciousPlusPlus
     this->pathTemperature = pathTemperature;
     SetNodesForInitialPath( falseVacuum,
                             trueVacuum );
-    SetCurrentMinuitTolerance( falseVacuum,
-                               trueVacuum );
+    pathRefiner->UpdateNodes( pathNodes,
+                              pathTemperature );
     SetCurrentMinuitTolerance( falseVacuum,
                                trueVacuum );
     std::vector< std::vector< double > > straightPath( 2,
