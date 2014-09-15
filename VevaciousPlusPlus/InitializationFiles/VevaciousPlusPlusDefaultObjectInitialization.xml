@@ -121,7 +121,7 @@
       <TunnelingStrategy>
         <!-- "NoTunneling", "JustQuantum", "JustThermal", "ThermalThenQuantum",
              or "QuantumThenThermal" -->
-        JustQuantum
+        JustThermal
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
@@ -144,7 +144,7 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfNodesForPotentialFit>
-            100
+            50
           </NumberOfNodesForPotentialFit>
           <NumberShootAttemptsAllowed>
             32

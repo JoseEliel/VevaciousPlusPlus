@@ -47,6 +47,13 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "REALLY NEED TO WORK OUT HOW TO CORRECTLY IDENTIFY DSB EVAPORATION AND"
+    << " HOW TO ENSURE THAT THE DSB MINIMUM AT T IS FOUND!";
+    std::cout << std::endl;/**/
+
     // First we find the temperature at which the DSB vacuum evaporates, and
     // possibly exclude the parameter point based on DSB being less deep than
     // origin.
@@ -106,6 +113,15 @@ namespace VevaciousPlusPlus
       survivalExponent += ( exp( -bounceOverTemperature )
                              / ( currentTemperature * currentTemperature ) );
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "currentTemperature = " << currentTemperature
+    << ", bounceOverTemperature = " << bounceOverTemperature
+    << ", survivalExponent = " << survivalExponent;
+    std::cout << std::endl;/**/
+
     double smallestExponent( bounceOverTemperature );
     dominantTemperatureInGigaElectronVolts = 0.0;
     double const thresholdExponent( -log( survivalProbabilityThreshold ) );
@@ -191,6 +207,13 @@ namespace VevaciousPlusPlus
                                              double const tunnelingTemperature,
                                            double const actionThreshold ) const
   {
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "REALLY NEED TO INTERPOLATE POTENTIAL ALONG PATH IN A WAY THAT DOES NOT"
+    << " PRODUCE ARTIFACT WIGGLES!";
+    std::cout << std::endl;/**/
+
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
@@ -202,7 +225,7 @@ namespace VevaciousPlusPlus
     double lastBounceAction( 2.0 * currentBounceAction );
 
     // debugging:
-    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
+    /*std::string straightPathPicture( "StraightBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
     << std::endl
     << "Initial straight path being plotted in " << straightPathPicture << ".";
@@ -216,7 +239,7 @@ namespace VevaciousPlusPlus
     fieldColors.push_back( "cyan" );
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                fieldColors,
-                                               straightPathPicture );/**/
+                                               straightPathPicture );*/
 
     while( ( bestBounceAction > actionThreshold )
            &&
@@ -253,24 +276,28 @@ namespace VevaciousPlusPlus
       {
         std::cout << " GeV";
       }
-      std::cout << ", threshold is " << actionThreshold;
+      std::cout << ", threshold is ";
       if( currentPath->NonZeroTemperature() )
       {
-        std::cout << " GeV";
+        std::cout  << ( actionThreshold * tunnelingTemperature ) << " GeV";
+      }
+      else
+      {
+        std::cout  << actionThreshold;
       }
       std::cout << ".";
       std::cout << std::endl;
     }
 
     // debugging:
-    /**/std::string finalPathPicture( "FinalBubbleProfile.eps" );
+    /*std::string finalPathPicture( "FinalBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
     << std::endl
     << "Final deformed path being plotted in " << finalPathPicture << ".";
     std::cout << std::endl;
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                fieldColors,
-                                               finalPathPicture );/**/
+                                               finalPathPicture );*/
 
     std::cout << std::endl
     << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "

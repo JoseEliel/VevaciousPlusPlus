@@ -237,11 +237,25 @@ namespace VevaciousPlusPlus
     }
     xmlFile << "</VevaciousResults>\n";
     xmlFile.close();
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "VevaciousPlusPlus::WriteXmlResults( xmlFilename = \"" << xmlFilename
+    << "\" ) finished.";
+    std::cout << std::endl;/**/
   }
 
   void VevaciousPlusPlus::WriteSlhaResults( std::string const& slhaFilename,
                                             bool const writeWarnings )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "VevaciousPlusPlus::WriteSlhaResults( slhaFilename = \"" << slhaFilename
+    << "\", writeWarnings = " << writeWarnings << " ) called.";
+    std::cout << std::endl;/**/
+
     BOL::StringParser const slhaIndexMaker( 3,
                                             ' ',
                                             9,
@@ -265,9 +279,24 @@ namespace VevaciousPlusPlus
       // this loop just brings the get pointer back to the char before the
       // last '\n'.
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "end of loop, endPosition = " << endPosition;
+    std::cout << std::endl;/**/
+
     outputFile.seekp( (++endPosition) );
     // the put pointer is now about to overwrite the 1st '\n' of the sequence
     // of '\n' characters ending the file.
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just after outputFile.seekp( (++endPosition) = " << endPosition
+    << " );";
+    std::cout << std::endl;/**/
+
     outputFile << "\n"
     "BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus\n"
     "# version " << VersionInformation::currentVersion << ", documented in "
@@ -284,6 +313,11 @@ namespace VevaciousPlusPlus
     {
       outputFile << "0  # Metastable DSB vacuum\n";
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just wrote VEVACIOUSSTABILITY";
+    std::cout << std::endl;/**/
     outputFile << "BLOCK VEVACIOUSZEROTEMPERATURE # Results at T = 0\n"
     "# [index] [verdict float]\n";
     if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
@@ -310,10 +344,35 @@ namespace VevaciousPlusPlus
                      tunnelingCalculator->LogOfMinusLogOfQuantumProbability() )
       << "  # Not calculated: ignore this number\n";
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just wrote VEVACIOUSZEROTEMPERATURE";
+    std::cout << std::endl;/**/
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "tunnelingCalculator->ThermalSurvivalProbability() = "
+    << tunnelingCalculator->ThermalSurvivalProbability();
+    std::cout << std::endl;/**/
     outputFile << "BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0\n"
     "# [index] [verdict float]\n";
     if( tunnelingCalculator->ThermalSurvivalProbability() >= 0.0 )
     {
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "tunnelingCalculator->ThermalSurvivalProbability() = "
+      << tunnelingCalculator->ThermalSurvivalProbability() << std::endl
+      << "tunnelingCalculator->DominantTemperatureInGigaElectronVolts() = "
+      << tunnelingCalculator->DominantTemperatureInGigaElectronVolts()
+      << std::endl
+      << "tunnelingCalculator->LogOfMinusLogOfThermalProbability() = "
+      << tunnelingCalculator->LogOfMinusLogOfThermalProbability() << std::endl
+      << "identified source of thermal hanging: BOLlib::StringParser cannot"
+      << " convert \"-inf\" to an SLHA float" << std::endl;
+      std::cout << std::endl;/**/
+
       outputFile <<  "  1  " << slhaDoubleMaker.doubleToString(
                             tunnelingCalculator->ThermalSurvivalProbability() )
       << "  # Probability of DSB vacuum surviving thermal tunneling\n";
@@ -336,6 +395,11 @@ namespace VevaciousPlusPlus
                      tunnelingCalculator->LogOfMinusLogOfThermalProbability() )
       << "  # Not calculated: ignore this number\n";
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just wrote VEVACIOUSNONZEROTEMPERATURE";
+    std::cout << std::endl;/**/
     outputFile
     << "BLOCK VEVACIOUSFIELDNAMES # Field names for each index\n"
     "# [index] [field name in \"\"]\n";
@@ -348,6 +412,11 @@ namespace VevaciousPlusPlus
       outputFile << slhaIndexMaker.intToString( fieldIndex ) << "  \""
       << fieldNames[ fieldIndex ] << "\"\n";
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just wrote VEVACIOUSFIELDNAMES";
+    std::cout << std::endl;/**/
     outputFile << "BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV\n"
     "# [index] [field VEV in GeV]\n";
     std::vector< double > const&
@@ -360,6 +429,11 @@ namespace VevaciousPlusPlus
       << slhaDoubleMaker.doubleToString( dsbFields[ fieldIndex ] ) << "  # "
       << fieldNames[ fieldIndex ] << "\n";
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just wrote VEVACIOUSDSBVACUUM";
+    std::cout << std::endl;/**/
     outputFile
     << "BLOCK VEVACIOUSPANICVACUUM # ";
     if( potentialMinimizer->DsbVacuumIsMetastable() )
@@ -385,7 +459,18 @@ namespace VevaciousPlusPlus
       << slhaDoubleMaker.doubleToString( (*panicFields)[ fieldIndex ] )
       << "  # " << fieldNames[ fieldIndex ] << "\n";
     }
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "just wrote VEVACIOUSPANICVACUUM";
+    std::cout << std::endl;/**/
     outputFile.close();
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "VevaciousPlusPlus::WriteSlhaResults( slhaFilename = \"" << slhaFilename
+    << "\", writeWarnings = " << writeWarnings << " ) finished.";
   }
 
   // This puts the content of the current element of xmlParser into
