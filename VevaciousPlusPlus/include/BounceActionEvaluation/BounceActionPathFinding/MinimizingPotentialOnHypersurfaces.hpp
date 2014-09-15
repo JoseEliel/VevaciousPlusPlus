@@ -125,8 +125,11 @@ namespace VevaciousPlusPlus
     this->pathTemperature = pathTemperature;
     SetNodesForInitialPath( falseVacuum,
                             trueVacuum );
-    pathRefiner->UpdateNodes( pathNodes,
-                              pathTemperature );
+    if( pathRefiner != NULL )
+    {
+      pathRefiner->UpdateNodes( pathNodes,
+                                pathTemperature );
+    }
     SetCurrentMinuitTolerance( falseVacuum,
                                trueVacuum );
     std::vector< std::vector< double > > straightPath( 2,
