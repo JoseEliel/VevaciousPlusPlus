@@ -101,7 +101,7 @@ namespace VevaciousPlusPlus
                                                  * squareRootOfSolitonicFactor
                                     * fourVolumeOfKnownUniverseOverGevFourth );
       actionThreshold = ( log( -solitonicFactorTimesFourVolume
-                                     / log( survivalProbabilityThreshold ) ) );
+                               / log( survivalProbabilityThreshold ) ) );
     }
     return BoundedBounceAction( falseVacuum,
                                 trueVacuum,

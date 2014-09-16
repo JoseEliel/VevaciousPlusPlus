@@ -72,6 +72,8 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;
       dominantTemperatureInGigaElectronVolts = 0.0;
       thermalSurvivalProbability = 0.0;
+      logOfMinusLogOfThermalProbability
+      = -exp( maximumPowerOfNaturalExponent );
       return;
     }
 
