@@ -36,8 +36,7 @@ namespace VevaciousPlusPlus
 
 
     // This doesn't do anything here.
-    virtual void
-    UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
+    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
 
 
   protected:
@@ -74,9 +73,9 @@ namespace VevaciousPlusPlus
     // optimal tunneling temperature, then writes and runs another Python
     // program to use CosmoTransitions to calculate the thermal action at this
     // optimal temperature.
-    virtual void
-    CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum );
+    virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum,
+                             double const potentialAtOriginAtZeroTemperature );
   };
 
 } /* namespace VevaciousPlusPlus */

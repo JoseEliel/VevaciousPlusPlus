@@ -55,9 +55,9 @@ namespace VevaciousPlusPlus
     // the integral already passes a threshold, and sets
     // dominantTemperatureInGigaElectronVolts to be the temperature with the
     // lowest survival probability.
-    virtual void
-    CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum );
+    virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                             double const potentialAtOriginAtZeroTemperature );
 
 
     // This returns either the dimensionless bounce action integrated over four

@@ -43,9 +43,10 @@ namespace VevaciousPlusPlus
   // the integral already passes a threshold, and sets
   // dominantTemperatureInGigaElectronVolts to be the temperature with the
   // lowest survival probability.
-  void BounceAlongPathWithThreshold::CalculateThermalTunneling(
+  void BounceAlongPathWithThreshold::ContinueThermalTunneling(
                                            PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum )
+                                           PotentialMinimum const& trueVacuum,
+                              double const potentialAtOriginAtZeroTemperature )
   {
     // placeholder:
     /**/std::cout << std::endl
@@ -53,28 +54,6 @@ namespace VevaciousPlusPlus
     << "REALLY NEED TO WORK OUT HOW TO CORRECTLY IDENTIFY DSB EVAPORATION AND"
     << " HOW TO ENSURE THAT THE DSB MINIMUM AT T IS FOUND!";
     std::cout << std::endl;/**/
-
-    // First we check whether we exclude the parameter point based on DSB being
-    // less deep than origin.
-    std::vector< double > const&
-    fieldOrigin( potentialFunction.FieldValuesOrigin() );
-    double const potentialAtOrigin( potentialFunction( fieldOrigin ) );
-    if( potentialFunction( falseVacuum.FieldConfiguration() )
-        > potentialAtOrigin )
-    {
-      std::cout
-      << std::endl
-      << "DSB vacuum has higher energy density than vacuum with no non-zero"
-      << " VEVs! Assuming that it is implausible that the Universe cooled into"
-      << " this false vacuum from the symmetric phase, and so setting survival"
-      << " probability to 0.";
-      std::cout << std::endl;
-      dominantTemperatureInGigaElectronVolts = 0.0;
-      thermalSurvivalProbability = 0.0;
-      logOfMinusLogOfThermalProbability
-      = -exp( maximumPowerOfNaturalExponent );
-      return;
-    }
 
     // The first normal step is to estimate the critical temperature where the
     // thermal DSB vacuum can no longer decay to the thermal panic vacuum. The
@@ -107,7 +86,7 @@ namespace VevaciousPlusPlus
     currentTemperature( criticalTunnelingTemperature - temperatureStep );
     thermalPotentialMinimizer.SetTemperature( currentTemperature );
     PotentialMinimum thermalFalseVacuum( potentialFunction.FieldValuesOrigin(),
-                                         potentialAtOrigin );
+                                         potentialAtOriginAtZeroTemperature );
     if( currentTemperature < falseEvaporationTemperature )
     {
       thermalFalseVacuum = thermalPotentialMinimizer(
@@ -150,8 +129,8 @@ namespace VevaciousPlusPlus
       thermalPotentialMinimizer.SetTemperature( currentTemperature );
       if( currentTemperature >= falseEvaporationTemperature )
       {
-        thermalFalseVacuum = PotentialMinimum( fieldOrigin,
-                                               potentialFunction( fieldOrigin,
+        thermalFalseVacuum = PotentialMinimum( potentialFunction.FieldValuesOrigin(),
+                                               potentialFunction( potentialFunction.FieldValuesOrigin(),
                                                         currentTemperature ) );
       }
       else

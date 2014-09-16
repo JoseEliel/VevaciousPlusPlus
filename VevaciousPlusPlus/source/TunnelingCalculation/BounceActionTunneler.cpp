@@ -235,6 +235,39 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;/**/
   }
 
+  // This should set thermalSurvivalProbability and
+  // dominantTemperatureInGigaElectronVolts appropriately.
+  void BounceActionTunneler::CalculateThermalTunneling(
+                                           PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum )
+  {
+    // First we check whether we exclude the parameter point based on DSB being
+    // less deep than origin.
+    std::vector< double > const&
+    fieldOrigin( potentialFunction.FieldValuesOrigin() );
+    double const
+    potentialAtOriginAtZeroTemperature( potentialFunction( fieldOrigin ) );
+    if( potentialFunction( falseVacuum.FieldConfiguration() )
+        > potentialAtOriginAtZeroTemperature )
+    {
+      std::cout
+      << std::endl
+      << "DSB vacuum has higher energy density than vacuum with no non-zero"
+      << " VEVs! Assuming that it is implausible that the Universe cooled into"
+      << " this false vacuum from the symmetric phase, and so setting survival"
+      << " probability to 0.";
+      std::cout << std::endl;
+      dominantTemperatureInGigaElectronVolts = 0.0;
+      thermalSurvivalProbability = 0.0;
+      logOfMinusLogOfThermalProbability
+      = -exp( maximumPowerOfNaturalExponent );
+      return;
+    }
+    ContinueThermalTunneling( falseVacuum,
+                              trueVacuum,
+                              potentialAtOriginAtZeroTemperature );
+  }
+
   // This calculates the temperature at which either tunneling from
   // givenVacuum to the field origin becomes impossible if
   // criticalRatherThanEvaporation is true or the temperature at which

@@ -196,30 +196,11 @@ namespace VevaciousPlusPlus
   // optimal tunneling temperature, then writes and runs another Python
   // program to use CosmoTransitions to calculate the thermal action at this
   // optimal temperature.
-  void CosmoTransitionsRunner::CalculateThermalTunneling(
+  void CosmoTransitionsRunner::ContinueThermalTunneling(
                                            PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum )
+                                           PotentialMinimum const& trueVacuum,
+                              double const potentialAtOriginAtZeroTemperature )
   {
-    // First we find the temperature at which the DSB vacuum evaporates, and
-    // possibly exclude the parameter point based on DSB being less deep than
-    // origin.
-    double const potentialAtOrigin( potentialFunction(
-                                     potentialFunction.FieldValuesOrigin() ) );
-    if( potentialFunction( falseVacuum.FieldConfiguration() )
-        > potentialAtOrigin )
-    {
-      std::cout
-      << std::endl
-      << "DSB vacuum has higher energy density than vacuum with no non-zero"
-      << " VEVs! Assuming that it is implausible that the Universe cooled into"
-      << " this false vacuum from the symmetric phase, and so setting survival"
-      << " probability to 0.";
-      std::cout << std::endl;
-      dominantTemperatureInGigaElectronVolts = 0.0;
-      thermalSurvivalProbability = 0.0;
-      return;
-    }
-
     criticalRatherThanEvaporation = false;
     evaporationMinimum = falseVacuum;
     double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(

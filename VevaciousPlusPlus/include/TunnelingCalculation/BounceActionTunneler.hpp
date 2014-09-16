@@ -70,17 +70,28 @@ namespace VevaciousPlusPlus
                                  PotentialMinimum const& trueVacuum,
                                  double const tunnelingTemperature ) const = 0;
 
-    // This sets quantumSurvivalProbability and quantumLifetimeInSeconds
-    // appropriately.
+    // This sets quantumSurvivalProbability, quantumLifetimeInSeconds, and
+    // logOfMinusLogOfQuantumProbability appropriately.
     virtual void
     CalculateQuantumTunneling( PotentialMinimum const& falseVacuum,
                                PotentialMinimum const& trueVacuum );
 
-    // This should set thermalSurvivalProbability and
-    // dominantTemperatureInGigaElectronVolts appropriately.
+    // This sets thermalSurvivalProbability,
+    // dominantTemperatureInGigaElectronVolts, and
+    // logOfMinusLogOfThermalProbability appropriately.
     virtual void
     CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum ) = 0;
+                               PotentialMinimum const& trueVacuum );
+
+    // This should set thermalSurvivalProbability,
+    // dominantTemperatureInGigaElectronVolts, and
+    // logOfMinusLogOfThermalProbability appropriately, in the context of being
+    // called after guarding against the case where the field origin is deeper
+    // than the DSB vacuum at zero temperature, which would make cooling into
+    // the DSB vacuum implausible.
+    virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum,
+                         double const potentialAtOriginAtZeroTemperature ) = 0;
 
     // This calculates the temperature at which either tunneling from
     // givenVacuum to the field origin becomes impossible if
