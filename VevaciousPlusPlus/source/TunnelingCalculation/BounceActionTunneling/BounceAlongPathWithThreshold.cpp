@@ -54,9 +54,8 @@ namespace VevaciousPlusPlus
     << " HOW TO ENSURE THAT THE DSB MINIMUM AT T IS FOUND!";
     std::cout << std::endl;/**/
 
-    // First we find the temperature at which the DSB vacuum evaporates, and
-    // possibly exclude the parameter point based on DSB being less deep than
-    // origin.
+    // First we check whether we exclude the parameter point based on DSB being
+    // less deep than origin.
     std::vector< double > const&
     fieldOrigin( potentialFunction.FieldValuesOrigin() );
     double const potentialAtOrigin( potentialFunction( fieldOrigin ) );
@@ -76,6 +75,15 @@ namespace VevaciousPlusPlus
       = -exp( maximumPowerOfNaturalExponent );
       return;
     }
+
+    // The first normal step is to estimate the critical temperature where the
+    // thermal DSB vacuum can no longer decay to the thermal panic vacuum. The
+    // thermal DSB vacuum is the minimum at a given temperature where Minuit2
+    // rolls to starting from the input zero-temperature DSB vacuum. Likewise,
+    // the thermal panic vacuum is where Minuit2 rolls to at the given
+    // temperature starting from the zero-temperature panic vacuum.
+
+
 
     // We note the temperatures where the DSB vacuum evaporates and where
     // tunneling from the true vacuum to the field origin becomes impossible :

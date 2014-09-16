@@ -10,7 +10,7 @@
 namespace VevaciousPlusPlus
 {
   std::string
-  CosmoTransitionsRunner::pythonPotentialFilenameBase( "VevaciousPotential");
+  CosmoTransitionsRunner::pythonPotentialFilenameBase( "VevaciousPotential" );
 
   CosmoTransitionsRunner::CosmoTransitionsRunner(
                                        IWritesPythonPotential& pythonPotential,

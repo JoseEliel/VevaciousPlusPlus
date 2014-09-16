@@ -65,7 +65,8 @@ namespace VevaciousPlusPlus
 
     // This is for ease of getting the index of a field of a given name. It
     // returns the largest possible unsigned int (-1 should tick over to that)
-    // if fieldName was not found.
+    // if fieldName was not found. Hence calling code can check that the return
+    // from this function is less than NumberOfFieldVariables().
     size_t FieldIndex( std::string const& fieldName ) const;
 
     std::vector< double > const& DsbFieldValues() const
@@ -143,7 +144,8 @@ namespace VevaciousPlusPlus
 
   // This is for ease of getting the index of a field of a given name. It
   // returns the largest possible unsigned int (-1 should tick over to that) if
-  // fieldName was not found.
+  // fieldName was not found. Hence calling code can check that the return from
+  // this function is less than NumberOfFieldVariables().
   inline size_t
   PotentialFunction::FieldIndex( std::string const& fieldName ) const
   {
