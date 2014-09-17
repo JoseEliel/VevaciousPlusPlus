@@ -16,50 +16,38 @@ namespace VevaciousPlusPlus
   class SplinePotential
   {
   public:
-    SplinePotential( double const minimumFalseVacuumConcavity = 1.0e-6 );
-    SplinePotential( SplinePotential const& copySource );
-    virtual ~SplinePotential();
+    SplinePotential( PotentialFunction const& potentialFunction,
+                     TunnelPath const& tunnelPath,
+                     size_t const numberOfPotentialSegments );
+    ~SplinePotential();
 
 
     // This returns the value of the potential at auxiliaryValue, by finding
     // the correct segment and then returning its value at that point.
-    virtual double operator()( double auxiliaryValue ) const;
+    double operator()( double auxiliaryValue ) const;
 
     // This returns the value of the first derivative of the potential at
     // auxiliaryValue, by finding the correct segment and then returning its
     // slope at that point.
-    virtual double FirstDerivative( double const auxiliaryValue ) const;
+    double FirstDerivative( double const auxiliaryValue ) const;
 
     // This returns the value of the second derivative of the potential at
-    // auxiliaryValue, by finding the correct segment and then returning its
-    // slope at that point.
-    virtual double SecondDerivative( double const auxiliaryValue ) const;
+    // the false vacuum end of the path.
+    double SecondDerivativeAtFalseVacuum() const
+    { return ( firstSegmentQuadratic + firstSegmentQuadratic ); }
 
     // This returns the value of the first derivative of the potential at
     // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
     // that it is in the implicit final segment.
-    virtual double FirstDerivativeNearPathPanic(
-                           double const differenceFromMaximumAuxiliary ) const;
+    double FirstDerivativeNearPathPanic(
+                            double const differenceFromMaximumAuxiliary ) const
+    { return ( 2.0 * differenceFromMaximumAuxiliary * lastSegmentQuadratic ); }
 
     // This returns the value of the second derivative of the potential at
     // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
     // that it is in the implicit final segment.
-    virtual double SecondDerivativeNearPathPanic(
-                           double const differenceFromMaximumAuxiliary ) const;
-
-    // This adds another point for the spline, assuming that it goes after the
-    // previously-added point by auxiliaryDifference from the previous point,
-    // to a potential value of potentialValue relative to the false vacuum.
-    void AddPoint( double const auxiliaryValue,
-                   double const potentialValue );
-
-    // This sets up the spline based on auxiliaryValues and potentialValues,
-    // ensuring that the potential reaches the correct values for the vacua,
-    // and that the potential derivative vanishes at the vacua. It also notes
-    // the first point where the potential drops below that of the false vacuum
-    // in definiteUndershootAuxiliary and the first maximum after that in
-    // definiteOvershootAuxiliary, and cuts off the potential at that maximum.
-    void SetSpline( double const trueVacuumPotentialDifference );
+    double SecondDerivativeNearPathPanic() const
+    { return lastSegmentQuadratic; }
 
     double DefiniteUndershootAuxiliary() const
     { return definiteUndershootAuxiliary; }
@@ -69,7 +57,7 @@ namespace VevaciousPlusPlus
 
     double StartOfFinalSegment() const{ return startOfFinalSegment; }
 
-    double SizeOfFinalSegment() const{ return sizeOfFinalSegment; }
+    double SizeOfFinalSegment() const{ return auxiliaryStep; }
 
     // This is for debugging.
     std::string AsDebuggingString() const;
@@ -86,57 +74,27 @@ namespace VevaciousPlusPlus
     // segment, where for an auxiliary value = 1 - d, the potential is
     // approximated by
     // V(1.0) + d^2 * [0.5*V''(1)] + d^4 * [V''''(1)/(4*3*2)].
-    std::vector< double > auxiliaryValues;
+    double auxiliaryStep;
+    double inverseOfAuxiliaryStep;
+    // There are ( numberOfPotentialSegments - 2 ) normal segments, which are
+    // taken as linear functions, with the false vacuum side potential of each
+    // segment stored in potentialValues[ i - 2 ] and the slope in
+    // firstDerivatives[ i - 2 ] for the ith segment (starting from 1). The
+    // segment at the start and the segment at the end are taken as quadratics
+    // without linear terms, parameterized by firstSegmentQuadratic for the
+    // segment at the false vacuum and finalPotential and lastSegmentQuadratic
+    // for the segment at the true vacuum, with that segment being treated as
+    // being based at the end of the path (truncated at the first path panic
+    // minimum).
     std::vector< double > potentialValues;
     std::vector< double > firstDerivatives;
-    std::vector< double > halfSecondDerivatives;
+    double firstSegmentQuadratic;
     double finalPotential;
-    double halfFinalSecondDerivative;
-    double finalCubicCoefficient;
-    double const minimumFalseVacuumConcavity;
+    double lastSegmentQuadratic;
     double definiteUndershootAuxiliary;
     double definiteOvershootAuxiliary;
-    double auxiliaryUpToCurrentSegment;
     double startOfFinalSegment;
-    double sizeOfFinalSegment;
   };
-
-
-
-
-  // This returns the value of the first derivative of the potential at
-  // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
-  // that it is in the implicit final segment.
-  inline double SplinePotential::FirstDerivativeNearPathPanic(
-                            double const differenceFromMaximumAuxiliary ) const
-  {
-    return ( ( ( 2.0 * halfFinalSecondDerivative )
-                   + ( 3.0 * finalCubicCoefficient
-                           * differenceFromMaximumAuxiliary ) )
-             * differenceFromMaximumAuxiliary );
-  }
-
-  // This returns the value of the second derivative of the potential at
-  // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
-  // that it is in the implicit final segment.
-  inline double SplinePotential::SecondDerivativeNearPathPanic(
-                            double const differenceFromMaximumAuxiliary ) const
-  {
-    return ( ( 2.0 * halfFinalSecondDerivative )
-               + ( 6.0 * finalCubicCoefficient
-                       * differenceFromMaximumAuxiliary ) );
-  }
-
-  // This adds another point for the spline, assuming that it goes after the
-  // previously-added point by auxiliaryDifference from the previous point,
-  // to a potential value of potentialValue relative to the false vacuum.
-  inline void SplinePotential::AddPoint( double const auxiliaryValue,
-                                         double const potentialValue )
-  {
-    auxiliaryValues.push_back( auxiliaryValue - auxiliaryUpToCurrentSegment );
-    potentialValues.push_back( potentialValue );
-    auxiliaryUpToCurrentSegment = auxiliaryValue;
-  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* SPLINEPOTENTIAL_HPP_ */

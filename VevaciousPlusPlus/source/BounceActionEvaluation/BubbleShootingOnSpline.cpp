@@ -258,8 +258,8 @@ namespace VevaciousPlusPlus
     // (All solutions found with Mathematica 8.)
 
     // This is b in the mathematics above.
-    double const
-    inverseScale( sqrt( potentialApproximation.SecondDerivative( 0.0 ) ) );
+    double const inverseScale(
+              sqrt( potentialApproximation.SecondDerivativeAtFalseVacuum() ) );
     double const scaledRadius( inverseScale * nextRadius );
 
     // debugging:

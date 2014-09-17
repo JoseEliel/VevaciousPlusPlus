@@ -309,7 +309,6 @@ namespace VevaciousPlusPlus
         if( BelowCriticalTemperature( temperatureGuess,
                                       zeroTemperatureVacuum ) )
         {
-
           rangeOfMaxTemperature.first = maximumAllowedTemperature;
           rangeOfMaxTemperature.second = maximumAllowedTemperature;
           std::cout << "... too low. Apparently this vacuum persists up to"
