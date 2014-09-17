@@ -114,7 +114,7 @@
          <BouncePathFinder>. -->
     <ClassType>
       <!-- Either "BounceAlongPathWithThreshold" or
-           "CosmoTransitionsRunner" -->
+           "CosmoTransitionsRunner". -->
       BounceAlongPathWithThreshold
     </ClassType>
     <ConstructorArguments>
@@ -126,6 +126,12 @@
       <SurvivalProbabilityThreshold>
         0.01
       </SurvivalProbabilityThreshold>
+      <ThermalActionResolution>
+        5
+      </ThermalActionResolution>
+      <CriticalTemperatureAccuracy>
+        7
+      </CriticalTemperatureAccuracy>
       <PathToCosmotransitions>
         /Users/oleary/BOL/machine-specific/CosmoTransitions2/
       </PathToCosmotransitions>

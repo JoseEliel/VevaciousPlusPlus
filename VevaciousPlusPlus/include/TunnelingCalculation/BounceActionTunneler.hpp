@@ -25,8 +25,7 @@ namespace VevaciousPlusPlus
     BounceActionTunneler( PotentialFunction& potentialFunction,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                           double const survivalProbabilityThreshold,
-                          size_t const temperatureAccuracy,
-                          size_t const evaporationResolution );
+                          size_t const temperatureAccuracy );
     virtual ~BounceActionTunneler();
 
 
@@ -52,7 +51,6 @@ namespace VevaciousPlusPlus
 
     PotentialFunction const& potentialFunction;
     size_t const temperatureAccuracy;
-    size_t const evaporationResolution;
     std::pair< double, double > rangeOfMaxTemperatureForOriginToFalse;
     std::pair< double, double > rangeOfMaxTemperatureForOriginToTrue;
 

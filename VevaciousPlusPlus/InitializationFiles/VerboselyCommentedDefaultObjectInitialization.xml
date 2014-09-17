@@ -189,6 +189,19 @@
       <SurvivalProbabilityThreshold>
         0.01
       </SurvivalProbabilityThreshold>
+      <ThermalActionResolution>
+      <!-- This is the number of temperatures taken for the thermal bounce
+           action calculation. If using "CosmoTransitionsRunner", the thermal
+           bounce actions with a straight path is sampled at this many
+           temperatures (equally spaced) and then used to estimate the thermal
+           dependence of the bounce action, which is then used to estimate the
+           temperature which dominates thermal tunneling, which is then used
+           for the full calculation by CosmoTransitions. If using
+           "BounceAlongPathWithThreshold", the integration of the decay width
+           over temperature is performed by a numerical approximation summing
+           over this many temperatures (equally space). -->
+        5
+      </ThermalActionResolution>
       <CriticalTemperatureAccuracy>
         <!-- This option gives the accuracy to which the critical and
              evaporation temperatures will be calculated if necessary, in that
@@ -196,15 +209,6 @@
              the exact value. -->
         7
       </CriticalTemperatureAccuracy>
-      <EvaporationBarrierResolution>
-        <!-- This option gives the resolution of the energy barrier between the
-             field configuration of the DSB vacuum at zero temperature and the
-             field origin, which is evaluated at different temperatures to see
-             if there is a positive energy barrier: if not, the DSB vacuum is
-             deemed to have "evaporated" and tunneling out of the DSB vacuum is
-             substituted with tunneling out of the field origin. -->
-        3
-      </EvaporationBarrierResolution>
       <!-- The following elements are read only if <ClassType> is
            "CosmoTransitionsRunner", and are ignored if <ClassType> is
            "BounceAlongPathWithThreshold". -->
@@ -231,6 +235,13 @@
              loop. If not given, 10 is used as the default. -->
         10
       </MaxOuterLoops>
+      <ThermalStraightPathFitResolution>
+      <!-- This is the number of points taken for estimating the thermal
+           dependence of the bounce action, which is then used to estimate the
+           temperature which dominates thermal tunneling, which is then used
+           for the full calculation by CosmoTransitions. -->
+        5
+      </ThermalStraightPathFitResolution>
       <!-- End of set of elements only read if <ClassType> is
            "CosmoTransitionsRunner". -->
       <!-- The following elements are read only if <ClassType> is

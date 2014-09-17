@@ -16,14 +16,12 @@ namespace VevaciousPlusPlus
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
-                                              size_t const temperatureAccuracy,
-                                            size_t const evaporationResolution,
-                                  size_t const thermalIntegrationResolution ) :
+                                     size_t const thermalIntegrationResolution,
+                                           size_t const temperatureAccuracy ) :
     BounceActionTunneler( potentialFunction,
                           tunnelingStrategy,
                           survivalProbabilityThreshold,
-                          temperatureAccuracy,
-                          evaporationResolution ),
+                          temperatureAccuracy ),
     pathFinder( pathFinder ),
     actionCalculator( actionCalculator ),
     thermalIntegrationResolution( thermalIntegrationResolution )
@@ -55,39 +53,21 @@ namespace VevaciousPlusPlus
     << " HOW TO ENSURE THAT THE DSB MINIMUM AT T IS FOUND!";
     std::cout << std::endl;/**/
 
-    // The first normal step is to estimate the critical temperature where the
-    // thermal DSB vacuum can no longer decay to the thermal panic vacuum. The
-    // thermal DSB vacuum is the minimum at a given temperature where Minuit2
-    // rolls to starting from the input zero-temperature DSB vacuum. Likewise,
-    // the thermal panic vacuum is where Minuit2 rolls to at the given
-    // temperature starting from the zero-temperature panic vacuum.
-
-
-
-    // We note the temperatures where the DSB vacuum evaporates and where
-    // tunneling from the true vacuum to the field origin becomes impossible :
-    criticalRatherThanEvaporation = false;
-    evaporationMinimum = falseVacuum;
-    double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(
-                                                         potentialAtOrigin ) );
-
-    criticalRatherThanEvaporation = true;
-    criticalMinimum = trueVacuum;
-    double const criticalTunnelingTemperature(
-                       CriticalOrEvaporationTemperature( potentialAtOrigin ) );
 
 
     // Now we start at almost the critical temperature, and sum up for
     // decreasing temperatures:
     double survivalExponent( 0.0 );
-    double const temperatureStep( criticalTunnelingTemperature
+    double const temperatureStep( rangeOfMaxTemperatureForOriginToTrue.first
                  / static_cast< double >( thermalIntegrationResolution + 1 ) );
-    double
-    currentTemperature( criticalTunnelingTemperature - temperatureStep );
+    double currentTemperature( rangeOfMaxTemperatureForOriginToTrue.first
+                               - temperatureStep );
     thermalPotentialMinimizer.SetTemperature( currentTemperature );
     PotentialMinimum thermalFalseVacuum( potentialFunction.FieldValuesOrigin(),
-                                         potentialAtOriginAtZeroTemperature );
-    if( currentTemperature < falseEvaporationTemperature )
+                      potentialFunction( potentialFunction.FieldValuesOrigin(),
+                                                           currentTemperature )
+                                - thermalPotentialMinimizer.FunctionOffset() );
+    if( currentTemperature < rangeOfMaxTemperatureForOriginToFalse.second )
     {
       thermalFalseVacuum = thermalPotentialMinimizer(
                                             falseVacuum.FieldConfiguration() );
@@ -127,11 +107,13 @@ namespace VevaciousPlusPlus
       }
       currentTemperature -= temperatureStep;
       thermalPotentialMinimizer.SetTemperature( currentTemperature );
-      if( currentTemperature >= falseEvaporationTemperature )
+      if( currentTemperature >= rangeOfMaxTemperatureForOriginToFalse.second )
       {
-        thermalFalseVacuum = PotentialMinimum( potentialFunction.FieldValuesOrigin(),
-                                               potentialFunction( potentialFunction.FieldValuesOrigin(),
-                                                        currentTemperature ) );
+        thermalFalseVacuum
+        = PotentialMinimum( potentialFunction.FieldValuesOrigin(),
+                      potentialFunction( potentialFunction.FieldValuesOrigin(),
+                                         currentTemperature )
+                                - thermalPotentialMinimizer.FunctionOffset() );
       }
       else
       {

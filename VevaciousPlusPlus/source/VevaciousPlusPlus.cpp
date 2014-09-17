@@ -703,8 +703,8 @@ namespace VevaciousPlusPlus
     // <MaxOuterLoops>.
     std::string tunnelingStrategy( "ThermalThenQuantum" );
     double survivalProbabilityThreshold( 0.1 );
+    int thermalStraightPathFitResolution( 5 );
     int temperatureAccuracy( 7 );
-    int evaporationResolution( 3 );
     std::string pathToCosmotransitions( "./cosmoTransitions/" );
     int resolutionOfDsbVacuum( 20 );
     int maxInnerLoops( 10 );
@@ -720,11 +720,11 @@ namespace VevaciousPlusPlus
                                      "SurvivalProbabilityThreshold",
                                      survivalProbabilityThreshold );
       InterpretElementIfNameMatches( xmlParser,
+                                     "ThermalActionResolution",
+                                     thermalStraightPathFitResolution );
+      InterpretElementIfNameMatches( xmlParser,
                                      "CriticalTemperatureAccuracy",
                                      temperatureAccuracy );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "EvaporationBarrierResolution",
-                                     evaporationResolution );
       InterpretElementIfNameMatches( xmlParser,
                                      "PathToCosmotransitions",
                                      pathToCosmotransitions );
@@ -744,11 +744,11 @@ namespace VevaciousPlusPlus
                               InterpretTunnelingStrategy( tunnelingStrategy ),
                                        survivalProbabilityThreshold,
                                        temperatureAccuracy,
-                                       evaporationResolution,
                                        pathToCosmotransitions,
                                        resolutionOfDsbVacuum,
                                        maxInnerLoops,
-                                       maxOuterLoops );
+                                       maxOuterLoops,
+                                       thermalStraightPathFitResolution );
   }
 
   //
@@ -761,9 +761,8 @@ namespace VevaciousPlusPlus
     std::string bouncePotentialFitArguments( "" );
     std::string tunnelingStrategy( "ThermalThenQuantum" );
     double survivalProbabilityThreshold( 0.1 );
-    int temperatureAccuracy( 7 );
-    int evaporationResolution( 3 );
     int thermalIntegrationResolution( 5 );
+    int temperatureAccuracy( 7 );
 
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
@@ -776,14 +775,11 @@ namespace VevaciousPlusPlus
                                      "SurvivalProbabilityThreshold",
                                      survivalProbabilityThreshold );
       InterpretElementIfNameMatches( xmlParser,
+                                     "ThermalActionResolution",
+                                     thermalIntegrationResolution );
+      InterpretElementIfNameMatches( xmlParser,
                                      "CriticalTemperatureAccuracy",
                                      temperatureAccuracy );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "EvaporationBarrierResolution",
-                                     evaporationResolution );
-      InterpretElementIfNameMatches( xmlParser,
-                                     "ThermalIntegrationResolution",
-                                     thermalIntegrationResolution );
       ReadClassAndArguments( xmlParser,
                              "BouncePotentialFit",
                              bouncePotentialFitClass,
@@ -801,9 +797,8 @@ namespace VevaciousPlusPlus
                                                  bouncePotentialFitArguments ),
                                InterpretTunnelingStrategy( tunnelingStrategy ),
                                              survivalProbabilityThreshold,
-                                             temperatureAccuracy,
-                                             evaporationResolution,
-                                             thermalIntegrationResolution );
+                                             thermalIntegrationResolution,
+                                             temperatureAccuracy );
   }
 
   //

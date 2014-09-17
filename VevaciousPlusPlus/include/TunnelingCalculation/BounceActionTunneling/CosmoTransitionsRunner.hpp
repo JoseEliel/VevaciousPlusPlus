@@ -27,16 +27,12 @@ namespace VevaciousPlusPlus
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                             double const survivalProbabilityThreshold,
                             size_t const temperatureAccuracy,
-                            size_t const evaporationResolution,
                             std::string const& pathToCosmotransitions,
                             size_t const resolutionOfDsbVacuum,
                             size_t const maxInnerLoops,
-                            size_t const maxOuterLoops );
+                            size_t const maxOuterLoops,
+                            size_t const thermalStraightPathFitResolution );
     virtual ~CosmoTransitionsRunner();
-
-
-    // This doesn't do anything here.
-    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
 
 
   protected:
@@ -47,6 +43,7 @@ namespace VevaciousPlusPlus
     size_t const resolutionOfDsbVacuum;
     size_t const maxInnerLoops;
     size_t const maxOuterLoops;
+    size_t const thermalStraightPathFitResolution;
 
 
     // This creates a Python file with the potential in a form that can be used
@@ -76,11 +73,6 @@ namespace VevaciousPlusPlus
     virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                              double const potentialAtOriginAtZeroTemperature );
-
-    // This returns the temperature at which Minuit2 rolls from the
-    // zero-temperature DSB input to
-    double const FalseVacuumEvaporationTemperature(
-                                         PotentialMinimum const& falseVacuum );
   };
 
 } /* namespace VevaciousPlusPlus */

@@ -76,14 +76,12 @@ namespace VevaciousPlusPlus
                                           PotentialFunction& potentialFunction,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
-                                              size_t const temperatureAccuracy,
-                                         size_t const evaporationResolution ) :
+                                           size_t const temperatureAccuracy ) :
     TunnelingCalculator( potentialFunction,
                          tunnelingStrategy,
                          survivalProbabilityThreshold ),
     potentialFunction( potentialFunction ),
     temperatureAccuracy( temperatureAccuracy ),
-    evaporationResolution( evaporationResolution ),
     thermalPotentialMinimizer( potentialFunction ),
     evaporationMinimum(),
     criticalMinimum(),

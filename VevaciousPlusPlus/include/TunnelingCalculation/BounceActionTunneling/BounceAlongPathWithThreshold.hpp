@@ -27,9 +27,8 @@ namespace VevaciousPlusPlus
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold,
-                                  size_t const temperatureAccuracy,
-                                  size_t const evaporationResolution,
-                                  size_t const thermalIntegrationResolution );
+                                  size_t const thermalIntegrationResolution,
+                                  size_t const temperatureAccuracy );
     virtual ~BounceAlongPathWithThreshold();
 
 
