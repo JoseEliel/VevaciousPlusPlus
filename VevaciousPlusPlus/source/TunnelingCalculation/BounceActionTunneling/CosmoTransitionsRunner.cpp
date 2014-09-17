@@ -201,26 +201,13 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
   {
-    criticalRatherThanEvaporation = false;
-    evaporationMinimum = falseVacuum;
-    double const falseEvaporationTemperature( CriticalOrEvaporationTemperature(
-                                                         potentialAtOrigin ) );
-
-    // Next we find a set of true and false vacua at a series of temperatures
-    // so that we can fit the temperature dependence of the thermal action.
-
-    criticalRatherThanEvaporation = true;
-    criticalMinimum = trueVacuum;
-    // We need the temperature where tunneling from the true vacuum to the
-    // field origin becomes impossible.
-    double const criticalTunnelingTemperature(
-                       CriticalOrEvaporationTemperature( potentialAtOrigin ) );
     // We are going to fit a function that diverges at
     // criticalTunnelingTemperature, so we shouldn't pick a point too close to
     // close to the divergence.
-    double const highestFitTemperature( 0.9 * criticalTunnelingTemperature );
+    double const highestFitTemperature( 0.9
+                                * rangeOfMaxTemperatureForOriginToTrue.first );
 
-    size_t const nodesForFit( 3 );
+    size_t const nodesForFit( NOT_A_MAGIC_NUMBER! );
     std::vector< std::vector< double > > fitFalseVacua( nodesForFit );
     std::vector< std::vector< double > > fitTrueVacua( nodesForFit );
     std::vector< double > fitTemperatures( nodesForFit );

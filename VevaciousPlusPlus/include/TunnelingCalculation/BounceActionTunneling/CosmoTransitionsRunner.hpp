@@ -76,6 +76,11 @@ namespace VevaciousPlusPlus
     virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                              double const potentialAtOriginAtZeroTemperature );
+
+    // This returns the temperature at which Minuit2 rolls from the
+    // zero-temperature DSB input to
+    double const FalseVacuumEvaporationTemperature(
+                                         PotentialMinimum const& falseVacuum );
   };
 
 } /* namespace VevaciousPlusPlus */
