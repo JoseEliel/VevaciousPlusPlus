@@ -57,7 +57,11 @@ namespace VevaciousPlusPlus
 
     // Now we start at almost the critical temperature, and sum up for
     // decreasing temperatures:
-    double survivalExponent( 0.0 );
+    double partialDecayWidth( 0.0 );
+    // The partial decay width scaled by the volume of the observable Universe
+    // is recorded in partialDecayWidth so that the bounce action threshold for
+    // each temperature can be calculated taking into account the contributions
+    // from higher temperatures.
     double const temperatureStep( rangeOfMaxTemperatureForOriginToTrue.first
                  / static_cast< double >( thermalIntegrationResolution + 1 ) );
     double currentTemperature( rangeOfMaxTemperatureForOriginToTrue.first
@@ -79,26 +83,29 @@ namespace VevaciousPlusPlus
                                   / currentTemperature );
     if( bounceOverTemperature < maximumPowerOfNaturalExponent )
     {
-      survivalExponent += ( exp( -bounceOverTemperature )
+      partialDecayWidth += ( exp( -bounceOverTemperature )
                              / ( currentTemperature * currentTemperature ) );
     }
+
+    double smallestExponent( bounceOverTemperature );
+    dominantTemperatureInGigaElectronVolts = 0.0;
+    double const thresholdDecayWidth( -log( survivalProbabilityThreshold )
+                 / ( temperatureStep * exp( lnOfThermalIntegrationFactor ) ) );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "currentTemperature = " << currentTemperature
     << ", bounceOverTemperature = " << bounceOverTemperature
-    << ", survivalExponent = " << survivalExponent;
+    << ", partialDecayWidth = " << partialDecayWidth
+    << ", thresholdPartialWidth = " << thresholdDecayWidth;
     std::cout << std::endl;/**/
 
-    double smallestExponent( bounceOverTemperature );
-    dominantTemperatureInGigaElectronVolts = 0.0;
-    double const thresholdExponent( -log( survivalProbabilityThreshold ) );
     for( size_t whichStep( 1 );
          whichStep < thermalIntegrationResolution;
          ++whichStep )
     {
-      if( survivalExponent > thresholdExponent )
+      if( partialDecayWidth > thresholdDecayWidth )
       {
         // We don't bother calculating the rest of the contributions to the
         // integral of the decay width if it is already large enough that the
@@ -122,11 +129,11 @@ namespace VevaciousPlusPlus
       }
       // If the bounce action from the next step is sufficiently small, then
       // the contribution to survivalExponent could make survivalExponent >
-      // thresholdExponent, which would mean that the survival probability is
+      // thresholdDecayWidth, which would mean that the survival probability is
       // definitely lower than survivalProbabilityThreshold.
-      double const actionThreshold( currentTemperature
-            * log( temperatureStep / ( ( thresholdExponent - survivalExponent )
-                                * currentTemperature * currentTemperature) ) );
+      double const actionThreshold( -currentTemperature
+                       * log( currentTemperature * currentTemperature
+                             * ( thresholdDecayWidth - partialDecayWidth ) ) );
       bounceOverTemperature = ( BoundedBounceAction( thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
                                                      currentTemperature,
@@ -135,9 +142,8 @@ namespace VevaciousPlusPlus
 
       if( bounceOverTemperature < maximumPowerOfNaturalExponent )
       {
-        survivalExponent
-        += ( ( temperatureStep * exp( -bounceOverTemperature ) )
-             / ( currentTemperature * currentTemperature ) );
+        partialDecayWidth += ( exp( -bounceOverTemperature )
+                               / ( currentTemperature * currentTemperature ) );
       }
       if( bounceOverTemperature < smallestExponent )
       {
@@ -145,10 +151,10 @@ namespace VevaciousPlusPlus
         dominantTemperatureInGigaElectronVolts = currentTemperature;
       }
     }
-    if( survivalExponent > 0.0 )
+    if( partialDecayWidth > 0.0 )
     {
-      logOfMinusLogOfThermalProbability
-      = ( lnOfThermalIntegrationFactor - log( survivalExponent ) );
+      logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor
+                                + log( partialDecayWidth * temperatureStep ) );
     }
     else
     {
@@ -277,10 +283,14 @@ namespace VevaciousPlusPlus
     {
       std::cout << " GeV";
     }
-    std::cout << ", threshold is " << actionThreshold;
+    std::cout << ", threshold is ";
     if( bestPath->NonZeroTemperature() )
     {
-      std::cout << " GeV";
+      std::cout  << ( actionThreshold * tunnelingTemperature ) << " GeV";
+    }
+    else
+    {
+      std::cout  << actionThreshold;
     }
     std::cout << ".";
     std::cout << std::endl;
