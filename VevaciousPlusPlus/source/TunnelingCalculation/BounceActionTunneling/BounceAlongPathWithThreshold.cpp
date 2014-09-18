@@ -201,6 +201,24 @@ namespace VevaciousPlusPlus
     double currentBounceAction( bestBounceAction );
     double lastBounceAction( 2.0 * currentBounceAction );
 
+    std::cout << std::endl
+    << "Initial path bounce action = " << currentBounceAction;
+    if( bestPath->NonZeroTemperature() )
+    {
+      std::cout << " GeV";
+    }
+    std::cout << ", threshold is ";
+    if( bestPath->NonZeroTemperature() )
+    {
+      std::cout  << ( actionThreshold * tunnelingTemperature ) << " GeV";
+    }
+    else
+    {
+      std::cout  << actionThreshold;
+    }
+    std::cout << ".";
+    std::cout << std::endl;
+
     // debugging:
     /*std::string straightPathPicture( "StraightBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"

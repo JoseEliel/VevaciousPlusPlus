@@ -37,23 +37,43 @@ namespace VevaciousPlusPlus
                             0.0 );
     double pathFalsePotential( potentialFunction( fieldConfiguration,
                                                   pathTemperature ) );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Path start: "
+    << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", potential value = " << pathFalsePotential;
+    std::cout << std::endl;*/
+
     tunnelPath.PutOnPathAt( fieldConfiguration,
                             1.0 );
     double const pathEndPotential( potentialFunction( fieldConfiguration,
                                                       pathTemperature ) );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Path end: "
+    << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", potential value = " << pathEndPotential;
+    std::cout << std::endl;*/
+
     double segmentEndAuxiliary( auxiliaryStep );
+    tunnelPath.PutOnPathAt( fieldConfiguration,
+                            segmentEndAuxiliary );
     double segmentEndPotential( potentialFunction( fieldConfiguration,
                                                    pathTemperature ) );
     size_t segmentIndex( 0 );
     while( segmentIndex < ( numberOfPotentialSegments - 1 ) )
     {
       // debugging:
-      /**/std::cout << std::endl << "debugging:"
+      /*std::cout << std::endl << "debugging:"
       << std::endl
       << "segmentIndex = " << segmentIndex << ", pathFalsePotential = "
       << pathFalsePotential << ", segmentEndPotential = "
       << segmentEndPotential;
-      std::cout << std::endl;/**/
+      std::cout << std::endl;*/
 
       // If we find the start of the energy barrier, we note so and break from
       // the loop.
@@ -73,6 +93,16 @@ namespace VevaciousPlusPlus
                               segmentEndAuxiliary );
       segmentEndPotential = potentialFunction( fieldConfiguration,
                                                pathTemperature );
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "segmentIndex = " << segmentIndex << ", segmentEndAuxiliary = "
+      << segmentEndAuxiliary << ", field configuration at segment end = "
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+      << ", potential value = " << pathEndPotential;
+      std::cout << std::endl;*/
     }
     // Now we move on to resolving the energy barrier, looking out for an early
     // path panic minimum. However, this is only done if we resolved the start
@@ -92,22 +122,34 @@ namespace VevaciousPlusPlus
       segmentEndPotential
       = ( potentialFunction( fieldConfiguration,
                              pathTemperature ) - pathFalsePotential );
-      firstDerivatives.front()
-      = ( segmentEndPotential - potentialValues.front() );
+      firstDerivatives.front() = ( inverseOfAuxiliaryStep *
+                           ( segmentEndPotential - potentialValues.front() ) );
       bool foundDefiniteUndershoot( false );
+
+      // We have to check whether the first straight segment goes below the
+      // path false minimum.
+      if( segmentEndPotential < 0 )
+      {
+        foundDefiniteUndershoot = true;
+        definiteUndershootAuxiliary
+        = ( auxiliaryStep * ( 1.0 - ( potentialValues.front()
+                                      / firstDerivatives.front() ) ) );
+      }
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "First straight segment: segmentIndex = " << segmentIndex
+      << ", segmentEndAuxiliary = " << segmentEndAuxiliary
+      << ", field configuration at segment end = "
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+      << ", potential value = " << ( segmentEndPotential + pathFalsePotential )
+      << ", relative value = " << segmentEndPotential;
+      std::cout << std::endl;*/
 
       while( segmentIndex < ( numberOfPotentialSegments - 2 ) )
       {
-        // debugging:
-        /**/std::cout << std::endl << "debugging:"
-        << std::endl
-        << "segmentIndex = " << segmentIndex << ", normalSegmentIndex = "
-        << normalSegmentIndex << ", potentialValues[ " << normalSegmentIndex
-        << " ] = " << potentialValues[ normalSegmentIndex ]
-        << ", firstDerivatives[ " << normalSegmentIndex << " ] = "
-        << firstDerivatives[ normalSegmentIndex ];
-        std::cout << std::endl;/**/
-
         // If we find an early path panic minimum, we note it and break early.
         if( ( potentialValues[ normalSegmentIndex ] < 0.0 )
             &&
@@ -136,7 +178,42 @@ namespace VevaciousPlusPlus
         = ( potentialFunction( fieldConfiguration,
                                pathTemperature ) - pathFalsePotential );
         firstDerivatives[ normalSegmentIndex ]
-        = ( segmentEndPotential - potentialValues.front() );
+        = ( inverseOfAuxiliaryStep
+           * ( segmentEndPotential - potentialValues[ normalSegmentIndex ] ) );
+
+        // We have to check whether this straight segment goes below the path
+        // false minimum.
+        if( !foundDefiniteUndershoot
+            &&
+            ( segmentEndPotential < 0 ) )
+        {
+          foundDefiniteUndershoot = true;
+          definiteUndershootAuxiliary
+          = ( segmentEndAuxiliary + ( potentialValues[ normalSegmentIndex ]
+                                  / firstDerivatives[ normalSegmentIndex ] ) );
+          // It is plus because potentialValues[ normalSegmentIndex ] must be
+          // positive and firstDerivatives[ normalSegmentIndex ] must be
+          // negative for this to happen, and thus definiteUndershootAuxiliary
+          // will be less than segmentEndAuxiliary.
+        }
+
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "segmentIndex = " << segmentIndex << ", normalSegmentIndex = "
+        << normalSegmentIndex << ", segmentEndAuxiliary = "
+        << segmentEndAuxiliary
+        << ", field configuration at segment end = "
+        << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+        << ", potential value = "
+        << ( segmentEndPotential + pathFalsePotential )
+        << ", relative value = " << segmentEndPotential
+        << ", potentialValues[ " << normalSegmentIndex << " ] = "
+        << potentialValues[ normalSegmentIndex ] << ", firstDerivatives[ "
+        << normalSegmentIndex << " ] = "
+        << firstDerivatives[ normalSegmentIndex ];
+        std::cout << std::endl;*/
       }
       // Now we have to check to see if the end of the path is lower than the
       // path false minimum, if we haven't already found an early path panic
@@ -151,7 +228,11 @@ namespace VevaciousPlusPlus
           // at the end of the last straight segment.
           lastSegmentQuadratic = ( ( segmentEndPotential - finalPotential )
                            * inverseOfAuxiliaryStep * inverseOfAuxiliaryStep );
-          numberOfNormalSegments = normalSegmentIndex;
+          numberOfNormalSegments = ( normalSegmentIndex + 1 );
+          // After the loop ends without an early path panic minimum,
+          // normalSegmentIndex is the index of the last normal segment, and
+          // since the index starts at 0, the total number of segments is one
+          // larger.
           definiteOvershootAuxiliary
           = ( ( numberOfNormalSegments + 2 ) * auxiliaryStep );
         }
@@ -222,6 +303,13 @@ namespace VevaciousPlusPlus
     returnStream << "energyBarrierResolved = " << energyBarrierResolved
     << ", trueVacuumLowerThanPathFalseMinimum = "
     << trueVacuumLowerThanPathFalseMinimum
+    << ", numberOfNormalSegments = " << numberOfNormalSegments
+    << ", firstSegmentQuadratic = " << firstSegmentQuadratic
+    << ", finalPotential = " << finalPotential
+    << ", lastSegmentQuadratic = " << lastSegmentQuadratic
+    << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
+    << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary
+    << ", startOfFinalSegment = " << startOfFinalSegment
     << ", potential = ( UnitStep[x] * ( "
     << doubleFormatter.doubleToString( firstSegmentQuadratic )
     << " * x^(2) ) * UnitStep["

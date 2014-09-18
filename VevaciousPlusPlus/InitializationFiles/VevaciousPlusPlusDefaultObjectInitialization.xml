@@ -149,9 +149,9 @@
           BubbleShootingOnSpline
         </ClassType>
         <ConstructorArguments>
-          <NumberOfNodesForPotentialFit>
+          <NumberOfSegmentsForPotentialFit>
             100
-          </NumberOfNodesForPotentialFit>
+          </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
           </NumberShootAttemptsAllowed>

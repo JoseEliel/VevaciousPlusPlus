@@ -842,7 +842,7 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::SetUpBubbleShootingOnSpline(
                                       std::string const& constructorArguments )
   {
-    int numberOfNodesForPotentialFit( 31 );
+    int numberOfSegmentsForPotentialFit( 32 );
     double lengthScaleResolutionForBounce( 0.05 );
     int shootAttemptsForBounce( 32 );
 
@@ -851,8 +851,8 @@ namespace VevaciousPlusPlus
     while( xmlParser.readNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
-                                     "NumberOfNodesForPotentialFit",
-                                     numberOfNodesForPotentialFit );
+                                     "NumberOfSegmentsForPotentialFit",
+                                     numberOfSegmentsForPotentialFit );
       InterpretElementIfNameMatches( xmlParser,
                                      "RadialResolution",
                                      lengthScaleResolutionForBounce );
@@ -862,7 +862,7 @@ namespace VevaciousPlusPlus
     }
 
     return new BubbleShootingOnSpline( *potentialFunction,
-                                       (numberOfNodesForPotentialFit + 1 ),
+                                       numberOfSegmentsForPotentialFit,
                                        lengthScaleResolutionForBounce,
                                        shootAttemptsForBounce );
   }

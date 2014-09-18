@@ -259,11 +259,8 @@
              vacuum to the false vacuum, parameterizing the potential along the
              tunneling path by a fit to a set of potential energy densities at
              a set of values for the path parameterization variable. The number
-             of nodes for this fit is given by
-             <ConstructorArguments><NumberOfNodesForPotentialFit> (excluding
-             the false vacuum and true vacuum, so if "3" were given, the
-             potential would be fitted to 5 points: the false vacuum, the true
-             vacuum, and 3 intermediate points).
+             of segments between sampling points for this fit is given by
+             <ConstructorArguments><NumberOfSegmentsForPotentialFit>.
              
              Currently, the way the potential is interpolated is fixed to being
              approximated as quadratic polynomials between nodes, with
@@ -289,9 +286,9 @@
           BubbleShootingOnSpline
         </ClassType>
         <ConstructorArguments>
-          <NumberOfNodesForPotentialFit>
+          <NumberOfSegmentsForPotentialFit>
             100
-          </NumberOfNodesForPotentialFit>
+          </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             <!-- This is the number of shoot attempts allowed to try to find
                  the perfect shot before moving on with the best shot so far to
