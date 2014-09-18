@@ -288,7 +288,7 @@ namespace VevaciousPlusPlus
                                       - ( auxiliarySteps * auxiliaryStep ) );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "SplinePotential::operator()( auxiliaryValue = " << auxiliaryValue
     << " ) called. auxiliarySteps = " << auxiliarySteps
@@ -297,7 +297,7 @@ namespace VevaciousPlusPlus
     << potentialValues[ auxiliarySteps - 1 ]
     << ", firstDerivatives[ " << ( auxiliarySteps - 1 ) << " ] = "
     << firstDerivatives[ auxiliarySteps - 1 ];
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     return ( potentialValues[ auxiliarySteps - 1 ]
           + ( auxiliaryDifference * firstDerivatives[ auxiliarySteps - 1 ] ) );
@@ -359,6 +359,10 @@ namespace VevaciousPlusPlus
     << doubleFormatter.doubleToString( definiteOvershootAuxiliary )
     << " - x] )" << std::endl;
 
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "preparing points for Mathematica.";
     returnStream << "Mathematica points = { ";
     for( size_t sampleIndex( 0 );
          sampleIndex <= ( 3 * ( numberOfNormalSegments + 2 ) );
@@ -373,6 +377,7 @@ namespace VevaciousPlusPlus
       << (*this)( sampleAuxiliary ) << " }";
     }
     returnStream << " }" << std::endl;
+    std::cout << std::endl;*/
 
     return returnStream.str();
   }

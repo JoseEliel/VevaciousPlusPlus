@@ -46,15 +46,6 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "REALLY NEED TO WORK OUT HOW TO CORRECTLY IDENTIFY DSB EVAPORATION AND"
-    << " HOW TO ENSURE THAT THE DSB MINIMUM AT T IS FOUND!";
-    std::cout << std::endl;/**/
-
-
-
     // Now we start at almost the critical temperature, and sum up for
     // decreasing temperatures:
     double partialDecayWidth( 0.0 );
@@ -184,13 +175,6 @@ namespace VevaciousPlusPlus
                                              double const tunnelingTemperature,
                                            double const actionThreshold ) const
   {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "REALLY NEED TO INTERPOLATE POTENTIAL ALONG PATH IN A WAY THAT DOES NOT"
-    << " PRODUCE ARTIFACT WIGGLES!";
-    std::cout << std::endl;/**/
-
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
@@ -220,7 +204,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     // debugging:
-    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
+    /*std::string straightPathPicture( "StraightBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
     << std::endl
     << "Initial straight path being plotted in " << straightPathPicture << ".";
@@ -234,7 +218,7 @@ namespace VevaciousPlusPlus
     fieldColors.push_back( "cyan" );
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                fieldColors,
-                                               straightPathPicture );/**/
+                                               straightPathPicture );*/
 
     while( ( bestBounceAction > actionThreshold )
            &&
