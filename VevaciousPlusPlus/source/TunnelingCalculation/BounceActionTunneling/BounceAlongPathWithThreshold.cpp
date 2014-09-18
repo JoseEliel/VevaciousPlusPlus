@@ -220,7 +220,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     // debugging:
-    /*std::string straightPathPicture( "StraightBubbleProfile.eps" );
+    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
     << std::endl
     << "Initial straight path being plotted in " << straightPathPicture << ".";
@@ -234,7 +234,7 @@ namespace VevaciousPlusPlus
     fieldColors.push_back( "cyan" );
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                fieldColors,
-                                               straightPathPicture );*/
+                                               straightPathPicture );/**/
 
     while( ( bestBounceAction > actionThreshold )
            &&

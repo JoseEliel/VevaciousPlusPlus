@@ -278,8 +278,10 @@ namespace VevaciousPlusPlus
     }
     if( auxiliaryValue >= startOfFinalSegment )
     {
-      return ( finalPotential
-               + ( auxiliaryValue * auxiliaryValue * lastSegmentQuadratic ) );
+      double const differenceFromMaximumAuxiliary( definiteOvershootAuxiliary
+                                                   - auxiliaryValue );
+      return ( finalPotential + ( differenceFromMaximumAuxiliary
+                  * differenceFromMaximumAuxiliary * lastSegmentQuadratic ) );
     }
     size_t const auxiliarySteps( auxiliaryValue * inverseOfAuxiliaryStep );
     double const auxiliaryDifference( auxiliaryValue - auxiliarySteps );
@@ -342,6 +344,22 @@ namespace VevaciousPlusPlus
     << ") ) * UnitStep["
     << doubleFormatter.doubleToString( definiteOvershootAuxiliary )
     << " - x] )" << std::endl;
+
+    returnStream << "Mathematica points = { ";
+    for( size_t sampleIndex( 0 );
+         sampleIndex <= ( 3 * ( numberOfNormalSegments + 2 ) );
+         ++sampleIndex )
+    {
+      if( sampleIndex > 0 )
+      {
+        returnStream << ", ";
+      }
+      double const sampleAuxiliary( ( sampleIndex * auxiliaryStep ) / 3.0 );
+      returnStream << "{ " << sampleAuxiliary << ", "
+      << (*this)( sampleAuxiliary ) << " }";
+    }
+    returnStream << " }" << std::endl;
+
     return returnStream.str();
   }
 

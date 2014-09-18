@@ -291,7 +291,7 @@ namespace VevaciousPlusPlus
     double const scaledRadius( inverseScale * nextRadius );
 
     // debugging:
-    /**?std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "inverseScale = " << inverseScale << ", scaledRadius = "
     << scaledRadius;

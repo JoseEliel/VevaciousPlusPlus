@@ -114,6 +114,13 @@ namespace VevaciousPlusPlus
     double kineticTerm( profilePoint.auxiliarySlope );
     kineticTerm *= ( 0.5 * kineticTerm
                          * tunnelPath.SlopeSquared( currentAuxiliary ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "kineticTerm = " << kineticTerm;
+    std::cout << std::endl;/**/
+
     return ( kineticTerm + potentialApproximation( currentAuxiliary ) );
   }
 
