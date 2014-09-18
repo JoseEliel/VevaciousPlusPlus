@@ -76,7 +76,6 @@ namespace VevaciousPlusPlus
     // of an energy barrier.
     if( energyBarrierResolved )
     {
-      double const auxiliaryStartOfNormalSegments( segmentEndAuxiliary );
       ++segmentIndex;
       segmentEndAuxiliary += auxiliaryStep;
       // Now segmentEndAuxiliary and segmentIndex are correct for the first
@@ -208,7 +207,7 @@ namespace VevaciousPlusPlus
   std::string SplinePotential::AsDebuggingString() const
   {
     BOL::StringParser doubleFormatter( 6,
-                                       '',
+                                       ' ',
                                        8,
                                        2,
                                        "",
