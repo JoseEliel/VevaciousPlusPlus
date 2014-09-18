@@ -119,5 +119,33 @@ namespace VevaciousPlusPlus
     double startOfFinalSegment;
   };
 
+
+
+
+  // This returns the value of the first derivative of the potential at
+  // auxiliaryValue, by finding the correct segment and then returning its
+  // slope at that point.
+  inline double
+  SplinePotential::FirstDerivative( double const auxiliaryValue ) const
+  {
+    if( ( auxiliaryValue <= 0.0 )
+        ||
+        ( auxiliaryValue >= definiteOvershootAuxiliary ) )
+    {
+      return 0.0;
+    }
+    if( auxiliaryValue < auxiliaryStep )
+    {
+      return ( 2.0 * auxiliaryValue * firstSegmentQuadratic );
+    }
+    if( auxiliaryValue >= startOfFinalSegment )
+    {
+      return FirstDerivativeNearPathPanic( auxiliaryValue
+                                           - definiteOvershootAuxiliary );
+    }
+    return
+    firstDerivatives[ size_t( auxiliaryValue * inverseOfAuxiliaryStep ) - 1 ];
+  }
+
 } /* namespace VevaciousPlusPlus */
 #endif /* SPLINEPOTENTIAL_HPP_ */
