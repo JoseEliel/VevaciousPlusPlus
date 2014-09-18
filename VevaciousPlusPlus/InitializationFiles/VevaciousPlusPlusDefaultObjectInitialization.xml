@@ -144,7 +144,7 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfNodesForPotentialFit>
-            100
+            99
           </NumberOfNodesForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
