@@ -22,9 +22,7 @@ namespace VevaciousPlusPlus
     radialStepSize( NAN ),
     estimatedRadialMaximum( NAN ),
     shootAttempts( shootAttempts ),
-    auxiliaryThreshold( 1.0E-6 ),
-    falseVacuumPotential( NAN ),
-    trueVacuumPotential( NAN )
+    auxiliaryThreshold( 1.0E-6 )
   {
     // This constructor is just an initialization list.
   }
@@ -47,9 +45,7 @@ namespace VevaciousPlusPlus
   {
     SplinePotential potentialApproximation( potentialFunction,
                                             tunnelPath,
-                                            numberOfPotentialSegments,
-                                            falseVacuumPotential,
-                                            trueVacuumPotential );
+                                            numberOfPotentialSegments );
     if( !(potentialApproximation.EnergyBarrierResolved()) )
     {
       std::cout
@@ -359,9 +355,7 @@ namespace VevaciousPlusPlus
   {
     SplinePotential potentialApproximation( potentialFunction,
                                             tunnelPath,
-                                            numberOfPotentialSegments,
-                                            falseVacuumPotential,
-                                            trueVacuumPotential );
+                                            numberOfPotentialSegments );
     if( !(potentialApproximation.EnergyBarrierResolved()) )
     {
       std::cout

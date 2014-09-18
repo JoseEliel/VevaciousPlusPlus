@@ -70,8 +70,6 @@ namespace VevaciousPlusPlus
     double estimatedRadialMaximum;
     size_t const shootAttempts;
     double const auxiliaryThreshold;
-    double falseVacuumPotential;
-    double trueVacuumPotential;
 
 
     // This evaluates the bounce action density at the given point on the
@@ -103,8 +101,6 @@ namespace VevaciousPlusPlus
                                                             trueVacuum ) ) ) );
     radialStepSize = ( lengthScaleResolution * lengthScale );
     estimatedRadialMaximum = ( 2.0 * lengthScale );
-    falseVacuumPotential = falseVacuum.PotentialValue();
-    trueVacuumPotential = trueVacuum.PotentialValue();
   }
 
   // This evaluates the bounce action density at the given point on the

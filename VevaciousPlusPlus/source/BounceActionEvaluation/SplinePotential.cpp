@@ -12,9 +12,7 @@ namespace VevaciousPlusPlus
 
   SplinePotential::SplinePotential( PotentialFunction const& potentialFunction,
                                     TunnelPath const& tunnelPath,
-                                    size_t const numberOfPotentialSegments,
-                                    double const falseVacuumPotential,
-                                    double const trueVacuumPotential ) :
+                                    size_t const numberOfPotentialSegments ) :
     energyBarrierResolved( false ),
     trueVacuumLowerThanPathFalseMinimum( false ),
     auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
@@ -25,20 +23,25 @@ namespace VevaciousPlusPlus
     firstDerivatives( numberOfNormalSegments,
                       NAN ),
     firstSegmentQuadratic( NAN ),
-    finalPotential( trueVacuumPotential - falseVacuumPotential ),
+    finalPotential( NAN ),
     lastSegmentQuadratic( NAN ),
     definiteUndershootAuxiliary( NAN ),
     definiteOvershootAuxiliary( 1.0 ),
     startOfFinalSegment( NAN )
   {
     // First we have to find the path false minimum.
-    double pathFalsePotential( falseVacuumPotential );
-    double segmentEndAuxiliary( auxiliaryStep );
     std::vector< double >
     fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
-    tunnelPath.PutOnPathAt( fieldConfiguration,
-                            segmentEndAuxiliary );
     double const pathTemperature( tunnelPath.TemperatureValue() );
+    tunnelPath.PutOnPathAt( fieldConfiguration,
+                            0.0 );
+    double pathFalsePotential( potentialFunction( fieldConfiguration,
+                                                  pathTemperature ) );
+    tunnelPath.PutOnPathAt( fieldConfiguration,
+                            1.0 );
+    double const pathEndPotential( potentialFunction( fieldConfiguration,
+                                                      pathTemperature ) );
+    double segmentEndAuxiliary( auxiliaryStep );
     double segmentEndPotential( potentialFunction( fieldConfiguration,
                                                    pathTemperature ) );
     size_t segmentIndex( 0 );
@@ -140,10 +143,10 @@ namespace VevaciousPlusPlus
       // minimum.
       if( !trueVacuumLowerThanPathFalseMinimum )
       {
-        if( trueVacuumPotential < pathFalsePotential )
+        if( pathEndPotential < pathFalsePotential )
         {
           trueVacuumLowerThanPathFalseMinimum = true;
-          finalPotential = ( trueVacuumPotential - pathFalsePotential );
+          finalPotential = ( pathEndPotential - pathFalsePotential );
           // At the end of the loop, segmentEndPotential is still the potential
           // at the end of the last straight segment.
           lastSegmentQuadratic = ( ( segmentEndPotential - finalPotential )

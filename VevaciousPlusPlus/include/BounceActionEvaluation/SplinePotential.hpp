@@ -20,9 +20,7 @@ namespace VevaciousPlusPlus
   public:
     SplinePotential( PotentialFunction const& potentialFunction,
                      TunnelPath const& tunnelPath,
-                     size_t const numberOfPotentialSegments,
-                     double const falseVacuumPotential,
-                     double const trueVacuumPotential );
+                     size_t const numberOfPotentialSegments );
     ~SplinePotential();
 
 
@@ -86,16 +84,6 @@ namespace VevaciousPlusPlus
     // trueVacuumLowerThanPathFalseMinimum is set to false.
     bool energyBarrierResolved;
     bool trueVacuumLowerThanPathFalseMinimum;
-    // There are auxiliaryValues.size() normal segments, each represented by 4
-    // values: the size of the segment in the auxiliary value, the potential
-    // (relative to the false vacuum at zero auxiliary value), its first
-    // derivative, and its second derivative. Within the segment, the potential
-    // is approximated by
-    // V(p_j + d) + d * V'(p_j) + d^2 * [0.5*V''(p_j)],
-    // where the auxiliary value is p = p_j + d. There is also one final
-    // segment, where for an auxiliary value = 1 - d, the potential is
-    // approximated by
-    // V(1.0) + d^2 * [0.5*V''(1)] + d^4 * [V''''(1)/(4*3*2)].
     double auxiliaryStep;
     double inverseOfAuxiliaryStep;
     // There are ( numberOfPotentialSegments - 2 ) normal segments, which are
