@@ -22,7 +22,9 @@ namespace VevaciousPlusPlus
     radialStepSize( NAN ),
     estimatedRadialMaximum( NAN ),
     shootAttempts( shootAttempts ),
-    auxiliaryThreshold( 1.0E-6 )
+    auxiliaryThreshold( 1.0E-6 ),
+    falseVacuumPotential( NAN ),
+    trueVacuumPotential( NAN )
   {
     // This constructor is just an initialization list.
   }
@@ -43,7 +45,29 @@ namespace VevaciousPlusPlus
   double
   BubbleShootingOnSpline::operator()( TunnelPath const& tunnelPath ) const
   {
-    SplinePotential potentialApproximation( PotentialAlongPath( tunnelPath ) );
+    SplinePotential potentialApproximation( potentialFunction,
+                                            tunnelPath,
+                                            numberOfPotentialSegments,
+                                            falseVacuumPotential,
+                                            trueVacuumPotential );
+    if( !(potentialApproximation.EnergyBarrierResolved()) )
+    {
+      std::cout
+      << std::endl
+      << "Warning! No energy barrier, so returning a bounce action of 0.";
+      std::cout << std::endl;
+      return 0.0;
+    }
+    if( !(potentialApproximation.TrueVacuumLowerThanPathFalseMinimum()) )
+    {
+      std::cout
+      << std::endl
+      << "Warning! True vacuum not lower than path false vacuum, so bounce"
+      << " configuration cannot be plotted.";
+      std::cout << std::endl;
+      return std::numeric_limits< double >::max();
+    }
+
     bool const nonZeroTemperature( tunnelPath.NonZeroTemperature() );
     BubbleProfile bubbleProfile( potentialApproximation,
                                  tunnelPath,
@@ -333,7 +357,29 @@ namespace VevaciousPlusPlus
                                  std::vector< std::string > const& fieldColors,
                                         std::string const& plotFilename ) const
   {
-    SplinePotential potentialApproximation( PotentialAlongPath( tunnelPath ) );
+    SplinePotential potentialApproximation( potentialFunction,
+                                            tunnelPath,
+                                            numberOfPotentialSegments,
+                                            falseVacuumPotential,
+                                            trueVacuumPotential );
+    if( !(potentialApproximation.EnergyBarrierResolved()) )
+    {
+      std::cout
+      << std::endl
+      << "Warning! No energy barrier, so bounce configuration cannot be"
+      << " plotted.";
+      std::cout << std::endl;
+      return;
+    }
+    if( !(potentialApproximation.TrueVacuumLowerThanPathFalseMinimum()) )
+    {
+      std::cout
+      << std::endl
+      << "Warning! True vacuum not lower than path false vacuum, so bounce"
+      << " configuration cannot be plotted.";
+      std::cout << std::endl;
+      return;
+    }
     BubbleProfile bubbleProfile( potentialApproximation,
                                  tunnelPath,
                                  radialStepSize,
@@ -402,66 +448,6 @@ namespace VevaciousPlusPlus
     bubblePlotter.plotData( plotData,
                             "rho/(1/GeV)",
                             "field/GeV" );
-  }
-
-  // This returns a spline polynomial approximation of the potential along
-  // the path given by tunnelPath.
-  SplinePotential BubbleShootingOnSpline::PotentialAlongPath(
-                                           TunnelPath const& tunnelPath ) const
-  {
-    SplinePotential potentialApproximation;
-    std::vector< double >
-    fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
-    tunnelPath.PutOnPathAt( fieldConfiguration,
-                            0.0 );
-    double const falseVacuumPotential( potentialFunction( fieldConfiguration,
-                                             tunnelPath.TemperatureValue() ) );
-    // We choose to take the cos of a linear distribution of equally-spaced
-    // points so that we have a finer resolution of the potential near the
-    // minima.
-    double auxiliaryValue( 0.0 );
-    for( size_t splinePoint( 1 );
-         splinePoint < numberOfPotentialSegments;
-         ++splinePoint )
-    {
-      auxiliaryValue = ( 0.5 * ( 1.0 - cos( ( splinePoint
-                                          * boost::math::double_constants::pi )
-                    / static_cast< double >( numberOfPotentialSegments ) ) ) );
-      // The above might run into numerical precision issues if too many spline
-      // segments are asked for, but it's probably OK up to even 10^5 segments
-      // (cos(0.0) - cos(10^(-5)) = 5E-11 which should still be well-resolved
-      // by doubles).
-      // auxiliaryValue = ( static_cast< double >( splinePoint )
-      //               / static_cast< double >( numberOfSplinesInPotential ) );
-      tunnelPath.PutOnPathAt( fieldConfiguration,
-                              auxiliaryValue );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "auxiliaryValue = " << auxiliaryValue << ", fieldConfiguration = "
-      << potentialFunction.FieldConfigurationAsMathematica(
-                                                          fieldConfiguration );
-      std::cout << std::endl;*/
-
-      potentialApproximation.AddPoint( auxiliaryValue,
-                                       ( potentialFunction( fieldConfiguration,
-                                                tunnelPath.TemperatureValue() )
-                                         - falseVacuumPotential ) );
-    }
-    tunnelPath.PutOnPathAt( fieldConfiguration,
-                            1.0 );
-    potentialApproximation.SetSpline( potentialFunction( fieldConfiguration,
-                                                tunnelPath.TemperatureValue() )
-                                      - falseVacuumPotential );
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "BubbleShootingOnSpline::PotentialAlongPath( tunnelPath =" << std::endl
-    << tunnelPath.AsDebuggingString() << " ) returning" << std::endl
-    << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;/**/
-    return potentialApproximation;
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -9,6 +9,7 @@
 #define BUBBLESHOOTINGONSPLINE_HPP_
 
 #include "CommonIncludes.hpp"
+#include <limits>
 #include "BounceActionCalculator.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PathParameterization/TunnelPath.hpp"
@@ -69,13 +70,9 @@ namespace VevaciousPlusPlus
     double estimatedRadialMaximum;
     size_t const shootAttempts;
     double const auxiliaryThreshold;
+    double falseVacuumPotential;
+    double trueVacuumPotential;
 
-
-    // This returns a spline polynomial approximation of the potential along
-    // the path given by tunnelPath. It also sets radialStepSize and
-    // estimatedRadialMaximum based on the lengths of the field vectors of
-    // the vacua on tunnelPath and the tunneling scale from potentialFunction.
-    SplinePotential PotentialAlongPath( TunnelPath const& tunnelPath ) const;
 
     // This evaluates the bounce action density at the given point on the
     // bubble profile.
@@ -106,6 +103,8 @@ namespace VevaciousPlusPlus
                                                             trueVacuum ) ) ) );
     radialStepSize = ( lengthScaleResolution * lengthScale );
     estimatedRadialMaximum = ( 2.0 * lengthScale );
+    falseVacuumPotential = falseVacuum.PotentialValue();
+    trueVacuumPotential = trueVacuum.PotentialValue();
   }
 
   // This evaluates the bounce action density at the given point on the

@@ -169,8 +169,8 @@ namespace VevaciousPlusPlus
         // to this branch, but here dV/dp = 2 * (p-p_0) * d^2V/dp^2.
         double const initialPositiveAuxiliary( initialAuxiliary
                                 + pathPotential.DefiniteOvershootAuxiliary() );
-        double const scaledSecondDerivative(
-                pathPotential.SecondDerivativeNearPathPanic( initialAuxiliary )
+        double const
+        scaledSecondDerivative( pathPotential.SecondDerivativeNearPathPanic()
                        / tunnelPath.SlopeSquared( initialPositiveAuxiliary ) );
         double const
         initialQuadraticCoefficient( 2.0 * initialAuxiliary

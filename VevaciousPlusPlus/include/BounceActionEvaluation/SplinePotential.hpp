@@ -9,6 +9,8 @@
 #define SPLINEPOTENTIAL_HPP_
 
 #include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
+#include "PathParameterization/TunnelPath.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -18,9 +20,21 @@ namespace VevaciousPlusPlus
   public:
     SplinePotential( PotentialFunction const& potentialFunction,
                      TunnelPath const& tunnelPath,
-                     size_t const numberOfPotentialSegments );
+                     size_t const numberOfPotentialSegments,
+                     double const falseVacuumPotential,
+                     double const trueVacuumPotential );
     ~SplinePotential();
 
+
+    // This is true if there was an energy barrier resolved at the given
+    // resolution.
+    bool EnergyBarrierResolved() const{ return energyBarrierResolved; }
+
+    // This is true if the path false minimum (where the false vacuum rolls to
+    // along the path based on the given resolution) has a higher potential
+    // than the path true minimum.
+    bool TrueVacuumLowerThanPathFalseMinimum() const
+    { return trueVacuumLowerThanPathFalseMinimum; }
 
     // This returns the value of the potential at auxiliaryValue, by finding
     // the correct segment and then returning its value at that point.
@@ -64,6 +78,14 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // There are two flags for possible problems: if there did not seem to be
+    // any energy barrier between the ends of the path, then
+    // energyBarrierResolved will be set to false, and if the path false
+    // minimum (where the false vacuum would roll to along the path at the
+    // given resolution) is actually deeper than the given true vacuum,
+    // trueVacuumLowerThanPathFalseMinimum is set to false.
+    bool energyBarrierResolved;
+    bool trueVacuumLowerThanPathFalseMinimum;
     // There are auxiliaryValues.size() normal segments, each represented by 4
     // values: the size of the segment in the auxiliary value, the potential
     // (relative to the false vacuum at zero auxiliary value), its first
@@ -86,6 +108,7 @@ namespace VevaciousPlusPlus
     // for the segment at the true vacuum, with that segment being treated as
     // being based at the end of the path (truncated at the first path panic
     // minimum).
+    size_t numberOfNormalSegments;
     std::vector< double > potentialValues;
     std::vector< double > firstDerivatives;
     double firstSegmentQuadratic;
