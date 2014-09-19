@@ -430,7 +430,7 @@ namespace VevaciousPlusPlus
         }
         std::cout << *fieldValue;
       }
-      std::cout << "}, {";
+      std::cout << " }, { ";
       for( std::vector< double >::const_iterator
            fieldValue( fitTrueVacua[ whichNode ].begin() );
            fieldValue < fitTrueVacua[ whichNode ].end();
@@ -442,7 +442,7 @@ namespace VevaciousPlusPlus
         }
         std::cout << *fieldValue;
       }
-      std::cout << "}, " << fittedActions[ whichNode ] << " ]" << std::endl;
+      std::cout << " }, " << fittedActions[ whichNode ] << " ]" << std::endl;
       std::cout << std::endl;
     }
     std::cout << std::endl;/**/
