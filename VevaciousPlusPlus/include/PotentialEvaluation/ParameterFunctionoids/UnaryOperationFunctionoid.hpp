@@ -8,8 +8,8 @@
 #ifndef UNARYOPERATIONFUNCTIONOID_HPP_
 #define UNARYOPERATIONFUNCTIONOID_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "CommonIncludes.hpp"
+#include "../ParameterFunctionoid.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -19,11 +19,10 @@ namespace VevaciousPlusPlus
   {
   public:
     UnaryOperationFunctionoid( double (*unaryOperation)( double ),
-                              ParameterFunctionoid* const functionoidPointer,
-                              std::string const& creationString,
-                              std::string const& pythonParameterName );
-    virtual
-    ~UnaryOperationFunctionoid();
+                               ParameterFunctionoid* const functionoidPointer,
+                               std::string const& creationString,
+                               std::string const& pythonParameterName );
+    virtual ~UnaryOperationFunctionoid();
 
 
     // This returns the value of the functionoid for the given logarithm of the

@@ -8,8 +8,11 @@
 #ifndef FIELDPOLYNOMIALSWITHSCALE_HPP_
 #define FIELDPOLYNOMIALSWITHSCALE_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "PolynomialGradientTargetSystem.hpp"
+#include "SlhaManagement/SlhaUpdatePropagator.hpp"
+#include "BasicFunctions/PolynomialTerm.hpp"
+#include "BasicFunctions/PolynomialSum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -18,10 +21,12 @@ namespace VevaciousPlusPlus
   {
   public:
     FieldPolynomialsWithScale( PolynomialSum const& potentialPolynomial,
-                               unsigned int const numberOfVariables,
-                               SlhaUpdatePropagator& previousPropagator );
-    virtual
-    ~FieldPolynomialsWithScale();
+                               size_t const numberOfVariables,
+                               SlhaUpdatePropagator& previousPropagator,
+                            std::vector< size_t > const& fieldsAssumedPositive,
+                            std::vector< size_t > const& fieldsAssumedNegative,
+                              bool const treeLevelMinimaOnlyAsValidSolutions );
+    virtual ~FieldPolynomialsWithScale();
 
 
     // This returns the first numberOfFields entries in
@@ -46,10 +51,6 @@ namespace VevaciousPlusPlus
     // should be given by lowerEndOfStartValues, and upperEndOfStartValues
     // should give the maximum renormalization scale.
     void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
-
-
-  protected:
-    unsigned int const numberOfFields;
   };
 
 

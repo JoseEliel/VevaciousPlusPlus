@@ -8,9 +8,9 @@
 #ifndef TUNNELINGCALCULATOR_HPP_
 #define TUNNELINGCALCULATOR_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "../PotentialMinimization/PotentialMinimum.hpp"
-#include "../PotentialEvaluation/SlhaUpdatePropagator.hpp"
+#include "CommonIncludes.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -28,10 +28,9 @@ namespace VevaciousPlusPlus
     };
 
     TunnelingCalculator( SlhaUpdatePropagator& slhaUpdatePropagator,
-                         TunnelingStrategy const tunnelingStrategy,
-                         double const survivalProbabilityThreshold );
-    virtual
-    ~TunnelingCalculator();
+                         TunnelingStrategy const tunnelingStrategy = NotSet,
+                         double const survivalProbabilityThreshold = 0.01 );
+    virtual ~TunnelingCalculator();
 
 
     // This should try to find the most accurate survival probability for
@@ -69,14 +68,14 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    TunnelingStrategy const tunnelingStrategy;
+    TunnelingStrategy tunnelingStrategy;
     double quantumSurvivalProbability;
     double logOfMinusLogOfQuantumProbability;
     double quantumLifetimeInSeconds;
     double thermalSurvivalProbability;
     double logOfMinusLogOfThermalProbability;
     double dominantTemperatureInGigaElectronVolts;
-    double const survivalProbabilityThreshold;
+    double survivalProbabilityThreshold;
   };
 
 } /* namespace VevaciousPlusPlus */

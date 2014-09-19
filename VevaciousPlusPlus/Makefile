@@ -14,6 +14,8 @@ SHELL=/bin/sh
 CC=g++
 AR=ar
 ARFLAGS=rcs
+#BOOSTDIR=./Boost/
+BOOSTDIR=../../../machine-specific/Boost/
 #LHPCDIR=./LHPC/
 LHPCDIR=../../../machine-specific/LHPC/
 LHPCLIBNAME=LHPC
@@ -28,54 +30,79 @@ MINUITINCLUDEDIR=../../../machine-specific/Minuit2/include/
 #MINUITLIBDIR=./MINUIT/include/
 MINUITLIBDIR=../../../machine-specific/Minuit2/lib/
 DEBUGFLAGS=
-INCLUDES=-I./include/ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(MINUITINCLUDEDIR)
+INCLUDES=-I./include/ \
+ -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
 CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
-MASSESSQUAREDCALCULATORS=source/PotentialEvaluation/MassesSquaredCalculators/
-PARAMETERFUNCTIONOIDS=source/PotentialEvaluation/ParameterFunctionoids/
-POTENTIALFUNCTIONS=source/PotentialEvaluation/PotentialFunctions/
-HOMOTOPYCONTINUATION=source/PotentialMinimization/HomotopyContinuation/
-MINUITMINIMIZATION=source/PotentialMinimization/MinuitMinimization/
-SOURCES=$(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/MassesSquaredCalculator.cpp \
+BOUNCEACTIONPATHFINDING= source/BounceActionEvaluation/BounceActionPathFinding/
+PATHPARAMETERIZATION= source/BounceActionEvaluation/PathParameterization/
+MASSESSQUAREDCALCULATORS= source/PotentialEvaluation/MassesSquaredCalculators/
+PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
+POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
+POTENTIALEVALUATION= source/PotentialMinimization/
+HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
+GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
+BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
+SOURCES= source/BasicFunctions/PolynomialSum.cpp \
+ source/BasicFunctions/PolynomialTerm.cpp \
+ source/BasicFunctions/ProductOfPolynomialSums.cpp \
+ source/BasicFunctions/SimplePolynomial.cpp \
+ source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
+ source/BounceActionEvaluation/BounceActionCalculator.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnBisections.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnHypersurfaces.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitBetweenPaths.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
+ $(BOUNCEACTIONPATHFINDING)/PathPolynomialAverager.cpp \
+ $(BOUNCEACTIONPATHFINDING)/PathSeparateFieldAverager.cpp \
+ source/BounceActionEvaluation/BouncePathFinder.cpp \
+ source/BounceActionEvaluation/BubbleProfile.cpp \
+ source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
+ source/BounceActionEvaluation/BubbleShootingOnSpline.cpp \
+ source/BounceActionEvaluation/OdeintBubbleDerivatives.cpp \
+ source/BounceActionEvaluation/OdeintBubbleObserver.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
+ $(PATHPARAMETERIZATION)/TunnelPath.cpp \
+ source/BounceActionEvaluation/SplinePotential.cpp \
+ source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
+ source/PotentialEvaluation/ParameterFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
- $(PARAMETERFUNCTIONOIDS)/ParameterFunctionoid.cpp \
+ source/PotentialEvaluation/PotentialFunction.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
- $(POTENTIALFUNCTIONS)/PotentialFunction.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
- source/PotentialEvaluation/PolynomialSum.cpp \
- source/PotentialEvaluation/PolynomialTerm.cpp \
- source/PotentialEvaluation/ProductOfPolynomialSums.cpp \
- source/PotentialEvaluation/RunningParameterManager.cpp \
- source/PotentialEvaluation/SumOfProductOfPolynomialSums.cpp \
- source/PotentialEvaluation/SlhaManager.cpp \
- source/PotentialEvaluation/SlhaUpdatePropagator.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
+ source/SlhaManagement/RunningParameterManager.cpp \
+ source/SlhaManagement/SlhaManager.cpp \
+ source/SlhaManagement/SlhaUpdatePropagator.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \
  $(HOMOTOPYCONTINUATION)/PolynomialGradientTargetSystem.cpp \
- $(MINUITMINIMIZATION)/MinuitManager.cpp \
- $(MINUITMINIMIZATION)/MinuitMinimum.cpp \
- $(MINUITMINIMIZATION)/PotentialForMinuit.cpp \
- source/PotentialMinimization/HomotopyContinuationAndGradient.cpp \
- source/PotentialMinimization/HomotopyContinuationAndMinuit.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/MinuitMinimum.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
+ source/PotentialMinimization/GradientFromStartingPoints.cpp \
+ source/PotentialMinimization/GradientMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
- source/TunnelingCalculation/BounceWithSplines.cpp \
- source/TunnelingCalculation/CosmoTransitionsRunner.cpp \
- source/TunnelingCalculation/MinuitBounceActionMinimizer.cpp \
- source/TunnelingCalculation/ThermalActionFitter.cpp \
+ source/PotentialMinimization/StartingPointFinder.cpp \
+ source/TunnelingCalculation/BounceActionTunneler.cpp \
+ $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
+ $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
+ $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
+ source/VersionInformation.cpp \
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/
@@ -106,7 +133,7 @@ $(LIBRARYFILE): $(LIBDIR) $(OBJECTS)
 
 $(BINDIR):
 	mkdir $@
-	
+
 $(EXEFILE): $(BINDIR) $(LIBRARYFILE)
 	$(CC) $(CCFLAGS) $(CCEXEFLAGS) -o $@ $(MAINCPP) $(LDFLAGS)
 

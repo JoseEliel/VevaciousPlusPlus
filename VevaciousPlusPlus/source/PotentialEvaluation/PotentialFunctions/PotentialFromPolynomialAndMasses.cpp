@@ -5,7 +5,8 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
+#include "VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -21,15 +22,23 @@ namespace VevaciousPlusPlus
                       PotentialFromPolynomialAndMasses::allowedVariableInitials
                                  + PotentialFromPolynomialAndMasses::digitChars
                                                                       + "_~" );
+  double const PotentialFromPolynomialAndMasses::piSquared(
+       boost::math::double_constants::pi * boost::math::double_constants::pi );
   double const
-  PotentialFromPolynomialAndMasses::loopFactor( 1.0 / ( 64.0 * M_PI * M_PI ) );
+  PotentialFromPolynomialAndMasses::loopFactor( 1.0
+                    / ( 64.0 * PotentialFromPolynomialAndMasses::piSquared ) );
   double const PotentialFromPolynomialAndMasses::thermalFactor( 1.0
-                                                     / ( 2.0 * M_PI * M_PI ) );
+                     / ( 2.0 * PotentialFromPolynomialAndMasses::piSquared ) );
+  std::string const PotentialFromPolynomialAndMasses::positiveByConvention(
+                                                      "PositiveByConvention" );
+  std::string const PotentialFromPolynomialAndMasses::negativeByConvention(
+                                                      "NegativeByConvention" );
 
   PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
                                               std::string const& modelFilename,
-                              RunningParameterManager& runningParameterManager,
-                                       double const scaleRangeMinimumFactor ) :
+                                          double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                           RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
@@ -48,8 +57,11 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
-    needToUpdateHomotopyContinuation( false ),
-    scaleRangeMinimumFactor( scaleRangeMinimumFactor )
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
+                     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
+    scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
+    fieldsAssumedPositive(),
+    fieldsAssumedNegative()
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -96,15 +108,115 @@ namespace VevaciousPlusPlus
          ++lineIndex )
     {
       readFieldName.assign( BOL::StringParser::trimFromFrontAndBack(
-                               FormatVariable( elementLines[ lineIndex ] ) ) );
+                                                 elementLines[ lineIndex ] ) );
       if( !(readFieldName.empty()) )
       {
-        fieldNames.push_back( readFieldName );
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "readFieldName = \"" << readFieldName << "\"";
+        std::cout << std::endl;
+        if( readFieldName.size() > positiveByConvention.size() )
+        {
+          std::cout << "long enough to include positiveByConvention."
+          << " readFieldName.compare(...) = "
+          << readFieldName.compare( ( readFieldName.size()
+                                    - positiveByConvention.size() ),
+                                    positiveByConvention.size(),
+                                    positiveByConvention ) << std::endl;
+        }*/
+
+        if( ( readFieldName.size() > positiveByConvention.size() )
+            &&
+            ( readFieldName.compare( ( readFieldName.size()
+                                       - positiveByConvention.size() ),
+                                     positiveByConvention.size(),
+                                     positiveByConvention ) == 0 ) )
+        {
+          // debugging:
+          /*std::cout << std::endl << "debugging:"
+          << std::endl
+          << "readFieldName.substr( 0, ( " << readFieldName.size() << " - "
+          << positiveByConvention.size() << " ) = "
+          << ( readFieldName.size() - positiveByConvention.size() )
+          << " ) = \""
+          << readFieldName.substr( 0,
+                       ( readFieldName.size() - positiveByConvention.size() ) )
+          << "\"";
+          std::cout << std::endl;*/
+          fieldsAssumedPositive.push_back( fieldNames.size() );
+          fieldNames.push_back( FormatVariable(
+                                       BOL::StringParser::trimFromFrontAndBack(
+                                                       readFieldName.substr( 0,
+                ( readFieldName.size() - positiveByConvention.size() ) ) ) ) );
+        }
+        else if( ( readFieldName.size() > negativeByConvention.size() )
+                 &&
+                 ( readFieldName.compare( ( readFieldName.size()
+                                            - negativeByConvention.size() ),
+                                          negativeByConvention.size(),
+                                          negativeByConvention ) == 0 ) )
+        {
+          fieldsAssumedNegative.push_back( fieldNames.size() );
+          fieldNames.push_back( FormatVariable(
+                                       BOL::StringParser::trimFromFrontAndBack(
+                                                       readFieldName.substr( 0,
+                ( readFieldName.size() - negativeByConvention.size() ) ) ) ) );
+        }
+        else
+        {
+          fieldNames.push_back( FormatVariable( readFieldName ) );
+        }
       }
     }
     numberOfFields = fieldNames.size();
     dsbFieldValuePolynomials.resize( numberOfFields );
     dsbFieldValueInputs.resize( numberOfFields );
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PotentialFromPolynomialAndMasses constructor: fieldNames = { \"";
+    for( std::vector< std::string >::const_iterator
+         fieldName( fieldNames.begin() );
+         fieldName < fieldNames.end();
+         ++fieldName )
+    {
+      if( fieldName > fieldNames.begin() )
+      {
+        std::cout << "\", \"";
+      }
+      std::cout << *fieldName;
+    }
+    std::cout << "\" }, fieldsAssumedPositive = { ";
+    for( std::vector< size_t >::const_iterator
+         positiveField( fieldsAssumedPositive.begin() );
+         positiveField < fieldsAssumedPositive.end();
+         ++positiveField )
+    {
+      {
+        if( positiveField > fieldsAssumedPositive.begin() )
+        {
+          std::cout << ", ";
+        }
+        std::cout << *positiveField;
+      }
+    }
+    std::cout << " }, fieldsAssumedNegative = { ";
+    for( std::vector< size_t >::const_iterator
+         negativeField( fieldsAssumedNegative.begin() );
+         negativeField < fieldsAssumedNegative.end();
+         ++negativeField )
+    {
+      {
+        if( negativeField > fieldsAssumedNegative.begin() )
+        {
+          std::cout << ", ";
+        }
+        std::cout << *negativeField;
+      }
+    }
+    std::cout << " }";
+    std::cout << std::endl;*/
     //   </FieldVariables>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
@@ -182,8 +294,7 @@ namespace VevaciousPlusPlus
         errorMessage.append( "\")" );
         throw std::runtime_error( errorMessage );
       }
-      unsigned int fieldIndex( FieldIndex(
-                                       BOL::StringParser::trimFromFrontAndBack(
+      size_t fieldIndex( FieldIndex( BOL::StringParser::trimFromFrontAndBack(
                                            elementLines[ lineIndex ].substr( 0,
                                                         equalsPosition ) ) ) );
       if( !( fieldIndex < fieldNames.size() ) )
@@ -251,7 +362,8 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                         elementLines,
                                         '\n');
-        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        int numberOfRows(
+                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
         if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
         {
           throw std::runtime_error( "Number of elements for"
@@ -287,7 +399,8 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                         elementLines,
                                         '\n');
-        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        int numberOfRows(
+                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
         if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
         {
           throw std::runtime_error( "Number of elements for"
@@ -315,7 +428,8 @@ namespace VevaciousPlusPlus
                                elementParser.getTrimmedCurrentElementContent(),
                                         elementLines,
                                         '\n');
-        int numberOfRows( sqrt( (double)(elementLines.getSize()) ) );
+        int numberOfRows(
+                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
         if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
         {
           throw std::runtime_error( "Number of elements for"
@@ -340,97 +454,33 @@ namespace VevaciousPlusPlus
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
     // after the constructor.
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < scalarMassSquaredMatrices.size();
          ++pointerIndex )
     {
       scalarSquareMasses.push_back(
                                 &(scalarMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back( &(fermionMassMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassSquaredMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back(
                                &(fermionMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < vectorMassSquaredMatrices.size();
          ++pointerIndex )
     {
       vectorSquareMasses.push_back(
                                 &(vectorMassSquaredMatrices[ pointerIndex ]) );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "end of PotentialFromPolynomialAndMasses::"
-    << "PotentialFromPolynomialAndMasses( \"" << modelFilename << "\" )"
-    << std::endl << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      std::cout << fieldNames[ fieldIndex ] << ": "
-      << dsbFieldValuePolynomials[ fieldIndex ].AsString() << std::endl;
-    }
-    std::cout
-    << std::endl
-    << "renormalizationScaleSquared = " << renormalizationScaleSquared
-    << std::endl
-    << "minimumRenormalizationScaleSquared = "
-    << minimumRenormalizationScaleSquared
-    << std::endl
-    << "treeLevelPotential = " << treeLevelPotential.AsString()
-    << std::endl
-    << "polynomialLoopCorrections = " << polynomialLoopCorrections.AsString()
-    << std::endl
-    << "scalarSquareMasses = " << std::endl;
-    for( std::vector< RealMassesSquaredMatrix >::iterator
-         whichScalar( scalarSquareMasses.begin() );
-         whichScalar < scalarSquareMasses.end();
-         ++whichScalar )
-    {
-      std::cout << whichScalar->AsString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "fermionMasses = " << std::endl;
-    for( std::vector< SymmetricComplexMassMatrix >::iterator
-         whichFermion( fermionMasses.begin() );
-         whichFermion < fermionMasses.end();
-         ++whichFermion )
-    {
-      std::cout << whichFermion->AsString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "fermionMassSquareds = " << std::endl;
-    for( std::vector< ComplexMassSquaredMatrix >::iterator
-         whichFermion( fermionMassSquareds.begin() );
-         whichFermion < fermionMassSquareds.end();
-         ++whichFermion )
-    {
-      std::cout << whichFermion->AsString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl
-    << "vectorSquareMasses = " << std::endl;
-    for( std::vector< RealMassesSquaredMatrix >::iterator
-         whichVector( vectorSquareMasses.begin() );
-         whichVector < vectorSquareMasses.end();
-         ++whichVector )
-    {
-      std::cout << whichVector->AsString();
-    }
-    std::cout << std::endl;*/
   }
 
   PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
@@ -443,7 +493,7 @@ namespace VevaciousPlusPlus
   // def PotentialFunction( fv ): return ...
   // in pythonFilename for fv being an array of floating-point numbers in the
   // same order as they are for the field configurations as internal to this
-  // C++ code. It uses the purely virtual function SetScaleInPythonFunction.
+  // C++ code. It uses the virtual function SetScaleForPythonPotentialCall.
   void PotentialFromPolynomialAndMasses::WriteAsPython(
                                        std::string const pythonFilename ) const
   {
@@ -451,7 +501,7 @@ namespace VevaciousPlusPlus
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VevaciousPlusPlus::versionString << "\n"
+    << VersionInformation::currentVersion << "\n"
     "from __future__ import division\n"
     "import math\n"
     "import numpy\n"
@@ -465,7 +515,8 @@ namespace VevaciousPlusPlus
     "# of the thermal functions so will be add zero.\n"
     "# Renormalization scale Q given as Q^(-2):\n"
     "invQSq = -1.0\n"
-    "# Q is set later, and may be set for each evaluation of the potential.\n"
+    "# The scale is set later (implicitly through invQSq), and may be set\n"
+    "# for each evaluation of the potential.\n"
     "\n" << ThermalFunctions::JFunctionsAsPython()
     << "\n"
     "\n" << runningParameters.RunningParametersAsPython()
@@ -759,8 +810,10 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( NAN ),
-    needToUpdateHomotopyContinuation( false ),
-    scaleRangeMinimumFactor( NAN )
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
+    scaleRangeMinimumFactor( NAN ),
+    fieldsAssumedPositive(),
+    fieldsAssumedNegative()
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -792,34 +845,36 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices( copySource.fermionMassSquaredMatrices ),
     vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
     vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant ),
-    needToUpdateHomotopyContinuation(
-                                 copySource.needToUpdateHomotopyContinuation ),
-    scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor )
+    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
+          copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
+    scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
+    fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
+    fieldsAssumedNegative( copySource.fieldsAssumedNegative )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
     // after the constructor.
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < scalarMassSquaredMatrices.size();
          ++pointerIndex )
     {
       scalarSquareMasses.push_back(
                                 &(scalarMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back( &(fermionMassMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < fermionMassSquaredMatrices.size();
          ++pointerIndex )
     {
       fermionSquareMasses.push_back(
                                &(fermionMassSquaredMatrices[ pointerIndex ]) );
     }
-    for( unsigned int pointerIndex( 0 );
+    for( size_t pointerIndex( 0 );
          pointerIndex < vectorMassSquaredMatrices.size();
          ++pointerIndex )
     {
@@ -833,7 +888,7 @@ namespace VevaciousPlusPlus
   // that the scale has been set correctly.
   double
   PotentialFromPolynomialAndMasses::LoopAndThermalCorrections(
-                             std::vector< double > const& fieldConfiguration,
+                               std::vector< double > const& fieldConfiguration,
           std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
          std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
           std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
@@ -884,7 +939,8 @@ namespace VevaciousPlusPlus
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
-    << "scalarQuantumCorrections = " << scalarQuantumCorrections;
+    << "scalarQuantumCorrections = " << scalarQuantumCorrections
+    << ", scalarThermalCorrections = " << scalarThermalCorrections;
     std::cout << std::endl;*/
 
 
@@ -907,7 +963,9 @@ namespace VevaciousPlusPlus
     /*std::cout << std::endl << "debugging:"
     << std::endl
     << "-2.0 * fermionQuantumCorrections = "
-    << ( -2.0 * fermionQuantumCorrections );
+    << ( -2.0 * fermionQuantumCorrections )
+    << ", 2.0 * fermionThermalCorrections = "
+    << ( 2.0 * fermionThermalCorrections );
     std::cout << std::endl;*/
 
     // Weyl fermion degrees of freedom add to both quantum and thermal
@@ -915,10 +973,8 @@ namespace VevaciousPlusPlus
     // for the quantum corrections. (The conventions used in Vevacious are that
     // the thermal correction functions already have any minus signs for
     // fermions.)
-    totalQuantumCorrections -= fermionQuantumCorrections;
-    totalQuantumCorrections -= fermionQuantumCorrections;
-    totalThermalCorrections += fermionThermalCorrections;
-    totalThermalCorrections += fermionThermalCorrections;
+    totalQuantumCorrections -= ( 2.0 * fermionQuantumCorrections );
+    totalThermalCorrections += ( 2.0 * fermionThermalCorrections );
 
     double vectorQuantumCorrections( 0.0 );
     double vectorThermalCorrections( 0.0 );
@@ -934,17 +990,16 @@ namespace VevaciousPlusPlus
     /*std::cout << std::endl << "debugging:"
     << std::endl
     << "3.0 * vectorQuantumCorrections = "
-    << ( 3.0 * vectorQuantumCorrections );
+    << ( 3.0 * vectorQuantumCorrections )
+    << ", 2.0 * vectorThermalCorrections = "
+    << ( 2.0 * vectorThermalCorrections );
     std::cout << std::endl;*/
 
     // Vector boson degrees of freedom add to quantum corrections with a factor
     // of 3 in dimensional regularization schemes, and to thermal corrections
     // with a factor of 2.
-    totalQuantumCorrections += vectorQuantumCorrections;
-    totalQuantumCorrections += vectorQuantumCorrections;
-    totalQuantumCorrections += vectorQuantumCorrections;
-    totalThermalCorrections += vectorThermalCorrections;
-    totalThermalCorrections += vectorThermalCorrections;
+    totalQuantumCorrections += ( 3.0 * vectorQuantumCorrections );
+    totalThermalCorrections += ( 2.0 * vectorThermalCorrections );
 
     return ( ( totalQuantumCorrections * loopFactor )
              + ( totalThermalCorrections * thermalFactor
@@ -1387,6 +1442,84 @@ namespace VevaciousPlusPlus
       << "cumulativeQuantumCorrection = " << cumulativeQuantumCorrection;
       std::cout << std::endl;*/
     }
+  }
+
+  // This is for debugging.
+  std::string PotentialFromPolynomialAndMasses::AsDebuggingString() const
+  {
+    std::stringstream returnStream;
+    returnStream << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
+    for( unsigned int fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      returnStream << fieldNames[ fieldIndex ] << ": "
+      << dsbFieldValuePolynomials[ fieldIndex ].AsDebuggingString()
+      << std::endl;
+    }
+    returnStream
+    << std::endl
+    << "currentMinimumRenormalizationScale = "
+    << currentMinimumRenormalizationScale
+    << std::endl
+    << "squareOfMinimumRenormalizationScale = "
+    << squareOfMinimumRenormalizationScale
+    << std::endl
+    << "currentMaximumRenormalizationScale = "
+    << currentMaximumRenormalizationScale
+    << std::endl
+    << "squareOfMaximumRenormalizationScale = "
+    << squareOfMaximumRenormalizationScale
+    << std::endl
+    << std::endl
+    << "treeLevelPotential = " << treeLevelPotential.AsDebuggingString()
+    << std::endl
+    << "polynomialLoopCorrections = "
+    << polynomialLoopCorrections.AsDebuggingString()
+    << std::endl
+    << "scalarSquareMasses = " << std::endl;
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+         whichScalar( scalarMassSquaredMatrices.begin() );
+         whichScalar < scalarMassSquaredMatrices.end();
+         ++whichScalar )
+    {
+      returnStream << whichScalar->AsString();
+    }
+    returnStream << std::endl;
+    returnStream << std::endl
+    << "fermionMasses = " << std::endl;
+    for( std::vector< SymmetricComplexMassMatrix >::const_iterator
+         whichFermion( fermionMassMatrices.begin() );
+         whichFermion < fermionMassMatrices.end();
+         ++whichFermion )
+    {
+      returnStream << whichFermion->AsString();
+    }
+    returnStream << std::endl;
+    returnStream << std::endl
+    << "fermionMassSquareds = " << std::endl;
+    for( std::vector< ComplexMassSquaredMatrix >::const_iterator
+         whichFermion( fermionMassSquaredMatrices.begin() );
+         whichFermion < fermionMassSquaredMatrices.end();
+         ++whichFermion )
+    {
+      returnStream << whichFermion->AsString();
+    }
+    returnStream << std::endl;
+    returnStream << std::endl
+    << "vectorSquareMasses = " << std::endl;
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+         whichVector( vectorMassSquaredMatrices.begin() );
+         whichVector < vectorMassSquaredMatrices.end();
+         ++whichVector )
+    {
+      returnStream << whichVector->AsString();
+    }
+    returnStream << std::endl
+    << "vectorMassCorrectionConstant = " << vectorMassCorrectionConstant
+    << std::endl << "scaleRangeMinimumFactor = " << scaleRangeMinimumFactor
+    << std::endl;
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -5,13 +5,12 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  RealMassesSquaredMatrix::RealMassesSquaredMatrix(
-                                               unsigned int const numberOfRows,
+  RealMassesSquaredMatrix::RealMassesSquaredMatrix( size_t const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
     MassesSquaredFromMatrix< double >( numberOfRows,
                                        attributeMap ),
@@ -49,17 +48,17 @@ namespace VevaciousPlusPlus
   Eigen::MatrixXd RealMassesSquaredMatrix::CurrentValues(
                         std::vector< double > const& fieldConfiguration ) const
   {
-    unsigned int rowsTimesLength( 0 );
+    size_t rowsTimesLength( 0 );
     Eigen::MatrixXd valuesMatrix( numberOfRows,
                                   numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
       valuesMatrix.coeffRef( rowIndex,
                              rowIndex )
       = matrixElements[ rowsTimesLength + rowIndex ]( fieldConfiguration );
-      for( unsigned int columnIndex( rowIndex + 1 );
+      for( size_t columnIndex( rowIndex + 1 );
            columnIndex < numberOfRows;
            ++columnIndex )
       {
@@ -83,10 +82,10 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const logarithmOfScale ) const
   {
-    unsigned int rowsTimesLength( 0 );
+    size_t rowsTimesLength( 0 );
     Eigen::MatrixXd valuesMatrix( numberOfRows,
                                   numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
@@ -94,7 +93,7 @@ namespace VevaciousPlusPlus
                              rowIndex )
       = matrixElements[ rowsTimesLength + rowIndex ]( fieldConfiguration,
                                                       logarithmOfScale );
-      for( unsigned int columnIndex( rowIndex + 1 );
+      for( size_t columnIndex( rowIndex + 1 );
            columnIndex < numberOfRows;
            ++columnIndex )
       {

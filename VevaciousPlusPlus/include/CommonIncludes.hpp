@@ -17,10 +17,12 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <utility>
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
+#include <ctime>
 #include "BOLlib/include/BOLlib.hpp"
 #include "SLHA.hpp"
 

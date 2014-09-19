@@ -8,9 +8,9 @@
 #ifndef REALMASSESSQUAREDMATRIX_HPP_
 #define REALMASSESSQUAREDMATRIX_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "MassesSquaredFromMatrix.hpp"
-#include "../PolynomialSum.hpp"
+#include "BasicFunctions/PolynomialSum.hpp"
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
@@ -19,16 +19,15 @@ namespace VevaciousPlusPlus
   class RealMassesSquaredMatrix : public MassesSquaredFromMatrix< double >
   {
   public:
-    RealMassesSquaredMatrix( unsigned int const numberOfRows,
+    RealMassesSquaredMatrix( size_t const numberOfRows,
                     std::map< std::string, std::string > const& attributeMap );
     RealMassesSquaredMatrix( RealMassesSquaredMatrix const& copySource );
     RealMassesSquaredMatrix();
-    virtual
-    ~RealMassesSquaredMatrix();
+    virtual ~RealMassesSquaredMatrix();
 
 
     // This allows access to the polynomial sum for a given index.
-    PolynomialSum& ElementAt( unsigned int const elementIndex )
+    PolynomialSum& ElementAt( size_t const elementIndex )
     { return matrixElements[ elementIndex ]; }
 
     std::vector< PolynomialSum > const& MatrixElements() const

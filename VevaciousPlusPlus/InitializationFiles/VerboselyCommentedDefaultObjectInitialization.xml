@@ -1,0 +1,441 @@
+<VevaciousPlusPlusObjectInitialization>
+
+<!--
+#  VevaciousPlusPlusObjectInitialization.xml
+#
+#  Created on: Apr 10, 2014
+#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+#      Copyright 2014 Ben O'Leary
+#
+#      This file is part of VevaciousPlusPlus, released under the
+#      GNU General Public License. Please see the accompanying
+#      README.VevaciousPlusPlus.txt file for a full list of files, brief
+#      documentation on how to use these classes, and further details on the
+#      license.
+#
+ -->
+
+<!-- Quick start: if you just want to change the model (i.e. the potential in
+     terms of a set of fields), change
+     <PotentialClass><ConstructorArguments><ModelFile> to the name of the file
+     with the model in it (such as ./ModelFiles/TwoHiggsDoublet.vin or
+     ./ModelFiles/RestrictedToRealVevsRealMssm.vin). Almost everything else is
+     for tweaking the way in which the (meta)stability is calculated, such as
+     the resolution of the tunneling path, or whether thermal tunneling is
+     skipped, and so on. -->
+ 
+  <PotentialClass>
+    <!-- Currently <ClassType> must be either "FixedScaleOneLoopPotential" or
+         "RgeImprovedOneLoopPotential". Both are classes that construct the
+         potential energy density from a tree-level polynomial with one-loop
+         corrections in the form of a polynomial of finite parts of
+         counterterms along with the usual corrections from mass-squared
+         eigenvalues in form m^4 ( ln[m^2/Q^2] - constant ), and thus both need
+         <ConstructorArguments> to give the model file in <ModelFile>.
+         Optionally, whether or not tree-level saddle points and maxima can be
+         used as valid starting points for gradient-based minimization can be
+         set in <RollOnlyMinima> within <ConstructorArguments> (defaulting to
+         false). -->
+    <ClassType>
+      FixedScaleOneLoopPotential
+    </ClassType>
+    <ConstructorArguments>
+      <ModelFile>
+        <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
+        <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
+        /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
+      </ModelFile>
+      <RollOnlyMinima>
+        <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if true
+             then the starting points for gradient-based minimization are only
+             the subset of solutions from the homotopy continuation solutions
+             which also are minima of the tree-level potential (so discarding
+             tree-level maxima and saddle points). This should only be used if
+             you are sure that the tree-level minima suffice to find every
+             one-loop minimum by following the steepest descent, and it will
+             only speed up this part of the run, while under usual
+             circumstances it is the tunneling calculation which is the
+             bottleneck. -->
+        true
+      </RollOnlyMinima>
+      <ScaleRangeMinimumFactor>
+      <!-- Another option: the maximum scale is at least the minimum scale in
+           the SLHA file multiplied by the number given here. For example, if
+           this number were 10.0, and the SLHA file had blocks at Q= 246.0 up
+           to Q= 1000.0, the maximum scale would be pushed up to 2460.0; in
+           contrast, if the number here were 2.0, the maximum scale would
+           remain 1000.0 as opposed to 2.0 * 246.0 = 492.0 (for purposes of
+           restricting Minuit2 from rolling too far away from the region of
+           validity, for example).
+        10.0
+      </ScaleRangeMinimumFactor>
+    </ConstructorArguments>
+  </PotentialClass>
+  
+  <MinimizerClass>
+    <!-- Currently <ClassType> must be "GradientFromStartingPoints", and
+         <ConstructorArguments> must give the <StartingPointFinderClass> and
+         <GradientMinimizerClass> components. Optional elements
+         <ExtremumSeparationThresholdFraction> and
+         <NonDsbRollingToDsbScalingFactor> may also be given. -->
+    <ClassType>
+      GradientFromStartingPoints
+    </ClassType>
+    <ConstructorArguments>
+      <StartingPointFinderClass>
+        <!-- Currently <ClassType> must be "Hom4ps2Runner", and
+             <ConstructorArguments> must give the path to the directory with
+             the hom4ps2 executable by <PathToHom4ps2> and the argument for the
+             executable by <Hom4ps2Argument>. -->
+        <ClassType>
+          Hom4ps2Runner
+        </ClassType>
+        <ConstructorArguments>
+          <PathToHom4ps2>
+            <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
+            /Users/oleary/BOL/machine-specific/HOM4PS2/
+          </PathToHom4ps2>
+          <Hom4ps2Argument>
+            <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
+                 "Please enter the option of homotopy method
+                    1. The polyhedral homotopy
+                    2. The classical linear homotopy"
+                 1 can be faster for systems of many variables,
+                 but 2 seems more reliable. -->
+            2
+          </Hom4ps2Argument>
+        </ConstructorArguments>
+      </StartingPointFinderClass>
+      <GradientMinimizerClass>
+        <!-- Currently <ClassType> must be "MinuitPotentialMinimizer" and
+             <ConstructorArguments> must have <MinimaSeparationThreshold>. -->
+        <ClassType>
+          MinuitPotentialMinimizer
+        </ClassType>
+        <ConstructorArguments>
+          <!-- The initial step sizes for Minuit2 will be equal to the
+               starting point scaled by the number given in
+               <InitialStepSizeFraction>, or equal to the number given in
+               <MinimumInitialStepSize>, whichever is larger (so a starting
+               value of 0 will still have an initial step size given by the
+               number in <MinimumInitialStepSize>, for example). -->
+          <InitialStepSizeFraction>
+            0.1
+          </InitialStepSizeFraction>
+          <MinimumInitialStepSize>
+            1.0
+          </MinimumInitialStepSize>
+          <MinuitStrategy>
+            <!-- The number given here is given to Minuit2 to decide how
+                 precise it tries to be, through more or less calls of the
+                 function to be minimized. The default is 1, while 0 emphasizes
+                 making less function calls, and 2 emphasizes more accuracy
+                 through more function calls. -->
+            1
+          </MinuitStrategy>
+        </ConstructorArguments>
+      </GradientMinimizerClass>
+      <ExtremumSeparationThresholdFraction>
+        <!-- The number given here is used as a threshold for ensuring that
+             the same minimum rolled to from separate starting points is
+             treated as the same minimum even if the minimizations did not lead
+             to exactly the same numbers for the values of the fields. If the
+             shorter of the Euclidean lengths of the 2 vectors in field space
+             describing the minima is l, and the Euclidean length of the
+             difference is d, and the number given by this element is f, then
+             2 minima are treated as the same minimum if d < (f * l). If not
+             given, 0.05 is taken as the default. -->
+        0.05
+      </ExtremumSeparationThresholdFraction>
+      <NonDsbRollingToDsbScalingFactor>
+        <!-- The number given here is used as a scaling factor if the minimum
+             is suspected of being the result of some unfortunate shifting of
+             basins of attraction: we discovered in explorations with
+             Vevacious 1 that it could happen that the basin of attraction of
+             the DSB minimum at 1-loop level could grow so large that it would
+             encompass tree-level minima that belong in some sense to other
+             1-loop minima, which moved very far away due to loop corrections,
+             so even though their basins of attraction also grew very large in
+             the same way that of the DSB minimum did, they moved enough that
+             "their" tree-level minima were left out. If a starting point is
+             sufficiently far away from the DSB minimum yet rolls there under
+             gradient-based minimization, the starting point's field values are
+             scaled up by the number given by this element, and used as a new
+             starting point. If not given, 4.0 is taken as the default. -->
+        4.0
+      </NonDsbRollingToDsbScalingFactor>
+    </ConstructorArguments>
+  </MinimizerClass>
+  
+  <TunnelingClass>
+    <!-- Currently <ClassType> must be either "BounceAlongPathWithThreshold" or
+         "CosmoTransitionsRunner", both needing <ConstructorArguments> to have
+         child elements <TunnelingStrategy> and <SurvivalProbabilityThreshold>.
+         If <ClassType> is "CosmoTransitionsRunner", then
+         <ConstructorArguments> must also give the path to the CosmoTransitions
+         directory (where pathDeformation.py is) by <PathToCosmotransitions>,
+         while "BounceAlongPathWithThreshold" needs <BouncePotentialFit> and
+         <BouncePathFinder>. -->
+    <ClassType>
+      BounceAlongPathWithThreshold
+    </ClassType>
+    <ConstructorArguments>
+      <TunnelingStrategy>
+        <!-- Valid options: "NoTunneling", "JustQuantum", "JustThermal",
+                            "ThermalThenQuantum", or "QuantumThenThermal"
+             (no quote marks in actual element). -->
+        JustQuantum
+      </TunnelingStrategy>
+      <SurvivalProbabilityThreshold>
+        0.01
+      </SurvivalProbabilityThreshold>
+      <ThermalActionResolution>
+      <!-- This is the number of temperatures taken for the thermal bounce
+           action calculation. If using "CosmoTransitionsRunner", the thermal
+           bounce actions with a straight path is sampled at this many
+           temperatures (equally spaced) and then used to estimate the thermal
+           dependence of the bounce action, which is then used to estimate the
+           temperature which dominates thermal tunneling, which is then used
+           for the full calculation by CosmoTransitions. If using
+           "BounceAlongPathWithThreshold", the integration of the decay width
+           over temperature is performed by a numerical approximation summing
+           over this many temperatures (equally space). -->
+        5
+      </ThermalActionResolution>
+      <CriticalTemperatureAccuracy>
+        <!-- This option gives the accuracy to which the critical and
+             evaporation temperatures will be calculated if necessary, in that
+             the temperature used will be within 2^-(the number given here) of
+             the exact value. -->
+        7
+      </CriticalTemperatureAccuracy>
+      <!-- The following elements are read only if <ClassType> is
+           "CosmoTransitionsRunner", and are ignored if <ClassType> is
+           "BounceAlongPathWithThreshold". -->
+      <PathToCosmotransitions>
+        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
+      </PathToCosmotransitions>
+      <PathResolution>
+        <!-- This is the number of nodes along the path between the false
+             vacuum and the true vacuum that CosmoTransitions uses. If not
+             given, 100 is used as the default. -->
+        100
+      </PathResolution>
+      <MaxInnerLoops>
+        <!-- This is the number of iterations of the inner loop that
+             CosmoTransitions is allowed. The inner loop adjusts the path along
+             the normal force directions. If not given, 10 is used as the
+             default. -->
+        10
+      </MaxInnerLoops>
+      <MaxOuterLoops>
+        <!-- This is the number of iterations of the outer loop that
+             CosmoTransitions is allowed. The outer loop adjusts the
+             1-dimensional bounce action along the path then runs the inner
+             loop. If not given, 10 is used as the default. -->
+        10
+      </MaxOuterLoops>
+      <ThermalStraightPathFitResolution>
+      <!-- This is the number of points taken for estimating the thermal
+           dependence of the bounce action, which is then used to estimate the
+           temperature which dominates thermal tunneling, which is then used
+           for the full calculation by CosmoTransitions. -->
+        5
+      </ThermalStraightPathFitResolution>
+      <!-- End of set of elements only read if <ClassType> is
+           "CosmoTransitionsRunner". -->
+      <!-- The following elements are read only if <ClassType> is
+           "BounceAlongPathWithThreshold", and are ignored if <ClassType> is
+           "CosmoTransitionsRunner". -->
+      <ThermalIntegrationResolution>
+        <!-- This is the number of temperatures summed over for thermal decay
+             width integrations. -->
+        5
+      </ThermalIntegrationResolution>
+      <BouncePotentialFit>
+        <!-- Currently the only valid option for <ClassType> is
+             "BubbleShootingOnSpline", which implements the Coleman
+             undershoot-overshoot method on a tunneling path from the true
+             vacuum to the false vacuum, parameterizing the potential along the
+             tunneling path by a fit to a set of potential energy densities at
+             a set of values for the path parameterization variable. The number
+             of segments between sampling points for this fit is given by
+             <ConstructorArguments><NumberOfSegmentsForPotentialFit>.
+             
+             Currently, the way the potential is interpolated is fixed to being
+             approximated as quadratic polynomials between nodes, with
+             continuous slope between the spline segments. The first and last
+             spline segments (i.e. each segment with a vacuum at one end) are
+             taken as being in the form p^2 + const, where p is the distance
+             from the vacuum end of the segment in the path parameterization
+             variable, so the vacua are proper minima. Unfortunately it is
+             crucial that the approximation in the neighborhoods of a vacuum
+             has the properties that the slope vanishes exactly at the vacuum,
+             decreasing monotonically as the distance from the vacuum
+             decreases, and that very small distances from the vacuum are
+             resolved precisely. If not, the undershoot/overshoot method
+             implemented in VevaciousPlusPlus will break down, as the
+             "particle rolling from one hill to another" might get stuck close
+             to the true vacuum if the slope resolves to zero instead of
+             10^-16, for example. A polynomial of degree
+             NumberOfNodesForPotentialFit really failed in our test cases where
+             the bubble would have a thin wall, as did quadratic splines
+             without the extra care to have special cases for the first and
+             last segments. -->
+        <ClassType>
+          BubbleShootingOnSpline
+        </ClassType>
+        <ConstructorArguments>
+          <NumberOfSegmentsForPotentialFit>
+            100
+          </NumberOfSegmentsForPotentialFit>
+          <NumberShootAttemptsAllowed>
+            <!-- This is the number of shoot attempts allowed to try to find
+                 the perfect shot before moving on with the best shot so far to
+                 calculate the bounce action. -->
+            32
+          </NumberShootAttemptsAllowed>
+          <RadialResolution>
+            <!-- The initial step size in 1/GeV for numerically integrating the
+                 bubble's equations of motion is given by the number given here
+                 divided by the largest energy scale from the potential (from
+                 among the Euclidean lengths of the vacua and the tunneling
+                 scale given by the PotentialFunction object). -->
+            0.05
+          </RadialResolution>
+        </ConstructorArguments>
+      </BouncePotentialFit>
+      <TunnelPathFinder>
+        <ClassType>
+        <!-- The valid options for this version of VevaciousPlusPlus are:
+             "MinimizingPotentialOnHemispheres" or
+             "MinimizingPotentialOnBisections". Both are based on
+             parameterizing the tunneling path in field space as a series of
+             nodes with straight interpolations between, and both aim to create
+             a path in field space where the force along the path is always
+             tangential to the path. This does NOT actually solve the equations
+             for the extremum of the bounce action which gives the decay width
+             of the false vacuum, but should be a good guess and certainly
+             gives a lower bound on the decay width.
+             The nodes for "MinimizingPotentialOnHemispheres" are chosen by
+             minimizing the potential on a hemisphere of fixed radius around
+             the false vacuum and then taking a step of twice this radius from
+             the false vacuum, giving a straight step which is parallel to the
+             force on its midpoint, then this node is used as the center of the
+             next hemisphere. (Well, the hemispheres are not actually
+             hemispheres, but rather hypersectors of hyperspheres subtended by
+             a polar angle slightly less than pi/2 so that each step gives a
+             node closer to the true vacuum than the last node.)
+             The nodes for "MinimizingPotentialOnBisections" are initially just
+             those on a straight line between the vacua, and then each node is
+             moved in a hyperplane which bisects the straight line between the
+             moving node's nearest neighbors until the potential in this
+             hyperplane is minimized. -->
+          MinimizingPotentialOnHemispheres
+        </ClassType>
+        <ConstructorArguments>
+          <!-- The arguments given here are all optional.
+               If <NodePathRefinement> is given, it will be used to construct a
+               MinuitBetweenPaths object that is used to try to improve the
+               path from the "no perpendicular force" path to a path which
+               might come closer to solving the equations of the maximal decay
+               width.
+               The other elements (<MinimumNumberOfNodes>,
+               <MovesPerImprovement>, <MinuitStrategy>, <MinuitTolerance>, and
+               <NodeMovementThreshold> (which is only used by
+               "MinimizingPotentialOnBisections")) can be given to change
+               default values. -->
+          <NodePathRefinement>
+            <ClassType>
+              <!-- The valid options for this version of VevaciousPlusPlus are:
+                   "PathSeparateFieldAverager", or
+                   "PathPolynomialAverager", or "none" (or the absence of
+                   <NodePathRefinement> is equivalent to "none", which is here
+                   just as an easy way of turning off this option). -->
+              PathSeparateFieldAverager
+            </ClassType>
+            <ConstructorArguments>
+              <MovesPerImprovement>
+                100
+              </MovesPerImprovement>
+              <MinuitStrategy>
+                1
+              </MinuitStrategy>
+              <MinuitTolerance>
+                0.1
+              </MinuitTolerance>
+              <BounceCalculator>
+              <!-- See the comment for <BouncePotentialFit> under
+                   <TunnelingClass><ConstructorArguments> to learn about the
+                   options for a valid bounce action calculator. The calculator
+                   object built from these options is separate to that used
+                   directly by the BounceAlongPathWithThreshold object which
+                   uses that built from the <BouncePotentialFit> options under
+                   <TunnelingClass><ConstructorArguments>. -->
+                <ClassType>
+                  BubbleShootingOnSpline
+                </ClassType>
+                <ConstructorArguments>
+                  <NumberOfNodesForPotentialFit>
+                    100
+                  </NumberOfNodesForPotentialFit>
+                  <NumberShootAttemptsAllowed>
+                    32
+                  </NumberShootAttemptsAllowed>
+                  <RadialResolution>
+                    0.05
+                  </RadialResolution>
+                </ConstructorArguments>
+              </BounceCalculator>
+            </ConstructorArguments>
+          </NodePathRefinement>
+          <MinimumNumberOfNodes>
+            <!-- If using "MinimizingPotentialOnHemispheres", the length
+                 between nodes is the total length of the straight line between
+                 the vacua divided by (n+1), where n is the number given by
+                 this element, and thus the actual number of nodes used
+                 internally will be larger than n, unless the path ends up as
+                 exactly straight between the vacua.
+                 If using "MinimizingPotentialOnBisections", the lines between
+                 nodes are divided in half recursively, so the number of nodes
+                 will actually be ( (2^n) - 1) where a is the smallest integer
+                 such that 2^n > the number given here. -->
+            20
+          </MinimumNumberOfNodes>
+          <MovesPerImprovement>
+            <!-- This is the number of nodes which can be moved for each call
+                 to improve the path before the bounce action along the path is
+                 checked against the threshold. -->
+            5
+          </MovesPerImprovement>
+          <MinuitStrategy>
+            <!-- The number given here is given to Minuit2 to decide how
+                 precise it tries to be, through more or less calls of the
+                 function to be minimized. The default is 1, while 0 emphasizes
+                 making less function calls, and 2 emphasizes more accuracy
+                 through more function calls. -->
+            1
+          </MinuitStrategy>
+          <MinuitTolerance>
+            <!-- The number given here is a fraction to multiply Minuit2's
+                 default 0.001 to yield the tolerance fraction, which is the
+                 fraction of the value of the function at a point which is
+                 used to compare to the estimated ("vertical") distance to the
+                 minimum. For example, if 0.5 is given, then as soon as Minuit2
+                 estimates that it is at a point with function value within
+                 0.0005 of what it estimates is the value at the minimum, it
+                 considers its minimization complete. -->
+            0.1
+          </MinuitTolerance>
+          <NodeMovementThreshold>
+            0.01
+          </NodeMovementThreshold>
+        </ConstructorArguments>
+      </TunnelPathFinder>
+      <!-- End of set of elements only read if <ClassType> is
+           "BounceAlongPathWithThreshold". -->
+    </ConstructorArguments>
+  </TunnelingClass>
+
+</VevaciousPlusPlusObjectInitialization>
+

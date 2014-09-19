@@ -8,8 +8,8 @@
 #ifndef HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 #define HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "../../PotentialEvaluation/SlhaUpdatePropagator.hpp"
+#include "CommonIncludes.hpp"
+#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -19,22 +19,26 @@ namespace VevaciousPlusPlus
     HomotopyContinuationTargetSystem(
                                     SlhaUpdatePropagator& previousPropagator );
     HomotopyContinuationTargetSystem( SlhaManager& slhaManager );
-    virtual
-    ~HomotopyContinuationTargetSystem();
+    virtual ~HomotopyContinuationTargetSystem();
 
 
     // This should evaluate the target system and place the values in
     // destinationVector.
     virtual void HomotopyContinuationSystemValues(
                    std::vector< std::complex< double > > solutionConfiguration,
-                std::vector< std::complex< double > >& destinationVector ) = 0;
+          std::vector< std::complex< double > >& destinationVector ) const = 0;
+
+    // This should be the real-valued version of the above.
+    virtual void HomotopyContinuationSystemValues(
+                                   std::vector< double > solutionConfiguration,
+                          std::vector< double >& destinationVector ) const = 0;
 
     // This should evaluate the derivatives of the target system and place the
     // values in destinationMatrix.
     virtual void HomotopyContinuationSystemGradients(
                    std::vector< std::complex< double > > solutionConfiguration,
-      std::vector< std::vector< std::complex< double > > >& destinationMatrix )
-    = 0;
+        std::vector< std::vector< std::complex< double > > >& destinationMatrix
+                                                                   ) const = 0;
 
     // This should return a vector of field values corresponding to the field
     // configuration as it should be passed to operator() for evaluating the
@@ -63,6 +67,12 @@ namespace VevaciousPlusPlus
             std::vector< std::complex< double > > const& solutionConfiguration,
                            std::vector< std::vector< double > >& realSolutions,
                                                  double const resolutionSize );
+
+  protected:
+    // This allows derived classes to veto particular solutions from being
+    // appended to realSolutions in AppendPureRealSolutionAndValidSignFlips.
+    virtual bool AllowedSolution(
+                std::vector< double > const& solutionConfiguration ) const = 0;
   };
 
 } /* namespace VevaciousPlusPlus */

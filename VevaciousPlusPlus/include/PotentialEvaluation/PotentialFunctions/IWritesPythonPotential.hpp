@@ -8,7 +8,7 @@
 #ifndef PYTHONCONVERTIBLEPOTENTIAL_HPP_
 #define PYTHONCONVERTIBLEPOTENTIAL_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -5,20 +5,27 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
                                               std::string const& modelFilename,
+                                          double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
+                                      scaleRangeMinimumFactor,
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       runningParameterManager ),
     inverseRenormalizationScaleSquared( NAN ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative,
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // This constructor is just an initialization list.
   }
@@ -29,7 +36,10 @@ namespace VevaciousPlusPlus
     inverseRenormalizationScaleSquared( NAN ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative,
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // This constructor is just an initialization list.
   }
@@ -57,6 +67,12 @@ namespace VevaciousPlusPlus
     std::vector< double > cappedFieldConfiguration( fieldConfiguration );
     double const squaredLengthBeyondCap( CapFieldConfiguration(
                                                   cappedFieldConfiguration ) );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "squaredLengthBeyondCap = " << squaredLengthBeyondCap;
+    std::cout << std::endl;*/
 
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
 

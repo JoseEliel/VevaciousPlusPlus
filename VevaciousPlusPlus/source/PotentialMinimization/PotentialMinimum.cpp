@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -30,6 +30,12 @@ namespace VevaciousPlusPlus
 
   PotentialMinimum::PotentialMinimum() :
     MinuitMinimum()
+  {
+    // This constructor is just an initialization list.
+  }
+
+  PotentialMinimum::PotentialMinimum( PotentialMinimum const& copySource ) :
+    MinuitMinimum( copySource )
   {
     // This constructor is just an initialization list.
   }

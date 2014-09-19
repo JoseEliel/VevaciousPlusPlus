@@ -5,18 +5,22 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   PolynomialGradientTargetSystem::PolynomialGradientTargetSystem(
                                       PolynomialSum const& potentialPolynomial,
-                                             unsigned int const numberOfFields,
-                                   SlhaUpdatePropagator& previousPropagator ) :
+                                                   size_t const numberOfFields,
+                                      SlhaUpdatePropagator& previousPropagator,
+                            std::vector< size_t > const& fieldsAssumedPositive,
+                            std::vector< size_t > const& fieldsAssumedNegative,
+                             bool const treeLevelMinimaOnlyAsValidSolutions ) :
     HomotopyContinuationTargetSystem( previousPropagator ),
     potentialPolynomial( potentialPolynomial ),
     numberOfVariables( numberOfFields ),
+    numberOfFields( numberOfFields ),
     targetSystem(),
     highestDegreeOfTargetSystem( 0 ),
     minimumScale( NAN ),
@@ -25,7 +29,10 @@ namespace VevaciousPlusPlus
     startValues(),
     validSolutions(),
     targetHessian(),
-    startHessian()
+    startHessian(),
+    fieldsAssumedPositive( fieldsAssumedPositive ),
+    fieldsAssumedNegative( fieldsAssumedNegative ),
+    treeLevelMinimaOnlyAsValidSolutions( treeLevelMinimaOnlyAsValidSolutions )
   {
     // This constructor is just an initialization list.
   }
@@ -37,18 +44,17 @@ namespace VevaciousPlusPlus
 
 
   // This fills targetHessian from targetSystem.
-  void
-  PolynomialGradientTargetSystem::PreparePolynomialHessian()
+  void PolynomialGradientTargetSystem::PreparePolynomialHessian()
   {
     targetHessian.resize( numberOfVariables,
-                              std::vector< PolynomialSum >( numberOfVariables ) );
-    for( unsigned int gradientIndex( 0 );
+                          std::vector< PolynomialSum >( numberOfVariables ) );
+    for( size_t gradientIndex( 0 );
          gradientIndex < numberOfVariables;
          ++gradientIndex )
     {
       std::vector< PolynomialTerm > const& gradientVector(
                              targetSystem[ gradientIndex ].PolynomialTerms() );
-      for( unsigned int fieldIndex( 0 );
+      for( size_t fieldIndex( 0 );
            fieldIndex < numberOfVariables;
            ++fieldIndex )
       {
@@ -101,14 +107,14 @@ namespace VevaciousPlusPlus
   // ( lowerEndOfStartValues^(2/3) * upperEndOfStartValues^(1/3) ),
   // ( lowerEndOfStartValues^(1/3) * upperEndOfStartValues^(2/3) ),
   // upperEndOfStartValues }.
-  void PolynomialGradientTargetSystem::SetStartSystem(
-                                              unsigned int const variableIndex,
+  void
+  PolynomialGradientTargetSystem::SetStartSystem( size_t const variableIndex,
                                             double const lowerEndOfStartValues,
                                            double const upperEndOfStartValues )
   {
     startValues[ variableIndex ].clear();
     startSystem[ variableIndex ] = ProductOfPolynomialSums();
-    unsigned int numberOfNonZeroStartValues( highestDegreeOfTargetSystem / 2 );
+    size_t numberOfNonZeroStartValues( highestDegreeOfTargetSystem / 2 );
     std::complex< double > startValue( 0.0,
                                        0.0 );
     if( ( highestDegreeOfTargetSystem % 2 ) == 1 )
@@ -131,13 +137,13 @@ namespace VevaciousPlusPlus
     else if( numberOfNonZeroStartValues > 1 )
     {
       double upperPower( 0.0 );
-      double const
-      powerDivisor( 1.0 / (double)( numberOfNonZeroStartValues - 1 ) );
-      for( unsigned int valueIndex( 0 );
+      double const powerDivisor( 1.0
+                   / static_cast< double >( numberOfNonZeroStartValues - 1 ) );
+      for( size_t valueIndex( 0 );
            valueIndex < numberOfNonZeroStartValues;
            ++valueIndex )
       {
-        upperPower = ( ((double)valueIndex) * powerDivisor );
+        upperPower = ( valueIndex * powerDivisor );
         startValue.real() = ( pow( lowerEndOfStartValues,
                                    ( 1.0 - upperPower ) )
                               * pow( upperEndOfStartValues,
@@ -189,15 +195,94 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;*/
   }
 
+  // This vetoes a homotopy continuation solution if any of the fields with
+  // index in fieldsAssumedPositive are negative (allowing for a small amount
+  // of numerical jitter) or if any of the fields with index in
+  // fieldsAssumedNegitive are positive ( also allowing for a small amount of
+  // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and
+  // the solution does not correspond to a minimum (rather than just an
+  // extremum) of potentialPolynomial.
+  bool PolynomialGradientTargetSystem::AllowedSolution(
+                     std::vector< double > const& solutionConfiguration ) const
+  {
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "PolynomialGradientTargetSystem::AllowedSolution( { ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < solutionConfiguration.size();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << ", ";
+      }
+      std::cout << solutionConfiguration[ fieldIndex ];
+    }
+    std::cout << " } ) called. treeLevelMinimaOnlyAsValidSolutions = " << treeLevelMinimaOnlyAsValidSolutions;
+    std::cout << std::endl;*/
+
+    for( std::vector< size_t >::const_iterator
+         positiveIndex( fieldsAssumedPositive.begin() );
+         positiveIndex < fieldsAssumedPositive.end();
+         ++positiveIndex )
+    {
+      if( solutionConfiguration[ *positiveIndex ] < -1.0 )
+      {
+        return false;
+      }
+    }
+    for( std::vector< size_t >::const_iterator
+         negativeIndex( fieldsAssumedNegative.begin() );
+         negativeIndex < fieldsAssumedNegative.end();
+         ++negativeIndex )
+    {
+      if( solutionConfiguration[ *negativeIndex ] > 1.0 )
+      {
+        return false;
+      }
+    }
+
+    // We only check for a negative eigenvalue if skipping was requested.
+    if( treeLevelMinimaOnlyAsValidSolutions )
+    {
+      // We need to check to see if targetHessian has any negative
+      // eigenvalues for solutionConfiguration.
+      Eigen::SelfAdjointEigenSolver< Eigen::MatrixXd >
+      eigenvalueFinder( FieldHessianOfPotential( solutionConfiguration ),
+                        Eigen::EigenvaluesOnly );
+      // The eigenvalues are sorted in ascending order according to the Eigen
+      // documentation, so it suffices to only check the 1st value.
+      if( eigenvalueFinder.eigenvalues()( 0 ) < 0.0 )
+      {
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "1st eigenvalue = " << eigenvalueFinder.eigenvalues()( 0 )
+        << ", so returning false.";
+        std::cout << std::endl;*/
+        return false;
+      }
+    }
+    // If we get here, either we were not skipping in the 1st place, or none of
+    // the eigenvalues were negative.
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Returning true.";
+    std::cout << std::endl;*/
+    return true;
+  }
+
   // This fills startHessian[ variableIndex ] from
   // startValues[ variableIndex ].
-  void PolynomialGradientTargetSystem::SetStartHessian(
-                                             unsigned int const variableIndex )
+  void
+  PolynomialGradientTargetSystem::SetStartHessian( size_t const variableIndex )
   {
     startHessian[ variableIndex ]
     = std::vector< SumOfProductOfPolynomialSums >( numberOfVariables );
-    unsigned int const indexOfFirstNonZero( highestDegreeOfTargetSystem % 2 );
-    unsigned int const
+    size_t const indexOfFirstNonZero( highestDegreeOfTargetSystem % 2 );
+    size_t const
     numberOfNonZeroStartValues( startValues[ variableIndex ].size() );
     PolynomialTerm fieldTerm;
     fieldTerm.RaiseFieldPower( variableIndex,
@@ -207,7 +292,7 @@ namespace VevaciousPlusPlus
       fieldTerm.RaiseFieldPower( variableIndex,
                                  1 );
       ProductOfPolynomialSums constructedProductOfSums;
-      for( unsigned int valueIndex( indexOfFirstNonZero );
+      for( size_t valueIndex( indexOfFirstNonZero );
            valueIndex < numberOfNonZeroStartValues;
            ++valueIndex )
       {
@@ -224,13 +309,13 @@ namespace VevaciousPlusPlus
     // appropriately.
     PolynomialSum zeroConstantQuadratic;
     zeroConstantQuadratic.PolynomialTerms().push_back( fieldTerm );
-    for( unsigned int differentiateIndex( indexOfFirstNonZero );
+    for( size_t differentiateIndex( indexOfFirstNonZero );
          differentiateIndex < numberOfNonZeroStartValues;
          ++differentiateIndex )
     {
       ProductOfPolynomialSums constructedProductOfSums;
       constructedProductOfSums.MultiplyBy( zeroConstantQuadratic );
-      for( unsigned int valueIndex( indexOfFirstNonZero );
+      for( size_t valueIndex( indexOfFirstNonZero );
            valueIndex < numberOfNonZeroStartValues;
            ++valueIndex )
       {

@@ -8,8 +8,8 @@
 #ifndef POTENTIALMINIMUM_HPP_
 #define POTENTIALMINIMUM_HPP_
 
-#include "../CommonIncludes.hpp"
-#include "MinuitMinimization/MinuitMinimum.hpp"
+#include "CommonIncludes.hpp"
+#include "GradientBasedMinimization/MinuitMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -20,8 +20,8 @@ namespace VevaciousPlusPlus
                       double const potentialDepth );
     PotentialMinimum( MinuitMinimum const& minuitMinimum );
     PotentialMinimum();
-    virtual
-    ~PotentialMinimum();
+    PotentialMinimum( PotentialMinimum const& copySource );
+    virtual ~PotentialMinimum();
 
 
     // This returns the sum of the squares of the differences in the field
@@ -67,7 +67,7 @@ namespace VevaciousPlusPlus
   {
     double returnDouble( 0.0 );
     double fieldDifference( 0.0 );
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {

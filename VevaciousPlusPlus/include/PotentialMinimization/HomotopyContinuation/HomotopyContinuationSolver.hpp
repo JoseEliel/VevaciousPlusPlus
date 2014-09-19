@@ -8,26 +8,27 @@
 #ifndef HOMOTOPYCONTINUATIONSOLVER_HPP_
 #define HOMOTOPYCONTINUATIONSOLVER_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
+#include "../StartingPointFinder.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
 
 
 namespace VevaciousPlusPlus
 {
 
-  class HomotopyContinuationSolver
+  class HomotopyContinuationSolver : public StartingPointFinder
   {
   public:
     HomotopyContinuationSolver(
-     HomotopyContinuationTargetSystem const& homotopyContinuationPotential );
-    virtual
-    ~HomotopyContinuationSolver();
+       HomotopyContinuationTargetSystem const& homotopyContinuationPotential );
+    virtual ~HomotopyContinuationSolver();
 
 
     // This should find all the extrema of homotopyContinuationPotential and
-    // put the purely real solutions into purelyRealSolutionSets.
-    virtual void FindTreeLevelExtrema(
-            std::vector< std::vector< double > >& purelyRealSolutionSets ) = 0;
+    // put the purely real solutions into startingPoints (inherited from
+    // StartingPointFinder, not actually over-written here).
+    // virtual void
+    // operator()( std::vector< std::vector< double > >& startingPoints ) = 0;
 
 
   protected:

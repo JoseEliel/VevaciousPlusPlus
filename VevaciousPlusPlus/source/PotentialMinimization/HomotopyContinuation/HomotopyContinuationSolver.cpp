@@ -5,13 +5,14 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/HomotopyContinuation/HomotopyContinuationSolver.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   HomotopyContinuationSolver::HomotopyContinuationSolver(
-    HomotopyContinuationTargetSystem const& homotopyContinuationPotential ) :
+      HomotopyContinuationTargetSystem const& homotopyContinuationPotential ) :
+    StartingPointFinder(),
     homotopyContinuationPotential( homotopyContinuationPotential )
   {
     // This constructor is just an initialization list.

@@ -5,13 +5,13 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   SymmetricComplexMassMatrix::SymmetricComplexMassMatrix(
-                                               unsigned int const numberOfRows,
+                                                     size_t const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
     MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
                                                        attributeMap ),
@@ -49,14 +49,14 @@ namespace VevaciousPlusPlus
   Eigen::MatrixXcd SymmetricComplexMassMatrix::MatrixToSquare(
                        std::vector< double > const& fieldConfiguration ) const
   {
-    unsigned int rowsTimesLength( 0 );
+    size_t rowsTimesLength( 0 );
     Eigen::MatrixXcd valuesMatrix( numberOfRows,
                                    numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      for( unsigned int columnIndex( 0 );
+      for( size_t columnIndex( 0 );
            columnIndex < rowIndex;
            ++columnIndex )
       {
@@ -94,14 +94,14 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const logarithmOfScale ) const
   {
-    unsigned int rowsTimesLength( 0 );
+    size_t rowsTimesLength( 0 );
     Eigen::MatrixXcd valuesMatrix( numberOfRows,
                                    numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      for( unsigned int columnIndex( 0 );
+      for( size_t columnIndex( 0 );
            columnIndex < rowIndex;
            ++columnIndex )
       {
@@ -142,11 +142,11 @@ namespace VevaciousPlusPlus
   {
     Eigen::MatrixXcd valuesSquaredMatrix( numberOfRows,
                                           numberOfRows );
-    for( unsigned int rowIndex( 0 );
+    for( size_t rowIndex( 0 );
          rowIndex < numberOfRows;
          ++rowIndex )
     {
-      for( unsigned int columnIndex( 0 );
+      for( size_t columnIndex( 0 );
            columnIndex <= rowIndex;
            ++columnIndex )
       {
@@ -154,7 +154,7 @@ namespace VevaciousPlusPlus
                                       columnIndex ).real() = 0.0;
         valuesSquaredMatrix.coeffRef( rowIndex,
                                       columnIndex ).imag() = 0.0;
-        for( unsigned int sumIndex( 0 );
+        for( size_t sumIndex( 0 );
              sumIndex < numberOfRows;
              ++sumIndex )
         {

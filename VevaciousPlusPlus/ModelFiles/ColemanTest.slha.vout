@@ -1,0 +1,34 @@
+<VevaciousResults>
+  <ReferenceData>
+     <VevaciousVersion>
+       1.0.00.alpha.003
+     </VevaciousVersion>
+     <CitationArticle>
+       [none as yet]
+     </CitationArticle>
+     <ResultTimestamp>
+       Mon Jun 23 11:06:57 2014
+     </ResultTimestamp>
+  </ReferenceData>
+  <StableOrMetastable>
+    metastable
+  </StableOrMetastable>
+  <DsbVacuum>
+    <FieldValues>
+      199.5 <!-- f -->
+    </FieldValues>
+    <RelativeDepth>
+      998744 <!-- Potential in GeV^4 minus value for all fields = 0 -->
+    </RelativeDepth>
+  </DsbVacuum>
+  <PanicVacuum>
+    <FieldValues>
+      -0.496299 <!-- f -->
+    </FieldValues>
+    <RelativeDepth>
+      -1243.81 <!-- Potential in GeV^4 minus value for all fields = 0 -->
+    </RelativeDepth>
+  </PanicVacuum>
+  <!-- Survival probability at zero temperature not calculated. -->
+  <!-- Survival probability at non-zero temperatures not calculated. -->
+</VevaciousResults>

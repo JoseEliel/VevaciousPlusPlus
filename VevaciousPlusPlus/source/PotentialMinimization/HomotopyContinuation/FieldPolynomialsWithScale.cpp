@@ -5,21 +5,26 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialMinimization/HomotopyContinuation/FieldPolynomialsWithScale.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   FieldPolynomialsWithScale::FieldPolynomialsWithScale(
                                       PolynomialSum const& potentialPolynomial,
-                                             unsigned int const numberOfFields,
-                                   SlhaUpdatePropagator& previousPropagator ) :
+                                                   size_t const numberOfFields,
+                                      SlhaUpdatePropagator& previousPropagator,
+                            std::vector< size_t > const& fieldsAssumedPositive,
+                            std::vector< size_t > const& fieldsAssumedNegative,
+                             bool const treeLevelMinimaOnlyAsValidSolutions ) :
     PolynomialGradientTargetSystem( potentialPolynomial,
                                     ( numberOfFields + 1 ),
-                                    previousPropagator ),
-    numberOfFields( numberOfFields )
+                                    previousPropagator,
+                                    fieldsAssumedPositive,
+                                    fieldsAssumedNegative,
+                                    treeLevelMinimaOnlyAsValidSolutions )
   {
-    // This constructor is just an initialization list.
+    this->numberOfFields = numberOfFields;
   }
 
   FieldPolynomialsWithScale::~FieldPolynomialsWithScale()
@@ -71,7 +76,7 @@ namespace VevaciousPlusPlus
     freshTerm.RaiseFieldPower( numberOfFields,
                                2 );
     scaleConstraint.PolynomialTerms().push_back( freshTerm );
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {

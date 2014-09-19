@@ -5,21 +5,28 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
                                               std::string const& modelFilename,
+                                          double const scaleRangeMinimumFactor,
+            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
+                                      scaleRangeMinimumFactor,
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       runningParameterManager ),
     logarithmOfMinimumRenormalizationScale( NAN ),
     logarithmOfMaximumRenormalizationScale( NAN ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative,
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // This constructor is just an initialization list.
   }
@@ -33,7 +40,10 @@ namespace VevaciousPlusPlus
                                         currentMaximumRenormalizationScale ) ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
-                                      *this )
+                                      *this,
+                                      fieldsAssumedPositive,
+                                      fieldsAssumedNegative,
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
   {
     // This constructor is just an initialization list.
   }

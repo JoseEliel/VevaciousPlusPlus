@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/VevaciousPlusPlus.hpp"
+#include "PotentialEvaluation/ParameterFunctionoids/SlhaFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -17,8 +17,8 @@ namespace VevaciousPlusPlus
                           pythonParameterName ),
     slhaBlock( NULL ),
     indexVector( BOL::StringParser::stringToIntVector( indexString ) ),
-    scaleLogarithmPowerCoefficients( 1,
-                                     NAN )
+    scaleLogarithmPowerCoefficients( std::vector< double > ( 1,
+                                                             NAN ) )
   {
     // This constructor is just an initialization list.
   }
@@ -38,7 +38,9 @@ namespace VevaciousPlusPlus
     // parameter at different scales we have.
     unsigned int const
     numberOfScales( slhaBlock->getNumberOfCopiesWithDifferentScale() );
-    scaleLogarithmPowerCoefficients.resize( numberOfScales );
+    std::vector< double >&
+    scaleCoefficients( scaleLogarithmPowerCoefficients.CoefficientVector() );
+    scaleCoefficients.resize( numberOfScales );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -54,7 +56,7 @@ namespace VevaciousPlusPlus
       Eigen::MatrixXd scaleDependenceMatrix( numberOfScales,
                                              numberOfScales );
       Eigen::VectorXd scaleDependenceVector( numberOfScales );
-      for( unsigned int whichScale( 0 );
+      for( size_t whichScale( 0 );
            whichScale < numberOfScales;
            ++whichScale )
       {
@@ -65,7 +67,7 @@ namespace VevaciousPlusPlus
                                0 ) = 1.0;
         scaleDependenceMatrix( whichScale,
                                1 ) = logarithmOfScale;
-        for( unsigned int whichPower( 2 );
+        for( size_t whichPower( 2 );
              whichPower < numberOfScales;
              ++whichPower )
         {
@@ -85,27 +87,28 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;*/
 
       // Now we solve for the coefficients:
-      Eigen::VectorXd
-      solutionVector( scaleDependenceMatrix.colPivHouseholderQr().solve(
+      scaleLogarithmPowerCoefficients.CopyFromEigen(
+                             scaleDependenceMatrix.colPivHouseholderQr().solve(
                                                      scaleDependenceVector ) );
-      for( unsigned int whichScale( 0 );
-           whichScale < numberOfScales;
-           ++whichScale )
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "scaleLogarithmPowerCoefficients = {";
+      for( std::vector< double >::const_iterator
+           coefficientValue(
+                 scaleLogarithmPowerCoefficients.CoefficientVector().begin() );
+           coefficientValue
+           < scaleLogarithmPowerCoefficients.CoefficientVector().end();
+           ++coefficientValue )
       {
-        scaleLogarithmPowerCoefficients[ whichScale ]
-        = solutionVector( whichScale );
-
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "scaleLogarithmPowerCoefficients[ " << whichScale << " ] = "
-        << scaleLogarithmPowerCoefficients[ whichScale ];
-        std::cout << std::endl;*/
+        std::cout << " " << *coefficientValue;
       }
+      std::cout << " }";
+      std::cout << std::endl;*/
     }
     else
     {
-      scaleLogarithmPowerCoefficients.assign( 1,
+      scaleLogarithmPowerCoefficients.CoefficientVector().assign( 1,
                                             (*slhaBlock)[ 1 ]( indexVector ) );
     }
   }

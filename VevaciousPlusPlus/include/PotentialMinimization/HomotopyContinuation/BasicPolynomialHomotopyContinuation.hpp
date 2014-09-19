@@ -8,7 +8,7 @@
 #ifndef BASICPOLYNOMIALHOMOTOPYCONTINUATION_HPP_
 #define BASICPOLYNOMIALHOMOTOPYCONTINUATION_HPP_
 
-#include "../../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 #include "HomotopyContinuationSolver.hpp"
 #include "HomotopyContinuationTargetSystem.hpp"
 
@@ -21,8 +21,7 @@ namespace VevaciousPlusPlus
   public:
     BasicPolynomialHomotopyContinuation(
                      HomotopyContinuationTargetSystem& polynomialPotential );
-    virtual
-    ~BasicPolynomialHomotopyContinuation();
+    virtual ~BasicPolynomialHomotopyContinuation();
 
 
     // This should find all the extrema of homotopyContinuationPotential and

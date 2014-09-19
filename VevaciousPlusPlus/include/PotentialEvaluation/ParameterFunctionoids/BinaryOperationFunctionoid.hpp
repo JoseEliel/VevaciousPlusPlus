@@ -8,8 +8,8 @@
 #ifndef PLUSMINUSFUNCTIONOID_HPP_
 #define PLUSMINUSFUNCTIONOID_HPP_
 
-#include "../../CommonIncludes.hpp"
-#include "ParameterFunctionoid.hpp"
+#include "CommonIncludes.hpp"
+#include "../ParameterFunctionoid.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -40,8 +40,7 @@ namespace VevaciousPlusPlus
                                 ParameterFunctionoid* const secondFunctionoid,
                                 std::string const& creationString,
                                 std::string const& pythonParameterName );
-    virtual
-    ~BinaryOperationFunctionoid();
+    virtual ~BinaryOperationFunctionoid();
 
 
     // This returns the value of the functionoid for the given logarithm of the

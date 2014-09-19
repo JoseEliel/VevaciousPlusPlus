@@ -8,7 +8,7 @@
 #ifndef THERMALFUNCTIONS_HPP_
 #define THERMALFUNCTIONS_HPP_
 
-#include "../CommonIncludes.hpp"
+#include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -130,9 +130,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::BosonMinusOneToMinusTwelve( double const squareRatio )
   {
     double scaledRatio( -10.0 * ( squareRatio + 1.0 ) );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( bosonMinusOneToMinusTwelve[ floorIndex ]
-             + ( 0.1 * ( scaledRatio - (double)floorIndex )
+             + ( 0.1 * ( scaledRatio - floorIndex )
                      * ( bosonMinusOneToMinusTwelve[ floorIndex + 1 ]
                          - bosonMinusOneToMinusTwelve[ floorIndex ] ) ) );
   }
@@ -142,9 +142,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::BosonZeroToMinusOne( double const squareRatio )
   {
     double scaledRatio( -100.0 * squareRatio );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( bosonZeroToMinusOne[ floorIndex ]
-             + ( 0.01 * ( scaledRatio - (double)floorIndex )
+             + ( 0.01 * ( scaledRatio - floorIndex )
                       * ( bosonZeroToMinusOne[ floorIndex + 1 ]
                           - bosonZeroToMinusOne[ floorIndex ] ) ) );
   }
@@ -154,9 +154,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::BosonZeroToPlusOne( double const squareRatio )
   {
     double scaledRatio( 100.0 * squareRatio );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( bosonZeroToPlusOne[ floorIndex ]
-             + ( 0.01 * ( scaledRatio - (double)floorIndex )
+             + ( 0.01 * ( scaledRatio - floorIndex )
                       * ( bosonZeroToPlusOne[ floorIndex + 1 ]
                           - bosonZeroToPlusOne[ floorIndex ] ) ) );
   }
@@ -166,9 +166,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::BosonPlusOneToPlusOneHundred( double const squareRatio )
   {
     double scaledRatio( squareRatio - 1.0 );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( bosonPlusOneToPlusOneHundred[ floorIndex ]
-             + ( ( scaledRatio - (double)floorIndex )
+             + ( ( scaledRatio - floorIndex )
                  * ( bosonPlusOneToPlusOneHundred[ floorIndex + 1 ]
                      - bosonPlusOneToPlusOneHundred[ floorIndex ] ) ) );
   }
@@ -178,9 +178,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::FermionMinusOneToMinusTwelve( double const squareRatio )
   {
     double scaledRatio( -10.0 * ( squareRatio + 1.0 ) );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( fermionMinusOneToMinusTwelve[ floorIndex ]
-             + ( 0.1 * ( scaledRatio - (double)floorIndex )
+             + ( 0.1 * ( scaledRatio - floorIndex )
                      * ( fermionMinusOneToMinusTwelve[ floorIndex + 1 ]
                          - fermionMinusOneToMinusTwelve[ floorIndex ] ) ) );
   }
@@ -190,9 +190,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::FermionZeroToMinusOne( double const squareRatio )
   {
     double scaledRatio( -100.0 * squareRatio );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( fermionZeroToMinusOne[ floorIndex ]
-             + ( 0.01 * ( scaledRatio - (double)floorIndex )
+             + ( 0.01 * ( scaledRatio - floorIndex )
                       * ( fermionZeroToMinusOne[ floorIndex + 1 ]
                           - fermionZeroToMinusOne[ floorIndex ] ) ) );
   }
@@ -202,9 +202,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::FermionZeroToPlusOne( double const squareRatio )
   {
     double scaledRatio( 100.0 * squareRatio );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( fermionZeroToPlusOne[ floorIndex ]
-             + ( 0.01 * ( scaledRatio - (double)floorIndex )
+             + ( 0.01 * ( scaledRatio - floorIndex )
                       * ( fermionZeroToPlusOne[ floorIndex + 1 ]
                           - fermionZeroToPlusOne[ floorIndex ] ) ) );
   }
@@ -214,9 +214,9 @@ namespace VevaciousPlusPlus
   ThermalFunctions::FermionPlusOneToPlusOneHundred( double const squareRatio )
   {
     double scaledRatio( squareRatio - 1.0 );
-    unsigned int floorIndex( scaledRatio );
+    size_t floorIndex( scaledRatio );
     return ( fermionPlusOneToPlusOneHundred[ floorIndex ]
-             + ( ( scaledRatio - (double)floorIndex )
+             + ( ( scaledRatio - floorIndex )
                  * ( fermionPlusOneToPlusOneHundred[ floorIndex + 1 ]
                      - fermionPlusOneToPlusOneHundred[ floorIndex ] ) ) );
   }
