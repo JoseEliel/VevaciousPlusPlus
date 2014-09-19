@@ -8,6 +8,7 @@
 #ifndef MINUITPATHFINDER_HPP_
 #define MINUITPATHFINDER_HPP_
 
+#include <limits>
 #include "CommonIncludes.hpp"
 #include "../BouncePathFinder.hpp"
 #include "Minuit2/FCNBase.h"
@@ -19,8 +20,7 @@ namespace VevaciousPlusPlus
                            public ROOT::Minuit2::FCNBase
   {
   public:
-    MinuitPathFinder( size_t const movesPerImprovement = 100,
-                      unsigned int const minuitStrategy = 1,
+    MinuitPathFinder( unsigned int const minuitStrategy = 1,
                       double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitPathFinder();
 
@@ -36,11 +36,42 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    size_t movesPerImprovement;
+    static double const functionValueForNanInput;
+
+
     unsigned int minuitStrategy;
     double minuitToleranceFraction;
     double currentMinuitTolerance;
+
+
+    // This returns true if any element of minuitParameterization appears to be
+    // a NAN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
+    bool NanParameterFromMinuit(
+                   std::vector< double > const& minuitParameterization ) const;
   };
+
+
+
+
+  // This returns true if any element of minuitParameterization appears to be
+  // a NAN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
+  inline bool MinuitPathFinder::NanParameterFromMinuit(
+                    std::vector< double > const& minuitParameterization ) const
+  {
+    for( std::vector< double >::const_iterator
+         minuitParameter( minuitParameterization.begin() );
+         minuitParameter < minuitParameterization.end();
+         ++minuitParameter )
+    {
+      if( !( *minuitParameter >= 0.0 )
+          &&
+          !( *minuitParameter < 0.0 ) )
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* MINUITPATHFINDER_HPP_ */

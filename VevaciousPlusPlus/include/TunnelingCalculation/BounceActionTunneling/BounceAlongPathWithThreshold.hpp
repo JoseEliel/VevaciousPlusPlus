@@ -27,9 +27,8 @@ namespace VevaciousPlusPlus
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold,
-                                  size_t const temperatureAccuracy,
-                                  size_t const evaporationResolution,
-                                  size_t const thermalIntegrationResolution );
+                                  size_t const thermalIntegrationResolution,
+                                  size_t const temperatureAccuracy );
     virtual ~BounceAlongPathWithThreshold();
 
 
@@ -55,9 +54,9 @@ namespace VevaciousPlusPlus
     // the integral already passes a threshold, and sets
     // dominantTemperatureInGigaElectronVolts to be the temperature with the
     // lowest survival probability.
-    virtual void
-    CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
-                               PotentialMinimum const& trueVacuum );
+    virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                             double const potentialAtOriginAtZeroTemperature );
 
 
     // This returns either the dimensionless bounce action integrated over four
@@ -101,7 +100,7 @@ namespace VevaciousPlusPlus
                                                  * squareRootOfSolitonicFactor
                                     * fourVolumeOfKnownUniverseOverGevFourth );
       actionThreshold = ( log( -solitonicFactorTimesFourVolume
-                                     / log( survivalProbabilityThreshold ) ) );
+                               / log( survivalProbabilityThreshold ) ) );
     }
     return BoundedBounceAction( falseVacuum,
                                 trueVacuum,

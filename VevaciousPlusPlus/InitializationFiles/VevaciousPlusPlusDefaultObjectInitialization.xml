@@ -114,18 +114,24 @@
          <BouncePathFinder>. -->
     <ClassType>
       <!-- Either "BounceAlongPathWithThreshold" or
-           "CosmoTransitionsRunner" -->
+           "CosmoTransitionsRunner". -->
       BounceAlongPathWithThreshold
     </ClassType>
     <ConstructorArguments>
       <TunnelingStrategy>
         <!-- "NoTunneling", "JustQuantum", "JustThermal", "ThermalThenQuantum",
              or "QuantumThenThermal" -->
-        JustQuantum
+        QuantumThenThermal
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
       </SurvivalProbabilityThreshold>
+      <ThermalActionResolution>
+        5
+      </ThermalActionResolution>
+      <CriticalTemperatureAccuracy>
+        7
+      </CriticalTemperatureAccuracy>
       <PathToCosmotransitions>
         /Users/oleary/BOL/machine-specific/CosmoTransitions2/
       </PathToCosmotransitions>
@@ -143,9 +149,9 @@
           BubbleShootingOnSpline
         </ClassType>
         <ConstructorArguments>
-          <NumberOfNodesForPotentialFit>
-            99
-          </NumberOfNodesForPotentialFit>
+          <NumberOfSegmentsForPotentialFit>
+            100
+          </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
           </NumberShootAttemptsAllowed>
@@ -156,48 +162,27 @@
       </BouncePotentialFit>
       <TunnelPathFinder>
         <ClassType>
-        <!-- "MinuitPathBounceMinimizer", "MinuitPathPotentialMinimizer", or
-             "MinuitNodePotentialMinimizer" -->
-          MinuitNodePotentialMinimizer
+        <!-- Only "MinimizingPotentialOnBisections" is valid at the moment and
+             there might never have another option. -->
+          MinimizingPotentialOnBisections
         </ClassType>
         <ConstructorArguments>
-          <NumberOfPotentialSamplePoints>
-            100
-          </NumberOfPotentialSamplePoints>
+          <!--
+          <NodePathRefinement>
+          </NodePathRefinement>
+          -->
+          <MaximumNumberOfNodes>
+            300
+          </MaximumNumberOfNodes>
+          <MovesPerImprovement>
+            10
+          </MovesPerImprovement>
           <MinuitStrategy>
             1
           </MinuitStrategy>
           <MinuitTolerance>
-            0.05
+            0.01
           </MinuitTolerance>
-          <PathParameterization>
-            <ClassType>
-              <!-- "PathFromNodes" or
-                   "PathFromPolynomialCoefficients" -->
-              PathFromNodes
-            </ClassType>
-            <ConstructorArguments>
-              <NumberOfCoefficientsPerVaryingField>
-                3
-              </NumberOfCoefficientsPerVaryingField>
-              <NumberOfVaryingNodes>
-              <!-- CAUTION! Minuit2 seems to try a point with a NAN co-ordinate
-                   if this is set higher than about 40. Sorry, but there's not
-                   really anything that we can do about that... -->
-                15
-              </NumberOfVaryingNodes>
-              <NodeParameterizationStyle>
-                <!-- "NodesOnParallelPlanes" or "NodesOnBisectingPlanes" -->
-                NodesOnBisectingPlanes
-              </NodeParameterizationStyle>
-              <InterpolationStyle>
-                <!-- "PolynomialPath", "LinearSplinePath", or
-                     "QuadraticSplinePath" . "PolynomialPath" is NOT
-                     recommended! -->
-                LinearSplinePath
-              </InterpolationStyle>
-            </ConstructorArguments>
-          </PathParameterization>
         </ConstructorArguments>
       </TunnelPathFinder>
     </ConstructorArguments>

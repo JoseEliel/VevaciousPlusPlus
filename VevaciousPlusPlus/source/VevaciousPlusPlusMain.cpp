@@ -197,8 +197,7 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "fix polynomial path from nodes: looks crazy after Minuit2" << std::endl
-  << "check full path action minimization" << std::endl
+  << "write MinuitBetweenPaths subclasses" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
   std::cout << std::endl;
@@ -207,9 +206,3 @@ int main( int argumentCount,
   // this was a triumph! I'm making a note here:
   return EXIT_SUCCESS;
 }
-
-
-
-
-
-

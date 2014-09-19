@@ -18,14 +18,14 @@ namespace VevaciousPlusPlus
     functionError( minuitMinimum.Edm() ),
     isValidMinimum( minuitMinimum.IsValid() )
   {
+    ROOT::Minuit2::MnUserParameters const&
+    userParameters( minuitMinimum.UserParameters() );
     for( size_t variableIndex( 0 );
          variableIndex < numberOfVariables;
          ++variableIndex )
     {
-      variableValues[ variableIndex ]
-      = minuitMinimum.UserParameters().Value( variableIndex );
-      variableErrors[ variableIndex ]
-      = minuitMinimum.UserParameters().Error( variableIndex );
+      variableValues[ variableIndex ] = userParameters.Value( variableIndex );
+      variableErrors[ variableIndex ] = userParameters.Error( variableIndex );
     }
   }
 

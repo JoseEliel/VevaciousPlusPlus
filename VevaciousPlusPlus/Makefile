@@ -50,12 +50,12 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/SimplePolynomial.cpp \
  source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
  source/BounceActionEvaluation/BounceActionCalculator.cpp \
- $(BOUNCEACTIONPATHFINDING)/FullPathVaryingMinuit.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinuitNodePotentialMinimizer.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinuitPathBounceMinimizer.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnBisections.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnHypersurfaces.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitBetweenPaths.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinuitPathPotentialMinimizer.cpp \
- $(BOUNCEACTIONPATHFINDING)/SingleNodeVaryingMinuit.cpp \
+ $(BOUNCEACTIONPATHFINDING)/PathPolynomialAverager.cpp \
+ $(BOUNCEACTIONPATHFINDING)/PathSeparateFieldAverager.cpp \
  source/BounceActionEvaluation/BouncePathFinder.cpp \
  source/BounceActionEvaluation/BubbleProfile.cpp \
  source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
@@ -64,21 +64,7 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BounceActionEvaluation/OdeintBubbleObserver.cpp \
  $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \
  $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
- $(PATHPARAMETERIZATION)/LinearSplineThroughNodesFactory.cpp \
- $(PATHPARAMETERIZATION)/NodesFromParameterization.cpp \
- $(PATHPARAMETERIZATION)/NodesOnBisectingPlanes.cpp \
- $(PATHPARAMETERIZATION)/NodesOnParallelPlanes.cpp \
- $(PATHPARAMETERIZATION)/NodesOnPlanes.cpp \
- $(PATHPARAMETERIZATION)/PathFromNodesFactory.cpp \
- $(PATHPARAMETERIZATION)/PolynomialPathFromCoefficients.cpp \
- $(PATHPARAMETERIZATION)/PolynomialsFromCoefficientsFactory.cpp \
- $(PATHPARAMETERIZATION)/PolynomialThroughNodes.cpp \
- $(PATHPARAMETERIZATION)/PolynomialThroughNodesFactory.cpp \
- $(PATHPARAMETERIZATION)/QuadraticSplinePathSegment.cpp \
- $(PATHPARAMETERIZATION)/QuadraticSplineThroughNodes.cpp \
- $(PATHPARAMETERIZATION)/QuadraticSplineThroughNodesFactory.cpp \
  $(PATHPARAMETERIZATION)/TunnelPath.cpp \
- $(PATHPARAMETERIZATION)/TunnelPathFactory.cpp \
  source/BounceActionEvaluation/SplinePotential.cpp \
  source/PotentialEvaluation/MassesSquaredCalculator.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \

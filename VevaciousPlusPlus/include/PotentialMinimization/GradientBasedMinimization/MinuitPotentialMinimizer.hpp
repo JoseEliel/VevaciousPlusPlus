@@ -51,6 +51,12 @@ namespace VevaciousPlusPlus
     RunMigrad( std::vector< double > const& startingPoint,
                double givenTolerance = -1.0 ) const;
 
+    // This returns the value of the potential at the field origin and at the
+    // current temperature, which is subtracted from the potential by
+    // minimizationFunction when evaluating the potential for Minuit2.
+    double FunctionOffset() const
+    { return minimizationFunction.FunctionAtOrigin(); }
+
 
   protected:
     PotentialForMinuit minimizationFunction;

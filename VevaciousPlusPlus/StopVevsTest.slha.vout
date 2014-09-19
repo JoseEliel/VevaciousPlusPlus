@@ -7,7 +7,7 @@
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-       Thu Sep 18 15:48:49 2014
+       Fri Sep 19 11:53:33 2014
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
@@ -35,16 +35,16 @@
       -1.87192e+12 <!-- Potential in GeV^4 minus value for all fields = 0 -->
     </RelativeDepth>
   </PanicVacuum>
-  <ZeroTemperatureDsbSurvival>
+  <!-- Survival probability at zero temperature not calculated. -->
+  <NonZeroTemperatureDsbSurvival>
     <DsbSurvivalProbability>
-      1
+      0
     </DsbSurvivalProbability>
     <LogOfMinusLogOfDsbSurvival>
-      -219.9 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
+      8.82641 <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> 
     </LogOfMinusLogOfDsbSurvival>
-    <DsbLifetime>
-      1e+100 <!-- in seconds; age of observed Universe is 4.3E+17s -->
-    </DsbLifetime>
-  </ZeroTemperatureDsbSurvival>
-  <!-- Survival probability at non-zero temperatures not calculated. -->
+    <DominantTunnelingTemperature>
+      476.73 <!-- in GeV -->
+    </DominantTunnelingTemperature>
+  </NonZeroTemperatureDsbSurvival>
 </VevaciousResults>

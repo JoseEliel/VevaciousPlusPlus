@@ -10,12 +10,13 @@
 namespace VevaciousPlusPlus
 {
 
-  MinuitPathFinder::MinuitPathFinder( size_t const movesPerImprovement,
-                                      unsigned int const minuitStrategy,
+  double const MinuitPathFinder::functionValueForNanInput(
+                                        std::numeric_limits< double >::max() );
+
+  MinuitPathFinder::MinuitPathFinder( unsigned int const minuitStrategy,
                                       double const minuitToleranceFraction ) :
     BouncePathFinder(),
     ROOT::Minuit2::FCNBase(),
-    movesPerImprovement( movesPerImprovement ),
     minuitStrategy( minuitStrategy ),
     minuitToleranceFraction( minuitToleranceFraction ),
     currentMinuitTolerance( NAN )

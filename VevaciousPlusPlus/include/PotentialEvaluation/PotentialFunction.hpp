@@ -49,6 +49,14 @@ namespace VevaciousPlusPlus
     { return (*this)( fieldConfiguration,
                       temperatureValue ); }
 
+    // This numerically evaluates the gradient at fieldConfiguration based on
+    // steps of numericalStepSize GeV in each field direction and places the
+    // gradient in gradientVector. Derived classes which can analytically
+    // evaluate the gradient can over-write this function.
+    virtual void SetAsGradientAt( std::vector< double >& gradientVector,
+                               std::vector< double > const& fieldConfiguration,
+                                  double const numericalStepSize = 1.0 ) const;
+
     // This should return the square of the scale (in GeV^2) relevant to
     // tunneling between the given minima for this potential.
     virtual double
@@ -57,7 +65,8 @@ namespace VevaciousPlusPlus
 
     // This is for ease of getting the index of a field of a given name. It
     // returns the largest possible unsigned int (-1 should tick over to that)
-    // if fieldName was not found.
+    // if fieldName was not found. Hence calling code can check that the return
+    // from this function is less than NumberOfFieldVariables().
     size_t FieldIndex( std::string const& fieldName ) const;
 
     std::vector< double > const& DsbFieldValues() const
@@ -108,9 +117,35 @@ namespace VevaciousPlusPlus
     return stringBuilder.str();
   }
 
+  // This numerically evaluates the gradient at fieldConfiguration based on
+  // steps of numericalStepSize GeV in each field direction, places the
+  // the gradient in gradientVector, and returns the potential evaluated at
+  // fieldConfiguration. Derived classes which can analytically evaluate the
+  // gradient can over-write this function, as well as SetAsGradientAt( ... ).
+  inline void
+  PotentialFunction::SetAsGradientAt( std::vector< double >& gradientVector,
+                               std::vector< double > const& fieldConfiguration,
+                                         double const numericalStepSize ) const
+  {
+    gradientVector.resize( numberOfFields );
+    double const potentialValue( (*this)( fieldConfiguration ) );
+    std::vector< double > displacementVector( fieldConfiguration );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      displacementVector[ fieldIndex ] += numericalStepSize;
+      gradientVector[ fieldIndex ]
+      = ( ( (*this)( displacementVector ) - potentialValue )
+          / numericalStepSize );
+      displacementVector[ fieldIndex ] -= numericalStepSize;
+    }
+  }
+
   // This is for ease of getting the index of a field of a given name. It
   // returns the largest possible unsigned int (-1 should tick over to that) if
-  // fieldName was not found.
+  // fieldName was not found. Hence calling code can check that the return from
+  // this function is less than NumberOfFieldVariables().
   inline size_t
   PotentialFunction::FieldIndex( std::string const& fieldName ) const
   {

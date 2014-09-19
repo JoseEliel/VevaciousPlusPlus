@@ -31,7 +31,6 @@ namespace VevaciousPlusPlus
     virtual TunnelPath const*
     SetInitialPath( PotentialMinimum const& falseVacuum,
                     PotentialMinimum const& trueVacuum,
-                    TunnelPath const* startingPath = NULL,
                     double const pathTemperature = 0.0 ) = 0;
 
     // This returns true if the last reset or path improvement did not meet
@@ -47,8 +46,12 @@ namespace VevaciousPlusPlus
     // C++11-compliant compiler, this function would return a
     // unique_ptr< TunnelPath >). The overshoot/undershoot algorithm along the
     // path should ensure that the bounce action calculated on the path is an
-    // upper bound on the bounce action at the desired extremum.
-    virtual TunnelPath const* ImprovePath() = 0;
+    // upper bound on the bounce action at the desired extremum. Whether or not
+    // the last call managed to lower the bounce action or not is given by
+    // lastImprovementWorked, which might be used to decide whether to change
+    // path improvement strategy internally in derived classes.
+    virtual TunnelPath const*
+    TryToImprovePath( bool const lastImprovementWorked = true ) = 0;
 
 
   protected:

@@ -10,42 +10,247 @@
 namespace VevaciousPlusPlus
 {
 
-  SplinePotential::SplinePotential(
-                                   double const minimumFalseVacuumConcavity ) :
-    auxiliaryValues(),
-    potentialValues( 1,
-                     0.0 ),
-    firstDerivatives(),
-    halfSecondDerivatives(),
+  SplinePotential::SplinePotential( PotentialFunction const& potentialFunction,
+                                    TunnelPath const& tunnelPath,
+                                    size_t const numberOfPotentialSegments ) :
+    energyBarrierResolved( false ),
+    trueVacuumLowerThanPathFalseMinimum( false ),
+    auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
+    inverseOfAuxiliaryStep( numberOfPotentialSegments ),
+    numberOfNormalSegments( numberOfPotentialSegments - 2 ),
+    potentialValues( numberOfNormalSegments,
+                     NAN ),
+    firstDerivatives( numberOfNormalSegments,
+                      NAN ),
+    firstSegmentQuadratic( NAN ),
     finalPotential( NAN ),
-    halfFinalSecondDerivative( NAN ),
-    finalCubicCoefficient( NAN ),
-    minimumFalseVacuumConcavity( minimumFalseVacuumConcavity ),
+    lastSegmentQuadratic( NAN ),
     definiteUndershootAuxiliary( NAN ),
     definiteOvershootAuxiliary( 1.0 ),
-    auxiliaryUpToCurrentSegment( 0.0 ),
-    startOfFinalSegment( NAN ),
-    sizeOfFinalSegment( NAN )
+    startOfFinalSegment( NAN )
   {
-    // This constructor is just an initialization list.
-  }
+    // First we have to find the path false minimum.
+    std::vector< double >
+    fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
+    double const pathTemperature( tunnelPath.TemperatureValue() );
+    tunnelPath.PutOnPathAt( fieldConfiguration,
+                            0.0 );
+    double pathFalsePotential( potentialFunction( fieldConfiguration,
+                                                  pathTemperature ) );
 
-  SplinePotential::SplinePotential( SplinePotential const& copySource ) :
-    auxiliaryValues( copySource.auxiliaryValues ),
-    potentialValues( copySource.potentialValues ),
-    firstDerivatives( copySource.firstDerivatives ),
-    halfSecondDerivatives( copySource.halfSecondDerivatives ),
-    finalPotential( copySource.finalPotential ),
-    halfFinalSecondDerivative( copySource.halfFinalSecondDerivative ),
-    finalCubicCoefficient( copySource.finalCubicCoefficient ),
-    minimumFalseVacuumConcavity( copySource.minimumFalseVacuumConcavity ),
-    definiteUndershootAuxiliary( copySource.definiteUndershootAuxiliary ),
-    definiteOvershootAuxiliary( copySource.definiteOvershootAuxiliary ),
-    auxiliaryUpToCurrentSegment( copySource.auxiliaryUpToCurrentSegment ),
-    startOfFinalSegment( copySource.startOfFinalSegment ),
-    sizeOfFinalSegment( copySource.sizeOfFinalSegment )
-  {
-    // This constructor is just an initialization list.
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Path start: "
+    << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", potential value = " << pathFalsePotential;
+    std::cout << std::endl;*/
+
+    tunnelPath.PutOnPathAt( fieldConfiguration,
+                            1.0 );
+    double const pathEndPotential( potentialFunction( fieldConfiguration,
+                                                      pathTemperature ) );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Path end: "
+    << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", potential value = " << pathEndPotential;
+    std::cout << std::endl;*/
+
+    double segmentEndAuxiliary( auxiliaryStep );
+    tunnelPath.PutOnPathAt( fieldConfiguration,
+                            segmentEndAuxiliary );
+    double segmentEndPotential( potentialFunction( fieldConfiguration,
+                                                   pathTemperature ) );
+    size_t segmentIndex( 0 );
+    while( segmentIndex < ( numberOfPotentialSegments - 1 ) )
+    {
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "segmentIndex = " << segmentIndex << ", pathFalsePotential = "
+      << pathFalsePotential << ", segmentEndPotential = "
+      << segmentEndPotential;
+      std::cout << std::endl;*/
+
+      // If we find the start of the energy barrier, we note so and break from
+      // the loop.
+      if( segmentEndPotential > pathFalsePotential )
+      {
+        energyBarrierResolved = true;
+        firstSegmentQuadratic = ( ( segmentEndPotential - pathFalsePotential )
+                           * inverseOfAuxiliaryStep * inverseOfAuxiliaryStep );
+        break;
+      }
+      // Otherwise we move onto the next segment to check for the start of the
+      // barrier.
+      pathFalsePotential = segmentEndPotential;
+      ++segmentIndex;
+      segmentEndAuxiliary += auxiliaryStep;
+      tunnelPath.PutOnPathAt( fieldConfiguration,
+                              segmentEndAuxiliary );
+      segmentEndPotential = potentialFunction( fieldConfiguration,
+                                               pathTemperature );
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "segmentIndex = " << segmentIndex << ", segmentEndAuxiliary = "
+      << segmentEndAuxiliary << ", field configuration at segment end = "
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+      << ", potential value = " << pathEndPotential;
+      std::cout << std::endl;*/
+    }
+    // Now we move on to resolving the energy barrier, looking out for an early
+    // path panic minimum. However, this is only done if we resolved the start
+    // of an energy barrier.
+    if( energyBarrierResolved )
+    {
+      ++segmentIndex;
+      segmentEndAuxiliary += auxiliaryStep;
+      // Now segmentEndAuxiliary and segmentIndex are correct for the first
+      // straight segment.
+      size_t normalSegmentIndex( 0 );
+      potentialValues.front() = ( segmentEndPotential - pathFalsePotential );
+      tunnelPath.PutOnPathAt( fieldConfiguration,
+                              segmentEndAuxiliary );
+      // From this point on, pathFalsePotential is always subtracted from
+      // potentials along the path.
+      segmentEndPotential
+      = ( potentialFunction( fieldConfiguration,
+                             pathTemperature ) - pathFalsePotential );
+      firstDerivatives.front() = ( inverseOfAuxiliaryStep *
+                           ( segmentEndPotential - potentialValues.front() ) );
+      bool foundDefiniteUndershoot( false );
+
+      // We have to check whether the first straight segment goes below the
+      // path false minimum.
+      if( segmentEndPotential < 0 )
+      {
+        foundDefiniteUndershoot = true;
+        definiteUndershootAuxiliary
+        = ( auxiliaryStep * ( 1.0 - ( potentialValues.front()
+                                      / firstDerivatives.front() ) ) );
+      }
+
+      // debugging:
+      /*std::cout << std::endl << "debugging:"
+      << std::endl
+      << "First straight segment: segmentIndex = " << segmentIndex
+      << ", segmentEndAuxiliary = " << segmentEndAuxiliary
+      << ", field configuration at segment end = "
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+      << ", potential value = " << ( segmentEndPotential + pathFalsePotential )
+      << ", relative value = " << segmentEndPotential;
+      std::cout << std::endl;*/
+
+      while( segmentIndex < ( numberOfPotentialSegments - 2 ) )
+      {
+        // If we find an early path panic minimum, we note it and break early.
+        if( ( potentialValues[ normalSegmentIndex ] < 0.0 )
+            &&
+            ( firstDerivatives[ normalSegmentIndex ] > 0.0 ) )
+        {
+          trueVacuumLowerThanPathFalseMinimum = true;
+          finalPotential = potentialValues[ normalSegmentIndex ];
+          lastSegmentQuadratic
+          = ( ( potentialValues[ normalSegmentIndex - 1 ] - finalPotential )
+                           * inverseOfAuxiliaryStep * inverseOfAuxiliaryStep );
+          numberOfNormalSegments = normalSegmentIndex;
+          definiteOvershootAuxiliary
+          = ( ( numberOfNormalSegments + 2 ) * auxiliaryStep );
+          break;
+        }
+        // Otherwise we move onto the next segment.
+        ++segmentIndex;
+        ++normalSegmentIndex;
+        segmentEndAuxiliary += auxiliaryStep;
+        potentialValues[ normalSegmentIndex ] = segmentEndPotential;
+        tunnelPath.PutOnPathAt( fieldConfiguration,
+                                segmentEndAuxiliary );
+        // From this point on, pathFalsePotential is always subtracted from
+        // potentials along the path.
+        segmentEndPotential
+        = ( potentialFunction( fieldConfiguration,
+                               pathTemperature ) - pathFalsePotential );
+        firstDerivatives[ normalSegmentIndex ]
+        = ( inverseOfAuxiliaryStep
+           * ( segmentEndPotential - potentialValues[ normalSegmentIndex ] ) );
+
+        // We have to check whether this straight segment goes below the path
+        // false minimum.
+        if( !foundDefiniteUndershoot
+            &&
+            ( segmentEndPotential < 0 ) )
+        {
+          foundDefiniteUndershoot = true;
+          definiteUndershootAuxiliary
+          = ( segmentEndAuxiliary + ( potentialValues[ normalSegmentIndex ]
+                                  / firstDerivatives[ normalSegmentIndex ] ) );
+          // It is plus because potentialValues[ normalSegmentIndex ] must be
+          // positive and firstDerivatives[ normalSegmentIndex ] must be
+          // negative for this to happen, and thus definiteUndershootAuxiliary
+          // will be less than segmentEndAuxiliary.
+        }
+
+        // debugging:
+        /*std::cout << std::endl << "debugging:"
+        << std::endl
+        << "segmentIndex = " << segmentIndex << ", normalSegmentIndex = "
+        << normalSegmentIndex << ", segmentEndAuxiliary = "
+        << segmentEndAuxiliary
+        << ", field configuration at segment end = "
+        << potentialFunction.FieldConfigurationAsMathematica(
+                                                           fieldConfiguration )
+        << ", potential value = "
+        << ( segmentEndPotential + pathFalsePotential )
+        << ", relative value = " << segmentEndPotential
+        << ", potentialValues[ " << normalSegmentIndex << " ] = "
+        << potentialValues[ normalSegmentIndex ] << ", firstDerivatives[ "
+        << normalSegmentIndex << " ] = "
+        << firstDerivatives[ normalSegmentIndex ];
+        std::cout << std::endl;*/
+      }
+      // Now we have to check to see if the end of the path is lower than the
+      // path false minimum, if we haven't already found an early path panic
+      // minimum.
+      if( !trueVacuumLowerThanPathFalseMinimum )
+      {
+        if( pathEndPotential < pathFalsePotential )
+        {
+          trueVacuumLowerThanPathFalseMinimum = true;
+          finalPotential = ( pathEndPotential - pathFalsePotential );
+          // At the end of the loop, segmentEndPotential is still the potential
+          // at the end of the last straight segment.
+          lastSegmentQuadratic = ( ( segmentEndPotential - finalPotential )
+                           * inverseOfAuxiliaryStep * inverseOfAuxiliaryStep );
+          numberOfNormalSegments = ( normalSegmentIndex + 1 );
+          // After the loop ends without an early path panic minimum,
+          // normalSegmentIndex is the index of the last normal segment, and
+          // since the index starts at 0, the total number of segments is one
+          // larger.
+          definiteOvershootAuxiliary
+          = ( ( numberOfNormalSegments + 2 ) * auxiliaryStep );
+        }
+      }
+      if( trueVacuumLowerThanPathFalseMinimum )
+      {
+        startOfFinalSegment = ( definiteOvershootAuxiliary - auxiliaryStep );
+        if( !foundDefiniteUndershoot )
+        {
+          // If none of the straight segments crossed into negative potential,
+          // then it happened in the last segment, so we find the auxiliary
+          // difference from definiteOvershootAuxiliary which brings the
+          // potential back up to 0.
+          definiteUndershootAuxiliary = ( definiteOvershootAuxiliary
+                            - sqrt( -finalPotential / lastSegmentQuadratic ) );
+        }
+      }
+    }
   }
 
   SplinePotential::~SplinePotential()
@@ -56,413 +261,124 @@ namespace VevaciousPlusPlus
 
   // This returns the value of the potential at auxiliaryValue, by finding the
   // correct segment and then returning its value at that point.
-  double SplinePotential::operator()( double const auxiliaryValue ) const
+  double
+  SplinePotential::operator()( double const auxiliaryValue ) const
   {
     if( auxiliaryValue <= 0.0 )
     {
-      return potentialValues.front();
+      return 0.0;
+    }
+    if( auxiliaryValue < auxiliaryStep )
+    {
+      return ( auxiliaryValue * auxiliaryValue * firstSegmentQuadratic );
     }
     if( auxiliaryValue >= definiteOvershootAuxiliary )
     {
       return finalPotential;
     }
-    size_t segmentIndex( 0 );
-    double auxiliaryDifference( auxiliaryValue );
-    while( segmentIndex < auxiliaryValues.size() )
+    if( auxiliaryValue >= startOfFinalSegment )
     {
-      if( auxiliaryDifference < auxiliaryValues[ segmentIndex ] )
-      {
-        return ( potentialValues[ segmentIndex ]
-                 + ( ( firstDerivatives[ segmentIndex ]
-                       + ( halfSecondDerivatives[ segmentIndex ]
-                           * auxiliaryDifference ) )
-                     * auxiliaryDifference ) );
-      }
-      auxiliaryDifference -= auxiliaryValues[ segmentIndex ];
-      ++segmentIndex;
+      double const differenceFromMaximumAuxiliary( definiteOvershootAuxiliary
+                                                   - auxiliaryValue );
+      return ( finalPotential + ( differenceFromMaximumAuxiliary
+                  * differenceFromMaximumAuxiliary * lastSegmentQuadratic ) );
     }
-    // If we get to here, we're beyond the last normal segment:
-    // auxiliaryValues.back() < auxiliaryValue < definiteOvershootAuxiliary.
-    auxiliaryDifference = ( auxiliaryValue - definiteOvershootAuxiliary );
-    return ( finalPotential
-             + ( ( halfFinalSecondDerivative
-                   + ( finalCubicCoefficient * auxiliaryDifference ) )
-                 * auxiliaryDifference * auxiliaryDifference ) );
-  }
-
-  // This returns the value of the first derivative of the potential at
-  // auxiliaryValue, by finding the correct segment and then returning its
-  // slope at that point.
-  double SplinePotential::FirstDerivative( double const auxiliaryValue ) const
-  {
-    if( ( auxiliaryValue <= 0.0 )
-        ||
-        ( auxiliaryValue >= definiteOvershootAuxiliary ) )
-    {
-      return 0.0;
-    }
-    size_t segmentIndex( 0 );
-    double auxiliaryDifference( auxiliaryValue );
-    while( segmentIndex < auxiliaryValues.size() )
-    {
-      if( auxiliaryDifference < auxiliaryValues[ segmentIndex ] )
-      {
-        return ( firstDerivatives[ segmentIndex ]
-                 + ( 2.0 * halfSecondDerivatives[ segmentIndex ]
-                         * auxiliaryDifference ) );
-      }
-      auxiliaryDifference -= auxiliaryValues[ segmentIndex ];
-      ++segmentIndex;
-    }
-    // If we get to here, we're beyond the last normal segment:
-    // auxiliaryValues[ currentGivenSize - 1 ] < auxiliaryValue < 1.0.
-    auxiliaryDifference = ( auxiliaryValue - definiteOvershootAuxiliary );
-    return ( ( ( 2.0 * halfFinalSecondDerivative )
-               + ( 3.0 * finalCubicCoefficient * auxiliaryDifference ) )
-                 * auxiliaryDifference );
-  }
-
-  // This returns the value of the first derivative of the potential at
-  // auxiliaryValue, by finding the correct segment and then returning its
-  // slope at that point.
-  double SplinePotential::SecondDerivative( double const auxiliaryValue ) const
-  {
-    if( ( auxiliaryValue < 0.0 )
-        ||
-        ( auxiliaryValue >= definiteOvershootAuxiliary ) )
-    {
-      return 0.0;
-    }
-    size_t segmentIndex( 0 );
-    double auxiliaryDifference( auxiliaryValue );
-    while( segmentIndex < auxiliaryValues.size() )
-    {
-      if( auxiliaryDifference < auxiliaryValues[ segmentIndex ] )
-      {
-        return ( 2.0 * halfSecondDerivatives[ segmentIndex ] );
-      }
-      auxiliaryDifference -= auxiliaryValues[ segmentIndex ];
-      ++segmentIndex;
-    }
-    // If we get to here, we're beyond the last normal segment:
-    // auxiliaryValues[ currentGivenSize - 1 ] < auxiliaryValue < 1.0.
-    auxiliaryDifference = ( auxiliaryValue - definiteOvershootAuxiliary );
-    return ( ( 2.0 * halfFinalSecondDerivative )
-             + ( 3.0 * finalCubicCoefficient * auxiliaryDifference ) );
-  }
-
-  // This sets up the spline based on auxiliaryValues and potentialValues,
-  // ensuring that the potential reaches the correct values for the vacua,
-  // and that the potential derivative vanishes at the vacua. It also notes
-  // the first point where the potential drops below that of the false vacuum
-  // in definiteUndershootAuxiliary and the first maximum after that in
-  // definiteOvershootAuxiliary, and cuts off the potential at that maximum.
-  void
-  SplinePotential::SetSpline( double const trueVacuumPotentialDifference )
-  {
-    firstDerivatives.resize( auxiliaryValues.size() );
-    halfSecondDerivatives.resize( auxiliaryValues.size() );
-    finalPotential = trueVacuumPotentialDifference;
-    firstDerivatives[ 0 ] = 0.0;
-    // There is a chance that numerical jitter means that the false vacuum may
-    // be slightly ahead or behind the auxiliary variable p = 0. Either way we
-    // flatten out the spline a bit (either forced concave by setting both
-    // the slope to 0 and the second derivative to minimumFalseVacuumConcavity
-    // if the proper false vacuum is at positive p, or just flattening it at
-    // p = 0 if it should be at negative p, by setting the slope to 0 at
-    // p = 0). It has the side-effect that potentials with energy barriers too
-    // thin to be resolved by the path resolution are then forced to have a
-    // small barrier at least.
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "potentialValues[ 0 ] = " << potentialValues[ 0 ]
-    << ", potentialValues[ 1 ] = " << potentialValues[ 1 ];
-    std::cout << std::endl;*/
-    if( potentialValues[ 1 ] < 0.0 )
-    {
-      halfSecondDerivatives[ 0 ] = minimumFalseVacuumConcavity;
-      potentialValues[ 0 ]
-      = ( potentialValues[ 1 ]
-          - ( minimumFalseVacuumConcavity
-              * auxiliaryValues[ 0 ] * auxiliaryValues[ 0 ] ) );
-      finalPotential += potentialValues[ 0 ];
-      // The true vacuum is also lowered to ensure that tunneling is still
-      // possible.
-    }
-    else
-    {
-      halfSecondDerivatives[ 0 ] = ( potentialValues[ 1 ]
-                           / ( auxiliaryValues[ 0 ] * auxiliaryValues[ 0 ] ) );
-    }
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "auxiliaryValues[ 0 ] = " << auxiliaryValues[ 0 ]
-    << ", potentialValues[ 0 ] = " << potentialValues[ 0 ]
-    << ", firstDerivatives[ 0 ] = " << firstDerivatives[ 0 ]
-    << ", halfSecondDerivatives[ 0 ] = " << halfSecondDerivatives[ 0 ];
-    std::cout << std::endl;*/
-    bool definiteUndershootFound( false );
-    bool definiteOvershootFound( false );
-    auxiliaryUpToCurrentSegment = auxiliaryValues[ 0 ];
-    for( size_t segmentIndex( 1 );
-         segmentIndex < auxiliaryValues.size();
-         ++segmentIndex )
-    {
-      firstDerivatives[ segmentIndex ]
-      = ( firstDerivatives[ segmentIndex - 1 ]
-          + ( 2.0 * auxiliaryValues[ segmentIndex - 1 ]
-                  * halfSecondDerivatives[ segmentIndex - 1 ] ) );
-      halfSecondDerivatives[ segmentIndex ]
-      = ( ( potentialValues[ segmentIndex + 1 ]
-            - potentialValues[ segmentIndex ]
-            - ( firstDerivatives[ segmentIndex ]
-                * auxiliaryValues[ segmentIndex ] ) )
-        / ( auxiliaryValues[ segmentIndex ]
-            * auxiliaryValues[ segmentIndex ] ) );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "auxiliaryUpToCurrentSegment = " << auxiliaryUpToCurrentSegment
-      << ", auxiliaryValues[ " << segmentIndex << " ] = "
-      << auxiliaryValues[ segmentIndex ]
-      << ", potentialValues[ " << segmentIndex << " ] = "
-      << potentialValues[ segmentIndex ]
-      << ", firstDerivatives[ " << segmentIndex << " ] = "
-      << firstDerivatives[ segmentIndex ]
-      << ", halfSecondDerivatives[ " << segmentIndex << " ] = "
-      << halfSecondDerivatives[ segmentIndex ];
-      std::cout << std::endl;*/
-
-      // Now we check for the potential dropping below potentialValues[ 0 ] in
-      // this segment.
-      if( !definiteUndershootFound )
-      {
-        if( ( halfSecondDerivatives[ segmentIndex ] == 0.0 )
-            &&
-            ( potentialValues[ segmentIndex + 1 ] < potentialValues[ 0 ] ) )
-        {
-          definiteUndershootAuxiliary
-          = ( auxiliaryUpToCurrentSegment
-              + ( ( potentialValues[ 0 ] - potentialValues[ segmentIndex ] )
-                  / firstDerivatives[ segmentIndex ] ) );
-          definiteUndershootFound = true;
-        }
-        else
-        {
-          double const
-          discriminantValue( ( firstDerivatives[ segmentIndex ]
-                               * firstDerivatives[ segmentIndex ] )
-                             - ( 4.0 * potentialValues[ segmentIndex ]
-                                   * halfSecondDerivatives[ segmentIndex ] ) );
-          if( discriminantValue >= 0.0 )
-          {
-            double const discriminantRoot( sqrt( discriminantValue ) );
-            double
-            crossingAuxiliary( ( -0.5 * ( firstDerivatives[ segmentIndex ]
-                                          + discriminantRoot ) )
-                               / ( halfSecondDerivatives[ segmentIndex ] ) );
-            // We take the lower value for crossing to lower potential first,
-            // but switch to the upper value if the lower value is negative
-            // (and thus outside the segment).
-            if( crossingAuxiliary < 0.0 )
-            {
-              crossingAuxiliary += ( discriminantRoot
-                                 / ( halfSecondDerivatives[ segmentIndex ] ) );
-            }
-            // Then we check that crossingAuxiliary is within the segment.
-            if( ( crossingAuxiliary >= 0.0 )
-                &&
-                ( crossingAuxiliary < auxiliaryValues[ segmentIndex ] ) )
-            {
-              definiteUndershootAuxiliary
-              = ( auxiliaryUpToCurrentSegment + crossingAuxiliary );
-              definiteUndershootFound = true;
-            }
-          }
-        }
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "after checking, definiteUndershootFound = "
-        << definiteUndershootFound << ", definiteUndershootAuxiliary = "
-        << definiteUndershootAuxiliary;
-        std::cout << std::endl;*/
-      }
-      // End of checking for crossing the line where the potential equals its
-      // value at the false vacuum.
-
-      // Now we check to see if we are looking for the 1st minimum after the
-      // definite undershoot point.
-      if( definiteUndershootFound
-          &&
-          !definiteOvershootFound )
-      {
-        double const
-        extremumAuxiliary( ( -0.5 * firstDerivatives[ segmentIndex ] )
-                           / ( halfSecondDerivatives[ segmentIndex ] ) );
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "definiteUndershootFound = " << definiteUndershootFound
-        << ", definiteOvershootFound = " << definiteOvershootFound
-        << ", extremumAuxiliary = " << extremumAuxiliary
-        << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary;
-        std::cout << std::endl;*/
-        if( ( extremumAuxiliary > std::max( 0.0,
-                                            ( definiteUndershootAuxiliary
-                                            - auxiliaryUpToCurrentSegment ) ) )
-            &&
-            ( extremumAuxiliary < auxiliaryValues[ segmentIndex ] ) )
-        {
-          // If we find a minimum in a normal segment after having crossed to
-          // deeper than the false vacuum (since the spline segments are only
-          // quadratic, crossing the depth means that the slope is negative
-          // and within any segment that starts with a negative slope, if there
-          // is an extremum, it is a minimum; the slope also cannot turn
-          // positive without having gone through a minimum), we set it up to
-          // be the implicit final segment, purely as
-          // finalPotential
-          // + (definiteOvershootAuxiliary-p)^2 * halfFinalSecondDerivative
-          // (no cubic term, and the linear term is absorbed by the shift of
-          // the end of the segment to the minimum), and then remove this
-          // normal segment and all those after it, and ends the function.
-          definiteOvershootAuxiliary
-          = ( auxiliaryUpToCurrentSegment + extremumAuxiliary );
-          definiteOvershootFound = true;
-          finalPotential = ( potentialValues[ segmentIndex ]
-                             + ( firstDerivatives[ segmentIndex ]
-                                 * extremumAuxiliary )
-                             + ( halfSecondDerivatives[ segmentIndex ]
-                                 * extremumAuxiliary * extremumAuxiliary ) );
-          halfFinalSecondDerivative = halfSecondDerivatives[ segmentIndex ];
-          finalCubicCoefficient = 0.0;
-          auxiliaryValues.resize( segmentIndex );
-          potentialValues.resize( segmentIndex );
-          firstDerivatives.resize( segmentIndex );
-          halfSecondDerivatives.resize( segmentIndex );
-          startOfFinalSegment = auxiliaryUpToCurrentSegment;
-          sizeOfFinalSegment = extremumAuxiliary;
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "found early path panic minimum in segment " << segmentIndex
-          << ", startOfFinalSegment = " << startOfFinalSegment
-          << ", sizeOfFinalSegment = " << sizeOfFinalSegment
-          << ", definiteUndershootFound = " << definiteUndershootFound
-          << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
-          << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary;
-          std::cout << std::endl;*/
-          return;
-        }
-      }
-
-      // Now we note the auxiliary value that starts the next segment.
-      auxiliaryUpToCurrentSegment += auxiliaryValues[ segmentIndex ];
-    }
-    startOfFinalSegment = auxiliaryUpToCurrentSegment;
-
-    if( !definiteUndershootFound )
-    {
-      // If the potential hasn't dropped below the value of the false potential
-      // in the other segments, we'll just leave the definite undershoot
-      // auxiliary value as the start of the final segment.
-      definiteUndershootAuxiliary = auxiliaryUpToCurrentSegment;
-    }
-
-    // If we get to here, there is only 1 deeper-than-false-vacuum minimum and
-    // it is in the implicit final segment. The last element of potentialValues
-    // is already the value of the potential at the end of the last normal
-    // segment, but firstDerivatives.back() is only the slope at the start of
-    // the last normal segment, so the second derivative must be added,
-    // multiplied by the last element of auxiliaryValues.
-    sizeOfFinalSegment = ( 1.0 - auxiliaryUpToCurrentSegment );
-    double const finalPotentialDrop( potentialValues.back() - finalPotential );
-    double const finalStartSlope( firstDerivatives.back()
-                                  + ( 2.0 * halfSecondDerivatives.back()
-                                          * auxiliaryValues.back() ) );
-    // If the slope at the start of the final segment is steep enough that a
-    // quadratic spline would have a path panic minimum before p = 1.0, we keep
-    // it and just end the spline at that minimum (no cubic term, and the
-    // linear term is absorbed by the shift of the end of the segment to the
-    // minimum). This is definitely the case if finalPotentialDrop is negative
-    // or small enough compared to -finalStartSlope (finalStartSlope must be
-    // negative or we would have already found an early path potential
-    // minimum).
-    if( ( 2.0 * finalPotentialDrop )
-        + ( finalStartSlope * sizeOfFinalSegment ) <= 0.0 )
-    {
-      finalCubicCoefficient = 0.0;
-      halfFinalSecondDerivative
-      = ( -( finalPotentialDrop + ( finalStartSlope * sizeOfFinalSegment ) )
-          / ( sizeOfFinalSegment * sizeOfFinalSegment ) );
-      double const
-      offsetOfMinimumFromOne( 0.5 * ( sizeOfFinalSegment
-                                      - ( finalPotentialDrop
-                                          / ( halfFinalSecondDerivative
-                                              * sizeOfFinalSegment ) ) ) );
-      definiteOvershootAuxiliary = ( 1.0 - offsetOfMinimumFromOne );
-      sizeOfFinalSegment -= offsetOfMinimumFromOne;
-      finalPotential = ( potentialValues.back()
-                         - ( halfFinalSecondDerivative * sizeOfFinalSegment
-                                                      * sizeOfFinalSegment ) );
-    }
-    else
-    {
-      halfFinalSecondDerivative = ( ( 3.0 * finalPotentialDrop )
-                                  + ( finalStartSlope * sizeOfFinalSegment ) );
-      finalCubicCoefficient
-      = ( ( halfFinalSecondDerivative - finalPotentialDrop )
-          / ( sizeOfFinalSegment * sizeOfFinalSegment * sizeOfFinalSegment ) );
-      halfFinalSecondDerivative = ( halfFinalSecondDerivative
-                               / ( sizeOfFinalSegment * sizeOfFinalSegment ) );
-      definiteOvershootAuxiliary = 1.0;
-    }
+    size_t const auxiliarySteps( auxiliaryValue * inverseOfAuxiliaryStep );
+    double const auxiliaryDifference( auxiliaryValue
+                                      - ( auxiliarySteps * auxiliaryStep ) );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
     << std::endl
-    << "Implicit final segment:" << std::endl
-    << "startOfFinalSegment = " << startOfFinalSegment
-    << ", sizeOfFinalSegment = " << sizeOfFinalSegment
-    << ", finalPotential = " << finalPotential
-    << ", halfFinalSecondDerivative = " << halfFinalSecondDerivative
-    << ", finalCubicCoefficient = " << finalCubicCoefficient
-    << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
-    << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary;
+    << "SplinePotential::operator()( auxiliaryValue = " << auxiliaryValue
+    << " ) called. auxiliarySteps = " << auxiliarySteps
+    << ", auxiliaryDifference = " << auxiliaryDifference
+    << ", potentialValues[ " << ( auxiliarySteps - 1 ) << " ] = "
+    << potentialValues[ auxiliarySteps - 1 ]
+    << ", firstDerivatives[ " << ( auxiliarySteps - 1 ) << " ] = "
+    << firstDerivatives[ auxiliarySteps - 1 ];
     std::cout << std::endl;*/
+
+    return ( potentialValues[ auxiliarySteps - 1 ]
+          + ( auxiliaryDifference * firstDerivatives[ auxiliarySteps - 1 ] ) );
   }
 
   // This is for debugging.
   std::string SplinePotential::AsDebuggingString() const
   {
+    BOL::StringParser doubleFormatter( 6,
+                                       ' ',
+                                       8,
+                                       2,
+                                       "",
+                                       "-",
+                                       "",
+                                       "-",
+                                       "*10^");
     std::stringstream returnStream;
-    double cumulativeAuxiliary( 0.0 );
+    returnStream << "energyBarrierResolved = " << energyBarrierResolved
+    << ", trueVacuumLowerThanPathFalseMinimum = "
+    << trueVacuumLowerThanPathFalseMinimum
+    << ", numberOfNormalSegments = " << numberOfNormalSegments
+    << ", firstSegmentQuadratic = " << firstSegmentQuadratic
+    << ", finalPotential = " << finalPotential
+    << ", lastSegmentQuadratic = " << lastSegmentQuadratic
+    << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
+    << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary
+    << ", startOfFinalSegment = " << startOfFinalSegment
+    << ", potential = ( UnitStep[x] * ( "
+    << doubleFormatter.doubleToString( firstSegmentQuadratic )
+    << " * x^(2) ) * UnitStep["
+    << doubleFormatter.doubleToString( auxiliaryStep ) << " - x]";
+    double cumulativeAuxiliary( auxiliaryStep );
     for( size_t segmentIndex( 0 );
-         segmentIndex < auxiliaryValues.size();
+         segmentIndex < numberOfNormalSegments;
          ++segmentIndex )
     {
-      if( segmentIndex > 0 )
-      {
-        returnStream << " + ";
-      }
-      returnStream
-      << "UnitStep[x - " << cumulativeAuxiliary << "] * ( ("
-      << potentialValues[ segmentIndex ] << ") + (x-(" << cumulativeAuxiliary
-      << ")) * (" << firstDerivatives[ segmentIndex ] << ") + (x-("
-      << cumulativeAuxiliary << "))^2 * ("
-      << halfSecondDerivatives[ segmentIndex ] << ") ) * UnitStep[";
-      cumulativeAuxiliary += auxiliaryValues[ segmentIndex ];
-      returnStream << cumulativeAuxiliary << " - x]" << std::endl;
+      returnStream << " + "
+      << "UnitStep[x - "
+      << doubleFormatter.doubleToString( cumulativeAuxiliary )
+      << "] * ( ("
+      << doubleFormatter.doubleToString( potentialValues[ segmentIndex ] )
+      << ") + (x-("
+      << doubleFormatter.doubleToString( cumulativeAuxiliary )
+      << ")) * ("
+      << doubleFormatter.doubleToString( firstDerivatives[ segmentIndex ] )
+      << ") ) * UnitStep[";
+      cumulativeAuxiliary += auxiliaryStep;
+      returnStream << doubleFormatter.doubleToString( cumulativeAuxiliary )
+      << " - x]";
     }
     returnStream
-    << " + UnitStep[x - " << cumulativeAuxiliary << "] * ( (" << finalPotential
+    << " + UnitStep[x - "
+    << doubleFormatter.doubleToString( cumulativeAuxiliary ) << "] * ( ("
+    << doubleFormatter.doubleToString( finalPotential )
     << ") + (x-" << definiteOvershootAuxiliary << ")^2 * ("
-    << halfFinalSecondDerivative << ") + (x-" << definiteOvershootAuxiliary
-    << ")^3 * (" << finalCubicCoefficient << ") ) * UnitStep["
-    << definiteOvershootAuxiliary << " - x]";
+    << doubleFormatter.doubleToString( lastSegmentQuadratic )
+    << ") ) * UnitStep["
+    << doubleFormatter.doubleToString( definiteOvershootAuxiliary )
+    << " - x] )" << std::endl;
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "preparing points for Mathematica.";
+    returnStream << "Mathematica points = { ";
+    for( size_t sampleIndex( 0 );
+         sampleIndex <= ( 3 * ( numberOfNormalSegments + 2 ) );
+         ++sampleIndex )
+    {
+      if( sampleIndex > 0 )
+      {
+        returnStream << ", ";
+      }
+      double const sampleAuxiliary( ( sampleIndex * auxiliaryStep ) / 3.0 );
+      returnStream << "{ " << sampleAuxiliary << ", "
+      << (*this)( sampleAuxiliary ) << " }";
+    }
+    returnStream << " }" << std::endl;
+    std::cout << std::endl;*/
+
     return returnStream.str();
   }
 
