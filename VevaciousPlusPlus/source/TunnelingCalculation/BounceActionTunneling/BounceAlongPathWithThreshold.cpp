@@ -67,10 +67,14 @@ namespace VevaciousPlusPlus
       thermalFalseVacuum = thermalPotentialMinimizer(
                                             falseVacuum.FieldConfiguration() );
     }
+    double const thresholdDecayWidth( -log( survivalProbabilityThreshold )
+                 / ( temperatureStep * exp( lnOfThermalIntegrationFactor ) ) );
+    double actionThreshold( -currentTemperature
+      * log( currentTemperature * currentTemperature * thresholdDecayWidth ) );
     double bounceOverTemperature( BoundedBounceAction( thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
                                                        currentTemperature,
-                                                 lnOfThermalIntegrationFactor )
+                                                       actionThreshold )
                                   / currentTemperature );
     if( bounceOverTemperature < maximumPowerOfNaturalExponent )
     {
@@ -80,8 +84,6 @@ namespace VevaciousPlusPlus
 
     double smallestExponent( bounceOverTemperature );
     dominantTemperatureInGigaElectronVolts = 0.0;
-    double const thresholdDecayWidth( -log( survivalProbabilityThreshold )
-                 / ( temperatureStep * exp( lnOfThermalIntegrationFactor ) ) );
 
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -122,8 +124,8 @@ namespace VevaciousPlusPlus
       // the contribution to survivalExponent could make survivalExponent >
       // thresholdDecayWidth, which would mean that the survival probability is
       // definitely lower than survivalProbabilityThreshold.
-      double const actionThreshold( -currentTemperature
-                       * log( currentTemperature * currentTemperature
+      actionThreshold = ( -currentTemperature
+                          * log( currentTemperature * currentTemperature
                              * ( thresholdDecayWidth - partialDecayWidth ) ) );
       bounceOverTemperature = ( BoundedBounceAction( thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
@@ -191,14 +193,10 @@ namespace VevaciousPlusPlus
     {
       std::cout << " GeV";
     }
-    std::cout << ", threshold is ";
+    std::cout << ", threshold is " << actionThreshold;
     if( bestPath->NonZeroTemperature() )
     {
-      std::cout  << ( actionThreshold * tunnelingTemperature ) << " GeV";
-    }
-    else
-    {
-      std::cout  << actionThreshold;
+      std::cout << " GeV";
     }
     std::cout << ".";
     std::cout << std::endl;
@@ -255,14 +253,10 @@ namespace VevaciousPlusPlus
       {
         std::cout << " GeV";
       }
-      std::cout << ", threshold is ";
+      std::cout << ", threshold is " << actionThreshold;
       if( currentPath->NonZeroTemperature() )
       {
-        std::cout  << ( actionThreshold * tunnelingTemperature ) << " GeV";
-      }
-      else
-      {
-        std::cout  << actionThreshold;
+        std::cout << " GeV";
       }
       std::cout << ".";
       std::cout << std::endl;
@@ -285,14 +279,10 @@ namespace VevaciousPlusPlus
     {
       std::cout << " GeV";
     }
-    std::cout << ", threshold is ";
+    std::cout << ", threshold is " << actionThreshold;
     if( bestPath->NonZeroTemperature() )
     {
-      std::cout  << ( actionThreshold * tunnelingTemperature ) << " GeV";
-    }
-    else
-    {
-      std::cout  << actionThreshold;
+      std::cout << " GeV";
     }
     std::cout << ".";
     std::cout << std::endl;

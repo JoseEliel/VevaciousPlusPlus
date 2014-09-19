@@ -48,11 +48,11 @@ namespace VevaciousPlusPlus
                                             numberOfPotentialSegments );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "potentialApproximation =" << std::endl;
     std::cout << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     if( !(potentialApproximation.EnergyBarrierResolved()) )
     {

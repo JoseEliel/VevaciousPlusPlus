@@ -182,23 +182,6 @@ namespace VevaciousPlusPlus
     else
     {
       thermalPotentialMinimizer.SetTemperature( temperatureGuess );
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl;
-      MinuitMinimum thermalMinimum( thermalPotentialMinimizer(
-                                zeroTemperatureVacuum.FieldConfiguration() ) );
-      std::cout << "thermalMinimum =" << std::endl;
-      std::cout << thermalMinimum.AsDebuggingString() << std::endl;
-      std::cout << "thermalPotentialMinimizer.FunctionOffset() = "
-      << thermalPotentialMinimizer.FunctionOffset() << std::endl;
-      std::cout << "thermalPotentialAtOrigin = " << thermalPotentialAtOrigin
-      << std::endl;
-      std::cout << std::endl;
-      return ( ( thermalMinimum.FunctionValue()
-                 + thermalPotentialMinimizer.FunctionOffset() )
-               < thermalPotentialAtOrigin );/**/
-
       return ( ( thermalPotentialMinimizer(
                    zeroTemperatureVacuum.FieldConfiguration() ).FunctionValue()
                  + thermalPotentialMinimizer.FunctionOffset() )

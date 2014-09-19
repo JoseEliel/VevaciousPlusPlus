@@ -180,11 +180,13 @@ namespace VevaciousPlusPlus
     resultStream >> calculatedAction;
     resultStream.close();
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Action calculated by CosmoTransitions = " << calculatedAction;
-    std::cout << std::endl;/**/
+    std::cout << std::endl << "CosmoTransitions calculated an action of "
+    << calculatedAction;
+    if( tunnelingTemperature > 0.0 )
+    {
+      std::cout << " GeV";
+    }
+    std::cout << "." << std::endl;
 
     return calculatedAction;
   }
