@@ -29,6 +29,8 @@ namespace VevaciousPlusPlus
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinimizingPotentialOnHypersurfaces();
 
+    needs number of uphill improvements!
+
 
     // This sets the vacua to be those given, and resets the nodes to describe
     // a straight path between the new vacua, as well as setting

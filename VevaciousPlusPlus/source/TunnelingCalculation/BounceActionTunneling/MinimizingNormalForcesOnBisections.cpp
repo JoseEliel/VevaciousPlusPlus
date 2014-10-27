@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/TunnelingCalculation/BounceActionTunneling/MinimizingNormalForcesOnBisections.hpp"
+#include "TunnelingCalculation/BounceActionTunneling/MinimizingNormalForcesOnBisections.hpp"
 
 namespace VevaciousPlusPlus
 {
