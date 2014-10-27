@@ -33,10 +33,9 @@ namespace VevaciousPlusPlus
     // This sets the vacua to be those given, and resets the nodes to describe
     // a straight path between the new vacua, as well as setting
     // pathTemperature and currentMinuitTolerance appropriately.
-    virtual TunnelPath const*
-    SetInitialPath( PotentialMinimum const& falseVacuum,
-                    PotentialMinimum const& trueVacuum,
-                    double const pathTemperature = 0.0 );
+    virtual void SetVacuaAndTemperature( PotentialMinimum const& falseVacuum,
+                                         PotentialMinimum const& trueVacuum,
+                                         double const pathTemperature = 0.0 );
 
     // This allows Minuit2 to adjust the full path a set number of times to try
     // to minimize the sum of potentials at a set of nodes or bounce action
@@ -117,7 +116,7 @@ namespace VevaciousPlusPlus
   // This sets the vacua to be those given, and resets the nodes to describe a
   // straight path between the new vacua, as well as setting pathTemperature
   // and currentMinuitTolerance appropriately.
-  inline TunnelPath const* MinimizingPotentialOnHypersurfaces::SetInitialPath(
+  inline void MinimizingPotentialOnHypersurfaces::SetVacuaAndTemperature(
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                                  double const pathTemperature )
@@ -132,12 +131,6 @@ namespace VevaciousPlusPlus
     }
     SetCurrentMinuitTolerance( falseVacuum,
                                trueVacuum );
-    std::vector< std::vector< double > > straightPath( 2,
-                                            falseVacuum.FieldConfiguration() );
-    straightPath.back() = trueVacuum.FieldConfiguration();
-    return new LinearSplineThroughNodes( straightPath,
-                                         std::vector< double >( 0 ),
-                                         pathTemperature );
   }
 
   // This takes the numberOfFields-1-dimensional vector and prepends a 0 to

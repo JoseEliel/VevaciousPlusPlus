@@ -28,10 +28,9 @@ namespace VevaciousPlusPlus
     // C++11-compliant compiler, this function would return a
     // unique_ptr< TunnelPath >). It should also reset
     // pathCanBeImproved and set pathTemperature appropriately.
-    virtual TunnelPath const*
-    SetInitialPath( PotentialMinimum const& falseVacuum,
-                    PotentialMinimum const& trueVacuum,
-                    double const pathTemperature = 0.0 ) = 0;
+    virtual void SetVacuaAndTemperature( PotentialMinimum const& falseVacuum,
+                                         PotentialMinimum const& trueVacuum,
+                                      double const pathTemperature = 0.0 ) = 0;
 
     // This returns true if the last reset or path improvement did not meet
     // the criterion the derived class has that the path cannot be improved any

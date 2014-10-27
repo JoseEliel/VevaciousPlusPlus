@@ -12,7 +12,7 @@ namespace VevaciousPlusPlus
 
   BounceAlongPathWithThreshold::BounceAlongPathWithThreshold(
                                           PotentialFunction& potentialFunction,
-                                            BouncePathFinder* const pathFinder,
+                           std::vector< BouncePathFinder* > const& pathFinders,
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
@@ -22,7 +22,7 @@ namespace VevaciousPlusPlus
                           tunnelingStrategy,
                           survivalProbabilityThreshold,
                           temperatureAccuracy ),
-    pathFinder( pathFinder ),
+    pathFinders( pathFinders ),
     actionCalculator( actionCalculator ),
     thermalIntegrationResolution( thermalIntegrationResolution )
   {
@@ -32,7 +32,13 @@ namespace VevaciousPlusPlus
   BounceAlongPathWithThreshold::~BounceAlongPathWithThreshold()
   {
     delete actionCalculator;
-    delete pathFinder;
+
+    for( size_t deletionIndex( 0 );
+         deletionIndex < pathFinders.size();
+         ++deletionIndex )
+    {
+      delete pathFinders[ deletionIndex ];
+    }
   }
 
 
@@ -177,12 +183,16 @@ namespace VevaciousPlusPlus
                                              double const tunnelingTemperature,
                                            double const actionThreshold ) const
   {
+    std::vector< std::vector< double > > straightPath( 2,
+                                            falseVacuum.FieldConfiguration() );
+    straightPath.back() = trueVacuum.FieldConfiguration();
+    TunnelPath const* bestPath( new LinearSplineThroughNodes( straightPath,
+                                                    std::vector< double >( 0 ),
+                                                      tunnelingTemperature ) );
+
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
-    TunnelPath const* bestPath( pathFinder->SetInitialPath( falseVacuum,
-                                                            trueVacuum,
-                                                      tunnelingTemperature ) );
     double bestBounceAction( (*actionCalculator)( *bestPath ) );
     double currentBounceAction( bestBounceAction );
     double lastBounceAction( 2.0 * currentBounceAction );
@@ -218,50 +228,58 @@ namespace VevaciousPlusPlus
                                                fieldColors,
                                                straightPathPicture );*/
 
-    while( ( bestBounceAction > actionThreshold )
-           &&
-           pathFinder->PathCanBeImproved() )
+    for( std::vector< BouncePathFinder* >::iterator
+         pathFinder( pathFinders.begin() );
+         pathFinder < pathFinders.end();
+         ++pathFinder )
     {
-      TunnelPath const* currentPath( pathFinder->TryToImprovePath(
+      pathFinder->SetVacuaAndTemperature( falseVacuum,
+                                          trueVacuum,
+                                          tunnelingTemperature );
+      while( ( bestBounceAction > actionThreshold )
+             &&
+             pathFinder->PathCanBeImproved() )
+      {
+        TunnelPath const* currentPath( pathFinder->TryToImprovePath(
                                     currentBounceAction < lastBounceAction ) );
-      if( currentPath == NULL )
-      {
-        break;
-      }
-      lastBounceAction = currentBounceAction;
-      currentBounceAction = (*actionCalculator)( *currentPath );
+        if( currentPath == NULL )
+        {
+          break;
+        }
+        lastBounceAction = currentBounceAction;
+        currentBounceAction = (*actionCalculator)( *currentPath );
 
-      if( currentBounceAction < bestBounceAction )
-      {
-        bestBounceAction = currentBounceAction;
-        delete bestPath;
-        bestPath = currentPath;
-      }
-      else
-      {
-        delete currentPath;
-      }
+        if( currentBounceAction < bestBounceAction )
+        {
+          bestBounceAction = currentBounceAction;
+          delete bestPath;
+          bestPath = currentPath;
+        }
+        else
+        {
+          delete currentPath;
+        }
 
-      std::cout << std::endl
-      << "Improved path bounce action = " << currentBounceAction;
-      if( currentPath->NonZeroTemperature() )
-      {
-        std::cout << " GeV";
+        std::cout << std::endl
+        << "Improved path bounce action = " << currentBounceAction;
+        if( currentPath->NonZeroTemperature() )
+        {
+          std::cout << " GeV";
+        }
+        std::cout << ", lowest bounce action so far = " << bestBounceAction;
+        if( currentPath->NonZeroTemperature() )
+        {
+          std::cout << " GeV";
+        }
+        std::cout << ", threshold is " << actionThreshold;
+        if( currentPath->NonZeroTemperature() )
+        {
+          std::cout << " GeV";
+        }
+        std::cout << ".";
+        std::cout << std::endl;
       }
-      std::cout << ", lowest bounce action so far = " << bestBounceAction;
-      if( currentPath->NonZeroTemperature() )
-      {
-        std::cout << " GeV";
-      }
-      std::cout << ", threshold is " << actionThreshold;
-      if( currentPath->NonZeroTemperature() )
-      {
-        std::cout << " GeV";
-      }
-      std::cout << ".";
-      std::cout << std::endl;
     }
-
     // debugging:
     /*std::string finalPathPicture( "FinalBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
