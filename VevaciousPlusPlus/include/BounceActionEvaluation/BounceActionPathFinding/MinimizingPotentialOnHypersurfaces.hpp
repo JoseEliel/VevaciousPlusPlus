@@ -31,6 +31,8 @@ namespace VevaciousPlusPlus
 
     needs number of uphill improvements!
 
+    re-use scaled to max angle from hemispheres path
+
 
     // This sets the vacua to be those given, and resets the nodes to describe
     // a straight path between the new vacua, as well as setting
