@@ -5,10 +5,11 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "TunnelingCalculation/BounceActionTunneling/MinimizingNormalForcesOnBisections.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinimizingNormalForcesOnBisections.hpp"
 
 namespace VevaciousPlusPlus
 {
+  REMEMBER TO ADD THIS TO THE MAKEFILE!
 
   MinimizingNormalForcesOnBisections::MinimizingNormalForcesOnBisections()
   {
