@@ -194,12 +194,9 @@ namespace VevaciousPlusPlus
                                   trueVacuum,
                                   tunnelingTemperature );
     BubbleProfile* bestBubble( (*actionCalculator)( *bestPath ) );
-    double bestBounceAction( bestBubble->BounceAction() );
-    double currentBounceAction( bestBounceAction );
-    double lastBounceAction( 2.0 * currentBounceAction );
 
     std::cout << std::endl
-    << "Initial path bounce action = " << currentBounceAction;
+    << "Initial path bounce action = " << bestBubble->BounceAction();
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
@@ -237,41 +234,63 @@ namespace VevaciousPlusPlus
       (*pathFinder)->SetVacuaAndTemperature( falseVacuum,
                                              trueVacuum,
                                              tunnelingTemperature );
-      TunnelPath const* currentPath( bestPath );
+      TunnelPath* currentPath( bestPath );
       BubbleProfile* currentBubble( bestBubble );
-      TunnelPath const* nextPath( NULL );
-      while( ( bestBounceAction > actionThreshold )
-             &&
-             (*pathFinder)->PathCanBeImproved() )
-      {
-        nextPath = (*pathFinder)->TryToImprovePath( currentPath,
-                                                    currentBubble );
-        if( nextPath == NULL )
-        {
-          break;
-        }
-        BubbleProfile* currentBubble( (*actionCalculator)( *currentPath ) );
-        lastBounceAction = currentBounceAction;
-        currentBounceAction = currentBubble->BounceAction();
 
-        if( currentBounceAction < bestBounceAction )
+      // Keeping track of a best path and bubble separately from the last-used
+      // path and bubble without copying any instances requires a bit of
+      // book-keeping. These two pointers get set to NULL if the current path
+      // and bubble happen to also be the best ones so far, so they can be
+      // deleted without problem, otherwise they delete the current path and
+      // bubble once they have been used to create the next path and bubble.
+      TunnelPath* currentPathDeleter( NULL );
+      BubbleProfile* currentBubbleDeleter( NULL );
+
+      while( ( bestBubble->BounceAction() > actionThreshold )
+             &&
+             (*pathFinder)->PathCanBeImproved( currentBubble ) )
+      {
+        // The nextPath and nextBubble pointers are not strictly necessary,
+        // but they make the logic of the code clearer and will probably be
+        // optimized away by the compiler anyway.
+        TunnelPath* nextPath( (*pathFinder)->TryToImprovePath( currentPath,
+                                                             currentBubble ) );
+        BubbleProfile* nextBubble( (*actionCalculator)( *nextPath ) );
+        delete currentBubbleDeleter;
+        delete currentPathDeleter;
+
+        if( nextBubble->BounceAction() < bestBubble->BounceAction() )
         {
-          bestBounceAction = currentBounceAction;
+          delete bestBubble;
+          bestBubble = nextBubble;
+          currentBubble = nextBubble;
+          currentBubbleDeleter = NULL;
           delete bestPath;
-          bestPath = currentPath;
+          bestPath = nextPath;
+          currentPath = nextPath;
+          currentPathDeleter = NULL;
         }
         else
         {
-          delete currentPath;
+          currentBubble = nextBubble;
+          currentPath = nextPath;
+
+          // If nextBubble wasn't an improvement on bestBubble, it and nextPath
+          // will be deleted after being used to generate the nextPath and
+          // nextBubble of the next iteration of the loop (or after the loop if
+          // this ends up being the last iteration) through these pointers.
+          currentBubbleDeleter = nextBubble;
+          currentPathDeleter = nextPath;
         }
 
         std::cout << std::endl
-        << "Improved path bounce action = " << currentBounceAction;
+        << "Improved path bounce action = " << currentBubble->BounceAction();
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
         }
-        std::cout << ", lowest bounce action so far = " << bestBounceAction;
+        std::cout << ", lowest bounce action so far = "
+        << bestBubble->BounceAction();
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
@@ -284,6 +303,12 @@ namespace VevaciousPlusPlus
         std::cout << ".";
         std::cout << std::endl;
       }
+      // At the end of the loop, these either point at the last tried path and
+      // bubble which did not end up as the best ones, so they should be
+      // deleted, or they are NULL (because the last tried path and bubble
+      // happened to be the best ones), so deleting them is no problem.
+      delete currentBubbleDeleter;
+      delete currentPathDeleter;
     }
     // debugging:
     /*std::string finalPathPicture( "FinalBubbleProfile.eps" );
@@ -297,7 +322,7 @@ namespace VevaciousPlusPlus
 
     std::cout << std::endl
     << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
-    << bestBounceAction;
+    << bestBubble->BounceAction();
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
@@ -310,9 +335,9 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
-    delete bestPath;
     delete bestBubble;
-    return bestBounceAction;
+    delete bestPath;
+    return bestBubble->BounceAction();
   }
 
 } /* namespace VevaciousPlusPlus */

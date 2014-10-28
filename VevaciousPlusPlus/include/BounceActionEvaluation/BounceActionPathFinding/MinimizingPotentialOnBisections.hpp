@@ -9,6 +9,7 @@
 #define MINIMIZINGPOTENTIALONBISECTIONS_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Eigen/Dense"
 #include "MinimizingPotentialOnHypersurfaces.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"
 
