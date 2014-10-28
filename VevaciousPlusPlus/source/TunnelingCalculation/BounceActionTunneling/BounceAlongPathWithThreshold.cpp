@@ -193,7 +193,8 @@ namespace VevaciousPlusPlus
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
-    double bestBounceAction( (*actionCalculator)( *bestPath ) );
+    BubbleProfile* bestBubble( (*actionCalculator)( *bestPath ) );
+    double bestBounceAction( bestBubble->BounceAction() );
     double currentBounceAction( bestBounceAction );
     double lastBounceAction( 2.0 * currentBounceAction );
 
@@ -234,20 +235,24 @@ namespace VevaciousPlusPlus
          ++pathFinder )
     {
       (*pathFinder)->SetVacuaAndTemperature( falseVacuum,
-                                          trueVacuum,
-                                          tunnelingTemperature );
+                                             trueVacuum,
+                                             tunnelingTemperature );
+      TunnelPath const* currentPath( bestPath );
+      BubbleProfile* currentBubble( bestBubble );
+      TunnelPath const* nextPath( NULL );
       while( ( bestBounceAction > actionThreshold )
              &&
              (*pathFinder)->PathCanBeImproved() )
       {
-        TunnelPath const* currentPath( (*pathFinder)->TryToImprovePath(
-                                    currentBounceAction < lastBounceAction ) );
-        if( currentPath == NULL )
+        nextPath = (*pathFinder)->TryToImprovePath( currentPath,
+                                                    currentBubble );
+        if( nextPath == NULL )
         {
           break;
         }
+        BubbleProfile* currentBubble( (*actionCalculator)( *currentPath ) );
         lastBounceAction = currentBounceAction;
-        currentBounceAction = (*actionCalculator)( *currentPath );
+        currentBounceAction = currentBubble->BounceAction();
 
         if( currentBounceAction < bestBounceAction )
         {
@@ -306,6 +311,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     delete bestPath;
+    delete bestBubble;
     return bestBounceAction;
   }
 
