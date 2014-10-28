@@ -33,14 +33,14 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This sets up the bubble profile, numerically integrates the bounce
-  // action over it, and then returns the bounce action along the path given
-  // by tunnelPath. Either S_4, the dimensionless quantum bounce action
-  // integrated over four dimensions, or S_3(T), the dimensionful (in GeV)
-  // thermal bounce action integrated over three dimensions at temperature T,
-  // should be returned: S_3(T) if the temperature T given by tunnelPath is
-  // greater than 0.0, S_4 otherwise.
-  double
+  // This sets up the bubble profile, numerically integrates the bounce action
+  // over it, and then returns the bubble profile with calculated bounce action
+  // along the path given by tunnelPath. Either S_4, the dimensionless quantum
+  // bounce action integrated over four dimensions, or S_3(T), the dimensionful
+  // (in GeV) thermal bounce action integrated over three dimensions at
+  // temperature T, is calculated: S_3(T) if the temperature T given by
+  // tunnelPath is greater than 0.0, S_4 otherwise.
+  BubbleProfile*
   BubbleShootingOnSpline::operator()( TunnelPath const& tunnelPath ) const
   {
     SplinePotential potentialApproximation( potentialFunction,
@@ -73,13 +73,13 @@ namespace VevaciousPlusPlus
     }
 
     bool const nonZeroTemperature( tunnelPath.NonZeroTemperature() );
-    BubbleProfile bubbleProfile( potentialApproximation,
-                                 tunnelPath,
-                                 radialStepSize,
-                                 estimatedRadialMaximum );
+    BubbleProfile* bubbleProfile( new BubbleProfile( potentialApproximation,
+                                                     tunnelPath,
+                                                     radialStepSize,
+                                                    estimatedRadialMaximum ) );
     std::vector< BubbleRadialValueDescription > const&
-    auxiliaryProfile( bubbleProfile( shootAttempts,
-                                     auxiliaryThreshold ) );
+    auxiliaryProfile( (*bubbleProfile)( shootAttempts,
+                                        auxiliaryThreshold ) );
 
     // We have a set of radial values r_i, path auxiliary values p(r_i), and
     // slopes dp/dr|_{r=r_i}, and can easily evaluate a set of "bounce action
@@ -139,7 +139,7 @@ namespace VevaciousPlusPlus
     double
     bounceAction( ( currentVolume
                     * potentialApproximation(
-                                    bubbleProfile.AuxiliaryAtBubbleCenter() ) )
+                                   bubbleProfile->AuxiliaryAtBubbleCenter() ) )
                   + ( nextVolume
                       * ( BounceActionDensity( potentialApproximation,
                                                tunnelPath,
@@ -150,9 +150,9 @@ namespace VevaciousPlusPlus
     << std::endl
     << "Before loop: currentRadius = " << currentRadius << ", currentVolume = "
     << currentVolume << ", nextRadius = " << nextRadius << ", nextVolume = "
-    << nextVolume << ", p(0) = " << bubbleProfile.AuxiliaryAtBubbleCenter()
+    << nextVolume << ", p(0) = " << bubbleProfile->AuxiliaryAtBubbleCenter()
     << ", B_{-1} = "
-    << potentialApproximation( bubbleProfile.AuxiliaryAtBubbleCenter() )
+    << potentialApproximation( bubbleProfile->AuxiliaryAtBubbleCenter() )
     << ", B_{0} = " << BounceActionDensity( potentialApproximation,
                                             tunnelPath,
                                             auxiliaryProfile.front() )
@@ -342,13 +342,17 @@ namespace VevaciousPlusPlus
     // 2 pi^2 (quantum) or 4 pi (thermal):
     if( nonZeroTemperature )
     {
-      return ( bounceAction * 2.0 * boost::math::double_constants::pi );
+      bubbleProfile->SetBounceAction( bounceAction
+                                      * 2.0
+                                      * boost::math::double_constants::pi );
     }
     else
     {
-      return ( bounceAction * boost::math::double_constants::pi
-                            * boost::math::double_constants::pi );
+      bubbleProfile->SetBounceAction( bounceAction
+                                      * boost::math::double_constants::pi
+                                      * boost::math::double_constants::pi );
     }
+    return bubbleProfile;
   }
 
   // This plots the fields as functions of the bubble radial value in a file

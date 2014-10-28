@@ -49,8 +49,9 @@ namespace VevaciousPlusPlus
     // the last call managed to lower the bounce action or not is given by
     // lastImprovementWorked, which might be used to decide whether to change
     // path improvement strategy internally in derived classes.
-    virtual TunnelPath const*
-    TryToImprovePath( bool const lastImprovementWorked = true ) = 0;
+    virtual TunnelPath const* TryToImprovePath( TunnelPath const& currentPath,
+                                              double const currentBounceAction,
+                                       double const previousBounceAction ) = 0;
 
 
   protected:

@@ -233,14 +233,14 @@ namespace VevaciousPlusPlus
          pathFinder < pathFinders.end();
          ++pathFinder )
     {
-      pathFinder->SetVacuaAndTemperature( falseVacuum,
+      (*pathFinder)->SetVacuaAndTemperature( falseVacuum,
                                           trueVacuum,
                                           tunnelingTemperature );
       while( ( bestBounceAction > actionThreshold )
              &&
-             pathFinder->PathCanBeImproved() )
+             (*pathFinder)->PathCanBeImproved() )
       {
-        TunnelPath const* currentPath( pathFinder->TryToImprovePath(
+        TunnelPath const* currentPath( (*pathFinder)->TryToImprovePath(
                                     currentBounceAction < lastBounceAction ) );
         if( currentPath == NULL )
         {

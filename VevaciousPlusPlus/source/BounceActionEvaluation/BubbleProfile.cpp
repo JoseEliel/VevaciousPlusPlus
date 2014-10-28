@@ -34,7 +34,8 @@ namespace VevaciousPlusPlus
     shootingThresholdSquared( NAN ),
     shootAttemptsLeft( 0 ),
     worthIntegratingFurther( true ),
-    currentShotGoodEnough( false )
+    currentShotGoodEnough( false ),
+    bounceAction( NAN )
   {
     if( tunnelPath.NonZeroTemperature() )
     {
@@ -394,6 +395,52 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;*/
 
     return auxiliaryProfile;
+  }
+
+  // This returns the derivative of the path auxiliary value with respect to
+  // the radial variable, evaluated at a value of auxiliaryValue for the
+  // path auxiliary, interpolating between the values entered into
+  // auxiliaryProfile by the last call of operator().
+  double BubbleProfile::AuxiliarySlope( double const auxiliaryValue ) const
+  {
+    // The path auxiliary should be a monotonically decreasing function of the
+    // radial variable, smoothly approaching 0 with a slope tending to 0 as the
+    // radial variable tends to infinity.
+    if( ( auxiliaryValue <= 0.0 )
+        ||
+        ( auxiliaryValue >= AuxiliaryAtBubbleCenter() ) )
+    {
+      return 0.0;
+    }
+    // We walk along auxiliaryProfile until we find the appropriate segment.
+    for( size_t segmentIndex( 1 );
+         segmentIndex < auxiliaryProfile.size();
+         ++segmentIndex )
+    {
+      if( ( auxiliaryProfile[ segmentIndex - 1 ].auxiliaryValue
+            >= auxiliaryValue )
+          &&
+          ( auxiliaryProfile[ segmentIndex ].auxiliaryValue
+            < auxiliaryValue ) )
+      {
+        double const inverseSegmentLength( 1.0
+                       / ( auxiliaryProfile[ segmentIndex - 1 ].auxiliaryValue
+                         - auxiliaryProfile[ segmentIndex ].auxiliaryValue ) );
+        double const
+        endSideWeight( ( auxiliaryProfile[ segmentIndex - 1 ].auxiliaryValue
+                         - auxiliaryValue ) * inverseSegmentLength );
+        double const startSideWeight( ( auxiliaryValue
+                            - auxiliaryProfile[ segmentIndex ].auxiliaryValue )
+                                    * inverseSegmentLength );
+        // The weight for the [ segmentIndex - 1 ] side is proportional to the
+        // distance from auxiliaryValue to the [ segmentIndex ] side.
+        return ( ( startSideWeight
+                   * auxiliaryProfile[ segmentIndex - 1 ].auxiliarySlope )
+                 + ( endSideWeight
+                     * auxiliaryProfile[ segmentIndex ].auxiliarySlope ) );
+      }
+    }
+    return 0.0;
   }
 
   // This looks through odeintProfile to see if there was a definite

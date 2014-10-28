@@ -44,6 +44,22 @@ namespace VevaciousPlusPlus
     // center of the bubble.
     double AuxiliaryAtBubbleCenter() const;
 
+    void SetBounceAction( double const bounceAction )
+    { this->bounceAction = bounceAction; }
+
+    double BounceAction() const{ return bounceAction; }
+
+    // This returns a reference to the bubble profile as calculated by the
+    // last call of operator().
+    std::vector< BubbleRadialValueDescription > const& RadialProfile() const
+    { return auxiliaryProfile; }
+
+    // This returns the derivative of the path auxiliary value with respect to
+    // the radial variable, evaluated at a value of auxiliaryValue for the
+    // path auxiliary, interpolating between the values entered into
+    // auxiliaryProfile by the last call of operator().
+    double AuxiliarySlope( double const auxiliaryValue ) const;
+
 
   protected:
     static double const auxiliaryPrecisionResolution;
@@ -66,6 +82,7 @@ namespace VevaciousPlusPlus
     size_t shootAttemptsLeft;
     bool worthIntegratingFurther;
     bool currentShotGoodEnough;
+    double bounceAction;
 
 
     // This looks through odeintProfile to see if there was a definite
