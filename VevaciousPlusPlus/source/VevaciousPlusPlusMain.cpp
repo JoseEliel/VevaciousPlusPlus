@@ -197,6 +197,8 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
+  << "use BounceActionCalculator along straight paths within"
+  << " CosmoTransitionsRunner for thermal action T dependence fit" << std::endl
   << "write MinuitBetweenPaths subclasses" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;

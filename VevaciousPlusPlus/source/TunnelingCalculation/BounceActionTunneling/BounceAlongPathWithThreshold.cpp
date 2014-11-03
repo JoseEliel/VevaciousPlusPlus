@@ -193,7 +193,7 @@ namespace VevaciousPlusPlus
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
-    BubbleProfile* bestBubble( (*actionCalculator)( *bestPath ) );
+    BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath ) );
 
     std::cout << std::endl
     << "Initial path bounce action = " << bestBubble->BounceAction();
@@ -234,28 +234,30 @@ namespace VevaciousPlusPlus
       (*pathFinder)->SetVacuaAndTemperature( falseVacuum,
                                              trueVacuum,
                                              tunnelingTemperature );
-      TunnelPath* currentPath( bestPath );
-      BubbleProfile* currentBubble( bestBubble );
+      TunnelPath const* currentPath( bestPath );
+      BubbleProfile const* currentBubble( bestBubble );
 
       // Keeping track of a best path and bubble separately from the last-used
       // path and bubble without copying any instances requires a bit of
       // book-keeping. These two pointers get set to NULL if the current path
       // and bubble happen to also be the best ones so far, so they can be
-      // deleted without problem, otherwise they delete the current path and
-      // bubble once they have been used to create the next path and bubble.
-      TunnelPath* currentPathDeleter( NULL );
-      BubbleProfile* currentBubbleDeleter( NULL );
+      // deleted without problem, otherwise they delete the (not best) current
+      // path and bubble once they have been used to create the next path and
+      // bubble.
+      TunnelPath const* currentPathDeleter( NULL );
+      BubbleProfile const* currentBubbleDeleter( NULL );
 
       while( ( bestBubble->BounceAction() > actionThreshold )
              &&
-             (*pathFinder)->PathCanBeImproved( currentBubble ) )
+             (*pathFinder)->PathCanBeImproved( *currentBubble ) )
       {
         // The nextPath and nextBubble pointers are not strictly necessary,
         // but they make the logic of the code clearer and will probably be
         // optimized away by the compiler anyway.
-        TunnelPath* nextPath( (*pathFinder)->TryToImprovePath( currentPath,
-                                                             currentBubble ) );
-        BubbleProfile* nextBubble( (*actionCalculator)( *nextPath ) );
+        TunnelPath const*
+        nextPath( (*pathFinder)->TryToImprovePath( *currentPath,
+                                                   *currentBubble ) );
+        BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath ) );
         delete currentBubbleDeleter;
         delete currentPathDeleter;
 

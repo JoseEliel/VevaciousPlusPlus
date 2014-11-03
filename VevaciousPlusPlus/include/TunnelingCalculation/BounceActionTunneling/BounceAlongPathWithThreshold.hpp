@@ -10,6 +10,9 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/BubbleProfile.hpp"
 #include "../BounceActionTunneler.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
@@ -88,7 +91,7 @@ namespace VevaciousPlusPlus
                                       double const tunnelingTemperature ) const
   {
     double actionThreshold( lnOfThermalIntegrationFactor );
-    // We assume that the threshold should be the na•ve threshold for thermal
+    // We assume that the threshold should be the naive threshold for thermal
     // tunneling, and then take the T = 0 version if the temperature is not a
     // valid temperature (i.e. we treat T < 0 and T "= NAN" as T = 0.0).
     if( !(tunnelingTemperature > 0.0 ) )
@@ -97,7 +100,7 @@ namespace VevaciousPlusPlus
                 potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
                                                                 trueVacuum ) );
       double const solitonicFactorTimesFourVolume( squareRootOfSolitonicFactor
-                                                 * squareRootOfSolitonicFactor
+                                                  * squareRootOfSolitonicFactor
                                     * fourVolumeOfKnownUniverseOverGevFourth );
       actionThreshold = ( log( -solitonicFactorTimesFourVolume
                                / log( survivalProbabilityThreshold ) ) );
