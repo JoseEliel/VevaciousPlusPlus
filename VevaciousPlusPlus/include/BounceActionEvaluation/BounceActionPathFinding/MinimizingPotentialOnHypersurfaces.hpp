@@ -100,16 +100,15 @@ namespace VevaciousPlusPlus
     { currentMinuitTolerance = ( minuitToleranceFraction
           * ( falseVacuum.PotentialValue() - trueVacuum.PotentialValue() ) ); }
 
-    // This just sets the elements of minuitInitialSteps to be 0.5 times the
-    // Euclidean length of currentParallelComponent.
-    virtual void SetCurrentMinuitSteps();
+    // This just sets the elements of minuitInitialSteps to be fractionOfLength
+    // times the Euclidean length of currentParallelComponent.
+    virtual void SetCurrentMinuitSteps( double const fractionOfLength );
 
-    // This runs mnMigrad.operator() and converts the result into a node vector
-    // (transformed by reflectionMatrix and added to currentHyperplaneOrigin)
-    // and puts that into resultVector.
+    // This creates and runs a Minuit2 MnMigrad object and converts the result
+    // into a node vector (transformed by reflectionMatrix and added to
+    // currentHyperplaneOrigin) and puts that into resultVector.
     virtual void
-    RunMigradAndPutTransformedResultIn( ROOT::Minuit2::MnMigrad& mnMigrad,
-                                        std::vector< double >& resultVector );
+    RunMigradAndPutTransformedResultIn( std::vector< double >& resultVector );
   };
 
 
@@ -198,9 +197,10 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This just sets the elements of minuitInitialSteps to be 0.5 times the
-  // Euclidean length of currentParallelComponent.
-  inline void MinimizingPotentialOnHypersurfaces::SetCurrentMinuitSteps()
+  // This just sets the elements of minuitInitialSteps to be fractionOfLength
+  // times the Euclidean length of currentParallelComponent.
+  inline void MinimizingPotentialOnHypersurfaces::SetCurrentMinuitSteps(
+                                                double const fractionOfLength )
   {
     double lengthSquared( 0.0 );
     for( size_t fieldIndex( 0 );
@@ -211,7 +211,7 @@ namespace VevaciousPlusPlus
                          * currentParallelComponent[ fieldIndex ] );
     }
     minuitInitialSteps.assign( ( numberOfFields - 1 ),
-                               sqrt( lengthSquared ) );
+                               ( fractionOfLength * sqrt( lengthSquared ) ) );
   }
 
 } /* namespace VevaciousPlusPlus */

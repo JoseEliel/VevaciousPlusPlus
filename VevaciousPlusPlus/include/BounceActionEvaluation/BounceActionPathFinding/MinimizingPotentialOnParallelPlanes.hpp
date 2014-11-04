@@ -10,7 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "MinimizingPotentialOnHypersurfaces.hpp"
-#include "Eigen/Dense"
+#include "Minuit2/MnMigrad.h"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"
@@ -29,20 +29,6 @@ namespace VevaciousPlusPlus
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinimizingPotentialOnParallelPlanes();
 
-    // This should minimize on a series of hyperplanes all perpendicular to
-    // the vector difference of the vacua, but maybe to avoid "zig-zag-iness"
-    // from Minuit2 coming to rest on a jittery line reasonably far from the
-    // starting path, each plane should have its starting point be (previous
-    // node + vector difference of previous node from the node before it), with
-    // special cases for the first and last varying nodes, of course.
-
-
-    // It may seem unwise to have this object call Minuit on itself, but really
-    // it's just a handy way of keeping the minimization function within the
-    // class that ends up finding its minimum. In this case,
-    // nodeParameterization is just the parameterization of the node.
-    virtual double
-    operator()( std::vector< double > const& nodeParameterization ) const;
 
     // This just returns true if it has not yet provided a path, or false if it
     // already has, as this class does all it can in a single call of
@@ -56,9 +42,8 @@ namespace VevaciousPlusPlus
     // "zig-zag-iness" from Minuit2 coming to rest on a jittery line reasonably
     // far from the starting path by setting the starting point on each plane
     // to be the previous node plus the vector difference of previous node from
-    // the node before it, with special cases for the first and last varying
-    // nodes, of course. It ignores both arguments, and also sets
-    // notYetProvidedPath to false.
+    // the node before it, with a special case for the first varying node. It
+    // ignores both arguments, and also sets notYetProvidedPath to false.
     virtual TunnelPath const* TryToImprovePath( TunnelPath const& lastPath,
                                      BubbleProfile const& bubbleFromLastPath );
 

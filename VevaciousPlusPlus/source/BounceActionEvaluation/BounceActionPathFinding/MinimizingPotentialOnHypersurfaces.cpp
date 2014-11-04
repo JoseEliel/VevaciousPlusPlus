@@ -115,13 +115,16 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This runs mnMigrad.operator() and converts the result into a node vector
-  // (transformed by reflectionMatrix and added to currentHyperplaneOrigin)
-  // and puts that into resultVector.
+  // This creates and runs a Minuit2 MnMigrad object and converts the result
+  // into a node vector (transformed by reflectionMatrix and added to
+  // currentHyperplaneOrigin) and puts that into resultVector.
   void MinimizingPotentialOnHypersurfaces::RunMigradAndPutTransformedResultIn(
-                                             ROOT::Minuit2::MnMigrad& mnMigrad,
                                           std::vector< double >& resultVector )
   {
+    ROOT::Minuit2::MnMigrad mnMigrad( *this,
+                                      nodeZeroParameterization,
+                                      minuitInitialSteps,
+                                      minuitStrategy );
     ROOT::Minuit2::FunctionMinimum const minuitResult( mnMigrad( 0,
                                                     currentMinuitTolerance ) );
     ROOT::Minuit2::MnUserParameters const&

@@ -37,31 +37,27 @@ namespace VevaciousPlusPlus
   // "zig-zag-iness" from Minuit2 coming to rest on a jittery line reasonably
   // far from the starting path by setting the starting point on each plane
   // to be the previous node plus the vector difference of previous node from
-  // the node before it, with special cases for the first and last varying
-  // nodes, of course. It ignores both arguments, and also sets
-  // notYetProvidedPath to false.
+  // the node before it, with a special case for the first varying node. It
+  // ignores both arguments, and also sets notYetProvidedPath to false.
   TunnelPath const* MinimizingPotentialOnParallelPlanes::TryToImprovePath(
                                                     TunnelPath const& lastPath,
                                       BubbleProfile const& bubbleFromLastPath )
   {
     SetParallelVector( pathNodes.front(),
                        pathNodes.back() );
+    SetCurrentMinuitSteps( planeDifferenceFraction );
     SetUpHouseholderReflection();
-    ROOT::Minuit2::MnMigrad mnMigrad( *this,
-                                      nodeZeroParameterization,
-                                      minuitInitialSteps,
-                                      minuitStrategy );
 
     currentHyperplaneOrigin = pathNodes.front();
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      currentHyperplaneOrigin[ fieldIndex ] += ( planeDifferenceFraction
-                                    * currentParallelComponent[ fieldIndex ] );
+      currentHyperplaneOrigin[ fieldIndex ] = ( pathNodes.front()[ fieldIndex ]
+                                                + ( planeDifferenceFraction
+                                  * currentParallelComponent[ fieldIndex ] ) );
     }
-    RunMigradAndPutTransformedResultIn( mnMigrad,
-                                        pathNodes[ 1 ] );
+    RunMigradAndPutTransformedResultIn( pathNodes[ 1 ] );
 
     for( size_t nodeIndex( 2 );
          nodeIndex <= numberOfVaryingNodes;
@@ -80,9 +76,12 @@ namespace VevaciousPlusPlus
         = ( ( 2.0 * pathNodes[ nodeIndex - 1 ][ fieldIndex ] )
             - pathNodes[ nodeIndex - 2 ][ fieldIndex ] );
       }
-      RunMigradAndPutTransformedResultIn( mnMigrad,
-                                          pathNodes[ nodeIndex ] );
+      RunMigradAndPutTransformedResultIn( pathNodes[ nodeIndex ] );
     }
+    notYetProvidedPath = false;
+    return new LinearSplineThroughNodes( pathNodes,
+                                         nodeZeroParameterization,
+                                         pathTemperature );
   }
 
 } /* namespace VevaciousPlusPlus */
