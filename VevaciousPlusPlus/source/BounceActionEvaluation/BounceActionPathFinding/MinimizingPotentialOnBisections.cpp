@@ -12,12 +12,10 @@ namespace VevaciousPlusPlus
 
   MinimizingPotentialOnBisections::MinimizingPotentialOnBisections(
                                     PotentialFunction const& potentialFunction,
-                                               MinuitBetweenPaths* pathRefiner,
                                              unsigned int const minuitStrategy,
                                           double const minuitToleranceFraction,
                                           size_t const maximumNumberOfNodes ) :
     MinimizingPotentialOnHypersurfaces( potentialFunction,
-                                        pathRefiner,
                                         minuitStrategy,
                                         minuitToleranceFraction ),
     maximumNumberOfNodes( maximumNumberOfNodes ),

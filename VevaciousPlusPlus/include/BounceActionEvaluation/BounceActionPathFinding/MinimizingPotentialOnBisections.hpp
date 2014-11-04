@@ -22,12 +22,14 @@ namespace VevaciousPlusPlus
   public:
     MinimizingPotentialOnBisections(
                                     PotentialFunction const& potentialFunction,
-                                     MinuitBetweenPaths* pathRefiner,
                                      unsigned int const minuitStrategy = 1,
                                     double const minuitToleranceFraction = 0.5,
                                      size_t const maximumNumberOfNodes = 254 );
     virtual ~MinimizingPotentialOnBisections();
 
+    needs number of uphill improvements!
+
+    need to incorporate use of currentParallelComponent properly!
 
     // It may seem unwise to have this object call Minuit on itself, but really
     // it's just a handy way of keeping the minimization function within the

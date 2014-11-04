@@ -14,7 +14,6 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"
-#include "MinuitBetweenPaths.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -24,15 +23,22 @@ namespace VevaciousPlusPlus
   public:
     MinimizingPotentialOnHypersurfaces(
                                     PotentialFunction const& potentialFunction,
-                                        MinuitBetweenPaths* pathRefiner = NULL,
+                                        size_t const numberOfPathSegments,
                                         unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinimizingPotentialOnHypersurfaces();
 
-    needs number of uphill improvements!
 
-    re-use scaled to max angle from hemispheres path
-
+    // It may seem unwise to have this object call Minuit on itself, but really
+    // it's just a handy way of keeping the minimization function within the
+    // class that ends up finding its minimum. In this case,
+    // nodeParameterization is just the parameterization of the node. The
+    // default takes nodeParameterization as a vector in the hyperplane
+    // perpendicular to field 0, applies reflectionMatrix to it, adds the
+    // result to currentParallelComponent, and returns the potential function
+    // for that field configuration.
+    virtual double
+    operator()( std::vector< double > const& nodeParameterization ) const;
 
     // This sets the vacua to be those given, and resets the nodes to describe
     // a straight path between the new vacua, as well as setting
@@ -41,45 +47,27 @@ namespace VevaciousPlusPlus
                                          PotentialMinimum const& trueVacuum,
                                          double const pathTemperature = 0.0 );
 
-    // This allows Minuit2 to adjust the full path a set number of times to try
-    // to minimize the sum of potentials at a set of nodes or bounce action
-    // along the adjusted path, and then sets the path. Whether or not the last
-    // call of TryToImprovePath( ... ) lowered the bounce action is given by
-    // lastImprovementWorked, which can be used by a derived class to decide
-    // internally whether to change strategy. If no improvement can be made,
-    // NULL is returned.
-    virtual TunnelPath const*
-    TryToImprovePath( bool const lastImprovementWorked = true );
-
 
   protected:
     PotentialFunction const& potentialFunction;
     size_t const numberOfFields;
+    size_t const numberOfNodes;
     std::vector< std::vector< double > > pathNodes;
     std::vector< double > currentParallelComponent;
     // This is the vector between the current 2 reference nodes, scaled to be
     // appropriate for the step from the false-side node under a
     // parameterization that is just a set of zeroes.
+    std::vector< double > currentHyperplaneOrigin;
+    // This is the vector to which the transformation of the vector in the
+    // parameterization hyperplane [the hyperplane perpendicular to field 0]
+    // gets added to yield the field configuration for the Minuit
+    // parameterization. It has to be set by TryToImprovePath before operator()
+    // is called (unless operator() has been over-ridden appropriately).
     Eigen::MatrixXd reflectionMatrix;
-    MinuitBetweenPaths* pathRefiner;
     std::vector< double > minuitInitialSteps;
     std::vector< double > const nodeZeroParameterization;
+    Eigen::VectorXd minuitResultAsUntransformedVector;
 
-
-    // This should internally change the derived class's strategy based on
-    // whether or not the last attempt to improve the path lowered the bounce
-    // action successfully or not, and the return true if there are still
-    // improvements to try, false if there is no improvement to try.
-    virtual bool NodesCanStillBeImproved( bool const lastMoveDidImprove ) = 0;
-
-    // This should move the nodes individually towards whatever the derived
-    // class considers to be the optimal tunneling path, by some amount, which
-    // is up to the derived class, but it should also note if it is finished
-    // moving the nodes around by setting nodesConverged to true. Whether or
-    // not the last call of TryToImprovePath( ... ) lowered the bounce action is
-    // given by lastImprovementWorked, which can be used by a derived class to
-    // decide internally whether to change strategy.
-    virtual void TryToImproveNodes() = 0;
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
     // which reflects the axis of field 0 to be parallel to
@@ -91,9 +79,12 @@ namespace VevaciousPlusPlus
     Eigen::VectorXd UntransformedNode(
                      std::vector< double > const& nodeParameterization ) const;
 
-    // This should set up pathNodes for a new pair of vacua.
+    // This should set up pathNodes for a new pair of vacua. By default, it
+    // just sets pathNodes.front() to be falseVacuum.FieldConfiguration() and
+    // pathNodes.back() to be trueVacuum.FieldConfiguration(), but this might
+    // need to be over-ridden.
     virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
-                                      PotentialMinimum const& trueVacuum ) = 0;
+                                         PotentialMinimum const& trueVacuum );
 
     // This sets the components of currentParallelComponent to be the elements
     // of endNode minus the values those elements have in startNode.
@@ -112,10 +103,42 @@ namespace VevaciousPlusPlus
     // This just sets the elements of minuitInitialSteps to be 0.5 times the
     // Euclidean length of currentParallelComponent.
     virtual void SetCurrentMinuitSteps();
+
+    // This runs mnMigrad.operator() and converts the result into a node vector
+    // (transformed by reflectionMatrix and added to currentHyperplaneOrigin)
+    // and puts that into resultVector.
+    virtual void
+    RunMigradAndPutTransformedResultIn( ROOT::Minuit2::MnMigrad& mnMigrad,
+                                        std::vector< double >& resultVector );
   };
 
 
 
+
+
+  // It may seem unwise to have this object call Minuit on itself, but really
+  // it's just a handy way of keeping the minimization function within the
+  // class that ends up finding its minimum. In this case,
+  // nodeParameterization is just the parameterization of the node. The
+  // default takes nodeParameterization as a vector in the hyperplane
+  // perpendicular to field 0, applies reflectionMatrix to it, adds the
+  // result to currentParallelComponent, and returns the potential function
+  // for that field configuration.
+  inline double MinimizingPotentialOnHypersurfaces::operator()(
+                      std::vector< double > const& nodeParameterization ) const
+  {
+    Eigen::VectorXd const transformedNode( reflectionMatrix
+                                 * UntransformedNode( nodeParameterization ) );
+    std::vector< double > fieldConfiguration( currentHyperplaneOrigin );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      fieldConfiguration[ fieldIndex ] += transformedNode( fieldIndex );
+    }
+    return potentialFunction( fieldConfiguration,
+                              pathTemperature );
+  }
 
   // This sets the vacua to be those given, and resets the nodes to describe a
   // straight path between the new vacua, as well as setting pathTemperature
@@ -128,11 +151,6 @@ namespace VevaciousPlusPlus
     this->pathTemperature = pathTemperature;
     SetNodesForInitialPath( falseVacuum,
                             trueVacuum );
-    if( pathRefiner != NULL )
-    {
-      pathRefiner->UpdateNodes( pathNodes,
-                                pathTemperature );
-    }
     SetCurrentMinuitTolerance( falseVacuum,
                                trueVacuum );
   }
@@ -151,6 +169,18 @@ namespace VevaciousPlusPlus
       untransformedNode( fieldIndex ) = nodeParameterization[ fieldIndex - 1 ];
     }
     return untransformedNode;
+  }
+
+  // This should set up pathNodes for a new pair of vacua. By default, it
+  // just sets pathNodes.front() to be falseVacuum.FieldConfiguration() and
+  // pathNodes.back() to be trueVacuum.FieldConfiguration(), but this might
+  // need to be over-ridden.
+  inline void MinimizingPotentialOnHypersurfaces::SetNodesForInitialPath(
+                                           PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum )
+  {
+    pathNodes.front() = falseVacuum.FieldConfiguration();
+    pathNodes.back() = trueVacuum.FieldConfiguration();
   }
 
   // This sets the components of currentParallelComponent to be the elements

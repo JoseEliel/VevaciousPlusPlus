@@ -11,60 +11,33 @@ namespace VevaciousPlusPlus
 {
   MinimizingPotentialOnHypersurfaces::MinimizingPotentialOnHypersurfaces(
                                     PotentialFunction const& potentialFunction,
-                                               MinuitBetweenPaths* pathRefiner,
+                                             size_t const numberOfPathSegments,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
     MinuitPathFinder( minuitStrategy,
                       minuitToleranceFraction ),
     potentialFunction( potentialFunction ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
-    pathNodes(),
+    numberOfNodes( numberOfPathSegments - 1 ),
+    pathNodes( numberOfNodes,
+               std::vector< double >( numberOfFields - 1 ) ),
     currentParallelComponent( numberOfFields ),
+    currentHyperplaneOrigin( numberOfFields ),
     reflectionMatrix( numberOfFields,
                       numberOfFields ),
-    pathRefiner( pathRefiner ),
     nodeZeroParameterization( ( numberOfFields - 1 ),
-                              0.0 )
+                              0.0 ),
+    minuitResultAsUntransformedVector( Eigen::VectorXd::Zero(
+                                                             numberOfFields ) )
   {
     // This constructor is just an initialization list.
   }
 
   MinimizingPotentialOnHypersurfaces::~MinimizingPotentialOnHypersurfaces()
   {
-    delete pathRefiner;
+    // This does nothing.
   }
 
-
-
-  // This allows Minuit2 to adjust the full path a set number of times to try
-  // to minimize the sum of potentials at a set of nodes or bounce action
-  // along the adjusted path, and then sets the path. Whether or not the last
-  // call of TryToImprovePath( ... ) lowered the bounce action is given by
-  // lastImprovementWorked, which can be used by a derived class to decide
-  // internally whether to change strategy. If no improvement can be made, NULL
-  // is returned.
-  TunnelPath const* MinimizingPotentialOnHypersurfaces::TryToImprovePath(
-                                             bool const lastImprovementWorked )
-  {
-    if( NodesCanStillBeImproved( lastImprovementWorked ) )
-    {
-      TryToImproveNodes();
-      return new LinearSplineThroughNodes( pathNodes,
-                                           nodeZeroParameterization,
-                                           pathTemperature );
-    }
-    else
-    {
-      if( pathRefiner != NULL )
-      {
-        return pathRefiner->ImprovePath();
-      }
-      else
-      {
-        return NULL;
-      }
-    }
-  }
 
   // This sets up reflectionMatrix to be the Householder reflection matrix
   // which reflects the axis of field 0 to be parallel to
@@ -139,6 +112,37 @@ namespace VevaciousPlusPlus
                           rowIndex ) = ( 1.0 + ( rowIndexPart * rowIndexPart
                                         * minusInverseOfOneMinusDotProduct ) );
       }
+    }
+  }
+
+  // This runs mnMigrad.operator() and converts the result into a node vector
+  // (transformed by reflectionMatrix and added to currentHyperplaneOrigin)
+  // and puts that into resultVector.
+  void MinimizingPotentialOnHypersurfaces::RunMigradAndPutTransformedResultIn(
+                                             ROOT::Minuit2::MnMigrad& mnMigrad,
+                                          std::vector< double >& resultVector )
+  {
+    ROOT::Minuit2::FunctionMinimum const minuitResult( mnMigrad( 0,
+                                                    currentMinuitTolerance ) );
+    ROOT::Minuit2::MnUserParameters const&
+    userParameters( minuitResult.UserParameters() );
+    // We assume that minuitResultAsUntransformedVector( 0 ) was set to 0.0
+    // in the constructor and never changes.
+    for( size_t variableIndex( 1 );
+         variableIndex < numberOfFields;
+         ++variableIndex )
+    {
+      minuitResultAsUntransformedVector( variableIndex )
+      = userParameters.Value( variableIndex - 1 );
+    }
+    Eigen::VectorXd const transformedNode( reflectionMatrix
+                                         * minuitResultAsUntransformedVector );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      resultVector[ fieldIndex ] = ( currentHyperplaneOrigin[ fieldIndex ]
+                                     + transformedNode( fieldIndex ) );
     }
   }
 
