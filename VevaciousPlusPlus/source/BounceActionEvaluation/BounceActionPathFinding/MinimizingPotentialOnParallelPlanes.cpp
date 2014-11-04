@@ -63,6 +63,26 @@ namespace VevaciousPlusPlus
     RunMigradAndPutTransformedResultIn( mnMigrad,
                                         pathNodes[ 1 ] );
 
+    for( size_t nodeIndex( 2 );
+         nodeIndex <= numberOfVaryingNodes;
+         ++nodeIndex )
+    {
+      // Each minimization in the next hyperplane starts at the previous node
+      // plus the difference vector going to the previous node from the node
+      // previous to that
+      // (e.g. node[ 3 ] = vector sum of node[ 2 ] + ( node[ 2 ] - node[ 1 ] ),
+      // hence the factor of 2 and the minus sign).
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        currentHyperplaneOrigin[ fieldIndex ]
+        = ( ( 2.0 * pathNodes[ nodeIndex - 1 ][ fieldIndex ] )
+            - pathNodes[ nodeIndex - 2 ][ fieldIndex ] );
+      }
+      RunMigradAndPutTransformedResultIn( mnMigrad,
+                                          pathNodes[ nodeIndex ] );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */
