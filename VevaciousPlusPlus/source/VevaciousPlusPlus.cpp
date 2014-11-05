@@ -674,8 +674,7 @@ namespace VevaciousPlusPlus
   TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
                                       std::string const& constructorArguments )
   {
-    std::string tunnelPathFinderClasses( "MinimizingPotentialOnHemispheres" );
-    std::string tunnelPathFinderArguments( "" );
+    std::string tunnelPathFinders( "" );
     std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
     std::string bouncePotentialFitArguments( "" );
     std::string tunnelingStrategy( "ThermalThenQuantum" );
@@ -703,15 +702,23 @@ namespace VevaciousPlusPlus
                              "BouncePotentialFit",
                              bouncePotentialFitClass,
                              bouncePotentialFitArguments );
-      ReadClassAndArguments( xmlParser,
-                             "TunnelPathFinders",
-                             tunnelPathFinderClasses,
-                             tunnelPathFinderArguments );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "TunnelPathFinders",
+                                     tunnelPathFinders );
     }
     CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
+    std::vector< BouncePathFinder* > pathFinders;
+    SetUpBouncePathFinders( tunnelPathFinders,
+                            pathFinders );
+    if( pathFinders.empty() )
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<TunnelPathFinders> produced no valid tunnel path finding objects!";
+      throw std::runtime_error( errorStream.str() );
+    }
     return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
-                                SetUpBouncePathFinder( tunnelPathFinderClasses,
-                                                   tunnelPathFinderArguments ),
+                                             pathFinders,
                           SetUpBounceActionCalculator( bouncePotentialFitClass,
                                                  bouncePotentialFitArguments ),
                                InterpretTunnelingStrategy( tunnelingStrategy ),
@@ -721,26 +728,63 @@ namespace VevaciousPlusPlus
   }
 
   //
-  BouncePathFinder* VevaciousPlusPlus::SetUpMinimizingPotentialOnBisections(
+  void VevaciousPlusPlus::SetUpBouncePathFinders(
+                                          std::string const& tunnelPathFinders,
+                                std::vector< BouncePathFinder* >& pathFinders )
+  {
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( tunnelPathFinders );
+    std::string classType( "" );
+    std::string constructorArguments( "" );
+    while( xmlParser.readNextElement() )
+    {
+      classType.clear();
+      constructorArguments.clear();
+      ReadClassAndArguments( xmlParser,
+                             "BouncePotentialFit",
+                             classType,
+                             constructorArguments );
+      if( !( classType.empty()
+             ||
+             constructorArguments.empty() ) )
+      {
+        if( classType.compare( "MinuitOnPotentialOnParallelPlanes" ) == 0 )
+        {
+          pathFinders.push_back( CreateMinuitOnPotentialOnParallelPlanes(
+                                                      constructorArguments ) );
+        }
+        else if( classType.compare( "MinuitOnPotentialPerpendicularToPath" )
+                 == 0 )
+        {
+          pathFinders.push_back( CreateMinuitOnPotentialPerpendicularToPath(
+                                                      constructorArguments ) );
+        }
+        else if( classType.compare( "MinuitOnPathPerpendicularForces" )
+                 == 0 )
+        {
+          pathFinders.push_back( CreateMinuitOnPathPerpendicularForces(
+                                                      constructorArguments ) );
+        }
+      }
+    }
+  }
+
+  //
+  BouncePathFinder* VevaciousPlusPlus::CreateMinuitOnPotentialOnParallelPlanes(
                                       std::string const& constructorArguments )
   {
-    std::string pathRefinerClass( "PathSeparateFieldAverager" );
-    std::string pathRefinerArguments( "" );
-    int maximumNumberOfNodes( 20 );
+    // The <ConstructorArguments> for this class should have child elements
+    // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
+    int numberOfPathSegments( 100 );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
-
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
     while( xmlParser.readNextElement() )
     {
-      ReadClassAndArguments( xmlParser,
-                             "NodePathRefinement",
-                             pathRefinerClass,
-                             pathRefinerArguments );
       InterpretElementIfNameMatches( xmlParser,
-                                     "MaximumNumberOfNodes",
-                                     maximumNumberOfNodes );
+                                     "NumberOfPathSegments",
+                                     numberOfPathSegments );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );
@@ -748,12 +792,86 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    return new MinimizingPotentialOnBisections( *ownedPotentialFunction,
-                                            SetUpPathRefiner( pathRefinerClass,
-                                                        pathRefinerArguments ),
-                                                minuitStrategy,
-                                                minuitToleranceFraction,
-                                                maximumNumberOfNodes );
+    return new MinuitOnPotentialOnParallelPlanes( *potentialFunction,
+                                 static_cast< size_t >( numberOfPathSegments ),
+                                                  minuitStrategy,
+                      static_cast< unsigned int >( minuitToleranceFraction ) );
+  }
+
+  //
+  BouncePathFinder*
+  VevaciousPlusPlus::CreateMinuitOnPotentialPerpendicularToPath(
+                                      std::string const& constructorArguments )
+  {
+    // The <ConstructorArguments> for this class should have child elements
+    // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
+    int numberOfPathSegments( 100 );
+    int numberOfAllowedWorsenings( 3 );
+    int minuitStrategy( 1 );
+    double minuitToleranceFraction( 0.5 );
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfPathSegments",
+                                     numberOfPathSegments );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfAllowedWorsenings",
+                                     numberOfAllowedWorsenings );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitStrategy",
+                                     minuitStrategy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitTolerance",
+                                     minuitToleranceFraction );
+    }
+    return new MinuitOnPotentialPerpendicularToPath( *potentialFunction,
+                                 static_cast< size_t >( numberOfPathSegments ),
+                                                     numberOfAllowedWorsenings,
+                                                     minuitStrategy,
+                      static_cast< unsigned int >( minuitToleranceFraction ) );
+  }
+
+  //
+  BouncePathFinder* VevaciousPlusPlus::CreateMinuitOnPathPerpendicularForces(
+                                      std::string const& constructorArguments )
+  {
+    // The <ConstructorArguments> for this class should have child elements
+    // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
+    int numberOfPathSegments( 100 );
+    int numberOfAllowedWorsenings( 3 );
+    int minuitStrategy( 1 );
+    double minuitToleranceFraction( 0.5 );
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfPathSegments",
+                                     numberOfPathSegments );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfAllowedWorsenings",
+                                     numberOfAllowedWorsenings );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitStrategy",
+                                     minuitStrategy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitTolerance",
+                                     minuitToleranceFraction );
+    }
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "CreateMinuitOnPathPerpendicularForces(...) returning NULL as the class"
+    << " does not yet exist!";
+    std::cout << std::endl;
+    return NULL;/**/
+    /*return new MinuitOnPathPerpendicularForces( *potentialFunction,
+                                 static_cast< size_t >( numberOfPathSegments ),
+                                                  numberOfAllowedWorsenings,
+                                                  minuitStrategy,
+                    static_cast< unsigned int >( minuitToleranceFraction ) );*/
   }
 
   //

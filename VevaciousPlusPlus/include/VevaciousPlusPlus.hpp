@@ -167,15 +167,23 @@ namespace VevaciousPlusPlus
                                      std::string const& constructorArguments );
 
     //
-    BouncePathFinder* SetUpBouncePathFinder( std::string const& className,
+    BouncePathFinder* CreateMinuitOnPotentialOnParallelPlanes(
                                      std::string const& constructorArguments );
 
     //
-    BouncePathFinder* SetUpMinimizingPotentialOnBisections(
+    void SetUpBouncePathFinders( std::string const& tunnelPathFinders,
+                               std::vector< BouncePathFinder* >& pathFinders );
+
+    //
+    BouncePathFinder* CreateMinuitOnPotentialOnParallelPlanes(
                                      std::string const& constructorArguments );
 
     //
-    MinuitBetweenPaths* SetUpPathRefiner( std::string const& className,
+    BouncePathFinder* CreateMinuitOnPotentialPerpendicularToPath(
+                                     std::string const& constructorArguments );
+
+    //
+    BouncePathFinder* CreateMinuitOnPathPerpendicularForces(
                                      std::string const& constructorArguments );
 
     //
@@ -353,25 +361,6 @@ namespace VevaciousPlusPlus
   }
 
   //
-  inline BouncePathFinder* VevaciousPlusPlus::SetUpBouncePathFinder(
-                                                  std::string const& className,
-                                      std::string const& constructorArguments )
-  {
-    if( className.compare( "MinimizingPotentialOnBisections" ) == 0 )
-    {
-      return SetUpMinimizingPotentialOnBisections( constructorArguments );
-    }
-    else
-    {
-      std::stringstream errorStream;
-      errorStream
-      << "<TunnelPathFinder> was not a recognized form! The only type"
-      << " currently valid is \"MinimizingPotentialOnBisections\".";
-      throw std::runtime_error( errorStream.str() );
-    }
-  }
-
-  //
   inline BounceActionCalculator*
   VevaciousPlusPlus::SetUpBounceActionCalculator( std::string const& className,
                                       std::string const& constructorArguments )
@@ -388,20 +377,6 @@ namespace VevaciousPlusPlus
       << " currently valid is \"BubbleShootingOnSpline\".";
       throw std::runtime_error( errorStream.str() );
     }
-  }
-
-  //
-  inline MinuitBetweenPaths* VevaciousPlusPlus::SetUpPathRefiner(
-                                                  std::string const& className,
-                                      std::string const& constructorArguments )
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "VevaciousPlusPlus::SetUpPathRefiner( \"" << className << "\", \""
-    << constructorArguments << "\" ) returning NULL.";
-    std::cout << std::endl;
-    return NULL;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

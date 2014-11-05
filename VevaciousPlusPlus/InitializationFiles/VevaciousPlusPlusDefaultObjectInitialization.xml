@@ -181,6 +181,26 @@
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              50
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              3
+            </NumberOfAllowedWorsenings>
+            <MinuitStrategy>
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <PathFinder>
           <ClassType>
             MinuitOnPotentialPerpendicularToPath
           </ClassType>
@@ -195,7 +215,7 @@
               1
             </MinuitStrategy>
             <MinuitTolerance>
-              0.5
+              0.1
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
