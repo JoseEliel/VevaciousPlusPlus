@@ -199,7 +199,7 @@
            for the full calculation by CosmoTransitions. If using
            "BounceAlongPathWithThreshold", the integration of the decay width
            over temperature is performed by a numerical approximation summing
-           over this many temperatures (equally space). -->
+           over this many temperatures (equally spaced). -->
         5
       </ThermalActionResolution>
       <CriticalTemperatureAccuracy>
@@ -235,23 +235,11 @@
              loop. If not given, 10 is used as the default. -->
         10
       </MaxOuterLoops>
-      <ThermalStraightPathFitResolution>
-      <!-- This is the number of points taken for estimating the thermal
-           dependence of the bounce action, which is then used to estimate the
-           temperature which dominates thermal tunneling, which is then used
-           for the full calculation by CosmoTransitions. -->
-        5
-      </ThermalStraightPathFitResolution>
       <!-- End of set of elements only read if <ClassType> is
            "CosmoTransitionsRunner". -->
       <!-- The following elements are read only if <ClassType> is
            "BounceAlongPathWithThreshold", and are ignored if <ClassType> is
            "CosmoTransitionsRunner". -->
-      <ThermalIntegrationResolution>
-        <!-- This is the number of temperatures summed over for thermal decay
-             width integrations. -->
-        5
-      </ThermalIntegrationResolution>
       <BouncePotentialFit>
         <!-- Currently the only valid option for <ClassType> is
              "BubbleShootingOnSpline", which implements the Coleman
@@ -305,133 +293,106 @@
           </RadialResolution>
         </ConstructorArguments>
       </BouncePotentialFit>
-      <TunnelPathFinder>
-        <ClassType>
-        <!-- The valid options for this version of VevaciousPlusPlus are:
-             "MinimizingPotentialOnHemispheres" or
-             "MinimizingPotentialOnBisections". Both are based on
-             parameterizing the tunneling path in field space as a series of
-             nodes with straight interpolations between, and both aim to create
-             a path in field space where the force along the path is always
-             tangential to the path. This does NOT actually solve the equations
-             for the extremum of the bounce action which gives the decay width
-             of the false vacuum, but should be a good guess and certainly
-             gives a lower bound on the decay width.
-             The nodes for "MinimizingPotentialOnHemispheres" are chosen by
-             minimizing the potential on a hemisphere of fixed radius around
-             the false vacuum and then taking a step of twice this radius from
-             the false vacuum, giving a straight step which is parallel to the
-             force on its midpoint, then this node is used as the center of the
-             next hemisphere. (Well, the hemispheres are not actually
-             hemispheres, but rather hypersectors of hyperspheres subtended by
-             a polar angle slightly less than pi/2 so that each step gives a
-             node closer to the true vacuum than the last node.)
-             The nodes for "MinimizingPotentialOnBisections" are initially just
-             those on a straight line between the vacua, and then each node is
-             moved in a hyperplane which bisects the straight line between the
-             moving node's nearest neighbors until the potential in this
-             hyperplane is minimized. -->
-          MinimizingPotentialOnHemispheres
-        </ClassType>
-        <ConstructorArguments>
-          <!-- The arguments given here are all optional.
-               If <NodePathRefinement> is given, it will be used to construct a
-               MinuitBetweenPaths object that is used to try to improve the
-               path from the "no perpendicular force" path to a path which
-               might come closer to solving the equations of the maximal decay
-               width.
-               The other elements (<MinimumNumberOfNodes>,
-               <MovesPerImprovement>, <MinuitStrategy>, <MinuitTolerance>, and
-               <NodeMovementThreshold> (which is only used by
-               "MinimizingPotentialOnBisections")) can be given to change
-               default values. -->
-          <NodePathRefinement>
-            <ClassType>
-              <!-- The valid options for this version of VevaciousPlusPlus are:
-                   "PathSeparateFieldAverager", or
-                   "PathPolynomialAverager", or "none" (or the absence of
-                   <NodePathRefinement> is equivalent to "none", which is here
-                   just as an easy way of turning off this option). -->
-              PathSeparateFieldAverager
-            </ClassType>
-            <ConstructorArguments>
-              <MovesPerImprovement>
-                100
-              </MovesPerImprovement>
-              <MinuitStrategy>
-                1
-              </MinuitStrategy>
-              <MinuitTolerance>
-                0.1
-              </MinuitTolerance>
-              <BounceCalculator>
-              <!-- See the comment for <BouncePotentialFit> under
-                   <TunnelingClass><ConstructorArguments> to learn about the
-                   options for a valid bounce action calculator. The calculator
-                   object built from these options is separate to that used
-                   directly by the BounceAlongPathWithThreshold object which
-                   uses that built from the <BouncePotentialFit> options under
-                   <TunnelingClass><ConstructorArguments>. -->
-                <ClassType>
-                  BubbleShootingOnSpline
-                </ClassType>
-                <ConstructorArguments>
-                  <NumberOfNodesForPotentialFit>
-                    100
-                  </NumberOfNodesForPotentialFit>
-                  <NumberShootAttemptsAllowed>
-                    32
-                  </NumberShootAttemptsAllowed>
-                  <RadialResolution>
-                    0.05
-                  </RadialResolution>
-                </ConstructorArguments>
-              </BounceCalculator>
-            </ConstructorArguments>
-          </NodePathRefinement>
-          <MinimumNumberOfNodes>
-            <!-- If using "MinimizingPotentialOnHemispheres", the length
-                 between nodes is the total length of the straight line between
-                 the vacua divided by (n+1), where n is the number given by
-                 this element, and thus the actual number of nodes used
-                 internally will be larger than n, unless the path ends up as
-                 exactly straight between the vacua.
-                 If using "MinimizingPotentialOnBisections", the lines between
-                 nodes are divided in half recursively, so the number of nodes
-                 will actually be ( (2^n) - 1) where a is the smallest integer
-                 such that 2^n > the number given here. -->
-            20
-          </MinimumNumberOfNodes>
-          <MovesPerImprovement>
-            <!-- This is the number of nodes which can be moved for each call
-                 to improve the path before the bounce action along the path is
-                 checked against the threshold. -->
-            5
-          </MovesPerImprovement>
-          <MinuitStrategy>
-            <!-- The number given here is given to Minuit2 to decide how
-                 precise it tries to be, through more or less calls of the
-                 function to be minimized. The default is 1, while 0 emphasizes
-                 making less function calls, and 2 emphasizes more accuracy
-                 through more function calls. -->
-            1
-          </MinuitStrategy>
-          <MinuitTolerance>
-            <!-- The number given here is a fraction to multiply Minuit2's
-                 default 0.001 to yield the tolerance fraction, which is the
-                 fraction of the value of the function at a point which is
-                 used to compare to the estimated ("vertical") distance to the
-                 minimum. For example, if 0.5 is given, then as soon as Minuit2
-                 estimates that it is at a point with function value within
-                 0.0005 of what it estimates is the value at the minimum, it
-                 considers its minimization complete. -->
-            0.1
-          </MinuitTolerance>
-          <NodeMovementThreshold>
-            0.01
-          </NodeMovementThreshold>
-        </ConstructorArguments>
-      </TunnelPathFinder>
+      <TunnelPathFinders>
+        <!-- This should be a list, *in order*, of the various objects which
+             will be used to try to find the dominant bounce action bubble
+             configuration. This allows faster approximations to set up rough
+             paths which are then refined by better approximations.
+             
+             Each path finder object should be enclosed in a "PathFinder" XML
+             element, and the element should have just 2 child elements:
+             "ClassType" and "ConstructorArguments".
+             
+             The valid path finder "ClassType" options are:
+             "MinuitOnPotentialOnParallelPlanes", which just tries to minimize
+             the energy barrier between the vacua, on planes without regard to
+             how the path is between the planes;
+             "MinuitOnPotentialPerpendicularToPath", which tries to minimize
+             the barrier so that the force at points along the path is aligned
+             locally with the path around each point;
+             and "MinuitOnPathPerpendicularForces", which actually tries to do
+             the same as "MinuitOnPotentialPerpendicularToPath" but with an
+             extra term which, when differentiated, would give the effective
+             force accounting for the rate of change of the field configuration
+             with respect to the radial space-time variable (this is similar to
+             the method used by CosmoTransitions right from the start, though
+             should be a lot faster since it starts from what should be a good
+             guess for the final path, and uses the power of Minuit2). -->
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialOnParallelPlanes
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              <!-- This is the number of segments to break the path between
+                   vacua in field space into, with the ends of the segments
+                   being the points moved around, and the resulting path being
+                   straight interpolations between these nodes. -->
+              50
+            </NumberOfPathSegments>
+            <MinuitStrategy>
+              <!-- The number given here is given to Minuit2 to decide how
+                   precise it tries to be, through more or less calls of the
+                   function to be minimized. The default is 1, while 0
+                   emphasizes making less function calls, and 2 emphasizes more
+                   accuracy through more function calls. -->
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              <!-- The number given here is a fraction to multiply Minuit2's
+                   default 0.001 to yield the tolerance fraction, which is the
+                   fraction of the value of the function at a point which is
+                   used to compare to the estimated ("vertical") distance to
+                   the minimum. For example, if 0.5 is given, then as soon as
+                   Minuit2 estimates that it is at a point with function value
+                   within 0.0005 of what it estimates is the value at the
+                   minimum, it considers its minimization complete. -->
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              <!-- This is the number of segments to break the path between
+                   vacua in field space into, with the ends of the segments
+                   being the points moved around, and the resulting path being
+                   straight interpolations between these nodes. -->
+              100
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              <!-- This is the number of times the
+                   MinuitOnPotentialPerpendicularToPath is allowed to produce a
+                   path with a higher bounce action than the last try before it
+                   decides that it can no longer try to find a path with a
+                   lower bounce action. -->
+              3
+            </NumberOfAllowedWorsenings>
+            <MinuitStrategy>
+              <!-- The number given here is given to Minuit2 to decide how
+                   precise it tries to be, through more or less calls of the
+                   function to be minimized. The default is 1, while 0
+                   emphasizes making less function calls, and 2 emphasizes more
+                   accuracy through more function calls. -->
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              <!-- The number given here is a fraction to multiply Minuit2's
+                   default 0.001 to yield the tolerance fraction, which is the
+                   fraction of the value of the function at a point which is
+                   used to compare to the estimated ("vertical") distance to
+                   the minimum. For example, if 0.5 is given, then as soon as
+                   Minuit2 estimates that it is at a point with function value
+                   within 0.0005 of what it estimates is the value at the
+                   minimum, it considers its minimization complete. -->
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <!-- MinuitOnPathPerpendicularForces does not actually exist yet! -->
+      </TunnelPathFinders>
       <!-- End of set of elements only read if <ClassType> is
            "BounceAlongPathWithThreshold". -->
     </ConstructorArguments>

@@ -674,7 +674,7 @@ namespace VevaciousPlusPlus
   TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
                                       std::string const& constructorArguments )
   {
-    std::string tunnelPathFinderClass( "MinimizingPotentialOnHemispheres" );
+    std::string tunnelPathFinderClasses( "MinimizingPotentialOnHemispheres" );
     std::string tunnelPathFinderArguments( "" );
     std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
     std::string bouncePotentialFitArguments( "" );
@@ -704,13 +704,13 @@ namespace VevaciousPlusPlus
                              bouncePotentialFitClass,
                              bouncePotentialFitArguments );
       ReadClassAndArguments( xmlParser,
-                             "TunnelPathFinder",
-                             tunnelPathFinderClass,
+                             "TunnelPathFinders",
+                             tunnelPathFinderClasses,
                              tunnelPathFinderArguments );
     }
     CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
     return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
-                                  SetUpBouncePathFinder( tunnelPathFinderClass,
+                                SetUpBouncePathFinder( tunnelPathFinderClasses,
                                                    tunnelPathFinderArguments ),
                           SetUpBounceActionCalculator( bouncePotentialFitClass,
                                                  bouncePotentialFitArguments ),

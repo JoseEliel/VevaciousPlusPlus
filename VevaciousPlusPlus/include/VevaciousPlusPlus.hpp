@@ -25,8 +25,8 @@
 #include "TunnelingCalculation/BounceActionTunneling/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnBisections.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinuitBetweenPaths.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialOnParallelPlanes.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
 
