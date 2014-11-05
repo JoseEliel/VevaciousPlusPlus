@@ -50,7 +50,6 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/SimplePolynomial.cpp \
  source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
  source/BounceActionEvaluation/BounceActionCalculator.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnBisections.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitBetweenPaths.cpp \

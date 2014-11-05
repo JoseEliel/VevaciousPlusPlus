@@ -17,9 +17,7 @@ namespace VevaciousPlusPlus
     MinuitOnHypersurfaces( potentialFunction,
                            numberOfPathSegments,
                            minuitStrategy,
-                           minuitToleranceFraction ),
-    planeDifferenceFraction( 1.0
-                             / static_cast< double > ( numberOfPathSegments ) )
+                           minuitToleranceFraction )
   {
     // This constructor is just an initialization list.
   }
@@ -44,7 +42,7 @@ namespace VevaciousPlusPlus
   {
     SetParallelVector( pathNodes.front(),
                        pathNodes.back() );
-    SetCurrentMinuitSteps( planeDifferenceFraction );
+    SetCurrentMinuitSteps( segmentAuxiliaryLength );
     SetUpHouseholderReflection();
 
     currentHyperplaneOrigin = pathNodes.front();
@@ -53,7 +51,7 @@ namespace VevaciousPlusPlus
          ++fieldIndex )
     {
       currentHyperplaneOrigin[ fieldIndex ] = ( pathNodes.front()[ fieldIndex ]
-                                                + ( planeDifferenceFraction
+                                                + ( segmentAuxiliaryLength
                                   * currentParallelComponent[ fieldIndex ] ) );
     }
     RunMigradAndPutTransformedResultIn( pathNodes[ 1 ] );

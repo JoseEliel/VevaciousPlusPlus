@@ -44,10 +44,6 @@ namespace VevaciousPlusPlus
     // ignores both arguments, and also sets notYetProvidedPath to false.
     virtual TunnelPath const* TryToImprovePath( TunnelPath const& lastPath,
                                      BubbleProfile const& bubbleFromLastPath );
-
-
-  protected:
-    double const planeDifferenceFraction;
   };
 
 } /* namespace VevaciousPlusPlus */

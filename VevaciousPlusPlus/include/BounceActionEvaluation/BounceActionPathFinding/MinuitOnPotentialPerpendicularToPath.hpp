@@ -24,7 +24,7 @@ namespace VevaciousPlusPlus
     MinuitOnPotentialPerpendicularToPath(
                                     PotentialFunction const& potentialFunction,
                                           size_t const numberOfPathSegments,
-                                       int const numberOfAllowedWorsenings = 5,
+                                       int const numberOfAllowedWorsenings = 3,
                                          unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnPotentialPerpendicularToPath();
@@ -48,6 +48,14 @@ namespace VevaciousPlusPlus
   protected:
     int numberOfAllowedWorsenings;
     double bounceBeforeLastPath;
+    std::vector< double > lastPathFalseSideNode;
+    std::vector< double > lastPathTrueSideNode;
+
+
+    // This is an empty hook that can be over-ridden to account for the
+    // bubble profile from the last path.
+    virtual void AccountForBubbleProfileAroundNode( size_t nodeIndex,
+                                    BubbleProfile const& bubbleFromLastPath ){}
   };
 
 } /* namespace VevaciousPlusPlus */
