@@ -14,6 +14,7 @@ namespace VevaciousPlusPlus
                                     PotentialFunction const& potentialFunction,
                                              size_t const numberOfPathSegments,
                                            int const numberOfAllowedWorsenings,
+                                    double const nodeMovementThresholdFraction,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
      MinuitOnHypersurfaces( potentialFunction,
@@ -21,9 +22,12 @@ namespace VevaciousPlusPlus
                             minuitStrategy,
                             minuitToleranceFraction ),
      numberOfAllowedWorsenings( numberOfAllowedWorsenings ),
+     nodeMovementThresholdFractionSquared( nodeMovementThresholdFraction
+                                           * nodeMovementThresholdFraction ),
      bounceBeforeLastPath( functionValueForNanInput ),
      lastPathFalseSideNode( potentialFunction.NumberOfFieldVariables() ),
-     lastPathTrueSideNode( potentialFunction.NumberOfFieldVariables() )
+     lastPathTrueSideNode( potentialFunction.NumberOfFieldVariables() ),
+     nodesConverged( false )
   {
     // This constructor is just an initialization list.
   }
@@ -34,31 +38,20 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This takes the bounce action from bubbleFromLastPath and updates
-  // numberOfAllowedWorsenings based on whether it was an improvement on the
-  // previous path. Then it returns false if too many paths have been tried
-  // which just made the action bigger, true otherwise.
-  bool MinuitOnPotentialPerpendicularToPath::PathCanBeImproved(
-                                      BubbleProfile const& bubbleFromLastPath )
-  {
-    if( bubbleFromLastPath.BounceAction() >= bounceBeforeLastPath )
-    {
-      --numberOfAllowedWorsenings;
-    }
-    bounceBeforeLastPath = bubbleFromLastPath.BounceAction();
-    return ( numberOfAllowedWorsenings > 0 );
-  }
-
   // This minimizes the potential on hyperplanes which are as close to
   // perpendicular to the path given by lastPath, at numberOfVaryingNodes
   // equally-space points along that path, and the minima on those
-  // hyperplanes are then used to construct the returned path. (The bubble
-  // profile from the last path is ignored, but there is an empty hook in the
-  // loop to allow derived classes to use it.)
+  // hyperplanes are then used to construct the returned path. If the minima
+  // are all sufficiently close to their starting points from lastPath,
+  // nodesConverged is set to ture. (The bubble profile from the last path is
+  // ignored, but there is an empty hook in the loop to allow derived classes
+  // to use it.)
   TunnelPath const* MinuitOnPotentialPerpendicularToPath::TryToImprovePath(
                                                     TunnelPath const& lastPath,
                                       BubbleProfile const& bubbleFromLastPath )
   {
+    // We assume that the nodes will converge with this call, and note if they
+    // don't.
     lastPath.PutOnPathAt( currentHyperplaneOrigin,
                           segmentAuxiliaryLength );
     lastPath.PutOnPathAt( lastPathTrueSideNode,
@@ -91,11 +84,27 @@ namespace VevaciousPlusPlus
                             ( ( nodeIndex + 1 ) * segmentAuxiliaryLength ) );
       SetParallelVector( lastPathFalseSideNode,
                          lastPathTrueSideNode );
+      double differenceSquared( 0.0 );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        differenceSquared += ( currentParallelComponent[ fieldIndex ]
+                               * currentParallelComponent[ fieldIndex ] );
+      }
       SetCurrentMinuitSteps( 0.5 );
       SetUpHouseholderReflection();
       AccountForBubbleProfileAroundNode( nodeIndex,
                                          bubbleFromLastPath );
       RunMigradAndPutTransformedResultIn( pathNodes[ nodeIndex ] );
+      // This function leaves the last Minuit parameterization in
+      // minuitResultAsUntransformedVector, so we can use it to determine "how
+      // far the node rolled".
+      if( minuitResultAsUntransformedVector.squaredNorm()
+          > ( nodeMovementThresholdFractionSquared * differenceSquared ) )
+      {
+        nodesConverged = false;
+      }
     }
     // Now we do the node just before the true vacuum. We don't bother copying
     // around all the nodes even though the code would be a bit easier to read.

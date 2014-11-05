@@ -25,31 +25,39 @@ namespace VevaciousPlusPlus
                                     PotentialFunction const& potentialFunction,
                                           size_t const numberOfPathSegments,
                                        int const numberOfAllowedWorsenings = 3,
+                             double const nodeMovementThresholdFraction = 0.05,
                                          unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnPotentialPerpendicularToPath();
 
 
-    // This takes the bounce action from bubbleFromLastPath and updates
-    // numberOfAllowedWorsenings based on whether it was an improvement on the
-    // previous path. Then it returns false if too many paths have been tried
-    // which just made the action bigger, true otherwise.
+    // This returns false if the last call of TryToImprovePath set
+    // nodesConverged to be true because the nodes did not move very far.
+    // Otherwise, it takes the bounce action from bubbleFromLastPath and
+    // updates numberOfAllowedWorsenings based on whether it was an improvement
+    // on the previous path. Then it returns false if too many paths have been
+    // tried which just made the action bigger, true otherwise.
     virtual bool PathCanBeImproved( BubbleProfile const& bubbleFromLastPath );
 
     // This minimizes the potential on hyperplanes which are as close to
     // perpendicular to the path given by lastPath, at numberOfVaryingNodes
     // equally-space points along that path, and the minima on those
-    // hyperplanes are then used to construct the returned path. (The bubble
-    // profile from the last path is ignored.)
+    // hyperplanes are then used to construct the returned path. If the minima
+    // are all sufficiently close to their starting points from lastPath,
+    // nodesConverged is set to ture. (The bubble profile from the last path is
+    // ignored, but there is an empty hook in the loop to allow derived classes
+    // to use it.)
     virtual TunnelPath const* TryToImprovePath( TunnelPath const& lastPath,
                                      BubbleProfile const& bubbleFromLastPath );
 
 
   protected:
     int numberOfAllowedWorsenings;
+    double const nodeMovementThresholdFractionSquared;
     double bounceBeforeLastPath;
     std::vector< double > lastPathFalseSideNode;
     std::vector< double > lastPathTrueSideNode;
+    bool nodesConverged;
 
 
     // This is an empty hook that can be over-ridden to account for the
@@ -57,6 +65,30 @@ namespace VevaciousPlusPlus
     virtual void AccountForBubbleProfileAroundNode( size_t nodeIndex,
                                     BubbleProfile const& bubbleFromLastPath ){}
   };
+
+
+
+
+  // This returns false if the last call of TryToImprovePath set nodesConverged
+  // to be true because the nodes did not move very far. Otherwise, it takes
+  // the bounce action from bubbleFromLastPath and updates
+  // numberOfAllowedWorsenings based on whether it was an improvement on the
+  // previous path. Then it returns false if too many paths have been tried
+  // which just made the action bigger, true otherwise.
+  inline bool MinuitOnPotentialPerpendicularToPath::PathCanBeImproved(
+                                      BubbleProfile const& bubbleFromLastPath )
+  {
+    if( nodesConverged )
+    {
+      return false;
+    }
+    if( bubbleFromLastPath.BounceAction() >= bounceBeforeLastPath )
+    {
+      --numberOfAllowedWorsenings;
+    }
+    bounceBeforeLastPath = bubbleFromLastPath.BounceAction();
+    return ( numberOfAllowedWorsenings > 0 );
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* MINUITONPOTENTIALPERPENDICULARTOPATH_HPP_ */
