@@ -93,7 +93,7 @@ namespace VevaciousPlusPlus
     double actionThreshold( lnOfThermalIntegrationFactor );
     // We assume that the threshold should be the naive threshold for thermal
     // tunneling, and then take the T = 0 version if the temperature is not a
-    // valid temperature (i.e. we treat T < 0 and T "= NAN" as T = 0.0).
+    // valid temperature (i.e. we treat T < 0 and T "= NaN" as T = 0.0).
     if( !(tunnelingTemperature > 0.0 ) )
     {
       double const squareRootOfSolitonicFactor(

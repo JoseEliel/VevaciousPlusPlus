@@ -1,31 +1,30 @@
 /*
- * MinimizingPotentialOnParallelPlanes.cpp
+ * MinuitOnPotentialOnParallelPlanes.cpp
  *
  *  Created on: Oct 27, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnParallelPlanes.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialOnParallelPlanes.hpp"
 
 namespace VevaciousPlusPlus
 {
-  MinimizingPotentialOnParallelPlanes::MinimizingPotentialOnParallelPlanes(
+  MinuitOnPotentialOnParallelPlanes::MinuitOnPotentialOnParallelPlanes(
                                     PotentialFunction const& potentialFunction,
                                              size_t const numberOfPathSegments,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
-    MinimizingPotentialOnHypersurfaces( potentialFunction,
-                                        numberOfPathSegments,
-                                        minuitStrategy,
-                                        minuitToleranceFraction ),
-    notYetProvidedPath( true ),
+    MinuitOnHypersurfaces( potentialFunction,
+                           numberOfPathSegments,
+                           minuitStrategy,
+                           minuitToleranceFraction ),
     planeDifferenceFraction( 1.0
                              / static_cast< double > ( numberOfPathSegments ) )
   {
     // This constructor is just an initialization list.
   }
 
-  MinimizingPotentialOnParallelPlanes::~MinimizingPotentialOnParallelPlanes()
+  MinuitOnPotentialOnParallelPlanes::~MinuitOnPotentialOnParallelPlanes()
   {
     // This does nothing.
   }
@@ -39,7 +38,7 @@ namespace VevaciousPlusPlus
   // to be the previous node plus the vector difference of previous node from
   // the node before it, with a special case for the first varying node. It
   // ignores both arguments, and also sets notYetProvidedPath to false.
-  TunnelPath const* MinimizingPotentialOnParallelPlanes::TryToImprovePath(
+  TunnelPath const* MinuitOnPotentialOnParallelPlanes::TryToImprovePath(
                                                     TunnelPath const& lastPath,
                                       BubbleProfile const& bubbleFromLastPath )
   {
@@ -78,7 +77,6 @@ namespace VevaciousPlusPlus
       }
       RunMigradAndPutTransformedResultIn( pathNodes[ nodeIndex ] );
     }
-    notYetProvidedPath = false;
     return new LinearSplineThroughNodes( pathNodes,
                                          nodeZeroParameterization,
                                          pathTemperature );

@@ -49,7 +49,7 @@ namespace VevaciousPlusPlus
   }
 
   MassesSquaredCalculator::MassesSquaredCalculator() :
-    multiplicityFactor( NAN ),
+    multiplicityFactor( 0.0 ),
     spinType( notSet )
   {
     // This constructor is just an initialization list.

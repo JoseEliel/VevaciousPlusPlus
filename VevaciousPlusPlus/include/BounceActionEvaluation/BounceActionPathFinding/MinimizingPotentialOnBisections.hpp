@@ -17,7 +17,7 @@ namespace VevaciousPlusPlus
 {
 
   class MinimizingPotentialOnBisections :
-                                      public MinimizingPotentialOnHypersurfaces
+                                      public MinuitOnHypersurfaces
   {
   public:
     MinimizingPotentialOnBisections(

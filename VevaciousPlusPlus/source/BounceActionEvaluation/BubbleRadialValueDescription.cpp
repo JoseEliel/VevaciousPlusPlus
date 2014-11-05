@@ -11,9 +11,9 @@ namespace VevaciousPlusPlus
 {
 
   BubbleRadialValueDescription::BubbleRadialValueDescription() :
-    radialValue( NAN ),
-    auxiliaryValue( NAN ),
-    auxiliarySlope( NAN )
+    radialValue( -1.0 ),
+    auxiliaryValue( -2.0 ),
+    auxiliarySlope( 0.0 )
   {
     // This constructor is just an initialization list.
   }

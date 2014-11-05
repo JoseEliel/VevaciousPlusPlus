@@ -19,15 +19,15 @@ namespace VevaciousPlusPlus
     inverseOfAuxiliaryStep( numberOfPotentialSegments ),
     numberOfNormalSegments( numberOfPotentialSegments - 2 ),
     potentialValues( numberOfNormalSegments,
-                     NAN ),
+                     0.0 ),
     firstDerivatives( numberOfNormalSegments,
-                      NAN ),
-    firstSegmentQuadratic( NAN ),
-    finalPotential( NAN ),
-    lastSegmentQuadratic( NAN ),
-    definiteUndershootAuxiliary( NAN ),
+                      0.0 ),
+    firstSegmentQuadratic( -1.0 ),
+    finalPotential( 0.0 ),
+    lastSegmentQuadratic( -1.0 ),
+    definiteUndershootAuxiliary( -1.0 ),
     definiteOvershootAuxiliary( 1.0 ),
-    startOfFinalSegment( NAN )
+    startOfFinalSegment( -1.0 )
   {
     // First we have to find the path false minimum.
     std::vector< double >

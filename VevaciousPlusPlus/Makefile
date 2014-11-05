@@ -51,8 +51,8 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
  source/BounceActionEvaluation/BounceActionCalculator.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnBisections.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnHypersurfaces.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinimizingPotentialOnParallelPlanes.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
+ $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitBetweenPaths.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
  $(BOUNCEACTIONPATHFINDING)/PathPolynomialAverager.cpp \

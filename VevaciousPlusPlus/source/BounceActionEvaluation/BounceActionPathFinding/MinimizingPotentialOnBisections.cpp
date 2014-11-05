@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
                                              unsigned int const minuitStrategy,
                                           double const minuitToleranceFraction,
                                           size_t const maximumNumberOfNodes ) :
-    MinimizingPotentialOnHypersurfaces( potentialFunction,
+    MinuitOnHypersurfaces( potentialFunction,
                                         minuitStrategy,
                                         minuitToleranceFraction ),
     maximumNumberOfNodes( maximumNumberOfNodes ),

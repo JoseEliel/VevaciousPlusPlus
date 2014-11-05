@@ -26,16 +26,16 @@ namespace VevaciousPlusPlus
     integrationStepSize( initialIntegrationStepSize ),
     integrationStartRadius( initialIntegrationStepSize ),
     integrationEndRadius( initialIntegrationEndRadius ),
-    undershootAuxiliary( NAN ),
-    overshootAuxiliary( NAN ),
-    initialAuxiliary( NAN ),
+    undershootAuxiliary( 0.0 ),
+    overshootAuxiliary( 1.0 ),
+    initialAuxiliary( 0.5 ),
     initialConditions( 2 ),
     twoPlusTwiceDampingFactor( 8.0 ),
-    shootingThresholdSquared( NAN ),
+    shootingThresholdSquared( -1.0 ),
     shootAttemptsLeft( 0 ),
     worthIntegratingFurther( true ),
     currentShotGoodEnough( false ),
-    bounceAction( NAN )
+    bounceAction( -1.0 )
   {
     if( tunnelPath.NonZeroTemperature() )
     {
@@ -261,7 +261,7 @@ namespace VevaciousPlusPlus
           // the magnitude of its product with integrationStepSize should be
           // larger than auxiliaryPrecisionResolution and thus the numeric
           // integration should be able to proceed normally.
-          double sinhOrBesselPart( NAN );
+          double sinhOrBesselPart( -2.0 );
           if( tunnelPath.NonZeroTemperature() )
           {
             sinhOrBesselPart = ( sinh( scaledRadius ) / scaledRadius );

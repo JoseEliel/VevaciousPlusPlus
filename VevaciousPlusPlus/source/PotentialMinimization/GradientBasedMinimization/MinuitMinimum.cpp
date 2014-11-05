@@ -33,8 +33,8 @@ namespace VevaciousPlusPlus
                                 std::vector< double > const& variableErrors ) :
     variableValues( variableValues ),
     variableErrors( variableErrors ),
-    functionValue( NAN ),
-    functionError( NAN ),
+    functionValue( 0.0 ),
+    functionError( -1.0 ),
     isValidMinimum( false )
   {
     // This constructor is just an initialization list.
@@ -43,8 +43,8 @@ namespace VevaciousPlusPlus
   MinuitMinimum::MinuitMinimum() :
     variableValues(),
     variableErrors(),
-    functionValue( NAN ),
-    functionError( NAN ),
+    functionValue( 0.0 ),
+    functionError( -1.0 ),
     isValidMinimum( false )
   {
     // This constructor is just an initialization list.

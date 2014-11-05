@@ -133,17 +133,20 @@ namespace VevaciousPlusPlus
     std::vector< size_t > const& fieldsAssumedPositive;
     std::vector< size_t > const& fieldsAssumedNegative;
     bool treeLevelMinimaOnlyAsValidSolutions;
+    double
 
 
     // This vetoes a homotopy continuation solution if any of the fields with
     // index in fieldsAssumedPositive are negative (allowing for a small amount
-    // of numerical jitter) or if any of the fields with index in
-    // fieldsAssumedNegitive are positive ( also allowing for a small amount of
-    // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and
-    // the solution does not correspond to a minimum (rather than just an
-    // extremum) of potentialPolynomial.
+    // of numerical jitter given by equationTolerance) or if any of the fields
+    // with index in fieldsAssumedNegitive are positive (also allowing for a
+    // small amount of numerical jitter), or if
+    // treeLevelMinimaOnlyAsValidSolutions is true and the solution does not
+    // correspond to a minimum (rather than just an extremum) of
+    // potentialPolynomial.
     virtual bool AllowedSolution(
-                    std::vector< double > const& solutionConfiguration ) const;
+                            std::vector< double > const& solutionConfiguration,
+                                  double const equationTolerance = 1.0 ) const;
 
     // This fills targetSystem from potentialPolynomial.
     virtual void

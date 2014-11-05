@@ -247,9 +247,11 @@ namespace VevaciousPlusPlus
       TunnelPath const* currentPathDeleter( NULL );
       BubbleProfile const* currentBubbleDeleter( NULL );
 
-      while( ( bestBubble->BounceAction() > actionThreshold )
-             &&
-             (*pathFinder)->PathCanBeImproved( *currentBubble ) )
+      // This loop will get a path from pathFinder and then repeat if
+      // pathFinder decides that the path can be improved once the bubble
+      // profile is obtained, as long as the bounce action has not dropped
+      // below the threshold.
+      do
       {
         // The nextPath and nextBubble pointers are not strictly necessary,
         // but they make the logic of the code clearer and will probably be
@@ -304,7 +306,9 @@ namespace VevaciousPlusPlus
         }
         std::cout << ".";
         std::cout << std::endl;
-      }
+      } while( ( bestBubble->BounceAction() > actionThreshold )
+               &&
+               (*pathFinder)->PathCanBeImproved( *currentBubble ) );
       // At the end of the loop, these either point at the last tried path and
       // bubble which did not end up as the best ones, so they should be
       // deleted, or they are NULL (because the last tried path and bubble

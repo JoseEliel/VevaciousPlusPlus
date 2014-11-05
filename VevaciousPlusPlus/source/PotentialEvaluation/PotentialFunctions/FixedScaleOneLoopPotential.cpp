@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
                                       scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       runningParameterManager ),
-    inverseRenormalizationScaleSquared( NAN ),
+    inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,
@@ -33,7 +33,7 @@ namespace VevaciousPlusPlus
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
-    inverseRenormalizationScaleSquared( NAN ),
+    inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,

@@ -23,8 +23,8 @@ namespace VevaciousPlusPlus
     numberOfFields( numberOfFields ),
     targetSystem(),
     highestDegreeOfTargetSystem( 0 ),
-    minimumScale( NAN ),
-    maximumScale( NAN ),
+    minimumScale( -2.0 ),
+    maximumScale( -2.0 ),
     startSystem(),
     startValues(),
     validSolutions(),
@@ -197,13 +197,15 @@ namespace VevaciousPlusPlus
 
   // This vetoes a homotopy continuation solution if any of the fields with
   // index in fieldsAssumedPositive are negative (allowing for a small amount
-  // of numerical jitter) or if any of the fields with index in
-  // fieldsAssumedNegitive are positive ( also allowing for a small amount of
-  // numerical jitter), or if treeLevelMinimaOnlyAsValidSolutions is true and
-  // the solution does not correspond to a minimum (rather than just an
-  // extremum) of potentialPolynomial.
+  // of numerical jitter given by equationTolerance) or if any of the fields
+  // with index in fieldsAssumedNegitive are positive (also allowing for a
+  // small amount of numerical jitter), or if
+  // treeLevelMinimaOnlyAsValidSolutions is true and the solution does not
+  // correspond to a minimum (rather than just an extremum) of
+  // potentialPolynomial.
   bool PolynomialGradientTargetSystem::AllowedSolution(
-                     std::vector< double > const& solutionConfiguration ) const
+                            std::vector< double > const& solutionConfiguration,
+                                         double const equationTolerance ) const
   {
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -219,7 +221,8 @@ namespace VevaciousPlusPlus
       }
       std::cout << solutionConfiguration[ fieldIndex ];
     }
-    std::cout << " } ) called. treeLevelMinimaOnlyAsValidSolutions = " << treeLevelMinimaOnlyAsValidSolutions;
+    std::cout << " } ) called. treeLevelMinimaOnlyAsValidSolutions = "
+    << treeLevelMinimaOnlyAsValidSolutions;
     std::cout << std::endl;*/
 
     for( std::vector< size_t >::const_iterator
@@ -227,7 +230,7 @@ namespace VevaciousPlusPlus
          positiveIndex < fieldsAssumedPositive.end();
          ++positiveIndex )
     {
-      if( solutionConfiguration[ *positiveIndex ] < -1.0 )
+      if( solutionConfiguration[ *positiveIndex ] < -equationTolerance )
       {
         return false;
       }
@@ -237,7 +240,7 @@ namespace VevaciousPlusPlus
          negativeIndex < fieldsAssumedNegative.end();
          ++negativeIndex )
     {
-      if( solutionConfiguration[ *negativeIndex ] > 1.0 )
+      if( solutionConfiguration[ *negativeIndex ] > equationTolerance )
       {
         return false;
       }

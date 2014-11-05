@@ -38,7 +38,7 @@ namespace VevaciousPlusPlus
     // bounce action previous to that given by bubbleFromLastPath is, if
     // relevant to the decision.
     virtual bool
-    PathCanBeImproved( BubbleProfile const& bubbleFromLastPath ) const = 0;
+    PathCanBeImproved( BubbleProfile const& bubbleFromLastPath ) = 0;
 
     // This should adjust the internal representation of the path towards
     // extremizing the bounce action, ideally in an incremental manner so that

@@ -23,8 +23,8 @@ namespace VevaciousPlusPlus
     slhaBlockFinder(),
     slhaAliasMap(),
     slhaAliasFinder(),
-    lowestBlockScale( NAN ),
-    highestBlockScale( NAN )
+    lowestBlockScale( -1.0 ),
+    highestBlockScale( -1.0 )
   {
     // This constructor is just an initialization list.
   }
@@ -430,7 +430,7 @@ namespace VevaciousPlusPlus
     {
       return parameterFinder->second;
     }
-    double constantValue( NAN );
+    double constantValue( 0.0 );
     if( BOL::StringParser::stringIsDouble( parameterString,
                                            constantValue ) )
     {
@@ -464,8 +464,8 @@ namespace VevaciousPlusPlus
   void RunningParameterManager::ReadFile( std::string const& slhaFilename )
   {
     slhaParser.readFile( slhaFilename );
-    lowestBlockScale = 0.0;
-    highestBlockScale = 0.0;
+    lowestBlockScale = -1.0;
+    highestBlockScale = -1.0;
     for( std::vector< RestrictedSlhaBlock* >::iterator
          whichBlock( slhaBlockPointers.begin() );
          whichBlock < slhaBlockPointers.end();

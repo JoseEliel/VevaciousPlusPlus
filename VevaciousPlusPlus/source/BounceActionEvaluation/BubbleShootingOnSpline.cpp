@@ -19,8 +19,8 @@ namespace VevaciousPlusPlus
     BounceActionCalculator( potentialFunction ),
     numberOfPotentialSegments( numberOfPotentialSegments ),
     lengthScaleResolution( lengthScaleResolution ),
-    radialStepSize( NAN ),
-    estimatedRadialMaximum( NAN ),
+    radialStepSize( -1.0 ),
+    estimatedRadialMaximum( -1.0 ),
     shootAttempts( shootAttempts ),
     auxiliaryThreshold( 1.0E-6 )
   {

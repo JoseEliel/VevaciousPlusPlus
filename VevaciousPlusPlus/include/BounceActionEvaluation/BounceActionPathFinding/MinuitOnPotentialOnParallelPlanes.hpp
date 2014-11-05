@@ -1,15 +1,15 @@
 /*
- * MinimizingPotentialOnParallelPlanes.hpp
+ * MinuitOnPotentialOnParallelPlanes.hpp
  *
  *  Created on: Oct 27, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef MINIMIZINGPOTENTIALONPARALLELPLANES_HPP_
-#define MINIMIZINGPOTENTIALONPARALLELPLANES_HPP_
+#ifndef MINUITONPOTENTIALONPARALLELPLANES_HPP_
+#define MINUITONPOTENTIALONPARALLELPLANES_HPP_
 
 #include "CommonIncludes.hpp"
-#include "MinimizingPotentialOnHypersurfaces.hpp"
+#include "MinuitOnHypersurfaces.hpp"
 #include "Minuit2/MnMigrad.h"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
@@ -18,24 +18,22 @@
 namespace VevaciousPlusPlus
 {
 
-  class MinimizingPotentialOnParallelPlanes :
-                                      public MinimizingPotentialOnHypersurfaces
+  class MinuitOnPotentialOnParallelPlanes : public MinuitOnHypersurfaces
   {
   public:
-    MinimizingPotentialOnParallelPlanes(
+    MinuitOnPotentialOnParallelPlanes(
                                     PotentialFunction const& potentialFunction,
-                                         size_t const numberOfPathSegments,
-                                         unsigned int const minuitStrategy = 1,
+                                       size_t const numberOfPathSegments,
+                                       unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
-    virtual ~MinimizingPotentialOnParallelPlanes();
+    virtual ~MinuitOnPotentialOnParallelPlanes();
 
 
-    // This just returns true if it has not yet provided a path, or false if it
-    // already has, as this class does all it can in a single call of
-    // TryToImprovePath.
-    virtual bool
-    PathCanBeImproved( BubbleProfile const& bubbleFromLastPath ) const
-    { return notYetProvidedPath; }
+    // This just returns false, as this class does all it can in a single call
+    // of TryToImprovePath, which is called before PathCanBeImproved under
+    // the only circumstances assumed.
+    virtual bool PathCanBeImproved( BubbleProfile const& bubbleFromLastPath )
+    { return false; }
 
     // This minimizes the potential on a series of hyperplanes, all
     // perpendicular to the vector difference of the vacua. It tries to avoid
@@ -49,9 +47,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    bool notYetProvidedPath;
     double const planeDifferenceFraction;
   };
 
 } /* namespace VevaciousPlusPlus */
-#endif /* MINIMIZINGPOTENTIALONPARALLELPLANES_HPP_ */
+#endif /* MINUITONPOTENTIALONPARALLELPLANES_HPP_ */
