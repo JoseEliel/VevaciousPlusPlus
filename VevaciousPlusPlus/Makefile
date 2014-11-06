@@ -53,10 +53,7 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialPerpendicularToPath.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinuitBetweenPaths.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
- $(BOUNCEACTIONPATHFINDING)/PathPolynomialAverager.cpp \
- $(BOUNCEACTIONPATHFINDING)/PathSeparateFieldAverager.cpp \
  source/BounceActionEvaluation/BouncePathFinder.cpp \
  source/BounceActionEvaluation/BubbleProfile.cpp \
  source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \

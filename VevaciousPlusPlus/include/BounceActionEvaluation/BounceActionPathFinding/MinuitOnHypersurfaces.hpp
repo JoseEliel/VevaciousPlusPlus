@@ -9,8 +9,9 @@
 #define MINUITONHYPERSURFACES_HPP_
 
 #include "CommonIncludes.hpp"
-#include "MinuitPathFinder.hpp"
+#include "Minuit2/MnMigrad.h"
 #include "Eigen/Dense"
+#include "MinuitPathFinder.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"
