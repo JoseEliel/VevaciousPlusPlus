@@ -23,6 +23,7 @@ namespace VevaciousPlusPlus
     FixedScaleOneLoopPotential( std::string const& modelFilename,
                                 double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager );
     FixedScaleOneLoopPotential(
           PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );

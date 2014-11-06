@@ -469,6 +469,7 @@ namespace VevaciousPlusPlus
     std::string modelFilename( "./ModelFiles/SM.vin" );
     double scaleRangeMinimumFactor( 10.0 );
     bool treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false );
+    double assumedPositiveOrNegativeTolerance( 1.0 );
     BOL::AsciiXmlParser elementParser;
     elementParser.loadString( constructorArguments );
     while( elementParser.readNextElement() )
@@ -477,11 +478,14 @@ namespace VevaciousPlusPlus
                                      "ModelFile",
                                      modelFilename );
       InterpretElementIfNameMatches( elementParser,
+                                     "ScaleRangeMinimumFactor",
+                                     scaleRangeMinimumFactor );
+      InterpretElementIfNameMatches( elementParser,
                                      "RollOnlyMinima",
                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions );
       InterpretElementIfNameMatches( elementParser,
-                                     "ScaleRangeMinimumFactor",
-                                     scaleRangeMinimumFactor );
+                                     "AssumedPositiveOrNegativeTolerance",
+                                     assumedPositiveOrNegativeTolerance );
     }
     if( className.compare( "FixedScaleOneLoopPotential" ) == 0 )
     {
@@ -489,6 +493,7 @@ namespace VevaciousPlusPlus
       = new FixedScaleOneLoopPotential( modelFilename,
                                         scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                        assumedPositiveOrNegativeTolerance,
                                         *ownedSlhaManager );
     }
     else if( className.compare( "RgeImprovedOneLoopPotential" ) == 0 )
@@ -497,6 +502,7 @@ namespace VevaciousPlusPlus
       = new RgeImprovedOneLoopPotential( modelFilename,
                                          scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                         assumedPositiveOrNegativeTolerance,
                                          *ownedSlhaManager );
     }
     else

@@ -45,6 +45,17 @@
         <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
         /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
       </ModelFile>
+      <ScaleRangeMinimumFactor>
+        <!-- The maximum scale is at least the minimum scale in the SLHA file
+             multiplied by the number given here. For example, if this number
+             were 10.0, and the SLHA file had blocks at Q= 246.0 up to
+             Q= 1000.0, the maximum scale would be pushed up to 2460.0; in
+             contrast, if the number here were 2.0, the maximum scale would
+             remain 1000.0 as opposed to 2.0 * 246.0 = 492.0 (for purposes of
+             restricting Minuit2 from rolling too far away from the region of
+             validity, for example). -->
+        10.0
+      </ScaleRangeMinimumFactor>
       <RollOnlyMinima>
         <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if true
              then the starting points for gradient-based minimization are only
@@ -58,17 +69,17 @@
              bottleneck. -->
         true
       </RollOnlyMinima>
-      <ScaleRangeMinimumFactor>
-      <!-- Another option: the maximum scale is at least the minimum scale in
-           the SLHA file multiplied by the number given here. For example, if
-           this number were 10.0, and the SLHA file had blocks at Q= 246.0 up
-           to Q= 1000.0, the maximum scale would be pushed up to 2460.0; in
-           contrast, if the number here were 2.0, the maximum scale would
-           remain 1000.0 as opposed to 2.0 * 246.0 = 492.0 (for purposes of
-           restricting Minuit2 from rolling too far away from the region of
-           validity, for example).
-        10.0
-      </ScaleRangeMinimumFactor>
+      <AssumedPositiveOrNegativeTolerance>
+        <!-- This number is used in decided whether a
+             homotopy-continuation-generated starting point is to be used by
+             the gradient minimization scheme when a field which is assumed to
+             be positive semi-definite has a numerically small but still
+             negative value, and the converse for those meant to be negative
+             semi-definite. If a field's magnitude is smaller than the value
+             given here, it is treated as zero and so passes the test for being
+             positive semi-definite or negative semi-definite. -->
+        1.0
+      </AssumedPositiveOrNegativeTolerance>
     </ConstructorArguments>
   </PotentialClass>
   

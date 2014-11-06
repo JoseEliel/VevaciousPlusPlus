@@ -16,7 +16,8 @@ namespace VevaciousPlusPlus
                                       SlhaUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
-                             bool const treeLevelMinimaOnlyAsValidSolutions ) :
+                                bool const treeLevelMinimaOnlyAsValidSolutions,
+                            double const assumedPositiveOrNegativeTolerance ) :
     HomotopyContinuationTargetSystem( previousPropagator ),
     potentialPolynomial( potentialPolynomial ),
     numberOfVariables( numberOfFields ),
@@ -32,7 +33,8 @@ namespace VevaciousPlusPlus
     startHessian(),
     fieldsAssumedPositive( fieldsAssumedPositive ),
     fieldsAssumedNegative( fieldsAssumedNegative ),
-    treeLevelMinimaOnlyAsValidSolutions( treeLevelMinimaOnlyAsValidSolutions )
+    treeLevelMinimaOnlyAsValidSolutions( treeLevelMinimaOnlyAsValidSolutions ),
+    assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
     // This constructor is just an initialization list.
   }
@@ -204,8 +206,7 @@ namespace VevaciousPlusPlus
   // correspond to a minimum (rather than just an extremum) of
   // potentialPolynomial.
   bool PolynomialGradientTargetSystem::AllowedSolution(
-                            std::vector< double > const& solutionConfiguration,
-                                         double const equationTolerance ) const
+                     std::vector< double > const& solutionConfiguration ) const
   {
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -230,7 +231,8 @@ namespace VevaciousPlusPlus
          positiveIndex < fieldsAssumedPositive.end();
          ++positiveIndex )
     {
-      if( solutionConfiguration[ *positiveIndex ] < -equationTolerance )
+      if( solutionConfiguration[ *positiveIndex ]
+          < -assumedPositiveOrNegativeTolerance )
       {
         return false;
       }
@@ -240,7 +242,8 @@ namespace VevaciousPlusPlus
          negativeIndex < fieldsAssumedNegative.end();
          ++negativeIndex )
     {
-      if( solutionConfiguration[ *negativeIndex ] > equationTolerance )
+      if( solutionConfiguration[ *negativeIndex ]
+          > assumedPositiveOrNegativeTolerance )
       {
         return false;
       }

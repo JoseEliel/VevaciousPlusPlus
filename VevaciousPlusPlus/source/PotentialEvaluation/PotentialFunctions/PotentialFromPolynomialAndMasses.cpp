@@ -38,6 +38,7 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                                           double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
@@ -61,7 +62,8 @@ namespace VevaciousPlusPlus
                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
     scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
     fieldsAssumedPositive(),
-    fieldsAssumedNegative()
+    fieldsAssumedNegative(),
+    assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -813,7 +815,8 @@ namespace VevaciousPlusPlus
     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
     scaleRangeMinimumFactor( -1.0 ),
     fieldsAssumedPositive(),
-    fieldsAssumedNegative()
+    fieldsAssumedNegative(),
+    assumedPositiveOrNegativeTolerance( -1.0 )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -849,7 +852,9 @@ namespace VevaciousPlusPlus
           copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
     scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
     fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
-    fieldsAssumedNegative( copySource.fieldsAssumedNegative )
+    fieldsAssumedNegative( copySource.fieldsAssumedNegative ),
+    assumedPositiveOrNegativeTolerance(
+                                copySource.assumedPositiveOrNegativeTolerance )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more

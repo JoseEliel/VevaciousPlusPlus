@@ -31,6 +31,7 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialAndMasses( std::string const& modelFilename,
                                       double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                             RunningParameterManager& runningParameterManager );
     virtual ~PotentialFromPolynomialAndMasses();
 
@@ -78,6 +79,7 @@ namespace VevaciousPlusPlus
     double const scaleRangeMinimumFactor;
     std::vector< size_t > fieldsAssumedPositive;
     std::vector< size_t > fieldsAssumedNegative;
+    double const assumedPositiveOrNegativeTolerance;
 
 
     // This is just for derived classes.

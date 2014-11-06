@@ -29,7 +29,8 @@ namespace VevaciousPlusPlus
                                     SlhaUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
-                              bool const treeLevelMinimaOnlyAsValidSolutions );
+                                bool const treeLevelMinimaOnlyAsValidSolutions,
+                             double const assumedPositiveOrNegativeTolerance );
     virtual ~PolynomialGradientTargetSystem();
 
 
@@ -133,7 +134,7 @@ namespace VevaciousPlusPlus
     std::vector< size_t > const& fieldsAssumedPositive;
     std::vector< size_t > const& fieldsAssumedNegative;
     bool treeLevelMinimaOnlyAsValidSolutions;
-    double
+    double const assumedPositiveOrNegativeTolerance;
 
 
     // This vetoes a homotopy continuation solution if any of the fields with
@@ -145,8 +146,7 @@ namespace VevaciousPlusPlus
     // correspond to a minimum (rather than just an extremum) of
     // potentialPolynomial.
     virtual bool AllowedSolution(
-                            std::vector< double > const& solutionConfiguration,
-                                  double const equationTolerance = 1.0 ) const;
+                    std::vector< double > const& solutionConfiguration ) const;
 
     // This fills targetSystem from potentialPolynomial.
     virtual void

@@ -74,8 +74,7 @@ namespace VevaciousPlusPlus
     // The numerical tolerance of whether the system is solved is given by
     // equationTolerance.
     virtual bool AllowedSolution(
-                std::vector< double > const& solutionConfiguration,
-                              double const equationTolerance = 1.0 ) const = 0;
+                std::vector< double > const& solutionConfiguration ) const = 0;
   };
 
 } /* namespace VevaciousPlusPlus */

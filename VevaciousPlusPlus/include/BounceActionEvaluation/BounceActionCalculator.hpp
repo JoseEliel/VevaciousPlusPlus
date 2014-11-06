@@ -11,6 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PathParameterization/TunnelPath.hpp"
+#include "BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {
