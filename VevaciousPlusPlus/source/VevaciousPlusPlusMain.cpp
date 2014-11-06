@@ -199,6 +199,7 @@ int main( int argumentCount,
   << "Still to do:" << std::endl
   << "use BounceActionCalculator along straight paths within"
   << " CosmoTransitionsRunner for thermal action T dependence fit" << std::endl
+  << "note rcode from CosmoTransitions and maybe issue warning" << std::endl
   << "write MinuitBetweenPaths subclasses" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
