@@ -211,6 +211,9 @@
             <NumberOfAllowedWorsenings>
               3
             </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
             <MinuitStrategy>
               1
             </MinuitStrategy>

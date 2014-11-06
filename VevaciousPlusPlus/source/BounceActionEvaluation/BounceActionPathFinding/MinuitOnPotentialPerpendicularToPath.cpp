@@ -22,7 +22,7 @@ namespace VevaciousPlusPlus
                             minuitStrategy,
                             minuitToleranceFraction ),
      numberOfAllowedWorsenings( numberOfAllowedWorsenings ),
-     nodeMovementThresholdFractionSquared( nodeMovementThresholdFraction
+     nodeMovementThresholdFractionSquared( 0.25 * nodeMovementThresholdFraction
                                            * nodeMovementThresholdFraction ),
      bounceBeforeLastPath( functionValueForNanInput ),
      lastPathFalseSideNode( potentialFunction.NumberOfFieldVariables() ),
@@ -30,6 +30,11 @@ namespace VevaciousPlusPlus
      nodesConverged( false )
   {
     // This constructor is just an initialization list.
+    // The factor of 0.25 in nodeMovementThresholdFractionSquared is to account
+    // for nodeMovementThresholdFraction being given in reference to the length
+    // of a single segment, while nodeMovementThresholdFractionSquared is used
+    // in comparison with the square of the length of the difference of nodes
+    // which are 2 segments apart.
   }
 
   MinuitOnPotentialPerpendicularToPath::~MinuitOnPotentialPerpendicularToPath()

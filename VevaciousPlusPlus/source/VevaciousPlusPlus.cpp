@@ -807,6 +807,7 @@ namespace VevaciousPlusPlus
     // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
     int numberOfPathSegments( 100 );
     int numberOfAllowedWorsenings( 3 );
+    double convergenceThresholdFraction( 0.05 );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
     BOL::AsciiXmlParser xmlParser;
@@ -820,6 +821,9 @@ namespace VevaciousPlusPlus
                                      "NumberOfAllowedWorsenings",
                                      numberOfAllowedWorsenings );
       InterpretElementIfNameMatches( xmlParser,
+                                     "ConvergenceThresholdFraction",
+                                     convergenceThresholdFraction );
+      InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );
       InterpretElementIfNameMatches( xmlParser,
@@ -829,6 +833,7 @@ namespace VevaciousPlusPlus
     return new MinuitOnPotentialPerpendicularToPath( *potentialFunction,
                                  static_cast< size_t >( numberOfPathSegments ),
                                                      numberOfAllowedWorsenings,
+                                                  convergenceThresholdFraction,
                                                      minuitStrategy,
                       static_cast< unsigned int >( minuitToleranceFraction ) );
   }
@@ -841,6 +846,7 @@ namespace VevaciousPlusPlus
     // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
     int numberOfPathSegments( 100 );
     int numberOfAllowedWorsenings( 3 );
+    double convergenceThresholdFraction( 0.05 );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
     BOL::AsciiXmlParser xmlParser;
@@ -853,6 +859,9 @@ namespace VevaciousPlusPlus
       InterpretElementIfNameMatches( xmlParser,
                                      "NumberOfAllowedWorsenings",
                                      numberOfAllowedWorsenings );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "ConvergenceThresholdFraction",
+                                     convergenceThresholdFraction );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );

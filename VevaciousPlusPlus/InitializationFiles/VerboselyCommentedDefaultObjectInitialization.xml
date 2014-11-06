@@ -370,6 +370,13 @@
                    lower bounce action. -->
               3
             </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              <!-- This is the fraction of the length of a path segment (after
+                   dividing the path into NumberOfPathSegments segments) that a
+                   node is allowed to move from its starting point without
+                   flagging that the path has not yet converged. -->
+              0.05
+            </ConvergenceThresholdFraction>
             <MinuitStrategy>
               <!-- The number given here is given to Minuit2 to decide how
                    precise it tries to be, through more or less calls of the
