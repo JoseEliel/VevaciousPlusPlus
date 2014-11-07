@@ -15,6 +15,7 @@ namespace VevaciousPlusPlus
                                 TunnelPath const& tunnelPath,
                                 double const initialIntegrationStepSize,
                                 double const initialIntegrationEndRadius ) :
+    isValid( false ),
     auxiliaryProfile(),
     odeintProfile( 1,
                    BubbleRadialValueDescription() ),
@@ -394,6 +395,7 @@ namespace VevaciousPlusPlus
     }
     std::cout << std::endl;*/
 
+    isValid = true;
     return auxiliaryProfile;
   }
 

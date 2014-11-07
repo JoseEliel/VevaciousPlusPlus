@@ -40,6 +40,10 @@ namespace VevaciousPlusPlus
     operator()( size_t const undershootOvershootAttempts,
                 double const shootingThreshold );
 
+    // This returns a bool which starts false but is set to true upon
+    // successfully finishing a call of operator().
+    bool IsValid() const{ return isValid; }
+
     // This returns the value that the auxiliary variable should have at the
     // center of the bubble.
     double AuxiliaryAtBubbleCenter() const;
@@ -64,6 +68,7 @@ namespace VevaciousPlusPlus
   protected:
     static double const auxiliaryPrecisionResolution;
 
+    bool isValid;
     std::vector< BubbleRadialValueDescription > auxiliaryProfile;
     std::vector< BubbleRadialValueDescription > odeintProfile;
     SplinePotential const& pathPotential;

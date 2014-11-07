@@ -223,6 +223,7 @@ namespace VevaciousPlusPlus
     fieldColors.push_back( "green" );
     fieldColors.push_back( "cyan" );
     actionCalculator->PlotBounceConfiguration( *bestPath,
+                                               *bestBubble,
                                                fieldColors,
                                                straightPathPicture );*/
 
@@ -323,6 +324,7 @@ namespace VevaciousPlusPlus
     << "Final deformed path being plotted in " << finalPathPicture << ".";
     std::cout << std::endl;
     actionCalculator->PlotBounceConfiguration( *bestPath,
+                                               *bestBubble,
                                                fieldColors,
                                                finalPathPicture );*/
 

@@ -46,6 +46,10 @@ namespace VevaciousPlusPlus
     SplinePotential potentialApproximation( potentialFunction,
                                             tunnelPath,
                                             numberOfPotentialSegments );
+    BubbleProfile* bubbleProfile( new BubbleProfile( potentialApproximation,
+                                                     tunnelPath,
+                                                     radialStepSize,
+                                                    estimatedRadialMaximum ) );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
@@ -58,25 +62,26 @@ namespace VevaciousPlusPlus
     {
       std::cout
       << std::endl
-      << "Warning! No energy barrier, so returning a bounce action of 0.";
+      << "Warning! No energy barrier, so returning an invalid bubble profile,"
+      << " but with a bounce action of 0.";
       std::cout << std::endl;
-      return 0.0;
+      bubbleProfile->SetBounceAction( 0.0 );
+      return bubbleProfile;
     }
     if( !(potentialApproximation.TrueVacuumLowerThanPathFalseMinimum()) )
     {
       std::cout
       << std::endl
-      << "Warning! True vacuum not lower than path false vacuum, so bounce"
-      << " configuration cannot be plotted.";
+      << "Warning! True vacuum not lower than path false vacuum, so returning"
+      << " an invalid bubble profile, but with a bounce action of "
+      << std::numeric_limits< double >::max()
+      << " (the largest double that can be represented on this computer)";
       std::cout << std::endl;
-      return std::numeric_limits< double >::max();
+      bubbleProfile->SetBounceAction( std::numeric_limits< double >::max() );
+      return bubbleProfile;
     }
 
     bool const nonZeroTemperature( tunnelPath.NonZeroTemperature() );
-    BubbleProfile* bubbleProfile( new BubbleProfile( potentialApproximation,
-                                                     tunnelPath,
-                                                     radialStepSize,
-                                                    estimatedRadialMaximum ) );
     std::vector< BubbleRadialValueDescription > const&
     auxiliaryProfile( (*bubbleProfile)( shootAttempts,
                                         auxiliaryThreshold ) );
@@ -362,48 +367,15 @@ namespace VevaciousPlusPlus
   // should not be plotted.
   void BubbleShootingOnSpline::PlotBounceConfiguration(
                                                   TunnelPath const& tunnelPath,
+                                            BubbleProfile const& bubbleProfile,
                                  std::vector< std::string > const& fieldColors,
                                         std::string const& plotFilename ) const
   {
-    SplinePotential potentialApproximation( potentialFunction,
-                                            tunnelPath,
-                                            numberOfPotentialSegments );
-    if( !(potentialApproximation.EnergyBarrierResolved()) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! No energy barrier, so bounce configuration cannot be"
-      << " plotted.";
-      std::cout << std::endl;
-      return;
-    }
-    if( !(potentialApproximation.TrueVacuumLowerThanPathFalseMinimum()) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! True vacuum not lower than path false vacuum, so bounce"
-      << " configuration cannot be plotted.";
-      std::cout << std::endl;
-      return;
-    }
-    BubbleProfile bubbleProfile( potentialApproximation,
-                                 tunnelPath,
-                                 radialStepSize,
-                                 estimatedRadialMaximum );
-    std::vector< BubbleRadialValueDescription > const&
-    auxiliaryProfile( bubbleProfile( shootAttempts,
-                                     auxiliaryThreshold ) );
     BOL::TwoDimensionalDataPlotter bubblePlotter( "/opt/local/bin/gnuplot",
                                                   plotFilename );
-
-    std::cout << std::endl
-    << "Path parameterized as:" << std::endl
-    << tunnelPath.AsDebuggingString();
-    std::cout << std::endl
-    << "Potential parameterized as:" << std::endl
-    << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;
     std::cout << "Bubble profile:" << std::endl;
+    std::vector< BubbleRadialValueDescription > const&
+    auxiliaryProfile( bubbleProfile.RadialProfile() );
     for( std::vector< BubbleRadialValueDescription >::const_iterator
          bubbleBit( auxiliaryProfile.begin() );
          bubbleBit < auxiliaryProfile.end();
