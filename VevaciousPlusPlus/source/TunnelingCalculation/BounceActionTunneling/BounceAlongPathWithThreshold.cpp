@@ -210,7 +210,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     // debugging:
-    /*std::string straightPathPicture( "StraightBubbleProfile.eps" );
+    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
     << std::endl
     << "Initial straight path being plotted in " << straightPathPicture << ".";
@@ -225,13 +225,17 @@ namespace VevaciousPlusPlus
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                *bestBubble,
                                                fieldColors,
-                                               straightPathPicture );*/
+                                               straightPathPicture );/**/
 
     for( std::vector< BouncePathFinder* >::iterator
          pathFinder( pathFinders.begin() );
          pathFinder < pathFinders.end();
          ++pathFinder )
     {
+      std::cout << std::endl
+      << "Passing best path so far to next path finder.";
+      std::cout << std::endl;
+
       (*pathFinder)->SetVacuaAndTemperature( falseVacuum,
                                              trueVacuum,
                                              tunnelingTemperature );
@@ -316,9 +320,22 @@ namespace VevaciousPlusPlus
       // happened to be the best ones), so deleting them is no problem.
       delete currentBubbleDeleter;
       delete currentPathDeleter;
+
+      // We don't bother with the rest of the path finders if the action has
+      // already dropped below the threshold.
+      if( bestBubble->BounceAction() < actionThreshold )
+      {
+        std::cout
+        << std::endl
+        << "Bounce action dropped below threshold, breaking off from looking"
+        << " for further path improvements.";
+        std::cout << std::endl;
+
+        break;
+      }
     }
     // debugging:
-    /*std::string finalPathPicture( "FinalBubbleProfile.eps" );
+    /**/std::string finalPathPicture( "FinalBubbleProfile.eps" );
     std::cout << std::endl << "debugging:"
     << std::endl
     << "Final deformed path being plotted in " << finalPathPicture << ".";
@@ -326,7 +343,7 @@ namespace VevaciousPlusPlus
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                *bestBubble,
                                                fieldColors,
-                                               finalPathPicture );*/
+                                               finalPathPicture );/**/
 
     std::cout << std::endl
     << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
