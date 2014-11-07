@@ -114,6 +114,7 @@ int main( int argumentCount,
                      "VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin" ),
                        10.0,
                        true,
+                       0.5,
                        runningParameterManager );
   VevaciousPlusPlus::RgeImprovedOneLoopPotential
   rgeImprovedPotential( fixedScalePotential );

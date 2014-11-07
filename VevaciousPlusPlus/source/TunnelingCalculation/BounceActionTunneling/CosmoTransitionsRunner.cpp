@@ -54,7 +54,7 @@ namespace VevaciousPlusPlus
   double
   CosmoTransitionsRunner::BounceAction( PotentialMinimum const& falseVacuum,
                                         PotentialMinimum const& trueVacuum,
-                                      double const tunnelingTemperature ) const
+                                        double const tunnelingTemperature )
   {
     std::string const
     pythonResultFilename( "VevaciousCosmoTransitionsResult.txt" );

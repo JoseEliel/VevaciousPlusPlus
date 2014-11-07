@@ -61,7 +61,7 @@ namespace VevaciousPlusPlus
     // are assumed to already be the minima at tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 double const tunnelingTemperature ) const;
+                                 double const tunnelingTemperature );
 
     // This calculates the evaporation and critical temperatures, then writes
     // and runs a Python program using the potential from

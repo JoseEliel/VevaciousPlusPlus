@@ -72,7 +72,7 @@ namespace VevaciousPlusPlus
     // tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 double const tunnelingTemperature ) const = 0;
+                                 double const tunnelingTemperature ) = 0;
 
     // This sets quantumSurvivalProbability, quantumLifetimeInSeconds, and
     // logOfMinusLogOfQuantumProbability appropriately.
