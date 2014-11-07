@@ -727,3 +727,36 @@ BLOCK VEVACIOUSPANICVACUUM # VEVs for panic vacuum in GeV
   1  2.31611073E+003  # Hu
   2  2.09779795E+003  # Q[1,3]
   3  2.22073512E+003  # U[3]
+BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus
+# version 1.0.00.alpha001, documented in [none as yet]
+# Results written Fri Nov  7 15:27:59 2014
+# [index] [verdict int]
+  1  0  # Metastable DSB vacuum
+BLOCK VEVACIOUSZEROTEMPERATURE # Results at T = 0
+# [index] [verdict float]
+  1  1.00000000E+000  # Probability of DSB vacuum surviving 4.3E17 seconds
+  2  1.00000000E+100  # Tunneling time out of DSB vacuum in seconds
+  3  -2.17262878E+002  # L = ln(-ln(P)), => P = e^(-e^L)
+BLOCK VEVACIOUSNONZEROTEMPERATURE # Results at T != 0
+# [index] [verdict float]
+  1  0.00000000E+000  # Probability of DSB vacuum surviving thermal tunneling
+  2  4.50241965E+002  # Dominant tunneling temperature in GeV
+  3  1.18325295E+001  # L = ln(-ln(P)), => P = e^(-e^L)
+BLOCK VEVACIOUSFIELDNAMES # Field names for each index
+# [index] [field name in ""]
+  0  "Hd"
+  1  "Hu"
+  2  "Q[1,3]"
+  3  "U[3]"
+BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV
+# [index] [field VEV in GeV]
+  0  5.19213443E+000  # Hd
+  1  2.32922567E+002  # Hu
+  2  0.00000000E+000  # Q[1,3]
+  3  0.00000000E+000  # U[3]
+BLOCK VEVACIOUSPANICVACUUM # VEVs for panic vacuum in GeV
+# [index] [field VEV in GeV]
+  0  2.20469611E+003  # Hd
+  1  2.31611073E+003  # Hu
+  2  2.09779795E+003  # Q[1,3]
+  3  2.22073512E+003  # U[3]
