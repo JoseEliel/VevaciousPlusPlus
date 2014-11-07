@@ -167,10 +167,6 @@ namespace VevaciousPlusPlus
                                      std::string const& constructorArguments );
 
     //
-    BouncePathFinder* CreateMinuitOnPotentialOnParallelPlanes(
-                                     std::string const& constructorArguments );
-
-    //
     void SetUpBouncePathFinders( std::string const& tunnelPathFinders,
                                std::vector< BouncePathFinder* >& pathFinders );
 

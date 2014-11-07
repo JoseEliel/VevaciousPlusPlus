@@ -25,7 +25,8 @@ namespace VevaciousPlusPlus
                                SlhaUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
-                              bool const treeLevelMinimaOnlyAsValidSolutions );
+                               bool const treeLevelMinimaOnlyAsValidSolutions,
+                             double const assumedPositiveOrNegativeTolerance );
     virtual ~FieldPolynomialsWithScale();
 
 

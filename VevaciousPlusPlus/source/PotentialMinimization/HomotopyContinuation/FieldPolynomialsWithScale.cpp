@@ -16,13 +16,15 @@ namespace VevaciousPlusPlus
                                       SlhaUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
-                             bool const treeLevelMinimaOnlyAsValidSolutions ) :
+                                bool const treeLevelMinimaOnlyAsValidSolutions,
+                            double const assumedPositiveOrNegativeTolerance ) :
     PolynomialGradientTargetSystem( potentialPolynomial,
                                     ( numberOfFields + 1 ),
                                     previousPropagator,
                                     fieldsAssumedPositive,
                                     fieldsAssumedNegative,
-                                    treeLevelMinimaOnlyAsValidSolutions )
+                                    treeLevelMinimaOnlyAsValidSolutions,
+                                    assumedPositiveOrNegativeTolerance )
   {
     this->numberOfFields = numberOfFields;
   }
