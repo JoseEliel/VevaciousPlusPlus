@@ -747,7 +747,7 @@ namespace VevaciousPlusPlus
       classType.clear();
       constructorArguments.clear();
       ReadClassAndArguments( xmlParser,
-                             "BouncePotentialFit",
+                             "PathFinder",
                              classType,
                              constructorArguments );
       if( !( classType.empty()
