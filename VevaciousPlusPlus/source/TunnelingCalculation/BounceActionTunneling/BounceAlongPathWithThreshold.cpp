@@ -343,9 +343,10 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
+    double const bounceAction( bestBubble->BounceAction() );
     delete bestBubble;
     delete bestPath;
-    return bestBubble->BounceAction();
+    return bounceAction;
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -7,7 +7,7 @@
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-       Mon Sep 22 11:49:49 2014
+       Fri Nov  7 15:03:42 2014
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
@@ -37,24 +37,14 @@
   </PanicVacuum>
   <ZeroTemperatureDsbSurvival>
     <DsbSurvivalProbability>
-      1
-    </DsbSurvivalProbability>
-    <LogOfMinusLogOfDsbSurvival>
-      -214.236 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
-    </LogOfMinusLogOfDsbSurvival>
-    <DsbLifetime>
-      1e+100 <!-- in seconds; age of observed Universe is 4.3E+17s -->
-    </DsbLifetime>
-  </ZeroTemperatureDsbSurvival>
-  <NonZeroTemperatureDsbSurvival>
-    <DsbSurvivalProbability>
       0
     </DsbSurvivalProbability>
     <LogOfMinusLogOfDsbSurvival>
-      18.539 <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> 
+      -22.0473 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
     </LogOfMinusLogOfDsbSurvival>
-    <DominantTunnelingTemperature>
-      450.242 <!-- in GeV -->
-    </DominantTunnelingTemperature>
-  </NonZeroTemperatureDsbSurvival>
+    <DsbLifetime>
+      6.18726e-28 <!-- in seconds; age of observed Universe is 4.3E+17s -->
+    </DsbLifetime>
+  </ZeroTemperatureDsbSurvival>
+  <!-- Survival probability at non-zero temperatures not calculated. -->
 </VevaciousResults>

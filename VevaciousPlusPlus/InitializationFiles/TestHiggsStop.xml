@@ -184,13 +184,32 @@
           </ClassType>
           <ConstructorArguments>
             <NumberOfPathSegments>
+              25
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              2
+            </NumberOfAllowedWorsenings>
+            <MinuitStrategy>
+              2
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
               50
             </NumberOfPathSegments>
             <NumberOfAllowedWorsenings>
-              3
+              2
             </NumberOfAllowedWorsenings>
             <MinuitStrategy>
-              1
+              2
             </MinuitStrategy>
             <MinuitTolerance>
               0.5
@@ -206,16 +225,16 @@
               100
             </NumberOfPathSegments>
             <NumberOfAllowedWorsenings>
-              3
+              2
             </NumberOfAllowedWorsenings>
             <ConvergenceThresholdFraction>
               0.05
             </ConvergenceThresholdFraction>
             <MinuitStrategy>
-              1
+              2
             </MinuitStrategy>
             <MinuitTolerance>
-              0.1
+              0.05
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
