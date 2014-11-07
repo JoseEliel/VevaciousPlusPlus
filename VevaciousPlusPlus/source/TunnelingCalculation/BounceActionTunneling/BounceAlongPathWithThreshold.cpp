@@ -181,7 +181,7 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                              double const tunnelingTemperature,
-                                           double const actionThreshold ) const
+                                                 double const actionThreshold )
   {
     std::vector< std::vector< double > > straightPath( 2,
                                             falseVacuum.FieldConfiguration() );

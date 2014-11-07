@@ -64,6 +64,7 @@ namespace VevaciousPlusPlus
     // given by fieldColors[ i ]. An empty string indicates that the field
     // should not be plotted.
     virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
+                                          BubbleProfile const& bubbleProfile,
                                  std::vector< std::string > const& fieldColors,
                                    std::string const& plotFilename ) const = 0;
 

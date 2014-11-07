@@ -50,7 +50,7 @@ namespace VevaciousPlusPlus
     // assumed to already be the minima at tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 double const tunnelingTemperature ) const;
+                                 double const tunnelingTemperature );
 
     // This sets thermalSurvivalProbability by numerically integrating from the
     // critical temperature for tunneling to be possible down to T = 0 unless
@@ -72,7 +72,7 @@ namespace VevaciousPlusPlus
     double BoundedBounceAction( PotentialMinimum const& falseVacuum,
                                 PotentialMinimum const& trueVacuum,
                                 double const tunnelingTemperature,
-                                double const actionThreshold ) const;
+                                double const actionThreshold );
   };
 
 
@@ -88,7 +88,7 @@ namespace VevaciousPlusPlus
   inline double BounceAlongPathWithThreshold::BounceAction(
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
-                                      double const tunnelingTemperature ) const
+                                            double const tunnelingTemperature )
   {
     double actionThreshold( lnOfThermalIntegrationFactor );
     // We assume that the threshold should be the naive threshold for thermal
