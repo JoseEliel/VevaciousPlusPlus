@@ -209,67 +209,182 @@ namespace VevaciousPlusPlus
     double const highestFitTemperature( 0.9
                                 * rangeOfMaxTemperatureForOriginToTrue.first );
 
-    std::vector< std::vector< double > >
-    fitFalseVacua( thermalStraightPathFitResolution );
-    std::vector< std::vector< double > >
-    fitTrueVacua( thermalStraightPathFitResolution );
-    std::vector< double > fitTemperatures( thermalStraightPathFitResolution );
-
     // Ideally the DSB vacuum evaporates at a much lower temperature than the
     // critical tunneling temperature for the true vacuum, so we can restrict
     // our fit to temperatures above the evaporation temperature where there is
     // a kink in the thermal action due to the rapid acceleration of the false
     // vacuum end of the tunneling path followed by a complete halt, with
     // respect to increasing temperature.
+    size_t straightPathPoints( thermalStraightPathFitResolution );
+    double
+    lowestFitTemperature( 1.1 * rangeOfMaxTemperatureForOriginToFalse.second );
     if( rangeOfMaxTemperatureForOriginToTrue.first
-        > ( 2.0 * rangeOfMaxTemperatureForOriginToFalse.second ) )
+        < ( 2.0 * rangeOfMaxTemperatureForOriginToFalse.second ) )
     {
-      double const lowestFitTemperature( 1.1
-                              * rangeOfMaxTemperatureForOriginToFalse.second );
-      double const
-      stepTemperature( ( highestFitTemperature - lowestFitTemperature )
-             / static_cast< double >( thermalStraightPathFitResolution - 1 ) );
-      double currentTemperature( lowestFitTemperature );
-      for( size_t whichNode( 0 );
-           whichNode < thermalStraightPathFitResolution;
-           ++whichNode )
+      lowestFitTemperature = 1.0;
+      if( highestFitTemperature
+          > rangeOfMaxTemperatureForOriginToFalse.second )
       {
-        fitTemperatures[ whichNode ] = currentTemperature;
-        thermalPotentialMinimizer.SetTemperature( currentTemperature );
-        fitFalseVacua[ whichNode ] = potentialFunction.FieldValuesOrigin();
-        fitTrueVacua[ whichNode ] = thermalPotentialMinimizer(
-                            trueVacuum.FieldConfiguration() ).VariableValues();
-        currentTemperature += stepTemperature;
+        straightPathPoints *= 2;
       }
     }
-    else
+    std::vector< double > fitTemperatures( straightPathPoints );
+    double const
+    stepTemperature( ( highestFitTemperature - lowestFitTemperature )
+                     / static_cast< double >( straightPathPoints - 1 ) );
+    double currentTemperature( lowestFitTemperature );
+    for( size_t whichNode( 0 );
+         whichNode < thermalStraightPathFitResolution;
+         ++whichNode )
     {
-      // If we have to fit below the kink, we have to do so...
-      double const lowestFitTemperature( 1.0 );
-      double const
-      stepTemperature( ( highestFitTemperature - lowestFitTemperature )
-             / static_cast< double >( thermalStraightPathFitResolution - 1 ) );
-      double currentTemperature( lowestFitTemperature );
-      for( size_t whichNode( 0 );
-           whichNode < thermalStraightPathFitResolution;
-           ++whichNode )
-      {
-        fitTemperatures[ whichNode ] = currentTemperature;
-        thermalPotentialMinimizer.SetTemperature( currentTemperature );
-        if( currentTemperature > rangeOfMaxTemperatureForOriginToFalse.second )
-        {
-          fitFalseVacua[ whichNode ] = potentialFunction.FieldValuesOrigin();
-        }
-        else
-        {
-          fitFalseVacua[ whichNode ] = thermalPotentialMinimizer(
-                           falseVacuum.FieldConfiguration() ).VariableValues();
-        }
-        fitTrueVacua[ whichNode ] = thermalPotentialMinimizer(
-                            trueVacuum.FieldConfiguration() ).VariableValues();
-        currentTemperature += stepTemperature;
-      }
+      fitTemperatures[ whichNode ] = currentTemperature;
+      currentTemperature += stepTemperature;
     }
+    std::vector< double > straightPathActions;
+    CalculateStraightPathActions( falseVacuum,
+                                  trueVacuum,
+                                  fitTemperatures,
+                                  straightPathActions );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Fitted actions as [ T, S ]:" << std::endl;
+    for( size_t whichNode( 0 );
+         whichNode < thermalStraightPathFitResolution;
+         ++whichNode )
+    {
+      std::cout
+      << "[ " << fitTemperatures[ whichNode ] << ", "
+      << straightPathActions[ whichNode ] << " ]" << std::endl;
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;/**/
+
+    ThermalActionFitter thermalActionFitter( fitTemperatures,
+                                             straightPathActions,
+                                  rangeOfMaxTemperatureForOriginToTrue.first );
+    ROOT::Minuit2::MnMigrad
+    fittedThermalActionMinimizer( thermalActionFitter,
+                                  std::vector< double >( 1,
+                        ( 0.5 * rangeOfMaxTemperatureForOriginToTrue.first ) ),
+                                  std::vector< double >( 1,
+                       ( 0.05 * rangeOfMaxTemperatureForOriginToTrue.first ) ),
+                                  1 );
+    dominantTemperatureInGigaElectronVolts
+    = fittedThermalActionMinimizer().UserParameters().Value( 0 );
+
+    std::cout
+    << std::endl
+    << "Dominant temperature for tunneling estimated to be "
+    << dominantTemperatureInGigaElectronVolts << " GeV.";
+    std::cout << std::endl;
+
+    // Finally we allow CosmoTransitions to calculate the action at our best
+    // guess of the optimal tunneling temperature with full path deformation.
+    thermalPotentialMinimizer.SetTemperature(
+                                      dominantTemperatureInGigaElectronVolts );
+    // We assume that dominantTemperatureInGigaElectronVolts is high enough
+    // that tunneling will be out of the field origin, as the DSB vacuum proper
+    // has evaporated at this temperature.
+    PotentialMinimum thermalFalseVacuum( potentialFunction.FieldValuesOrigin(),
+                      potentialFunction( potentialFunction.FieldValuesOrigin(),
+                                       dominantTemperatureInGigaElectronVolts )
+                                - thermalPotentialMinimizer.FunctionOffset() );
+    if( dominantTemperatureInGigaElectronVolts
+        < rangeOfMaxTemperatureForOriginToFalse.second )
+    {
+      // If the DSB vacuum has not evaporated, we find out where it is exactly
+      // so that it can be tunneled out of.
+      thermalFalseVacuum
+      = thermalPotentialMinimizer( falseVacuum.FieldConfiguration() );
+    }
+
+    double thermalAction( BounceAction( thermalFalseVacuum,
+                  thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
+                                    dominantTemperatureInGigaElectronVolts ) );
+    logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor
+                                          - ( thermalAction
+                                     / dominantTemperatureInGigaElectronVolts )
+                                          - log( thermalAction ) );
+    SetThermalSurvivalProbability();
+  }
+
+  // This uses a BubbleShootingOnSpline object at different temperatures to
+  // fill straightPathActions based on straight paths between the thermal
+  // vacua.
+  void CosmoTransitionsRunner::InteralGuessFromStraightPaths(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                  std::vector< double > const& fitTemperatures,
+                                   std::vector< double >& straightPathActions )
+  {
+    // First we set up the (square of the) threshold distance that we demand
+    // between the vacua at every temperature to trust the tunneling
+    // calculation.
+    double const
+    thresholdSeparationSquared( ThresholdSeparationSquared( falseVacuum,
+                                                            trueVacuum ) );
+
+    straightPathActions.clear();
+    BubbleShootingOnSpline actionCalculator( potentialFunction,
+                                             resolutionOfDsbVacuum,
+                                  ( 0.1 * sqrt( thresholdSeparationSquared ) ),
+                                             32 );
+    // There probably should not be those magic numbers (0.1, 32), but it is
+    // unlikely that anyone will ever want to change them.
+    PotentialMinimum thermalFalseVacuum( falseVacuum );
+    PotentialMinimum thermalTrueVacuum( trueVacuum );
+    std::vector< std::vector< double > > straightPath( 2 );
+    for( std::vector< double >::const_iterator
+         fitTemperature( fitTemperatures.begin() );
+         fitTemperature < fitTemperatures.end();
+         ++fitTemperature )
+    {
+      thermalPotentialMinimizer.SetTemperature( *fitTemperature );
+      thermalFalseVacuum
+      = thermalPotentialMinimizer( thermalFalseVacuum.FieldConfiguration() );
+      thermalTrueVacuum
+      = thermalPotentialMinimizer( thermalTrueVacuum.FieldConfiguration() );
+      if( ( thermalFalseVacuum.PotentialValue()
+            <= thermalTrueVacuum.PotentialValue() )
+          ||
+          ( thermalTrueVacuum.SquareDistanceTo( thermalFalseVacuum )
+            < thresholdSeparationSquared ) )
+      {
+        // If the thermal vacua have gotten so close that a tunneling
+        // calculation is suspect, or tunneling to the panic vacuum has become
+        // impossible, we break and take only the contributions from lower
+        // temperatures.
+        break;
+      }
+      straightPath.front() = thermalFalseVacuum.FieldConfiguration();
+      straightPath.back() = thermalTrueVacuum.FieldConfiguration();
+      BubbleProfile*
+      bubbleProfile( actionCalculator( LinearSplineThroughNodes( straightPath,
+                                                    std::vector< double >( 0 ),
+                                                         *fitTemperature ) ) );
+      straightPathActions.push_back( bubbleProfile->BounceAction() );
+      delete bubbleProfile;
+    }
+  }
+
+  // This writes a Python programme using CosmoTransitions with the minimum
+  // number of deformations to get a set of actions at temperatures, and then
+  // reads in the file created to fill straightPathActions.
+  void CosmoTransitionsRunner::FitFromCosmoTransitionsStraightPaths(
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                  std::vector< double > const& fitTemperatures,
+                                   std::vector< double >& straightPathActions )
+  {
+    // First we set up the (square of the) threshold distance that we demand
+    // between the vacua at every temperature to trust the tunneling
+    // calculation.
+    double const
+    thresholdSeparationSquared( ThresholdSeparationSquared( falseVacuum,
+                                                            trueVacuum ) );
+
     std::string const
     pythonResultFilename( "VevaciousCosmoTransitionsThermalFitResult.txt" );
     std::string const
@@ -307,21 +422,48 @@ namespace VevaciousPlusPlus
     "# Each tuple of fitTuples is\n"
     "# [ temperature, true vacuum array, false vacuum array].\n"
     "fitTuples = [ ";
+
+    PotentialMinimum thermalFalseVacuum( thermalPotentialMinimizer(
+                                          falseVacuum.FieldConfiguration() ) );
+    PotentialMinimum thermalTrueVacuum( thermalPotentialMinimizer(
+                                           trueVacuum.FieldConfiguration() ) );
+    straightPathActions.clear();
     for( size_t whichNode( 0 );
-         whichNode < thermalStraightPathFitResolution;
+         whichNode < fitTemperatures.size();
          ++whichNode )
     {
+      thermalPotentialMinimizer.SetTemperature( fitTemperatures[ whichNode ] );
+      // We update the positions of the thermal vacua based on their positions
+      // at the last temperature step.
+      thermalFalseVacuum
+      = thermalPotentialMinimizer( thermalFalseVacuum.FieldConfiguration() );
+      thermalTrueVacuum
+      = thermalPotentialMinimizer( thermalTrueVacuum.FieldConfiguration() );
+
+      if( thermalTrueVacuum.SquareDistanceTo( thermalFalseVacuum )
+          < thresholdSeparationSquared )
+      {
+        // If the thermal vacua have gotten so close that a tunneling
+        // calculation is suspect, we break and take only the contributions
+        // from lower temperatures.
+        break;
+      }
+      straightPathActions.push_back( std::numeric_limits< double >::max() );
       if( whichNode > 0 )
       {
         pythonFile << ",\n ";
       }
       pythonFile << "[ " << fitTemperatures[ whichNode ] << ", [";
+      std::vector< double > const&
+      thermalTrueVacuumFields( thermalTrueVacuum.FieldConfiguration() );
+      std::vector< double > const&
+      thermalFalseVacuumFields( thermalFalseVacuum.FieldConfiguration() );
       for( std::vector< double >::const_iterator
-           fieldValue( fitTrueVacua[ whichNode ].begin() );
-           fieldValue < fitTrueVacua[ whichNode ].end();
+           fieldValue( thermalTrueVacuumFields.begin() );
+           fieldValue < thermalTrueVacuumFields.end();
            ++fieldValue )
       {
-        if( fieldValue != fitTrueVacua[ whichNode ].begin() )
+        if( fieldValue != thermalTrueVacuumFields.begin() )
         {
           pythonFile << ", ";
         }
@@ -329,11 +471,11 @@ namespace VevaciousPlusPlus
       }
       pythonFile << "], [";
       for( std::vector< double >::const_iterator
-           fieldValue( fitFalseVacua[ whichNode ].begin() );
-           fieldValue < fitFalseVacua[ whichNode ].end();
+           fieldValue( thermalFalseVacuumFields.begin() );
+           fieldValue < thermalFalseVacuumFields.end();
            ++fieldValue )
       {
-        if( fieldValue != fitFalseVacua[ whichNode ].begin() )
+        if( fieldValue != thermalFalseVacuumFields.begin() )
         {
           pythonFile << ", ";
         }
@@ -399,101 +541,15 @@ namespace VevaciousPlusPlus
     << "Parsing output from " << pythonMainFilename << ".";
     std::cout << std::endl;
 
-    std::vector< double > fittedActions( thermalStraightPathFitResolution );
     std::ifstream resultStream;
     resultStream.open( pythonResultFilename.c_str() );
     for( size_t whichNode( 0 );
-         whichNode < thermalStraightPathFitResolution;
+         whichNode < straightPathActions.size();
          ++whichNode )
     {
-      resultStream >> fittedActions[ whichNode ];
+      resultStream >> straightPathActions[ whichNode ];
     }
     resultStream.close();
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Fitted actions as [ T, {DSB}, {panic}, S ]:" << std::endl;
-    for( size_t whichNode( 0 );
-         whichNode < thermalStraightPathFitResolution;
-         ++whichNode )
-    {
-      std::cout << "[ " << fitTemperatures[ whichNode ] << ", { ";
-      for( std::vector< double >::const_iterator
-           fieldValue( fitFalseVacua[ whichNode ].begin() );
-           fieldValue < fitFalseVacua[ whichNode ].end();
-           ++fieldValue )
-      {
-        if( fieldValue != fitFalseVacua[ whichNode ].begin() )
-        {
-          std::cout << ", ";
-        }
-        std::cout << *fieldValue;
-      }
-      std::cout << " }, { ";
-      for( std::vector< double >::const_iterator
-           fieldValue( fitTrueVacua[ whichNode ].begin() );
-           fieldValue < fitTrueVacua[ whichNode ].end();
-           ++fieldValue )
-      {
-        if( fieldValue != fitTrueVacua[ whichNode ].begin() )
-        {
-          std::cout << ", ";
-        }
-        std::cout << *fieldValue;
-      }
-      std::cout << " }, " << fittedActions[ whichNode ] << " ]" << std::endl;
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;/**/
-
-    ThermalActionFitter thermalActionFitter( fitTemperatures,
-                                             fittedActions,
-                                  rangeOfMaxTemperatureForOriginToTrue.first );
-    ROOT::Minuit2::MnMigrad
-    fittedThermalActionMinimizer( thermalActionFitter,
-                                  std::vector< double >( 1,
-                        ( 0.5 * rangeOfMaxTemperatureForOriginToTrue.first ) ),
-                                  std::vector< double >( 1,
-                       ( 0.05 * rangeOfMaxTemperatureForOriginToTrue.first ) ),
-                                  1 );
-    dominantTemperatureInGigaElectronVolts
-    = fittedThermalActionMinimizer().UserParameters().Value( 0 );
-
-    std::cout
-    << std::endl
-    << "Dominant temperature for tunneling estimated to be "
-    << dominantTemperatureInGigaElectronVolts << " GeV.";
-    std::cout << std::endl;
-
-    // Finally we allow CosmoTransitions to calculate the action at our best
-    // guess of the optimal tunneling temperature with full path deformation.
-    thermalPotentialMinimizer.SetTemperature(
-                                      dominantTemperatureInGigaElectronVolts );
-    // We assume that dominantTemperatureInGigaElectronVolts is high enough
-    // that tunneling will be out of the field origin, as the DSB vacuum proper
-    // has evaporated at this temperature.
-    PotentialMinimum thermalFalseVacuum( potentialFunction.FieldValuesOrigin(),
-                      potentialFunction( potentialFunction.FieldValuesOrigin(),
-                                       dominantTemperatureInGigaElectronVolts )
-                                - thermalPotentialMinimizer.FunctionOffset() );
-    if( dominantTemperatureInGigaElectronVolts
-        < rangeOfMaxTemperatureForOriginToFalse.second )
-    {
-      // If the DSB vacuum has not evaporated, we find out where it is exactly
-      // so that it can be tunneled out of.
-      thermalFalseVacuum
-      = thermalPotentialMinimizer( falseVacuum.FieldConfiguration() );
-    }
-
-    double thermalAction( BounceAction( thermalFalseVacuum,
-                  thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
-                                    dominantTemperatureInGigaElectronVolts ) );
-    logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor
-                                          - ( thermalAction
-                                     / dominantTemperatureInGigaElectronVolts )
-                                          - log( thermalAction ) );
-    SetThermalSurvivalProbability();
   }
 
 } /* namespace VevaciousPlusPlus */

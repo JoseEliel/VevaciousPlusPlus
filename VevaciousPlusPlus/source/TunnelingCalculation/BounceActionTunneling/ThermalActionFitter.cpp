@@ -14,10 +14,10 @@ namespace VevaciousPlusPlus
                                   std::vector< double > const& fitTemperatures,
                                     std::vector< double > const& fittedActions,
                                            double const criticalTemperature ) :
-    fitCoefficients( fitTemperatures.size() ),
+    fitCoefficients( fittedActions.size() ),
     criticalTemperature( criticalTemperature )
   {
-    unsigned int const numberOfNodes( fitTemperatures.size() );
+    size_t const numberOfNodes( fittedActions.size() );
     if( numberOfNodes > 1 )
     {
       Eigen::MatrixXd fitMatrix( numberOfNodes,
@@ -25,7 +25,7 @@ namespace VevaciousPlusPlus
       Eigen::VectorXd actionTimesTemperatureDifferenceVector( numberOfNodes );
       double currentTemperature( 0.0 );
       double temperatureDifference( 0.0 );
-      for( unsigned int whichNode( 0 );
+      for( size_t whichNode( 0 );
            whichNode < numberOfNodes;
            ++whichNode )
       {
@@ -51,7 +51,7 @@ namespace VevaciousPlusPlus
       Eigen::VectorXd
       solutionVector( fitMatrix.colPivHouseholderQr().solve(
                                     actionTimesTemperatureDifferenceVector ) );
-      for( unsigned int whichNode( 0 );
+      for( size_t whichNode( 0 );
            whichNode < numberOfNodes;
            ++whichNode )
       {

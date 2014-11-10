@@ -9,6 +9,7 @@
 #define COSMOTRANSITIONSRUNNER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "limits"
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialEvaluation/PotentialFunctions/IWritesPythonPotential.hpp"
@@ -16,6 +17,7 @@
 #include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
+#include "BounceActionEvaluation/BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -80,10 +82,10 @@ namespace VevaciousPlusPlus
     // again if somehow the internal straight path bounce action calculation
     // turns out to be deficient.
     void
-    StraightPathActions( PotentialMinimum const& falseVacuum,
-                         PotentialMinimum const& trueVacuum,
-                         std::vector< double > const& fitTemperatures,
-                         std::vector< double >& straightPathActions )
+    CalculateStraightPathActions( PotentialMinimum const& falseVacuum,
+                                  PotentialMinimum const& trueVacuum,
+                                  std::vector< double > const& fitTemperatures,
+                                  std::vector< double >& straightPathActions )
     { InteralGuessFromStraightPaths( falseVacuum,
                                      trueVacuum,
                                      fitTemperatures,
@@ -103,69 +105,9 @@ namespace VevaciousPlusPlus
     void
     FitFromCosmoTransitionsStraightPaths( PotentialMinimum const& falseVacuum,
                                           PotentialMinimum const& trueVacuum,
-                                std::vector< double > const& fitTemperatures );
-  };
-
-  // This uses a BubbleShootingOnSpline object at different temperatures to
-  // fill straightPathActions based on straight paths between the thermal
-  // vacua.
-  void CosmoTransitionsRunner::InteralGuessFromStraightPaths(
-                                           PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
                                   std::vector< double > const& fitTemperatures,
-                                   std::vector< double >& straightPathActions )
-  {
-    // First we set up the (square of the) threshold distance that we demand
-    // between the vacua at every temperature to trust the tunneling
-    // calculation: the minimum distance allowed is half of the length of the
-    // shortest side of the triangle in field space joining the field origin
-    // with the vacua at zero temperature.
-    double const thresholdSeparationSquared( 0.25
-                              * std::min( std::min( trueVacuum.LengthSquared(),
-                                                 falseVacuum.LengthSquared() ),
-                                trueVacuum.SquareDistanceTo( falseVacuum ) ) );
-
-    straightPathActions.clear();
-    PotentialMinimum thermalFalseVacuum( falseVacuum );
-    PotentialMinimum thermalTrueVacuum( trueVacuum );
-    for( std::vector< double >::const_iterator
-         fitTemperature( fitTemperatures.begin() );
-         fitTemperature < fitTemperatures.end();
-         ++fitTemperature )
-    {
-      thermalPotentialMinimizer.SetTemperature( *fitTemperature );
-      thermalFalseVacuum
-      = thermalPotentialMinimizer( thermalFalseVacuum.FieldConfiguration() );
-      thermalTrueVacuum
-      = thermalPotentialMinimizer( thermalTrueVacuum.FieldConfiguration() );
-      if( ( thermalFalseVacuum.PotentialValue()
-            <= thermalTrueVacuum.PotentialValue() )
-          ||
-          ( thermalTrueVacuum.SquareDistanceTo( thermalFalseVacuum )
-            < thresholdSeparationSquared ) )
-      {
-        // If the thermal vacua have gotten so close that a tunneling
-        // calculation is suspect, or tunneling to the panic vacuum has become
-        // impossible, we break and take only the contributions from lower
-        // temperatures.
-        break;
-      }
-      std::vector< std::vector< double > > straightPath( 2,
-                                     thermalFalseVacuum.FieldConfiguration() );
-      straightPath.back() = thermalTrueVacuum.FieldConfiguration();
-      LinearSplineThroughNodes thermalTunnelPath( straightPath,
-                                                  std::vector< double >( 0 ),
-                                                  *fitTemperature );
-    }
-  }
-
-  // This writes a Python programme using CosmoTransitions with the minimum
-  // number of deformations to get a set of actions at temperatures, and then
-  // reads in the file created to fill straightPathActions.
-  void
-  FitFromCosmoTransitionsStraightPaths( PotentialMinimum const& falseVacuum,
-                                        PotentialMinimum const& trueVacuum,
-                        std::vector< double > const& fitTemperatures ) const;
+                                  std::vector< double >& straightPathActions );
+  };
 
 } /* namespace VevaciousPlusPlus */
 #endif /* COSMOTRANSITIONSRUNNER_HPP_ */
