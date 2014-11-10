@@ -57,10 +57,21 @@ namespace VevaciousPlusPlus
     // calculation: the minimum distance allowed is half of the length of the
     // shortest side of the triangle in field space joining the field origin
     // with the vacua at zero temperature.
-    double const thresholdSeparationSquared( 0.25
-                              * std::min( std::min( trueVacuum.LengthSquared(),
-                                                 falseVacuum.LengthSquared() ),
-                                trueVacuum.SquareDistanceTo( falseVacuum ) ) );
+    double const trueVacuumLengthSquared( trueVacuum.LengthSquared() );
+    double const falseVacuumLengthSquared( falseVacuum.LengthSquared() );
+    double const shorterVacuumLengthSquared( std::min( trueVacuumLengthSquared,
+                                                  falseVacuumLengthSquared ) );
+    double const
+    separationSquared( trueVacuum.SquareDistanceTo( falseVacuum ) );
+
+    // The threshold separation is either 10% of the separation at zero
+    // temperature, or half of the length of the shortest side of the triangle
+    // in field space joining the field origin with the vacua at zero
+    // temperature.
+    double const
+    thresholdSeparationSquared( std::max( ( 0.01 * separationSquared ),
+                                          0.25 * std::min( separationSquared,
+                                              shorterVacuumLengthSquared ) ) );
 
     // Now we start at almost the critical temperature, and sum up for
     // decreasing temperatures:
