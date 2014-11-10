@@ -52,8 +52,8 @@ namespace VevaciousPlusPlus
                                  PotentialMinimum const& trueVacuum,
                                  double const tunnelingTemperature );
 
-    // This sets thermalSurvivalProbability by numerically integrating from the
-    // critical temperature for tunneling to be possible down to T = 0 unless
+    // This sets thermalSurvivalProbability by numerically integrating up to
+    // the critical temperature for tunneling to be possible from T = 0 unless
     // the integral already passes a threshold, and sets
     // dominantTemperatureInGigaElectronVolts to be the temperature with the
     // lowest survival probability.
