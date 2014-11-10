@@ -40,21 +40,21 @@ namespace VevaciousPlusPlus
                                                     TunnelPath const& lastPath,
                                       BubbleProfile const& bubbleFromLastPath )
   {
-    SetParallelVector( pathNodes.front(),
-                       pathNodes.back() );
+    SetParallelVector( returnPathNodes.front(),
+                       returnPathNodes.back() );
     SetCurrentMinuitSteps( segmentAuxiliaryLength );
     SetUpHouseholderReflection();
 
-    currentHyperplaneOrigin = pathNodes.front();
+    currentHyperplaneOrigin = returnPathNodes.front();
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      currentHyperplaneOrigin[ fieldIndex ] = ( pathNodes.front()[ fieldIndex ]
+      currentHyperplaneOrigin[ fieldIndex ] = ( returnPathNodes.front()[ fieldIndex ]
                                                 + ( segmentAuxiliaryLength
                                   * currentParallelComponent[ fieldIndex ] ) );
     }
-    RunMigradAndPutTransformedResultIn( pathNodes[ 1 ] );
+    RunMigradAndPutTransformedResultIn( returnPathNodes[ 1 ] );
 
     for( size_t nodeIndex( 2 );
          nodeIndex <= numberOfVaryingNodes;
@@ -70,12 +70,12 @@ namespace VevaciousPlusPlus
            ++fieldIndex )
       {
         currentHyperplaneOrigin[ fieldIndex ]
-        = ( ( 2.0 * pathNodes[ nodeIndex - 1 ][ fieldIndex ] )
-            - pathNodes[ nodeIndex - 2 ][ fieldIndex ] );
+        = ( ( 2.0 * returnPathNodes[ nodeIndex - 1 ][ fieldIndex ] )
+            - returnPathNodes[ nodeIndex - 2 ][ fieldIndex ] );
       }
-      RunMigradAndPutTransformedResultIn( pathNodes[ nodeIndex ] );
+      RunMigradAndPutTransformedResultIn( returnPathNodes[ nodeIndex ] );
     }
-    return new LinearSplineThroughNodes( pathNodes,
+    return new LinearSplineThroughNodes( returnPathNodes,
                                          nodeZeroParameterization,
                                          pathTemperature );
   }

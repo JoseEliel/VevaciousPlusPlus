@@ -65,7 +65,7 @@ namespace VevaciousPlusPlus
     // For the first varying node, we don't bother copying pathNodes.front()
     // into lastPathFalseSideNode, as it'll just be over-written by the first
     // iteration of the loop.
-    SetParallelVector( pathNodes.front(),
+    SetParallelVector( returnPathNodes.front(),
                        lastPathTrueSideNode );
     SetCurrentMinuitSteps( 0.5 );
     // The starting step sizes for Minuit2 are set to be half the Euclidean
@@ -77,7 +77,7 @@ namespace VevaciousPlusPlus
 
     AccountForBubbleProfileAroundNode( 1,
                                        bubbleFromLastPath );
-    RunMigradAndPutTransformedResultIn( pathNodes[ 1 ] );
+    RunMigradAndPutTransformedResultIn( returnPathNodes[ 1 ] );
 
     for( size_t nodeIndex( 2 );
          nodeIndex < numberOfVaryingNodes;
@@ -101,7 +101,7 @@ namespace VevaciousPlusPlus
       SetUpHouseholderReflection();
       AccountForBubbleProfileAroundNode( nodeIndex,
                                          bubbleFromLastPath );
-      RunMigradAndPutTransformedResultIn( pathNodes[ nodeIndex ] );
+      RunMigradAndPutTransformedResultIn( returnPathNodes[ nodeIndex ] );
       // This function leaves the last Minuit parameterization in
       // minuitResultAsUntransformedVector, so we can use it to determine "how
       // far the node rolled".
@@ -114,14 +114,15 @@ namespace VevaciousPlusPlus
     // Now we do the node just before the true vacuum. We don't bother copying
     // around all the nodes even though the code would be a bit easier to read.
     SetParallelVector( currentHyperplaneOrigin,
-                       pathNodes.back() );
+                       returnPathNodes.back() );
     currentHyperplaneOrigin = lastPathTrueSideNode;
     SetCurrentMinuitSteps( 0.5 );
     SetUpHouseholderReflection();
     AccountForBubbleProfileAroundNode( numberOfVaryingNodes,
                                        bubbleFromLastPath );
-    RunMigradAndPutTransformedResultIn( pathNodes[ numberOfVaryingNodes ] );
-    return new LinearSplineThroughNodes( pathNodes,
+    RunMigradAndPutTransformedResultIn(
+                                     returnPathNodes[ numberOfVaryingNodes ] );
+    return new LinearSplineThroughNodes( returnPathNodes,
                                          nodeZeroParameterization,
                                          pathTemperature );
   }

@@ -21,8 +21,8 @@ namespace VevaciousPlusPlus
     numberOfVaryingNodes( numberOfPathSegments - 1 ),
     segmentAuxiliaryLength( 1.0
                             / static_cast< double > ( numberOfPathSegments ) ),
-    pathNodes( ( numberOfVaryingNodes + 2 ),
-               std::vector< double >( numberOfFields ) ),
+    returnPathNodes( ( numberOfVaryingNodes + 2 ),
+                     std::vector< double >( numberOfFields ) ),
     currentParallelComponent( numberOfFields ),
     currentHyperplaneOrigin( numberOfFields ),
     reflectionMatrix( numberOfFields,

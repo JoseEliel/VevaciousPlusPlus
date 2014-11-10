@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "Minuit2/MnMigrad.h"
+#include "Minuit2/MnUserParameters.h"
 #include "Eigen/Dense"
 #include "MinuitPathFinder.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
@@ -53,7 +54,7 @@ namespace VevaciousPlusPlus
     size_t const numberOfFields;
     size_t const numberOfVaryingNodes;
     double segmentAuxiliaryLength;
-    std::vector< std::vector< double > > pathNodes;
+    std::vector< std::vector< double > > returnPathNodes;
     std::vector< double > currentParallelComponent;
     // This is the vector between the current 2 reference nodes, scaled to be
     // appropriate for the step from the false-side node under a
@@ -110,6 +111,14 @@ namespace VevaciousPlusPlus
     // currentHyperplaneOrigin) and puts that into resultVector.
     virtual void
     RunMigradAndPutTransformedResultIn( std::vector< double >& resultVector );
+
+    // This creates and runs a Minuit2 MnMigrad object and converts the result
+    // into a node vector transformed by reflectionMatrix and puts that into
+    // resultVector. Currently just throws an exception.
+    virtual void
+    RunMigradAndPutDisplacementIn( Eigen::VectorXd& resultVector )
+    { throw
+      std::runtime_error( "RunMigradAndPutDisplacementIn not written yet!" ); }
   };
 
 
@@ -179,8 +188,8 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
-    pathNodes.front() = falseVacuum.FieldConfiguration();
-    pathNodes.back() = trueVacuum.FieldConfiguration();
+    returnPathNodes.front() = falseVacuum.FieldConfiguration();
+    returnPathNodes.back() = trueVacuum.FieldConfiguration();
   }
 
   // This sets the components of currentParallelComponent to be the elements

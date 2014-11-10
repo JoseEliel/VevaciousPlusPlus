@@ -58,6 +58,7 @@ namespace VevaciousPlusPlus
     std::vector< double > lastPathFalseSideNode;
     std::vector< double > lastPathTrueSideNode;
     bool nodesConverged;
+    std::vector< Eigen::VectorXd > lastPathNodes;
 
 
     // This is an empty hook that can be over-ridden to account for the
