@@ -132,6 +132,17 @@ namespace VevaciousPlusPlus
     // This ensures that thermalSurvivalProbability is set correctly from
     // logOfMinusLogOfThermalProbability.
     void SetThermalSurvivalProbability();
+
+
+    // This returns a threshold separation-squared for the purposes of
+    // deciding whether thermal vacua are too close for tunneling to be
+    // trusted. The threshold separation is either 10% of the separation at zero
+    // temperature, or half of the length of the shortest side of the triangle
+    // in field space joining the field origin with the vacua at zero
+    // temperature.
+    virtual double
+    ThresholdSeparationSquared( PotentialMinimum const& falseVacuum,
+                                PotentialMinimum const& trueVacuum ) const;
   };
 
 
@@ -210,6 +221,27 @@ namespace VevaciousPlusPlus
     {
       return resolutionOfDsbVacuum;
     }
+  }
+
+  // This returns a threshold separation-squared for the purposes of
+  // deciding whether thermal vacua are too close for tunneling to be
+  // trusted. The threshold separation is either 10% of the separation at zero
+  // temperature, or half of the length of the shortest side of the triangle
+  // in field space joining the field origin with the vacua at zero
+  // temperature.
+  inline double BounceActionTunneler::ThresholdSeparationSquared(
+                                           PotentialMinimum const& falseVacuum,
+                                    PotentialMinimum const& trueVacuum ) const
+  {
+    double const trueVacuumLengthSquared( trueVacuum.LengthSquared() );
+    double const falseVacuumLengthSquared( falseVacuum.LengthSquared() );
+    double const shorterVacuumLengthSquared( std::min( trueVacuumLengthSquared,
+                                                  falseVacuumLengthSquared ) );
+    double const
+    separationSquared( trueVacuum.SquareDistanceTo( falseVacuum ) );
+    return ( std::max( ( 0.01 * separationSquared ),
+                       0.25 * std::min( separationSquared,
+                                        shorterVacuumLengthSquared ) ) );
   }
 
 } /* namespace VevaciousPlusPlus */

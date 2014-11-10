@@ -54,24 +54,10 @@ namespace VevaciousPlusPlus
   {
     // First we set up the (square of the) threshold distance that we demand
     // between the vacua at every temperature to trust the tunneling
-    // calculation: the minimum distance allowed is half of the length of the
-    // shortest side of the triangle in field space joining the field origin
-    // with the vacua at zero temperature.
-    double const trueVacuumLengthSquared( trueVacuum.LengthSquared() );
-    double const falseVacuumLengthSquared( falseVacuum.LengthSquared() );
-    double const shorterVacuumLengthSquared( std::min( trueVacuumLengthSquared,
-                                                  falseVacuumLengthSquared ) );
+    // calculation.
     double const
-    separationSquared( trueVacuum.SquareDistanceTo( falseVacuum ) );
-
-    // The threshold separation is either 10% of the separation at zero
-    // temperature, or half of the length of the shortest side of the triangle
-    // in field space joining the field origin with the vacua at zero
-    // temperature.
-    double const
-    thresholdSeparationSquared( std::max( ( 0.01 * separationSquared ),
-                                          0.25 * std::min( separationSquared,
-                                              shorterVacuumLengthSquared ) ) );
+    thresholdSeparationSquared( ThresholdSeparationSquared( falseVacuum,
+                                                            trueVacuum ) );
 
     // Now we start at almost the critical temperature, and sum up for
     // decreasing temperatures:
