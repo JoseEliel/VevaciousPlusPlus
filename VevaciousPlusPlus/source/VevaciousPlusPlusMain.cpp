@@ -198,10 +198,18 @@ int main( int argumentCount,
   std::cout
   << std::endl
   << "Still to do:" << std::endl
-  << "use BounceActionCalculator along straight paths within"
-  << " CosmoTransitionsRunner for thermal action T dependence fit" << std::endl
+  << "check new straight paths code in CosmoTransitionsRunner for thermal"
+  << " action T dependence fit" << std::endl
   << "note rcode from CosmoTransitions and maybe issue warning" << std::endl
+  << "put functionality into MinuitOnPotentialPerpendicularToPath and into"
+  << " MinimizingNormalForcesOnBisections (also rename that) to move nodes by"
+  << " only a fraction (e.g. 0.75) of the displacement from the starting point"
+  << " given by Minuit2, and to take the weighted average of that displacement"
+  << " with neighboring displacements (e.g. displace node[i] by average of"
+  << " displacement[i] with weight 1, displacement[i-1] and [i+1] each with"
+  << " weight 0.5, [i-2] and [i+2] each with weight 0.25)" << std::endl
   << "write MinuitBetweenPaths subclasses" << std::endl
+  << "write BertiniRunner" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
   << "think about uncertainties" << std::endl;
   std::cout << std::endl;
