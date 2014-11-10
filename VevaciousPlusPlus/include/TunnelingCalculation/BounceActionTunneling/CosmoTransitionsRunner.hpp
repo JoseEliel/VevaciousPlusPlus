@@ -83,7 +83,7 @@ namespace VevaciousPlusPlus
     StraightPathActions( PotentialMinimum const& falseVacuum,
                          PotentialMinimum const& trueVacuum,
                          std::vector< double > const& fitTemperatures,
-                         std::vector< double >& straightPathActions ) const
+                         std::vector< double >& straightPathActions )
     { InteralGuessFromStraightPaths( falseVacuum,
                                      trueVacuum,
                                      fitTemperatures,
@@ -95,7 +95,7 @@ namespace VevaciousPlusPlus
     void InteralGuessFromStraightPaths( PotentialMinimum const& falseVacuum,
                                         PotentialMinimum const& trueVacuum,
                                   std::vector< double > const& fitTemperatures,
-                            std::vector< double >& straightPathActions ) const;
+                                  std::vector< double >& straightPathActions );
 
     // This writes a Python programme using CosmoTransitions with the minimum
     // number of deformations to get a set of actions at temperatures, and then
@@ -103,7 +103,7 @@ namespace VevaciousPlusPlus
     void
     FitFromCosmoTransitionsStraightPaths( PotentialMinimum const& falseVacuum,
                                           PotentialMinimum const& trueVacuum,
-                          std::vector< double > const& fitTemperatures ) const;
+                                std::vector< double > const& fitTemperatures );
   };
 
   // This uses a BubbleShootingOnSpline object at different temperatures to
@@ -113,15 +113,49 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                   std::vector< double > const& fitTemperatures,
-                             std::vector< double >& straightPathActions ) const
+                                   std::vector< double >& straightPathActions )
   {
+    // First we set up the (square of the) threshold distance that we demand
+    // between the vacua at every temperature to trust the tunneling
+    // calculation: the minimum distance allowed is half of the length of the
+    // shortest side of the triangle in field space joining the field origin
+    // with the vacua at zero temperature.
+    double const thresholdSeparationSquared( 0.25
+                              * std::min( std::min( trueVacuum.LengthSquared(),
+                                                 falseVacuum.LengthSquared() ),
+                                trueVacuum.SquareDistanceTo( falseVacuum ) ) );
+
     straightPathActions.clear();
+    PotentialMinimum thermalFalseVacuum( falseVacuum );
+    PotentialMinimum thermalTrueVacuum( trueVacuum );
     for( std::vector< double >::const_iterator
          fitTemperature( fitTemperatures.begin() );
          fitTemperature < fitTemperatures.end();
          ++fitTemperature )
     {
-
+      thermalPotentialMinimizer.SetTemperature( *fitTemperature );
+      thermalFalseVacuum
+      = thermalPotentialMinimizer( thermalFalseVacuum.FieldConfiguration() );
+      thermalTrueVacuum
+      = thermalPotentialMinimizer( thermalTrueVacuum.FieldConfiguration() );
+      if( ( thermalFalseVacuum.PotentialValue()
+            <= thermalTrueVacuum.PotentialValue() )
+          ||
+          ( thermalTrueVacuum.SquareDistanceTo( thermalFalseVacuum )
+            < thresholdSeparationSquared ) )
+      {
+        // If the thermal vacua have gotten so close that a tunneling
+        // calculation is suspect, or tunneling to the panic vacuum has become
+        // impossible, we break and take only the contributions from lower
+        // temperatures.
+        break;
+      }
+      std::vector< std::vector< double > > straightPath( 2,
+                                     thermalFalseVacuum.FieldConfiguration() );
+      straightPath.back() = thermalTrueVacuum.FieldConfiguration();
+      LinearSplineThroughNodes thermalTunnelPath( straightPath,
+                                                  std::vector< double >( 0 ),
+                                                  *fitTemperature );
     }
   }
 
