@@ -118,27 +118,36 @@ namespace VevaciousPlusPlus
       Eigen::VectorXd
       weightedAverageDisplacement( nodeDisplacements[ nodeIndex ] );
       double weightNormalization( 1.0 );
-      for( size_t neighborIndex( 0 );
-           neighborIndex < neighborDisplacementWeights.size();
+      size_t const weightsSize( neighborDisplacementWeights.size() );
+      // We use neighborIndex going from 1 to weightsSize because it's]
+      // conceptually easier to think of number of steps to get to the
+      // neighbor. Hence the nearest neighbor has neighborIndex of 1, and
+      // the nearest neighbor displacements for node nodeIndex are
+      // nodeDisplacements[ nodeIndex - 1 ] and
+      // nodeDisplacements[ nodeIndex + 1 ], making things much easier to think
+      // about, bearing in mind that the weight is found in
+      // neighborDisplacementWeights[ neighborIndex - 1 ].
+      for( size_t neighborIndex( 1 );
+           neighborIndex <= weightsSize;
            ++neighborIndex )
       {
-        if( nodeIndex > ( neighborIndex + 1 ) )
+        double const
+        neighborWeight( neighborDisplacementWeights[ neighborIndex - 1 ] );
+        if( nodeIndex > neighborIndex )
         {
           // We average in the false-side neighbors if they are not at the end
           // or beyond.
-          weightNormalization += neighborDisplacementWeights[ neighborIndex ];
-          weightedAverageDisplacement
-          += ( neighborDisplacementWeights[ neighborIndex ]
-               * nodeDisplacements[ nodeIndex - neighborIndex - 1 ] );
+          weightNormalization += neighborWeight;
+          weightedAverageDisplacement += ( neighborWeight
+                            * nodeDisplacements[ nodeIndex - neighborIndex ] );
         }
-        if( ( nodeIndex + neighborIndex ) < numberOfVaryingNodes )
+        if( ( nodeIndex + neighborIndex ) <= numberOfVaryingNodes )
         {
           // We average in the true-side neighbors if they are not at the end
           // or beyond.
-          weightNormalization += neighborDisplacementWeights[ neighborIndex ];
-          weightedAverageDisplacement
-          += ( neighborDisplacementWeights[ neighborIndex ]
-               * nodeDisplacements[ nodeIndex + neighborIndex + 1 ] );
+          weightNormalization += neighborWeight;
+          weightedAverageDisplacement += ( neighborWeight
+                            * nodeDisplacements[ nodeIndex + neighborIndex ] );
         }
       }
 
