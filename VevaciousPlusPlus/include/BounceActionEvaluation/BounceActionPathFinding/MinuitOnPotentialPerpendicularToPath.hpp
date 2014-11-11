@@ -26,6 +26,9 @@ namespace VevaciousPlusPlus
                                           size_t const numberOfPathSegments,
                                        int const numberOfAllowedWorsenings = 3,
                              double const nodeMovementThresholdFraction = 0.05,
+                                          double const dampingFactor = 0.75,
+                        std::vector< double > const neighborDisplacementWeights
+                        = std::vector< double >(),
                                          unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnPotentialPerpendicularToPath();
@@ -44,7 +47,7 @@ namespace VevaciousPlusPlus
     // equally-space points along that path, and the minima on those
     // hyperplanes are then used to construct the returned path. If the minima
     // are all sufficiently close to their starting points from lastPath,
-    // nodesConverged is set to ture. (The bubble profile from the last path is
+    // nodesConverged is set to true. (The bubble profile from the last path is
     // ignored, but there is an empty hook in the loop to allow derived classes
     // to use it.)
     virtual TunnelPath const* TryToImprovePath( TunnelPath const& lastPath,
@@ -54,12 +57,19 @@ namespace VevaciousPlusPlus
   protected:
     int numberOfAllowedWorsenings;
     double const nodeMovementThresholdFractionSquared;
-    double bounceBeforeLastPath;
-    std::vector< double > lastPathFalseSideNode;
-    std::vector< double > lastPathTrueSideNode;
-    bool nodesConverged;
+    double const dampingFactor;
+    std::vector< double > const neighborDisplacementWeights;
     std::vector< Eigen::VectorXd > lastPathNodes;
+    std::vector< Eigen::VectorXd > nodeDisplacements;
+    double bounceBeforeLastPath;
+    bool nodesConverged;
 
+    // This sets returnPathNodes.front() and lastPathNodes.front() to be
+    // falseVacuum.FieldConfiguration(), and returnPathNodes.back()
+    // and lastPathNodes.back() to be trueVacuum.FieldConfiguration(),
+    // assuming that every path given is between the vacua.
+    virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
+                                         PotentialMinimum const& trueVacuum );
 
     // This is an empty hook that can be over-ridden to account for the
     // bubble profile from the last path.
@@ -89,6 +99,27 @@ namespace VevaciousPlusPlus
     }
     bounceBeforeLastPath = bubbleFromLastPath.BounceAction();
     return ( numberOfAllowedWorsenings > 0 );
+  }
+
+  // This sets returnPathNodes.front() and lastPathNodes.front() to be
+  // falseVacuum.FieldConfiguration(), and returnPathNodes.back()
+  // and lastPathNodes.back() to be trueVacuum.FieldConfiguration(),
+  // assuming that every path given is between the vacua.
+  inline void MinuitOnPotentialPerpendicularToPath::SetNodesForInitialPath(
+                                           PotentialMinimum const& falseVacuum,
+                                           PotentialMinimum const& trueVacuum )
+  {
+    returnPathNodes.front() = falseVacuum.FieldConfiguration();
+    returnPathNodes.back() = trueVacuum.FieldConfiguration();
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      lastPathNodes.front()( fieldIndex )
+      = falseVacuum.FieldConfiguration()[ fieldIndex ];
+      lastPathNodes.back()( fieldIndex )
+      = trueVacuum.FieldConfiguration()[ fieldIndex ];
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

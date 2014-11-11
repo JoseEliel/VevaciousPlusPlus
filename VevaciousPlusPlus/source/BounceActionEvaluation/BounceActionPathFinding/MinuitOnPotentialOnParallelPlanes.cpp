@@ -50,9 +50,10 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      currentHyperplaneOrigin[ fieldIndex ] = ( returnPathNodes.front()[ fieldIndex ]
-                                                + ( segmentAuxiliaryLength
-                                  * currentParallelComponent[ fieldIndex ] ) );
+      currentHyperplaneOrigin( fieldIndex )
+      = ( returnPathNodes.front()[ fieldIndex ]
+          + ( segmentAuxiliaryLength
+              * currentParallelComponent( fieldIndex ) ) );
     }
     RunMigradAndPutTransformedResultIn( returnPathNodes[ 1 ] );
 
@@ -69,7 +70,7 @@ namespace VevaciousPlusPlus
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
-        currentHyperplaneOrigin[ fieldIndex ]
+        currentHyperplaneOrigin( fieldIndex )
         = ( ( 2.0 * returnPathNodes[ nodeIndex - 1 ][ fieldIndex ] )
             - returnPathNodes[ nodeIndex - 2 ][ fieldIndex ] );
       }

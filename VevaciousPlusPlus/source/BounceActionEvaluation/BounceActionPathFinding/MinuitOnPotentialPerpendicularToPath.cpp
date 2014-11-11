@@ -15,6 +15,8 @@ namespace VevaciousPlusPlus
                                              size_t const numberOfPathSegments,
                                            int const numberOfAllowedWorsenings,
                                     double const nodeMovementThresholdFraction,
+                                                    double const dampingFactor,
+                       std::vector< double > const neighborDisplacementWeights,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
      MinuitOnHypersurfaces( potentialFunction,
@@ -24,9 +26,12 @@ namespace VevaciousPlusPlus
      numberOfAllowedWorsenings( numberOfAllowedWorsenings ),
      nodeMovementThresholdFractionSquared( 0.25 * nodeMovementThresholdFraction
                                            * nodeMovementThresholdFraction ),
+     dampingFactor( dampingFactor ),
+     neighborDisplacementWeights( neighborDisplacementWeights ),
      bounceBeforeLastPath( functionValueForNanInput ),
-     lastPathFalseSideNode( potentialFunction.NumberOfFieldVariables() ),
-     lastPathTrueSideNode( potentialFunction.NumberOfFieldVariables() ),
+     lastPathNodes( ( numberOfPathSegments + 1 ),
+                    Eigen::VectorXd::Zero( numberOfFields ) ),
+     nodeDisplacements( lastPathNodes ),
      nodesConverged( false )
   {
     // This constructor is just an initialization list.
@@ -48,80 +53,106 @@ namespace VevaciousPlusPlus
   // equally-space points along that path, and the minima on those
   // hyperplanes are then used to construct the returned path. If the minima
   // are all sufficiently close to their starting points from lastPath,
-  // nodesConverged is set to ture. (The bubble profile from the last path is
+  // nodesConverged is set to true. (The bubble profile from the last path is
   // ignored, but there is an empty hook in the loop to allow derived classes
   // to use it.)
   TunnelPath const* MinuitOnPotentialPerpendicularToPath::TryToImprovePath(
                                                     TunnelPath const& lastPath,
                                       BubbleProfile const& bubbleFromLastPath )
   {
-    // We assume that the nodes will converge with this call, and note if they
-    // don't.
-    lastPath.PutOnPathAt( currentHyperplaneOrigin,
-                          segmentAuxiliaryLength );
-    lastPath.PutOnPathAt( lastPathTrueSideNode,
-                         ( segmentAuxiliaryLength + segmentAuxiliaryLength ) );
-
-    // For the first varying node, we don't bother copying pathNodes.front()
-    // into lastPathFalseSideNode, as it'll just be over-written by the first
-    // iteration of the loop.
-    SetParallelVector( returnPathNodes.front(),
-                       lastPathTrueSideNode );
-    SetCurrentMinuitSteps( 0.5 );
-    // The starting step sizes for Minuit2 are set to be half the Euclidean
-    // length of the difference between lastPathFalseSideNode and
-    // lastPathTrueSideNode, times whatever internal factor Minuit2 uses (seems
-    // to be 0.1 or 0.01), but the sizes are adapted as the minimization
-    // proceeds anyway.
-    SetUpHouseholderReflection();
-
-    AccountForBubbleProfileAroundNode( 1,
-                                       bubbleFromLastPath );
-    RunMigradAndPutTransformedResultIn( returnPathNodes[ 1 ] );
-
-    for( size_t nodeIndex( 2 );
-         nodeIndex < numberOfVaryingNodes;
+    // First we set up the nodes corresponding to the last path, ignoring the
+    // ends, which should have been set correctly by SetNodesForInitialPath.
+    for( size_t nodeIndex( 1 );
+         nodeIndex <= numberOfVaryingNodes;
          ++nodeIndex )
     {
-      lastPathFalseSideNode = currentHyperplaneOrigin;
-      currentHyperplaneOrigin = lastPathTrueSideNode;
-      lastPath.PutOnPathAt( lastPathTrueSideNode,
-                            ( ( nodeIndex + 1 ) * segmentAuxiliaryLength ) );
-      SetParallelVector( lastPathFalseSideNode,
-                         lastPathTrueSideNode );
-      double differenceSquared( 0.0 );
-      for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfFields;
-           ++fieldIndex )
-      {
-        differenceSquared += ( currentParallelComponent[ fieldIndex ]
-                               * currentParallelComponent[ fieldIndex ] );
-      }
+      lastPath.PutOnPathAt( lastPathNodes[ nodeIndex ],
+                            ( nodeIndex * segmentAuxiliaryLength ) );
+    }
+
+    // We assume that the nodes will converge with this call, and note if they
+    // don't.
+    nodesConverged = true;
+
+    // Next we calculate and store the displacements, ignoring the ends, which
+    // should not get displaced.
+    for( size_t nodeIndex( 1 );
+         nodeIndex <= numberOfVaryingNodes;
+         ++nodeIndex )
+    {
+      currentHyperplaneOrigin = lastPathNodes[ nodeIndex ];
+      SetParallelVector( lastPathNodes[ nodeIndex - 1 ],
+                         lastPathNodes[ nodeIndex + 1 ] );
       SetCurrentMinuitSteps( 0.5 );
+      // The starting step sizes for Minuit2 are set to be half the Euclidean
+      // length of the difference between lastPathNodes[ nodeIndex - 1 ] and
+      // lastPathNodes[ nodeIndex + 1 ], times whatever internal factor Minuit2
+      // uses (seems to be 0.1 or 0.01), but the sizes are adapted as the
+      // minimization proceeds anyway.
       SetUpHouseholderReflection();
       AccountForBubbleProfileAroundNode( nodeIndex,
                                          bubbleFromLastPath );
-      RunMigradAndPutTransformedResultIn( returnPathNodes[ nodeIndex ] );
+      nodeDisplacements[ nodeIndex ] = RunMigradAndReturnDisplacement();
       // This function leaves the last Minuit parameterization in
       // minuitResultAsUntransformedVector, so we can use it to determine "how
       // far the node rolled".
       if( minuitResultAsUntransformedVector.squaredNorm()
-          > ( nodeMovementThresholdFractionSquared * differenceSquared ) )
+          > ( nodeMovementThresholdFractionSquared
+              * currentParallelComponent.squaredNorm() ) )
       {
         nodesConverged = false;
       }
     }
-    // Now we do the node just before the true vacuum. We don't bother copying
-    // around all the nodes even though the code would be a bit easier to read.
-    SetParallelVector( currentHyperplaneOrigin,
-                       returnPathNodes.back() );
-    currentHyperplaneOrigin = lastPathTrueSideNode;
-    SetCurrentMinuitSteps( 0.5 );
-    SetUpHouseholderReflection();
-    AccountForBubbleProfileAroundNode( numberOfVaryingNodes,
-                                       bubbleFromLastPath );
-    RunMigradAndPutTransformedResultIn(
-                                     returnPathNodes[ numberOfVaryingNodes ] );
+
+    // Now we set returnPathNodes based on lastPathNodes plus scaled weighted
+    // averages of nodeDisplacements, ignoring the ends, which should not get
+    // displaced.
+    for( size_t nodeIndex( 1 );
+         nodeIndex <= numberOfVaryingNodes;
+         ++nodeIndex )
+    {
+      // It might be more efficient to average individual components and put
+      // them directly into returnPathNodes[ nodeIndex ], but this way is
+      // clearer. It might get optimized to be as efficient as doing individual
+      // components anyway.
+      Eigen::VectorXd
+      weightedAverageDisplacement( nodeDisplacements[ nodeIndex ] );
+      double weightNormalization( 1.0 );
+      for( size_t neighborIndex( 0 );
+           neighborIndex < neighborDisplacementWeights.size();
+           ++neighborIndex )
+      {
+        if( nodeIndex > ( neighborIndex + 1 ) )
+        {
+          // We average in the false-side neighbors if they are not at the end
+          // or beyond.
+          weightNormalization += neighborDisplacementWeights[ neighborIndex ];
+          weightedAverageDisplacement
+          += ( neighborDisplacementWeights[ neighborIndex ]
+               * nodeDisplacements[ nodeIndex - neighborIndex - 1 ] );
+        }
+        if( ( nodeIndex + neighborIndex ) < numberOfVaryingNodes )
+        {
+          // We average in the true-side neighbors if they are not at the end
+          // or beyond.
+          weightNormalization += neighborDisplacementWeights[ neighborIndex ];
+          weightedAverageDisplacement
+          += ( neighborDisplacementWeights[ neighborIndex ]
+               * nodeDisplacements[ nodeIndex + neighborIndex + 1 ] );
+        }
+      }
+
+      double const displacementScaling( dampingFactor / weightNormalization );
+      for( size_t fieldIndex( 0 );
+           fieldIndex < numberOfFields;
+           ++fieldIndex )
+      {
+        returnPathNodes[ nodeIndex ][ fieldIndex ]
+        = ( displacementScaling * weightedAverageDisplacement( fieldIndex ) );
+      }
+    }
+
+    // Finally we make a new path through returnPathNodes.
     return new LinearSplineThroughNodes( returnPathNodes,
                                          nodeZeroParameterization,
                                          pathTemperature );
