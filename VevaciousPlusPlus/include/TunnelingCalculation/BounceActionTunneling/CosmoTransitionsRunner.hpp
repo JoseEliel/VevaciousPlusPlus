@@ -16,6 +16,7 @@
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
 #include "BounceActionEvaluation/BubbleProfile.hpp"
 

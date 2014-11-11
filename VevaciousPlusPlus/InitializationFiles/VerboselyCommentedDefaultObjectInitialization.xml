@@ -388,6 +388,32 @@
                    flagging that the path has not yet converged. -->
               0.05
             </ConvergenceThresholdFraction>
+            <MinuitDampingFraction>
+              <!-- This is the fraction which multiplies the displacements of
+                   the nodes from the last path. The new positions of the nodes
+                   are calculated by a minimization by Minuit2 starting from
+                   points on the last path, and the displacements of these new
+                   nodes are multiplied by this fraction before being added to
+                   the starting points to get the nodes along the new path, so
+                   "damping" the difference between the paths. This is an
+                   attempt to improve the convergence of the path finder. -->
+              0.75
+            </MinuitDampingFraction>
+            <NeighborDisplacementWeights>
+              <!-- This is a set of weights used in averaging the change in
+                   the path. A given node has its displacement calculated by
+                   Minuit2, then the actual displacement used (which is also
+                   multiplied by MinuitDampingFraction) is the weighted average
+                   of that displacement with the displacements from the nearest
+                   neighbor nodes. The first number given is the weight of the
+                   nearest neighbor node displacements (i.e. those of the nodes
+                   at the end of the segments either side of the original node)
+                   compared to the original displacement having weight 1.0, the
+                   second number given is the weight of the next-nearest node,
+                   and so on. The numbers should be separated by newlines. -->
+              0.5
+              0.25
+            </NeighborDisplacementWeights>
             <MinuitStrategy>
               <!-- The number given here is given to Minuit2 to decide how
                    precise it tries to be, through more or less calls of the

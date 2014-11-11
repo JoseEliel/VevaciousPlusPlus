@@ -25,6 +25,7 @@
 #include "TunnelingCalculation/BounceActionTunneling/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPathNormalInertialPotential.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialOnParallelPlanes.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
@@ -179,7 +180,7 @@ namespace VevaciousPlusPlus
                                      std::string const& constructorArguments );
 
     //
-    BouncePathFinder* CreateMinuitOnPathPerpendicularForces(
+    BouncePathFinder* CreateMinuitOnPathNormalInertialPotential(
                                      std::string const& constructorArguments );
 
     //

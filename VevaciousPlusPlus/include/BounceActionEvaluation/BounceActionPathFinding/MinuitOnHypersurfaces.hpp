@@ -120,8 +120,7 @@ namespace VevaciousPlusPlus
     // This creates and runs a Minuit2 MnMigrad object and converts the result
     // into a node vector transformed by reflectionMatrix and puts that into
     // displacementVector.
-    virtual Eigen::VectorXd
-    MinuitOnHypersurfaces::RunMigradAndReturnDisplacement();
+    virtual Eigen::VectorXd RunMigradAndReturnDisplacement();
   };
 
 

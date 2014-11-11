@@ -768,7 +768,7 @@ namespace VevaciousPlusPlus
         else if( classType.compare( "MinuitOnPathPerpendicularForces" )
                  == 0 )
         {
-          pathFinders.push_back( CreateMinuitOnPathPerpendicularForces(
+          pathFinders.push_back( CreateMinuitOnPathNormalInertialPotential(
                                                       constructorArguments ) );
         }
       }
@@ -814,6 +814,8 @@ namespace VevaciousPlusPlus
     int numberOfPathSegments( 100 );
     int numberOfAllowedWorsenings( 3 );
     double convergenceThresholdFraction( 0.05 );
+    double minuitDampingFraction( 0.75 );
+    std::string neighborDisplacementWeightsString( "0.5, 0.25" );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
     BOL::AsciiXmlParser xmlParser;
@@ -830,22 +832,44 @@ namespace VevaciousPlusPlus
                                      "ConvergenceThresholdFraction",
                                      convergenceThresholdFraction );
       InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitDampingFraction",
+                                     minuitDampingFraction );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NeighborDisplacementWeights",
+                                     neighborDisplacementWeightsString );
+      InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
+    BOL::VectorlikeArray< std::string > weightsStrings;
+    BOL::StringParser::parseByChar( neighborDisplacementWeightsString,
+                                    weightsStrings,
+                                    " \t\n,;" );
+    std::vector< double > neighborDisplacementWeights;
+    for( int weightIndex( 0 );
+         weightIndex < weightsStrings.getSize();
+         ++weightIndex )
+    {
+      neighborDisplacementWeights.push_back(
+          BOL::StringParser::stringToDouble( weightsStrings[ weightIndex ] ) );
+    }
+
     return new MinuitOnPotentialPerpendicularToPath( *potentialFunction,
                                  static_cast< size_t >( numberOfPathSegments ),
                                                      numberOfAllowedWorsenings,
                                                   convergenceThresholdFraction,
+                                                     minuitDampingFraction,
+                                                   neighborDisplacementWeights,
                                                      minuitStrategy,
                       static_cast< unsigned int >( minuitToleranceFraction ) );
   }
 
   //
-  BouncePathFinder* VevaciousPlusPlus::CreateMinuitOnPathPerpendicularForces(
+  BouncePathFinder*
+  VevaciousPlusPlus::CreateMinuitOnPathNormalInertialPotential(
                                       std::string const& constructorArguments )
   {
     // The <ConstructorArguments> for this class should have child elements
@@ -853,6 +877,8 @@ namespace VevaciousPlusPlus
     int numberOfPathSegments( 100 );
     int numberOfAllowedWorsenings( 3 );
     double convergenceThresholdFraction( 0.05 );
+    double minuitDampingFraction( 0.75 );
+    std::string neighborDisplacementWeightsString( "0.5, 0.25" );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
     BOL::AsciiXmlParser xmlParser;
@@ -869,23 +895,45 @@ namespace VevaciousPlusPlus
                                      "ConvergenceThresholdFraction",
                                      convergenceThresholdFraction );
       InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitDampingFraction",
+                                     minuitDampingFraction );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NeighborDisplacementWeights",
+                                     neighborDisplacementWeightsString );
+      InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
+    BOL::VectorlikeArray< std::string > weightsStrings;
+    BOL::StringParser::parseByChar( neighborDisplacementWeightsString,
+                                    weightsStrings,
+                                    " \t\n,;" );
+    std::vector< double > neighborDisplacementWeights;
+    for( int weightIndex( 0 );
+         weightIndex < weightsStrings.getSize();
+         ++weightIndex )
+    {
+      neighborDisplacementWeights.push_back(
+          BOL::StringParser::stringToDouble( weightsStrings[ weightIndex ] ) );
+    }
+
     // placeholder:
     /**/std::cout << std::endl
     << "Placeholder: "
-    << "CreateMinuitOnPathPerpendicularForces(...) returning NULL as the class"
-    << " does not yet exist!";
+    << "CreateMinuitOnPathNormalInertialPotential(...) returning NULL as the"
+    << " class does not yet exist!";
     std::cout << std::endl;
     return NULL;/**/
-    /*return new MinuitOnPathPerpendicularForces( *potentialFunction,
+    /*return new MinuitOnPathNormalInertialPotential( *potentialFunction,
                                  static_cast< size_t >( numberOfPathSegments ),
-                                                  numberOfAllowedWorsenings,
-                                                  minuitStrategy,
+                                                     numberOfAllowedWorsenings,
+                                                  convergenceThresholdFraction,
+                                                     minuitDampingFraction,
+                                                   neighborDisplacementWeights,
+                                                     minuitStrategy,
                     static_cast< unsigned int >( minuitToleranceFraction ) );*/
   }
 

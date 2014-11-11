@@ -45,7 +45,6 @@ namespace VevaciousPlusPlus
     SetCurrentMinuitSteps( segmentAuxiliaryLength );
     SetUpHouseholderReflection();
 
-    currentHyperplaneOrigin = returnPathNodes.front();
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
