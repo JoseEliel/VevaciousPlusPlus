@@ -93,15 +93,23 @@ namespace VevaciousPlusPlus
       AccountForBubbleProfileAroundNode( nodeIndex,
                                          bubbleFromLastPath );
       nodeDisplacements[ nodeIndex ] = RunMigradAndReturnDisplacement();
-      // This function leaves the last Minuit parameterization in
-      // minuitResultAsUntransformedVector, so we can use it to determine "how
-      // far the node rolled".
-      if( minuitResultAsUntransformedVector.squaredNorm()
+      if( nodeDisplacements[ nodeIndex ].squaredNorm()
           > ( nodeMovementThresholdFractionSquared
               * currentParallelComponent.squaredNorm() ) )
       {
         nodesConverged = false;
       }
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "nodeDisplacements[ " << nodeIndex << " ] length = "
+      << sqrt( nodeDisplacements[ nodeIndex ].squaredNorm() )
+      << ", currentParallelComponent length = "
+      << sqrt( currentParallelComponent.squaredNorm() )
+      << ", nodesConverged = " << nodesConverged;
+      std::cout << std::endl;/**/
+
     }
 
     // Now we set returnPathNodes based on lastPathNodes plus scaled weighted

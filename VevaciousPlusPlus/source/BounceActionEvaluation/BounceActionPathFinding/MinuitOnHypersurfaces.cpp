@@ -17,6 +17,7 @@ namespace VevaciousPlusPlus
     MinuitPathFinder( minuitStrategy,
                       minuitToleranceFraction ),
     potentialFunction( potentialFunction ),
+    potentialAtOrigin( -1.0 ),
     numberOfFields( potentialFunction.NumberOfFieldVariables() ),
     numberOfVaryingNodes( numberOfPathSegments - 1 ),
     segmentAuxiliaryLength( 1.0
@@ -114,6 +115,38 @@ namespace VevaciousPlusPlus
                                         * minusInverseOfOneMinusDotProduct ) );
       }
     }
+  }
+
+  // This creates and runs a Minuit2 MnMigrad object and converts the result
+  // into a node vector transformed by reflectionMatrix and puts that into
+  // displacementVector.
+  Eigen::VectorXd
+  MinuitOnHypersurfaces::RunMigradAndReturnDisplacement()
+  {
+    ROOT::Minuit2::MnMigrad mnMigrad( *this,
+                                      nodeZeroParameterization,
+                                      minuitInitialSteps,
+                                      minuitStrategy );
+    ROOT::Minuit2::FunctionMinimum const minuitResult( mnMigrad( 0,
+                                                    currentMinuitTolerance ) );
+    // We return a zero displacement if Minuit2 failed to minimize operator()
+    // better than that.
+    if( minuitResult.Fval() > (*this)( nodeZeroParameterization ) )
+    {
+      return Eigen::VectorXd::Zero( numberOfFields );
+    }
+    ROOT::Minuit2::MnUserParameters const&
+    userParameters( minuitResult.UserParameters() );
+    // We assume that minuitResultAsUntransformedVector( 0 ) was set to 0.0
+    // in the constructor and never changes.
+    for( size_t variableIndex( 1 );
+         variableIndex < numberOfFields;
+         ++variableIndex )
+    {
+      minuitResultAsUntransformedVector( variableIndex )
+      = userParameters.Value( variableIndex - 1 );
+    }
+    return ( reflectionMatrix * minuitResultAsUntransformedVector );
   }
 
 } /* namespace VevaciousPlusPlus */

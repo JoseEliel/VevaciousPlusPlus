@@ -72,6 +72,16 @@ namespace VevaciousPlusPlus
     thermalPotentialMinimizer.SetTemperature( currentTemperature );
     PotentialMinimum thermalFalseVacuum( thermalPotentialMinimizer(
                                           falseVacuum.FieldConfiguration() ) );
+    // We have to check to see if the field origin should be the thermal false
+    // vacuum. The result of thermalPotentialMinimizer already has the value of
+    // the potential at the field origin subtracted, so we just compare with
+    // zero.
+    if( thermalFalseVacuum.PotentialValue() > 0.0 )
+    {
+      thermalFalseVacuum
+      = PotentialMinimum( potentialFunction.FieldValuesOrigin(),
+                          0.0 );
+    }
     PotentialMinimum thermalTrueVacuum( thermalPotentialMinimizer(
                                            trueVacuum.FieldConfiguration() ) );
     double const thresholdDecayWidth( -log( survivalProbabilityThreshold )
@@ -118,6 +128,16 @@ namespace VevaciousPlusPlus
       // at the last temperature step.
       thermalFalseVacuum
       = thermalPotentialMinimizer( thermalFalseVacuum.FieldConfiguration() );
+      // We have to keep checking to see if the field origin should be the
+      // thermal false vacuum. The result of thermalPotentialMinimizer already
+      // has the value of the potential at the field origin subtracted, so we
+      // just compare with zero.
+      if( thermalFalseVacuum.PotentialValue() > 0.0 )
+      {
+        thermalFalseVacuum
+        = PotentialMinimum( potentialFunction.FieldValuesOrigin(),
+                            0.0 );
+      }
       thermalTrueVacuum
       = thermalPotentialMinimizer( thermalTrueVacuum.FieldConfiguration() );
 
@@ -274,6 +294,11 @@ namespace VevaciousPlusPlus
         << std::endl
         << "nextPath:" << std::endl
         << nextPath->AsDebuggingString();
+        SplinePotential potentialApproximation( potentialFunction,
+                                                *nextPath,
+                                                200 );
+        std::cout << "potentialApproximation:" << std::endl
+        << potentialApproximation.AsDebuggingString();
         std::cout << std::endl;/**/
 
         BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath ) );

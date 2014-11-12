@@ -60,6 +60,7 @@ namespace VevaciousPlusPlus
 
   protected:
     PotentialFunction const& potentialFunction;
+    double potentialAtOrigin;
     size_t const numberOfFields;
     size_t const numberOfVaryingNodes;
     double segmentAuxiliaryLength;
@@ -187,8 +188,8 @@ namespace VevaciousPlusPlus
       fieldConfiguration[ fieldIndex ] = ( transformedNode( fieldIndex )
                                      + currentHyperplaneOrigin( fieldIndex ) );
     }
-    return potentialFunction( fieldConfiguration,
-                              pathTemperature );
+    return ( potentialFunction( fieldConfiguration,
+                                pathTemperature ) - potentialAtOrigin );
   }
 
   // This sets the vacua to be those given, and resets the nodes to describe a
@@ -200,6 +201,9 @@ namespace VevaciousPlusPlus
                                                  double const pathTemperature )
   {
     this->pathTemperature = pathTemperature;
+    potentialAtOrigin
+    = potentialFunction( potentialFunction.FieldValuesOrigin(),
+                         pathTemperature );
     SetNodesForInitialPath( falseVacuum,
                             trueVacuum );
     SetCurrentMinuitTolerance( falseVacuum,
@@ -279,32 +283,6 @@ namespace VevaciousPlusPlus
     }
     minuitInitialSteps.assign( ( numberOfFields - 1 ),
                                ( fractionOfLength * sqrt( lengthSquared ) ) );
-  }
-
-  // This creates and runs a Minuit2 MnMigrad object and converts the result
-  // into a node vector transformed by reflectionMatrix and puts that into
-  // displacementVector.
-  inline Eigen::VectorXd
-  MinuitOnHypersurfaces::RunMigradAndReturnDisplacement()
-  {
-    ROOT::Minuit2::MnMigrad mnMigrad( *this,
-                                      nodeZeroParameterization,
-                                      minuitInitialSteps,
-                                      minuitStrategy );
-    ROOT::Minuit2::FunctionMinimum const minuitResult( mnMigrad( 0,
-                                                    currentMinuitTolerance ) );
-    ROOT::Minuit2::MnUserParameters const&
-    userParameters( minuitResult.UserParameters() );
-    // We assume that minuitResultAsUntransformedVector( 0 ) was set to 0.0
-    // in the constructor and never changes.
-    for( size_t variableIndex( 1 );
-         variableIndex < numberOfFields;
-         ++variableIndex )
-    {
-      minuitResultAsUntransformedVector( variableIndex )
-      = userParameters.Value( variableIndex - 1 );
-    }
-    return ( reflectionMatrix * minuitResultAsUntransformedVector );
   }
 
   // This creates and runs a Minuit2 MnMigrad object and converts the result
