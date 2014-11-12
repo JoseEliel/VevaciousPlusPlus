@@ -129,6 +129,15 @@ namespace VevaciousPlusPlus
                                       minuitStrategy );
     ROOT::Minuit2::FunctionMinimum const minuitResult( mnMigrad( 0,
                                                     currentMinuitTolerance ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "minuitResult.Fval() = " << minuitResult.Fval()
+    << ", (*this)( nodeZeroParameterization ) = "
+    << (*this)( nodeZeroParameterization );
+    std::cout << std::endl;/**/
+
     // We return a zero displacement if Minuit2 failed to minimize operator()
     // better than that.
     if( minuitResult.Fval() > (*this)( nodeZeroParameterization ) )

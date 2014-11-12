@@ -55,7 +55,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    int numberOfAllowedWorsenings;
+    unsigned int const numberOfAllowedWorsenings;
+    unsigned int numberOfWorseningsSoFar;
     double const nodeMovementThresholdFractionSquared;
     double const dampingFactor;
     std::vector< double > const neighborDisplacementWeights;
@@ -95,10 +96,10 @@ namespace VevaciousPlusPlus
     }
     if( bubbleFromLastPath.BounceAction() >= bounceBeforeLastPath )
     {
-      --numberOfAllowedWorsenings;
+      ++numberOfWorseningsSoFar;
     }
     bounceBeforeLastPath = bubbleFromLastPath.BounceAction();
-    return ( numberOfAllowedWorsenings > 0 );
+    return ( numberOfAllowedWorsenings > numberOfWorseningsSoFar );
   }
 
   // This sets returnPathNodes.front() and lastPathNodes.front() to be
@@ -120,6 +121,8 @@ namespace VevaciousPlusPlus
       lastPathNodes.back()( fieldIndex )
       = trueVacuum.FieldConfiguration()[ fieldIndex ];
     }
+    // We reset the number of allowed worsening steps here.
+    numberOfWorseningsSoFar = 0;
   }
 
 } /* namespace VevaciousPlusPlus */

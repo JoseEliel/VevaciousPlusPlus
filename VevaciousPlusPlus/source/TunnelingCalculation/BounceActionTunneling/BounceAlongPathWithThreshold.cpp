@@ -293,7 +293,7 @@ namespace VevaciousPlusPlus
         /**/std::cout << std::endl << "debugging:"
         << std::endl
         << "nextPath:" << std::endl
-        << nextPath->AsDebuggingString();
+        << nextPath->AsDebuggingString() << std::endl;
         SplinePotential potentialApproximation( potentialFunction,
                                                 *nextPath,
                                                 200 );

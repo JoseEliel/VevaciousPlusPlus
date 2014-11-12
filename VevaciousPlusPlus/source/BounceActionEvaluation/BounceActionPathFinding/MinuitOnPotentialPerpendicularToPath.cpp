@@ -24,6 +24,7 @@ namespace VevaciousPlusPlus
                             minuitStrategy,
                             minuitToleranceFraction ),
      numberOfAllowedWorsenings( numberOfAllowedWorsenings ),
+     numberOfWorseningsSoFar( 0 ),
      nodeMovementThresholdFractionSquared( 0.25 * nodeMovementThresholdFraction
                                            * nodeMovementThresholdFraction ),
      dampingFactor( dampingFactor ),
@@ -99,17 +100,6 @@ namespace VevaciousPlusPlus
       {
         nodesConverged = false;
       }
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "nodeDisplacements[ " << nodeIndex << " ] length = "
-      << sqrt( nodeDisplacements[ nodeIndex ].squaredNorm() )
-      << ", currentParallelComponent length = "
-      << sqrt( currentParallelComponent.squaredNorm() )
-      << ", nodesConverged = " << nodesConverged;
-      std::cout << std::endl;/**/
-
     }
 
     // Now we set returnPathNodes based on lastPathNodes plus scaled weighted
