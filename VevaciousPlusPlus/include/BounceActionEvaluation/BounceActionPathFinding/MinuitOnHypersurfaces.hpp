@@ -23,6 +23,15 @@ namespace VevaciousPlusPlus
   class MinuitOnHypersurfaces : public MinuitPathFinder
   {
   public:
+    // This puts the elements of eigenVector into stlVector.
+    static void ConvertEigenToStl( Eigen::VectorXd const& eigenVector,
+                                   std::vector< double >& stlVector );
+
+    // This puts the elements of stlVector into eigenVector.
+    static void ConvertStlToEigen( std::vector< double > const& stlVector,
+                                   Eigen::VectorXd& eigenVector );
+
+
     MinuitOnHypersurfaces( PotentialFunction const& potentialFunction,
                            size_t const numberOfPathSegments,
                            unsigned int const minuitStrategy = 1,
@@ -112,20 +121,50 @@ namespace VevaciousPlusPlus
     virtual void SetCurrentMinuitSteps( double const fractionOfLength );
 
     // This creates and runs a Minuit2 MnMigrad object and converts the result
+    // into a node vector transformed by reflectionMatrix and puts that into
+    // displacementVector.
+    virtual Eigen::VectorXd RunMigradAndReturnDisplacement();
+
+    // This creates and runs a Minuit2 MnMigrad object and converts the result
     // into a node vector (transformed by reflectionMatrix and added to
     // currentHyperplaneOrigin) and puts that into resultVector.
     virtual void
     RunMigradAndPutTransformedResultIn( std::vector< double >& resultVector );
-
-    // This creates and runs a Minuit2 MnMigrad object and converts the result
-    // into a node vector transformed by reflectionMatrix and puts that into
-    // displacementVector.
-    virtual Eigen::VectorXd RunMigradAndReturnDisplacement();
   };
 
 
 
 
+
+  // This puts the elements of eigenVector into stlVector.
+  inline void
+  MinuitOnHypersurfaces::ConvertEigenToStl( Eigen::VectorXd const& eigenVector,
+                                            std::vector< double >& stlVector )
+  {
+    size_t const numberOfFields( eigenVector.rows() );
+    stlVector.resize( numberOfFields );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      stlVector[ fieldIndex ] = eigenVector( fieldIndex );
+    }
+  }
+
+  // This puts the elements of stlVector into eigenVector.
+  inline void MinuitOnHypersurfaces::ConvertStlToEigen(
+                                        std::vector< double > const& stlVector,
+                                                 Eigen::VectorXd& eigenVector )
+  {
+    size_t const numberOfFields( stlVector.size() );
+    eigenVector.resize( numberOfFields );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      eigenVector( fieldIndex ) = stlVector[ fieldIndex ];
+    }
+  }
 
   // It may seem unwise to have this object call Minuit on itself, but really
   // it's just a handy way of keeping the minimization function within the

@@ -36,18 +36,17 @@
       <ModelFile>
         <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin -->
         <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
-        /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
+        <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStauAndStopVevs.vin -->
+        <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin -->
+        /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStauAndMuSnuVevs.vin
       </ModelFile>
+      <RollOnlyMinima>
+        <!-- Either "true"/"yes" or "false"/"no" -->
+        no
+      </RollOnlyMinima>
       <ScaleRangeMinimumFactor>
         10.0
       </ScaleRangeMinimumFactor>
-      <RollOnlyMinima>
-        <!-- Either "true"/"yes" or "false"/"no" -->
-        true
-      </RollOnlyMinima>
-      <AssumedPositiveOrNegativeTolerance>
-        1.0
-      </AssumedPositiveOrNegativeTolerance>
     </ConstructorArguments>
   </PotentialClass>
   
@@ -153,13 +152,13 @@
         </ClassType>
         <ConstructorArguments>
           <NumberOfSegmentsForPotentialFit>
-            100
+            200
           </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
           </NumberShootAttemptsAllowed>
           <RadialResolution>
-            0.05
+            0.01
           </RadialResolution>
         </ConstructorArguments>
       </BouncePotentialFit>
@@ -180,7 +179,7 @@
               1
             </MinuitStrategy>
             <MinuitTolerance>
-              0.5
+              0.1
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
@@ -193,7 +192,7 @@
               50
             </NumberOfPathSegments>
             <NumberOfAllowedWorsenings>
-              3
+              1
             </NumberOfAllowedWorsenings>
             <ConvergenceThresholdFraction>
               0.05
@@ -209,7 +208,7 @@
               1
             </MinuitStrategy>
             <MinuitTolerance>
-              0.5
+              0.005
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
@@ -222,7 +221,7 @@
               100
             </NumberOfPathSegments>
             <NumberOfAllowedWorsenings>
-              3
+              1
             </NumberOfAllowedWorsenings>
             <ConvergenceThresholdFraction>
               0.05
@@ -234,11 +233,14 @@
               0.5
               0.25
             </NeighborDisplacementWeights>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
             <MinuitStrategy>
-              1
+              0
             </MinuitStrategy>
             <MinuitTolerance>
-              0.1
+              0.001
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>

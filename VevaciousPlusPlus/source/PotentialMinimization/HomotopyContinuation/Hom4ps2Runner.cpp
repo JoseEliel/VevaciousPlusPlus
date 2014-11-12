@@ -204,13 +204,20 @@ namespace VevaciousPlusPlus
     }
     std::cout << std::endl
     << "complexSolutions = { " << std::endl;
-    for( std::vector< std::complex< long double > >::iterator
-         complexValue( complexSolutions.begin() );
-         complexValue < complexSolutions.end();
-         ++complexValue )
+    for( size_t whichIndex( 0 );
+         whichIndex < complexSolutions.size();
+         ++whichIndex )
     {
-      std::cout << " ( " << complexValue->real() << ", "
-      << complexValue->imag() << " i )";
+      if( whichIndex > 0 )
+      {
+        std::cout << ", ";
+        if( ( whichIndex % numberOfVariables ) == 0 )
+        {
+          std::cout << std::endl;
+        }
+      }
+      std::cout << " ( " << complexSolutions[ whichIndex ].real() << ", "
+      << complexSolutions[ whichIndex ].imag() << " i )";
     }
     std::cout << "}" << std::endl;
     std::cout << std::endl;*/

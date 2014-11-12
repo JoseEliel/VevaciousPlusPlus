@@ -74,7 +74,8 @@ namespace VevaciousPlusPlus
         // debugging:
         /*std::cout << std::endl << "debugging:"
         << std::endl
-        << "Not purely real (" << fieldValue->imag() << "i).";
+        << "Not purely real (" << solutionConfiguration[ fieldIndex ].imag()
+        << "i).";
         std::cout << std::endl;*/
         return;
       }
@@ -147,8 +148,11 @@ namespace VevaciousPlusPlus
                fieldValue < signFlip->end();
                ++fieldValue )
           {
-            std::cout << " ( " << fieldValue->real() << ", "
-            << fieldValue->imag() << " )";
+            if( fieldValue != signFlip->begin() )
+            {
+              std::cout << ", ";
+            }
+            std::cout << *fieldValue;
           }
           std::cout << " } failed to solve target system.";
           std::cout << std::endl;*/

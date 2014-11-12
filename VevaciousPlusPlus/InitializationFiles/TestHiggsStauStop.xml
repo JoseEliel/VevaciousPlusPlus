@@ -194,6 +194,16 @@
             <NumberOfAllowedWorsenings>
               1
             </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
+            <MinuitDampingFraction>
+              0.75
+            </MinuitDampingFraction>
+            <NeighborDisplacementWeights>
+              0.5
+              0.25
+            </NeighborDisplacementWeights>
             <MinuitStrategy>
               1
             </MinuitStrategy>
@@ -213,6 +223,16 @@
             <NumberOfAllowedWorsenings>
               1
             </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
+            <MinuitDampingFraction>
+              0.75
+            </MinuitDampingFraction>
+            <NeighborDisplacementWeights>
+              0.5
+              0.25
+            </NeighborDisplacementWeights>
             <ConvergenceThresholdFraction>
               0.05
             </ConvergenceThresholdFraction>

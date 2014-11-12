@@ -268,6 +268,14 @@ namespace VevaciousPlusPlus
         TunnelPath const*
         nextPath( (*pathFinder)->TryToImprovePath( *currentPath,
                                                    *currentBubble ) );
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "nextPath:" << std::endl
+        << nextPath->AsDebuggingString();
+        std::cout << std::endl;/**/
+
         BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath ) );
         delete currentBubbleDeleter;
         delete currentPathDeleter;
