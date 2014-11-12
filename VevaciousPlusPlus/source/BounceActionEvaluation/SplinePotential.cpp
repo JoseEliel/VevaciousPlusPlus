@@ -39,12 +39,12 @@ namespace VevaciousPlusPlus
                                                   pathTemperature ) );
 
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "Path start: "
     << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
     << ", potential value = " << pathFalsePotential;
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
 
     tunnelPath.PutOnPathAt( fieldConfiguration,
                             1.0 );
@@ -52,12 +52,12 @@ namespace VevaciousPlusPlus
                                                       pathTemperature ) );
 
     // debugging:
-    /*std::cout << std::endl << "debugging:"
+    /**/std::cout << std::endl << "debugging:"
     << std::endl
     << "Path end: "
     << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
     << ", potential value = " << pathEndPotential;
-    std::cout << std::endl;*/
+    std::cout << std::endl;/**/
 
     double segmentEndAuxiliary( auxiliaryStep );
     tunnelPath.PutOnPathAt( fieldConfiguration,
@@ -68,12 +68,12 @@ namespace VevaciousPlusPlus
     while( segmentIndex < ( numberOfPotentialSegments - 1 ) )
     {
       // debugging:
-      /*std::cout << std::endl << "debugging:"
+      /**/std::cout << std::endl << "debugging:"
       << std::endl
       << "segmentIndex = " << segmentIndex << ", pathFalsePotential = "
       << pathFalsePotential << ", segmentEndPotential = "
       << segmentEndPotential;
-      std::cout << std::endl;*/
+      std::cout << std::endl;/**/
 
       // If we find the start of the energy barrier, we note so and break from
       // the loop.
@@ -95,14 +95,14 @@ namespace VevaciousPlusPlus
                                                pathTemperature );
 
       // debugging:
-      /*std::cout << std::endl << "debugging:"
+      /**/std::cout << std::endl << "debugging:"
       << std::endl
       << "segmentIndex = " << segmentIndex << ", segmentEndAuxiliary = "
       << segmentEndAuxiliary << ", field configuration at segment end = "
       << potentialFunction.FieldConfigurationAsMathematica(
                                                            fieldConfiguration )
       << ", potential value = " << pathEndPotential;
-      std::cout << std::endl;*/
+      std::cout << std::endl;/**/
     }
     // Now we move on to resolving the energy barrier, looking out for an early
     // path panic minimum. However, this is only done if we resolved the start
@@ -137,7 +137,7 @@ namespace VevaciousPlusPlus
       }
 
       // debugging:
-      /*std::cout << std::endl << "debugging:"
+      /**/std::cout << std::endl << "debugging:"
       << std::endl
       << "First straight segment: segmentIndex = " << segmentIndex
       << ", segmentEndAuxiliary = " << segmentEndAuxiliary
@@ -146,7 +146,16 @@ namespace VevaciousPlusPlus
                                                            fieldConfiguration )
       << ", potential value = " << ( segmentEndPotential + pathFalsePotential )
       << ", relative value = " << segmentEndPotential;
-      std::cout << std::endl;*/
+      std::cout << std::endl;/**/
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "Why do I not note that trueVacuumLowerThanPathFalseMinimum must be"
+      << " true when checking for the definite undershoot?" << std::endl
+      << "Also, what happens if the given true vacuum is not as deep as the"
+      << " point 1 segment back towards the false vacuum?";
+      std::cout << std::endl;/**/
 
       while( segmentIndex < ( numberOfPotentialSegments - 2 ) )
       {
@@ -198,7 +207,7 @@ namespace VevaciousPlusPlus
         }
 
         // debugging:
-        /*std::cout << std::endl << "debugging:"
+        /**/std::cout << std::endl << "debugging:"
         << std::endl
         << "segmentIndex = " << segmentIndex << ", normalSegmentIndex = "
         << normalSegmentIndex << ", segmentEndAuxiliary = "
@@ -213,7 +222,7 @@ namespace VevaciousPlusPlus
         << potentialValues[ normalSegmentIndex ] << ", firstDerivatives[ "
         << normalSegmentIndex << " ] = "
         << firstDerivatives[ normalSegmentIndex ];
-        std::cout << std::endl;*/
+        std::cout << std::endl;/**/
       }
       // Now we have to check to see if the end of the path is lower than the
       // path false minimum, if we haven't already found an early path panic
