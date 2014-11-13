@@ -135,6 +135,9 @@
       <PathResolution>
         100
       </PathResolution>
+      <MinimumVacuumSeparationFraction>
+        0.2
+      </MinimumVacuumSeparationFraction>
       <MaxInnerLoops>
         10
       </MaxInnerLoops>
@@ -143,7 +146,7 @@
       </MaxOuterLoops>
       <BouncePotentialFit>
         <ClassType>
-          BubbleShootingOnSpline
+          BubbleShootingOnPathInFieldSpace
         </ClassType>
         <ConstructorArguments>
           <NumberOfSegmentsForPotentialFit>

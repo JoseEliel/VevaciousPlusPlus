@@ -632,6 +632,7 @@ namespace VevaciousPlusPlus
     int temperatureAccuracy( 7 );
     std::string pathToCosmotransitions( "./cosmoTransitions/" );
     int resolutionOfDsbVacuum( 20 );
+    double vacuumSeparationFraction( 0.2 );
     int maxInnerLoops( 10 );
     int maxOuterLoops( 10 );
     BOL::AsciiXmlParser xmlParser;
@@ -657,6 +658,9 @@ namespace VevaciousPlusPlus
                                      "PathResolution",
                                      resolutionOfDsbVacuum );
       InterpretElementIfNameMatches( xmlParser,
+                                     "MinimumVacuumSeparationFraction",
+                                     vacuumSeparationFraction );
+      InterpretElementIfNameMatches( xmlParser,
                                      "MaxInnerLoops",
                                      maxInnerLoops );
       InterpretElementIfNameMatches( xmlParser,
@@ -673,7 +677,8 @@ namespace VevaciousPlusPlus
                                        resolutionOfDsbVacuum,
                                        maxInnerLoops,
                                        maxOuterLoops,
-                                       thermalStraightPathFitResolution );
+                                       thermalStraightPathFitResolution,
+                                       vacuumSeparationFraction );
   }
 
   //
@@ -687,6 +692,8 @@ namespace VevaciousPlusPlus
     double survivalProbabilityThreshold( 0.1 );
     int thermalIntegrationResolution( 5 );
     int temperatureAccuracy( 7 );
+    int resolutionOfPathPotential( 100 );
+    double vacuumSeparationFraction( 0.2 );
 
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
@@ -704,6 +711,12 @@ namespace VevaciousPlusPlus
       InterpretElementIfNameMatches( xmlParser,
                                      "CriticalTemperatureAccuracy",
                                      temperatureAccuracy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "PathResolution",
+                                     resolutionOfPathPotential );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinimumVacuumSeparationFraction",
+                                     vacuumSeparationFraction );
       ReadClassAndArguments( xmlParser,
                              "BouncePotentialFit",
                              bouncePotentialFitClass,
@@ -730,7 +743,8 @@ namespace VevaciousPlusPlus
                                InterpretTunnelingStrategy( tunnelingStrategy ),
                                              survivalProbabilityThreshold,
                                              thermalIntegrationResolution,
-                                             temperatureAccuracy );
+                                             temperatureAccuracy,
+                                             resolutionOfPathPotential );
   }
 
   //
@@ -939,7 +953,7 @@ namespace VevaciousPlusPlus
 
   //
   BounceActionCalculator*
-  VevaciousPlusPlus::SetUpBubbleShootingOnSpline(
+  VevaciousPlusPlus::SetUpBubbleShootingOnPathInFieldSpace(
                                       std::string const& constructorArguments )
   {
     int numberOfSegmentsForPotentialFit( 32 );
@@ -951,9 +965,6 @@ namespace VevaciousPlusPlus
     while( xmlParser.readNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
-                                     "NumberOfSegmentsForPotentialFit",
-                                     numberOfSegmentsForPotentialFit );
-      InterpretElementIfNameMatches( xmlParser,
                                      "RadialResolution",
                                      lengthScaleResolutionForBounce );
       InterpretElementIfNameMatches( xmlParser,
@@ -962,9 +973,8 @@ namespace VevaciousPlusPlus
     }
 
     return new BubbleShootingOnPathInFieldSpace( *potentialFunction,
-                                       numberOfSegmentsForPotentialFit,
-                                       lengthScaleResolutionForBounce,
-                                       shootAttemptsForBounce );
+                                                lengthScaleResolutionForBounce,
+                                                 shootAttemptsForBounce );
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -189,8 +189,8 @@ namespace VevaciousPlusPlus
                                  std::string const& constructorArguments );
 
     //
-    BounceActionCalculator*
-    SetUpBubbleShootingOnSpline( std::string const& constructorArguments );
+    BounceActionCalculator* SetUpBubbleShootingOnPathInFieldSpace(
+                                     std::string const& constructorArguments );
   };
 
 
@@ -362,16 +362,16 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::SetUpBounceActionCalculator( std::string const& className,
                                       std::string const& constructorArguments )
   {
-    if( className.compare( "BubbleShootingOnSpline" ) == 0 )
+    if( className.compare( "BubbleShootingOnPathInFieldSpace" ) == 0 )
     {
-      return SetUpBubbleShootingOnSpline( constructorArguments );
+      return SetUpBubbleShootingOnPathInFieldSpace( constructorArguments );
     }
     else
     {
       std::stringstream errorStream;
       errorStream
       << "<BouncePotentialFit> was not a recognized form! The only type"
-      << " currently valid is \"BubbleShootingOnSpline\".";
+      << " currently valid is \"BubbleShootingOnPathInFieldSpace\".";
       throw std::runtime_error( errorStream.str() );
     }
   }

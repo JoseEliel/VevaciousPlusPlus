@@ -5,19 +5,18 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
+#include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 
 namespace VevaciousPlusPlus
 {
-  double const BubbleShootingOnPathInFieldSpace::radiusDifferenceThreshold( 0.01 );
+  double const
+  BubbleShootingOnPathInFieldSpace::radiusDifferenceThreshold( 0.01 );
 
   BubbleShootingOnPathInFieldSpace::BubbleShootingOnPathInFieldSpace(
                                     PotentialFunction const& potentialFunction,
-                                        size_t const numberOfPotentialSegments,
                                             double const lengthScaleResolution,
                                                  size_t const shootAttempts ) :
     BounceActionCalculator( potentialFunction ),
-    numberOfPotentialSegments( numberOfPotentialSegments ),
     lengthScaleResolution( lengthScaleResolution ),
     radialStepSize( -1.0 ),
     estimatedRadialMaximum( -1.0 ),
@@ -40,8 +39,9 @@ namespace VevaciousPlusPlus
   // (in GeV) thermal bounce action integrated over three dimensions at
   // temperature T, is calculated: S_3(T) if the temperature T given by
   // tunnelPath is greater than 0.0, S_4 otherwise.
-  BubbleProfile*
-  BubbleShootingOnPathInFieldSpace::operator()( TunnelPath const& tunnelPath ) const
+  BubbleProfile* BubbleShootingOnPathInFieldSpace::operator()(
+                                                  TunnelPath const& tunnelPath,
+                  OneDimensionalPotentialAlongPath const& pathPotential ) const
   {
     SplinePotential potentialApproximation( potentialFunction,
                                             tunnelPath,

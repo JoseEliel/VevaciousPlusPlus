@@ -16,15 +16,19 @@ namespace VevaciousPlusPlus
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
-                                     size_t const thermalIntegrationResolution,
-                                           size_t const temperatureAccuracy ) :
+                               unsigned int const thermalIntegrationResolution,
+                                        unsigned int const temperatureAccuracy,
+                                    unsigned int const pathPotentialResolution,
+                                      double const vacuumSeparationFraction ) :
     BounceActionTunneler( potentialFunction,
                           tunnelingStrategy,
                           survivalProbabilityThreshold,
-                          temperatureAccuracy ),
+                          temperatureAccuracy,
+                          vacuumSeparationFraction ),
     pathFinders( pathFinders ),
     actionCalculator( actionCalculator ),
-    thermalIntegrationResolution( thermalIntegrationResolution )
+    thermalIntegrationResolution( thermalIntegrationResolution ),
+    pathPotentialResolution( pathPotentialResolution )
   {
     // This constructor is just an initialization list.
   }
@@ -55,9 +59,8 @@ namespace VevaciousPlusPlus
     // First we set up the (square of the) threshold distance that we demand
     // between the vacua at every temperature to trust the tunneling
     // calculation.
-    double const
-    thresholdSeparationSquared( ThresholdSeparationSquared( falseVacuum,
-                                                            trueVacuum ) );
+    double const thresholdSeparationSquared( vacuumSeparationFractionSquared
+                                * falseVacuum.SquareDistanceTo( trueVacuum ) );
 
     // Now we start at almost the critical temperature, and sum up for
     // decreasing temperatures:
@@ -91,7 +94,8 @@ namespace VevaciousPlusPlus
     double bounceOverTemperature( BoundedBounceAction( thermalFalseVacuum,
                                                        thermalTrueVacuum,
                                                        currentTemperature,
-                                                       actionThreshold )
+                                                       actionThreshold,
+                                                   thresholdSeparationSquared )
                                   / currentTemperature );
     if( bounceOverTemperature < maximumPowerOfNaturalExponent )
     {
@@ -160,7 +164,8 @@ namespace VevaciousPlusPlus
       bounceOverTemperature = ( BoundedBounceAction( thermalFalseVacuum,
                                                      thermalTrueVacuum,
                                                      currentTemperature,
-                                                     actionThreshold )
+                                                     actionThreshold,
+                                                   thresholdSeparationSquared )
                                 / currentTemperature );
 
       if( bounceOverTemperature < maximumPowerOfNaturalExponent )
@@ -205,7 +210,8 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                              double const tunnelingTemperature,
-                                                 double const actionThreshold )
+                                                  double const actionThreshold,
+                                 double const requiredVacuumSeparationSquared )
   {
     std::vector< std::vector< double > > straightPath( 2,
                                             falseVacuum.FieldConfiguration() );
@@ -217,10 +223,18 @@ namespace VevaciousPlusPlus
     actionCalculator->ResetVacua( falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
+
+
+    SplinePotential pathPotential( potentialFunction,
+                                   *bestPath,
+                                   pathPotentialResolution );
+
+    need to guard against bad paths here
+
     BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath ) );
 
     std::cout << std::endl
-    << "Initial path bounce action = " << bestBubble->BounceAction();
+    << "Initial path bounce action = " << bestBubble->bounceAction;
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
@@ -249,7 +263,8 @@ namespace VevaciousPlusPlus
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                *bestBubble,
                                                fieldColors,
-                                               straightPathPicture );/**/
+                                               straightPathPicture,
+                                               pathPotentialResolution );/**/
 
     for( std::vector< BouncePathFinder* >::iterator
          pathFinder( pathFinders.begin() );
@@ -296,7 +311,7 @@ namespace VevaciousPlusPlus
         << nextPath->AsDebuggingString() << std::endl;
         SplinePotential potentialApproximation( potentialFunction,
                                                 *nextPath,
-                                                200 );
+                                                pathPotentialResolution );
         std::cout << "potentialApproximation:" << std::endl
         << potentialApproximation.AsDebuggingString();
         std::cout << std::endl;/**/
@@ -305,7 +320,7 @@ namespace VevaciousPlusPlus
         delete currentBubbleDeleter;
         delete currentPathDeleter;
 
-        if( nextBubble->BounceAction() < bestBubble->BounceAction() )
+        if( nextBubble->bounceAction < bestBubble->bounceAction )
         {
           delete bestBubble;
           bestBubble = nextBubble;
@@ -330,13 +345,13 @@ namespace VevaciousPlusPlus
         }
 
         std::cout << std::endl
-        << "Improved path bounce action = " << currentBubble->BounceAction();
+        << "Improved path bounce action = " << currentBubble->bounceAction;
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
         }
         std::cout << ", lowest bounce action so far = "
-        << bestBubble->BounceAction();
+        << bestBubble->bounceAction;
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
@@ -348,7 +363,7 @@ namespace VevaciousPlusPlus
         }
         std::cout << ".";
         std::cout << std::endl;
-      } while( ( bestBubble->BounceAction() > actionThreshold )
+      } while( ( bestBubble->bounceAction > actionThreshold )
                &&
                (*pathFinder)->PathCanBeImproved( *currentBubble ) );
       // At the end of the loop, these either point at the last tried path and
@@ -360,7 +375,7 @@ namespace VevaciousPlusPlus
 
       // We don't bother with the rest of the path finders if the action has
       // already dropped below the threshold.
-      if( bestBubble->BounceAction() < actionThreshold )
+      if( bestBubble->bounceAction < actionThreshold )
       {
         std::cout
         << std::endl
@@ -380,11 +395,12 @@ namespace VevaciousPlusPlus
     actionCalculator->PlotBounceConfiguration( *bestPath,
                                                *bestBubble,
                                                fieldColors,
-                                               finalPathPicture );/**/
+                                               finalPathPicture,
+                                               pathPotentialResolution );/**/
 
     std::cout << std::endl
     << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
-    << bestBubble->BounceAction();
+    << bestBubble->bounceAction;
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
@@ -397,7 +413,7 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
-    double const bounceAction( bestBubble->BounceAction() );
+    double const bounceAction( bestBubble->bounceAction );
     delete bestBubble;
     delete bestPath;
     return bounceAction;

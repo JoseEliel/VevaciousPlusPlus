@@ -220,18 +220,37 @@
              the exact value. -->
         7
       </CriticalTemperatureAccuracy>
+      <PathResolution>
+        <!-- If using "CosmoTransitionsRunner", this is the number of nodes
+             along the path between the false vacuum and the true vacuum that
+             CosmoTransitions varies. If using "BounceAlongPathWithThreshold",
+             this is the number of points along every tried tunneling path
+             which are sampled to create the one-dimensional potential along
+             the path, which is taken as pure quadratics between the end nodes
+             and their nearest neighbors, and straight lines between the rest
+             of the nodes. -->
+        100
+      </PathResolution>
+      <MinimumVacuumSeparationFraction>
+        <!-- This gives a fraction which is used to try to avoid tunneling from
+             a numerical approximation of the position of a vacuum to a
+             different numerical approximation of the same vacuum position. If
+             this fraction times the length between the DSB vacuum and panic
+             vacuum at zero temperature is greater than the distance between to
+             field configurations, tunneling between the field configurations
+             is aborted. (An example case is when investigating tunneling at
+             higher temperatures, it could be that the survival probability
+             flips to being based on tunneling between the field origin and the
+             field configuration that would cool to be the DSB vacuum, rather
+             than on tunneling to the panic vacuum.) -->
+        0.2
+      </MinimumVacuumSeparationFraction>
       <!-- The following elements are read only if <ClassType> is
            "CosmoTransitionsRunner", and are ignored if <ClassType> is
            "BounceAlongPathWithThreshold". -->
       <PathToCosmotransitions>
         /Users/oleary/BOL/machine-specific/CosmoTransitions2/
       </PathToCosmotransitions>
-      <PathResolution>
-        <!-- This is the number of nodes along the path between the false
-             vacuum and the true vacuum that CosmoTransitions uses. If not
-             given, 100 is used as the default. -->
-        100
-      </PathResolution>
       <MaxInnerLoops>
         <!-- This is the number of iterations of the inner loop that
              CosmoTransitions is allowed. The inner loop adjusts the path along
@@ -253,41 +272,14 @@
            "CosmoTransitionsRunner". -->
       <BouncePotentialFit>
         <!-- Currently the only valid option for <ClassType> is
-             "BubbleShootingOnSpline", which implements the Coleman
+             "BubbleShootingOnPathInFieldSpace", which implements the Coleman
              undershoot-overshoot method on a tunneling path from the true
-             vacuum to the false vacuum, parameterizing the potential along the
-             tunneling path by a fit to a set of potential energy densities at
-             a set of values for the path parameterization variable. The number
-             of segments between sampling points for this fit is given by
-             <ConstructorArguments><NumberOfSegmentsForPotentialFit>.
-             
-             Currently, the way the potential is interpolated is fixed to being
-             approximated as quadratic polynomials between nodes, with
-             continuous slope between the spline segments. The first and last
-             spline segments (i.e. each segment with a vacuum at one end) are
-             taken as being in the form p^2 + const, where p is the distance
-             from the vacuum end of the segment in the path parameterization
-             variable, so the vacua are proper minima. Unfortunately it is
-             crucial that the approximation in the neighborhoods of a vacuum
-             has the properties that the slope vanishes exactly at the vacuum,
-             decreasing monotonically as the distance from the vacuum
-             decreases, and that very small distances from the vacuum are
-             resolved precisely. If not, the undershoot/overshoot method
-             implemented in VevaciousPlusPlus will break down, as the
-             "particle rolling from one hill to another" might get stuck close
-             to the true vacuum if the slope resolves to zero instead of
-             10^-16, for example. A polynomial of degree
-             NumberOfNodesForPotentialFit really failed in our test cases where
-             the bubble would have a thin wall, as did quadratic splines
-             without the extra care to have special cases for the first and
-             last segments. -->
+             vacuum to the false vacuum, ignoring the "forces" perpendicular to
+             the path. -->
         <ClassType>
-          BubbleShootingOnSpline
+          BubbleShootingOnPathInFieldSpace
         </ClassType>
         <ConstructorArguments>
-          <NumberOfSegmentsForPotentialFit>
-            100
-          </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             <!-- This is the number of shoot attempts allowed to try to find
                  the perfect shot before moving on with the best shot so far to

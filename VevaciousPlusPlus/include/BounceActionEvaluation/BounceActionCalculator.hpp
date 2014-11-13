@@ -11,6 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PathParameterization/TunnelPath.hpp"
+#include "OneDimensionalPotentialAlongPath.hpp"
 #include "BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
@@ -54,8 +55,8 @@ namespace VevaciousPlusPlus
     // dimensions at temperature T, should be set in the returned
     // BubbleProfile: S_3(T) if the temperature T given by tunnelPath is
     // greater than 0.0, S_4 otherwise.
-    virtual BubbleProfile*
-    operator()( TunnelPath const& tunnelPath ) const = 0;
+    virtual BubbleProfile* operator()( TunnelPath const& tunnelPath,
+             OneDimensionalPotentialAlongPath const& pathPotential ) const = 0;
 
     // This plots the fields as functions of the spatial variables in a file
     // called plotFilename in .eps format, with each field plotted in the color
@@ -65,7 +66,7 @@ namespace VevaciousPlusPlus
     virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
                                           BubbleProfile const& bubbleProfile,
                                  std::vector< std::string > const& fieldColors,
-                                           std::string const& plotFilename,
+                                          std::string const& plotFilename,
                                      unsigned int const plotResolution ) const;
 
   protected:

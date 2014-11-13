@@ -17,7 +17,7 @@
 #include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
 #include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
-#include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
+#include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 #include "BounceActionEvaluation/BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
@@ -35,7 +35,8 @@ namespace VevaciousPlusPlus
                             size_t const resolutionOfDsbVacuum,
                             size_t const maxInnerLoops,
                             size_t const maxOuterLoops,
-                            size_t const thermalStraightPathFitResolution );
+                            size_t const thermalStraightPathFitResolution,
+                            double const vacuumSeparationFraction );
     virtual ~CosmoTransitionsRunner();
 
 

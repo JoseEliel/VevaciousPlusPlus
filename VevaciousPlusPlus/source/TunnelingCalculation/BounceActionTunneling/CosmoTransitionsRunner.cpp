@@ -22,11 +22,13 @@ namespace VevaciousPlusPlus
                                             size_t const resolutionOfDsbVacuum,
                                                     size_t const maxInnerLoops,
                                                     size_t const maxOuterLoops,
-                              size_t const thermalStraightPathFitResolution ) :
+                                 size_t const thermalStraightPathFitResolution,
+                                      double const vacuumSeparationFraction ) :
     BounceActionTunneler( potentialFunction,
                           tunnelingStrategy,
                           survivalProbabilityThreshold,
-                          temperatureAccuracy ),
+                          temperatureAccuracy,
+                          vacuumSeparationFraction ),
     pythonPotential( pythonPotential ),
     pathToCosmotransitions( pathToCosmotransitions ),
     resolutionOfDsbVacuum( resolutionOfDsbVacuum ),
@@ -322,9 +324,8 @@ namespace VevaciousPlusPlus
     // First we set up the (square of the) threshold distance that we demand
     // between the vacua at every temperature to trust the tunneling
     // calculation.
-    double const
-    thresholdSeparationSquared( ThresholdSeparationSquared( falseVacuum,
-                                                            trueVacuum ) );
+    double const thresholdSeparationSquared( vacuumSeparationFractionSquared
+                                * falseVacuum.SquareDistanceTo( trueVacuum ) );
 
     straightPathActions.clear();
     BubbleShootingOnPathInFieldSpace actionCalculator( potentialFunction,
@@ -364,7 +365,7 @@ namespace VevaciousPlusPlus
       bubbleProfile( actionCalculator( LinearSplineThroughNodes( straightPath,
                                                     std::vector< double >( 0 ),
                                                          *fitTemperature ) ) );
-      straightPathActions.push_back( bubbleProfile->BounceAction() );
+      straightPathActions.push_back( bubbleProfile->bounceAction );
       delete bubbleProfile;
     }
   }
@@ -381,9 +382,8 @@ namespace VevaciousPlusPlus
     // First we set up the (square of the) threshold distance that we demand
     // between the vacua at every temperature to trust the tunneling
     // calculation.
-    double const
-    thresholdSeparationSquared( ThresholdSeparationSquared( falseVacuum,
-                                                            trueVacuum ) );
+    double const thresholdSeparationSquared( vacuumSeparationFractionSquared
+                                * falseVacuum.SquareDistanceTo( trueVacuum ) );
 
     std::string const
     pythonResultFilename( "VevaciousCosmoTransitionsThermalFitResult.txt" );

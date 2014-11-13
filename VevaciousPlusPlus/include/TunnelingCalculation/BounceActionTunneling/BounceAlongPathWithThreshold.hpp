@@ -13,6 +13,7 @@
 #include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
 #include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 #include "BounceActionEvaluation/BubbleProfile.hpp"
+#include "BounceActionEvaluation/OneDimensionalPotentialAlongPath.hpp"
 #include "../BounceActionTunneler.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
@@ -30,16 +31,18 @@ namespace VevaciousPlusPlus
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold,
-                                  size_t const thermalIntegrationResolution,
-                                  size_t const temperatureAccuracy );
+                               unsigned int const thermalIntegrationResolution,
+                                  unsigned int const temperatureAccuracy,
+                                  unsigned int const pathPotentialResolution,
+                                  double const vacuumSeparationFraction );
     virtual ~BounceAlongPathWithThreshold();
 
 
   protected:
     std::vector< BouncePathFinder* > pathFinders;
     BounceActionCalculator* actionCalculator;
-    size_t thermalIntegrationResolution;
-
+    unsigned int thermalIntegrationResolution;
+    unsigned int const pathPotentialResolution;
 
     // This returns either the dimensionless bounce action integrated over four
     // dimensions (for zero temperature) or the dimensionful bounce action
@@ -72,7 +75,8 @@ namespace VevaciousPlusPlus
     double BoundedBounceAction( PotentialMinimum const& falseVacuum,
                                 PotentialMinimum const& trueVacuum,
                                 double const tunnelingTemperature,
-                                double const actionThreshold );
+                                double const actionThreshold,
+                                double const requiredVacuumSeparationSquared );
   };
 
 
@@ -108,7 +112,9 @@ namespace VevaciousPlusPlus
     return BoundedBounceAction( falseVacuum,
                                 trueVacuum,
                                 tunnelingTemperature,
-                                actionThreshold );
+                                actionThreshold,
+                               ( vacuumSeparationFractionSquared
+                              * falseVacuum.SquareDistanceTo( trueVacuum ) ) );
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -135,12 +135,15 @@
       <CriticalTemperatureAccuracy>
         7
       </CriticalTemperatureAccuracy>
-      <PathToCosmotransitions>
-        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
-      </PathToCosmotransitions>
       <PathResolution>
         100
       </PathResolution>
+      <MinimumVacuumSeparationFraction>
+        0.2
+      </MinimumVacuumSeparationFraction>
+      <PathToCosmotransitions>
+        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
+      </PathToCosmotransitions>
       <MaxInnerLoops>
         10
       </MaxInnerLoops>
@@ -149,12 +152,9 @@
       </MaxOuterLoops>
       <BouncePotentialFit>
         <ClassType>
-          BubbleShootingOnSpline
+          BubbleShootingOnPathInFieldSpace
         </ClassType>
         <ConstructorArguments>
-          <NumberOfSegmentsForPotentialFit>
-            100
-          </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
           </NumberShootAttemptsAllowed>
