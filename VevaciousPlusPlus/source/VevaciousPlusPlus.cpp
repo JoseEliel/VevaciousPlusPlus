@@ -961,7 +961,7 @@ namespace VevaciousPlusPlus
                                      shootAttemptsForBounce );
     }
 
-    return new BubbleShootingOnSpline( *potentialFunction,
+    return new BubbleShootingOnPathInFieldSpace( *potentialFunction,
                                        numberOfSegmentsForPotentialFit,
                                        lengthScaleResolutionForBounce,
                                        shootAttemptsForBounce );

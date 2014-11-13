@@ -57,8 +57,7 @@ namespace VevaciousPlusPlus
     virtual BubbleProfile*
     operator()( TunnelPath const& tunnelPath ) const = 0;
 
-    // This should plots the fields as functions of the spatial variables
-    // according to the method of calculating the bounce action in a file
+    // This plots the fields as functions of the spatial variables in a file
     // called plotFilename in .eps format, with each field plotted in the color
     // given by fieldColors: the field with index i is plotted in the color
     // given by fieldColors[ i ]. An empty string indicates that the field
@@ -66,7 +65,8 @@ namespace VevaciousPlusPlus
     virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
                                           BubbleProfile const& bubbleProfile,
                                  std::vector< std::string > const& fieldColors,
-                                   std::string const& plotFilename ) const = 0;
+                                           std::string const& plotFilename,
+                                     unsigned int const plotResolution ) const;
 
   protected:
     PotentialFunction const& potentialFunction;

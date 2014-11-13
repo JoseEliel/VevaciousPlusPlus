@@ -1,5 +1,5 @@
 /*
- * BubbleShootingOnSpline.hpp
+ * BubbleShootingOnPathInFieldSpace.hpp
  *
  *  Created on: Jul 1, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
@@ -20,14 +20,14 @@
 namespace VevaciousPlusPlus
 {
 
-  class BubbleShootingOnSpline : public BounceActionCalculator
+  class BubbleShootingOnPathInFieldSpace : public BounceActionCalculator
   {
   public:
-    BubbleShootingOnSpline( PotentialFunction const& potentialFunction,
+    BubbleShootingOnPathInFieldSpace( PotentialFunction const& potentialFunction,
                             size_t const numberOfPotentialSegments,
                             double const lengthScaleResolution,
                             size_t const shootAttempts );
-    virtual ~BubbleShootingOnSpline();
+    virtual ~BubbleShootingOnPathInFieldSpace();
 
 
     // This sets radialStepSize to be lengthScaleResolution times the length
@@ -92,7 +92,7 @@ namespace VevaciousPlusPlus
   // estimatedRadialMaximum to be initially twice the length scale, as it
   // gets extended over the course of the calculation anyway if necessary.
   inline void
-  BubbleShootingOnSpline::ResetVacua( PotentialMinimum const& falseVacuum,
+  BubbleShootingOnPathInFieldSpace::ResetVacua( PotentialMinimum const& falseVacuum,
                                       PotentialMinimum const& trueVacuum,
                                       double const tunnelingTemperature )
   {
@@ -106,7 +106,7 @@ namespace VevaciousPlusPlus
 
   // This evaluates the bounce action density at the given point on the
   // bubble profile.
-  inline double BubbleShootingOnSpline::BounceActionDensity(
+  inline double BubbleShootingOnPathInFieldSpace::BounceActionDensity(
                                  SplinePotential const& potentialApproximation,
                                                   TunnelPath const& tunnelPath,
                        BubbleRadialValueDescription const& profilePoint ) const

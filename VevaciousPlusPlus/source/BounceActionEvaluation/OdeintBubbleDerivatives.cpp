@@ -15,11 +15,11 @@ namespace VevaciousPlusPlus
                                                TunnelPath const& tunnelPath ) :
     pathPotential( pathPotential ),
     tunnelPath( tunnelPath ),
-    dampingFactor( 3 )
+    dampingFactor( 3.0 )
   {
     if( tunnelPath.NonZeroTemperature() )
     {
-      dampingFactor = 2;
+      dampingFactor = 2.0;
     }
   }
 

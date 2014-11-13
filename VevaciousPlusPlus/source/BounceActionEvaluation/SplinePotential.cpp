@@ -13,8 +13,6 @@ namespace VevaciousPlusPlus
   SplinePotential::SplinePotential( PotentialFunction const& potentialFunction,
                                     TunnelPath const& tunnelPath,
                                     size_t const numberOfPotentialSegments ) :
-    energyBarrierResolved( false ),
-    trueVacuumLowerThanPathFalseMinimum( false ),
     auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
     inverseOfAuxiliaryStep( numberOfPotentialSegments ),
     numberOfNormalSegments( numberOfPotentialSegments - 2 ),
@@ -24,10 +22,7 @@ namespace VevaciousPlusPlus
                       0.0 ),
     firstSegmentQuadratic( -1.0 ),
     finalPotential( 0.0 ),
-    lastSegmentQuadratic( -1.0 ),
-    definiteUndershootAuxiliary( -1.0 ),
-    definiteOvershootAuxiliary( 1.0 ),
-    startOfFinalSegment( -1.0 )
+    lastSegmentQuadratic( -1.0 )
   {
     // First we have to find the path false minimum.
     std::vector< double >
@@ -248,7 +243,8 @@ namespace VevaciousPlusPlus
       }
       if( trueVacuumLowerThanPathFalseMinimum )
       {
-        startOfFinalSegment = ( definiteOvershootAuxiliary - auxiliaryStep );
+        thresholdForNearPathPanic
+        = ( definiteOvershootAuxiliary - auxiliaryStep );
         if( !foundDefiniteUndershoot )
         {
           // If none of the straight segments crossed into negative potential,
@@ -270,8 +266,7 @@ namespace VevaciousPlusPlus
 
   // This returns the value of the potential at auxiliaryValue, by finding the
   // correct segment and then returning its value at that point.
-  double
-  SplinePotential::operator()( double const auxiliaryValue ) const
+  double SplinePotential::operator()( double const auxiliaryValue ) const
   {
     if( auxiliaryValue <= 0.0 )
     {
@@ -285,7 +280,7 @@ namespace VevaciousPlusPlus
     {
       return finalPotential;
     }
-    if( auxiliaryValue >= startOfFinalSegment )
+    if( auxiliaryValue >= thresholdForNearPathPanic )
     {
       double const differenceFromMaximumAuxiliary( definiteOvershootAuxiliary
                                                    - auxiliaryValue );
@@ -325,16 +320,13 @@ namespace VevaciousPlusPlus
                                        "-",
                                        "*10^");
     std::stringstream returnStream;
-    returnStream << "energyBarrierResolved = " << energyBarrierResolved
-    << ", trueVacuumLowerThanPathFalseMinimum = "
-    << trueVacuumLowerThanPathFalseMinimum
-    << ", numberOfNormalSegments = " << numberOfNormalSegments
+    returnStream << "numberOfNormalSegments = " << numberOfNormalSegments
     << ", firstSegmentQuadratic = " << firstSegmentQuadratic
     << ", finalPotential = " << finalPotential
     << ", lastSegmentQuadratic = " << lastSegmentQuadratic
     << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
     << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary
-    << ", startOfFinalSegment = " << startOfFinalSegment
+    << ", thresholdForNearPathPanic = " << thresholdForNearPathPanic
     << ", potential = ( UnitStep[x] * ( "
     << doubleFormatter.doubleToString( firstSegmentQuadratic )
     << " * x^(2) ) * UnitStep["

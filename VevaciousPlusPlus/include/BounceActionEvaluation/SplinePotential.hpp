@@ -11,79 +11,52 @@
 #include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PathParameterization/TunnelPath.hpp"
+#include "OneDimensionalPotentialAlongPath.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SplinePotential
+  class SplinePotential : public OneDimensionalPotentialAlongPath
   {
   public:
     SplinePotential( PotentialFunction const& potentialFunction,
                      TunnelPath const& tunnelPath,
                      size_t const numberOfPotentialSegments );
-    ~SplinePotential();
+    virtual ~SplinePotential();
 
-
-    // This is true if there was an energy barrier resolved at the given
-    // resolution.
-    bool EnergyBarrierResolved() const{ return energyBarrierResolved; }
-
-    // This is true if the path false minimum (where the false vacuum rolls to
-    // along the path based on the given resolution) has a higher potential
-    // than the path true minimum.
-    bool TrueVacuumLowerThanPathFalseMinimum() const
-    { return trueVacuumLowerThanPathFalseMinimum; }
 
     // This returns the value of the potential at auxiliaryValue, by finding
     // the correct segment and then returning its value at that point.
-    double operator()( double auxiliaryValue ) const;
+    virtual double operator()( double auxiliaryValue ) const;
 
     // This returns the value of the first derivative of the potential at
     // auxiliaryValue, by finding the correct segment and then returning its
     // slope at that point.
-    double FirstDerivative( double const auxiliaryValue ) const;
+    virtual double FirstDerivative( double const auxiliaryValue ) const;
 
     // This returns the value of the second derivative of the potential at
     // the false vacuum end of the path.
-    double SecondDerivativeAtFalseVacuum() const
+    virtual double SecondDerivativeAtFalseVacuum() const
     { return ( firstSegmentQuadratic + firstSegmentQuadratic ); }
 
     // This returns the value of the first derivative of the potential at
     // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
     // that it is in the implicit final segment.
-    double FirstDerivativeNearPathPanic(
+    virtual double FirstDerivativeNearPathPanic(
                             double const differenceFromMaximumAuxiliary ) const
     { return ( 2.0 * differenceFromMaximumAuxiliary * lastSegmentQuadratic ); }
 
     // This returns the value of the second derivative of the potential at
     // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
     // that it is in the implicit final segment.
-    double SecondDerivativeNearPathPanic() const
+    virtual double SecondDerivativeNearPathPanic() const
     { return lastSegmentQuadratic; }
 
-    double DefiniteUndershootAuxiliary() const
-    { return definiteUndershootAuxiliary; }
-
-    double DefiniteOvershootAuxiliary() const
-    { return definiteOvershootAuxiliary; }
-
-    double StartOfFinalSegment() const{ return startOfFinalSegment; }
-
-    double SizeOfFinalSegment() const{ return auxiliaryStep; }
-
     // This is for debugging.
-    std::string AsDebuggingString() const;
+    virtual std::string AsDebuggingString() const;
 
 
   protected:
-    // There are two flags for possible problems: if there did not seem to be
-    // any energy barrier between the ends of the path, then
-    // energyBarrierResolved will be set to false, and if the path false
-    // minimum (where the false vacuum would roll to along the path at the
-    // given resolution) is actually deeper than the given true vacuum,
-    // trueVacuumLowerThanPathFalseMinimum is set to false.
-    bool energyBarrierResolved;
-    bool trueVacuumLowerThanPathFalseMinimum;
     double auxiliaryStep;
     double inverseOfAuxiliaryStep;
     // There are ( numberOfPotentialSegments - 2 ) normal segments, which are
@@ -102,9 +75,6 @@ namespace VevaciousPlusPlus
     double firstSegmentQuadratic;
     double finalPotential;
     double lastSegmentQuadratic;
-    double definiteUndershootAuxiliary;
-    double definiteOvershootAuxiliary;
-    double startOfFinalSegment;
   };
 
 
@@ -126,7 +96,7 @@ namespace VevaciousPlusPlus
     {
       return ( 2.0 * auxiliaryValue * firstSegmentQuadratic );
     }
-    if( auxiliaryValue >= startOfFinalSegment )
+    if( auxiliaryValue >= thresholdForNearPathPanic )
     {
       return FirstDerivativeNearPathPanic( auxiliaryValue
                                            - definiteOvershootAuxiliary );

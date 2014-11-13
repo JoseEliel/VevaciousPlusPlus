@@ -310,7 +310,7 @@ namespace VevaciousPlusPlus
     SetThermalSurvivalProbability();
   }
 
-  // This uses a BubbleShootingOnSpline object at different temperatures to
+  // This uses a BubbleShootingOnPathInFieldSpace object at different temperatures to
   // fill straightPathActions based on straight paths between the thermal
   // vacua.
   void CosmoTransitionsRunner::InteralGuessFromStraightPaths(
@@ -327,7 +327,7 @@ namespace VevaciousPlusPlus
                                                             trueVacuum ) );
 
     straightPathActions.clear();
-    BubbleShootingOnSpline actionCalculator( potentialFunction,
+    BubbleShootingOnPathInFieldSpace actionCalculator( potentialFunction,
                                              resolutionOfDsbVacuum,
                                   ( 0.1 * sqrt( thresholdSeparationSquared ) ),
                                              32 );
