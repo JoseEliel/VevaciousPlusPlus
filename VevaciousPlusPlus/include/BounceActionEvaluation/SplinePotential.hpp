@@ -21,9 +21,13 @@ namespace VevaciousPlusPlus
   public:
     SplinePotential( PotentialFunction const& potentialFunction,
                      TunnelPath const& tunnelPath,
-                     size_t const numberOfPotentialSegments );
+                     size_t const numberOfPotentialSegments,
+                     double const minimumSquareDistanceBetweenPathVacua );
     virtual ~SplinePotential();
 
+
+    virtual bool EnergyBarrierWasResolved() const
+    {return energyBarrierWasResolved; }
 
     // This returns the value of the potential at auxiliaryValue, by finding
     // the correct segment and then returning its value at that point.
@@ -75,6 +79,8 @@ namespace VevaciousPlusPlus
     double firstSegmentQuadratic;
     double finalPotential;
     double lastSegmentQuadratic;
+    bool energyBarrierWasResolved;
+    bool tunnelingPossibleOnPath;
   };
 
 

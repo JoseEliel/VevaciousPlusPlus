@@ -12,7 +12,8 @@ namespace VevaciousPlusPlus
 
   SplinePotential::SplinePotential( PotentialFunction const& potentialFunction,
                                     TunnelPath const& tunnelPath,
-                                    size_t const numberOfPotentialSegments ) :
+                                    size_t const numberOfPotentialSegments,
+                         double const minimumSquareDistanceBetweenPathVacua ) :
     auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
     inverseOfAuxiliaryStep( numberOfPotentialSegments ),
     numberOfNormalSegments( numberOfPotentialSegments - 2 ),
@@ -22,11 +23,10 @@ namespace VevaciousPlusPlus
                       0.0 ),
     firstSegmentQuadratic( -1.0 ),
     finalPotential( 0.0 ),
-    lastSegmentQuadratic( -1.0 )
+    lastSegmentQuadratic( -1.0 ),
+    energyBarrierWasResolved( false ),
+    tunnelingPossibleOnPath( false )
   {
-    THIS IS WHERE THINGS HAVE TO BE WORKED OUT!
-
-
     // First we have to find the path false minimum.
     std::vector< double >
     fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
@@ -43,6 +43,17 @@ namespace VevaciousPlusPlus
     << potentialFunction.FieldConfigurationAsMathematica( fieldConfiguration )
     << ", potential value = " << pathFalsePotential;
     std::cout << std::endl;/**/
+
+    double auxiliaryOfPathFalseVacuum( FindPathFalseVacuum( 0.0,
+                                                            pathFalsePotential,
+                                                            tunnelPath,
+                                                            fieldConfiguration,
+                                     minimumSquareDistanceBetweenPathVacua ) );
+
+
+
+    THIS IS WHERE THINGS HAVE TO BE WORKED OUT!
+
 
     tunnelPath.PutOnPathAt( fieldConfiguration,
                             1.0 );
