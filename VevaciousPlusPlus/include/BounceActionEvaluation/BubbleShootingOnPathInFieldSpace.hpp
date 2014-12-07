@@ -15,6 +15,7 @@
 #include "PathParameterization/TunnelPath.hpp"
 #include "OneDimensionalPotentialAlongPath.hpp"
 #include "BubbleProfile.hpp"
+#include "UndershootOvershootBubble.hpp"
 #include "BubbleRadialValueDescription.hpp"
 
 namespace VevaciousPlusPlus
@@ -25,6 +26,7 @@ namespace VevaciousPlusPlus
   public:
     BubbleShootingOnPathInFieldSpace(
                                     PotentialFunction const& potentialFunction,
+                                      size_t const numberOfPotentialSegments,
                                       double const lengthScaleResolution,
                                       size_t const shootAttempts );
     virtual ~BubbleShootingOnPathInFieldSpace();

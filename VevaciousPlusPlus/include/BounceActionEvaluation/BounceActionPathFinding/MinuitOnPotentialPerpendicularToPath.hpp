@@ -94,11 +94,11 @@ namespace VevaciousPlusPlus
     {
       return false;
     }
-    if( bubbleFromLastPath.BounceAction() >= bounceBeforeLastPath )
+    if( bubbleFromLastPath.bounceAction >= bounceBeforeLastPath )
     {
       ++numberOfWorseningsSoFar;
     }
-    bounceBeforeLastPath = bubbleFromLastPath.BounceAction();
+    bounceBeforeLastPath = bubbleFromLastPath.bounceAction;
     return ( numberOfAllowedWorsenings > numberOfWorseningsSoFar );
   }
 

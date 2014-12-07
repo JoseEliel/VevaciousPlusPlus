@@ -32,7 +32,7 @@ MINUITLIBDIR=../../../machine-specific/Minuit2/lib/
 DEBUGFLAGS=
 INCLUDES=-I./include/ \
  -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
-CCFLAGS=-Wall -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
+CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 BOUNCEACTIONPATHFINDING= source/BounceActionEvaluation/BounceActionPathFinding/
@@ -57,7 +57,7 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BounceActionEvaluation/BouncePathFinder.cpp \
  source/BounceActionEvaluation/BubbleProfile.cpp \
  source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
- source/BounceActionEvaluation/BubbleShootingOnSpline.cpp \
+ source/BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.cpp \
  source/BounceActionEvaluation/OdeintBubbleDerivatives.cpp \
  source/BounceActionEvaluation/OdeintBubbleObserver.cpp \
  $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \

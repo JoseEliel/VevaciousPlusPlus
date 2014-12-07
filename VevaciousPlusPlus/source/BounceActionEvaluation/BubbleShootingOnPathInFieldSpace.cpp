@@ -14,9 +14,11 @@ namespace VevaciousPlusPlus
 
   BubbleShootingOnPathInFieldSpace::BubbleShootingOnPathInFieldSpace(
                                     PotentialFunction const& potentialFunction,
+                                        size_t const numberOfPotentialSegments,
                                             double const lengthScaleResolution,
                                                  size_t const shootAttempts ) :
     BounceActionCalculator( potentialFunction ),
+    numberOfPotentialSegments( numberOfPotentialSegments ),
     lengthScaleResolution( lengthScaleResolution ),
     radialStepSize( -1.0 ),
     estimatedRadialMaximum( -1.0 ),
@@ -52,11 +54,12 @@ namespace VevaciousPlusPlus
                                                   estimatedRadialMaximum,
                                                   shootAttempts,
                                                   auxiliaryThreshold ) );
+    bubbleProfile->CalculateProfile( tunnelPath,
+                                     potentialApproximation );
 
     bool const nonZeroTemperature( tunnelPath.NonZeroTemperature() );
     std::vector< BubbleRadialValueDescription > const&
-    auxiliaryProfile( (*bubbleProfile)( shootAttempts,
-                                        auxiliaryThreshold ) );
+    auxiliaryProfile( bubbleProfile->AuxiliaryProfile() );
 
     // We have a set of radial values r_i, path auxiliary values p(r_i), and
     // slopes dp/dr|_{r=r_i}, and can easily evaluate a set of "bounce action

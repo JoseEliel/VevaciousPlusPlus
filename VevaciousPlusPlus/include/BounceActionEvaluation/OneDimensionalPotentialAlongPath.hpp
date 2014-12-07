@@ -50,7 +50,7 @@ namespace VevaciousPlusPlus
     // at (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary),
     // assuming that it is greater than thresholdForNearPathPanic. It is
     // assumed that differenceFromMaximumAuxiliary is negative.
-    double SecondDerivativeNearPathPanic() const = 0;
+    virtual double SecondDerivativeNearPathPanic() const = 0;
 
     // This returns what should be the path auxiliary value which is close
     // enough to the path panic minimum that special care must be taken in

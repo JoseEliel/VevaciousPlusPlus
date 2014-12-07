@@ -24,6 +24,9 @@ namespace VevaciousPlusPlus
     finalPotential( 0.0 ),
     lastSegmentQuadratic( -1.0 )
   {
+    THIS IS WHERE THINGS HAVE TO BE WORKED OUT!
+
+
     // First we have to find the path false minimum.
     std::vector< double >
     fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
