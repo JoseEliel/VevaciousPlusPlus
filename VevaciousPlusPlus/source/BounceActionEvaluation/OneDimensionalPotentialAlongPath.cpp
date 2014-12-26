@@ -11,9 +11,10 @@ namespace VevaciousPlusPlus
 {
 
   OneDimensionalPotentialAlongPath::OneDimensionalPotentialAlongPath() :
-    definiteUndershootAuxiliary( -1.0 ),
-    definiteOvershootAuxiliary( -1.0 ),
-    thresholdForNearPathPanic( -1.0 )
+    auxiliaryOfPathFalseVacuum( 0.0 ),
+    auxiliaryOfPathPanicVacuum( 1.0 ),
+    definiteUndershootAuxiliary( 0.0 ),
+    thresholdForNearPathPanic( 0.01 )
   {
     // This constructor is just an initialization list.
   }

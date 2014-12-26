@@ -33,11 +33,23 @@ namespace VevaciousPlusPlus
     // the false vacuum end of the path.
     virtual double SecondDerivativeAtFalseVacuum() const = 0;
 
+    // Numerical effects might lead to the path ends not being quite at the
+    // positions of the vacua they are supposed to be at, so the minima along
+    // the path used for tunneling are recorded and accessible.
+    double AuxiliaryOfPathFalseVacuum() const
+    { return auxiliaryOfPathFalseVacuum; }
+
+    // Numerical effects might lead to the path ends not being quite at the
+    // positions of the vacua they are supposed to be at, so the minima along
+    // the path used for tunneling are recorded and accessible.
+    double AuxiliaryOfPathPanicVacuum() const
+    { return auxiliaryOfPathPanicVacuum; }
+
+    // This returns the value which should definitely undershoot, but for
+    // efficiency, it should be as large as possible while still satisfying
+    // that condition.
     double DefiniteUndershootAuxiliary() const
     { return definiteUndershootAuxiliary; }
-
-    double DefiniteOvershootAuxiliary() const
-    { return definiteOvershootAuxiliary; }
 
     // This should return the value of the first derivative of the potential at
     // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
@@ -64,8 +76,12 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // Numerical effects might lead to the path ends not being quite at the
+    // positions of the vacua they are supposed to be at, so the minima along
+    // the path used for tunneling are recorded and accessible.
+    double auxiliaryOfPathFalseVacuum;
+    double auxiliaryOfPathPanicVacuum;
     double definiteUndershootAuxiliary;
-    double definiteOvershootAuxiliary;
     double thresholdForNearPathPanic;
   };
 

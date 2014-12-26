@@ -76,11 +76,41 @@ namespace VevaciousPlusPlus
     size_t numberOfNormalSegments;
     std::vector< double > potentialValues;
     std::vector< double > firstDerivatives;
+    double pathFalsePotential;
     double firstSegmentQuadratic;
     double finalPotential;
     double lastSegmentQuadratic;
     bool energyBarrierWasResolved;
     bool tunnelingPossibleOnPath;
+
+
+    // This goes along the segment ends checking for the lowest before the
+    // potential starts to rise again, returning true if it finds such a point
+    // before the end of the path, false otherwise. It leaves the auxiliary
+    // value of this point with lowest potential in auxiliaryOfPathFalseVacuum,
+    // the lowest potential in pathFalsePotential, its field configuration in
+    // fieldConfiguration, and the potential at
+    // ( auxiliaryOfPathFalseVacuum + auxiliaryStep ) along tunnelPath in
+    // potentialValues.front().
+    bool RollToPathLocalMinimum( PotentialFunction const& potentialFunction,
+                                 TunnelPath const& tunnelPath,
+                                 double const pathTemperature,
+                                 std::vector< double >& fieldConfiguration );
+
+    // This goes along the segment ends adding the differences from
+    // pathFalsePotential to potentialValues appropriately so that
+    // potentialValues[ 0 ] is the potential at the start of the first straight
+    // segment minus pathFalsePotential, potentialValues[ 1 ] at the start of
+    // the second segment minus pathFalsePotential, and so on. This continues
+    // until it finds the path panic vacuum, which is either the start of the
+    // first straight segment which has the potential at its start end lower
+    // than pathFalsePotential and also has positive slope, or is the point at
+    // the true vacuum end of tunnelPath. It returns false if it doesn't find
+    // any point with potential lower than pathFalsePotential.
+    bool FindPathPanicVacuum( PotentialFunction const& potentialFunction,
+                              TunnelPath const& tunnelPath,
+                              double const pathTemperature,
+                              std::vector< double >& fieldConfiguration );
   };
 
 
@@ -109,6 +139,60 @@ namespace VevaciousPlusPlus
     }
     return
     firstDerivatives[ size_t( auxiliaryValue * inverseOfAuxiliaryStep ) - 1 ];
+  }
+
+
+  // This goes along the segment ends checking for the lowest before the
+  // potential starts to rise again, returning true if it finds such a point
+  // before the end of the path, false otherwise. It leaves the auxiliary
+  // value of this point with lowest potential in auxiliaryOfPathFalseVacuum,
+  // the lowest potential in pathFalsePotential, its field configuration in
+  // fieldConfiguration, and the potential at
+  // ( auxiliaryOfPathFalseVacuum + auxiliaryStep ) along tunnelPath in
+  // potentialValues.front().
+  inline bool SplinePotential::RollToPathLocalMinimum(
+                                    PotentialFunction const& potentialFunction,
+                                                  TunnelPath const& tunnelPath,
+                                                  double const pathTemperature,
+                                    std::vector< double >& fieldConfiguration )
+  {
+    // We need at least one step between auxiliaryOfPathFalseVacuum and the
+    // true vacuum which means that we cannot go any closer than 2 steps away
+    // from the true vacuum end of the path.
+    double const maximumFalseAuxiliary( 1.0 - auxiliaryStep - auxiliaryStep );
+    while( auxiliaryOfPathFalseVacuum < maximumFalseAuxiliary )
+    {
+      tunnelPath.PutOnPathAt( fieldConfiguration,
+                              ( auxiliaryOfPathFalseVacuum + auxiliaryStep ) );
+      potentialValues.front() = potentialFunction( fieldConfiguration,
+                                                   pathTemperature );
+      if( potentialValues.front() > pathFalsePotential )
+      {
+        return true;
+      }
+      pathFalsePotential = potentialValues.front();
+      auxiliaryOfPathFalseVacuum += auxiliaryStep;
+    }
+    return false;
+  }
+
+  // This goes along the segment ends adding the differences from
+  // pathFalsePotential to potentialValues appropriately so that
+  // potentialValues[ 0 ] is the potential at the start of the first straight
+  // segment minus pathFalsePotential, potentialValues[ 1 ] at the start of
+  // the second segment minus pathFalsePotential, and so on. This continues
+  // until it finds the path panic vacuum, which is either the start of the
+  // first straight segment which has the potential at its start end lower
+  // than pathFalsePotential and also has positive slope, or is the point at
+  // the true vacuum end of tunnelPath. It returns false if it doesn't find
+  // any point with potential lower than pathFalsePotential.
+  inline bool SplinePotential::FindPathPanicVacuum(
+                                    PotentialFunction const& potentialFunction,
+                                                  TunnelPath const& tunnelPath,
+                                                  double const pathTemperature,
+                                    std::vector< double >& fieldConfiguration )
+  {
+    NEED TO PUT CODE IN HERE!
   }
 
 } /* namespace VevaciousPlusPlus */

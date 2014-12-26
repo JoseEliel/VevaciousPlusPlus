@@ -19,6 +19,7 @@ namespace VevaciousPlusPlus
     BubbleProfile(),
     auxiliaryProfile(),
     auxiliaryAtBubbleCenter( -1.0 ),
+    auxiliaryAtRadialInfinity( -1.0 ),
     odeintProfile( 1,
                    BubbleRadialValueDescription() ),
     integrationStepSize( initialIntegrationStepSize ),
@@ -48,11 +49,15 @@ namespace VevaciousPlusPlus
   // on the best shot. It integrates the auxiliary variable derivative to
   // increasing radial values until it is definite that the initial auxiliary
   // value gave an undershoot or an overshoot, or until the auxiliary value
-  // at the largest radial value is within shootingThreshold of 0.
+  // at the largest radial value is within shootingThreshold of
+  // auxiliaryAtRadialInfinity. It also correctly sets
+  // auxiliaryAtRadialInfinity beforehand and afterwards
+  // auxiliaryAtBubbleCenter.
   void
   UndershootOvershootBubble::CalculateProfile( TunnelPath const& tunnelPath,
                                          SplinePotential const& pathPotential )
   {
+    auxiliaryAtRadialInfinity = pathPotential.AuxiliaryOfPathFalseVacuum();
     double twoPlusTwiceDampingFactor( 8.0 );
     if( tunnelPath.NonZeroTemperature() )
     {
@@ -62,7 +67,7 @@ namespace VevaciousPlusPlus
     unsigned int shootAttemptsLeft( allowShootingAttempts );
 
     undershootAuxiliary = pathPotential.DefiniteUndershootAuxiliary();
-    overshootAuxiliary = pathPotential.DefiniteOvershootAuxiliary();
+    overshootAuxiliary = pathPotential.AuxiliaryOfPathPanicVacuum();
 
     // If undershootAuxiliary or overshootAuxiliary is in the final segment, it
     // is set to be the (negative) offset from the end of the final segment.
@@ -403,7 +408,8 @@ namespace VevaciousPlusPlus
     {
       // If the shot has gone past the false vacuum, it was definitely an
       // overshoot.
-      if( odeintProfile[ radialIndex ].auxiliaryValue < 0.0 )
+      if( odeintProfile[ radialIndex ].auxiliaryValue
+          < auxiliaryAtRadialInfinity )
       {
         // debugging:
         /*std::cout << std::endl << "debugging:"
@@ -467,7 +473,7 @@ namespace VevaciousPlusPlus
       size_t const numberOfFields( tunnelPath.NumberOfFields() );
       std::vector< double > falseConfiguration( numberOfFields );
       tunnelPath.PutOnPathAt( falseConfiguration,
-                              0.0 );
+                              auxiliaryAtRadialInfinity );
       std::vector< double > currentConfiguration( falseConfiguration.size() );
       tunnelPath.PutOnPathAt( currentConfiguration,
                               auxiliaryProfile.back().auxiliaryValue );

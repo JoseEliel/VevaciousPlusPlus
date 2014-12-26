@@ -37,14 +37,15 @@ namespace VevaciousPlusPlus
     // variable derivative to increasing radial values until it is definite
     // that the initial auxiliary value gave an undershoot or an overshoot, or
     // until the auxiliary value at the largest radial value is within
-    // shootingThreshold of 0. It also correctly sets auxiliaryAtBubbleCenter.
+    // shootingThreshold of auxiliaryAtRadialInfinity. It also correctly sets
+    // auxiliaryAtRadialInfinity beforehand and afterwards
+    // auxiliaryAtBubbleCenter.
     virtual void CalculateProfile( TunnelPath const& tunnelPath,
                                    SplinePotential const& pathPotential );
 
     // This interpolates between the 2 values of the auxiliary variable in
     // auxiliaryProfile with radial values either side of radialValue.
     virtual double AuxiliaryAt( double const radialValue ) const;
-
 
     // This interpolates between the 2 values of the auxiliary slope in
     // auxiliaryProfile with radial values either side of radialValue.
@@ -63,12 +64,19 @@ namespace VevaciousPlusPlus
     // This just returns the path auxiliary at a radial value of 0.
     double AuxiliaryAtBubbleCenter() const{ return auxiliaryAtBubbleCenter; }
 
+    // This just returns the path auxiliary at a radial value of infinity
+    // (because of numerical effects, the path false vacuum might not be at
+    // zero).
+    double AuxiliaryAtRadialInfinity() const
+    { return auxiliaryAtRadialInfinity; }
+
 
   protected:
     static double const auxiliaryPrecisionResolution;
 
     std::vector< BubbleRadialValueDescription > auxiliaryProfile;
     double auxiliaryAtBubbleCenter;
+    double auxiliaryAtRadialInfinity;
     std::vector< BubbleRadialValueDescription > odeintProfile;
     double integrationStepSize;
     double integrationStartRadius;
@@ -110,7 +118,7 @@ namespace VevaciousPlusPlus
     // worthIntegratingFurther based on whether the integration showed that
     // there definitely was an undershoot, there definitely was an overshoot,
     // or that the auxiliary variable has not yet gotten within
-    // shootingThresholdSquared^(1/2) of 0.
+    // shootingThresholdSquared^(1/2) of auxiliaryAtRadialInfinity.
     void ShootFromInitialConditions( TunnelPath const& tunnelPath,
                                      SplinePotential const& pathPotential );
 
@@ -212,7 +220,7 @@ namespace VevaciousPlusPlus
   // worthIntegratingFurther based on whether the integration showed that
   // there definitely was an undershoot, there definitely was an overshoot,
   // or that the auxiliary variable has not yet gotten within
-  // shootingThresholdSquared^(1/2) of 0.
+  // shootingThresholdSquared^(1/2) of auxiliaryAtRadialInfinity.
   inline void UndershootOvershootBubble::ShootFromInitialConditions(
                                                   TunnelPath const& tunnelPath,
                                          SplinePotential const& pathPotential )

@@ -208,6 +208,8 @@ int main( int argumentCount,
   << " with neighboring displacements (e.g. displace node[i] by average of"
   << " displacement[i] with weight 1, displacement[i-1] and [i+1] each with"
   << " weight 0.5, [i-2] and [i+2] each with weight 0.25)" << std::endl
+  << "find out why \"do not move if Minuit2 result is worse\" is still moving"
+  << " path nodes" << std::endl
   << "write MinuitBetweenPaths subclasses" << std::endl
   << "write BertiniRunner" << std::endl
   << "write BasicPolynomialHomotopyContinuation" << std::endl
