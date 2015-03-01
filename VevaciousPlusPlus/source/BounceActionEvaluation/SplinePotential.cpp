@@ -16,27 +16,31 @@ namespace VevaciousPlusPlus
                          double const minimumSquareDistanceBetweenPathVacua ) :
     auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
     inverseOfAuxiliaryStep( numberOfPotentialSegments ),
+    numberOfPotentialSegments( numberOfPotentialSegments ),
     numberOfNormalSegments( numberOfPotentialSegments - 2 ),
     potentialValues( numberOfNormalSegments,
                      0.0 ),
     firstDerivatives( numberOfNormalSegments,
                       0.0 ),
+    pathFalseVacuumIndex( 0 ),
+    pathPanicVacuumIndex( numberOfPotentialSegments ),
     pathFalsePotential( -1.0 ),
     firstSegmentQuadratic( -1.0 ),
     finalPotential( 0.0 ),
     lastSegmentQuadratic( -1.0 ),
     energyBarrierWasResolved( false ),
-    tunnelingPossibleOnPath( false )
+    tunnelingPossibleOnPath( false ),
+    fieldConfiguration( potentialFunction.NumberOfFieldVariables() ),
+    potentialFunction( potentialFunction ),
+    tunnelPath( tunnelPath ),
+    pathTemperature( tunnelPath.TemperatureValue() )
   {
     // First we have to find the path false minimum. The base constructor
     // already set auxiliaryOfPathPanicVacuum to zero.
-    std::vector< double >
-    fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
     tunnelPath.PutOnPathAt( fieldConfiguration,
                             auxiliaryOfPathFalseVacuum );
     std::vector< double > const
     pathFalseEndConfiguration( fieldConfiguration );
-    double const pathTemperature( tunnelPath.TemperatureValue() );
     pathFalsePotential = potentialFunction( pathFalseEndConfiguration,
                                             pathTemperature );
 
@@ -58,37 +62,60 @@ namespace VevaciousPlusPlus
     // path by at least sqrt(minimumSquareDistanceBetweenPathVacua).
     while( !energyBarrierWasResolved )
     {
-      potentialValues.resize( 1,
-                              -1.0 );
       // The return value of RollForwardToLocalMinimum is false if it moves all
       // the way to the true vacuum end of the path without the potential ever
       // increasing. Here fieldConfiguration is being used as the field
       // configuration of the path false vacuum.
-      tunnelingPossibleOnPath = RollToPathLocalMinimum( potentialFunction,
-                                                        tunnelPath,
-                                                        pathTemperature,
-                                                        fieldConfiguration );
+      tunnelingPossibleOnPath = RollForwardToLocalMinimum();
       if( !tunnelingPossibleOnPath )
       {
         // There is no point in continuing if tunneling is not possible.
         break;
       }
+
+      // We set thresholdForNearPathPanic so that the "near panic" range is at
+      // least 1 step long.
+      thresholdForNearPathPanic = ( 1.0 - auxiliaryStep );
 
       // The return value of FindEndOfEnergyBarrier is false if it moves all
       // the way to the true vacuum end of the path without the potential ever
-      // dropping below pathFalsePotential. Here fieldConfiguration is being
-      // used as the field configuration of the point at the end of the energy
-      // barrier.
-      tunnelingPossibleOnPath = FindPathPanicVacuum( potentialFunction,
-                                                     tunnelPath,
-                                                     pathTemperature,
-                                                     fieldConfiguration );
+      // dropping below pathFalsePotential.
+      tunnelingPossibleOnPath = CheckForEndOfPositiveBarrier();
 
       if( !tunnelingPossibleOnPath )
       {
         // There is no point in continuing if tunneling is not possible.
         break;
       }
+
+      //
+      auxiliaryOfPathPanicVacuum = FindPathPanicVacuum();
+      numberOfNormalSegments = potentialValues.size();
+
+      // If FindEndOfPositiveBarrier() left a positive value in
+      // potentialValues.back(), then tunneling is only possible to the end of
+      // tunnelPath. Otherwise, we need to check for an early panic minimum on
+      // the path.
+      if( potentialValues.back() < 0.0 )
+      {
+      }
+
+      // We set thresholdForNearPathPanic to be at least (slightly more than)
+      // auxiliaryStep and at most twice auxiliaryStep away from then end of
+      // tunnelPath.
+      NEED TO DECIDE HOW EXACTLY TO DO THIS. Keep at least over 1 step away
+      from 1.0 in CheckForEndOfPositiveBarrier(), then the same again for
+      FindPathPanicVacuum()?
+          Probably should do below loop only AFTER finding the path panic.
+
+      thresholdForNearPathPanic = auxiliaryOfPathFalseVacuum;
+      double const twoStepsFromPathEnd( 1.0 - auxiliaryStep - auxiliaryStep );
+      while( thresholdForNearPathPanic < twoStepsFromPathEnd )
+      {
+        thresholdForNearPathPanic += auxiliaryStep;
+      }
+
+
 
       // Now we have to check that the tunneling is not over a spurious barrier
       // which might be due to numerical effects. The best we can do at the
@@ -124,17 +151,18 @@ namespace VevaciousPlusPlus
 
       // If we get here, then the energy barrier was resolved, the path false
       // vacuum is at auxiliaryOfPathFalseVacuum along tunnelPath, the
-      // potential has dropped below pathFalsePotential by
-      // definiteUndershootAuxiliary, and the path panic vacuum is at
-      // auxiliaryOfPathPanicVacuum along tunnelPath and is sufficiently
-      // separated from the false vacuum end of tunnelPath. Now we have to
-      // ensure that the parabolic segments have the proper values.
+      // potential has dropped below pathFalsePotential between
+      // definiteUndershootAuxiliary and
+      // ( definiteUndershootAuxiliary + auxiliaryStep ), and the path panic
+      // vacuum is at auxiliaryOfPathPanicVacuum along tunnelPath and is
+      // sufficiently separated from the false vacuum end of tunnelPath. Now we
+      // have to ensure that the parabolic segments have the proper values and
+      // to set the slopes of the straight segments.
       firstSegmentQuadratic = ( potentialValues.front()
                                 * inverseOfAuxiliaryStep
                                 * inverseOfAuxiliaryStep );
       thresholdForNearPathPanic
       = ( auxiliaryOfPathPanicVacuum - auxiliaryStep );
-      finalPotential = potentialValues.back();
       size_t const numberOfSegments( potentialValues.size() );
       for( size_t segmentIndex( 0 );
            segmentIndex < ( numberOfSegments - 1 );
@@ -381,27 +409,31 @@ namespace VevaciousPlusPlus
   // correct segment and then returning its value at that point.
   double SplinePotential::operator()( double auxiliaryValue ) const
   {
-    if( auxiliaryValue >= definiteOvershootAuxiliary )
+    if( auxiliaryValue >= auxiliaryOfPathPanicVacuum )
     {
       return finalPotential;
-    }
-    if( auxiliaryValue >= thresholdForNearPathPanic )
-    {
-      double const differenceFromMaximumAuxiliary( definiteOvershootAuxiliary
-                                                   - auxiliaryValue );
-      return ( finalPotential + ( differenceFromMaximumAuxiliary
-                  * differenceFromMaximumAuxiliary * lastSegmentQuadratic ) );
     }
     if( auxiliaryValue <= auxiliaryOfPathFalseVacuum )
     {
       return 0.0;
     }
     auxiliaryValue -= auxiliaryOfPathFalseVacuum;
-    if( auxiliaryValue < auxiliaryStep )
+    if( auxiliaryValue <= auxiliaryStep )
     {
       return ( auxiliaryValue * auxiliaryValue * firstSegmentQuadratic );
     }
     size_t const auxiliarySteps( auxiliaryValue * inverseOfAuxiliaryStep );
+    if( auxiliarySteps > numberOfNormalSegments )
+    {
+      // We have to undo the "auxiliaryValue -= auxiliaryOfPathFalseVacuum" to
+      // find the difference from the path panic point.
+      double const differenceFromMaximumAuxiliary( auxiliaryOfPathPanicVacuum
+                           - ( auxiliaryValue + auxiliaryOfPathFalseVacuum ) );
+      return ( finalPotential
+               + ( differenceFromMaximumAuxiliary
+                   * differenceFromMaximumAuxiliary
+                   * lastSegmentQuadratic ) );
+    }
     double const auxiliaryDifference( auxiliaryValue
                                       - ( auxiliarySteps * auxiliaryStep ) );
 
@@ -496,17 +528,5 @@ namespace VevaciousPlusPlus
 
     return returnStream.str();
   }
-
-
-  // This goes along the segment ends checking for the lowest before the
-  // potential starts to rise again, returning the auxiliary value of the
-  // segment end with lowest potential, leaving the lowest potential in
-  // pathFalsePotential and its field configuration in fieldConfiguration.
-  double SplinePotential::FindPathFalseVacuum(
-                                    double const pathFalseVacuumAuxiliarySoFar,
-                              double& pathFalsePotential,
-                              TunnelPath const& tunnelPath,
-                              std::vector< double >& fieldConfiguration,
-                        double const minimumSquareDistanceBetweenPathVacua );
 
 } /* namespace VevaciousPlusPlus */
