@@ -45,6 +45,8 @@ namespace VevaciousPlusPlus
                                                   TunnelPath const& tunnelPath,
                   OneDimensionalPotentialAlongPath const& pathPotential ) const
   {
+    HERE! Need to work out how to insert minimumSquareDistanceBetweenPathVacua
+    - should it be this->something?
     SplinePotential potentialApproximation( potentialFunction,
                                             tunnelPath,
                                             numberOfPotentialSegments );

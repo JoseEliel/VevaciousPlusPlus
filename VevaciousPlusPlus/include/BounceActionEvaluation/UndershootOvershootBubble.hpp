@@ -193,8 +193,8 @@ namespace VevaciousPlusPlus
     // where auxiliaryProfile[ segmentIndex ] (after increment) starts beyond
     // radialValue, so we know that segmentIndex is 1 beyond what we want to
     // return.
-    return std::pair< size_t, double >( --segmentIndex,
-              ( radialValue - auxiliaryProfile[ segmentIndex ].radialValue ) );
+    return std::pair< size_t, double >( segmentIndex - 1,
+          ( radialValue - auxiliaryProfile[ segmentIndex - 1 ].radialValue ) );
   }
 
   // This returns the weights of the ends of the segment with index
