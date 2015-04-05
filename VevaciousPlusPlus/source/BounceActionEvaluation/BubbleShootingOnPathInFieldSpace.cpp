@@ -41,15 +41,15 @@ namespace VevaciousPlusPlus
   // (in GeV) thermal bounce action integrated over three dimensions at
   // temperature T, is calculated: S_3(T) if the temperature T given by
   // tunnelPath is greater than 0.0, S_4 otherwise.
-  BubbleProfile* BubbleShootingOnPathInFieldSpace::operator()(
-                                                  TunnelPath const& tunnelPath,
-                  OneDimensionalPotentialAlongPath const& pathPotential ) const
+  BubbleProfile*
+  BubbleShootingOnPathInFieldSpace::operator()( TunnelPath const& tunnelPath,
+                         OneDimensionalPotentialAlongPath const& pathPotential,
+                             double const minimumVacuaSeparationSquared ) const
   {
-    HERE! Need to work out how to insert minimumSquareDistanceBetweenPathVacua
-    - should it be this->something?
     SplinePotential potentialApproximation( potentialFunction,
                                             tunnelPath,
-                                            numberOfPotentialSegments );
+                                            numberOfPotentialSegments,
+                                            minimumVacuaSeparationSquared );
 
     UndershootOvershootBubble*
     bubbleProfile( new UndershootOvershootBubble( radialStepSize,

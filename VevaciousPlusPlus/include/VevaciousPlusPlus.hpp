@@ -29,7 +29,7 @@
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialOnParallelPlanes.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
-#include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
+#include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 
 
 namespace VevaciousPlusPlus

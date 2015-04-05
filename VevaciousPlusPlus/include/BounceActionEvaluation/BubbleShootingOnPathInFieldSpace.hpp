@@ -52,7 +52,8 @@ namespace VevaciousPlusPlus
     // three dimensions at temperature T, is calculated: S_3(T) if the
     // temperature T given by tunnelPath is greater than 0.0, S_4 otherwise.
     virtual BubbleProfile* operator()( TunnelPath const& tunnelPath,
-                 OneDimensionalPotentialAlongPath const& pathPotential ) const;
+                 OneDimensionalPotentialAlongPath const& pathPotential,
+                            double const minimumVacuaSeparationSquared ) const;
 
     // This plots the fields as functions of the bubble radial value in a file
     // called plotFilename in .eps format, with each field plotted in the color

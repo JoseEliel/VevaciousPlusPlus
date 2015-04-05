@@ -97,6 +97,7 @@ namespace VevaciousPlusPlus
 
       auxiliaryOfPathPanicVacuum
       = RollForwardToPathPanicVacuum( maximumNumberOfNormalSegments );
+      finalPotential = potentialValues[ numberOfNormalSegments + 1 ];
 
       // At this point, the path false vacuum is at auxiliaryOfPathFalseVacuum,
       // there are numberOfNormalSegments normal segments, the values in
@@ -105,7 +106,6 @@ namespace VevaciousPlusPlus
       // elements are junk, but resizing would only save memory, which is not
       // critical, while it would take time, which is critical), and both
       // pathFalsePotential and finalPotential have been set.
-
 
       // Now we have to check that the tunneling is not over a spurious barrier
       // which might be due to numerical effects. The best we can do at the
@@ -146,7 +146,7 @@ namespace VevaciousPlusPlus
       // ( definiteUndershootAuxiliary + auxiliaryStep ), and the path panic
       // vacuum is at auxiliaryOfPathPanicVacuum along tunnelPath and is
       // sufficiently separated from the false vacuum end of tunnelPath, with
-      // the potential at the path panic vacuum in
+      // the potential at the path panic vacuum in finalPotential and in
       // potentialValues[ numberOfNormalSegments + 1 ]. Now we have to ensure
       // that the parabolic segments have the proper values and to set the
       // slopes of the straight segments.
@@ -238,14 +238,17 @@ namespace VevaciousPlusPlus
                                        "-",
                                        "*10^");
     std::stringstream returnStream;
-    returnStream << "numberOfNormalSegments = " << numberOfNormalSegments
-    << ", firstSegmentQuadratic = " << firstSegmentQuadratic
-    << ", finalPotential = " << finalPotential
-    << ", lastSegmentQuadratic = " << lastSegmentQuadratic
+    returnStream
+    << "auxiliaryOfPathFalseVacuum = " << auxiliaryOfPathFalseVacuum
+    << ", auxiliaryOfPathPanicVacuum = " << auxiliaryOfPathPanicVacuum
     << ", definiteUndershootAuxiliary = " << definiteUndershootAuxiliary
-    << ", definiteOvershootAuxiliary = " << definiteOvershootAuxiliary
     << ", thresholdForNearPathPanic = " << thresholdForNearPathPanic
-    << ", potential = ( UnitStep[x] * ( "
+    << ", auxiliaryStep = " << auxiliaryStep
+    << ", inverseOfAuxiliaryStep = " << inverseOfAuxiliaryStep
+    << ", numberOfNormalSegments = " << numberOfNormalSegments
+    << std::endl
+    << std::endl;
+    returnStream << "potential = ( UnitStep[x] * ( "
     << doubleFormatter.doubleToString( firstSegmentQuadratic )
     << " * x^(2) ) * UnitStep["
     << doubleFormatter.doubleToString( auxiliaryStep ) << " - x]";
@@ -272,31 +275,79 @@ namespace VevaciousPlusPlus
     << " + UnitStep[x - "
     << doubleFormatter.doubleToString( cumulativeAuxiliary ) << "] * ( ("
     << doubleFormatter.doubleToString( finalPotential )
-    << ") + (x-" << definiteOvershootAuxiliary << ")^2 * ("
+    << ") + (x-" << auxiliaryOfPathPanicVacuum << ")^2 * ("
     << doubleFormatter.doubleToString( lastSegmentQuadratic )
     << ") ) * UnitStep["
-    << doubleFormatter.doubleToString( definiteOvershootAuxiliary )
-    << " - x] )" << std::endl;
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "preparing points for Mathematica.";
-    returnStream << "Mathematica points = { ";
-    for( size_t sampleIndex( 0 );
-         sampleIndex <= ( 3 * ( numberOfNormalSegments + 2 ) );
-         ++sampleIndex )
+    << doubleFormatter.doubleToString( auxiliaryOfPathPanicVacuum )
+    << " - x] )" << std::endl
+    << std::endl;
+    returnStream
+    << "potentialValues = { ";
+    for( size_t segmentIndex( 0 );
+         segmentIndex <= numberOfNormalSegments;
+         ++segmentIndex )
     {
-      if( sampleIndex > 0 )
+      if( segmentIndex > 0 )
       {
-        returnStream << ", ";
+        returnStream << ",";
       }
-      double const sampleAuxiliary( ( sampleIndex * auxiliaryStep ) / 3.0 );
-      returnStream << "{ " << sampleAuxiliary << ", "
-      << (*this)( sampleAuxiliary ) << " }";
+      returnStream << " "
+      << doubleFormatter.doubleToString( potentialValues[ segmentIndex ] );
     }
-    returnStream << " }" << std::endl;
-    std::cout << std::endl;*/
+    returnStream << std::endl << "(then {";
+    for( size_t segmentIndex( numberOfNormalSegments + 1 );
+         segmentIndex < potentialValues.size();
+         ++segmentIndex )
+    {
+      if( segmentIndex > ( numberOfNormalSegments + 1 ) )
+      {
+        returnStream << ",";
+      }
+      returnStream << " "
+      << doubleFormatter.doubleToString( potentialValues[ segmentIndex ] );
+    }
+    returnStream << " })";
+    returnStream << std::endl
+    << "firstDerivatives = { ";
+    for( size_t segmentIndex( 0 );
+         segmentIndex < numberOfNormalSegments;
+         ++segmentIndex )
+    {
+      if( segmentIndex > 0 )
+      {
+        returnStream << ",";
+      }
+      returnStream << " "
+      << doubleFormatter.doubleToString( firstDerivatives[ segmentIndex ] );
+    }
+    returnStream << std::endl << "(then {";
+    for( size_t segmentIndex( numberOfNormalSegments );
+         segmentIndex < firstDerivatives.size();
+         ++segmentIndex )
+    {
+      if( segmentIndex > numberOfNormalSegments )
+      {
+        returnStream << ",";
+      }
+      returnStream << " "
+      << doubleFormatter.doubleToString( firstDerivatives[ segmentIndex ] );
+    }
+    returnStream << " })";
+    returnStream << std::endl;
+    returnStream
+    << "pathFalsePotential = " << pathFalsePotential
+    << ", firstSegmentQuadratic = " << firstSegmentQuadratic
+    << ", lastSegmentQuadratic = " << lastSegmentQuadratic
+    << ", energyBarrierWasResolved = " << energyBarrierWasResolved
+    << ", tunnelingPossibleOnPath = " << tunnelingPossibleOnPath
+    << ", fieldConfiguration not really relevant"
+    << ", potentialFunction not really printable" << std::endl;
+    returnStream << std::endl;
+    returnStream << "tunnelPath = " << tunnelPath.AsDebuggingString()
+    << ", pathTemperature = " << pathTemperature
+    << std::endl
+    << std::endl;
+
 
     return returnStream.str();
   }
