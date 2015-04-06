@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   OdeintBubbleDerivatives::OdeintBubbleDerivatives(
-                                          SplinePotential const& pathPotential,
+                         OneDimensionalPotentialAlongPath const& pathPotential,
                                                TunnelPath const& tunnelPath ) :
     pathPotential( pathPotential ),
     tunnelPath( tunnelPath ),

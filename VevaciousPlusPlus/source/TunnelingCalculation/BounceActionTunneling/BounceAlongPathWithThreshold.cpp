@@ -227,11 +227,12 @@ namespace VevaciousPlusPlus
 
     SplinePotential pathPotential( potentialFunction,
                                    *bestPath,
-                                   pathPotentialResolution );
+                                   pathPotentialResolution,
+                                   requiredVacuumSeparationSquared );
 
-    need to guard against bad paths here
 
-    BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath ) );
+    BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath,
+                                                          pathPotential ) );
 
     std::cout << std::endl
     << "Initial path bounce action = " << bestBubble->bounceAction;
@@ -311,12 +312,14 @@ namespace VevaciousPlusPlus
         << nextPath->AsDebuggingString() << std::endl;
         SplinePotential potentialApproximation( potentialFunction,
                                                 *nextPath,
-                                                pathPotentialResolution );
+                                                pathPotentialResolution,
+                                             requiredVacuumSeparationSquared );
         std::cout << "potentialApproximation:" << std::endl
         << potentialApproximation.AsDebuggingString();
         std::cout << std::endl;/**/
 
-        BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath ) );
+        BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath,
+                                                    potentialApproximation ) );
         delete currentBubbleDeleter;
         delete currentPathDeleter;
 

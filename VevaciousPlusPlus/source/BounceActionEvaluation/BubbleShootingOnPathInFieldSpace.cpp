@@ -43,21 +43,15 @@ namespace VevaciousPlusPlus
   // tunnelPath is greater than 0.0, S_4 otherwise.
   BubbleProfile*
   BubbleShootingOnPathInFieldSpace::operator()( TunnelPath const& tunnelPath,
-                         OneDimensionalPotentialAlongPath const& pathPotential,
-                             double const minimumVacuaSeparationSquared ) const
+                  OneDimensionalPotentialAlongPath const& pathPotential ) const
   {
-    SplinePotential potentialApproximation( potentialFunction,
-                                            tunnelPath,
-                                            numberOfPotentialSegments,
-                                            minimumVacuaSeparationSquared );
-
     UndershootOvershootBubble*
     bubbleProfile( new UndershootOvershootBubble( radialStepSize,
                                                   estimatedRadialMaximum,
                                                   shootAttempts,
                                                   auxiliaryThreshold ) );
     bubbleProfile->CalculateProfile( tunnelPath,
-                                     potentialApproximation );
+                                     pathPotential );
 
     bool const nonZeroTemperature( tunnelPath.NonZeroTemperature() );
     std::vector< BubbleRadialValueDescription > const&
@@ -120,10 +114,9 @@ namespace VevaciousPlusPlus
     // common factor of 0.5 * [solid angle] being left until after the loop.
     double
     bounceAction( ( currentVolume
-                    * potentialApproximation(
-                                   bubbleProfile->AuxiliaryAtBubbleCenter() ) )
+                  * pathPotential( bubbleProfile->AuxiliaryAtBubbleCenter() ) )
                   + ( nextVolume
-                      * ( BounceActionDensity( potentialApproximation,
+                      * ( BounceActionDensity( pathPotential,
                                                tunnelPath,
                                               auxiliaryProfile.front() ) ) ) );
 
@@ -181,7 +174,7 @@ namespace VevaciousPlusPlus
           > ( radiusDifferenceThreshold * currentRadius ) )
       {
         bounceAction
-        += ( BounceActionDensity( potentialApproximation,
+        += ( BounceActionDensity( pathPotential,
                                   tunnelPath,
                                   auxiliaryProfile[ radiusIndex ] )
             * ( nextVolume - previousVolume ) );
@@ -194,7 +187,7 @@ namespace VevaciousPlusPlus
           currentArea *= currentRadius;
         }
         bounceAction
-        += ( BounceActionDensity( potentialApproximation,
+        += ( BounceActionDensity( pathPotential,
                                   tunnelPath,
                                   auxiliaryProfile[ radiusIndex ] )
              * ( nextRadius - previousRadius )
@@ -213,7 +206,7 @@ namespace VevaciousPlusPlus
     double kineticTerm( auxiliaryProfile.back().auxiliarySlope );
     kineticTerm *= ( 0.5 * kineticTerm
                          * tunnelPath.SlopeSquared( currentAuxiliary ) );
-    double const potentialTerm( potentialApproximation( currentAuxiliary ) );
+    double const potentialTerm( pathPotential( currentAuxiliary ) );
     if( ( nextRadius - currentRadius )
         > ( radiusDifferenceThreshold * currentRadius ) )
     {
@@ -268,8 +261,8 @@ namespace VevaciousPlusPlus
     // (All solutions found with Mathematica 8.)
 
     // This is b in the mathematics above.
-    double const inverseScale(
-              sqrt( potentialApproximation.SecondDerivativeAtFalseVacuum() ) );
+    double const
+    inverseScale( sqrt( pathPotential.SecondDerivativeAtFalseVacuum() ) );
     double const scaledRadius( inverseScale * nextRadius );
 
     // debugging:

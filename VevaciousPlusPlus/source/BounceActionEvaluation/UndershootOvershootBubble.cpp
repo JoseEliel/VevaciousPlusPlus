@@ -55,7 +55,7 @@ namespace VevaciousPlusPlus
   // auxiliaryAtBubbleCenter.
   void
   UndershootOvershootBubble::CalculateProfile( TunnelPath const& tunnelPath,
-                                         SplinePotential const& pathPotential )
+                        OneDimensionalPotentialAlongPath const& pathPotential )
   {
     auxiliaryAtRadialInfinity = pathPotential.AuxiliaryOfPathFalseVacuum();
     double twoPlusTwiceDampingFactor( 8.0 );
@@ -69,15 +69,15 @@ namespace VevaciousPlusPlus
     undershootAuxiliary = pathPotential.DefiniteUndershootAuxiliary();
     overshootAuxiliary = pathPotential.AuxiliaryOfPathPanicVacuum();
 
-    // If undershootAuxiliary or overshootAuxiliary is in the final segment, it
-    // is set to be the (negative) offset from the end of the final segment.
+    // If undershootAuxiliary or overshootAuxiliary is close to the path panic
+    // vacuum, it is set to be the (negative) offset from the panic vacuum.
     // (This should mitigate precision issues for trying to start very close to
     // the path panic minimum.)
-    if( undershootAuxiliary >= pathPotential.StartOfFinalSegment() )
+    if( undershootAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
     {
       undershootAuxiliary -= pathPotential.DefiniteOvershootAuxiliary();
     }
-    if( overshootAuxiliary >= pathPotential.StartOfFinalSegment() )
+    if( overshootAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
     {
       overshootAuxiliary -= pathPotential.DefiniteOvershootAuxiliary();
     }
@@ -103,9 +103,9 @@ namespace VevaciousPlusPlus
         initialAuxiliary = ( 0.5 * ( undershootAuxiliary
                                      + overshootAuxiliary
                               + pathPotential.DefiniteOvershootAuxiliary() ) );
-        if( initialAuxiliary >= pathPotential.StartOfFinalSegment() )
+        if( initialAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
         {
-          initialAuxiliary = ( pathPotential.StartOfFinalSegment()
+          initialAuxiliary = ( pathPotential.ThresholdForNearPathPanic()
                               - initialAuxiliary );
         }
       }

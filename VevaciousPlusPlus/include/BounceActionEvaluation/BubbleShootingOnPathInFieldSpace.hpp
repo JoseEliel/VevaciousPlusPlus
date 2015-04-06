@@ -52,8 +52,7 @@ namespace VevaciousPlusPlus
     // three dimensions at temperature T, is calculated: S_3(T) if the
     // temperature T given by tunnelPath is greater than 0.0, S_4 otherwise.
     virtual BubbleProfile* operator()( TunnelPath const& tunnelPath,
-                 OneDimensionalPotentialAlongPath const& pathPotential,
-                            double const minimumVacuaSeparationSquared ) const;
+                 OneDimensionalPotentialAlongPath const& pathPotential ) const;
 
     // This plots the fields as functions of the bubble radial value in a file
     // called plotFilename in .eps format, with each field plotted in the color
@@ -79,7 +78,8 @@ namespace VevaciousPlusPlus
 
     // This evaluates the bounce action density at the given point on the
     // bubble profile.
-    double BounceActionDensity( SplinePotential const& potentialApproximation,
+    double BounceActionDensity(
+                OneDimensionalPotentialAlongPath const& potentialApproximation,
                                 TunnelPath const& tunnelPath,
                       BubbleRadialValueDescription const& profilePoint ) const;
   };
@@ -111,7 +111,7 @@ namespace VevaciousPlusPlus
   // This evaluates the bounce action density at the given point on the
   // bubble profile.
   inline double BubbleShootingOnPathInFieldSpace::BounceActionDensity(
-                                 SplinePotential const& potentialApproximation,
+                OneDimensionalPotentialAlongPath const& potentialApproximation,
                                                   TunnelPath const& tunnelPath,
                        BubbleRadialValueDescription const& profilePoint ) const
   {

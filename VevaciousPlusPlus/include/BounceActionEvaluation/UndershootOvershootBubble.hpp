@@ -41,7 +41,7 @@ namespace VevaciousPlusPlus
     // auxiliaryAtRadialInfinity beforehand and afterwards
     // auxiliaryAtBubbleCenter.
     virtual void CalculateProfile( TunnelPath const& tunnelPath,
-                                   SplinePotential const& pathPotential );
+                       OneDimensionalPotentialAlongPath const& pathPotential );
 
     // This interpolates between the 2 values of the auxiliary variable in
     // auxiliaryProfile with radial values either side of radialValue.
@@ -120,7 +120,7 @@ namespace VevaciousPlusPlus
     // or that the auxiliary variable has not yet gotten within
     // shootingThresholdSquared^(1/2) of auxiliaryAtRadialInfinity.
     void ShootFromInitialConditions( TunnelPath const& tunnelPath,
-                                     SplinePotential const& pathPotential );
+                       OneDimensionalPotentialAlongPath const& pathPotential );
 
     // This returns the slope of the solution for the bubble equation of motion
     // along the path in terms of p, which is either the derivative of
@@ -223,7 +223,7 @@ namespace VevaciousPlusPlus
   // shootingThresholdSquared^(1/2) of auxiliaryAtRadialInfinity.
   inline void UndershootOvershootBubble::ShootFromInitialConditions(
                                                   TunnelPath const& tunnelPath,
-                                         SplinePotential const& pathPotential )
+                        OneDimensionalPotentialAlongPath const& pathPotential )
   {
     odeintProfile.clear();
 

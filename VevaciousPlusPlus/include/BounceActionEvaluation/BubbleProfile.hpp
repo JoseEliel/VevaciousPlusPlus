@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
     // This should set up the bubble profile in terms of the auxiliary variable
     // and its slope, at values of the radial variable.
     virtual void CalculateProfile( TunnelPath const& tunnelPath,
-                                   SplinePotential const& pathPotential ) = 0;
+                   OneDimensionalPotentialAlongPath const& pathPotential ) = 0;
 
     // This should return the value that the auxiliary variable should have for
     // the radial value given by radialValue.
