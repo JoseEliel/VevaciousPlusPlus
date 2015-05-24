@@ -52,8 +52,10 @@ namespace VevaciousPlusPlus
 
     // This returns the value of the second derivative of the potential at
     // (definiteOvershootAuxiliary + differenceFromMaximumAuxiliary), assuming
-    // that it is in the implicit final segment.
-    virtual double SecondDerivativeNearPathPanic() const
+    // that it is in the implicit final segment. The second derivative is
+    // constant in the segment, so differenceFromMaximumAuxiliary is ignored.
+    virtual double SecondDerivativeNearPathPanic(
+                            double const differenceFromMaximumAuxiliary) const
     { return lastSegmentQuadratic; }
 
     // This is for debugging.

@@ -115,6 +115,7 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This runs the point parameterized in the given file.
   void VevaciousPlusPlus::RunPoint( std::string const& parameterFilename )
   {
     time( &currentTime );
@@ -159,6 +160,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
   }
 
+  // This writes the results as an XML file.
   void VevaciousPlusPlus::WriteXmlResults( std::string const& xmlFilename )
   {
     std::ofstream xmlFile( xmlFilename.c_str() );
@@ -242,6 +244,7 @@ namespace VevaciousPlusPlus
     << "\"." << std::endl;
   }
 
+  // This writes the results as an SLHA file.
   void VevaciousPlusPlus::WriteSlhaResults( std::string const& slhaFilename,
                                             bool const writeWarnings )
   {
@@ -433,7 +436,8 @@ namespace VevaciousPlusPlus
     }
   }
 
-  //
+  // This interprets the given string as the appropriate element of the
+  // TunnelingCalculator::TunnelingStrategy enum.
   TunnelingCalculator::TunnelingStrategy
   VevaciousPlusPlus::InterpretTunnelingStrategy(
                                                std::string& tunnelingStrategy )
@@ -517,7 +521,9 @@ namespace VevaciousPlusPlus
     return ownedPotentialFunction;
   }
 
-  //
+  // This decides on the derived class (based on GradientMinimizer) to use
+  // to minimize the potential and constructs it with the arguments parsed
+  // from constructorArguments.
   PotentialMinimizer* VevaciousPlusPlus::SetUpGradientFromStartingPoints(
                                       std::string const& constructorArguments )
   {
@@ -590,7 +596,9 @@ namespace VevaciousPlusPlus
     return ownedPotentialMinimizer;
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitPotentialMinimizer instance to use to minimize the
+  // potential from a set of starting points.
   GradientMinimizer* VevaciousPlusPlus::SetUpMinuitPotentialMinimizer(
                                       std::string const& constructorArguments )
   {
@@ -617,7 +625,9 @@ namespace VevaciousPlusPlus
                                          minuitStrategy );
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a CosmoTransitionsRunner instance to use to calculate the
+  // tunneling from the DSB vacuum to the panic vacuum, if possible.
   TunnelingCalculator* VevaciousPlusPlus::SetUpCosmoTransitionsRunner(
                                       std::string const& constructorArguments )
   {
@@ -681,7 +691,9 @@ namespace VevaciousPlusPlus
                                        vacuumSeparationFraction );
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a BounceAlongPathWithThreshold instance to use to calculate
+  // the tunneling from the DSB vacuum to the panic vacuum, if possible.
   TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
                                       std::string const& constructorArguments )
   {
@@ -744,10 +756,12 @@ namespace VevaciousPlusPlus
                                              survivalProbabilityThreshold,
                                              thermalIntegrationResolution,
                                              temperatureAccuracy,
-                                             resolutionOfPathPotential );
+                                             resolutionOfPathPotential,
+                                             vacuumSeparationFraction );
   }
 
-  //
+  // This parses the XMl of tunnelPathFinders to construct a set of
+  // BouncePathFinder instances, filling pathFinders with pointers to them.
   void VevaciousPlusPlus::SetUpBouncePathFinders(
                                           std::string const& tunnelPathFinders,
                                 std::vector< BouncePathFinder* >& pathFinders )
@@ -789,7 +803,9 @@ namespace VevaciousPlusPlus
     }
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
+  // extremize the bounce action.
   BouncePathFinder* VevaciousPlusPlus::CreateMinuitOnPotentialOnParallelPlanes(
                                       std::string const& constructorArguments )
   {
@@ -818,7 +834,9 @@ namespace VevaciousPlusPlus
                       static_cast< unsigned int >( minuitToleranceFraction ) );
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitOnPotentialPerpendicularToPath instance to use to try to
+  // extremize the bounce action.
   BouncePathFinder*
   VevaciousPlusPlus::CreateMinuitOnPotentialPerpendicularToPath(
                                       std::string const& constructorArguments )
@@ -881,7 +899,9 @@ namespace VevaciousPlusPlus
                       static_cast< unsigned int >( minuitToleranceFraction ) );
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitOnPathNormalInertialPotential instance to use to try to
+  // extremize the bounce action.
   BouncePathFinder*
   VevaciousPlusPlus::CreateMinuitOnPathNormalInertialPotential(
                                       std::string const& constructorArguments )
@@ -951,12 +971,13 @@ namespace VevaciousPlusPlus
                     static_cast< unsigned int >( minuitToleranceFraction ) );*/
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a BubbleShootingOnPathInFieldSpace instance to use to calculate
+  // the bounce action on given paths.
   BounceActionCalculator*
   VevaciousPlusPlus::SetUpBubbleShootingOnPathInFieldSpace(
                                       std::string const& constructorArguments )
   {
-    int numberOfSegmentsForPotentialFit( 32 );
     double lengthScaleResolutionForBounce( 0.05 );
     int shootAttemptsForBounce( 32 );
 

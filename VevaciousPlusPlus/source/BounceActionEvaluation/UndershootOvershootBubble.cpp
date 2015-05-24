@@ -9,7 +9,8 @@
 
 namespace VevaciousPlusPlus
 {
-  double const UndershootOvershootBubble::auxiliaryPrecisionResolution( 1.0e-6 );
+  double const
+  UndershootOvershootBubble::auxiliaryPrecisionResolution( 1.0e-6 );
 
   UndershootOvershootBubble::UndershootOvershootBubble(
                                        double const initialIntegrationStepSize,
@@ -75,11 +76,11 @@ namespace VevaciousPlusPlus
     // the path panic minimum.)
     if( undershootAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
     {
-      undershootAuxiliary -= pathPotential.DefiniteOvershootAuxiliary();
+      undershootAuxiliary -= pathPotential.AuxiliaryOfPathPanicVacuum();
     }
     if( overshootAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
     {
-      overshootAuxiliary -= pathPotential.DefiniteOvershootAuxiliary();
+      overshootAuxiliary -= pathPotential.AuxiliaryOfPathPanicVacuum();
     }
 
     // This loop is broken out of if the shoot attempt seems to have been close
@@ -102,7 +103,7 @@ namespace VevaciousPlusPlus
       {
         initialAuxiliary = ( 0.5 * ( undershootAuxiliary
                                      + overshootAuxiliary
-                              + pathPotential.DefiniteOvershootAuxiliary() ) );
+                              + pathPotential.AuxiliaryOfPathPanicVacuum() ) );
         if( initialAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
         {
           initialAuxiliary = ( pathPotential.ThresholdForNearPathPanic()
@@ -153,9 +154,9 @@ namespace VevaciousPlusPlus
         // which gives the same result as in the else statement complementary
         // to this branch, but here dV/dp = 2 * (p-p_0) * d^2V/dp^2.
         double const initialPositiveAuxiliary( initialAuxiliary
-                                + pathPotential.DefiniteOvershootAuxiliary() );
-        double const
-        scaledSecondDerivative( pathPotential.SecondDerivativeNearPathPanic()
+                                + pathPotential.AuxiliaryOfPathPanicVacuum() );
+        double const scaledSecondDerivative(
+                pathPotential.SecondDerivativeNearPathPanic( initialAuxiliary )
                        / tunnelPath.SlopeSquared( initialPositiveAuxiliary ) );
         double const
         initialQuadraticCoefficient( 2.0 * initialAuxiliary
@@ -241,9 +242,9 @@ namespace VevaciousPlusPlus
             std::cout << std::endl;*/
           }
           // At this point, the slope of p(r) at
-          // r = inverseRadialScale * scaledSlope ) should be large enough that
-          // the magnitude of its product with integrationStepSize should be
-          // larger than auxiliaryPrecisionResolution and thus the numeric
+          // r = ( inverseRadialScale * scaledSlope ) should be large enough
+          // that the magnitude of its product with integrationStepSize should
+          // be larger than auxiliaryPrecisionResolution and thus the numeric
           // integration should be able to proceed normally.
           double sinhOrBesselPart( -2.0 );
           if( tunnelPath.NonZeroTemperature() )
@@ -256,7 +257,10 @@ namespace VevaciousPlusPlus
                                                                scaledRadius ) )
                                  / scaledRadius );
           }
-          initialConditions[ 0 ] = ( pathPotential.DefiniteOvershootAuxiliary()
+          // As above:
+          // p - p_0 = (p_i - p_0) * ( [ (4 * I_1(b*r)) / (b*r) ] - 1 )
+          // or p - p_0 = (p_i - p_0) * ( [ (2 * sinh(b*r)) / (b*r) ] - 1 )
+          initialConditions[ 0 ] = ( pathPotential.AuxiliaryOfPathPanicVacuum()
                                      + ( initialAuxiliary
                                     * ( ( 2.0 * sinhOrBesselPart ) - 1.0 ) ) );
           initialConditions[ 1 ]
@@ -382,7 +386,7 @@ namespace VevaciousPlusPlus
 
     if( initialAuxiliary < 0.0 )
     {
-      auxiliaryAtBubbleCenter = ( pathPotential.DefiniteOvershootAuxiliary()
+      auxiliaryAtBubbleCenter = ( pathPotential.AuxiliaryOfPathPanicVacuum()
                                   + initialAuxiliary );
     }
     else

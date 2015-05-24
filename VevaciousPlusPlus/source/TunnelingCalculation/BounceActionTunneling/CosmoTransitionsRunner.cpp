@@ -312,9 +312,9 @@ namespace VevaciousPlusPlus
     SetThermalSurvivalProbability();
   }
 
-  // This uses a BubbleShootingOnPathInFieldSpace object at different temperatures to
-  // fill straightPathActions based on straight paths between the thermal
-  // vacua.
+  // This uses a BubbleShootingOnPathInFieldSpace object at different
+  // temperatures to fill straightPathActions based on straight paths between
+  // the thermal vacua.
   void CosmoTransitionsRunner::InteralGuessFromStraightPaths(
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
@@ -329,11 +329,10 @@ namespace VevaciousPlusPlus
 
     straightPathActions.clear();
     BubbleShootingOnPathInFieldSpace actionCalculator( potentialFunction,
-                                             resolutionOfDsbVacuum,
-                                  ( 0.1 * sqrt( thresholdSeparationSquared ) ),
-                                             32 );
-    // There probably should not be those magic numbers (0.1, 32), but it is
-    // unlikely that anyone will ever want to change them.
+                      ( 1.0 / static_cast< double >( resolutionOfDsbVacuum ) ),
+                                                       32 );
+    // The number of shoot attempts doesn't need to be fixed at 32, but it is
+    // unlikely that anyone will ever want to change it.
     PotentialMinimum thermalFalseVacuum( falseVacuum );
     PotentialMinimum thermalTrueVacuum( trueVacuum );
     std::vector< std::vector< double > > straightPath( 2 );
@@ -361,10 +360,15 @@ namespace VevaciousPlusPlus
       }
       straightPath.front() = thermalFalseVacuum.FieldConfiguration();
       straightPath.back() = thermalTrueVacuum.FieldConfiguration();
-      BubbleProfile*
-      bubbleProfile( actionCalculator( LinearSplineThroughNodes( straightPath,
-                                                    std::vector< double >( 0 ),
-                                                         *fitTemperature ) ) );
+      LinearSplineThroughNodes straightSplinePath( straightPath,
+                                                   std::vector< double >( 0 ),
+                                                   *fitTemperature );
+      SplinePotential potentialApproximation( potentialFunction,
+                                              straightSplinePath,
+                                              resolutionOfDsbVacuum,
+                                              thresholdSeparationSquared );
+      BubbleProfile* bubbleProfile( actionCalculator( straightSplinePath,
+                                                    potentialApproximation ) );
       straightPathActions.push_back( bubbleProfile->bounceAction );
       delete bubbleProfile;
     }

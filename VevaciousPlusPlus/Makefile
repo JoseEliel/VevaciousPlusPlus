@@ -49,56 +49,58 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/ProductOfPolynomialSums.cpp \
  source/BasicFunctions/SimplePolynomial.cpp \
  source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
- source/BounceActionEvaluation/BounceActionCalculator.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialPerpendicularToPath.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
+ $(PATHPARAMETERIZATION)/TunnelPath.cpp \
+ source/BounceActionEvaluation/BounceActionCalculator.cpp \
  source/BounceActionEvaluation/BouncePathFinder.cpp \
  source/BounceActionEvaluation/BubbleProfile.cpp \
  source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
  source/BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.cpp \
  source/BounceActionEvaluation/OdeintBubbleDerivatives.cpp \
  source/BounceActionEvaluation/OdeintBubbleObserver.cpp \
- $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \
- $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
- $(PATHPARAMETERIZATION)/TunnelPath.cpp \
+ source/BounceActionEvaluation/OneDimensionalPotentialAlongPath.cpp \
  source/BounceActionEvaluation/SplinePotential.cpp \
- source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ source/BounceActionEvaluation/UndershootOvershootBubble.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
- source/PotentialEvaluation/ParameterFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
- source/PotentialEvaluation/PotentialFunction.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
+ source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ source/PotentialEvaluation/ParameterFunctionoid.cpp \
+ source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  source/SlhaManagement/RunningParameterManager.cpp \
  source/SlhaManagement/SlhaManager.cpp \
  source/SlhaManagement/SlhaUpdatePropagator.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/MinuitMinimum.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
+ $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \
  $(HOMOTOPYCONTINUATION)/PolynomialGradientTargetSystem.cpp \
- $(GRADIENTBASEDMINIMIZATION)/MinuitMinimum.cpp \
- $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
- $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  source/PotentialMinimization/GradientFromStartingPoints.cpp \
  source/PotentialMinimization/GradientMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
  source/PotentialMinimization/StartingPointFinder.cpp \
- source/TunnelingCalculation/BounceActionTunneler.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
+ source/TunnelingCalculation/BounceActionTunneler.cpp \
  source/TunnelingCalculation/TunnelingCalculator.cpp \
  source/VersionInformation.cpp \
  source/VevaciousPlusPlus.cpp

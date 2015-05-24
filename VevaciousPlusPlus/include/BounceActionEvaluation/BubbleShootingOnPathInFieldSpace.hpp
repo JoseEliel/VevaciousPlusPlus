@@ -26,7 +26,6 @@ namespace VevaciousPlusPlus
   public:
     BubbleShootingOnPathInFieldSpace(
                                     PotentialFunction const& potentialFunction,
-                                      size_t const numberOfPotentialSegments,
                                       double const lengthScaleResolution,
                                       size_t const shootAttempts );
     virtual ~BubbleShootingOnPathInFieldSpace();
@@ -62,13 +61,14 @@ namespace VevaciousPlusPlus
     virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
                                           BubbleProfile const& bubbleProfile,
                                  std::vector< std::string > const& fieldColors,
+                                 unsigned int const plotResolution,
+                                std::string const& gnuplotCommandIncludingPath,
                                        std::string const& plotFilename ) const;
 
 
   protected:
     static double const radiusDifferenceThreshold;
 
-    size_t const numberOfPotentialSegments;
     double const lengthScaleResolution;
     double radialStepSize;
     double estimatedRadialMaximum;
@@ -101,7 +101,7 @@ namespace VevaciousPlusPlus
                                             double const tunnelingTemperature )
   {
     // We estimate the maximum radius to be twice the length scale, and the
-    // step size to be lengthScaleResolution time the length scale.
+    // step size to be lengthScaleResolution times the length scale.
     estimatedRadialMaximum = ( 2.0 / std::max( tunnelingTemperature,
           sqrt( potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
                                                             trueVacuum ) ) ) );
