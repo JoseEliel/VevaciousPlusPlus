@@ -25,10 +25,11 @@
 #include "TunnelingCalculation/BounceActionTunneling/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinimizingPotentialOnBisections.hpp"
-#include "BounceActionEvaluation/BounceActionPathFinding/MinuitBetweenPaths.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPathNormalInertialPotential.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialOnParallelPlanes.hpp"
+#include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
-#include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
+#include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -58,10 +59,14 @@ namespace VevaciousPlusPlus
 
     virtual ~VevaciousPlusPlus();
 
+
+    // This runs the point parameterized in the given file.
     void RunPoint( std::string const& parameterFilename );
 
+    // This writes the results as an XML file.
     void WriteXmlResults( std::string const& xmlFilename );
 
+    // This writes the results as an SLHA file.
     void WriteSlhaResults( std::string const& slhaFilename,
                            bool const writeWarnings = true );
 
@@ -111,11 +116,13 @@ namespace VevaciousPlusPlus
                                        std::string& className,
                                        std::string& constructorArguments );
 
-    //
+    // This interprets the given string as the appropriate element of the
+    // TunnelingCalculator::TunnelingStrategy enum.
     static TunnelingCalculator::TunnelingStrategy
     InterpretTunnelingStrategy( std::string& tunnelingStrategy );
 
-    //
+    // This throws an exception if the survival probability threshold was
+    // outside the range for a valid probability.
     static void
     CheckSurvivalProbabilityThreshold( double survivalProbabilityThreshold );
 
@@ -141,51 +148,77 @@ namespace VevaciousPlusPlus
     PotentialMinimizer* SetUpPotentialMinimizer( std::string const& className,
                                      std::string const& constructorArguments );
 
-    //
+    // This decides on the derived class (based on GradientMinimizer) to use
+    // to minimize the potential and constructs it with the arguments parsed
+    // from constructorArguments.
     PotentialMinimizer*
     SetUpGradientFromStartingPoints( std::string const& constructorArguments );
 
-    //
+    // This parses arguments from constructorArguments and uses them to
+    // construct a Hom4ps2Runner instance to use to find starting points.
     StartingPointFinder*
     SetUpHom4ps2Runner( std::string const& constructorArguments );
 
-    //
+    // This parses arguments from constructorArguments and uses them to
+    // construct a MinuitPotentialMinimizer instance to use to minimize the
+    // potential from a set of starting points.
     GradientMinimizer*
     SetUpMinuitPotentialMinimizer( std::string const& constructorArguments );
 
-    //
+    // This decides on the derived class to use for ownedTunnelingCalculator
+    // and constructs it with the arguments parsed from constructorArguments.
     TunnelingCalculator*
     SetUpTunnelingCalculator( std::string const& className,
                               std::string const& constructorArguments );
 
-    //
+    // This parses arguments from constructorArguments and uses them to
+    // construct a CosmoTransitionsRunner instance to use to calculate the
+    // tunneling from the DSB vacuum to the panic vacuum, if possible.
     TunnelingCalculator*
     SetUpCosmoTransitionsRunner( std::string const& constructorArguments );
 
-    //
+    // This parses arguments from constructorArguments and uses them to
+    // construct a BounceAlongPathWithThreshold instance to use to calculate
+    // the tunneling from the DSB vacuum to the panic vacuum, if possible.
     TunnelingCalculator* SetUpBounceAlongPathWithThreshold(
                                      std::string const& constructorArguments );
 
-    //
-    BouncePathFinder* SetUpBouncePathFinder( std::string const& className,
+    // This parses the XMl of tunnelPathFinders to construct a set of
+    // BouncePathFinder instances, filling pathFinders with pointers to them.
+    void SetUpBouncePathFinders( std::string const& tunnelPathFinders,
+                               std::vector< BouncePathFinder* >& pathFinders );
+
+    // This parses arguments from constructorArguments and uses them to
+    // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
+    // extremize the bounce action.
+    BouncePathFinder* CreateMinuitOnPotentialOnParallelPlanes(
                                      std::string const& constructorArguments );
 
-    //
-    BouncePathFinder* SetUpMinimizingPotentialOnBisections(
+    // This parses arguments from constructorArguments and uses them to
+    // construct a MinuitOnPotentialPerpendicularToPath instance to use to try
+    // to extremize the bounce action.
+    BouncePathFinder* CreateMinuitOnPotentialPerpendicularToPath(
                                      std::string const& constructorArguments );
 
-    //
-    MinuitBetweenPaths* SetUpPathRefiner( std::string const& className,
+    // This parses arguments from constructorArguments and uses them to
+    // construct a MinuitOnPathNormalInertialPotential instance to use to try
+    // to extremize the bounce action.
+    BouncePathFinder* CreateMinuitOnPathNormalInertialPotential(
                                      std::string const& constructorArguments );
 
-    //
+    // This decides on the derived class (based on BounceActionCalculator) to use
+    // to extremize the bounce action to use to calculate the tunneling
+    // probability and constructs it with the arguments parsed from
+    // constructorArguments.
     BounceActionCalculator*
     SetUpBounceActionCalculator( std::string const& className,
                                  std::string const& constructorArguments );
 
-    //
-    BounceActionCalculator*
-    SetUpBubbleShootingOnSpline( std::string const& constructorArguments );
+    // This parses arguments from constructorArguments and uses them to
+    // construct a BubbleShootingOnPathInFieldSpace instance to use to calculate
+    // the bounce action on given paths.
+    BounceActionCalculator* SetUpBubbleShootingOnPathInFieldSpace(
+                                     std::string const& constructorArguments );
   };
 
 
@@ -261,7 +294,8 @@ namespace VevaciousPlusPlus
     }
   }
 
-  //
+  // This throws an exception if the survival probability threshold was outside
+  // the range for a valid probability.
   inline void VevaciousPlusPlus::CheckSurvivalProbabilityThreshold(
                                           double survivalProbabilityThreshold )
   {
@@ -300,7 +334,8 @@ namespace VevaciousPlusPlus
     return ownedPotentialMinimizer;
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to construct
+  // a Hom4ps2Runner instance to use to find starting points.
   inline StartingPointFinder* VevaciousPlusPlus::SetUpHom4ps2Runner(
                                       std::string const& constructorArguments )
   {
@@ -325,7 +360,8 @@ namespace VevaciousPlusPlus
                               homotopyType );
   }
 
-  //
+  // This decides on the derived class to use for ownedTunnelingCalculator and
+  // constructs it with the arguments parsed from constructorArguments.
   inline TunnelingCalculator* VevaciousPlusPlus::SetUpTunnelingCalculator(
                                                   std::string const& className,
                                       std::string const& constructorArguments )
@@ -352,56 +388,26 @@ namespace VevaciousPlusPlus
     return ownedTunnelingCalculator;
   }
 
-  //
-  inline BouncePathFinder* VevaciousPlusPlus::SetUpBouncePathFinder(
-                                                  std::string const& className,
-                                      std::string const& constructorArguments )
-  {
-    if( className.compare( "MinimizingPotentialOnBisections" ) == 0 )
-    {
-      return SetUpMinimizingPotentialOnBisections( constructorArguments );
-    }
-    else
-    {
-      std::stringstream errorStream;
-      errorStream
-      << "<TunnelPathFinder> was not a recognized form! The only type"
-      << " currently valid is \"MinimizingPotentialOnBisections\".";
-      throw std::runtime_error( errorStream.str() );
-    }
-  }
-
-  //
+  // This decides on the derived class (based on BounceActionCalculator) to use
+  // to extremize the bounce action to use to calculate the tunneling
+  // probability and constructs it with the arguments parsed from
+  // constructorArguments.
   inline BounceActionCalculator*
   VevaciousPlusPlus::SetUpBounceActionCalculator( std::string const& className,
                                       std::string const& constructorArguments )
   {
-    if( className.compare( "BubbleShootingOnSpline" ) == 0 )
+    if( className.compare( "BubbleShootingOnPathInFieldSpace" ) == 0 )
     {
-      return SetUpBubbleShootingOnSpline( constructorArguments );
+      return SetUpBubbleShootingOnPathInFieldSpace( constructorArguments );
     }
     else
     {
       std::stringstream errorStream;
       errorStream
       << "<BouncePotentialFit> was not a recognized form! The only type"
-      << " currently valid is \"BubbleShootingOnSpline\".";
+      << " currently valid is \"BubbleShootingOnPathInFieldSpace\".";
       throw std::runtime_error( errorStream.str() );
     }
-  }
-
-  //
-  inline MinuitBetweenPaths* VevaciousPlusPlus::SetUpPathRefiner(
-                                                  std::string const& className,
-                                      std::string const& constructorArguments )
-  {
-    // placeholder:
-    /**/std::cout << std::endl
-    << "Placeholder: "
-    << "VevaciousPlusPlus::SetUpPathRefiner( \"" << className << "\", \""
-    << constructorArguments << "\" ) returning NULL.";
-    std::cout << std::endl;
-    return NULL;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

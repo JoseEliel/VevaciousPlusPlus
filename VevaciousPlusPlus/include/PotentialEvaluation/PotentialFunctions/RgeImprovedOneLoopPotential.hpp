@@ -25,6 +25,7 @@ namespace VevaciousPlusPlus
     RgeImprovedOneLoopPotential( std::string const& modelFilename,
                                  double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                             RunningParameterManager& runningParameterManager );
     RgeImprovedOneLoopPotential(
     PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );

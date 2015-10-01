@@ -45,7 +45,7 @@ namespace VevaciousPlusPlus
 
 
     // This returns true if any element of minuitParameterization appears to be
-    // a NAN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
+    // a NaN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
     bool NanParameterFromMinuit(
                    std::vector< double > const& minuitParameterization ) const;
   };
@@ -54,7 +54,7 @@ namespace VevaciousPlusPlus
 
 
   // This returns true if any element of minuitParameterization appears to be
-  // a NAN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
+  // a NaN by simultaneously being not >= 0.0 and not < 0.0, false otherwise.
   inline bool MinuitPathFinder::NanParameterFromMinuit(
                     std::vector< double > const& minuitParameterization ) const
   {

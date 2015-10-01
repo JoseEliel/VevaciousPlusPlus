@@ -25,7 +25,8 @@ namespace VevaciousPlusPlus
     BounceActionTunneler( PotentialFunction& potentialFunction,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                           double const survivalProbabilityThreshold,
-                          size_t const temperatureAccuracy );
+                          size_t const temperatureAccuracy,
+                          double const vacuumSeparationFraction );
     virtual ~BounceActionTunneler();
 
 
@@ -55,9 +56,10 @@ namespace VevaciousPlusPlus
     std::pair< double, double > rangeOfMaxTemperatureForOriginToTrue;
 
     MinuitPotentialMinimizer thermalPotentialMinimizer;
-    PotentialMinimum evaporationMinimum;
-    PotentialMinimum criticalMinimum;
-    bool criticalRatherThanEvaporation;
+    // PotentialMinimum evaporationMinimum;
+    // PotentialMinimum criticalMinimum;
+    // bool criticalRatherThanEvaporation;
+    double const vacuumSeparationFractionSquared;
 
 
     // This is a hook to allow for derived classes to prepare things common to
@@ -72,7 +74,7 @@ namespace VevaciousPlusPlus
     // tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 double const tunnelingTemperature ) const = 0;
+                                 double const tunnelingTemperature ) = 0;
 
     // This sets quantumSurvivalProbability, quantumLifetimeInSeconds, and
     // logOfMinusLogOfQuantumProbability appropriately.

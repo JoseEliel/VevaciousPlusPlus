@@ -1,85 +1,59 @@
 /*
- * BubbleShootingOnSpline.cpp
+ * BubbleShootingOnPathInFieldSpace.cpp
  *
  *  Created on: Jul 1, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "BounceActionEvaluation/BubbleShootingOnSpline.hpp"
+#include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 
 namespace VevaciousPlusPlus
 {
-  double const BubbleShootingOnSpline::radiusDifferenceThreshold( 0.01 );
+  double const
+  BubbleShootingOnPathInFieldSpace::radiusDifferenceThreshold( 0.01 );
 
-  BubbleShootingOnSpline::BubbleShootingOnSpline(
+  BubbleShootingOnPathInFieldSpace::BubbleShootingOnPathInFieldSpace(
                                     PotentialFunction const& potentialFunction,
-                                        size_t const numberOfPotentialSegments,
                                             double const lengthScaleResolution,
                                                  size_t const shootAttempts ) :
     BounceActionCalculator( potentialFunction ),
-    numberOfPotentialSegments( numberOfPotentialSegments ),
     lengthScaleResolution( lengthScaleResolution ),
-    radialStepSize( NAN ),
-    estimatedRadialMaximum( NAN ),
+    radialStepSize( -1.0 ),
+    estimatedRadialMaximum( -1.0 ),
     shootAttempts( shootAttempts ),
     auxiliaryThreshold( 1.0E-6 )
   {
     // This constructor is just an initialization list.
   }
 
-  BubbleShootingOnSpline::~BubbleShootingOnSpline()
+  BubbleShootingOnPathInFieldSpace::~BubbleShootingOnPathInFieldSpace()
   {
     // This does nothing.
   }
 
 
-  // This sets up the bubble profile, numerically integrates the bounce
-  // action over it, and then returns the bounce action along the path given
-  // by tunnelPath. Either S_4, the dimensionless quantum bounce action
-  // integrated over four dimensions, or S_3(T), the dimensionful (in GeV)
-  // thermal bounce action integrated over three dimensions at temperature T,
-  // should be returned: S_3(T) if the temperature T given by tunnelPath is
-  // greater than 0.0, S_4 otherwise.
-  double
-  BubbleShootingOnSpline::operator()( TunnelPath const& tunnelPath ) const
+  // This sets up the bubble profile, numerically integrates the bounce action
+  // over it, and then returns the bubble profile with calculated bounce action
+  // along the path given by tunnelPath. Either S_4, the dimensionless quantum
+  // bounce action integrated over four dimensions, or S_3(T), the dimensionful
+  // (in GeV) thermal bounce action integrated over three dimensions at
+  // temperature T, is calculated: S_3(T) if the temperature T given by
+  // tunnelPath is greater than 0.0, S_4 otherwise.
+  BubbleProfile*
+  BubbleShootingOnPathInFieldSpace::operator()( TunnelPath const& tunnelPath,
+                  OneDimensionalPotentialAlongPath const& pathPotential ) const
   {
-    SplinePotential potentialApproximation( potentialFunction,
-                                            tunnelPath,
-                                            numberOfPotentialSegments );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "potentialApproximation =" << std::endl;
-    std::cout << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;*/
-
-    if( !(potentialApproximation.EnergyBarrierResolved()) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! No energy barrier, so returning a bounce action of 0.";
-      std::cout << std::endl;
-      return 0.0;
-    }
-    if( !(potentialApproximation.TrueVacuumLowerThanPathFalseMinimum()) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! True vacuum not lower than path false vacuum, so bounce"
-      << " configuration cannot be plotted.";
-      std::cout << std::endl;
-      return std::numeric_limits< double >::max();
-    }
+    UndershootOvershootBubble*
+    bubbleProfile( new UndershootOvershootBubble( radialStepSize,
+                                                  estimatedRadialMaximum,
+                                                  shootAttempts,
+                                                  auxiliaryThreshold ) );
+    bubbleProfile->CalculateProfile( tunnelPath,
+                                     pathPotential );
 
     bool const nonZeroTemperature( tunnelPath.NonZeroTemperature() );
-    BubbleProfile bubbleProfile( potentialApproximation,
-                                 tunnelPath,
-                                 radialStepSize,
-                                 estimatedRadialMaximum );
     std::vector< BubbleRadialValueDescription > const&
-    auxiliaryProfile( bubbleProfile( shootAttempts,
-                                     auxiliaryThreshold ) );
+    auxiliaryProfile( bubbleProfile->AuxiliaryProfile() );
 
     // We have a set of radial values r_i, path auxiliary values p(r_i), and
     // slopes dp/dr|_{r=r_i}, and can easily evaluate a set of "bounce action
@@ -138,10 +112,9 @@ namespace VevaciousPlusPlus
     // common factor of 0.5 * [solid angle] being left until after the loop.
     double
     bounceAction( ( currentVolume
-                    * potentialApproximation(
-                                    bubbleProfile.AuxiliaryAtBubbleCenter() ) )
+                  * pathPotential( bubbleProfile->AuxiliaryAtBubbleCenter() ) )
                   + ( nextVolume
-                      * ( BounceActionDensity( potentialApproximation,
+                      * ( BounceActionDensity( pathPotential,
                                                tunnelPath,
                                               auxiliaryProfile.front() ) ) ) );
 
@@ -150,9 +123,9 @@ namespace VevaciousPlusPlus
     << std::endl
     << "Before loop: currentRadius = " << currentRadius << ", currentVolume = "
     << currentVolume << ", nextRadius = " << nextRadius << ", nextVolume = "
-    << nextVolume << ", p(0) = " << bubbleProfile.AuxiliaryAtBubbleCenter()
+    << nextVolume << ", p(0) = " << bubbleProfile->AuxiliaryAtBubbleCenter()
     << ", B_{-1} = "
-    << potentialApproximation( bubbleProfile.AuxiliaryAtBubbleCenter() )
+    << potentialApproximation( bubbleProfile->AuxiliaryAtBubbleCenter() )
     << ", B_{0} = " << BounceActionDensity( potentialApproximation,
                                             tunnelPath,
                                             auxiliaryProfile.front() )
@@ -199,7 +172,7 @@ namespace VevaciousPlusPlus
           > ( radiusDifferenceThreshold * currentRadius ) )
       {
         bounceAction
-        += ( BounceActionDensity( potentialApproximation,
+        += ( BounceActionDensity( pathPotential,
                                   tunnelPath,
                                   auxiliaryProfile[ radiusIndex ] )
             * ( nextVolume - previousVolume ) );
@@ -212,7 +185,7 @@ namespace VevaciousPlusPlus
           currentArea *= currentRadius;
         }
         bounceAction
-        += ( BounceActionDensity( potentialApproximation,
+        += ( BounceActionDensity( pathPotential,
                                   tunnelPath,
                                   auxiliaryProfile[ radiusIndex ] )
              * ( nextRadius - previousRadius )
@@ -231,7 +204,7 @@ namespace VevaciousPlusPlus
     double kineticTerm( auxiliaryProfile.back().auxiliarySlope );
     kineticTerm *= ( 0.5 * kineticTerm
                          * tunnelPath.SlopeSquared( currentAuxiliary ) );
-    double const potentialTerm( potentialApproximation( currentAuxiliary ) );
+    double const potentialTerm( pathPotential( currentAuxiliary ) );
     if( ( nextRadius - currentRadius )
         > ( radiusDifferenceThreshold * currentRadius ) )
     {
@@ -286,8 +259,8 @@ namespace VevaciousPlusPlus
     // (All solutions found with Mathematica 8.)
 
     // This is b in the mathematics above.
-    double const inverseScale(
-              sqrt( potentialApproximation.SecondDerivativeAtFalseVacuum() ) );
+    double const
+    inverseScale( sqrt( pathPotential.SecondDerivativeAtFalseVacuum() ) );
     double const scaledRadius( inverseScale * nextRadius );
 
     // debugging:
@@ -342,13 +315,17 @@ namespace VevaciousPlusPlus
     // 2 pi^2 (quantum) or 4 pi (thermal):
     if( nonZeroTemperature )
     {
-      return ( bounceAction * 2.0 * boost::math::double_constants::pi );
+      bubbleProfile->bounceAction = ( bounceAction
+                                      * 2.0
+                                      * boost::math::double_constants::pi );
     }
     else
     {
-      return ( bounceAction * boost::math::double_constants::pi
-                            * boost::math::double_constants::pi );
+      bubbleProfile->bounceAction = ( bounceAction
+                                      * boost::math::double_constants::pi
+                                      * boost::math::double_constants::pi );
     }
+    return bubbleProfile;
   }
 
   // This plots the fields as functions of the bubble radial value in a file
@@ -356,63 +333,22 @@ namespace VevaciousPlusPlus
   // given by fieldColors: the field with index i is plotted in the color
   // given by fieldColors[ i ]. An empty string indicates that the field
   // should not be plotted.
-  void BubbleShootingOnSpline::PlotBounceConfiguration(
+  void BubbleShootingOnPathInFieldSpace::PlotBounceConfiguration(
                                                   TunnelPath const& tunnelPath,
+                                            BubbleProfile const& bubbleProfile,
                                  std::vector< std::string > const& fieldColors,
+                                             unsigned int const plotResolution,
+                                std::string const& gnuplotCommandIncludingPath,
                                         std::string const& plotFilename ) const
   {
-    SplinePotential potentialApproximation( potentialFunction,
-                                            tunnelPath,
-                                            numberOfPotentialSegments );
-    if( !(potentialApproximation.EnergyBarrierResolved()) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! No energy barrier, so bounce configuration cannot be"
-      << " plotted.";
-      std::cout << std::endl;
-      return;
-    }
-    if( !(potentialApproximation.TrueVacuumLowerThanPathFalseMinimum()) )
-    {
-      std::cout
-      << std::endl
-      << "Warning! True vacuum not lower than path false vacuum, so bounce"
-      << " configuration cannot be plotted.";
-      std::cout << std::endl;
-      return;
-    }
-    BubbleProfile bubbleProfile( potentialApproximation,
-                                 tunnelPath,
-                                 radialStepSize,
-                                 estimatedRadialMaximum );
-    std::vector< BubbleRadialValueDescription > const&
-    auxiliaryProfile( bubbleProfile( shootAttempts,
-                                     auxiliaryThreshold ) );
-    BOL::TwoDimensionalDataPlotter bubblePlotter( "/opt/local/bin/gnuplot",
+    BOL::TwoDimensionalDataPlotter bubblePlotter( gnuplotCommandIncludingPath,
                                                   plotFilename );
-
     std::cout << std::endl
-    << "Path parameterized as:" << std::endl
+    << "Field-space path parameterized as:" << std::endl
     << tunnelPath.AsDebuggingString();
-    std::cout << std::endl
-    << "Potential parameterized as:" << std::endl
-    << potentialApproximation.AsDebuggingString();
-    std::cout << std::endl;
-    std::cout << "Bubble profile:" << std::endl;
-    for( std::vector< BubbleRadialValueDescription >::const_iterator
-         bubbleBit( auxiliaryProfile.begin() );
-         bubbleBit < auxiliaryProfile.end();
-         ++bubbleBit )
-    {
-      std::cout << "r = " << bubbleBit->radialValue << ", p = "
-      << bubbleBit->auxiliaryValue << ", dp/dr = " << bubbleBit->auxiliarySlope
-      << ", "
-      << tunnelPath.FieldsString( bubbleBit->auxiliaryValue )
-      << std::endl;
-    }
     std::cout << std::endl;
 
+    std::cout << std::endl;
     size_t numberOfPlottedFields( std::min( fieldColors.size(),
                                 potentialFunction.NumberOfFieldVariables() ) );
     BOL::TwoDimensionalDataPlotter::PlotDataVector plotData;
@@ -425,7 +361,7 @@ namespace VevaciousPlusPlus
       {
         fieldData.second.first.assign( fieldColors[ fieldIndex ] );
         fieldData.second.second.assign(
-                                potentialFunction.FieldNames()[ fieldIndex ] );
+            potentialFunction.FieldNames()[ fieldIndex ] );
         plotData.push_back( fieldData );
       }
     }
@@ -433,12 +369,14 @@ namespace VevaciousPlusPlus
     std::vector< double >
     fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
     for( size_t radiusIndex( 0 );
-         radiusIndex < auxiliaryProfile.size();
+         radiusIndex < plotResolution;
          ++radiusIndex )
     {
-      double const radialValue( auxiliaryProfile[ radiusIndex ].radialValue );
+      double const
+      radialValue( ( radiusIndex * bubbleProfile.MaximumPlotRadius() )
+                   / static_cast< double >( plotResolution ) );
       tunnelPath.PutOnPathAt( fieldConfiguration,
-                              auxiliaryProfile[ radiusIndex ].auxiliaryValue );
+                              bubbleProfile.AuxiliaryAt( radialValue ) );
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfPlottedFields;
            ++fieldIndex )

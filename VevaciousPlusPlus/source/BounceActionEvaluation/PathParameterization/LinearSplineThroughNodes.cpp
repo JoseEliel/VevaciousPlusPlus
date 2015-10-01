@@ -18,7 +18,7 @@ namespace VevaciousPlusPlus
                 pathParameterization,
                 pathTemperature ),
     pathSegments( pathNodes.size() - 1 ),
-    slopeSquared( NAN )
+    slopeSquared( -1.0 )
   {
     // debugging:
     /*std::cout << std::endl << "debugging:"

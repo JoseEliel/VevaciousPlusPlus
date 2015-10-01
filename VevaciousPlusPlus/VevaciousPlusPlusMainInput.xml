@@ -18,7 +18,14 @@
   <InitializationFile>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml -->
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauStop.xml -->
+<<<<<<< HEAD
   /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml
+=======
+  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml -->
+  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStau.xml -->
+  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauMuSnu.xml -->
+  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStau.xml
+>>>>>>> 5cc445dddf824e23906df096e140cbbbd18f1a8b
   </InitializationFile>
   
   <slha>

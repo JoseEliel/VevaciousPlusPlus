@@ -9,6 +9,7 @@
 #define TUNNELPATH_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
 {
@@ -33,6 +34,11 @@ namespace VevaciousPlusPlus
     // This should fill fieldConfiguration with the values that the fields
     // should have when the path auxiliary is given by auxiliaryValue.
     virtual void PutOnPathAt( std::vector< double >& fieldConfiguration,
+                              double const auxiliaryValue ) const = 0;
+
+    // This should fill fieldConfiguration with the values that the fields
+    // should have when the path auxiliary is given by auxiliaryValue.
+    virtual void PutOnPathAt( Eigen::VectorXd& fieldConfiguration,
                               double const auxiliaryValue ) const = 0;
 
     // This should return the dot product with itself of the derivative of the

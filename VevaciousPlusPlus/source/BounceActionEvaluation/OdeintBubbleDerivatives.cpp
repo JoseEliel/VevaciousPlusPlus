@@ -11,15 +11,15 @@ namespace VevaciousPlusPlus
 {
 
   OdeintBubbleDerivatives::OdeintBubbleDerivatives(
-                                          SplinePotential const& pathPotential,
+                         OneDimensionalPotentialAlongPath const& pathPotential,
                                                TunnelPath const& tunnelPath ) :
     pathPotential( pathPotential ),
     tunnelPath( tunnelPath ),
-    dampingFactor( 3 )
+    dampingFactor( 3.0 )
   {
     if( tunnelPath.NonZeroTemperature() )
     {
-      dampingFactor = 2;
+      dampingFactor = 2.0;
     }
   }
 

@@ -11,8 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   BouncePathFinder::BouncePathFinder() :
-    pathTemperature( 0.0 ),
-    pathCanBeImproved( true )
+    pathTemperature( 0.0 )
   {
     // This constructor is just an initialization list.
   }

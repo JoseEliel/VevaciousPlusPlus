@@ -14,19 +14,22 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                                           double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
                                       scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                      assumedPositiveOrNegativeTolerance,
                                       runningParameterManager ),
-    logarithmOfMinimumRenormalizationScale( NAN ),
-    logarithmOfMaximumRenormalizationScale( NAN ),
+    logarithmOfMinimumRenormalizationScale( 0.0 ),
+    logarithmOfMaximumRenormalizationScale( 0.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,
                                       fieldsAssumedPositive,
                                       fieldsAssumedNegative,
-                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                      assumedPositiveOrNegativeTolerance )
   {
     // This constructor is just an initialization list.
   }
@@ -43,7 +46,8 @@ namespace VevaciousPlusPlus
                                       *this,
                                       fieldsAssumedPositive,
                                       fieldsAssumedNegative,
-                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                      assumedPositiveOrNegativeTolerance )
   {
     // This constructor is just an initialization list.
   }

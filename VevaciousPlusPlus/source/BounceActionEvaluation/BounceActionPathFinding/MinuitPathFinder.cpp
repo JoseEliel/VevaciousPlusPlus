@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
     ROOT::Minuit2::FCNBase(),
     minuitStrategy( minuitStrategy ),
     minuitToleranceFraction( minuitToleranceFraction ),
-    currentMinuitTolerance( NAN )
+    currentMinuitTolerance( -1.0 )
   {
     // This constructor is just an initialization list.
   }

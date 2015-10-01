@@ -76,16 +76,19 @@ namespace VevaciousPlusPlus
                                           PotentialFunction& potentialFunction,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
-                                           size_t const temperatureAccuracy ) :
+                                              size_t const temperatureAccuracy,
+                                      double const vacuumSeparationFraction ) :
     TunnelingCalculator( potentialFunction,
                          tunnelingStrategy,
                          survivalProbabilityThreshold ),
     potentialFunction( potentialFunction ),
     temperatureAccuracy( temperatureAccuracy ),
     thermalPotentialMinimizer( potentialFunction ),
-    evaporationMinimum(),
-    criticalMinimum(),
-    criticalRatherThanEvaporation( true )
+    // evaporationMinimum(),
+    // criticalMinimum(),
+    // criticalRatherThanEvaporation( true ),
+    vacuumSeparationFractionSquared( vacuumSeparationFraction
+                                     * vacuumSeparationFraction )
   {
     // This constructor is just an initialization list.
   }

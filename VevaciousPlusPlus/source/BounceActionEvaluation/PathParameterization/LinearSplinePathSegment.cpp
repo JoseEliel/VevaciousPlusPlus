@@ -43,7 +43,7 @@ namespace VevaciousPlusPlus
     numberOfFields( 0 ),
     fieldConstants(),
     fieldLinears(),
-    segmentAuxiliaryLength( NAN )
+    segmentAuxiliaryLength( -1.0 )
   {
     // This constructor is just an initialization list.
   }

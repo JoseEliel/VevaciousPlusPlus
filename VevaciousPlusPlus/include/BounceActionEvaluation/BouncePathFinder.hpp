@@ -11,6 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "PathParameterization/TunnelPath.hpp"
+#include "BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -22,41 +23,42 @@ namespace VevaciousPlusPlus
     virtual ~BouncePathFinder();
 
 
-    // This should reset the BouncePathFinder and return a pointer to an
-    // initial path between the given vacua, and the management of this memory
-    // is entirely up to the calling code (if we allowed ourselves to require a
-    // C++11-compliant compiler, this function would return a
-    // unique_ptr< TunnelPath >). It should also reset
-    // pathCanBeImproved and set pathTemperature appropriately.
-    virtual TunnelPath const*
-    SetInitialPath( PotentialMinimum const& falseVacuum,
-                    PotentialMinimum const& trueVacuum,
-                    double const pathTemperature = 0.0 ) = 0;
+    // This should reset the BouncePathFinder and set pathTemperature
+    // appropriately.
+    virtual void SetVacuaAndTemperature( PotentialMinimum const& falseVacuum,
+                                         PotentialMinimum const& trueVacuum,
+                                      double const pathTemperature = 0.0 ) = 0;
 
-    // This returns true if the last reset or path improvement did not meet
-    // the criterion the derived class has that the path cannot be improved any
-    // more.
-    bool PathCanBeImproved() const{ return pathCanBeImproved; }
+    // This should prompt the derived class instance to assess whether the path
+    // can be improved based on the bubble profile which resulted from the last
+    // call of TryToImprovePath (or from the path given by a previous
+    // BouncePathFinder instance), and return true if it might be improved.
+    // Internal variables in the derived class should take care of noticing if
+    // this object had not yet had its TryToImprovePath called or what the
+    // bounce action previous to that given by bubbleFromLastPath is, if
+    // relevant to the decision.
+    virtual bool
+    PathCanBeImproved( BubbleProfile const& bubbleFromLastPath ) = 0;
 
     // This should adjust the internal representation of the path towards
     // extremizing the bounce action, ideally in an incremental manner so that
     // the process can be broken off early if it is going to be the case that
     // the survival probability will be lower than a threshold, and return a
-    // TunnelPath* for this path (if we allowed ourselves to require a
-    // C++11-compliant compiler, this function would return a
+    // TunnelPath const* for this path (if we allowed ourselves to require a
+    // C++11-compliant compiler, this function would return a const
     // unique_ptr< TunnelPath >). The overshoot/undershoot algorithm along the
     // path should ensure that the bounce action calculated on the path is an
-    // upper bound on the bounce action at the desired extremum. Whether or not
-    // the last call managed to lower the bounce action or not is given by
-    // lastImprovementWorked, which might be used to decide whether to change
-    // path improvement strategy internally in derived classes.
-    virtual TunnelPath const*
-    TryToImprovePath( bool const lastImprovementWorked = true ) = 0;
+    // upper bound on the bounce action at the desired extremum. The bubble
+    // profile from the last path is provided in addition for strategies that
+    // rely on the radial dependence of the path auxiliary being approximated
+    // reasonably by that of the previous path, similarly to the strategy used
+    // by CosmoTransitions.
+    virtual TunnelPath const* TryToImprovePath( TunnelPath const& lastPath,
+                                 BubbleProfile const& bubbleFromLastPath ) = 0;
 
 
   protected:
     double pathTemperature;
-    bool pathCanBeImproved;
   };
 
 } /* namespace VevaciousPlusPlus */

@@ -10,6 +10,10 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/BubbleProfile.hpp"
+#include "BounceActionEvaluation/OneDimensionalPotentialAlongPath.hpp"
 #include "../BounceActionTunneler.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
@@ -23,20 +27,22 @@ namespace VevaciousPlusPlus
   {
   public:
     BounceAlongPathWithThreshold( PotentialFunction& potentialFunction,
-                                  BouncePathFinder* const pathFinder,
+                           std::vector< BouncePathFinder* > const& pathFinders,
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold,
-                                  size_t const thermalIntegrationResolution,
-                                  size_t const temperatureAccuracy );
+                               unsigned int const thermalIntegrationResolution,
+                                  unsigned int const temperatureAccuracy,
+                                  unsigned int const pathPotentialResolution,
+                                  double const vacuumSeparationFraction );
     virtual ~BounceAlongPathWithThreshold();
 
 
   protected:
-    BouncePathFinder* pathFinder;
+    std::vector< BouncePathFinder* > pathFinders;
     BounceActionCalculator* actionCalculator;
-    size_t thermalIntegrationResolution;
-
+    unsigned int thermalIntegrationResolution;
+    unsigned int const pathPotentialResolution;
 
     // This returns either the dimensionless bounce action integrated over four
     // dimensions (for zero temperature) or the dimensionful bounce action
@@ -47,10 +53,10 @@ namespace VevaciousPlusPlus
     // assumed to already be the minima at tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 double const tunnelingTemperature ) const;
+                                 double const tunnelingTemperature );
 
-    // This sets thermalSurvivalProbability by numerically integrating from the
-    // critical temperature for tunneling to be possible down to T = 0 unless
+    // This sets thermalSurvivalProbability by numerically integrating up to
+    // the critical temperature for tunneling to be possible from T = 0 unless
     // the integral already passes a threshold, and sets
     // dominantTemperatureInGigaElectronVolts to be the temperature with the
     // lowest survival probability.
@@ -69,7 +75,8 @@ namespace VevaciousPlusPlus
     double BoundedBounceAction( PotentialMinimum const& falseVacuum,
                                 PotentialMinimum const& trueVacuum,
                                 double const tunnelingTemperature,
-                                double const actionThreshold ) const;
+                                double const actionThreshold,
+                                double const requiredVacuumSeparationSquared );
   };
 
 
@@ -85,19 +92,19 @@ namespace VevaciousPlusPlus
   inline double BounceAlongPathWithThreshold::BounceAction(
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
-                                      double const tunnelingTemperature ) const
+                                            double const tunnelingTemperature )
   {
     double actionThreshold( lnOfThermalIntegrationFactor );
-    // We assume that the threshold should be the na•ve threshold for thermal
+    // We assume that the threshold should be the naive threshold for thermal
     // tunneling, and then take the T = 0 version if the temperature is not a
-    // valid temperature (i.e. we treat T < 0 and T "= NAN" as T = 0.0).
+    // valid temperature (i.e. we treat T < 0 and T "= NaN" as T = 0.0).
     if( !(tunnelingTemperature > 0.0 ) )
     {
       double const squareRootOfSolitonicFactor(
                 potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
                                                                 trueVacuum ) );
       double const solitonicFactorTimesFourVolume( squareRootOfSolitonicFactor
-                                                 * squareRootOfSolitonicFactor
+                                                  * squareRootOfSolitonicFactor
                                     * fourVolumeOfKnownUniverseOverGevFourth );
       actionThreshold = ( log( -solitonicFactorTimesFourVolume
                                / log( survivalProbabilityThreshold ) ) );
@@ -105,7 +112,9 @@ namespace VevaciousPlusPlus
     return BoundedBounceAction( falseVacuum,
                                 trueVacuum,
                                 tunnelingTemperature,
-                                actionThreshold );
+                                actionThreshold,
+                               ( vacuumSeparationFractionSquared
+                              * falseVacuum.SquareDistanceTo( trueVacuum ) ) );
   }
 
 } /* namespace VevaciousPlusPlus */

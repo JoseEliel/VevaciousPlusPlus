@@ -9,6 +9,7 @@
 #define LINEARSPLINETHROUGHNODES_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Eigen/Dense"
 #include "TunnelPath.hpp"
 #include "LinearSplinePathSegment.hpp"
 
@@ -27,8 +28,13 @@ namespace VevaciousPlusPlus
 
     // This fills fieldConfiguration with the values that the fields
     // should have when the path auxiliary is given by auxiliaryValue.
-    void PutOnPathAt( std::vector< double >& fieldConfiguration,
-                      double const auxiliaryValue ) const;
+    virtual void PutOnPathAt( std::vector< double >& fieldConfiguration,
+                              double const auxiliaryValue ) const;
+
+    // This fills fieldConfiguration with the values that the fields
+    // should have when the path auxiliary is given by auxiliaryValue.
+    virtual void PutOnPathAt( Eigen::VectorXd& fieldConfiguration,
+                              double const auxiliaryValue ) const;
 
     // This returns the dot product with itself of the derivative of the
     // field vector with respect to the path auxiliary evaluated at
@@ -70,6 +76,30 @@ namespace VevaciousPlusPlus
   // should have when the path auxiliary is given by auxiliaryValue.
   inline void LinearSplineThroughNodes::PutOnPathAt(
                                      std::vector< double >& fieldConfiguration,
+                                            double const auxiliaryValue ) const
+  {
+    size_t segmentIndex( 0 );
+    double segmentAuxiliary( auxiliaryValue );
+    while( ( segmentIndex < ( pathSegments.size() - 1 ) )
+           &&
+           ( segmentAuxiliary
+             > pathSegments[ segmentIndex ].SegmentLength() ) )
+    {
+      segmentAuxiliary -= pathSegments[ segmentIndex ].SegmentLength();
+      ++segmentIndex;
+    }
+    // At this point, either we found the segment which contains the
+    // auxiliary point, or segmentIndex = ( pathSegments.size() - 1 ), so the
+    // last segment. Auxiliary values outside the range get put on the
+    // extensions of the first or last segment appropriately.
+    pathSegments[ segmentIndex ].PutOnSegment( fieldConfiguration,
+                                               segmentAuxiliary );
+  }
+
+  // This fills fieldConfiguration with the values that the fields
+  // should have when the path auxiliary is given by auxiliaryValue.
+  inline void LinearSplineThroughNodes::PutOnPathAt(
+                                           Eigen::VectorXd& fieldConfiguration,
                                             double const auxiliaryValue ) const
   {
     size_t segmentIndex( 0 );

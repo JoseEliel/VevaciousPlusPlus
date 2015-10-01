@@ -9,12 +9,16 @@
 #define COSMOTRANSITIONSRUNNER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "limits"
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialEvaluation/PotentialFunctions/IWritesPythonPotential.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
+#include "BounceActionEvaluation/BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -31,7 +35,8 @@ namespace VevaciousPlusPlus
                             size_t const resolutionOfDsbVacuum,
                             size_t const maxInnerLoops,
                             size_t const maxOuterLoops,
-                            size_t const thermalStraightPathFitResolution );
+                            size_t const thermalStraightPathFitResolution,
+                            double const vacuumSeparationFraction );
     virtual ~CosmoTransitionsRunner();
 
 
@@ -61,7 +66,7 @@ namespace VevaciousPlusPlus
     // are assumed to already be the minima at tunnelingTemperature.
     virtual double BounceAction( PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
-                                 double const tunnelingTemperature ) const;
+                                 double const tunnelingTemperature );
 
     // This calculates the evaporation and critical temperatures, then writes
     // and runs a Python program using the potential from
@@ -73,6 +78,37 @@ namespace VevaciousPlusPlus
     virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                              double const potentialAtOriginAtZeroTemperature );
+
+
+    // This is just to make it easy to switch back to using CosmoTransitions
+    // again if somehow the internal straight path bounce action calculation
+    // turns out to be deficient.
+    void
+    CalculateStraightPathActions( PotentialMinimum const& falseVacuum,
+                                  PotentialMinimum const& trueVacuum,
+                                  std::vector< double > const& fitTemperatures,
+                                  std::vector< double >& straightPathActions )
+    { InteralGuessFromStraightPaths( falseVacuum,
+                                     trueVacuum,
+                                     fitTemperatures,
+                                     straightPathActions ); }
+
+    // This uses a BubbleShootingOnSpline object at different temperatures to
+    // fill straightPathActions based on straight paths between the thermal
+    // vacua.
+    void InteralGuessFromStraightPaths( PotentialMinimum const& falseVacuum,
+                                        PotentialMinimum const& trueVacuum,
+                                  std::vector< double > const& fitTemperatures,
+                                  std::vector< double >& straightPathActions );
+
+    // This writes a Python programme using CosmoTransitions with the minimum
+    // number of deformations to get a set of actions at temperatures, and then
+    // reads in the file created to fill straightPathActions.
+    void
+    FitFromCosmoTransitionsStraightPaths( PotentialMinimum const& falseVacuum,
+                                          PotentialMinimum const& trueVacuum,
+                                  std::vector< double > const& fitTemperatures,
+                                  std::vector< double >& straightPathActions );
   };
 
 } /* namespace VevaciousPlusPlus */

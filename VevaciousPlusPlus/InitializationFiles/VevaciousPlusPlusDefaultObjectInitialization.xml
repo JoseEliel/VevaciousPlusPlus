@@ -38,13 +38,16 @@
         <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
         /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LimitedMssm.vin
       </ModelFile>
+      <ScaleRangeMinimumFactor>
+        10.0
+      </ScaleRangeMinimumFactor>
       <RollOnlyMinima>
         <!-- Either "true"/"yes" or "false"/"no" -->
         true
       </RollOnlyMinima>
-      <ScaleRangeMinimumFactor>
-        10.0
-      </ScaleRangeMinimumFactor>
+      <AssumedPositiveOrNegativeTolerance>
+        1.0
+      </AssumedPositiveOrNegativeTolerance>
     </ConstructorArguments>
   </PotentialClass>
   
@@ -132,12 +135,15 @@
       <CriticalTemperatureAccuracy>
         7
       </CriticalTemperatureAccuracy>
-      <PathToCosmotransitions>
-        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
-      </PathToCosmotransitions>
       <PathResolution>
         100
       </PathResolution>
+      <MinimumVacuumSeparationFraction>
+        0.2
+      </MinimumVacuumSeparationFraction>
+      <PathToCosmotransitions>
+        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
+      </PathToCosmotransitions>
       <MaxInnerLoops>
         10
       </MaxInnerLoops>
@@ -146,12 +152,9 @@
       </MaxOuterLoops>
       <BouncePotentialFit>
         <ClassType>
-          BubbleShootingOnSpline
+          BubbleShootingOnPathInFieldSpace
         </ClassType>
         <ConstructorArguments>
-          <NumberOfSegmentsForPotentialFit>
-            100
-          </NumberOfSegmentsForPotentialFit>
           <NumberShootAttemptsAllowed>
             32
           </NumberShootAttemptsAllowed>
@@ -160,31 +163,86 @@
           </RadialResolution>
         </ConstructorArguments>
       </BouncePotentialFit>
-      <TunnelPathFinder>
-        <ClassType>
-        <!-- Only "MinimizingPotentialOnBisections" is valid at the moment and
-             there might never have another option. -->
-          MinimizingPotentialOnBisections
-        </ClassType>
-        <ConstructorArguments>
-          <!--
-          <NodePathRefinement>
-          </NodePathRefinement>
-          -->
-          <MaximumNumberOfNodes>
-            300
-          </MaximumNumberOfNodes>
-          <MovesPerImprovement>
-            10
-          </MovesPerImprovement>
-          <MinuitStrategy>
-            1
-          </MinuitStrategy>
-          <MinuitTolerance>
-            0.01
-          </MinuitTolerance>
-        </ConstructorArguments>
-      </TunnelPathFinder>
+      <TunnelPathFinders>
+        <!-- Valid options, in an ordered list, are:
+             "MinuitOnPotentialOnParallelPlanes",
+             "MinuitOnPotentialPerpendicularToPath", and
+             "MinuitOnPathPerpendicularForces". -->
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialOnParallelPlanes
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              50
+            </NumberOfPathSegments>
+            <MinuitStrategy>
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              50
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              3
+            </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
+            <MinuitDampingFraction>
+              0.75
+            </MinuitDampingFraction>
+            <NeighborDisplacementWeights>
+              0.5
+              0.25
+            </NeighborDisplacementWeights>
+            <MinuitStrategy>
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              100
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              3
+            </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
+            <MinuitDampingFraction>
+              0.75
+            </MinuitDampingFraction>
+            <NeighborDisplacementWeights>
+              0.5
+              0.25
+            </NeighborDisplacementWeights>
+            <MinuitStrategy>
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.1
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+      </TunnelPathFinders>
     </ConstructorArguments>
   </TunnelingClass>
 

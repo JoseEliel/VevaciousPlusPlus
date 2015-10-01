@@ -18,7 +18,7 @@ namespace VevaciousPlusPlus
     slhaBlock( NULL ),
     indexVector( BOL::StringParser::stringToIntVector( indexString ) ),
     scaleLogarithmPowerCoefficients( std::vector< double > ( 1,
-                                                             NAN ) )
+                                                             0.0 ) )
   {
     // This constructor is just an initialization list.
   }

@@ -9,6 +9,7 @@
 #define LINEARSPLINEPATHSEGMENT_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Eigen/Dense"
 
 namespace VevaciousPlusPlus
 {
@@ -27,6 +28,11 @@ namespace VevaciousPlusPlus
     // This fills fieldConfiguration with the values that the fields should
     // have when the segment auxiliary is given by segmentAuxiliary.
     void PutOnSegment( std::vector< double >& fieldConfiguration,
+                       double const segmentAuxiliary ) const;
+
+    // This fills fieldConfiguration with the values that the fields should
+    // have when the segment auxiliary is given by segmentAuxiliary.
+    void PutOnSegment( Eigen::VectorXd& fieldConfiguration,
                        double const segmentAuxiliary ) const;
 
     // This returns the sum of the squares of the slopes at segmentAuxiliary.
@@ -68,9 +74,23 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      fieldConfiguration[ fieldIndex ]
-      = ( fieldConstants[ fieldIndex ]
-          + ( segmentAuxiliary * fieldLinears[ fieldIndex ] ) );
+      fieldConfiguration[ fieldIndex ] = ( fieldConstants[ fieldIndex ]
+                         + ( segmentAuxiliary * fieldLinears[ fieldIndex ] ) );
+    }
+  }
+
+  // This fills fieldConfiguration with the values that the fields should
+  // have when the segment auxiliary is given by segmentAuxiliary.
+  inline void LinearSplinePathSegment::PutOnSegment(
+                                           Eigen::VectorXd& fieldConfiguration,
+                                          double const segmentAuxiliary ) const
+  {
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      fieldConfiguration( fieldIndex ) = ( fieldConstants[ fieldIndex ]
+                         + ( segmentAuxiliary * fieldLinears[ fieldIndex ] ) );
     }
   }
 

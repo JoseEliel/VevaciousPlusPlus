@@ -9,7 +9,7 @@
 #define ODEINTBUBBLEDERIVATIVES_HPP_
 
 #include "CommonIncludes.hpp"
-#include "SplinePotential.hpp"
+#include "OneDimensionalPotentialAlongPath.hpp"
 #include "PathParameterization/TunnelPath.hpp"
 
 namespace VevaciousPlusPlus
@@ -18,7 +18,8 @@ namespace VevaciousPlusPlus
   class OdeintBubbleDerivatives
   {
   public:
-    OdeintBubbleDerivatives( SplinePotential const& pathPotential,
+    OdeintBubbleDerivatives(
+                         OneDimensionalPotentialAlongPath const& pathPotential,
                              TunnelPath const& tunnelPath );
     virtual ~OdeintBubbleDerivatives();
 
@@ -31,7 +32,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SplinePotential const& pathPotential;
+    OneDimensionalPotentialAlongPath const& pathPotential;
     TunnelPath const& tunnelPath;
     double dampingFactor;
   };

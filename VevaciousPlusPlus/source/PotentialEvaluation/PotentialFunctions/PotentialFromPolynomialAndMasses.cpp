@@ -38,15 +38,16 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                                           double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    currentMinimumRenormalizationScale( NAN ),
-    squareOfMinimumRenormalizationScale( NAN ),
-    currentMaximumRenormalizationScale( NAN ),
-    squareOfMaximumRenormalizationScale( NAN ),
+    currentMinimumRenormalizationScale( -1.0 ),
+    squareOfMinimumRenormalizationScale( -1.0 ),
+    currentMaximumRenormalizationScale( -1.0 ),
+    squareOfMaximumRenormalizationScale( -1.0 ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -56,12 +57,13 @@ namespace VevaciousPlusPlus
     fermionMassMatrices(),
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
-    vectorMassCorrectionConstant( NAN ),
+    vectorMassCorrectionConstant( 5.0 / 6.0 ),
     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
     scaleRangeMinimumFactor( scaleRangeMinimumFactor ),
     fieldsAssumedPositive(),
-    fieldsAssumedNegative()
+    fieldsAssumedNegative(),
+    assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
     BOL::AsciiXmlParser fileParser( false );
     BOL::AsciiXmlParser elementParser( false );
@@ -796,10 +798,10 @@ namespace VevaciousPlusPlus
     IWritesPythonPotential(),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
-    currentMinimumRenormalizationScale( NAN ),
-    squareOfMinimumRenormalizationScale( NAN ),
-    currentMaximumRenormalizationScale( NAN ),
-    squareOfMaximumRenormalizationScale( NAN ),
+    currentMinimumRenormalizationScale( -1.0 ),
+    squareOfMinimumRenormalizationScale( -1.0 ),
+    currentMaximumRenormalizationScale( -1.0 ),
+    squareOfMaximumRenormalizationScale( -1.0 ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -809,11 +811,12 @@ namespace VevaciousPlusPlus
     fermionMassMatrices(),
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
-    vectorMassCorrectionConstant( NAN ),
+    vectorMassCorrectionConstant( 5.0 / 6.0 ),
     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
-    scaleRangeMinimumFactor( NAN ),
+    scaleRangeMinimumFactor( -1.0 ),
     fieldsAssumedPositive(),
-    fieldsAssumedNegative()
+    fieldsAssumedNegative(),
+    assumedPositiveOrNegativeTolerance( -1.0 )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -849,7 +852,9 @@ namespace VevaciousPlusPlus
           copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
     scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
     fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
-    fieldsAssumedNegative( copySource.fieldsAssumedNegative )
+    fieldsAssumedNegative( copySource.fieldsAssumedNegative ),
+    assumedPositiveOrNegativeTolerance(
+                                copySource.assumedPositiveOrNegativeTolerance )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more

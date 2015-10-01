@@ -115,6 +115,7 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This runs the point parameterized in the given file.
   void VevaciousPlusPlus::RunPoint( std::string const& parameterFilename )
   {
     time( &currentTime );
@@ -159,6 +160,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
   }
 
+  // This writes the results as an XML file.
   void VevaciousPlusPlus::WriteXmlResults( std::string const& xmlFilename )
   {
     std::ofstream xmlFile( xmlFilename.c_str() );
@@ -242,6 +244,7 @@ namespace VevaciousPlusPlus
     << "\"." << std::endl;
   }
 
+  // This writes the results as an SLHA file.
   void VevaciousPlusPlus::WriteSlhaResults( std::string const& slhaFilename,
                                             bool const writeWarnings )
   {
@@ -433,7 +436,8 @@ namespace VevaciousPlusPlus
     }
   }
 
-  //
+  // This interprets the given string as the appropriate element of the
+  // TunnelingCalculator::TunnelingStrategy enum.
   TunnelingCalculator::TunnelingStrategy
   VevaciousPlusPlus::InterpretTunnelingStrategy(
                                                std::string& tunnelingStrategy )
@@ -469,6 +473,7 @@ namespace VevaciousPlusPlus
     std::string modelFilename( "./ModelFiles/SM.vin" );
     double scaleRangeMinimumFactor( 10.0 );
     bool treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false );
+    double assumedPositiveOrNegativeTolerance( 1.0 );
     BOL::AsciiXmlParser elementParser;
     elementParser.loadString( constructorArguments );
     while( elementParser.readNextElement() )
@@ -477,11 +482,14 @@ namespace VevaciousPlusPlus
                                      "ModelFile",
                                      modelFilename );
       InterpretElementIfNameMatches( elementParser,
+                                     "ScaleRangeMinimumFactor",
+                                     scaleRangeMinimumFactor );
+      InterpretElementIfNameMatches( elementParser,
                                      "RollOnlyMinima",
                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions );
       InterpretElementIfNameMatches( elementParser,
-                                     "ScaleRangeMinimumFactor",
-                                     scaleRangeMinimumFactor );
+                                     "AssumedPositiveOrNegativeTolerance",
+                                     assumedPositiveOrNegativeTolerance );
     }
     if( className.compare( "FixedScaleOneLoopPotential" ) == 0 )
     {
@@ -489,6 +497,7 @@ namespace VevaciousPlusPlus
       = new FixedScaleOneLoopPotential( modelFilename,
                                         scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                        assumedPositiveOrNegativeTolerance,
                                         *ownedSlhaManager );
     }
     else if( className.compare( "RgeImprovedOneLoopPotential" ) == 0 )
@@ -497,6 +506,7 @@ namespace VevaciousPlusPlus
       = new RgeImprovedOneLoopPotential( modelFilename,
                                          scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                         assumedPositiveOrNegativeTolerance,
                                          *ownedSlhaManager );
     }
     else
@@ -511,7 +521,9 @@ namespace VevaciousPlusPlus
     return ownedPotentialFunction;
   }
 
-  //
+  // This decides on the derived class (based on GradientMinimizer) to use
+  // to minimize the potential and constructs it with the arguments parsed
+  // from constructorArguments.
   PotentialMinimizer* VevaciousPlusPlus::SetUpGradientFromStartingPoints(
                                       std::string const& constructorArguments )
   {
@@ -584,7 +596,9 @@ namespace VevaciousPlusPlus
     return ownedPotentialMinimizer;
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitPotentialMinimizer instance to use to minimize the
+  // potential from a set of starting points.
   GradientMinimizer* VevaciousPlusPlus::SetUpMinuitPotentialMinimizer(
                                       std::string const& constructorArguments )
   {
@@ -611,7 +625,9 @@ namespace VevaciousPlusPlus
                                          minuitStrategy );
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a CosmoTransitionsRunner instance to use to calculate the
+  // tunneling from the DSB vacuum to the panic vacuum, if possible.
   TunnelingCalculator* VevaciousPlusPlus::SetUpCosmoTransitionsRunner(
                                       std::string const& constructorArguments )
   {
@@ -626,6 +642,7 @@ namespace VevaciousPlusPlus
     int temperatureAccuracy( 7 );
     std::string pathToCosmotransitions( "./cosmoTransitions/" );
     int resolutionOfDsbVacuum( 20 );
+    double vacuumSeparationFraction( 0.2 );
     int maxInnerLoops( 10 );
     int maxOuterLoops( 10 );
     BOL::AsciiXmlParser xmlParser;
@@ -651,6 +668,9 @@ namespace VevaciousPlusPlus
                                      "PathResolution",
                                      resolutionOfDsbVacuum );
       InterpretElementIfNameMatches( xmlParser,
+                                     "MinimumVacuumSeparationFraction",
+                                     vacuumSeparationFraction );
+      InterpretElementIfNameMatches( xmlParser,
                                      "MaxInnerLoops",
                                      maxInnerLoops );
       InterpretElementIfNameMatches( xmlParser,
@@ -667,21 +687,25 @@ namespace VevaciousPlusPlus
                                        resolutionOfDsbVacuum,
                                        maxInnerLoops,
                                        maxOuterLoops,
-                                       thermalStraightPathFitResolution );
+                                       thermalStraightPathFitResolution,
+                                       vacuumSeparationFraction );
   }
 
-  //
+  // This parses arguments from constructorArguments and uses them to
+  // construct a BounceAlongPathWithThreshold instance to use to calculate
+  // the tunneling from the DSB vacuum to the panic vacuum, if possible.
   TunnelingCalculator* VevaciousPlusPlus::SetUpBounceAlongPathWithThreshold(
                                       std::string const& constructorArguments )
   {
-    std::string tunnelPathFinderClass( "MinimizingPotentialOnHemispheres" );
-    std::string tunnelPathFinderArguments( "" );
+    std::string tunnelPathFinders( "" );
     std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
     std::string bouncePotentialFitArguments( "" );
     std::string tunnelingStrategy( "ThermalThenQuantum" );
     double survivalProbabilityThreshold( 0.1 );
     int thermalIntegrationResolution( 5 );
     int temperatureAccuracy( 7 );
+    int resolutionOfPathPotential( 100 );
+    double vacuumSeparationFraction( 0.2 );
 
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
@@ -699,48 +723,104 @@ namespace VevaciousPlusPlus
       InterpretElementIfNameMatches( xmlParser,
                                      "CriticalTemperatureAccuracy",
                                      temperatureAccuracy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "PathResolution",
+                                     resolutionOfPathPotential );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinimumVacuumSeparationFraction",
+                                     vacuumSeparationFraction );
       ReadClassAndArguments( xmlParser,
                              "BouncePotentialFit",
                              bouncePotentialFitClass,
                              bouncePotentialFitArguments );
-      ReadClassAndArguments( xmlParser,
-                             "TunnelPathFinder",
-                             tunnelPathFinderClass,
-                             tunnelPathFinderArguments );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "TunnelPathFinders",
+                                     tunnelPathFinders );
     }
     CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
+    std::vector< BouncePathFinder* > pathFinders;
+    SetUpBouncePathFinders( tunnelPathFinders,
+                            pathFinders );
+    if( pathFinders.empty() )
+    {
+      std::stringstream errorStream;
+      errorStream
+      << "<TunnelPathFinders> produced no valid tunnel path finding objects!";
+      throw std::runtime_error( errorStream.str() );
+    }
     return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
-                                  SetUpBouncePathFinder( tunnelPathFinderClass,
-                                                   tunnelPathFinderArguments ),
+                                             pathFinders,
                           SetUpBounceActionCalculator( bouncePotentialFitClass,
                                                  bouncePotentialFitArguments ),
                                InterpretTunnelingStrategy( tunnelingStrategy ),
                                              survivalProbabilityThreshold,
                                              thermalIntegrationResolution,
-                                             temperatureAccuracy );
+                                             temperatureAccuracy,
+                                             resolutionOfPathPotential,
+                                             vacuumSeparationFraction );
   }
 
-  //
-  BouncePathFinder* VevaciousPlusPlus::SetUpMinimizingPotentialOnBisections(
+  // This parses the XMl of tunnelPathFinders to construct a set of
+  // BouncePathFinder instances, filling pathFinders with pointers to them.
+  void VevaciousPlusPlus::SetUpBouncePathFinders(
+                                          std::string const& tunnelPathFinders,
+                                std::vector< BouncePathFinder* >& pathFinders )
+  {
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( tunnelPathFinders );
+    std::string classType( "" );
+    std::string constructorArguments( "" );
+    while( xmlParser.readNextElement() )
+    {
+      classType.clear();
+      constructorArguments.clear();
+      ReadClassAndArguments( xmlParser,
+                             "PathFinder",
+                             classType,
+                             constructorArguments );
+      if( !( classType.empty()
+             ||
+             constructorArguments.empty() ) )
+      {
+        if( classType.compare( "MinuitOnPotentialOnParallelPlanes" ) == 0 )
+        {
+          pathFinders.push_back( CreateMinuitOnPotentialOnParallelPlanes(
+                                                      constructorArguments ) );
+        }
+        else if( classType.compare( "MinuitOnPotentialPerpendicularToPath" )
+                 == 0 )
+        {
+          pathFinders.push_back( CreateMinuitOnPotentialPerpendicularToPath(
+                                                      constructorArguments ) );
+        }
+        else if( classType.compare( "MinuitOnPathPerpendicularForces" )
+                 == 0 )
+        {
+          pathFinders.push_back( CreateMinuitOnPathNormalInertialPotential(
+                                                      constructorArguments ) );
+        }
+      }
+    }
+  }
+
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
+  // extremize the bounce action.
+  BouncePathFinder* VevaciousPlusPlus::CreateMinuitOnPotentialOnParallelPlanes(
                                       std::string const& constructorArguments )
   {
-    std::string pathRefinerClass( "PathSeparateFieldAverager" );
-    std::string pathRefinerArguments( "" );
-    int maximumNumberOfNodes( 20 );
+    // The <ConstructorArguments> for this class should have child elements
+    // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
+    int numberOfPathSegments( 100 );
     int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
-
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
     while( xmlParser.readNextElement() )
     {
-      ReadClassAndArguments( xmlParser,
-                             "NodePathRefinement",
-                             pathRefinerClass,
-                             pathRefinerArguments );
       InterpretElementIfNameMatches( xmlParser,
-                                     "MaximumNumberOfNodes",
-                                     maximumNumberOfNodes );
+                                     "NumberOfPathSegments",
+                                     numberOfPathSegments );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinuitStrategy",
                                      minuitStrategy );
@@ -748,20 +828,156 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    return new MinimizingPotentialOnBisections( *ownedPotentialFunction,
-                                            SetUpPathRefiner( pathRefinerClass,
-                                                        pathRefinerArguments ),
-                                                minuitStrategy,
-                                                minuitToleranceFraction,
-                                                maximumNumberOfNodes );
+    return new MinuitOnPotentialOnParallelPlanes( *potentialFunction,
+                                 static_cast< size_t >( numberOfPathSegments ),
+                                                  minuitStrategy,
+                      static_cast< unsigned int >( minuitToleranceFraction ) );
   }
 
-  //
-  BounceActionCalculator*
-  VevaciousPlusPlus::SetUpBubbleShootingOnSpline(
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitOnPotentialPerpendicularToPath instance to use to try to
+  // extremize the bounce action.
+  BouncePathFinder*
+  VevaciousPlusPlus::CreateMinuitOnPotentialPerpendicularToPath(
                                       std::string const& constructorArguments )
   {
-    int numberOfSegmentsForPotentialFit( 32 );
+    // The <ConstructorArguments> for this class should have child elements
+    // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
+    int numberOfPathSegments( 100 );
+    int numberOfAllowedWorsenings( 3 );
+    double convergenceThresholdFraction( 0.05 );
+    double minuitDampingFraction( 0.75 );
+    std::string neighborDisplacementWeightsString( "0.5, 0.25" );
+    int minuitStrategy( 1 );
+    double minuitToleranceFraction( 0.5 );
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfPathSegments",
+                                     numberOfPathSegments );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfAllowedWorsenings",
+                                     numberOfAllowedWorsenings );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "ConvergenceThresholdFraction",
+                                     convergenceThresholdFraction );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitDampingFraction",
+                                     minuitDampingFraction );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NeighborDisplacementWeights",
+                                     neighborDisplacementWeightsString );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitStrategy",
+                                     minuitStrategy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitTolerance",
+                                     minuitToleranceFraction );
+    }
+    BOL::VectorlikeArray< std::string > weightsStrings;
+    BOL::StringParser::parseByChar( neighborDisplacementWeightsString,
+                                    weightsStrings,
+                                    " \t\n,;" );
+    std::vector< double > neighborDisplacementWeights;
+    for( int weightIndex( 0 );
+         weightIndex < weightsStrings.getSize();
+         ++weightIndex )
+    {
+      neighborDisplacementWeights.push_back(
+          BOL::StringParser::stringToDouble( weightsStrings[ weightIndex ] ) );
+    }
+
+    return new MinuitOnPotentialPerpendicularToPath( *potentialFunction,
+                                 static_cast< size_t >( numberOfPathSegments ),
+                                                     numberOfAllowedWorsenings,
+                                                  convergenceThresholdFraction,
+                                                     minuitDampingFraction,
+                                                   neighborDisplacementWeights,
+                                                     minuitStrategy,
+                      static_cast< unsigned int >( minuitToleranceFraction ) );
+  }
+
+  // This parses arguments from constructorArguments and uses them to
+  // construct a MinuitOnPathNormalInertialPotential instance to use to try to
+  // extremize the bounce action.
+  BouncePathFinder*
+  VevaciousPlusPlus::CreateMinuitOnPathNormalInertialPotential(
+                                      std::string const& constructorArguments )
+  {
+    // The <ConstructorArguments> for this class should have child elements
+    // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
+    int numberOfPathSegments( 100 );
+    int numberOfAllowedWorsenings( 3 );
+    double convergenceThresholdFraction( 0.05 );
+    double minuitDampingFraction( 0.75 );
+    std::string neighborDisplacementWeightsString( "0.5, 0.25" );
+    int minuitStrategy( 1 );
+    double minuitToleranceFraction( 0.5 );
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( constructorArguments );
+    while( xmlParser.readNextElement() )
+    {
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfPathSegments",
+                                     numberOfPathSegments );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NumberOfAllowedWorsenings",
+                                     numberOfAllowedWorsenings );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "ConvergenceThresholdFraction",
+                                     convergenceThresholdFraction );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitDampingFraction",
+                                     minuitDampingFraction );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "NeighborDisplacementWeights",
+                                     neighborDisplacementWeightsString );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitStrategy",
+                                     minuitStrategy );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "MinuitTolerance",
+                                     minuitToleranceFraction );
+    }
+    BOL::VectorlikeArray< std::string > weightsStrings;
+    BOL::StringParser::parseByChar( neighborDisplacementWeightsString,
+                                    weightsStrings,
+                                    " \t\n,;" );
+    std::vector< double > neighborDisplacementWeights;
+    for( int weightIndex( 0 );
+         weightIndex < weightsStrings.getSize();
+         ++weightIndex )
+    {
+      neighborDisplacementWeights.push_back(
+          BOL::StringParser::stringToDouble( weightsStrings[ weightIndex ] ) );
+    }
+
+    // placeholder:
+    /**/std::cout << std::endl
+    << "Placeholder: "
+    << "CreateMinuitOnPathNormalInertialPotential(...) returning NULL as the"
+    << " class does not yet exist!";
+    std::cout << std::endl;
+    return NULL;/**/
+    /*return new MinuitOnPathNormalInertialPotential( *potentialFunction,
+                                 static_cast< size_t >( numberOfPathSegments ),
+                                                     numberOfAllowedWorsenings,
+                                                  convergenceThresholdFraction,
+                                                     minuitDampingFraction,
+                                                   neighborDisplacementWeights,
+                                                     minuitStrategy,
+                    static_cast< unsigned int >( minuitToleranceFraction ) );*/
+  }
+
+  // This parses arguments from constructorArguments and uses them to
+  // construct a BubbleShootingOnPathInFieldSpace instance to use to calculate
+  // the bounce action on given paths.
+  BounceActionCalculator*
+  VevaciousPlusPlus::SetUpBubbleShootingOnPathInFieldSpace(
+                                      std::string const& constructorArguments )
+  {
     double lengthScaleResolutionForBounce( 0.05 );
     int shootAttemptsForBounce( 32 );
 
@@ -770,9 +986,6 @@ namespace VevaciousPlusPlus
     while( xmlParser.readNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
-                                     "NumberOfSegmentsForPotentialFit",
-                                     numberOfSegmentsForPotentialFit );
-      InterpretElementIfNameMatches( xmlParser,
                                      "RadialResolution",
                                      lengthScaleResolutionForBounce );
       InterpretElementIfNameMatches( xmlParser,
@@ -780,10 +993,9 @@ namespace VevaciousPlusPlus
                                      shootAttemptsForBounce );
     }
 
-    return new BubbleShootingOnSpline( *potentialFunction,
-                                       numberOfSegmentsForPotentialFit,
-                                       lengthScaleResolutionForBounce,
-                                       shootAttemptsForBounce );
+    return new BubbleShootingOnPathInFieldSpace( *potentialFunction,
+                                                lengthScaleResolutionForBounce,
+                                                 shootAttemptsForBounce );
   }
 
 } /* namespace VevaciousPlusPlus */

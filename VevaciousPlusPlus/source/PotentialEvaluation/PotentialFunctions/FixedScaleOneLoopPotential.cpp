@@ -14,18 +14,21 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                                           double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                               double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
     PotentialFromPolynomialAndMasses( modelFilename,
                                       scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                      assumedPositiveOrNegativeTolerance,
                                       runningParameterManager ),
-    inverseRenormalizationScaleSquared( NAN ),
+    inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,
                                       fieldsAssumedPositive,
                                       fieldsAssumedNegative,
-                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                      assumedPositiveOrNegativeTolerance )
   {
     // This constructor is just an initialization list.
   }
@@ -33,13 +36,14 @@ namespace VevaciousPlusPlus
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
     PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
-    inverseRenormalizationScaleSquared( NAN ),
+    inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,
                                       fieldsAssumedPositive,
                                       fieldsAssumedNegative,
-                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions )
+                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                                      assumedPositiveOrNegativeTolerance )
   {
     // This constructor is just an initialization list.
   }
