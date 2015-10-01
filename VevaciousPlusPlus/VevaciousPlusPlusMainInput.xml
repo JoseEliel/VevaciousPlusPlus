@@ -18,13 +18,13 @@
   <InitializationFile>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml -->
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauStop.xml -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml
+  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml
   </InitializationFile>
   
   <slha>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha -->
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/Fittino.slha -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/Fittino.slha
+  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha
   </slha>
   
   <!-- If <InputFolder> is given, it should contain the path to a folder with

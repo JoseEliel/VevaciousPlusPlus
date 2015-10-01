@@ -316,7 +316,7 @@ namespace VevaciousPlusPlus
                                      "PathToHom4ps2",
                                      pathToHom4ps2 );
       InterpretElementIfNameMatches( xmlParser,
-                                     "PathToHom4ps2",
+                                     "Hom4ps2Argument",
                                      homotopyType );
     }
     return new Hom4ps2Runner(

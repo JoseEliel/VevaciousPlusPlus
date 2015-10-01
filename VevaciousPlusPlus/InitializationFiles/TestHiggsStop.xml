@@ -38,7 +38,7 @@
         <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RestrictedToRealVevsRealMssm.vin -->
         <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStauAndStopVevs.vin -->
         <!-- /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin -->
-        /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin
+        /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin
       </ModelFile>
       <RollOnlyMinima>
         <!-- Either "true"/"yes" or "false"/"no" -->
@@ -62,7 +62,7 @@
         <ConstructorArguments>
           <PathToHom4ps2>
             <!-- /home/bol/BOL/machine-specific/HOM4PS2/ -->
-            /Users/oleary/BOL/machine-specific/HOM4PS2/
+            /home/bol/BOL/ProjectDependencies/HOM4PS2/
           </PathToHom4ps2>
           <Hom4ps2Argument>
             <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
