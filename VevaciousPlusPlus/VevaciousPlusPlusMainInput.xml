@@ -17,20 +17,15 @@
  
   <InitializationFile>
   <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml -->
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauStop.xml -->
-<<<<<<< HEAD
   /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml
-=======
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml -->
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStau.xml -->
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauMuSnu.xml -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStau.xml
->>>>>>> 5cc445dddf824e23906df096e140cbbbd18f1a8b
+  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStau.xml -->
+  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauStop.xml -->
+  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauMuSnu.xml -->
   </InitializationFile>
   
   <slha>
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha -->
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/Fittino.slha -->
+  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha -->
+  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/Fittino.slha -->
   /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha
   </slha>
   

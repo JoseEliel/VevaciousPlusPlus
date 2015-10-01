@@ -282,15 +282,23 @@ namespace VevaciousPlusPlus
       TunnelPath const* currentPath( bestPath );
       BubbleProfile const* currentBubble( bestBubble );
 
+      // The paths produced in sequence by pathFinder are kept separate from
+      // bestPath to give more freedom to pathFinder internally (though I
+      // cannot right now think of any way in which it would actually be
+      // useful, apart from maybe some crazy MCMC which might try to get out of
+      // a local minimum, which wouldn't work if it was sent back to the local
+      // minimum at each step).
+
       // Keeping track of a best path and bubble separately from the last-used
       // path and bubble without copying any instances requires a bit of
-      // book-keeping. These two pointers get set to NULL if the current path
-      // and bubble happen to also be the best ones so far, so they can be
-      // deleted without problem, otherwise they delete the (not best) current
-      // path and bubble once they have been used to create the next path and
-      // bubble.
-      TunnelPath const* currentPathDeleter( NULL );
-      BubbleProfile const* currentBubbleDeleter( NULL );
+      // book-keeping. Each iteration of the loop below will produce new
+      // instances of a path and a bubble, and either the new path and bubble
+      // need to be deleted or the previous best need to be deleted. These two
+      // pointers keep track of which is to be deleted. They start as NULL,
+      // allowing the first iteration to delete them before any path has been
+      // marked for deletion.
+      TunnelPath const* pathDeleter( NULL );
+      BubbleProfile const* bubbleDeleter( NULL );
 
       // This loop will get a path from pathFinder and then repeat if
       // pathFinder decides that the path can be improved once the bubble
@@ -320,32 +328,37 @@ namespace VevaciousPlusPlus
 
         BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath,
                                                     potentialApproximation ) );
-        delete currentBubbleDeleter;
-        delete currentPathDeleter;
+
+        // On the first iteration of the loop, these pointers are NULL, so
+        // it's no problem to delete them. On subsequent iterations, they point
+        // at the higher-action path and bubble from the last iterations
+        // comparison between its nextPath and bestPath.
+        delete bubbleDeleter;
+        delete pathDeleter;
 
         if( nextBubble->bounceAction < bestBubble->bounceAction )
         {
-          delete bestBubble;
+          // If nextBubble was an improvement on bestBubble, what bestPath
+          // currently points at gets marked for deletion either on the next
+          // iteration of this loop or just after the loop, and then bestPath
+          // is set to point at nextPath, with the corresponding operations for
+          // the bubble pointers.
+          bubbleDeleter = bestBubble;
           bestBubble = nextBubble;
-          currentBubble = nextBubble;
-          currentBubbleDeleter = NULL;
-          delete bestPath;
+          pathDeleter = bestPath;
           bestPath = nextPath;
-          currentPath = nextPath;
-          currentPathDeleter = NULL;
         }
         else
         {
-          currentBubble = nextBubble;
-          currentPath = nextPath;
-
           // If nextBubble wasn't an improvement on bestBubble, it and nextPath
           // will be deleted after being used to generate the nextPath and
           // nextBubble of the next iteration of the loop (or after the loop if
           // this ends up being the last iteration) through these pointers.
-          currentBubbleDeleter = nextBubble;
-          currentPathDeleter = nextPath;
+          bubbleDeleter = nextBubble;
+          pathDeleter = nextPath;
         }
+        currentBubble = nextBubble;
+        currentPath = nextPath;
 
         std::cout << std::endl
         << "Improved path bounce action = " << currentBubble->bounceAction;
@@ -369,12 +382,10 @@ namespace VevaciousPlusPlus
       } while( ( bestBubble->bounceAction > actionThreshold )
                &&
                (*pathFinder)->PathCanBeImproved( *currentBubble ) );
-      // At the end of the loop, these either point at the last tried path and
-      // bubble which did not end up as the best ones, so they should be
-      // deleted, or they are NULL (because the last tried path and bubble
-      // happened to be the best ones), so deleting them is no problem.
-      delete currentBubbleDeleter;
-      delete currentPathDeleter;
+      // At the end of the loop, these point at the last tried path and bubble
+      // which did not end up as the best ones, so deleting them is no problem.
+      delete bubbleDeleter;
+      delete pathDeleter;
 
       // We don't bother with the rest of the path finders if the action has
       // already dropped below the threshold.

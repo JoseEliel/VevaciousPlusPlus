@@ -7,11 +7,7 @@
        [none as yet]
      </CitationArticle>
      <ResultTimestamp>
-<<<<<<< HEAD
        Thu Oct  1 11:24:37 2015
-=======
-       Fri Nov  7 15:27:59 2014
->>>>>>> 5cc445dddf824e23906df096e140cbbbd18f1a8b
      </ResultTimestamp>
   </ReferenceData>
   <StableOrMetastable>
@@ -55,11 +51,7 @@
       0
     </DsbSurvivalProbability>
     <LogOfMinusLogOfDsbSurvival>
-<<<<<<< HEAD
-      15.1884 <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> 
-=======
-      11.8325 <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> 
->>>>>>> 5cc445dddf824e23906df096e140cbbbd18f1a8b
+      15.1884 <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->
     </LogOfMinusLogOfDsbSurvival>
     <DominantTunnelingTemperature>
       450.242 <!-- in GeV -->
