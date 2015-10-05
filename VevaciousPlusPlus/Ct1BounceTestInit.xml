@@ -1,0 +1,38 @@
+<VevaciousPlusPlusInitialization>
+
+<!--
+#  VevaciousPlusPlusInitialization.xml
+#
+#  Created on: Apr 10, 2014
+#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+#      Copyright 2014 Ben O'Leary
+#
+#      This file is part of VevaciousPlusPlus, released under the
+#      GNU General Public License. Please see the accompanying
+#      README.VevaciousPlusPlus.txt file for a full list of files, brief
+#      documentation on how to use these classes, and further details on the
+#      license.
+#
+ -->
+ 
+  <InitializationFile>
+  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/Ct1BounceTestHiggsStop.xml
+  </InitializationFile>
+  
+  <slha>
+  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha
+  </slha>
+  
+  <!-- If <InputFolder> is given, it should contain the path to a folder with
+       only files in the SLHA format, which will be taken as input for
+       VevaciousPlusPlus, and <OutputFolder> must also be given, as the place
+       where the output files will be put. The 2 folders must be different! -->
+  <!--
+  <InputFolder>
+  </InputFolder>
+  <OutputFolder>
+  </OutputFolder>
+  -->
+
+</VevaciousPlusPlusInitialization>
+
