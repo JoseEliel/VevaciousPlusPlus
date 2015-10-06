@@ -12,8 +12,9 @@
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/FunctionMinimum.h"
+
+#include "../../MinuitWrappersAndHelpers/MinuitMinimum.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
 #include "../BounceActionCalculator.hpp"
 #include "../PathParameterization/TunnelPath.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"

@@ -125,8 +125,8 @@ namespace VevaciousPlusPlus
     << currentVolume << ", nextRadius = " << nextRadius << ", nextVolume = "
     << nextVolume << ", p(0) = " << bubbleProfile->AuxiliaryAtBubbleCenter()
     << ", B_{-1} = "
-    << potentialApproximation( bubbleProfile->AuxiliaryAtBubbleCenter() )
-    << ", B_{0} = " << BounceActionDensity( potentialApproximation,
+    << pathPotential( bubbleProfile->AuxiliaryAtBubbleCenter() )
+    << ", B_{0} = " << BounceActionDensity( pathPotential,
                                             tunnelPath,
                                             auxiliaryProfile.front() )
     << ", bounceAction = " << bounceAction;
@@ -161,7 +161,7 @@ namespace VevaciousPlusPlus
       << ", nextRadius = " << nextRadius
       << ", nextVolume = " << nextVolume
       << ", B_" << radiusIndex << " = "
-      << BounceActionDensity( potentialApproximation,
+      << BounceActionDensity( pathPotential,
                               tunnelPath,
                               auxiliaryProfile[ radiusIndex ] );
       std::cout << std::endl;*/

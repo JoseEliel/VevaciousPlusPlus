@@ -8,8 +8,8 @@
 #ifndef POTENTIALMINIMUM_HPP_
 #define POTENTIALMINIMUM_HPP_
 
+#include "../MinuitWrappersAndHelpers/MinuitMinimum.hpp"
 #include "CommonIncludes.hpp"
-#include "GradientBasedMinimization/MinuitMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {

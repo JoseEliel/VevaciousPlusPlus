@@ -14,6 +14,7 @@ namespace VevaciousPlusPlus
                                     TunnelPath const& tunnelPath,
                                     size_t const numberOfPotentialSegments,
                          double const minimumSquareDistanceBetweenPathVacua ) :
+    OneDimensionalPotentialAlongPath(),
     auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
     inverseOfAuxiliaryStep( numberOfPotentialSegments ),
     numberOfNormalSegments( numberOfPotentialSegments - 2 ),
@@ -160,8 +161,9 @@ namespace VevaciousPlusPlus
            ++segmentIndex )
       {
         firstDerivatives[ segmentIndex ]
-        = ( potentialValues[ segmentIndex + 1 ]
-            - potentialValues[ segmentIndex ] );
+        = ( ( potentialValues[ segmentIndex + 1 ]
+              - potentialValues[ segmentIndex ] )
+            * inverseOfAuxiliaryStep );
       }
 
       lastSegmentQuadratic
@@ -169,6 +171,12 @@ namespace VevaciousPlusPlus
             - potentialValues[ numberOfNormalSegments + 1 ] )
           * inverseOfAuxiliaryStep * inverseOfAuxiliaryStep );
     }
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "SplinePotential ends up as " << this->AsDebuggingString();
+    std::cout << std::endl;*/
   }
 
   SplinePotential::~SplinePotential()

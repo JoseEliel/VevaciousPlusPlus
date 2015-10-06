@@ -110,7 +110,7 @@ int main( int argumentCount,
 
   VevaciousPlusPlus::FixedScaleOneLoopPotential
   fixedScalePotential( argumentParser.fromTag( "model",
-                               "/Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/"
+                                 "/home/bol/BOL/C++Projects/VevaciousPlusPlus/"
                      "VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin" ),
                        10.0,
                        true,

@@ -66,6 +66,7 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BounceActionEvaluation/OneDimensionalPotentialAlongPath.cpp \
  source/BounceActionEvaluation/SplinePotential.cpp \
  source/BounceActionEvaluation/UndershootOvershootBubble.cpp \
+ source/MinuitWrappersAndHelpers/MinuitMinimum.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
@@ -83,7 +84,6 @@ SOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/SlhaManagement/RunningParameterManager.cpp \
  source/SlhaManagement/SlhaManager.cpp \
  source/SlhaManagement/SlhaUpdatePropagator.cpp \
- $(GRADIENTBASEDMINIMIZATION)/MinuitMinimum.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \

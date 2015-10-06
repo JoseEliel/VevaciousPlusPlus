@@ -95,7 +95,7 @@ namespace VevaciousPlusPlus
       integrationStartRadius = integrationStepSize;
 
       // It shouldn't ever happen that undershootAuxiliary is negative while
-      // undershootAuxiliary is positive, as then the undershoot would be at a
+      // overshootAuxiliary is positive, as then the undershoot would be at a
       // larger auxiliary value than the overshoot.
       if( ( undershootAuxiliary > 0.0 )
           &&
@@ -106,8 +106,7 @@ namespace VevaciousPlusPlus
                               + pathPotential.AuxiliaryOfPathPanicVacuum() ) );
         if( initialAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
         {
-          initialAuxiliary = ( pathPotential.ThresholdForNearPathPanic()
-                              - initialAuxiliary );
+          initialAuxiliary -= pathPotential.AuxiliaryOfPathPanicVacuum();
         }
       }
       else
@@ -134,8 +133,8 @@ namespace VevaciousPlusPlus
       // close to the path panic minimum.
       if( initialAuxiliary <= 0.0 )
       {
-        // If we're in the last segment, we go with a full solution of the
-        // equation linearized in p:
+        // If we're close to the path panic minimum, we go with a full solution
+        // of the equation linearized in p:
         // [d^2/dr^2 + (dampingFactor/r)d/dr - ((d^2V/dp^2)/(|df/dp|^2))] p = 0
         // assuming that p is close enough to a minimum that dV/dp is
         // proportional to p and that dp/dr is small enough that we can neglect
@@ -172,9 +171,10 @@ namespace VevaciousPlusPlus
                / ( 2.0 * initialQuadraticCoefficient * integrationStepSize ) );
 
         // debugging:
-        /*std::cout << "in last segment. undershootAuxiliary = "
-        << undershootAuxiliary << ", overshootAuxiliary = "
-        << overshootAuxiliary << ", p = " << initialPositiveAuxiliary
+        /*std::cout << "close to the path panic minimum."
+        << " undershootAuxiliary = " << undershootAuxiliary
+        << ", overshootAuxiliary = " << overshootAuxiliary
+        << ", p = " << initialPositiveAuxiliary
         << " (" << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << -initialAuxiliary << "), initialQuadraticCoefficient = "
         << initialQuadraticCoefficient << ", integrationStartRadius = "
@@ -286,9 +286,10 @@ namespace VevaciousPlusPlus
                                                           initialAuxiliary ) );
 
         // debugging:
-        /*std::cout << "not in last segment. undershootAuxiliary = "
-        << undershootAuxiliary << ", overshootAuxiliary = "
-        << overshootAuxiliary << ", trying p = " << initialAuxiliary << " ("
+        /*std::cout << "not close to the path panic minimum."
+        << " undershootAuxiliary = " << undershootAuxiliary
+        << ", overshootAuxiliary = " << overshootAuxiliary
+        << ", trying p = " << initialAuxiliary << " ("
         << pathPotential.DefiniteOvershootAuxiliary() << " - "
         << ( pathPotential.DefiniteOvershootAuxiliary() - initialAuxiliary )
         << "), initialPotentialDerivative = " << initialPotentialDerivative;

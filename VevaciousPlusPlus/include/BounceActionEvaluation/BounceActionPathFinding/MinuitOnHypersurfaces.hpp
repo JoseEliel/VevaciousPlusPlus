@@ -16,6 +16,7 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "../PathParameterization/LinearSplineThroughNodes.hpp"
+#include "../../MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -46,7 +47,10 @@ namespace VevaciousPlusPlus
     // default takes nodeParameterization as a vector in the hyperplane
     // perpendicular to field 0, applies reflectionMatrix to it, adds the
     // result to currentParallelComponent, and returns the potential function
-    // for that field configuration.
+    // for that field configuration, plus the fourth power of the Euclidean
+    // length of nodeParameterization as a penalty to stop the path straying
+    // too far from the zero parameterization. The penalty is an attempt to
+    // stop jumping between paths to degenerate vacua.
     virtual double
     operator()( std::vector< double > const& nodeParameterization ) const;
 
@@ -174,22 +178,30 @@ namespace VevaciousPlusPlus
   // default takes nodeParameterization as a vector in the hyperplane
   // perpendicular to field 0, applies reflectionMatrix to it, adds the
   // result to currentParallelComponent, and returns the potential function
-  // for that field configuration.
+  // for that field configuration, plus the fourth power of the Euclidean
+  // length of nodeParameterization as a penalty to stop the path straying
+  // too far from the zero parameterization. The penalty is an attempt to
+  // stop jumping between paths to degenerate vacua.
   inline double MinuitOnHypersurfaces::operator()(
                       std::vector< double > const& nodeParameterization ) const
   {
     Eigen::VectorXd const transformedNode( reflectionMatrix
                                  * UntransformedNode( nodeParameterization ) );
     std::vector< double > fieldConfiguration( numberOfFields );
+    double parameterizationLengthSquared( 0.0 );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
       fieldConfiguration[ fieldIndex ] = ( transformedNode( fieldIndex )
                                      + currentHyperplaneOrigin( fieldIndex ) );
+      parameterizationLengthSquared
+      += ( transformedNode( fieldIndex ) * transformedNode( fieldIndex ) );
     }
-    return ( potentialFunction( fieldConfiguration,
-                                pathTemperature ) - potentialAtOrigin );
+    return ( ( parameterizationLengthSquared * parameterizationLengthSquared )
+             + potentialFunction( fieldConfiguration,
+                                  pathTemperature )
+             - potentialAtOrigin );
   }
 
   // This sets the vacua to be those given, and resets the nodes to describe a

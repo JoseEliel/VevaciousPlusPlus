@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialMinimization/GradientBasedMinimization/MinuitMinimum.hpp"
+#include "MinuitWrappersAndHelpers/MinuitMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {

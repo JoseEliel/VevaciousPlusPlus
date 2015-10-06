@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
                                                std::string const& plotFilename,
                                      unsigned int const plotResolution ) const
   {
-    BOL::TwoDimensionalDataPlotter bubblePlotter( "/opt/local/bin/gnuplot",
+    BOL::TwoDimensionalDataPlotter bubblePlotter( "/usr/bin/gnuplot",
                                                   plotFilename );
     double const radialStepSize( bubbleProfile.MaximumPlotRadius()
                                  / static_cast< double >( plotResolution ) );

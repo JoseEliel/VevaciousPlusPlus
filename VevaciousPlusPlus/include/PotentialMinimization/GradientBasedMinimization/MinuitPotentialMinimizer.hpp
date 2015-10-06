@@ -12,8 +12,9 @@
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/FunctionMinimum.h"
+
+#include "../../MinuitWrappersAndHelpers/MinuitMinimum.hpp"
 #include "../GradientMinimizer.hpp"
-#include "MinuitMinimum.hpp"
 #include "PotentialForMinuit.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 

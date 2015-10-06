@@ -16,11 +16,11 @@
  -->
  
   <InitializationFile>
-  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/BolBounceTestHiggsStop.xml
+  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/BolBounceTestHiggsStauStop.xml
   </InitializationFile>
   
   <slha>
-  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha
+  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/OldFittino.slha
   </slha>
   
   <!-- If <InputFolder> is given, it should contain the path to a folder with

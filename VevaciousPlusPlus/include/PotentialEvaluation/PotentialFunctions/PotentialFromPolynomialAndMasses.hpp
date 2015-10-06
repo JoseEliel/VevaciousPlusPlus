@@ -21,6 +21,7 @@
 #include "../ThermalFunctions.hpp"
 #include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 #include "IWritesPythonPotential.hpp"
+#include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -164,7 +165,10 @@ namespace VevaciousPlusPlus
     // returns the difference of the original sum of squares from
     // squareOfMaximumRenormalizationScale.
     double CapFieldConfiguration(
-                       std::vector< double >& cappedFieldConfiguration ) const;
+                        std::vector< double >& cappedFieldConfiguration ) const
+    { return MinuitHypersphereBoundAlternative::CapVariableVector(
+                                                      cappedFieldConfiguration,
+                                       squareOfMaximumRenormalizationScale ); }
   };
 
 
@@ -213,58 +217,6 @@ namespace VevaciousPlusPlus
            std::make_pair( (*whichMatrix)->MassesSquared( fieldConfiguration ),
                            (*whichMatrix)->MultiplicityFactor() ) );
     }
-  }
-
-  // This scales down the values of cappedFieldConfiguration if the sum of
-  // the squares of the elements is larger than
-  // squareOfMaximumRenormalizationScale so that the sum is equal to it, and
-  // returns the difference of the original sum of squares from
-  // squareOfMaximumRenormalizationScale.
-  inline double PotentialFromPolynomialAndMasses::CapFieldConfiguration(
-                        std::vector< double >& cappedFieldConfiguration ) const
-  {
-    double lengthSquared( 0.0 );
-    for( std::vector< double >::const_iterator
-         fieldValue( cappedFieldConfiguration.begin() );
-         fieldValue < cappedFieldConfiguration.end();
-         ++fieldValue )
-    {
-      lengthSquared += ( (*fieldValue) * (*fieldValue) );
-    }
-    if( lengthSquared <= squareOfMaximumRenormalizationScale )
-    {
-      return 0.0;
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "cappedFieldConfiguration = "
-    << FieldConfigurationAsMathematica( cappedFieldConfiguration )
-    << std::endl << "lengthSquared = " << lengthSquared
-    << ", squareOfMaximumRenormalizationScale = "
-    << squareOfMaximumRenormalizationScale;
-    std::cout << std::endl;*/
-
-    double const
-    scaleFactor( sqrt( squareOfMaximumRenormalizationScale / lengthSquared ) );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < cappedFieldConfiguration.size();
-         ++fieldIndex )
-    {
-      cappedFieldConfiguration[ fieldIndex ] *= scaleFactor;
-    }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "cappedFieldConfiguration -> "
-    << FieldConfigurationAsMathematica( cappedFieldConfiguration )
-    << std::endl << "returning "
-    << ( lengthSquared - squareOfMaximumRenormalizationScale );
-    std::cout << std::endl;*/
-
-    return ( lengthSquared - squareOfMaximumRenormalizationScale );
   }
 
 } /* namespace VevaciousPlusPlus */

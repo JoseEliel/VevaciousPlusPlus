@@ -131,12 +131,12 @@ namespace VevaciousPlusPlus
                                                     currentMinuitTolerance ) );
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "minuitResult.Fval() = " << minuitResult.Fval()
     << ", (*this)( nodeZeroParameterization ) = "
     << (*this)( nodeZeroParameterization );
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     // We return a zero displacement if Minuit2 failed to minimize operator()
     // better than that.

@@ -15,6 +15,14 @@
 namespace VevaciousPlusPlus
 {
 
+  // An instance of this class acts as the function of the potential energy
+  // constrained to a path in field space. It is a function of one variable,
+  // which is referred to as the auxiliary (variable), and the auxiliary goes
+  // from 0 at the false vacuum end of the path to 1 at the panic vacuum end of
+  // the path. It may be that numerical effects mean that the points on the
+  // path which should be considered the false vacuum and the panic vacuum do
+  // not correspond to 0 and 1 respectively, so this class holds the values of
+  // the auxiliary for these points as well.
   class OneDimensionalPotentialAlongPath
   {
   public:

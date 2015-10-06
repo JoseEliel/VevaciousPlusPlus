@@ -379,6 +379,33 @@ namespace VevaciousPlusPlus
         }
         std::cout << ".";
         std::cout << std::endl;
+
+        // debugging:
+        /**/std::string nextPathPicture( "NextBubbleProfile.eps" );
+        std::cout << std::endl << "debugging:"
+        << std::endl
+        << "nextPath being plotted in " << nextPathPicture << ".";
+        std::cout << std::endl;
+        std::vector< std::string > fieldColors;
+        fieldColors.push_back( "red" );
+        fieldColors.push_back( "brown" );
+        fieldColors.push_back( "blue" );
+        fieldColors.push_back( "purple" );
+        fieldColors.push_back( "green" );
+        fieldColors.push_back( "cyan" );
+        actionCalculator->PlotBounceConfiguration( *nextPath,
+                                                   *nextBubble,
+                                                   fieldColors,
+                                                   nextPathPicture,
+                                                   pathPotentialResolution );
+        std::cout << std::endl;
+        std::cout << "Dummy input for pause.";
+        std::cout << std::endl;
+        std::cin >> nextPathPicture;
+        std::cout << std::endl;
+        std::cout << "Resuming.";
+        std::cout << std::endl;/**/
+
       } while( ( bestBubble->bounceAction > actionThreshold )
                &&
                (*pathFinder)->PathCanBeImproved( *currentBubble ) );
