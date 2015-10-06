@@ -84,12 +84,12 @@ namespace VevaciousPlusPlus
       currentHyperplaneOrigin = lastPathNodes[ nodeIndex ];
       SetParallelVector( lastPathNodes[ nodeIndex - 1 ],
                          lastPathNodes[ nodeIndex + 1 ] );
-      SetCurrentMinuitSteps( 0.5 );
-      // The starting step sizes for Minuit2 are set to be half the Euclidean
-      // length of the difference between lastPathNodes[ nodeIndex - 1 ] and
-      // lastPathNodes[ nodeIndex + 1 ], times whatever internal factor Minuit2
-      // uses (seems to be 0.1 or 0.01), but the sizes are adapted as the
-      // minimization proceeds anyway.
+      SetCurrentMinuitSteps( 0.1 );
+      // The starting step sizes for Minuit2 are set to be a twentieth of the
+      // Euclidean length of the difference between
+      // lastPathNodes[ nodeIndex - 1 ] and lastPathNodes[ nodeIndex + 1 ],
+      // times whatever internal factor Minuit2 uses (seems to be 0.1 or 0.01),
+      // but the sizes are adapted as the minimization proceeds anyway.
       SetUpHouseholderReflection();
       AccountForBubbleProfileAroundNode( nodeIndex,
                                          bubbleFromLastPath );

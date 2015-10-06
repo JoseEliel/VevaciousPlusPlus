@@ -42,7 +42,11 @@ namespace VevaciousPlusPlus
   {
     SetParallelVector( returnPathNodes.front(),
                        returnPathNodes.back() );
-    SetCurrentMinuitSteps( segmentAuxiliaryLength );
+
+    // A tenth of the Euclidean distance between hyperplanes is used as the
+    // initial step size for Minuit, though the step size should be adapted
+    // internally as the minimization proceeds.
+    SetCurrentMinuitSteps( 0.1 * segmentAuxiliaryLength );
     SetUpHouseholderReflection();
 
     for( size_t fieldIndex( 0 );
