@@ -118,20 +118,6 @@ namespace VevaciousPlusPlus
                                                tunnelPath,
                                               auxiliaryProfile.front() ) ) ) );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Before loop: currentRadius = " << currentRadius << ", currentVolume = "
-    << currentVolume << ", nextRadius = " << nextRadius << ", nextVolume = "
-    << nextVolume << ", p(0) = " << bubbleProfile->AuxiliaryAtBubbleCenter()
-    << ", B_{-1} = "
-    << pathPotential( bubbleProfile->AuxiliaryAtBubbleCenter() )
-    << ", B_{0} = " << BounceActionDensity( pathPotential,
-                                            tunnelPath,
-                                            auxiliaryProfile.front() )
-    << ", bounceAction = " << bounceAction;
-    std::cout << std::endl;*/
-
     for( size_t radiusIndex( 1 );
          radiusIndex < ( auxiliaryProfile.size() - 1 );
          ++radiusIndex )
@@ -150,21 +136,6 @@ namespace VevaciousPlusPlus
       {
         nextVolume *= ( 0.25 * nextRadius );
       }
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "previousRadius = " << previousRadius
-      << ", previousVolume = " << previousVolume
-      << ", currentRadius = " << currentRadius
-      << ", currentVolume = " << currentVolume
-      << ", nextRadius = " << nextRadius
-      << ", nextVolume = " << nextVolume
-      << ", B_" << radiusIndex << " = "
-      << BounceActionDensity( pathPotential,
-                              tunnelPath,
-                              auxiliaryProfile[ radiusIndex ] );
-      std::cout << std::endl;*/
 
       // B_i * r_i^(d-1) * ( r_{i+1} - r_{i-1} )
       // or B_i * ( r_{i+1}^d - r_{i-1}^d )/d.
@@ -193,11 +164,6 @@ namespace VevaciousPlusPlus
       }
       // The common factor of 0.5 * [solid angle] is being left until after the
       // loop.
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "bounceAction = " << bounceAction;
-      std::cout << std::endl;*/
     }
     // Now we add the last shell:
     double const currentAuxiliary( auxiliaryProfile.back().auxiliaryValue );
@@ -221,12 +187,6 @@ namespace VevaciousPlusPlus
       bounceAction += ( ( kineticTerm + potentialTerm )
                         * ( nextRadius - currentRadius ) * currentArea );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "After last shell, bounceAction = " << bounceAction;
-    std::cout << std::endl;*/
 
     // Near the false vacuum at p = 0, the potential should be of the form
     // constant + p^2 * (d^2V/dp^2) / 2, so the bubble equations of motion can
@@ -263,13 +223,6 @@ namespace VevaciousPlusPlus
     inverseScale( sqrt( pathPotential.SecondDerivativeAtFalseVacuum() ) );
     double const scaledRadius( inverseScale * nextRadius );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "inverseScale = " << inverseScale << ", scaledRadius = "
-    << scaledRadius;
-    std::cout << std::endl;*/
-
     if( nonZeroTemperature )
     {
       // Potential term: (R / b^2 ) * ( 1 + b R ).
@@ -303,13 +256,6 @@ namespace VevaciousPlusPlus
                         * ( potentialTimesFactor
                             + ( 2.375 * kineticTerm * nextRadius ) ) );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "After Bessel or exponent functions to infinity, bounceAction = "
-    << bounceAction;
-    std::cout << std::endl;*/
 
     // The common factor of 1/2 is combined with the solid angle of
     // 2 pi^2 (quantum) or 4 pi (thermal):

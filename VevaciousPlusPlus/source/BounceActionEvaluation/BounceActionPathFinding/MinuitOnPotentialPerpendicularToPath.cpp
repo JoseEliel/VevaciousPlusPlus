@@ -85,7 +85,7 @@ namespace VevaciousPlusPlus
       SetParallelVector( lastPathNodes[ nodeIndex - 1 ],
                          lastPathNodes[ nodeIndex + 1 ] );
       SetCurrentMinuitSteps( 0.1 );
-      // The starting step sizes for Minuit2 are set to be a twentieth of the
+      // The starting step sizes for Minuit2 are set to be a tenth of the
       // Euclidean length of the difference between
       // lastPathNodes[ nodeIndex - 1 ] and lastPathNodes[ nodeIndex + 1 ],
       // times whatever internal factor Minuit2 uses (seems to be 0.1 or 0.01),
@@ -160,48 +160,6 @@ namespace VevaciousPlusPlus
                 * weightedAverageDisplacement( fieldIndex ) ) );
       }
     }
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "MinuitOnPotentialPerpendicularToPath::TryToImprovePath( ... ) about to"
-    << " return new TunnelPath*." << std::endl
-    << "Nodes:" << std::endl
-    << " { lastPathNodes, potential;"
-    //<< std::endl << " "
-    << " returnPathNodes, potential;"
-    // << std::endl << " "
-    << " difference vector, potential difference"
-    // << std::endl
-    << " }"
-    << std::endl;
-    std::vector< double > nodeAsStlVector( numberOfFields );
-    Eigen::VectorXd nodeAsEigenVector;
-    for( size_t nodeIndex( 0 );
-         nodeIndex < returnPathNodes.size();
-         ++nodeIndex )
-    {
-      ConvertEigenToStl( lastPathNodes[ nodeIndex ],
-                         nodeAsStlVector );
-      ConvertStlToEigen( returnPathNodes[ nodeIndex ],
-                         nodeAsEigenVector );
-      double const lastPotential( potentialFunction( nodeAsStlVector ) );
-      double const
-      returnPotential( potentialFunction( returnPathNodes[ nodeIndex ] ) );
-      std::cout << "{ ( " << lastPathNodes[ nodeIndex ].transpose() << " ), "
-      << lastPotential << ";"
-      //<< std::endl << " "
-      << " ("
-      << nodeAsEigenVector.transpose() << " ), " << returnPotential << ";"
-      //<< std::endl << " "
-      << " ("
-      << ( nodeAsEigenVector - lastPathNodes[ nodeIndex ] ).transpose()
-      << " ), "
-      << ( returnPotential - lastPotential )
-      << " }"
-      << std::endl;
-    }
-    std::cout << std::endl;/**/
 
     // Finally we make a new path through returnPathNodes.
     return new LinearSplineThroughNodes( returnPathNodes,

@@ -191,37 +191,6 @@ namespace VevaciousPlusPlus
       ++whichVariable;
     }
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "indexOrder = ";
-    for( std::vector< size_t >::iterator
-         whichIndex( indexOrder.begin() );
-         whichIndex < indexOrder.end();
-         ++whichIndex )
-    {
-      std::cout << std::endl << *whichIndex;
-    }
-    std::cout << std::endl
-    << "complexSolutions = { " << std::endl;
-    for( size_t whichIndex( 0 );
-         whichIndex < complexSolutions.size();
-         ++whichIndex )
-    {
-      if( whichIndex > 0 )
-      {
-        std::cout << ", ";
-        if( ( whichIndex % numberOfVariables ) == 0 )
-        {
-          std::cout << std::endl;
-        }
-      }
-      std::cout << " ( " << complexSolutions[ whichIndex ].real() << ", "
-      << complexSolutions[ whichIndex ].imag() << " i )";
-    }
-    std::cout << "}" << std::endl;
-    std::cout << std::endl;*/
-
     std::vector< std::complex< double > >
     candidateRealSolution( numberOfVariables );
     size_t solutionIndex;
@@ -242,28 +211,6 @@ namespace VevaciousPlusPlus
                                                               1.0 );
       }
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "purelyRealSolutionSets = {" << std::endl;
-    for( std::vector< std::vector< double > >::iterator
-         realSolution( purelyRealSolutionSets.begin() );
-         realSolution < purelyRealSolutionSets.end();
-         ++realSolution )
-    {
-      std::cout << "{";
-      for( std::vector< double >::iterator
-           realValue( realSolution->begin() );
-           realValue < realSolution->end();
-           ++realValue )
-      {
-        std::cout << " " << *realValue;
-      }
-      std::cout << " }" << std::endl;
-    }
-    std::cout << "}" << std::endl;
-    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

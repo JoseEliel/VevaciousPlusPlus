@@ -54,14 +54,6 @@ namespace VevaciousPlusPlus
                                                 double const logarithmOfScale )
   {
     currentValue = (*unaryOperation)( (*functionoidPointer)() );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "[" << this->AsString()
-    << "].UpdateForNewLogarithmOfScale( " << logarithmOfScale
-    << " ) called. currentValue = " << currentValue;
-    std::cout << std::endl;*/
   }
 
   // This is mainly for debugging.

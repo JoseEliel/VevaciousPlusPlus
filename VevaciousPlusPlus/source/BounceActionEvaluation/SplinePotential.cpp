@@ -43,15 +43,6 @@ namespace VevaciousPlusPlus
     pathFalsePotential = potentialFunction( pathFalseEndConfiguration,
                                             pathTemperature );
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Path start: "
-    << potentialFunction.FieldConfigurationAsMathematica(
-                                                    pathFalseEndConfiguration )
-    << ", potential value = " << pathFalsePotential;
-    std::cout << std::endl;/**/
-
     // We start at the assumed path false vacuum, then move along the resolved
     // segment ends to find any that are lower which are not separated by an
     // energy barrier which ends sufficiently far away from the given path
@@ -171,12 +162,6 @@ namespace VevaciousPlusPlus
             - potentialValues[ numberOfNormalSegments + 1 ] )
           * inverseOfAuxiliaryStep * inverseOfAuxiliaryStep );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "SplinePotential ends up as " << this->AsDebuggingString();
-    std::cout << std::endl;*/
   }
 
   SplinePotential::~SplinePotential()
@@ -216,18 +201,6 @@ namespace VevaciousPlusPlus
     }
     double const auxiliaryDifference( auxiliaryValue
                                       - ( auxiliarySteps * auxiliaryStep ) );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "SplinePotential::operator()( auxiliaryValue = " << auxiliaryValue
-    << " ) called. auxiliarySteps = " << auxiliarySteps
-    << ", auxiliaryDifference = " << auxiliaryDifference
-    << ", potentialValues[ " << ( auxiliarySteps - 1 ) << " ] = "
-    << potentialValues[ auxiliarySteps - 1 ]
-    << ", firstDerivatives[ " << ( auxiliarySteps - 1 ) << " ] = "
-    << firstDerivatives[ auxiliarySteps - 1 ];
-    std::cout << std::endl;*/
 
     return ( potentialValues[ auxiliarySteps - 1 ]
           + ( auxiliaryDifference * firstDerivatives[ auxiliarySteps - 1 ] ) );

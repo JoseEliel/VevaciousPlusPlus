@@ -157,44 +157,6 @@ namespace VevaciousPlusPlus
       }
     }
     SetStartHessian( variableIndex );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "startValues = {";
-    for( unsigned int outerIndex( 0 );
-         outerIndex < startValues.size();
-         ++outerIndex )
-    {
-      std::cout << std::endl << "{  ";
-      for( unsigned int innerIndex( 0 );
-           innerIndex < startValues[ outerIndex ].size();
-           ++innerIndex )
-      {
-        std::cout << "  " << startValues[ outerIndex ][ innerIndex ];
-      }
-      std::cout << "  }";
-    }
-    std::cout << std::endl << "}";
-    std::cout << std::endl << "startSystem = {";
-    std::vector< std::string > fieldNames;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfVariables;
-         ++fieldIndex )
-    {
-      std::stringstream stringBuilder;
-      stringBuilder << "fv[" << fieldIndex << "]";
-      fieldNames.push_back( stringBuilder.str() );
-    }
-    for( unsigned int valueIndex( 0 );
-         valueIndex < startSystem.size();
-         ++valueIndex )
-    {
-      std::cout
-      << std::endl << startSystem[ valueIndex ].AsString( fieldNames );
-    }
-    std::cout << std::endl << "}";
-    std::cout << std::endl;*/
   }
 
   // This vetoes a homotopy continuation solution if any of the fields with
@@ -208,24 +170,6 @@ namespace VevaciousPlusPlus
   bool PolynomialGradientTargetSystem::AllowedSolution(
                      std::vector< double > const& solutionConfiguration ) const
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialGradientTargetSystem::AllowedSolution( { ";
-    for( size_t fieldIndex( 0 );
-         fieldIndex < solutionConfiguration.size();
-         ++fieldIndex )
-    {
-      if( fieldIndex > 0 )
-      {
-        std::cout << ", ";
-      }
-      std::cout << solutionConfiguration[ fieldIndex ];
-    }
-    std::cout << " } ) called. treeLevelMinimaOnlyAsValidSolutions = "
-    << treeLevelMinimaOnlyAsValidSolutions;
-    std::cout << std::endl;*/
-
     for( std::vector< size_t >::const_iterator
          positiveIndex( fieldsAssumedPositive.begin() );
          positiveIndex < fieldsAssumedPositive.end();
@@ -261,22 +205,11 @@ namespace VevaciousPlusPlus
       // documentation, so it suffices to only check the 1st value.
       if( eigenvalueFinder.eigenvalues()( 0 ) < 0.0 )
       {
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "1st eigenvalue = " << eigenvalueFinder.eigenvalues()( 0 )
-        << ", so returning false.";
-        std::cout << std::endl;*/
         return false;
       }
     }
     // If we get here, either we were not skipping in the 1st place, or none of
     // the eigenvalues were negative.
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Returning true.";
-    std::cout << std::endl;*/
     return true;
   }
 
@@ -336,30 +269,6 @@ namespace VevaciousPlusPlus
       startHessian[ variableIndex ][ variableIndex ].AddToSum(
                                                     constructedProductOfSums );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialGradientTargetSystem::SetStartHessian( " << variableIndex
-    << " ) set startHessian[ " << variableIndex << " ] to be ";
-    std::cout << std::endl;
-    std::vector< std::string > fieldNames;
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfVariables;
-         ++fieldIndex )
-    {
-      std::stringstream stringBuilder;
-      stringBuilder << "fv[" << fieldIndex << "]";
-      fieldNames.push_back( stringBuilder.str() );
-    }
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfVariables;
-         ++fieldIndex )
-    {
-      std::cout
-      << startHessian[ variableIndex ][ fieldIndex ].AsString( fieldNames )
-      << std::endl;
-    }*/
   }
 
 } /* namespace VevaciousPlusPlus */

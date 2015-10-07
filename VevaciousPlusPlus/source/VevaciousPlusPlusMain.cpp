@@ -46,12 +46,6 @@ int main( int argumentCount,
                                                    "" ) );
   std::string outputFolder( argumentParser.fromTag( "OutputFolder",
                                                     "" ) );
-  // debugging:
-  /**/std::cout << std::endl << "debugging:"
-  << std::endl
-  << "inputFolder = \"" << inputFolder << "\", inputFolder.empty() = "
-  << inputFolder.empty();
-  std::cout << std::endl;/**/
 
   if( !(inputFolder.empty()) )
   {
@@ -96,126 +90,10 @@ int main( int argumentCount,
     }
   }
 
-
-  // placeholder:
-  /**/std::cout << std::endl
-  << "Placeholder: "
-  << "EVERYTHING AFTER THIS IS CODE TO TEST STUFF!";
-  std::cout << std::endl;/**/
-
-  // The RunningParameterManager class handles SLHA data and interpolates to
-  // the scale dependence as given in the SLHA file.
-  VevaciousPlusPlus::RunningParameterManager runningParameterManager;
-
-
-  VevaciousPlusPlus::FixedScaleOneLoopPotential
-  fixedScalePotential( argumentParser.fromTag( "model",
-                                 "/home/bol/BOL/C++Projects/VevaciousPlusPlus/"
-                     "VevaciousPlusPlus/ModelFiles/RealMssmWithStopVevs.vin" ),
-                       10.0,
-                       true,
-                       0.5,
-                       runningParameterManager );
-  VevaciousPlusPlus::RgeImprovedOneLoopPotential
-  rgeImprovedPotential( fixedScalePotential );
-
-  // debugging:
-  /**/std::cout << std::endl << "debugging:"
-  << std::endl;
-  runningParameterManager.UpdateSlhaData( slhaFile );
-
-  std::cout
-  << "Fixed-scale at origin = "
-  << fixedScalePotential( fixedScalePotential.FieldValuesOrigin() )
-  << std::endl;
-  std::cout
-  << "Fixed-scale at DSB = "
-  << fixedScalePotential( fixedScalePotential.DsbFieldValues() )
-  << std::endl;
-  /**/
-
   std::cout
   << std::endl
-  << "------" << std::endl << std::endl;
+  << "Vevacious finished running.";
   std::cout << std::endl;
-
-  double subtractionConstant( fixedScalePotential(
-                                   fixedScalePotential.FieldValuesOrigin() ) );
-  std::cout
-  << std::endl
-  << "At field origin, fixedScalePotential = " << subtractionConstant;
-  std::cout << std::endl;
-
-
-  std::vector< double >
-  testConfiguration( fixedScalePotential.FieldValuesOrigin() );
-  for( int vdStep( 0 );
-       vdStep < 13;
-       ++vdStep )
-  {
-    testConfiguration[ 0 ]
-    = ( 0.1 * vdStep * std::max( 1.0,
-                                 fixedScalePotential.DsbFieldValues()[ 0 ] ) );
-    if( testConfiguration.size() > 1 )
-    {
-      for( int vuStep( 0 );
-           vuStep < 13;
-           ++vuStep )
-      {
-        testConfiguration[ 1 ]
-        = ( 0.1 * vuStep * std::max( 1.0,
-                                 fixedScalePotential.DsbFieldValues()[ 1 ] ) );
-        std::cout << "For "
-        << fixedScalePotential.FieldConfigurationAsMathematica(
-                                                            testConfiguration )
-        << ", fixedScalePotential => "
-        << fixedScalePotential( testConfiguration )
-        << " => " << ( fixedScalePotential( testConfiguration )
-                       - subtractionConstant )
-        << "; tree = "
-        << fixedScalePotential.QuickApproximation( testConfiguration );
-        std::cout << std::endl;
-      }
-    }
-    else
-    {
-      std::cout << "For "
-      << fixedScalePotential.FieldConfigurationAsMathematica(
-                                                            testConfiguration )
-      << ", fixedScalePotential => "
-      << fixedScalePotential( testConfiguration )
-      << " => " << ( fixedScalePotential( testConfiguration )
-                     - subtractionConstant )
-      << "; tree = "
-      << fixedScalePotential.QuickApproximation( testConfiguration );
-      std::cout << std::endl;
-    }
-  }/**/
-
-  std::cout << std::endl;
-  std::cout << std::endl;
-
-  std::cout
-  << std::endl
-  << "Still to do:" << std::endl
-  << "check new straight paths code in CosmoTransitionsRunner for thermal"
-  << " action T dependence fit" << std::endl
-  << "note rcode from CosmoTransitions and maybe issue warning" << std::endl
-  << "put functionality into MinuitOnPotentialPerpendicularToPath and into"
-  << " MinimizingNormalForcesOnBisections (also rename that) to move nodes by"
-  << " only a fraction (e.g. 0.75) of the displacement from the starting point"
-  << " given by Minuit2, and to take the weighted average of that displacement"
-  << " with neighboring displacements (e.g. displace node[i] by average of"
-  << " displacement[i] with weight 1, displacement[i-1] and [i+1] each with"
-  << " weight 0.5, [i-2] and [i+2] each with weight 0.25)" << std::endl
-  << "find out why \"do not move if Minuit2 result is worse\" is still moving"
-  << " path nodes" << std::endl
-  << "write MinuitBetweenPaths subclasses" << std::endl
-  << "write BertiniRunner" << std::endl
-  << "write BasicPolynomialHomotopyContinuation" << std::endl
-  << "think about uncertainties" << std::endl;
-  std::cout << std::endl;
-
 
   // this was a triumph! I'm making a note here:
   return EXIT_SUCCESS;

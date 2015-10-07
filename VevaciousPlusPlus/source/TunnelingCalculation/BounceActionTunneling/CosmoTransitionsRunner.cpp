@@ -248,21 +248,6 @@ namespace VevaciousPlusPlus
                                   fitTemperatures,
                                   straightPathActions );
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Fitted actions as [ T, S ]:" << std::endl;
-    for( size_t whichNode( 0 );
-         whichNode < thermalStraightPathFitResolution;
-         ++whichNode )
-    {
-      std::cout
-      << "[ " << fitTemperatures[ whichNode ] << ", "
-      << straightPathActions[ whichNode ] << " ]" << std::endl;
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;/**/
-
     ThermalActionFitter thermalActionFitter( fitTemperatures,
                                              straightPathActions,
                                   rangeOfMaxTemperatureForOriginToTrue.first );

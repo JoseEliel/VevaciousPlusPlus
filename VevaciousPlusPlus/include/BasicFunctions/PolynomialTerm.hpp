@@ -72,7 +72,10 @@ namespace VevaciousPlusPlus
 
     // This returns true if the field with index fieldIndex has a non-zero
     // power.
-    bool NonZeroDerivative( size_t const fieldIndex ) const;
+    bool NonZeroDerivative( size_t const fieldIndex ) const
+    { return ( ( fieldPowersByIndex.size() > fieldIndex )
+               &&
+               ( fieldPowersByIndex[ fieldIndex ] > 0 ) ); }
 
     // This returns a PolynomialTerm that is the partial derivative with
     // respect to the field with index fieldIndex.
@@ -197,29 +200,6 @@ namespace VevaciousPlusPlus
     fieldPowersByIndex.clear();
     functionoidProduct.clear();
     currentScaleTotalCoefficient = 1.0;
-  }
-
-  // This returns true if the field with index fieldIndex has a non-zero
-  // power.
-  inline bool
-  PolynomialTerm::NonZeroDerivative( size_t const fieldIndex ) const
-  {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialTerm::NonZeroDerivative( " << fieldIndex
-    << " ) called. fieldPowersByIndex.size() = " << fieldPowersByIndex.size();
-    if( fieldPowersByIndex.size() > fieldIndex )
-    {
-      std::cout
-      << ", fieldPowersByIndex[ fieldIndex ] = "
-      << fieldPowersByIndex[ fieldIndex ] << std::endl;
-    }
-    std::cout << std::endl;*/
-
-    return ( ( fieldPowersByIndex.size() > fieldIndex )
-             &&
-             ( fieldPowersByIndex[ fieldIndex ] > 0 ) );
   }
 
   // This returns a PolynomialTerm that is the partial derivative with

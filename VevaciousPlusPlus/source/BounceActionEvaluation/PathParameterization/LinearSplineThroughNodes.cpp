@@ -20,46 +20,6 @@ namespace VevaciousPlusPlus
     pathSegments( pathNodes.size() - 1 ),
     slopeSquared( -1.0 )
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "LinearSplineThroughNodes::LinearSplineThroughNodes( pathNodes = { ";
-    for( size_t nodeIndex( 0 );
-         nodeIndex < pathNodes.size();
-         ++nodeIndex )
-    {
-      if( nodeIndex > 0 )
-      {
-        std::cout << " }," << std::endl;
-      }
-      std::cout << "{ ";
-      for( size_t fieldIndex( 0 );
-           fieldIndex < pathNodes[ nodeIndex ].size();
-           ++fieldIndex )
-      {
-        if( fieldIndex > 0 )
-        {
-          std::cout << ", ";
-        }
-        std::cout << pathNodes[ nodeIndex ][ fieldIndex ];
-      }
-    }
-    std::cout << " } }, pathParameterization = { " << std::endl;
-    for( std::vector< double >::const_iterator
-         pathParameter( pathParameterization.begin() );
-         pathParameter < pathParameterization.end();
-         ++pathParameter )
-    {
-      if( pathParameter > pathParameterization.begin() )
-      {
-        std::cout << ", ";
-      }
-      std::cout << *pathParameter;
-    }
-    std::cout << " }, pathTemperature = " << pathTemperature
-    << " ) called.";
-    std::cout << std::endl;*/
-
     std::vector< double > segmentLengths( pathSegments.size() );
     double totalLength( 0.0 );
     for( size_t segmentIndex( 0 );
@@ -80,6 +40,7 @@ namespace VevaciousPlusPlus
       segmentLengths[ segmentIndex ] = sqrt( squaredLength );
       totalLength += segmentLengths[ segmentIndex ];
     }
+
     // The constant velocity is totalLength divided by the range of the path
     // auxiliary, which goes from 0 to 1, so the dot product of the vector of
     // the derivatives of the fields with respect to the path auxiliary with
@@ -95,13 +56,6 @@ namespace VevaciousPlusPlus
                                  pathNodes[ segmentIndex + 1 ],
                      ( segmentLengths[ segmentIndex ] * inverseTotalLength ) );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "slopeSquared = " << slopeSquared << ", this->AsDebuggingString() = "
-    << this->AsDebuggingString();
-    std::cout << std::endl;*/
   }
 
   LinearSplineThroughNodes::~LinearSplineThroughNodes()

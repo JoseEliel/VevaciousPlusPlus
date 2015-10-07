@@ -173,25 +173,6 @@ namespace VevaciousPlusPlus
     }
     std::cout << std::endl;
     std::cout << std::endl;
-
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "dsbVacuum = " << dsbVacuum.AsDebuggingString()
-    << std::endl
-    << "panicVacuum = " << panicVacuum.AsDebuggingString()
-    << std::endl
-    << "panicVacua.size() = " << panicVacua.size();
-    for( size_t panicIndex( 0 );
-         panicIndex < panicVacua.size();
-         ++panicIndex )
-    {
-      std::cout << std::endl << "panicVacua[ " << panicIndex << " ] = "
-      << panicVacua[ panicIndex ].AsDebuggingString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;*/
   }
 
 } /* namespace VevaciousPlusPlus */

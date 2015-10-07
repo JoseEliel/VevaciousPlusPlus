@@ -113,21 +113,6 @@ namespace VevaciousPlusPlus
                                                  elementLines[ lineIndex ] ) );
       if( !(readFieldName.empty()) )
       {
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "readFieldName = \"" << readFieldName << "\"";
-        std::cout << std::endl;
-        if( readFieldName.size() > positiveByConvention.size() )
-        {
-          std::cout << "long enough to include positiveByConvention."
-          << " readFieldName.compare(...) = "
-          << readFieldName.compare( ( readFieldName.size()
-                                    - positiveByConvention.size() ),
-                                    positiveByConvention.size(),
-                                    positiveByConvention ) << std::endl;
-        }*/
-
         if( ( readFieldName.size() > positiveByConvention.size() )
             &&
             ( readFieldName.compare( ( readFieldName.size()
@@ -135,17 +120,6 @@ namespace VevaciousPlusPlus
                                      positiveByConvention.size(),
                                      positiveByConvention ) == 0 ) )
         {
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "readFieldName.substr( 0, ( " << readFieldName.size() << " - "
-          << positiveByConvention.size() << " ) = "
-          << ( readFieldName.size() - positiveByConvention.size() )
-          << " ) = \""
-          << readFieldName.substr( 0,
-                       ( readFieldName.size() - positiveByConvention.size() ) )
-          << "\"";
-          std::cout << std::endl;*/
           fieldsAssumedPositive.push_back( fieldNames.size() );
           fieldNames.push_back( FormatVariable(
                                        BOL::StringParser::trimFromFrontAndBack(
@@ -174,51 +148,6 @@ namespace VevaciousPlusPlus
     numberOfFields = fieldNames.size();
     dsbFieldValuePolynomials.resize( numberOfFields );
     dsbFieldValueInputs.resize( numberOfFields );
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses constructor: fieldNames = { \"";
-    for( std::vector< std::string >::const_iterator
-         fieldName( fieldNames.begin() );
-         fieldName < fieldNames.end();
-         ++fieldName )
-    {
-      if( fieldName > fieldNames.begin() )
-      {
-        std::cout << "\", \"";
-      }
-      std::cout << *fieldName;
-    }
-    std::cout << "\" }, fieldsAssumedPositive = { ";
-    for( std::vector< size_t >::const_iterator
-         positiveField( fieldsAssumedPositive.begin() );
-         positiveField < fieldsAssumedPositive.end();
-         ++positiveField )
-    {
-      {
-        if( positiveField > fieldsAssumedPositive.begin() )
-        {
-          std::cout << ", ";
-        }
-        std::cout << *positiveField;
-      }
-    }
-    std::cout << " }, fieldsAssumedNegative = { ";
-    for( std::vector< size_t >::const_iterator
-         negativeField( fieldsAssumedNegative.begin() );
-         negativeField < fieldsAssumedNegative.end();
-         ++negativeField )
-    {
-      {
-        if( negativeField > fieldsAssumedNegative.begin() )
-        {
-          std::cout << ", ";
-        }
-        std::cout << *negativeField;
-      }
-    }
-    std::cout << " }";
-    std::cout << std::endl;*/
     //   </FieldVariables>
     //   <SlhaBlocks>
     successfullyReadElement = elementParser.readNextElement();
@@ -900,28 +829,6 @@ namespace VevaciousPlusPlus
                                               double const inverseScaleSquared,
                                           double const temperatureValue ) const
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::LoopAndThermalCorrections( {";
-    for( std::vector< double >::const_iterator
-         fieldValue( fieldConfiguration.begin() );
-         fieldValue < fieldConfiguration.end();
-         ++fieldValue )
-    {
-      std::cout << "  " << *fieldValue;
-    }
-    std::cout
-    << "  }, [scalarMassesSquaredWithFactors, size = "
-    << scalarMassesSquaredWithFactors.size()
-    << "], [fermionMassesSquaredWithFactors, size = "
-    << fermionMassesSquaredWithFactors.size()
-    << "], [vectorMassesSquaredWithFactors, size = "
-    << vectorMassesSquaredWithFactors.size() << "], inverseScaleSquared = "
-    << inverseScaleSquared << ", temperatureValue = " << temperatureValue
-    << " ) called.";
-    std::cout << std::endl;*/
-
     double inverseTemperatureSquared( 1.0 );
     if( temperatureValue > 0.0 )
     {
@@ -941,14 +848,6 @@ namespace VevaciousPlusPlus
                       scalarQuantumCorrections,
                       scalarThermalCorrections );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "scalarQuantumCorrections = " << scalarQuantumCorrections
-    << ", scalarThermalCorrections = " << scalarThermalCorrections;
-    std::cout << std::endl;*/
-
-
     // Real scalar degrees of freedom add to both quantum and thermal
     // corrections without any factors.
     totalQuantumCorrections += scalarQuantumCorrections;
@@ -963,15 +862,6 @@ namespace VevaciousPlusPlus
                       &(ThermalFunctions::FermionicJ),
                       fermionQuantumCorrections,
                       fermionThermalCorrections );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "-2.0 * fermionQuantumCorrections = "
-    << ( -2.0 * fermionQuantumCorrections )
-    << ", 2.0 * fermionThermalCorrections = "
-    << ( 2.0 * fermionThermalCorrections );
-    std::cout << std::endl;*/
 
     // Weyl fermion degrees of freedom add to both quantum and thermal
     // corrections with a factor of 2, though there is an additional minus sign
@@ -991,15 +881,6 @@ namespace VevaciousPlusPlus
                       vectorQuantumCorrections,
                       vectorThermalCorrections );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "3.0 * vectorQuantumCorrections = "
-    << ( 3.0 * vectorQuantumCorrections )
-    << ", 2.0 * vectorThermalCorrections = "
-    << ( 2.0 * vectorThermalCorrections );
-    std::cout << std::endl;*/
-
     // Vector boson degrees of freedom add to quantum corrections with a factor
     // of 3 in dimensional regularization schemes, and to thermal corrections
     // with a factor of 2.
@@ -1018,13 +899,6 @@ namespace VevaciousPlusPlus
                                               std::string const& stringToParse,
                     std::pair< PolynomialSum, PolynomialSum >& polynomialSums )
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms( \""
-    << stringToParse << "\", ... ) called.";
-    std::cout << std::endl;*/
-
     polynomialSums.first.PolynomialTerms().clear();
     polynomialSums.second.PolynomialTerms().clear();
     if( stringToParse.empty() )
@@ -1051,14 +925,6 @@ namespace VevaciousPlusPlus
       polynomialTerm.MultiplyBy( -1.0 );
     }
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Just made initial polynomialTerm, =" << std::endl
-    << polynomialTerm.AsString();
-    std::cout << std::endl;*/
-
-
     bool imaginaryTerm( false );
     wordStart = PutNextNumberOrVariableIntoPolynomial( stringToParse,
                                                        wordStart,
@@ -1076,14 +942,6 @@ namespace VevaciousPlusPlus
           ||
           ( stringToParse[ wordStart ] == '-' ) )
       {
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "imaginaryTerm = " << imaginaryTerm << std::endl
-        << "polynomialTerm:"
-        << std::endl << polynomialTerm.AsString();
-        std::cout << std::endl;*/
-
         if( polynomialTerm.IsValid() )
         {
           if( imaginaryTerm )
@@ -1108,14 +966,6 @@ namespace VevaciousPlusPlus
                                                          polynomialTerm,
                                                          imaginaryTerm );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "imaginaryTerm = " << imaginaryTerm << std::endl
-    << "polynomialTerm:"
-    << std::endl << polynomialTerm.AsString();
-    std::cout << std::endl;*/
 
     if( polynomialTerm.IsValid() )
     {
@@ -1142,15 +992,6 @@ namespace VevaciousPlusPlus
                                                PolynomialTerm& polynomialTerm,
                                                           bool& imaginaryTerm )
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PotentialFromPolynomialAndMasses::"
-    << "PutNextNumberOrVariableIntoPolynomial( \"" << stringToParse << "\", "
-    << wordStart << ", ..., " << imaginaryTerm << " ) called. stringToParse[ "
-    << wordStart << " ] = \'" << stringToParse[ wordStart ] << "\'";
-    std::cout << std::endl;*/
-
     size_t wordEnd( 0 );
     while( wordStart < stringToParse.size() )
     {
@@ -1199,15 +1040,6 @@ namespace VevaciousPlusPlus
         polynomialTerm.MultiplyBy( BOL::StringParser::stringToDouble(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
-
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "multiplied by number: " << stringToParse.substr( wordStart,
-                                                      ( wordEnd - wordStart ) )
-        << ", returning " << wordEnd;
-        std::cout << std::endl;*/
-
         return wordEnd;
       }
       else if( allowedVariableInitials.find( stringToParse[ wordStart ] )
@@ -1269,13 +1101,6 @@ namespace VevaciousPlusPlus
               ||
               ( variableString[ 0 ] == 'J' ) ) )
         {
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "power of imaginary unit = " << powerInt
-          << ", returning " << wordEnd;
-          std::cout << std::endl;*/
-
           if( ( powerInt % 2 ) == 1 )
           {
             imaginaryTerm = true;
@@ -1297,15 +1122,6 @@ namespace VevaciousPlusPlus
             // and return position of the char just after the parsed chars.
             polynomialTerm.RaiseFieldPower( fieldIndex,
                                             powerInt );
-
-            // debugging:
-            /*std::cout << std::endl << "debugging:"
-            << std::endl
-            << "multiplied by field[ " << fieldIndex << " ] = \""
-            << fieldNames[ fieldIndex ] << "\" to power of " << powerInt
-            << ", returning " << wordEnd;
-            std::cout << std::endl;*/
-
             return wordEnd;
           }
         }
@@ -1316,25 +1132,6 @@ namespace VevaciousPlusPlus
         polynomialTerm.MultiplyBy( runningParameters.GetFunctionoid(
                                                               variableString ),
                                    powerInt );
-
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "multiplied by functionoid ";
-        ParameterFunctionoid* multiplyingFunctionoid(
-                          runningParameters.GetFunctionoid( variableString ) );
-        if( multiplyingFunctionoid == NULL )
-        {
-          std::cout << "NULL";
-        }
-        else
-        {
-          std::cout << multiplyingFunctionoid->AsString();
-        }
-        std::cout << " to power of " << powerInt
-        << ", returning " << wordEnd;
-        std::cout << std::endl;*/
-
         return wordEnd;
       }
       else if( ( stringToParse[ wordStart ] == '+' )
@@ -1367,12 +1164,6 @@ namespace VevaciousPlusPlus
                                            double& cumulativeQuantumCorrection,
                                     double& cumulativeThermalCorrection ) const
   {
-    // debugging:
-    /*std::cout << std::setprecision( 12 ) << std::endl << "debugging:"
-    << std::endl
-    << "inverseScaleSquared = " << inverseScaleSquared;
-    std::cout << std::endl;*/
-
     double currentQuantumCorrection( 0.0 );
     double currentThermalCorrection( 0.0 );
     double massSquared( 0.0 );
@@ -1399,53 +1190,17 @@ namespace VevaciousPlusPlus
                                         * ( log( massSquared
                                                  * inverseScaleSquared )
                                             - subtractFromLogarithm ) );
-
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "massSquared = " << massSquared
-          << std::endl
-          << "massSquared * inverseScaleSquared = "
-          << ( massSquared * inverseScaleSquared )
-          << std::endl
-          << "log(massSquared * inverseScaleSquared ) = "
-          << log( massSquared * inverseScaleSquared )
-          << std::endl
-          << "log(massSquared * inverseScaleSquared )"
-          <<  " - subtractFromLogarithm = "
-          << ( log( massSquared * inverseScaleSquared )
-               - subtractFromLogarithm )
-          << std::endl
-          << "total correction = "
-          << ( massSquared * massSquared
-              * ( log( massSquared
-                       * inverseScaleSquared )
-                  - subtractFromLogarithm ) );
-          std::cout << std::endl;*/
         }
         if( inverseTemperatureSquared > 0.0 )
         {
           currentThermalCorrection += (*ThermalFunction)( massSquared
                                                  * inverseTemperatureSquared );
         }
-
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "*massSquaredIterator = " << *massSquaredIterator
-        << ", currentQuantumCorrection = " << currentQuantumCorrection;
-        std::cout << std::endl;*/
       }
       cumulativeQuantumCorrection
       += ( massesSquared->second * currentQuantumCorrection );
       cumulativeThermalCorrection
       += ( massesSquared->second * currentThermalCorrection );
-
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "cumulativeQuantumCorrection = " << cumulativeQuantumCorrection;
-      std::cout << std::endl;*/
     }
   }
 

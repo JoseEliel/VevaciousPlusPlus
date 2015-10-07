@@ -209,12 +209,6 @@ namespace VevaciousPlusPlus
           * hBarInGigaElectronVoltSeconds )
         / fourthRootOfSolitonicFactor );
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "quantumLifetimeInSeconds = " << quantumLifetimeInSeconds;
-    std::cout << std::endl;/**/
-
     double
     survivalExponent( ageOfKnownUniverseInSeconds / quantumLifetimeInSeconds );
     if( survivalExponent >= maximumPowerOfNaturalExponent )
@@ -230,12 +224,6 @@ namespace VevaciousPlusPlus
     {
       quantumSurvivalProbability = exp( -survivalExponent );
     }
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "quantumSurvivalProbability = " << quantumSurvivalProbability;
-    std::cout << std::endl;/**/
   }
 
   // This should set thermalSurvivalProbability and
@@ -406,11 +394,6 @@ namespace VevaciousPlusPlus
       thermalSurvivalProbability
       = exp( -exp( logOfMinusLogOfThermalProbability ) );
     }
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "thermalSurvivalProbability = " << thermalSurvivalProbability;
-    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -64,18 +64,14 @@ namespace VevaciousPlusPlus
          nodeIndex <= numberOfVaryingNodes;
          ++nodeIndex )
     {
-      // Each minimization in the next hyperplane starts at the previous node
-      // plus the difference vector going to the previous node from the node
-      // previous to that
-      // (e.g. node[ 3 ] = vector sum of node[ 2 ] + ( node[ 2 ] - node[ 1 ] ),
-      // hence the factor of 2 and the minus sign).
+      // Each minimization in the next hyperplane starts at points along the
+      // straight vector between the vacua at equal intervals.
       for( size_t fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
         currentHyperplaneOrigin( fieldIndex )
-        = ( ( 2.0 * returnPathNodes[ nodeIndex - 1 ][ fieldIndex ] )
-            - returnPathNodes[ nodeIndex - 2 ][ fieldIndex ] );
+        += ( segmentAuxiliaryLength * currentParallelComponent( fieldIndex ) );
       }
       RunMigradAndPutTransformedResultIn( returnPathNodes[ nodeIndex ] );
     }

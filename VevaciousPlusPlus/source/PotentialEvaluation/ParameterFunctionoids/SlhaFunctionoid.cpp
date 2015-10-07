@@ -42,14 +42,6 @@ namespace VevaciousPlusPlus
     scaleCoefficients( scaleLogarithmPowerCoefficients.CoefficientVector() );
     scaleCoefficients.resize( numberOfScales );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "[" << this->AsString()
-    << "].UpdateForNewSlhaParameters() called. numberOfScales = "
-    << numberOfScales;
-    std::cout << std::endl;*/
-
     if( numberOfScales > 1 )
     {
       double logarithmOfScale;
@@ -77,34 +69,10 @@ namespace VevaciousPlusPlus
         }
       }
 
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "scaleDependenceMatrix = " << std::endl
-      << scaleDependenceMatrix << std::endl
-      << "scaleDependenceVector = " << std::endl
-      << scaleDependenceVector << std::endl;
-      std::cout << std::endl;*/
-
       // Now we solve for the coefficients:
       scaleLogarithmPowerCoefficients.CopyFromEigen(
                              scaleDependenceMatrix.colPivHouseholderQr().solve(
                                                      scaleDependenceVector ) );
-      // debugging:
-      /*std::cout << std::endl << "debugging:"
-      << std::endl
-      << "scaleLogarithmPowerCoefficients = {";
-      for( std::vector< double >::const_iterator
-           coefficientValue(
-                 scaleLogarithmPowerCoefficients.CoefficientVector().begin() );
-           coefficientValue
-           < scaleLogarithmPowerCoefficients.CoefficientVector().end();
-           ++coefficientValue )
-      {
-        std::cout << " " << *coefficientValue;
-      }
-      std::cout << " }";
-      std::cout << std::endl;*/
     }
     else
     {

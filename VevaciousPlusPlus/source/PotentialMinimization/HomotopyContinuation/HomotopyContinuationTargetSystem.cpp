@@ -43,22 +43,6 @@ namespace VevaciousPlusPlus
                            std::vector< std::vector< double > >& realSolutions,
                                                   double const resolutionSize )
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "HomotopyContinuationTargetSystem::"
-    << "AppendPureRealSolutionAndValidSignFlips( {";
-    for( std::vector< std::complex< double > >::const_iterator
-         fieldValue( solutionConfiguration.begin() );
-         fieldValue < solutionConfiguration.end();
-         ++fieldValue )
-    {
-      std::cout << " ( " << fieldValue->real() << ", " << fieldValue->imag()
-          << " )";
-    }
-    std::cout << " }, ... ) called.";
-    std::cout << std::endl;*/
-
     // First we return from the function having done nothing if the solution is
     // not purely real.
     size_t const numberOfValues( solutionConfiguration.size() );
@@ -71,12 +55,6 @@ namespace VevaciousPlusPlus
           ||
           ( solutionConfiguration[ fieldIndex ].imag() < -resolutionSize ) )
       {
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "Not purely real (" << solutionConfiguration[ fieldIndex ].imag()
-        << "i).";
-        std::cout << std::endl;*/
         return;
       }
       realSolution[ fieldIndex ] = solutionConfiguration[ fieldIndex ].real();
@@ -139,24 +117,6 @@ namespace VevaciousPlusPlus
         // to realSolutions if it doesn't solve the target system.
         if( !validSolution )
         {
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "signFlip {";
-          for( std::vector< double >::const_iterator
-               fieldValue( signFlip->begin() );
-               fieldValue < signFlip->end();
-               ++fieldValue )
-          {
-            if( fieldValue != signFlip->begin() )
-            {
-              std::cout << ", ";
-            }
-            std::cout << *fieldValue;
-          }
-          std::cout << " } failed to solve target system.";
-          std::cout << std::endl;*/
-
           break;
         }
       }
@@ -168,33 +128,6 @@ namespace VevaciousPlusPlus
              existingSolution < realSolutions.end();
              ++existingSolution )
         {
-          // debugging:
-          /*std::cout << std::endl << "debugging:"
-          << std::endl
-          << "Comparing *signFlip = { ";
-          for( size_t valueIndex( 0 );
-               valueIndex < numberOfValues;
-               ++valueIndex )
-          {
-            if( valueIndex > 0 )
-            {
-              std::cout << ", ";
-            }
-            std::cout << (*signFlip)[ valueIndex ];
-          }
-          std::cout << " } to *existingSolution = { ";
-          for( size_t valueIndex( 0 );
-               valueIndex < numberOfValues;
-               ++valueIndex )
-          {
-            if( valueIndex > 0 )
-            {
-              std::cout << ", ";
-            }
-            std::cout << (*existingSolution)[ valueIndex ];
-          }
-          std::cout << " }. resolutionSize = " << resolutionSize;
-          std::cout << std::endl;*/
           validSolution = false;
           for( size_t valueIndex( 0 );
                valueIndex < numberOfValues;

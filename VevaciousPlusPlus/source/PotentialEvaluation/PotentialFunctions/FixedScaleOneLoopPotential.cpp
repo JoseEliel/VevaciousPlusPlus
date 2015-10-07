@@ -62,50 +62,17 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const temperatureValue ) const
   {
-    // debugging:
-    /*std::cout << "debugging: FixedScaleOneLoopPotential( "
-    << FieldConfigurationAsMathematica( fieldConfiguration ) << ", T = "
-    << temperatureValue << " ) called.";
-    std::cout << std::endl;*/
-
     std::vector< double > cappedFieldConfiguration( fieldConfiguration );
     double const squaredLengthBeyondCap( CapFieldConfiguration(
                                                   cappedFieldConfiguration ) );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "squaredLengthBeyondCap = " << squaredLengthBeyondCap;
-    std::cout << std::endl;*/
-
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << " scalarSquareMasses";
-    std::cout << std::endl;*/
     AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       scalarSquareMasses,
                                       scalarMassesSquaredWithFactors );
     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::operator():"
-    << " fermionMasses";
-    std::cout << std::endl;*/
     AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       fermionSquareMasses,
                                       fermionMassesSquaredWithFactors );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::operator():"
-    << " vectorSquareMasses";
-    std::cout << std::endl;*/
     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       vectorSquareMasses,

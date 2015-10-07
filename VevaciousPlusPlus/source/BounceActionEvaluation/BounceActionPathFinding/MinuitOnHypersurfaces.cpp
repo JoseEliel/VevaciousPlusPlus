@@ -130,14 +130,6 @@ namespace VevaciousPlusPlus
     ROOT::Minuit2::FunctionMinimum const minuitResult( mnMigrad( 0,
                                                     currentMinuitTolerance ) );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "minuitResult.Fval() = " << minuitResult.Fval()
-    << ", (*this)( nodeZeroParameterization ) = "
-    << (*this)( nodeZeroParameterization );
-    std::cout << std::endl;*/
-
     // We return a zero displacement if Minuit2 failed to minimize operator()
     // better than that.
     if( minuitResult.Fval() > (*this)( nodeZeroParameterization ) )
@@ -146,8 +138,8 @@ namespace VevaciousPlusPlus
     }
     ROOT::Minuit2::MnUserParameters const&
     userParameters( minuitResult.UserParameters() );
-    // We assume that minuitResultAsUntransformedVector( 0 ) was set to 0.0
-    // in the constructor and never changes.
+    // We assume that minuitResultAsUntransformedVector( 0 ) was set to 0.0 in
+    // the constructor and never changes.
     for( size_t variableIndex( 1 );
          variableIndex < numberOfFields;
          ++variableIndex )

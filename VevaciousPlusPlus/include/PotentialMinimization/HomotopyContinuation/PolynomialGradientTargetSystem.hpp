@@ -211,29 +211,6 @@ namespace VevaciousPlusPlus
       destinationVector[ whichIndex ]
       = targetSystem[ whichIndex ]( solutionConfiguration );
     }
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialGradientTargetSystem::HomotopyContinuationSystemValues("
-    << " {";
-    for( size_t whichIndex( 0 );
-         whichIndex < solutionConfiguration.size();
-         ++whichIndex )
-    {
-      std::cout << " ( " << solutionConfiguration[ whichIndex ].real()
-       << ", " << solutionConfiguration[ whichIndex ].imag() << " )";
-    }
-    std::cout << " }, ... ) set destinationVector to be { ";
-    for( size_t whichIndex( 0 );
-         whichIndex < destinationVector.size();
-         ++whichIndex )
-    {
-      std::cout << " ( " << destinationVector[ whichIndex ].real()
-       << ", " << destinationVector[ whichIndex ].imag() << " )";
-    }
-    std::cout << " }.";
-    std::cout << std::endl;
-    std::cout << std::endl;*/
   }
 
   // This evaluates the target system and places the values in
@@ -288,15 +265,6 @@ namespace VevaciousPlusPlus
     std::vector< PolynomialTerm > const& polynomialForGradient(
                                        potentialPolynomial.PolynomialTerms() );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "PolynomialGradientTargetSystem::PreparePolynomialGradient()"
-    <<  " called. targetSystem.size() set to "
-    << targetSystem.size()
-    <<  ", polynomialForGradient.size() = " << polynomialForGradient.size();
-    std::cout << std::endl;*/
-
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfVariables;
          ++fieldIndex )
@@ -306,14 +274,6 @@ namespace VevaciousPlusPlus
            whichTerm < polynomialForGradient.end();
            ++whichTerm )
       {
-        // debugging:
-        /*std::cout << std::endl << "debugging:"
-        << std::endl
-        << "trying to differentiate [" << whichTerm->AsDebuggingString()
-        << "] with respect to fieldNames[ " << fieldIndex << " ] = \""
-        << fieldNames[ fieldIndex ] << "\".";
-        std::cout << std::endl;*/
-
         if( whichTerm->NonZeroDerivative( fieldIndex ) )
         {
           targetSystem[ fieldIndex ].PolynomialTerms().push_back(
@@ -321,22 +281,6 @@ namespace VevaciousPlusPlus
         }
       }
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "potentialPolynomial =" << std::endl
-    << potentialPolynomial.AsDebuggingString() << std::endl
-    << "targetSystem =" << std::endl;
-    for( std::vector< PolynomialSum >::iterator
-         whichTadpole( targetSystem.begin() );
-         whichTadpole < targetSystem.end();
-         ++whichTadpole )
-    {
-      std::cout << std::endl << whichTadpole->AsDebuggingString();
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;*/
   }
 
 

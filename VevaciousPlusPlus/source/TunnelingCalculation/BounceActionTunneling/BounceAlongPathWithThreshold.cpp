@@ -106,15 +106,6 @@ namespace VevaciousPlusPlus
     double smallestExponent( bounceOverTemperature );
     dominantTemperatureInGigaElectronVolts = 0.0;
 
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "currentTemperature = " << currentTemperature
-    << ", bounceOverTemperature = " << bounceOverTemperature
-    << ", partialDecayWidth = " << partialDecayWidth
-    << ", thresholdPartialWidth = " << thresholdDecayWidth;
-    std::cout << std::endl;/**/
-
     for( size_t whichStep( 1 );
          whichStep < thermalIntegrationResolution;
          ++whichStep )
@@ -248,25 +239,6 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
-    // debugging:
-    /**/std::string straightPathPicture( "StraightBubbleProfile.eps" );
-    std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Initial straight path being plotted in " << straightPathPicture << ".";
-    std::cout << std::endl;
-    std::vector< std::string > fieldColors;
-    fieldColors.push_back( "red" );
-    fieldColors.push_back( "brown" );
-    fieldColors.push_back( "blue" );
-    fieldColors.push_back( "purple" );
-    fieldColors.push_back( "green" );
-    fieldColors.push_back( "cyan" );
-    actionCalculator->PlotBounceConfiguration( *bestPath,
-                                               *bestBubble,
-                                               fieldColors,
-                                               straightPathPicture,
-                                               pathPotentialResolution );/**/
-
     for( std::vector< BouncePathFinder* >::iterator
          pathFinder( pathFinders.begin() );
          pathFinder < pathFinders.end();
@@ -313,18 +285,10 @@ namespace VevaciousPlusPlus
         nextPath( (*pathFinder)->TryToImprovePath( *currentPath,
                                                    *currentBubble ) );
 
-        // debugging:
-        /**/std::cout << std::endl << "debugging:"
-        << std::endl
-        << "nextPath:" << std::endl
-        << nextPath->AsDebuggingString() << std::endl;
         SplinePotential potentialApproximation( potentialFunction,
                                                 *nextPath,
                                                 pathPotentialResolution,
                                              requiredVacuumSeparationSquared );
-        std::cout << "potentialApproximation:" << std::endl
-        << potentialApproximation.AsDebuggingString();
-        std::cout << std::endl;/**/
 
         BubbleProfile const* nextBubble( (*actionCalculator)( *nextPath,
                                                     potentialApproximation ) );
@@ -361,7 +325,7 @@ namespace VevaciousPlusPlus
         currentPath = nextPath;
 
         std::cout << std::endl
-        << "Improved path bounce action = " << currentBubble->bounceAction;
+        << "bounce action for new path = " << currentBubble->bounceAction;
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
@@ -379,33 +343,6 @@ namespace VevaciousPlusPlus
         }
         std::cout << ".";
         std::cout << std::endl;
-
-        // debugging:
-        /**/std::string nextPathPicture( "NextBubbleProfile.eps" );
-        std::cout << std::endl << "debugging:"
-        << std::endl
-        << "nextPath being plotted in " << nextPathPicture << ".";
-        std::cout << std::endl;
-        std::vector< std::string > fieldColors;
-        fieldColors.push_back( "red" );
-        fieldColors.push_back( "brown" );
-        fieldColors.push_back( "blue" );
-        fieldColors.push_back( "purple" );
-        fieldColors.push_back( "green" );
-        fieldColors.push_back( "cyan" );
-        actionCalculator->PlotBounceConfiguration( *nextPath,
-                                                   *nextBubble,
-                                                   fieldColors,
-                                                   nextPathPicture,
-                                                   pathPotentialResolution );
-        std::cout << std::endl;
-        std::cout << "Dummy input for pause.";
-        std::cout << std::endl;
-        std::cin >> nextPathPicture;
-        std::cout << std::endl;
-        std::cout << "Resuming.";
-        std::cout << std::endl;/**/
-
       } while( ( bestBubble->bounceAction > actionThreshold )
                &&
                (*pathFinder)->PathCanBeImproved( *currentBubble ) );
@@ -427,17 +364,6 @@ namespace VevaciousPlusPlus
         break;
       }
     }
-    // debugging:
-    /**/std::string finalPathPicture( "FinalBubbleProfile.eps" );
-    std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Final deformed path being plotted in " << finalPathPicture << ".";
-    std::cout << std::endl;
-    actionCalculator->PlotBounceConfiguration( *bestPath,
-                                               *bestBubble,
-                                               fieldColors,
-                                               finalPathPicture,
-                                               pathPotentialResolution );/**/
 
     std::cout << std::endl
     << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
