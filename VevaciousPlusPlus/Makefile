@@ -44,7 +44,8 @@ POTENTIALEVALUATION= source/PotentialMinimization/
 HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
-SOURCES= source/BasicFunctions/PolynomialSum.cpp \
+SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
+ source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/PolynomialTerm.cpp \
  source/BasicFunctions/ProductOfPolynomialSums.cpp \
  source/BasicFunctions/SimplePolynomial.cpp \

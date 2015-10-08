@@ -60,7 +60,8 @@ namespace VevaciousPlusPlus
                           size_t const powerInt );
 
     // This multiplies coefficientConstant by multiplicationFactor.
-    void MultiplyBy( double const multiplicationFactor );
+    void MultiplyBy( double const multiplicationFactor )
+    { coefficientConstant *= multiplicationFactor; }
 
     // This adds runningParameter to the set of functionoids which multiply
     // coefficientConstant to form the scale-dependent coefficient.
@@ -118,11 +119,11 @@ namespace VevaciousPlusPlus
     double const FieldProduct( double doubleToMultiply,
                        std::vector< double > const& fieldConfiguration ) const;
 
-    // This returns doubleToMultiply multiplied by the funtionoids in
+    // This returns doubleToMultiply multiplied by the functionoids in
     // functionoidProduct using the values from the last scale update.
     double const FunctionoidProduct( double doubleToMultiply ) const;
 
-    // This returns doubleToMultiply multiplied by the funtionoids in
+    // This returns doubleToMultiply multiplied by the functionoids in
     // functionoidProduct at the scale given by the natural exponent of
     // logarithmOfScale.
     double const FunctionoidProduct( double doubleToMultiply,
@@ -148,12 +149,6 @@ namespace VevaciousPlusPlus
       returnValue *= fieldConfiguration[ *whichField ];
     }
     return returnValue;
-  }
-
-  // This multiplies coefficientConstant by multiplicationFactor.
-  inline void PolynomialTerm::MultiplyBy( double const multiplicationFactor )
-  {
-    coefficientConstant *= multiplicationFactor;
   }
 
   // This adds runningParameter to the set of functionoids which multiply
@@ -244,7 +239,7 @@ namespace VevaciousPlusPlus
     return doubleToMultiply;
   }
 
-  // This returns doubleToMultiply multiplied by the funtionoids in
+  // This returns doubleToMultiply multiplied by the functionoids in
   // functionoidProduct using the values from the last scale update.
   inline double const
   PolynomialTerm::FunctionoidProduct( double doubleToMultiply ) const
@@ -259,7 +254,7 @@ namespace VevaciousPlusPlus
     return doubleToMultiply;
   }
 
-  // This returns doubleToMultiply multiplied by the funtionoids in
+  // This returns doubleToMultiply multiplied by the functionoids in
   // functionoidProduct at the scale given by the natural exponent of
   // logarithmOfScale.
   inline double const
