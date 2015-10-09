@@ -8,11 +8,11 @@
 #ifndef GRADIENTFROMSTARTINGPOINTS_HPP_
 #define GRADIENTFROMSTARTINGPOINTS_HPP_
 
+#include "../LagrangianParameterManagement/SlhaManager.hpp"
 #include "PotentialMinimizer.hpp"
 #include "StartingPointFinder.hpp"
 #include "GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "SlhaManagement/SlhaManager.hpp"
 #include "HomotopyContinuation/Hom4ps2Runner.hpp"
 #include "GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 

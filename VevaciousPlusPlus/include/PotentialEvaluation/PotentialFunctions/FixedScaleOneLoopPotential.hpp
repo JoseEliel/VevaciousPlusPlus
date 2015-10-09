@@ -8,16 +8,16 @@
 #ifndef FIXEDSCALEONELOOPPOTENTIAL_HPP_
 #define FIXEDSCALEONELOOPPOTENTIAL_HPP_
 
+#include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "../../LagrangianParameterManagement/SlhaManager.hpp"
 #include "CommonIncludes.hpp"
-#include "PotentialFromPolynomialAndMasses.hpp"
-#include "SlhaManagement/RunningParameterManager.hpp"
-#include "SlhaManagement/SlhaManager.hpp"
+#include "OldPotentialFromPolynomialAndMasses.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class FixedScaleOneLoopPotential : public PotentialFromPolynomialAndMasses
+  class FixedScaleOneLoopPotential : public OldPotentialFromPolynomialAndMasses
   {
   public:
     FixedScaleOneLoopPotential( std::string const& modelFilename,
@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager );
     FixedScaleOneLoopPotential(
-          PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
+          OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
     virtual ~FixedScaleOneLoopPotential();
 
 

@@ -5,16 +5,16 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/OldSymmetricComplexMassMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  SymmetricComplexMassMatrix::SymmetricComplexMassMatrix(
+  OldSymmetricComplexMassMatrix::OldSymmetricComplexMassMatrix(
                                                      size_t const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
-                                                       attributeMap ),
+    OldMassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
+                                                          attributeMap ),
     matrixElements( ( numberOfRows * numberOfRows ),
                     std::pair< PolynomialSum, PolynomialSum >( PolynomialSum(),
                                                             PolynomialSum() ) )
@@ -22,22 +22,22 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  SymmetricComplexMassMatrix::SymmetricComplexMassMatrix(
-                               SymmetricComplexMassMatrix const& copySource ) :
-    MassesSquaredFromMatrix( copySource ),
+  OldSymmetricComplexMassMatrix::OldSymmetricComplexMassMatrix(
+                               OldSymmetricComplexMassMatrix const& copySource ) :
+    OldMassesSquaredFromMatrix( copySource ),
     matrixElements( copySource.matrixElements )
   {
     // This constructor is just an initialization list.
   }
 
-  SymmetricComplexMassMatrix::SymmetricComplexMassMatrix() :
-    MassesSquaredFromMatrix(),
+  OldSymmetricComplexMassMatrix::OldSymmetricComplexMassMatrix() :
+    OldMassesSquaredFromMatrix(),
     matrixElements()
   {
     // This constructor is just an initialization list.
   }
 
-  SymmetricComplexMassMatrix::~SymmetricComplexMassMatrix()
+  OldSymmetricComplexMassMatrix::~OldSymmetricComplexMassMatrix()
   {
     // This does nothing.
   }
@@ -46,7 +46,7 @@ namespace VevaciousPlusPlus
   // This returns a matrix of the values of the elements for a field
   // configuration given by fieldConfiguration, with all functionoids
   // evaluated at the last scale which was used to update them.
-  Eigen::MatrixXcd SymmetricComplexMassMatrix::MatrixToSquare(
+  Eigen::MatrixXcd OldSymmetricComplexMassMatrix::MatrixToSquare(
                        std::vector< double > const& fieldConfiguration ) const
   {
     size_t rowsTimesLength( 0 );
@@ -90,7 +90,7 @@ namespace VevaciousPlusPlus
   // This returns a matrix of the values of the elements for a field
   // configuration given by fieldConfiguration, with all functionoids
   // evaluated at the natural exponent of logarithmOfScale.
-  Eigen::MatrixXcd SymmetricComplexMassMatrix::MatrixToSquare(
+  Eigen::MatrixXcd OldSymmetricComplexMassMatrix::MatrixToSquare(
                                std::vector< double > const& fieldConfiguration,
                                           double const logarithmOfScale ) const
   {
@@ -137,7 +137,7 @@ namespace VevaciousPlusPlus
 
   // This returns a matrix that is the lower-triangular part (only column
   // index <= row index) of the square of matrixToSquare.
-  Eigen::MatrixXcd SymmetricComplexMassMatrix::LowerTriangleOfSquareMatrix(
+  Eigen::MatrixXcd OldSymmetricComplexMassMatrix::LowerTriangleOfSquareMatrix(
                                  Eigen::MatrixXcd const& matrixToSquare ) const
   {
     Eigen::MatrixXcd valuesSquaredMatrix( numberOfRows,

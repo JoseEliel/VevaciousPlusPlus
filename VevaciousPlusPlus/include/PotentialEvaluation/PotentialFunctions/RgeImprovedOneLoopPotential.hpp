@@ -8,18 +8,18 @@
 #ifndef RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 #define RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 
+#include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "../../LagrangianParameterManagement/SlhaManager.hpp"
+#include "../OldMassesSquaredCalculator.hpp"
 #include "CommonIncludes.hpp"
-#include "PotentialFromPolynomialAndMasses.hpp"
-#include "SlhaManagement/RunningParameterManager.hpp"
-#include "SlhaManagement/SlhaManager.hpp"
-#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
+#include "OldPotentialFromPolynomialAndMasses.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "PotentialMinimization/HomotopyContinuation/FieldPolynomialsWithScale.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class RgeImprovedOneLoopPotential : public PotentialFromPolynomialAndMasses
+  class RgeImprovedOneLoopPotential : public OldPotentialFromPolynomialAndMasses
   {
   public:
     RgeImprovedOneLoopPotential( std::string const& modelFilename,
@@ -28,7 +28,7 @@ namespace VevaciousPlusPlus
                                double const assumedPositiveOrNegativeTolerance,
                             RunningParameterManager& runningParameterManager );
     RgeImprovedOneLoopPotential(
-    PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );
+    OldPotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );
     virtual ~RgeImprovedOneLoopPotential();
 
 
@@ -78,7 +78,7 @@ namespace VevaciousPlusPlus
     // exponent of logarithmOfScale.
     void AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
                std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors,
                                          double const logarithmOfScale ) const;
 
@@ -118,11 +118,11 @@ namespace VevaciousPlusPlus
   inline void
   RgeImprovedOneLoopPotential::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
                std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors,
                                           double const logarithmOfScale ) const
   {
-    for( std::vector< MassesSquaredCalculator* >::const_iterator
+    for( std::vector< OldMassesSquaredCalculator* >::const_iterator
          whichMatrix( massSquaredMatrices.begin() );
          whichMatrix < massSquaredMatrices.end();
          ++whichMatrix )

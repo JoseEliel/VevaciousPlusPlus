@@ -222,7 +222,7 @@
      and are interpreted with the standard operator precedence. Raising x to
      the nth power (where n is a natural number) can be written using a caret:
      x^n, for example. This does not work for constant numbers! Division is not
-     possible, unfortunately; none of '/', 'Ö', nor "^-" are permitted: please
+     possible, unfortunately; none of '/', '\D6', nor "^-" are permitted: please
      expand out e.g. 4.0/8.0 as 0.5 or use DerivedParameters for such things as
      a ratio of parameters from an SLHA file. -->
 <!-- The TreeLevelPotential element should be a polynomial as described above.

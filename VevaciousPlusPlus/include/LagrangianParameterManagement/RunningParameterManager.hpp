@@ -8,13 +8,13 @@
 #ifndef RUNNINGPARAMETERMANAGER_HPP_
 #define RUNNINGPARAMETERMANAGER_HPP_
 
+#include "../LagrangianParameterManagement/SlhaManager.hpp"
 #include "CommonIncludes.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoid.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoids/BinaryOperationFunctionoid.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoids/ConstantFunctionoid.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoids/SlhaFunctionoid.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoids/UnaryOperationFunctionoid.hpp"
-#include "SlhaManager.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -11,10 +11,10 @@ namespace VevaciousPlusPlus
 {
 
   TunnelingCalculator::TunnelingCalculator(
-                                    SlhaUpdatePropagator& slhaUpdatePropagator,
+                                    ParameterUpdatePropagator& slhaUpdatePropagator,
                                      TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold ) :
-    SlhaUpdatePropagator( slhaUpdatePropagator ),
+    ParameterUpdatePropagator( slhaUpdatePropagator ),
     tunnelingStrategy( tunnelingStrategy ),
     quantumSurvivalProbability( -1.0 ),
     logOfMinusLogOfQuantumProbability( -1.0E+100 ),

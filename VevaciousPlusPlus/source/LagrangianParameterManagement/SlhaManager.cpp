@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "SlhaManagement/SlhaManager.hpp"
+#include "../../include/LagrangianParameterManagement/SlhaManager.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -13,7 +13,7 @@ namespace VevaciousPlusPlus
   SlhaManager::SlhaManager() :
     BOL::BasicObserved()
   {
-    // This does nothing.
+    // This constructor is just an initialization list.
   }
 
   SlhaManager::~SlhaManager()

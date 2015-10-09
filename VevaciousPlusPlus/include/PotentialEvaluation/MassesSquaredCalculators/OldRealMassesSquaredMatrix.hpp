@@ -5,25 +5,26 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef REALMASSESSQUAREDMATRIX_HPP_
-#define REALMASSESSQUAREDMATRIX_HPP_
+#ifndef OLDREALMASSESSQUAREDMATRIX_HPP_
+#define OLDREALMASSESSQUAREDMATRIX_HPP_
 
 #include "CommonIncludes.hpp"
-#include "MassesSquaredFromMatrix.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
 #include "Eigen/Dense"
+#include "OldMassesSquaredFromMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class RealMassesSquaredMatrix : public MassesSquaredFromMatrix< double >
+  class OldRealMassesSquaredMatrix :
+                                    public OldMassesSquaredFromMatrix< double >
   {
   public:
-    RealMassesSquaredMatrix( size_t const numberOfRows,
+    OldRealMassesSquaredMatrix( size_t const numberOfRows,
                     std::map< std::string, std::string > const& attributeMap );
-    RealMassesSquaredMatrix( RealMassesSquaredMatrix const& copySource );
-    RealMassesSquaredMatrix();
-    virtual ~RealMassesSquaredMatrix();
+    OldRealMassesSquaredMatrix( OldRealMassesSquaredMatrix const& copySource );
+    OldRealMassesSquaredMatrix();
+    virtual ~OldRealMassesSquaredMatrix();
 
 
     // This allows access to the polynomial sum for a given index.
@@ -59,7 +60,7 @@ namespace VevaciousPlusPlus
 
 
   // This is mainly for debugging:
-  inline std::string RealMassesSquaredMatrix::AsString() const
+  inline std::string OldRealMassesSquaredMatrix::AsString() const
   {
     std::stringstream returnStream;
     returnStream
@@ -77,4 +78,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* REALMASSESSQUAREDMATRIX_HPP_ */
+#endif /* OLDREALMASSESSQUAREDMATRIX_HPP_ */

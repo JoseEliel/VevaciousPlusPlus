@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFromPolynomialAndMasses( modelFilename,
+    OldPotentialFromPolynomialAndMasses( modelFilename,
                                       scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       assumedPositiveOrNegativeTolerance,
@@ -35,8 +35,8 @@ namespace VevaciousPlusPlus
   }
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-   PotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses ) :
-    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
+   OldPotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses ) :
+    OldPotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
     logarithmOfMinimumRenormalizationScale( log(
                                         currentMinimumRenormalizationScale ) ),
     logarithmOfMaximumRenormalizationScale( log(

@@ -8,17 +8,17 @@
 #ifndef POTENTIALFUNCTION_HPP_
 #define POTENTIALFUNCTION_HPP_
 
+#include "../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 #include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class PotentialFunction : public SlhaUpdatePropagator
+  class PotentialFunction : public ParameterUpdatePropagator
   {
   public:
-    PotentialFunction( SlhaManager& slhaManager );
+    PotentialFunction( ParameterUpdatePropagator& parameterUpdatePropagator );
     PotentialFunction( PotentialFunction const& copySource );
     virtual ~PotentialFunction();
 
@@ -89,6 +89,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    ParameterUpdatePropagator& parameterUpdatePropagator;
     std::vector< std::string > fieldNames;
     size_t numberOfFields;
     std::vector< double > dsbFieldValueInputs;

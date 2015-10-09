@@ -5,15 +5,15 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/OldComplexMassSquaredMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
+  OldComplexMassSquaredMatrix::OldComplexMassSquaredMatrix(
                                                      size_t const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
+    OldMassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
                                                        attributeMap ),
     matrixElements( ( numberOfRows * numberOfRows ),
                     std::pair< PolynomialSum, PolynomialSum >( PolynomialSum(),
@@ -22,22 +22,22 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  ComplexMassSquaredMatrix::ComplexMassSquaredMatrix(
-                                 ComplexMassSquaredMatrix const& copySource ) :
-    MassesSquaredFromMatrix< std::complex< double > >( copySource ),
+  OldComplexMassSquaredMatrix::OldComplexMassSquaredMatrix(
+                                 OldComplexMassSquaredMatrix const& copySource ) :
+    OldMassesSquaredFromMatrix< std::complex< double > >( copySource ),
     matrixElements( copySource.matrixElements )
   {
     // This constructor is just an initialization list.
   }
 
-  ComplexMassSquaredMatrix::ComplexMassSquaredMatrix() :
-    MassesSquaredFromMatrix< std::complex< double > >(),
+  OldComplexMassSquaredMatrix::OldComplexMassSquaredMatrix() :
+    OldMassesSquaredFromMatrix< std::complex< double > >(),
     matrixElements()
   {
     // This constructor is just an initialization list.
   }
 
-  ComplexMassSquaredMatrix::~ComplexMassSquaredMatrix()
+  OldComplexMassSquaredMatrix::~OldComplexMassSquaredMatrix()
   {
     // This does nothing.
   }
@@ -46,7 +46,7 @@ namespace VevaciousPlusPlus
   // This returns a matrix of the values of the elements for a field
   // configuration given by fieldConfiguration, with all functionoids
   // evaluated at the last scale which was used to update them.
-  Eigen::MatrixXcd ComplexMassSquaredMatrix::CurrentValues(
+  Eigen::MatrixXcd OldComplexMassSquaredMatrix::CurrentValues(
                         std::vector< double > const& fieldConfiguration ) const
   {
     size_t rowsTimesLength( 0 );
@@ -86,7 +86,7 @@ namespace VevaciousPlusPlus
   // This returns a matrix of the values of the elements for a field
   // configuration given by fieldConfiguration, with all functionoids
   // evaluated at the natural exponent of logarithmOfScale.
-  Eigen::MatrixXcd ComplexMassSquaredMatrix::CurrentValues(
+  Eigen::MatrixXcd OldComplexMassSquaredMatrix::CurrentValues(
                                std::vector< double > const& fieldConfiguration,
                                           double const logarithmOfScale ) const
   {

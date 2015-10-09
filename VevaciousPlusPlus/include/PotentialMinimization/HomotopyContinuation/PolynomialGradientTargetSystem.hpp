@@ -8,10 +8,10 @@
 #ifndef POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 #define POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 
+#include "../../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"
 #include "HomotopyContinuationTargetSystem.hpp"
-#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 #include "BasicFunctions/PolynomialTerm.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
 #include "BasicFunctions/ProductOfPolynomialSums.hpp"
@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
   public:
     PolynomialGradientTargetSystem( PolynomialSum const& potentialPolynomial,
                                     size_t const numberOfVariables,
-                                    SlhaUpdatePropagator& previousPropagator,
+                                    ParameterUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
                                 bool const treeLevelMinimaOnlyAsValidSolutions,

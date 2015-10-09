@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
   // This class is an abstract base class to try to impose some consistency on
   // PotentialMinimizers and TunnelingCalculators so that they share the data
   // from an SLHA file.
-  class SlhaManager : public BOL::BasicObserved
+  class SlhaManager : public LagrangianParameterManager
   {
   public:
     SlhaManager();

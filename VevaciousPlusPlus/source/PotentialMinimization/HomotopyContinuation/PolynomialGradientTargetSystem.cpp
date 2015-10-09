@@ -13,7 +13,7 @@ namespace VevaciousPlusPlus
   PolynomialGradientTargetSystem::PolynomialGradientTargetSystem(
                                       PolynomialSum const& potentialPolynomial,
                                                    size_t const numberOfFields,
-                                      SlhaUpdatePropagator& previousPropagator,
+                                      ParameterUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
                                 bool const treeLevelMinimaOnlyAsValidSolutions,

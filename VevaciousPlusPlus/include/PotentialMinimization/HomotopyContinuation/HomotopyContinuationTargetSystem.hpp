@@ -8,16 +8,16 @@
 #ifndef HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 #define HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 
+#include "../../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
-#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class HomotopyContinuationTargetSystem : public SlhaUpdatePropagator
+  class HomotopyContinuationTargetSystem : public ParameterUpdatePropagator
   {
   public:
     HomotopyContinuationTargetSystem(
-                                    SlhaUpdatePropagator& previousPropagator );
+                                    ParameterUpdatePropagator& previousPropagator );
     HomotopyContinuationTargetSystem( SlhaManager& slhaManager );
     virtual ~HomotopyContinuationTargetSystem();
 

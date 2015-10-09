@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFromPolynomialAndMasses( modelFilename,
+    OldPotentialFromPolynomialAndMasses( modelFilename,
                                       scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       assumedPositiveOrNegativeTolerance,
@@ -34,8 +34,8 @@ namespace VevaciousPlusPlus
   }
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
-         PotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
-    PotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
+         OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
+    OldPotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
     inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,

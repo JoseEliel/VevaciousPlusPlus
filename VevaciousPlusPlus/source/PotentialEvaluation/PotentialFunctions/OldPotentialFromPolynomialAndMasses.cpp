@@ -5,36 +5,37 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
+#include "../../../include/PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
+
 #include "VevaciousPlusPlus.hpp"
 
 namespace VevaciousPlusPlus
 {
   std::string const
-  PotentialFromPolynomialAndMasses::digitChars( "0123456789" );
+  OldPotentialFromPolynomialAndMasses::digitChars( "0123456789" );
   std::string const
-  PotentialFromPolynomialAndMasses::dotAndDigits( "."
-                              + PotentialFromPolynomialAndMasses::digitChars );
-  std::string const PotentialFromPolynomialAndMasses::allowedVariableInitials(
+  OldPotentialFromPolynomialAndMasses::dotAndDigits( "."
+                              + OldPotentialFromPolynomialAndMasses::digitChars );
+  std::string const OldPotentialFromPolynomialAndMasses::allowedVariableInitials(
                                                    "qwertyuiopasdfghjklzxcvbnm"
                                                 "QWERTYUIOPASDFGHJKLZXCVBNM" );
-  std::string const PotentialFromPolynomialAndMasses::allowedVariableChars(
-                      PotentialFromPolynomialAndMasses::allowedVariableInitials
-                                 + PotentialFromPolynomialAndMasses::digitChars
+  std::string const OldPotentialFromPolynomialAndMasses::allowedVariableChars(
+                      OldPotentialFromPolynomialAndMasses::allowedVariableInitials
+                                 + OldPotentialFromPolynomialAndMasses::digitChars
                                                                       + "_~" );
-  double const PotentialFromPolynomialAndMasses::piSquared(
+  double const OldPotentialFromPolynomialAndMasses::piSquared(
        boost::math::double_constants::pi * boost::math::double_constants::pi );
   double const
-  PotentialFromPolynomialAndMasses::loopFactor( 1.0
-                    / ( 64.0 * PotentialFromPolynomialAndMasses::piSquared ) );
-  double const PotentialFromPolynomialAndMasses::thermalFactor( 1.0
-                     / ( 2.0 * PotentialFromPolynomialAndMasses::piSquared ) );
-  std::string const PotentialFromPolynomialAndMasses::positiveByConvention(
+  OldPotentialFromPolynomialAndMasses::loopFactor( 1.0
+                    / ( 64.0 * OldPotentialFromPolynomialAndMasses::piSquared ) );
+  double const OldPotentialFromPolynomialAndMasses::thermalFactor( 1.0
+                     / ( 2.0 * OldPotentialFromPolynomialAndMasses::piSquared ) );
+  std::string const OldPotentialFromPolynomialAndMasses::positiveByConvention(
                                                       "PositiveByConvention" );
-  std::string const PotentialFromPolynomialAndMasses::negativeByConvention(
+  std::string const OldPotentialFromPolynomialAndMasses::negativeByConvention(
                                                       "NegativeByConvention" );
 
-  PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
+  OldPotentialFromPolynomialAndMasses::OldPotentialFromPolynomialAndMasses(
                                               std::string const& modelFilename,
                                           double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
@@ -300,7 +301,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                      " RealBosonMassSquaredMatrix was not a square integer!" );
         }
-        RealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
+        OldRealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
                                  elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -311,7 +312,7 @@ namespace VevaciousPlusPlus
                                     massSquaredMatrix.ElementAt( lineIndex ) );
         }
         if( massSquaredMatrix.GetSpinType()
-            == MassesSquaredCalculator::gaugeBoson )
+            == OldMassesSquaredCalculator::gaugeBoson )
         {
           vectorMassSquaredMatrices.push_back( massSquaredMatrix );
         }
@@ -337,7 +338,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                           " WeylFermionMassMatrix was not a square integer!" );
         }
-        SymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
+        OldSymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
                                  elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -366,7 +367,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
             " ComplexWeylFermionMassSquaredMatrix was not a square integer!" );
         }
-        ComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
+        OldComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
                                  elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -414,7 +415,7 @@ namespace VevaciousPlusPlus
     }
   }
 
-  PotentialFromPolynomialAndMasses::~PotentialFromPolynomialAndMasses()
+  OldPotentialFromPolynomialAndMasses::~OldPotentialFromPolynomialAndMasses()
   {
     // This does nothing.
   }
@@ -425,7 +426,7 @@ namespace VevaciousPlusPlus
   // in pythonFilename for fv being an array of floating-point numbers in the
   // same order as they are for the field configurations as internal to this
   // C++ code. It uses the virtual function SetScaleForPythonPotentialCall.
-  void PotentialFromPolynomialAndMasses::WriteAsPython(
+  void OldPotentialFromPolynomialAndMasses::WriteAsPython(
                                        std::string const pythonFilename ) const
   {
     std::ofstream pythonFile( pythonFilename.c_str() );
@@ -496,7 +497,7 @@ namespace VevaciousPlusPlus
     "\n"
     "def ScalarMassesSquaredWithFactors( fv ):\n"
     "    massesSquaredWithFactors = []\n";
-    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
          whichMatrix( scalarMassSquaredMatrices.begin() );
          whichMatrix < scalarMassSquaredMatrices.end();
          ++whichMatrix )
@@ -523,7 +524,7 @@ namespace VevaciousPlusPlus
     "\n"
     "def FermionMassesSquaredWithFactors( fv ):\n"
     "    massesSquaredWithFactors = []\n";
-    for( std::vector< ComplexMassSquaredMatrix >::const_iterator
+    for( std::vector< OldComplexMassSquaredMatrix >::const_iterator
          whichMatrix( fermionMassSquaredMatrices.begin() );
          whichMatrix < fermionMassSquaredMatrices.end();
          ++whichMatrix )
@@ -548,7 +549,7 @@ namespace VevaciousPlusPlus
       "    massesSquaredWithFactors.append( [ numpy.linalg.eigvalsh( M ),\n"
       "                     " << whichMatrix->MultiplicityFactor() << " ] )\n";
     }
-    for( std::vector< SymmetricComplexMassMatrix >::const_iterator
+    for( std::vector< OldSymmetricComplexMassMatrix >::const_iterator
          whichMatrix( fermionMassMatrices.begin() );
          whichMatrix < fermionMassMatrices.end();
          ++whichMatrix )
@@ -578,7 +579,7 @@ namespace VevaciousPlusPlus
     "\n"
     "def VectorMassesSquaredWithFactors( fv ):\n"
     "    massesSquaredWithFactors = []\n";
-    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
          whichMatrix( vectorMassSquaredMatrices.begin() );
          whichMatrix < vectorMassSquaredMatrices.end();
          ++whichMatrix )
@@ -721,7 +722,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is just for derived classes.
-  PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
+  OldPotentialFromPolynomialAndMasses::OldPotentialFromPolynomialAndMasses(
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction( runningParameterManager ),
     IWritesPythonPotential(),
@@ -753,8 +754,8 @@ namespace VevaciousPlusPlus
   }
 
   // This is just for derived classes.
-  PotentialFromPolynomialAndMasses::PotentialFromPolynomialAndMasses(
-                         PotentialFromPolynomialAndMasses const& copySource ) :
+  OldPotentialFromPolynomialAndMasses::OldPotentialFromPolynomialAndMasses(
+                         OldPotentialFromPolynomialAndMasses const& copySource ) :
     PotentialFunction( copySource ),
     IWritesPythonPotential(),
     runningParameters( copySource.runningParameters ),
@@ -821,7 +822,7 @@ namespace VevaciousPlusPlus
   // This evaluates the one-loop potential with thermal corrections assuming
   // that the scale has been set correctly.
   double
-  PotentialFromPolynomialAndMasses::LoopAndThermalCorrections(
+  OldPotentialFromPolynomialAndMasses::LoopAndThermalCorrections(
                                std::vector< double > const& fieldConfiguration,
           std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
          std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
@@ -895,7 +896,7 @@ namespace VevaciousPlusPlus
 
   // This interprets stringToParse as a sum of polynomial terms and sets
   // polynomialSum accordingly.
-  void PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
+  void OldPotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
                                               std::string const& stringToParse,
                     std::pair< PolynomialSum, PolynomialSum >& polynomialSums )
   {
@@ -986,7 +987,7 @@ namespace VevaciousPlusPlus
   // If there was a factor of "i", "I", "j", or "J", imaginaryTerm is set to
   // true.
   size_t
-  PotentialFromPolynomialAndMasses::PutNextNumberOrVariableIntoPolynomial(
+  OldPotentialFromPolynomialAndMasses::PutNextNumberOrVariableIntoPolynomial(
                                               std::string const& stringToParse,
                                                               size_t wordStart,
                                                PolynomialTerm& polynomialTerm,
@@ -1155,7 +1156,7 @@ namespace VevaciousPlusPlus
   // temperature given by inverseTemperatureSquared^(-1/2) using a thermal
   // correction function given by ThermalFunction, and adds them to
   // cumulativeQuantumCorrection and cumulativeThermalCorrection.
-  void PotentialFromPolynomialAndMasses::AddToCorrections(
+  void OldPotentialFromPolynomialAndMasses::AddToCorrections(
          std::vector< DoubleVectorWithDouble > const& massesSquaredWithFactors,
                                               double const inverseScaleSquared,
                                         double const inverseTemperatureSquared,
@@ -1205,7 +1206,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is for debugging.
-  std::string PotentialFromPolynomialAndMasses::AsDebuggingString() const
+  std::string OldPotentialFromPolynomialAndMasses::AsDebuggingString() const
   {
     std::stringstream returnStream;
     returnStream << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
@@ -1238,7 +1239,7 @@ namespace VevaciousPlusPlus
     << polynomialLoopCorrections.AsDebuggingString()
     << std::endl
     << "scalarSquareMasses = " << std::endl;
-    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
          whichScalar( scalarMassSquaredMatrices.begin() );
          whichScalar < scalarMassSquaredMatrices.end();
          ++whichScalar )
@@ -1248,7 +1249,7 @@ namespace VevaciousPlusPlus
     returnStream << std::endl;
     returnStream << std::endl
     << "fermionMasses = " << std::endl;
-    for( std::vector< SymmetricComplexMassMatrix >::const_iterator
+    for( std::vector< OldSymmetricComplexMassMatrix >::const_iterator
          whichFermion( fermionMassMatrices.begin() );
          whichFermion < fermionMassMatrices.end();
          ++whichFermion )
@@ -1258,7 +1259,7 @@ namespace VevaciousPlusPlus
     returnStream << std::endl;
     returnStream << std::endl
     << "fermionMassSquareds = " << std::endl;
-    for( std::vector< ComplexMassSquaredMatrix >::const_iterator
+    for( std::vector< OldComplexMassSquaredMatrix >::const_iterator
          whichFermion( fermionMassSquaredMatrices.begin() );
          whichFermion < fermionMassSquaredMatrices.end();
          ++whichFermion )
@@ -1268,7 +1269,7 @@ namespace VevaciousPlusPlus
     returnStream << std::endl;
     returnStream << std::endl
     << "vectorSquareMasses = " << std::endl;
-    for( std::vector< RealMassesSquaredMatrix >::const_iterator
+    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
          whichVector( vectorMassSquaredMatrices.begin() );
          whichVector < vectorMassSquaredMatrices.end();
          ++whichVector )

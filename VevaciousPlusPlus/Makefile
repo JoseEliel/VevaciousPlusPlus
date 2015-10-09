@@ -69,23 +69,30 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/BounceActionEvaluation/SplinePotential.cpp \
  source/BounceActionEvaluation/UndershootOvershootBubble.cpp \
  source/MinuitWrappersAndHelpers/MinuitMinimum.cpp \
+ $(MASSESSQUAREDCALCULATORS)/BaseComplexMassMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/OldComplexMassSquaredMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/OldRealMassesSquaredMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/OldSymmetricComplexMassMatrix.cpp \
  $(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
- $(POTENTIALFUNCTIONS)/PotentialFromPolynomialAndMasses.cpp \
+ $(POTENTIALFUNCTIONS)/PotentialFromPolynomialWithMasses.cpp \
+ $(POTENTIALFUNCTIONS)/OldPotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ source/PotentialEvaluation/OldMassesSquaredCalculator.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- source/SlhaManagement/RunningParameterManager.cpp \
- source/SlhaManagement/SlhaManager.cpp \
- source/SlhaManagement/SlhaUpdatePropagator.cpp \
+ source/LagrangianParameterManagement/LagrangianParameterManager.cpp \
+ source/LagrangianParameterManagement/RunningParameterManager.cpp \
+ source/LagrangianParameterManagement/SlhaManager.cpp \
+ source/LagrangianParameterManagement/ParameterUpdatePropagator.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \

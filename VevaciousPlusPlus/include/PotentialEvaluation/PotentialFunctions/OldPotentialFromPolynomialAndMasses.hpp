@@ -5,19 +5,19 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
-#define POTENTIALFROMPOLYNOMIALANDMASSES_HPP_
+#ifndef OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_
+#define OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
+#include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "../PotentialFunction.hpp"
-#include "SlhaManagement/RunningParameterManager.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
-#include "../MassesSquaredCalculator.hpp"
-#include "../MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
-#include "../MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
-#include "../MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
-#include "../MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
+#include "../MassesSquaredCalculators/OldComplexMassSquaredMatrix.hpp"
+#include "../MassesSquaredCalculators/OldMassesSquaredFromMatrix.hpp"
+#include "../MassesSquaredCalculators/OldRealMassesSquaredMatrix.hpp"
+#include "../MassesSquaredCalculators/OldSymmetricComplexMassMatrix.hpp"
+#include "../OldMassesSquaredCalculator.hpp"
 #include "../ThermalFunctions.hpp"
 #include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 #include "IWritesPythonPotential.hpp"
@@ -25,16 +25,16 @@
 
 namespace VevaciousPlusPlus
 {
-  class PotentialFromPolynomialAndMasses : public PotentialFunction,
+  class OldPotentialFromPolynomialAndMasses : public PotentialFunction,
                                            public IWritesPythonPotential
   {
   public:
-    PotentialFromPolynomialAndMasses( std::string const& modelFilename,
+    OldPotentialFromPolynomialAndMasses( std::string const& modelFilename,
                                       double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
                             RunningParameterManager& runningParameterManager );
-    virtual ~PotentialFromPolynomialAndMasses();
+    virtual ~OldPotentialFromPolynomialAndMasses();
 
 
     // This writes the potential as
@@ -68,13 +68,13 @@ namespace VevaciousPlusPlus
     double squareOfMaximumRenormalizationScale;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
-    std::vector< MassesSquaredCalculator* > scalarSquareMasses;
-    std::vector< MassesSquaredCalculator* > fermionSquareMasses;
-    std::vector< MassesSquaredCalculator* > vectorSquareMasses;
-    std::vector< RealMassesSquaredMatrix > scalarMassSquaredMatrices;
-    std::vector< SymmetricComplexMassMatrix > fermionMassMatrices;
-    std::vector< ComplexMassSquaredMatrix > fermionMassSquaredMatrices;
-    std::vector< RealMassesSquaredMatrix > vectorMassSquaredMatrices;
+    std::vector< OldMassesSquaredCalculator* > scalarSquareMasses;
+    std::vector< OldMassesSquaredCalculator* > fermionSquareMasses;
+    std::vector< OldMassesSquaredCalculator* > vectorSquareMasses;
+    std::vector< OldRealMassesSquaredMatrix > scalarMassSquaredMatrices;
+    std::vector< OldSymmetricComplexMassMatrix > fermionMassMatrices;
+    std::vector< OldComplexMassSquaredMatrix > fermionMassSquaredMatrices;
+    std::vector< OldRealMassesSquaredMatrix > vectorMassSquaredMatrices;
     double vectorMassCorrectionConstant;
     bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions;
     double const scaleRangeMinimumFactor;
@@ -84,12 +84,12 @@ namespace VevaciousPlusPlus
 
 
     // This is just for derived classes.
-    PotentialFromPolynomialAndMasses(
+    OldPotentialFromPolynomialAndMasses(
                             RunningParameterManager& runningParameterManager );
 
     // This is just for derived classes.
-    PotentialFromPolynomialAndMasses(
-                          PotentialFromPolynomialAndMasses const& copySource );
+    OldPotentialFromPolynomialAndMasses(
+                          OldPotentialFromPolynomialAndMasses const& copySource );
 
     // This evaluates the one-loop potential with thermal corrections assuming
     // that the scale has been set correctly.
@@ -131,7 +131,7 @@ namespace VevaciousPlusPlus
     // which was used to update them.
     void AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
        std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const;
 
     // This evaluates the sum of corrections for the degrees of freedom with
@@ -175,7 +175,7 @@ namespace VevaciousPlusPlus
 
 
   // This puts all index brackets into a consistent form.
-  inline std::string PotentialFromPolynomialAndMasses::FormatVariable(
+  inline std::string OldPotentialFromPolynomialAndMasses::FormatVariable(
                                  std::string const& unformattedVariable ) const
   {
     return RunningParameterManager::FormatVariable( unformattedVariable );
@@ -183,7 +183,7 @@ namespace VevaciousPlusPlus
 
   // This interprets stringToParse as a sum of real polynomial terms and sets
   // polynomialSum accordingly.
-  inline void PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
+  inline void OldPotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
                                               std::string const& stringToParse,
                                                  PolynomialSum& polynomialSum )
   {
@@ -203,12 +203,12 @@ namespace VevaciousPlusPlus
   // massSquaredMatrices, with all functionoids evaluated at the last scale
   // which was used to update them.
   inline void
-  PotentialFromPolynomialAndMasses::AddMassesSquaredWithMultiplicity(
+  OldPotentialFromPolynomialAndMasses::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
         std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const
   {
-    for( std::vector< MassesSquaredCalculator* >::const_iterator
+    for( std::vector< OldMassesSquaredCalculator* >::const_iterator
          whichMatrix( massSquaredMatrices.begin() );
          whichMatrix < massSquaredMatrices.end();
          ++whichMatrix )
@@ -220,4 +220,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* POTENTIALFROMPOLYNOMIALANDMASSES_HPP_ */
+#endif /* OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_ */

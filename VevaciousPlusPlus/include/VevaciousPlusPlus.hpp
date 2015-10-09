@@ -10,9 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "VersionInformation.hpp"
-#include "SlhaManagement/RunningParameterManager.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialAndMasses.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 #include "PotentialMinimization/PotentialMinimizer.hpp"
@@ -30,6 +28,8 @@
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
+#include "LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -130,7 +130,7 @@ namespace VevaciousPlusPlus
     SlhaManager* slhaManager;
     RunningParameterManager* ownedSlhaManager;
     PotentialFunction* potentialFunction;
-    PotentialFromPolynomialAndMasses* ownedPotentialFunction;
+    OldPotentialFromPolynomialAndMasses* ownedPotentialFunction;
     PotentialMinimizer* potentialMinimizer;
     PotentialMinimizer* ownedPotentialMinimizer;
     TunnelingCalculator* tunnelingCalculator;

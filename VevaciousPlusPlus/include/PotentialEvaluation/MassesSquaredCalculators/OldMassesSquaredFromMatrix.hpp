@@ -5,8 +5,8 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef MASSESSQUAREDFROMMATRIX_HPP_
-#define MASSESSQUAREDFROMMATRIX_HPP_
+#ifndef OLDMASSESSQUAREDFROMMATRIX_HPP_
+#define OLDMASSESSQUAREDFROMMATRIX_HPP_
 
 #include "CommonIncludes.hpp"
 #include "../MassesSquaredCalculator.hpp"
@@ -14,18 +14,18 @@
 
 namespace VevaciousPlusPlus
 {
-  template< typename ElementType > class MassesSquaredFromMatrix :
-                                                 public MassesSquaredCalculator
+  template< typename ElementType > class OldMassesSquaredFromMatrix :
+                                              public OldMassesSquaredCalculator
   {
   public:
     typedef typename
     Eigen::Matrix< ElementType, Eigen::Dynamic, Eigen::Dynamic > EigenMatrix;
 
-    MassesSquaredFromMatrix( size_t numberOfRows,
+    OldMassesSquaredFromMatrix( size_t numberOfRows,
                     std::map< std::string, std::string > const& attributeMap );
-    MassesSquaredFromMatrix( MassesSquaredFromMatrix const& copySource );
-    MassesSquaredFromMatrix();
-    virtual ~MassesSquaredFromMatrix();
+    OldMassesSquaredFromMatrix( OldMassesSquaredFromMatrix const& copySource );
+    OldMassesSquaredFromMatrix();
+    virtual ~OldMassesSquaredFromMatrix();
 
 
     // This returns the eigenvalues of the matrix, with all functionoids
@@ -62,34 +62,34 @@ namespace VevaciousPlusPlus
 
 
   template< typename ElementType > inline
-  MassesSquaredFromMatrix< ElementType >::MassesSquaredFromMatrix(
+  OldMassesSquaredFromMatrix< ElementType >::OldMassesSquaredFromMatrix(
                                                            size_t numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    MassesSquaredCalculator( attributeMap ),
+    OldMassesSquaredCalculator( attributeMap ),
     numberOfRows( numberOfRows )
   {
     // This constructor is just an initialization list.
   }
 
   template< typename ElementType > inline
-  MassesSquaredFromMatrix< ElementType >::MassesSquaredFromMatrix(
-                   MassesSquaredFromMatrix< ElementType > const& copySource ) :
-    MassesSquaredCalculator( copySource ),
+  OldMassesSquaredFromMatrix< ElementType >::OldMassesSquaredFromMatrix(
+                   OldMassesSquaredFromMatrix< ElementType > const& copySource ) :
+    OldMassesSquaredCalculator( copySource ),
     numberOfRows( copySource.numberOfRows )
   {
     // This constructor is just an initialization list.
   }
 
   template< typename ElementType > inline
-  MassesSquaredFromMatrix< ElementType >::MassesSquaredFromMatrix() :
-    MassesSquaredCalculator(),
+  OldMassesSquaredFromMatrix< ElementType >::OldMassesSquaredFromMatrix() :
+    OldMassesSquaredCalculator(),
     numberOfRows( 0 )
   {
     // This constructor is just an initialization list.
   }
 
   template< typename ElementType > inline
-  MassesSquaredFromMatrix< ElementType >::~MassesSquaredFromMatrix()
+  OldMassesSquaredFromMatrix< ElementType >::~OldMassesSquaredFromMatrix()
   {
     // This does nothing.
   }
@@ -97,7 +97,7 @@ namespace VevaciousPlusPlus
   // This returns the eigenvalues of the matrix, with all functionoids
   // evaluated at the last scale which was used to update them.
   template< typename ElementType > inline std::vector< double >
-  MassesSquaredFromMatrix< ElementType >::MassesSquared(
+  OldMassesSquaredFromMatrix< ElementType >::MassesSquared(
                         std::vector< double > const& fieldConfiguration ) const
   {
     Eigen::SelfAdjointEigenSolver< EigenMatrix >
@@ -117,7 +117,7 @@ namespace VevaciousPlusPlus
   // This returns the eigenvalues of the matrix, with all functionoids
   // evaluated at the natural exponent of logarithmOfScale.
   template< typename ElementType > inline std::vector< double >
-  MassesSquaredFromMatrix< ElementType >::MassesSquared(
+  OldMassesSquaredFromMatrix< ElementType >::MassesSquared(
                                std::vector< double > const& fieldConfiguration,
                                           double const logarithmOfScale ) const
   {
@@ -137,4 +137,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* MASSESSQUAREDFROMMATRIX_HPP_ */
+#endif /* OLDMASSESSQUAREDFROMMATRIX_HPP_ */

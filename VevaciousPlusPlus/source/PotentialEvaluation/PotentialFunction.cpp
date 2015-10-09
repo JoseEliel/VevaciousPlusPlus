@@ -10,8 +10,10 @@
 namespace VevaciousPlusPlus
 {
 
-  PotentialFunction::PotentialFunction( SlhaManager& slhaManager ) :
-    SlhaUpdatePropagator( slhaManager ),
+  PotentialFunction::PotentialFunction(
+                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
+    ParameterUpdatePropagator( parameterUpdatePropagator ),
+    parameterUpdatePropagator( parameterUpdatePropagator ),
     fieldNames(),
     numberOfFields( 0 ),
     dsbFieldValueInputs()
@@ -20,7 +22,8 @@ namespace VevaciousPlusPlus
   }
 
   PotentialFunction::PotentialFunction( PotentialFunction const& copySource ) :
-    SlhaUpdatePropagator( copySource.slhaManager ),
+    ParameterUpdatePropagator( copySource.parameterUpdatePropagator ),
+    parameterUpdatePropagator( parameterUpdatePropagator ),
     fieldNames( copySource.fieldNames ),
     numberOfFields( copySource.numberOfFields ),
     dsbFieldValueInputs( copySource.dsbFieldValueInputs )

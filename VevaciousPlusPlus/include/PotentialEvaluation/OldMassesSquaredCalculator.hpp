@@ -5,15 +5,15 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef MASSESSQUAREDCALCULATOR_HPP_
-#define MASSESSQUAREDCALCULATOR_HPP_
+#ifndef OLDMASSESSQUAREDCALCULATOR_HPP_
+#define OLDMASSESSQUAREDCALCULATOR_HPP_
 
 #include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class MassesSquaredCalculator
+  class OldMassesSquaredCalculator
   {
   public:
     enum SpinType
@@ -24,11 +24,11 @@ namespace VevaciousPlusPlus
       notSet
     };
 
-    MassesSquaredCalculator(
+    OldMassesSquaredCalculator(
                     std::map< std::string, std::string > const& attributeMap );
-    MassesSquaredCalculator( MassesSquaredCalculator const& copySource );
-    MassesSquaredCalculator();
-    virtual ~MassesSquaredCalculator();
+    OldMassesSquaredCalculator( OldMassesSquaredCalculator const& copySource );
+    OldMassesSquaredCalculator();
+    virtual ~OldMassesSquaredCalculator();
 
 
     // This should return the masses-squared, with all functionoids evaluated
@@ -55,4 +55,4 @@ namespace VevaciousPlusPlus
   };
 
 } /* namespace VevaciousPlusPlus */
-#endif /* MASSESSQUAREDCALCULATOR_HPP_ */
+#endif /* OLDMASSESSQUAREDCALCULATOR_HPP_ */

@@ -5,12 +5,12 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
+#include "../../include/PotentialEvaluation/OldMassesSquaredCalculator.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  MassesSquaredCalculator::MassesSquaredCalculator(
+  OldMassesSquaredCalculator::OldMassesSquaredCalculator(
                    std::map< std::string, std::string > const& attributeMap ) :
     multiplicityFactor( 1.0 ),
     spinType( notSet )
@@ -40,22 +40,22 @@ namespace VevaciousPlusPlus
     }
   }
 
-  MassesSquaredCalculator::MassesSquaredCalculator(
-                                  MassesSquaredCalculator const& copySource ) :
+  OldMassesSquaredCalculator::OldMassesSquaredCalculator(
+                                  OldMassesSquaredCalculator const& copySource ) :
     multiplicityFactor( copySource.multiplicityFactor ),
     spinType( copySource.spinType )
   {
     // This constructor is just an initialization list.
   }
 
-  MassesSquaredCalculator::MassesSquaredCalculator() :
+  OldMassesSquaredCalculator::OldMassesSquaredCalculator() :
     multiplicityFactor( 0.0 ),
     spinType( notSet )
   {
     // This constructor is just an initialization list.
   }
 
-  MassesSquaredCalculator::~MassesSquaredCalculator()
+  OldMassesSquaredCalculator::~OldMassesSquaredCalculator()
   {
     // This does nothing.
   }

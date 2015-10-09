@@ -5,13 +5,13 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "SlhaManagement/SlhaUpdatePropagator.hpp"
+#include "../../include/LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  SlhaUpdatePropagator::SlhaUpdatePropagator(
-                                   SlhaUpdatePropagator& previousPropagator ) :
+  ParameterUpdatePropagator::ParameterUpdatePropagator(
+                                   ParameterUpdatePropagator& previousPropagator ) :
     BOL::PushedToObserver< SlhaManager >(),
     BOL::PushingObserved< SlhaManager >(),
     slhaManager( previousPropagator.slhaManager )
@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
     previousPropagator.registerObserver( this );
   }
 
-  SlhaUpdatePropagator::SlhaUpdatePropagator( SlhaManager& slhaManager ) :
+  ParameterUpdatePropagator::ParameterUpdatePropagator( SlhaManager& slhaManager ) :
     BOL::PushedToObserver< SlhaManager >(),
     BOL::PushingObserved< SlhaManager >(),
     slhaManager( slhaManager )
@@ -27,7 +27,7 @@ namespace VevaciousPlusPlus
     slhaManager.registerObserver( this );
   }
 
-  SlhaUpdatePropagator::~SlhaUpdatePropagator()
+  ParameterUpdatePropagator::~ParameterUpdatePropagator()
   {
     // This does nothing beyond the destructors of the base classes.
   }

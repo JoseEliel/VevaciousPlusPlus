@@ -9,10 +9,11 @@
 #define BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 
 #include <limits>
+
+#include "../LagrangianParameterManagement/SlhaManager.hpp"
 #include "CommonIncludes.hpp"
 #include "TunnelingCalculator.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "SlhaManagement/SlhaManager.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 

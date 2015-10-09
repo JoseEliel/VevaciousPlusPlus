@@ -5,26 +5,26 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef COMPLEXMASSMATRIX_HPP_
-#define COMPLEXMASSMATRIX_HPP_
+#ifndef OLDCOMPLEXMASSMATRIX_HPP_
+#define OLDCOMPLEXMASSMATRIX_HPP_
 
 #include "CommonIncludes.hpp"
-#include "MassesSquaredFromMatrix.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
 #include "Eigen/Dense"
+#include "OldMassesSquaredFromMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SymmetricComplexMassMatrix :
-                       public MassesSquaredFromMatrix< std::complex< double > >
+  class OldSymmetricComplexMassMatrix :
+                       public OldMassesSquaredFromMatrix< std::complex< double > >
   {
   public:
-    SymmetricComplexMassMatrix( size_t const numberOfElements,
+    OldSymmetricComplexMassMatrix( size_t const numberOfElements,
                     std::map< std::string, std::string > const& attributeMap );
-    SymmetricComplexMassMatrix( SymmetricComplexMassMatrix const& copySource );
-    SymmetricComplexMassMatrix();
-    virtual ~SymmetricComplexMassMatrix();
+    OldSymmetricComplexMassMatrix( OldSymmetricComplexMassMatrix const& copySource );
+    OldSymmetricComplexMassMatrix();
+    virtual ~OldSymmetricComplexMassMatrix();
 
 
     // This allows access to the pair of polynomial sums for a given index.
@@ -82,7 +82,7 @@ namespace VevaciousPlusPlus
 
 
   // This is mainly for debugging:
-  inline std::string SymmetricComplexMassMatrix::AsString() const
+  inline std::string OldSymmetricComplexMassMatrix::AsString() const
   {
     std::stringstream returnStream;
     returnStream
@@ -104,4 +104,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* COMPLEXMASSMATRIX_HPP_ */
+#endif /* OLDCOMPLEXMASSMATRIX_HPP_ */

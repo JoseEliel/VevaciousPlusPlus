@@ -8,9 +8,9 @@
 #ifndef FIELDPOLYNOMIALSWITHSCALE_HPP_
 #define FIELDPOLYNOMIALSWITHSCALE_HPP_
 
+#include "../../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "PolynomialGradientTargetSystem.hpp"
-#include "SlhaManagement/SlhaUpdatePropagator.hpp"
 #include "BasicFunctions/PolynomialTerm.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
 
@@ -22,7 +22,7 @@ namespace VevaciousPlusPlus
   public:
     FieldPolynomialsWithScale( PolynomialSum const& potentialPolynomial,
                                size_t const numberOfVariables,
-                               SlhaUpdatePropagator& previousPropagator,
+                               ParameterUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
                                bool const treeLevelMinimaOnlyAsValidSolutions,
