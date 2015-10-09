@@ -27,4 +27,34 @@ namespace VevaciousPlusPlus
     // This does nothing.
   }
 
+
+  // This returns a string that should be valid Python assuming that the
+  // field configuration is given as an array called "fv".
+  std::string PolynomialSum::AsPython() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "( ";
+    if( polynomialTerms.empty() )
+    {
+      stringBuilder << "0.0";
+    }
+    else
+    {
+      for( std::vector< PolynomialTerm >::const_iterator
+           polynomialTerm( polynomialTerms.begin() );
+           polynomialTerm < polynomialTerms.end();
+           ++polynomialTerm )
+      {
+        if( polynomialTerm != polynomialTerms.begin() )
+        {
+          stringBuilder << " + ";
+        }
+        stringBuilder << polynomialTerm->AsPython();
+      }
+    }
+    stringBuilder << " )";
+
+    return stringBuilder.str();
+  }
+
 } /* namespace VevaciousPlusPlus */

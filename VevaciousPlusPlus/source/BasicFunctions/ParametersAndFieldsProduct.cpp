@@ -10,15 +10,94 @@
 namespace VevaciousPlusPlus
 {
 
-  ParametersAndFieldsProduct::ParametersAndFieldsProduct()
+  ParametersAndFieldsProduct::ParametersAndFieldsProduct() :
+    coefficientConstant( 1.0 ),
+    fieldProductByIndex(),
+    fieldPowersByIndex(),
+    parameterIndices(),
+    totalCoefficientForFixedScale( 1.0 )
   {
-    // TODO Auto-generated constructor stub
+    // This constructor is just an initialization list.
+  }
 
+  ParametersAndFieldsProduct::ParametersAndFieldsProduct(
+                               ParametersAndFieldsProduct const& copySource ) :
+    coefficientConstant( copySource.coefficientConstant ),
+    fieldProductByIndex( copySource.fieldProductByIndex ),
+    fieldPowersByIndex( copySource.fieldPowersByIndex ),
+    parameterIndices( copySource.parameterIndices ),
+    totalCoefficientForFixedScale( copySource.totalCoefficientForFixedScale )
+  {
+    // This constructor is just an initialization list.
   }
 
   ParametersAndFieldsProduct::~ParametersAndFieldsProduct()
   {
-    // TODO Auto-generated destructor stub
+    // This does nothing.
+  }
+
+
+  // This returns a string that should be valid Python assuming that the
+  // field configuration is given as an array called "fv" and that the
+  // Lagrangian parameters are in an array called "lp".
+  std::string ParametersAndFieldsProduct::AsPython() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << std::setprecision( 12 ) << "( " << coefficientConstant;
+    for( size_t parameterIndex( 0 );
+         parameterIndex < parameterIndices.size();
+         ++parameterIndex )
+    {
+      stringBuilder << " * lp[ " << parameterIndex << " ]";
+    }
+    for( size_t fieldIndex( 0 );
+         fieldIndex < fieldPowersByIndex.size();
+         ++fieldIndex )
+    {
+      if( fieldPowersByIndex[ fieldIndex ] == 1 )
+      {
+        stringBuilder << " * fv[ " << fieldIndex << " ]";
+      }
+      if( fieldPowersByIndex[ fieldIndex ] > 1 )
+      {
+        stringBuilder << " * (fv[ " << fieldIndex << " ])**"
+        << fieldPowersByIndex[ fieldIndex ];
+      }
+    }
+    stringBuilder << " )";
+
+    return stringBuilder.str();
+  }
+
+  // This is mainly for debugging.
+  std::string ParametersAndFieldsProduct::AsDebuggingString() const
+  {
+    std::stringstream returnStream;
+    returnStream
+    << "coefficientConstant = " << coefficientConstant << std::endl
+    << "fieldProductByIndex = {";
+    for( std::vector< size_t >::const_iterator
+         fieldIndex( fieldProductByIndex.begin() );
+         fieldIndex < fieldProductByIndex.end();
+         ++fieldIndex )
+    {
+      returnStream << " " << *fieldIndex;
+    }
+    returnStream
+    << " }" << std::endl
+    << "parameterIndices = {";
+    for( std::vector< size_t >::const_iterator
+         parameterIndex( parameterIndices.begin() );
+         parameterIndex < parameterIndices.end();
+         ++parameterIndex )
+    {
+      returnStream << " " << *parameterIndex;
+    }
+    returnStream
+    << " }" << std::endl
+    << "totalCoefficientForFixedScale = " << totalCoefficientForFixedScale
+    << std::endl;
+    return returnStream.str();
   }
 
 } /* namespace VevaciousPlusPlus */

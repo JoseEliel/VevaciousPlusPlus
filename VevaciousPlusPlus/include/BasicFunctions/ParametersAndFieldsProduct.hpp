@@ -8,6 +8,8 @@
 #ifndef PARAMETERSANDFIELDSPRODUCT_HPP_
 #define PARAMETERSANDFIELDSPRODUCT_HPP_
 
+#include "CommonIncludes.hpp"
+
 namespace VevaciousPlusPlus
 {
   // This class serves the purpose of turning a vector of field values into a
@@ -67,7 +69,8 @@ namespace VevaciousPlusPlus
                                powerInt,
                                parameterIndex ); }
 
-    // This resets the PolynomialTerm to be as if freshly constructed.
+    // This resets the ParametersAndFieldsProduct to be as if freshly
+    // constructed.
     void ResetValues();
 
     // This returns true if the field with index fieldIndex has a non-zero
@@ -77,22 +80,27 @@ namespace VevaciousPlusPlus
                &&
                ( fieldPowersByIndex[ fieldIndex ] > 0 ) ); }
 
-    // This returns a PolynomialTerm that is the partial derivative with
-    // respect to the field with index fieldIndex.
-    PolynomialTerm PartialDerivative( size_t const fieldIndex ) const;
+    // This returns a ParametersAndFieldsProduct that is the partial derivative
+    // with respect to the field with index fieldIndex.
+    ParametersAndFieldsProduct
+    PartialDerivative( size_t const fieldIndex ) const;
 
     // This returns the sum of the powers of the fields.
     size_t FieldPower() const{ return fieldProductByIndex.size(); }
 
     // This returns a string that should be valid Python assuming that the
-    // field configuration is given as an array called "fv".
+    // field configuration is given as an array called "fv" and that the
+    // Lagrangian parameters are in an array called "lp".
     std::string AsPython() const;
+
+    // This is mainly for debugging.
+    std::string AsDebuggingString() const;
 
 
   protected:
     double coefficientConstant;
     std::vector< size_t > fieldProductByIndex;
-    std::vector< unsigned int > fieldPowersByIndex;
+    std::vector< size_t > fieldPowersByIndex;
     std::vector< size_t > parameterIndices;
     double totalCoefficientForFixedScale;
 
@@ -123,6 +131,39 @@ namespace VevaciousPlusPlus
                                  0 );
     }
     fieldPowersByIndex[ fieldIndex ] += powerInt;
+  }
+
+  // This resets the ParametersAndFieldsProduct to be as if freshly
+  // constructed.
+  inline void ParametersAndFieldsProduct::ResetValues()
+  {
+    coefficientConstant = 1.0;
+    fieldProductByIndex.clear();
+    fieldPowersByIndex.clear();
+    parameterIndices.clear();
+    totalCoefficientForFixedScale = 1.0;
+  }
+
+  // This returns a ParametersAndFieldsProduct that is the partial derivative
+  // with respect to the field with index fieldIndex.
+  inline ParametersAndFieldsProduct
+  ParametersAndFieldsProduct::PartialDerivative(
+                                                size_t const fieldIndex ) const
+  {
+    ParametersAndFieldsProduct returnTerm( *this );
+    returnTerm.coefficientConstant *= fieldPowersByIndex[ fieldIndex ];
+    returnTerm.fieldPowersByIndex[ fieldIndex ] -= 1;
+    returnTerm.fieldProductByIndex.clear();
+    for( size_t whichField( 0 );
+         whichField < fieldPowersByIndex.size();
+         ++whichField )
+    {
+        returnTerm.fieldProductByIndex.insert(
+                                          returnTerm.fieldProductByIndex.end(),
+                                   returnTerm.fieldPowersByIndex[ whichField ],
+                                               whichField );
+    }
+    return returnTerm;
   }
 
   // This returns doubleToMultiply multiplied by the field product using the
