@@ -92,6 +92,7 @@ namespace VevaciousPlusPlus
     ParameterUpdatePropagator& parameterUpdatePropagator;
     std::vector< std::string > fieldNames;
     size_t numberOfFields;
+    std::vector< std::string > dsbFieldInputStrings;
     std::vector< double > dsbFieldValueInputs;
   };
 

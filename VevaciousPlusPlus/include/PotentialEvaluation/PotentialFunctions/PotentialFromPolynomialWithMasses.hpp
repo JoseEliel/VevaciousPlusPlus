@@ -14,9 +14,9 @@
 #include "../PotentialFunction.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
 #include "../MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
-#include "../MassesSquaredCalculators/OldComplexMassSquaredMatrix.hpp"
-#include "../MassesSquaredCalculators/OldRealMassesSquaredMatrix.hpp"
-#include "../MassesSquaredCalculators/OldSymmetricComplexMassMatrix.hpp"
+#include "../MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
+#include "../MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
+#include "../MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
 #include "../OldMassesSquaredCalculator.hpp"
 #include "../ThermalFunctions.hpp"
 #include "IWritesPythonPotential.hpp"
@@ -164,7 +164,7 @@ namespace VevaciousPlusPlus
 
 
   // This puts all index brackets into a consistent form.
-  inline std::string PotentialFromPolynomialAndMasses::FormatVariable(
+  inline std::string PotentialFromPolynomialWithMasses::FormatVariable(
                                  std::string const& unformattedVariable ) const
   {
     return RunningParameterManager::FormatVariable( unformattedVariable );
@@ -172,11 +172,12 @@ namespace VevaciousPlusPlus
 
   // This interprets stringToParse as a sum of real polynomial terms and sets
   // polynomialSum accordingly.
-  inline void PotentialFromPolynomialAndMasses::ParseSumOfPolynomialTerms(
+  inline void PotentialFromPolynomialWithMasses::ParseSumOfPolynomialTerms(
                                               std::string const& stringToParse,
                                                  PolynomialSum& polynomialSum )
   {
-    std::pair< PolynomialSum, PolynomialSum > complexSum;
+    std::pair< ParametersAndFieldsProductSum, ParametersAndFieldsProductSum >
+    complexSum;
     ParseSumOfPolynomialTerms( stringToParse,
                                complexSum );
     if( !(complexSum.second.PolynomialTerms().empty()) )
@@ -192,7 +193,7 @@ namespace VevaciousPlusPlus
   // massSquaredMatrices, with all functionoids evaluated at the last scale
   // which was used to update them.
   inline void
-  PotentialFromPolynomialAndMasses::AddMassesSquaredWithMultiplicity(
+  PotentialFromPolynomialWithMasses::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
             std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
         std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const

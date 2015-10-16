@@ -32,7 +32,8 @@ namespace VevaciousPlusPlus
 
 
     // This calls UpdateForFixedScale on each element of matrixElements.
-    void UpdateForFixedScale( std::vector< double > const& parameterValues );
+    virtual void
+    UpdateForFixedScale( std::vector< double > const& parameterValues );
 
     // This allows access to the pair of polynomial sums for a given index.
     ComplexParametersAndFieldsProductSum&

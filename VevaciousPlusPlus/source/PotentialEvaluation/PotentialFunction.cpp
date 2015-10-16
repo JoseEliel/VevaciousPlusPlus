@@ -16,6 +16,7 @@ namespace VevaciousPlusPlus
     parameterUpdatePropagator( parameterUpdatePropagator ),
     fieldNames(),
     numberOfFields( 0 ),
+    dsbFieldInputStrings(),
     dsbFieldValueInputs()
   {
     // This constructor is just an initialization list.
@@ -26,6 +27,7 @@ namespace VevaciousPlusPlus
     parameterUpdatePropagator( parameterUpdatePropagator ),
     fieldNames( copySource.fieldNames ),
     numberOfFields( copySource.numberOfFields ),
+    dsbFieldInputStrings( copySource.dsbFieldInputStrings ),
     dsbFieldValueInputs( copySource.dsbFieldValueInputs )
   {
     // This constructor is just an initialization list.

@@ -74,20 +74,8 @@ namespace VevaciousPlusPlus
       throw std::runtime_error( "Could not parse <ModelFileDetails>." );
     }
     // </ModelFileDetails>
-    // <AllowedNonZeroVariables>
+    // <FieldVariables>
     successfullyReadElement = fileParser.readNextElement();
-    if( !successfullyReadElement )
-    {
-      throw std::runtime_error( "Could not parse <AllowedNonZeroVariables>." );
-    }
-    successfullyReadElement
-    = elementParser.loadString( fileParser.getCurrentElementContent() );
-    if( !successfullyReadElement )
-    {
-      throw std::runtime_error( "Could not parse <AllowedNonZeroVariables>." );
-    }
-    //   <FieldVariables>
-    successfullyReadElement = elementParser.readNextElement();
     if( !successfullyReadElement )
     {
       throw std::runtime_error( "Could not parse <FieldVariables>." );
@@ -138,63 +126,11 @@ namespace VevaciousPlusPlus
       }
     }
     numberOfFields = fieldNames.size();
-    dsbFieldValuePolynomials.resize( numberOfFields );
     dsbFieldValueInputs.resize( numberOfFields );
-    //   </FieldVariables>
-    //   <SlhaBlocks>
-    successfullyReadElement = elementParser.readNextElement();
-    if( !successfullyReadElement )
-    {
-      throw std::runtime_error( "Could not parse <SlhaBlocks>." );
-    }
-    std::string slhaString;
-    std::string aliasString;
-    elementLines.clearEntries();
-    BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
-                                    elementLines,
-                                    '\n');
-    for( int lineIndex( 0 );
-         lineIndex < elementLines.getSize();
-         ++lineIndex )
-    {
-      slhaString = BOL::StringParser::trimFromFrontAndBack(
-                     BOL::StringParser::firstWordOf( elementLines[ lineIndex ],
-                                                     &aliasString,
-                                                     "=" ) );
-      if( !(slhaString.empty()) )
-      {
-        runningParameters.AddValidSlhaBlock( slhaString,
-                      BOL::StringParser::trimFromFrontAndBack( aliasString ) );
-      }
-    }
-    //   </SlhaBlocks>
-    //   <DerivedParameters>
-    successfullyReadElement = elementParser.readNextElement();
-    if( !successfullyReadElement )
-    {
-      throw std::runtime_error( "Could not parse <DerivedParameters>." );
-    }
-    std::string readableName;
-    elementLines.clearEntries();
-    BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
-                                    elementLines,
-                                    '\n');
-    for( int lineIndex( 0 );
-         lineIndex < elementLines.getSize();
-         ++lineIndex )
-    {
-      aliasString
-      = BOL::StringParser::trimFromFrontAndBack( elementLines[ lineIndex ] );
-      if( !(aliasString.empty()) )
-      {
-        runningParameters.CreateDerivedParameter( aliasString );
-      }
-    }
-    //   </DerivedParameters>
-    //   <DsbMinimum>
-    successfullyReadElement = elementParser.readNextElement();
+    dsbFieldInputStrings.resize( numberOfFields );
+    // </FieldVariables>
+    // <DsbMinimum>
+    successfullyReadElement = fileParser.readNextElement();
     if( !successfullyReadElement )
     {
       throw std::runtime_error( "Could not parse <DsbMinimum>." );
@@ -217,9 +153,11 @@ namespace VevaciousPlusPlus
         errorMessage.append( "\")" );
         throw std::runtime_error( errorMessage );
       }
-      size_t fieldIndex( FieldIndex( BOL::StringParser::trimFromFrontAndBack(
+
+      readFieldName.assign( BOL::StringParser::trimFromFrontAndBack(
                                            elementLines[ lineIndex ].substr( 0,
-                                                        equalsPosition ) ) ) );
+                                                          equalsPosition ) ) );
+      size_t fieldIndex( FieldIndex( FormatVariable( readFieldName ) ) );
       if( !( fieldIndex < fieldNames.size() ) )
       {
         std::string errorMessage( "Unknown field (\"" );
@@ -228,12 +166,11 @@ namespace VevaciousPlusPlus
         errorMessage.append( "\") given value in DsbMinimum!" );
         throw std::runtime_error( errorMessage );
       }
-      ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
-                      elementLines[ lineIndex ].substr( equalsPosition + 1 ) ),
-                                 dsbFieldValuePolynomials[ fieldIndex ] );
+      dsbFieldInputStrings[ fieldIndex ]
+      = FormatVariable( BOL::StringParser::trimFromFrontAndBack(
+                   elementLines[ lineIndex ].substr( equalsPosition + 1 ) ) ) ;
     }
-    //   </DsbMinimum>
-    // </AllowedNonZeroVariables>
+    // </DsbMinimum>
     // <TreeLevelPotential>
     successfullyReadElement = fileParser.readNextElement();
     if( !successfullyReadElement )
@@ -292,7 +229,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                      " RealBosonMassSquaredMatrix was not a square integer!" );
         }
-        OldRealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
+        RealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
                                  elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -303,7 +240,7 @@ namespace VevaciousPlusPlus
                                     massSquaredMatrix.ElementAt( lineIndex ) );
         }
         if( massSquaredMatrix.GetSpinType()
-            == OldMassesSquaredCalculator::gaugeBoson )
+            == MassesSquaredCalculator::gaugeBoson )
         {
           vectorMassSquaredMatrices.push_back( massSquaredMatrix );
         }
@@ -329,7 +266,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
                           " WeylFermionMassMatrix was not a square integer!" );
         }
-        OldSymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
+        SymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
                                  elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -358,7 +295,7 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( "Number of elements for"
             " ComplexWeylFermionMassSquaredMatrix was not a square integer!" );
         }
-        OldComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
+        ComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
                                  elementParser.getCurrentElementAttributes() );
         for( int lineIndex( 0 );
              lineIndex < elementLines.getSize();
@@ -714,15 +651,10 @@ namespace VevaciousPlusPlus
 
   // This is just for derived classes.
   PotentialFromPolynomialWithMasses::PotentialFromPolynomialWithMasses(
-                           RunningParameterManager& runningParameterManager ) :
-    PotentialFunction( runningParameterManager ),
+                     LagrangianParameterManager& lagrangianParameterManager ) :
+    PotentialFunction( parameterUpdatePropagator ),
     IWritesPythonPotential(),
-    runningParameters( runningParameterManager ),
-    dsbFieldValuePolynomials(),
-    currentMinimumRenormalizationScale( -1.0 ),
-    squareOfMinimumRenormalizationScale( -1.0 ),
-    currentMaximumRenormalizationScale( -1.0 ),
-    squareOfMaximumRenormalizationScale( -1.0 ),
+    lagrangianParameterManager( lagrangianParameterManager ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -733,8 +665,6 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices(),
     vectorMassSquaredMatrices(),
     vectorMassCorrectionConstant( 5.0 / 6.0 ),
-    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false ),
-    scaleRangeMinimumFactor( -1.0 ),
     fieldsAssumedPositive(),
     fieldsAssumedNegative(),
     assumedPositiveOrNegativeTolerance( -1.0 )
@@ -749,16 +679,7 @@ namespace VevaciousPlusPlus
                          PotentialFromPolynomialWithMasses const& copySource ) :
     PotentialFunction( copySource ),
     IWritesPythonPotential(),
-    runningParameters( copySource.runningParameters ),
-    dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
-    currentMinimumRenormalizationScale(
-                               copySource.currentMinimumRenormalizationScale ),
-    squareOfMinimumRenormalizationScale(
-                              copySource.squareOfMinimumRenormalizationScale ),
-    currentMaximumRenormalizationScale(
-                               copySource.currentMaximumRenormalizationScale ),
-    squareOfMaximumRenormalizationScale(
-                               copySource.squareOfMaximumRenormalizationScale ),
+    lagrangianParameterManager( copySource.lagrangianParameterManager ),
     treeLevelPotential( copySource.treeLevelPotential ),
     polynomialLoopCorrections( copySource.polynomialLoopCorrections ),
     scalarSquareMasses(),
@@ -769,9 +690,6 @@ namespace VevaciousPlusPlus
     fermionMassSquaredMatrices( copySource.fermionMassSquaredMatrices ),
     vectorMassSquaredMatrices( copySource.vectorMassSquaredMatrices ),
     vectorMassCorrectionConstant( copySource.vectorMassCorrectionConstant ),
-    treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions(
-          copySource.treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions ),
-    scaleRangeMinimumFactor( copySource.scaleRangeMinimumFactor ),
     fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
     fieldsAssumedNegative( copySource.fieldsAssumedNegative ),
     assumedPositiveOrNegativeTolerance(
