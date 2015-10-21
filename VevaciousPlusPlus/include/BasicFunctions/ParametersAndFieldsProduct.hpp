@@ -25,6 +25,14 @@ namespace VevaciousPlusPlus
     virtual ~ParametersAndFieldsProduct();
 
 
+    // This is used to indicate that the string read in to create the object
+    // was invalid.
+    void MarkAsInvalid() { isValid = false; }
+
+    // This is used to indicate whether the string read in to create the object
+    // was invalid.
+    bool IsValid() const { return isValid; }
+
     // This sets the coefficient which multiplies the field values once for a
     // new parameter point, to save the product of parameters being
     // re-calculated many times for the same parameter point.
@@ -63,6 +71,13 @@ namespace VevaciousPlusPlus
     // This adds parameterIndex to the set of indices used to select the values
     // of Lagrangian parameters when forming the scale-dependent coefficient
     // given a vector of Lagrangian parameters evaluated at the relevant scale.
+    void MultiplyByParameter( size_t const parameterIndex )
+    { parameterIndices.push_back( parameterIndex ); }
+
+    // This adds parameterIndex, raised to the power of powerInt, to the set of
+    // indices used to select the values of Lagrangian parameters when forming
+    // the scale-dependent coefficient given a vector of Lagrangian parameters
+    // evaluated at the relevant scale.
     void MultiplyByParameter( size_t const parameterIndex,
                               size_t const powerInt )
     { parameterIndices.insert( parameterIndices.end(),
@@ -98,6 +113,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    bool isValid;
     double coefficientConstant;
     std::vector< size_t > fieldProductByIndex;
     std::vector< size_t > fieldPowersByIndex;

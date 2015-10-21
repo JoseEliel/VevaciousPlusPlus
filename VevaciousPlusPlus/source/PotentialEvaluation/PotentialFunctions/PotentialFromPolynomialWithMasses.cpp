@@ -512,8 +512,8 @@ namespace VevaciousPlusPlus
                                               std::string const& stringToParse,
                           ComplexParametersAndFieldsProductSum& polynomialSum )
   {
-    polynomialSums.first.PolynomialTerms().clear();
-    polynomialSums.second.PolynomialTerms().clear();
+    polynomialSum.first.ParametersAndFieldsProducts().clear();
+    polynomialSum.second.ParametersAndFieldsProducts().clear();
     if( stringToParse.empty() )
     {
       return;
@@ -527,15 +527,15 @@ namespace VevaciousPlusPlus
       positiveTerm = false;
       wordStart = 1;
     }
-    if( stringToParse[ 0 ] == '+' )
+    else if( stringToParse[ 0 ] == '+' )
     {
       wordStart = 1;
     }
     // Now we have skipped any initial '+' or '-', so we start the 1st term.
-    PolynomialTerm polynomialTerm;
+    ParametersAndFieldsProduct polynomialTerm;
     if( !positiveTerm )
     {
-      polynomialTerm.MultiplyBy( -1.0 );
+      polynomialTerm.MultiplyByConstant( -1.0 );
     }
 
     bool imaginaryTerm( false );
@@ -559,18 +559,18 @@ namespace VevaciousPlusPlus
         {
           if( imaginaryTerm )
           {
-            polynomialSums.second.PolynomialTerms().push_back(
+            polynomialSum.second.ParametersAndFieldsProducts().push_back(
                                                               polynomialTerm );
           }
           else
           {
-            polynomialSums.first.PolynomialTerms().push_back( polynomialTerm );
+            polynomialSum.first.ParametersAndFieldsProducts().push_back( polynomialTerm );
           }
         }
         polynomialTerm.ResetValues();
         if( stringToParse[ wordStart ] == '-' )
         {
-          polynomialTerm.MultiplyBy( -1.0 );
+          polynomialTerm.MultiplyByConstant( -1.0 );
         }
       }
       // Now we parse the next word.
@@ -584,11 +584,13 @@ namespace VevaciousPlusPlus
     {
       if( imaginaryTerm )
       {
-        polynomialSums.second.PolynomialTerms().push_back( polynomialTerm );
+        polynomialSum.second.ParametersAndFieldsProducts().push_back(
+                                                              polynomialTerm );
       }
       else
       {
-        polynomialSums.first.PolynomialTerms().push_back( polynomialTerm );
+        polynomialSum.first.ParametersAndFieldsProducts().push_back(
+                                                              polynomialTerm );
       }
     }
   }
@@ -602,7 +604,7 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialWithMasses::PutNextNumberOrVariableIntoPolynomial(
                                               std::string const& stringToParse,
                                                               size_t wordStart,
-                                               PolynomialTerm& polynomialTerm,
+                                    ParametersAndFieldsProduct& polynomialTerm,
                                                           bool& imaginaryTerm )
   {
     size_t wordEnd( 0 );
@@ -650,7 +652,7 @@ namespace VevaciousPlusPlus
         }
         // If it is a number, we multiply the polynomial term and return the
         // position of the char just after the chars that we have just parsed.
-        polynomialTerm.MultiplyBy( BOL::StringParser::stringToDouble(
+        polynomialTerm.MultiplyByConstant( BOL::StringParser::stringToDouble(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
         return wordEnd;
@@ -659,7 +661,7 @@ namespace VevaciousPlusPlus
                != std::string::npos )
       {
         // Otherwise we have to check to see if it is a string that could be a
-        // field variable name or a string mapping to a functionoid.
+        // field variable name or a string mapping to a Lagrangian parameter.
         wordEnd = stringToParse.find_first_not_of( allowedVariableChars,
                                                    wordStart );
         if( ( wordEnd < ( stringToParse.size() - 1 ) )
@@ -678,8 +680,8 @@ namespace VevaciousPlusPlus
           wordEnd += 1;
         }
         // For comparison, we need the string to be in the proper format:
-        std::string
-        variableString( FormatVariable( stringToParse.substr( wordStart,
+        std::string variableString( lagrangianParameterManager.FormatVariable(
+                                               stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
         unsigned int powerInt( 1 );
         if( ( wordEnd < stringToParse.size() )
@@ -720,12 +722,12 @@ namespace VevaciousPlusPlus
           }
           if( ( powerInt % 4 ) > 1 )
           {
-            polynomialTerm.MultiplyBy( -1.0 );
+            polynomialTerm.MultiplyByConstant( -1.0 );
           }
           return wordEnd;
         }
         // Next we check for a field name:
-        for( unsigned int fieldIndex( 0 );
+        for( size_t fieldIndex( 0 );
              fieldIndex < fieldNames.size();
              ++fieldIndex )
         {
@@ -738,13 +740,20 @@ namespace VevaciousPlusPlus
             return wordEnd;
           }
         }
-        // If we get to here, it wasn't a field name, so we try to get a
-        // functionoid from runningParameters, which will return NULL if the
-        // string doesn't map to any functionoid, and polynomialTerm.MultiplyBy
-        // will set its internal validity flag to false on being given NULL.
-        polynomialTerm.MultiplyBy( runningParameters.GetFunctionoid(
-                                                              variableString ),
-                                   powerInt );
+        // If we get to here, it wasn't a field name, so we check whether it's
+        // a Lagrangian parameter known to lagrangianParameterManager.
+        std::pair< bool, size_t >
+        parameterValidityAndIndex(
+              lagrangianParameterManager.RegisterParameter( variableString ) );
+        if( parameterValidityAndIndex.first )
+        {
+          polynomialTerm.MultiplyByParameter( parameterValidityAndIndex.second,
+                                              powerInt );
+        }
+        else
+        {
+          polynomialTerm.MarkAsInvalid();
+        }
         return wordEnd;
       }
       else if( ( stringToParse[ wordStart ] == '+' )
@@ -772,8 +781,8 @@ namespace VevaciousPlusPlus
          std::vector< DoubleVectorWithDouble > const& massesSquaredWithFactors,
                                               double const inverseScaleSquared,
                                         double const inverseTemperatureSquared,
-                                           double const subtractFromLogarithm,
-                                    double (*ThermalFunction)( double const ),
+                                            double const subtractFromLogarithm,
+                                     double (*ThermalFunction)( double const ),
                                            double& cumulativeQuantumCorrection,
                                     double& cumulativeThermalCorrection ) const
   {

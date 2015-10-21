@@ -20,11 +20,20 @@ namespace VevaciousPlusPlus
     virtual ~LagrangianParameterManager();
 
 
-    // This should ensure that the given string is understood as a Lagrangian
-    // parameter and return an index which will be used to find the value of
-    // the parameter in the vector returned by ParametersAtScale and in the
-    // array returned by the function created by ParametersAsPython.
-    virtual size_t RegisterParameter( std::string const& parameterName ) = 0;
+    // This should check whether the given string is understood as a Lagrangian
+    // parameter and return a pair of the bool indicating whether it was a
+    // valid string for an understood Lagrangian parameter, paired with an
+    // index which will be used to find the value of the parameter in the
+    // vector returned by ParametersAtScale and in the array returned by the
+    // function created by ParametersAsPython. It would be inconvenient to
+    // throw an exception for an invalid parameter input string as it is
+    // expected that sometimes strings for fields will be passed in when
+    // parsing a model file where certain fields have been deselected as
+    // variable fields. Hence calls of this method would always be wrapped in
+    // try-catch, making the whole thing a bit more complicated than it has to
+    // be, in my opinion.
+    virtual std::pair< bool, size_t >
+    RegisterParameter( std::string const& parameterName ) = 0;
 
     // This should return a vector of the values of the Lagrangian parameters
     // evaluated at the given scale, ordered so that the indices given out by

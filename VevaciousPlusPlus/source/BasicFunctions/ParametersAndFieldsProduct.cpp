@@ -11,6 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   ParametersAndFieldsProduct::ParametersAndFieldsProduct() :
+    isValid( true ),
     coefficientConstant( 1.0 ),
     fieldProductByIndex(),
     fieldPowersByIndex(),
@@ -22,6 +23,7 @@ namespace VevaciousPlusPlus
 
   ParametersAndFieldsProduct::ParametersAndFieldsProduct(
                                ParametersAndFieldsProduct const& copySource ) :
+    isValid( copySource.isValid ),
     coefficientConstant( copySource.coefficientConstant ),
     fieldProductByIndex( copySource.fieldProductByIndex ),
     fieldPowersByIndex( copySource.fieldPowersByIndex ),
@@ -42,6 +44,10 @@ namespace VevaciousPlusPlus
   // Lagrangian parameters are in an array called "lp".
   std::string ParametersAndFieldsProduct::AsPython() const
   {
+    if( !isValid )
+    {
+      return "( 0.0 )";
+    }
     std::stringstream stringBuilder;
     stringBuilder << std::setprecision( 12 ) << "( " << coefficientConstant;
     for( size_t parameterIndex( 0 );

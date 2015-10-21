@@ -115,7 +115,7 @@ namespace VevaciousPlusPlus
     size_t
     PutNextNumberOrVariableIntoPolynomial( std::string const& stringToParse,
                                            size_t wordStart,
-                                           PolynomialTerm& polynomialTerm,
+                                    ParametersAndFieldsProduct& polynomialTerm,
                                            bool& imaginaryTerm );
 
     // This appends the masses-squared and multiplicity from each
