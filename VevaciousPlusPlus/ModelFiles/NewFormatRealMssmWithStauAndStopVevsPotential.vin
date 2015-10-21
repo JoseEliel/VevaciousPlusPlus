@@ -98,7 +98,8 @@
      x^n, for example. This does not work for constant numbers! Division is not
      possible, unfortunately; neither '/' nor "^(-1)" (or the like) are
      permitted: please expand out e.g. 4.0/8.0 as 0.5 or use keywords known to
-     the Lagrangian parameter manager (e.g. the default SLHA Lagrangian parameter manager. -->
+     the Lagrangian parameter manager (e.g. the default SLHA Lagrangian
+     parameter manager should understand OneOverSix to be 1/6). -->
 <!-- The TreeLevelPotential element should be a polynomial as described above.
      It is used as the tree-level part of the potential energy density
      function. -->

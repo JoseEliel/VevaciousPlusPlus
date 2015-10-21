@@ -52,7 +52,7 @@ namespace VevaciousPlusPlus
 
     // This should update all objects which contribute to the masses with the
     // values for the Lagrangian parameters given in parameterValues.
-    void
+    virtual void
     UpdateForFixedScale( std::vector< double > const& parameterValues ) = 0;
 
 

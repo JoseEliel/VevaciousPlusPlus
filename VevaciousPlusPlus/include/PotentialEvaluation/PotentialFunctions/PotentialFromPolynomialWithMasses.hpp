@@ -44,19 +44,15 @@ namespace VevaciousPlusPlus
     PolynomialApproximation() const
     { return treeLevelPotential; }
 
-    // This writes the potential as
-    // def PotentialFunction( fv ): return ...
-    // in pythonFilename for fv being an array of floating-point numbers in the
-    // same order as they are for the field configurations as internal to this
-    // C++ code. It uses the virtual function SetScaleForPythonPotentialCall.
-    virtual void WriteAsPython( std::string const pythonFilename ) const;
-
     // This is for debugging.
     std::string AsDebuggingString() const;
 
 
   protected:
     typedef std::pair< std::vector< double >, double > DoubleVectorWithDouble;
+    typedef
+    std::pair< ParametersAndFieldsProductSum, ParametersAndFieldsProductSum >
+    ComplexParametersAndFieldsProductSum;
     static std::string const digitChars;
     static std::string const dotAndDigits;
     static std::string const allowedVariableInitials;
@@ -101,18 +97,15 @@ namespace VevaciousPlusPlus
                                               double const inverseScaleSquared,
                                          double const temperatureValue ) const;
 
-    // This puts all index brackets into a consistent form.
-    std::string FormatVariable( std::string const& unformattedVariable ) const;
-
     // This interprets stringToParse as a sum of complex polynomial terms and
     // sets polynomialSum accordingly.
     void ParseSumOfPolynomialTerms( std::string const& stringToParse,
-                   std::pair< PolynomialSum, PolynomialSum >& polynomialSums );
+                         ComplexParametersAndFieldsProductSum& polynomialSum );
 
     // This interprets stringToParse as a sum of real polynomial terms and sets
     // polynomialSum accordingly.
     void ParseSumOfPolynomialTerms( std::string const& stringToParse,
-                                    PolynomialSum& polynomialSum );
+                                ParametersAndFieldsProductSum& polynomialSum );
 
     // This reads in a whole number or variable (including possible raising to
     // a power), applies the correct operation to polynomialTerm, and then
@@ -149,43 +142,28 @@ namespace VevaciousPlusPlus
                            double (*ThermalFunction)( double const ),
                            double& cumulativeQuantumCorrection,
                            double& cumulativeThermalCorrection ) const;
-
-    // This should return a string that is valid Python indented by 4 spaces to
-    // set the scale Q, given by Q^(-2) called invQSq, for an evaluation of the
-    // potential assuming that the field configuration is given as an array
-    // called "fv" and the temperature by T, given by T^(-2) called invTSq,
-    // given the rest of the Python code written by WriteAsPython. By default Q
-    // is left as the lowest scale given by the blocks of the SLHA file.
-    virtual std::string SetScaleForPythonPotentialCall() const
-    { return std::string( "" ); }
   };
 
 
 
 
-  // This puts all index brackets into a consistent form.
-  inline std::string PotentialFromPolynomialWithMasses::FormatVariable(
-                                 std::string const& unformattedVariable ) const
-  {
-    return RunningParameterManager::FormatVariable( unformattedVariable );
-  }
 
   // This interprets stringToParse as a sum of real polynomial terms and sets
   // polynomialSum accordingly.
   inline void PotentialFromPolynomialWithMasses::ParseSumOfPolynomialTerms(
                                               std::string const& stringToParse,
-                                                 PolynomialSum& polynomialSum )
+                                 ParametersAndFieldsProductSum& polynomialSum )
   {
-    std::pair< ParametersAndFieldsProductSum, ParametersAndFieldsProductSum >
-    complexSum;
+    ComplexParametersAndFieldsProductSum complexSum;
     ParseSumOfPolynomialTerms( stringToParse,
                                complexSum );
-    if( !(complexSum.second.PolynomialTerms().empty()) )
+    if( !(complexSum.second.ParametersAndFieldsProducts().empty()) )
     {
       throw std::runtime_error(
                       "Polynomial that should be real has imaginary factor!" );
     }
-    polynomialSum.PolynomialTerms() = complexSum.first.PolynomialTerms();
+    polynomialSum.ParametersAndFieldsProducts()
+    = complexSum.first.ParametersAndFieldsProducts();
   }
 
   // This appends the masses-squared and multiplicity from each
