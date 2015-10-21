@@ -88,7 +88,7 @@ namespace VevaciousPlusPlus
                          PotentialFromPolynomialWithMasses const& copySource );
 
     // This evaluates the one-loop potential with thermal corrections assuming
-    // that the scale has been set correctly.
+    // that the squared masses were evaluated at the given scale correctly.
     double
     LoopAndThermalCorrections( std::vector< double > const& fieldConfiguration,
           std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
@@ -119,9 +119,19 @@ namespace VevaciousPlusPlus
                                            bool& imaginaryTerm );
 
     // This appends the masses-squared and multiplicity from each
-    // MassesSquaredFromMatrix in massSquaredMatrices to
-    // massSquaredMatrices, with all functionoids evaluated at the last scale
+    // MassesSquaredFromMatrix in massSquaredMatrices to massSquaredMatrices,
+    // with all functionoids evaluated at the last scale
     // which was used to update them.
+    void AddMassesSquaredWithMultiplicity(
+                                  std::vector< double > const& parameterValues,
+                               std::vector< double > const& fieldConfiguration,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+       std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const;
+
+    // This appends the masses-squared and multiplicity from each
+    // MassesSquaredFromMatrix in massSquaredMatrices to massSquaredMatrices,
+    // with all Lagrangian parameters evaluated at the last scale which was
+    // used to update them.
     void AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
             std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
@@ -167,9 +177,9 @@ namespace VevaciousPlusPlus
   }
 
   // This appends the masses-squared and multiplicity from each
-  // MassesSquaredFromMatrix in massSquaredMatrices to
-  // massSquaredMatrices, with all functionoids evaluated at the last scale
-  // which was used to update them.
+  // MassesSquaredFromMatrix in massSquaredMatrices to massSquaredMatrices,
+  // with all Lagrangian parameters evaluated at the last scale which was
+  // used to update them.
   inline void
   PotentialFromPolynomialWithMasses::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,

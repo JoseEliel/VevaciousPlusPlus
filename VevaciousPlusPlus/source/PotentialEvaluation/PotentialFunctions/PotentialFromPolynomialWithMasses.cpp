@@ -432,7 +432,7 @@ namespace VevaciousPlusPlus
 
 
   // This evaluates the one-loop potential with thermal corrections assuming
-  // that the scale has been set correctly.
+  // that the squared masses were evaluated at the given scale correctly.
   double
   PotentialFromPolynomialWithMasses::LoopAndThermalCorrections(
                                std::vector< double > const& fieldConfiguration,
@@ -830,29 +830,15 @@ namespace VevaciousPlusPlus
   std::string PotentialFromPolynomialWithMasses::AsDebuggingString() const
   {
     std::stringstream returnStream;
-    returnStream << "fieldNames, dsbFieldValuePolynomials:" << std::endl;
+    returnStream << "fieldNames, dsbFieldInputStrings:" << std::endl;
     for( unsigned int fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
       returnStream << fieldNames[ fieldIndex ] << ": "
-      << dsbFieldValuePolynomials[ fieldIndex ].AsDebuggingString()
-      << std::endl;
+      << dsbFieldInputStrings[ fieldIndex ] << std::endl;
     }
     returnStream
-    << std::endl
-    << "currentMinimumRenormalizationScale = "
-    << currentMinimumRenormalizationScale
-    << std::endl
-    << "squareOfMinimumRenormalizationScale = "
-    << squareOfMinimumRenormalizationScale
-    << std::endl
-    << "currentMaximumRenormalizationScale = "
-    << currentMaximumRenormalizationScale
-    << std::endl
-    << "squareOfMaximumRenormalizationScale = "
-    << squareOfMaximumRenormalizationScale
-    << std::endl
     << std::endl
     << "treeLevelPotential = " << treeLevelPotential.AsDebuggingString()
     << std::endl
@@ -860,7 +846,7 @@ namespace VevaciousPlusPlus
     << polynomialLoopCorrections.AsDebuggingString()
     << std::endl
     << "scalarSquareMasses = " << std::endl;
-    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
          whichScalar( scalarMassSquaredMatrices.begin() );
          whichScalar < scalarMassSquaredMatrices.end();
          ++whichScalar )
@@ -870,7 +856,7 @@ namespace VevaciousPlusPlus
     returnStream << std::endl;
     returnStream << std::endl
     << "fermionMasses = " << std::endl;
-    for( std::vector< OldSymmetricComplexMassMatrix >::const_iterator
+    for( std::vector< SymmetricComplexMassMatrix >::const_iterator
          whichFermion( fermionMassMatrices.begin() );
          whichFermion < fermionMassMatrices.end();
          ++whichFermion )
@@ -880,7 +866,7 @@ namespace VevaciousPlusPlus
     returnStream << std::endl;
     returnStream << std::endl
     << "fermionMassSquareds = " << std::endl;
-    for( std::vector< OldComplexMassSquaredMatrix >::const_iterator
+    for( std::vector< ComplexMassSquaredMatrix >::const_iterator
          whichFermion( fermionMassSquaredMatrices.begin() );
          whichFermion < fermionMassSquaredMatrices.end();
          ++whichFermion )
@@ -890,7 +876,7 @@ namespace VevaciousPlusPlus
     returnStream << std::endl;
     returnStream << std::endl
     << "vectorSquareMasses = " << std::endl;
-    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
+    for( std::vector< RealMassesSquaredMatrix >::const_iterator
          whichVector( vectorMassSquaredMatrices.begin() );
          whichVector < vectorMassSquaredMatrices.end();
          ++whichVector )
@@ -899,8 +885,7 @@ namespace VevaciousPlusPlus
     }
     returnStream << std::endl
     << "vectorMassCorrectionConstant = " << vectorMassCorrectionConstant
-    << std::endl << "scaleRangeMinimumFactor = " << scaleRangeMinimumFactor
-    << std::endl;
+    << std::endl,
     return returnStream.str();
   }
 
