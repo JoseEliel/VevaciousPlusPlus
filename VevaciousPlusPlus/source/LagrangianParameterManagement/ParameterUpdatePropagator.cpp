@@ -5,26 +5,27 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
+#include "LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   ParameterUpdatePropagator::ParameterUpdatePropagator(
-                                   ParameterUpdatePropagator& previousPropagator ) :
-    BOL::PushedToObserver< SlhaManager >(),
-    BOL::PushingObserved< SlhaManager >(),
-    slhaManager( previousPropagator.slhaManager )
+                              ParameterUpdatePropagator& previousPropagator ) :
+    BOL::PushedToObserver< ParameterUpdatePropagator >(),
+    BOL::PushingObserved< ParameterUpdatePropagator >(),
+    lagrangianParameterManager( previousPropagator.lagrangianParameterManager )
   {
     previousPropagator.registerObserver( this );
   }
 
-  ParameterUpdatePropagator::ParameterUpdatePropagator( SlhaManager& slhaManager ) :
-    BOL::PushedToObserver< SlhaManager >(),
-    BOL::PushingObserved< SlhaManager >(),
-    slhaManager( slhaManager )
+  ParameterUpdatePropagator::ParameterUpdatePropagator(
+                     LagrangianParameterManager& lagrangianParameterManager ) :
+    BOL::PushedToObserver< ParameterUpdatePropagator >(),
+    BOL::PushingObserved< ParameterUpdatePropagator >(),
+    lagrangianParameterManager( lagrangianParameterManager )
   {
-    slhaManager.registerObserver( this );
+    lagrangianParameterManager.registerObserver( this );
   }
 
   ParameterUpdatePropagator::~ParameterUpdatePropagator()

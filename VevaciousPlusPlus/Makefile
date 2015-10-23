@@ -40,6 +40,7 @@ PATHPARAMETERIZATION= source/BounceActionEvaluation/PathParameterization/
 MASSESSQUAREDCALCULATORS= source/PotentialEvaluation/MassesSquaredCalculators/
 PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
+LAGRANGIANPARAMETERMANAGEMENT= source/LagrangianParameterManagement/
 POTENTIALEVALUATION= source/PotentialMinimization/
 HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
@@ -89,10 +90,12 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- source/LagrangianParameterManagement/LagrangianParameterManager.cpp \
- source/LagrangianParameterManagement/RunningParameterManager.cpp \
- source/LagrangianParameterManagement/SlhaParameterInterpolator.cpp \
- source/LagrangianParameterManagement/SlhaManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoid.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
  source/LagrangianParameterManagement/ParameterUpdatePropagator.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \

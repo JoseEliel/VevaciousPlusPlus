@@ -2,7 +2,7 @@
  * LagrangianParameterManager.hpp
  *
  *  Created on: Oct 9, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #ifndef LAGRANGIANPARAMETERMANAGER_HPP_
@@ -19,6 +19,17 @@ namespace VevaciousPlusPlus
     LagrangianParameterManager();
     virtual ~LagrangianParameterManager();
 
+
+    // This should return the value of the requested parameter at the requested
+    // scale as an alternative to adding it to the list of parameters evaluated
+    // by ParametersAtScale. It is almost certain to be much slower if used to
+    // obtain parameters repeatedly for different scales at the same parameter
+    // point, but is more efficient if there are some parameters which do not
+    // need to be evaluated for the potential but still depend on Lagrangian
+    // parameters, for example when evaluating the VEVs of the DSB vacuum for
+    // the parameter point.
+    virtual double OnceOffParameter( std::string const& parameterName,
+                                     double const evaluationScale ) = 0;
 
     // This should check whether the given string is understood as a Lagrangian
     // parameter and return a pair of the bool indicating whether it was a
@@ -41,6 +52,10 @@ namespace VevaciousPlusPlus
     // returned vector.
     virtual std::vector< double >
     ParametersAtScale( double evaluationScale ) const = 0;
+
+    // This just runs the internal PrepareNewParameterPoint method then updates
+    // the observers.
+    virtual void NewParameterPoint( std::string const& newInput );
 
     // This puts all variables with index brackets into a consistent form. It
     // can be overridden if necessary.
@@ -65,6 +80,17 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // This should prepare the LagrangianParameterManager for a new parameter
+    // point. It is expected  that newInput is the name of a file containing
+    // input required to evaluate the Lagrangian parameters (even the values
+    // of the parameters themselves, such as given by an SLHA file), but
+    // could itself be an encoding of the new input directly if a derived class
+    // needs it. It could even just be ignored, if the derived class takes on
+    // the role of deciding parameter input itself. Regardless, there should be
+    // some code to prepare the parameters so that code objects which depend on
+    // them can be informed that there is a new parameter point.
+    virtual void PrepareNewParameterPoint( std::string const& newInput ) = 0;
+
     // This puts all index brackets into a consistent form. It can be
     // overridden if necessary.
     virtual std::string FormatIndexBracketContent(
@@ -74,6 +100,15 @@ namespace VevaciousPlusPlus
 
 
 
+
+  // This just runs the internal PrepareNewParameterPoint method then updates
+  // the observers.
+  inline void
+  LagrangianParameterManager::NewParameterPoint( std::string const& newInput )
+  {
+    PrepareNewParameterPoint( newInput );
+    updateObservers();
+  }
 
   // This puts all variables with index brackets into a consistent form.
   inline std::string LagrangianParameterManager::FormatVariable(

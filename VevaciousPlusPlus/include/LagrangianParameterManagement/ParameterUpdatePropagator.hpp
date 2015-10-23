@@ -8,7 +8,7 @@
 #ifndef PARAMETERUPDATEPROPAGATOR_HPP_
 #define PARAMETERUPDATEPROPAGATOR_HPP_
 
-#include "../LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
@@ -28,8 +28,9 @@ namespace VevaciousPlusPlus
     LagrangianParameterManager const& GetLagrangianParameterManager() const
     { return lagrangianParameterManager; }
 
-    // This should perform all relevant updates for the new SLHA data except
-    // for propagating the push to the set of dependent SlhaUpdatePropagators.
+    // This should perform all relevant updates for the new parameter point
+    // except for propagating the push to the set of dependent
+    // ParameterUpdatePropagator objects.
     virtual void UpdateSelfForNewParameterPoint(
             LagrangianParameterManager const& lagrangianParameterManager ) = 0;
 

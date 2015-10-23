@@ -2,7 +2,7 @@
  * LagrangianParameterManager.cpp
  *
  *  Created on: Oct 9, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
