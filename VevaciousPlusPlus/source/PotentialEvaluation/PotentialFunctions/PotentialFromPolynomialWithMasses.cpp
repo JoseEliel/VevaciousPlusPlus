@@ -885,7 +885,7 @@ namespace VevaciousPlusPlus
     }
     returnStream << std::endl
     << "vectorMassCorrectionConstant = " << vectorMassCorrectionConstant
-    << std::endl,
+    << std::endl;
     return returnStream.str();
   }
 
