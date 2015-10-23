@@ -120,8 +120,7 @@ namespace VevaciousPlusPlus
 
     // This appends the masses-squared and multiplicity from each
     // MassesSquaredFromMatrix in massSquaredMatrices to massSquaredMatrices,
-    // with all functionoids evaluated at the last scale
-    // which was used to update them.
+    // with the values of the Lagrangian parameters given in parameterValues.
     void AddMassesSquaredWithMultiplicity(
                                   std::vector< double > const& parameterValues,
                                std::vector< double > const& fieldConfiguration,
@@ -174,6 +173,28 @@ namespace VevaciousPlusPlus
     }
     polynomialSum.ParametersAndFieldsProducts()
     = complexSum.first.ParametersAndFieldsProducts();
+  }
+
+  // This appends the masses-squared and multiplicity from each
+  // MassesSquaredFromMatrix in massSquaredMatrices to massSquaredMatrices,
+  // with the values of the Lagrangian parameters given in parameterValues.
+  inline void
+  PotentialFromPolynomialWithMasses::AddMassesSquaredWithMultiplicity(
+                                  std::vector< double > const& parameterValues,
+                               std::vector< double > const& fieldConfiguration,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
+        std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const
+  {
+    for( std::vector< MassesSquaredCalculator* >::const_iterator
+         whichMatrix( massSquaredMatrices.begin() );
+         whichMatrix < massSquaredMatrices.end();
+         ++whichMatrix )
+    {
+      massesSquaredWithFactors.push_back(
+           std::make_pair( (*whichMatrix)->MassesSquared( parameterValues,
+                                                          fieldConfiguration ),
+                           (*whichMatrix)->MultiplicityFactor() ) );
+    }
   }
 
   // This appends the masses-squared and multiplicity from each

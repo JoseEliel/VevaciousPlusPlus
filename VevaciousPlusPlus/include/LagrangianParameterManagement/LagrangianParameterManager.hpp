@@ -48,11 +48,20 @@ namespace VevaciousPlusPlus
     FormatVariable( std::string const& unformattedVariable ) const;
 
     // This should write a function in the form
-    // def LagrangianParameter( Q ): return ...
+    // def LagrangianParameters( Q ): return ...
     // to return an array of the values of the Lagrangian parameters evaluated
     // at the scale Q, in the order in which a call to ParametersAtScale would
-    // return them internal to this C++ code.
-    virtual std::string ParametersAsPython() const = 0;
+    // return them internal to this C++ code. By default it produces Python
+    // code which throws an exception, as a derived class may not need to write
+    // Python as the CosmoTransitions Python code may not be needed.
+    virtual std::string ParametersAsPython() const
+    { return std::string( "def LagrangianParameters( Q ): raise"
+                          " NotImplementedError( \"A C++ class derived from"
+                          " Vevacious::LagrangainParameterManager did not"
+                          " override the ParametersAsPython() method to"
+                          " provide valid Python code to return the values of"
+                          " the Lagrangian parameters at the scale Q as an"
+                          " array.\")");}
 
 
   protected:

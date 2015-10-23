@@ -564,7 +564,8 @@ namespace VevaciousPlusPlus
           }
           else
           {
-            polynomialSum.first.ParametersAndFieldsProducts().push_back( polynomialTerm );
+            polynomialSum.first.ParametersAndFieldsProducts().push_back(
+                                                              polynomialTerm );
           }
         }
         polynomialTerm.ResetValues();

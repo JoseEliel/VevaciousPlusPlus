@@ -91,6 +91,7 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  source/LagrangianParameterManagement/LagrangianParameterManager.cpp \
  source/LagrangianParameterManagement/RunningParameterManager.cpp \
+ source/LagrangianParameterManagement/SlhaParameterInterpolator.cpp \
  source/LagrangianParameterManagement/SlhaManager.cpp \
  source/LagrangianParameterManagement/ParameterUpdatePropagator.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
