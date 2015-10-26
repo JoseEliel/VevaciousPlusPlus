@@ -22,11 +22,12 @@ namespace VevaciousPlusPlus
 
     size_t IndexInValuesVector() const { return indexInValuesVector; }
 
-    // This returns the value of the functionoid for the given logarithm of the
-    // scale.
+    // This should return the value of the functionoid for the given logarithm
+    // of the scale.
     virtual double operator()( double const logarithmOfScale ) const = 0;
 
-    // This is for creating a Python version of the potential.
+    // This should return a string for creating a Python version of the
+    // potential.
     virtual std::string PythonParameterEvaluation() const = 0;
 
     // This is false until the functionoid has been assigned an index as an
@@ -52,6 +53,7 @@ namespace VevaciousPlusPlus
     indexInValuesVector = activeIndex;
     isActive = true;
   }
+
 } /* namespace VevaciousPlusPlus */
 
 #endif /* SLHADERIVEDFUNCTIONOID_HPP_ */

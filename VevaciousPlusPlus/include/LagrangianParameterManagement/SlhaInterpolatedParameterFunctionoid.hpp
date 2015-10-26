@@ -60,7 +60,7 @@ namespace VevaciousPlusPlus
     scaleCoefficients( scaleLogarithmPowerCoefficients.CoefficientVector() );
     std::stringstream stringBuilder;
     stringBuilder << std::setprecision( 12 ) << "( " << scaleCoefficients[ 0 ];
-    for( unsigned int whichPower( 1 );
+    for( size_t whichPower( 1 );
          whichPower < scaleCoefficients.size();
          ++whichPower )
     {
