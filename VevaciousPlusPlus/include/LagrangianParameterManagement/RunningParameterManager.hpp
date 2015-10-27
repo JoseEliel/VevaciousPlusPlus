@@ -9,6 +9,7 @@
 #define RUNNINGPARAMETERMANAGER_HPP_
 
 #include "../LagrangianParameterManagement/SlhaManager.hpp"
+#include "../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoid.hpp"
 #include "../PotentialEvaluation/ParameterFunctionoids/BinaryOperationFunctionoid.hpp"
@@ -19,7 +20,8 @@
 namespace VevaciousPlusPlus
 {
 
-  class RunningParameterManager : public SlhaManager
+  class RunningParameterManager : public SlhaManager,
+                                  public ParameterUpdatePropagator
   {
   public:
     typedef LHPC::SLHA::SparseManyIndexedBlock< double > RestrictedSlhaBlock;
@@ -61,6 +63,12 @@ namespace VevaciousPlusPlus
     // This returns a string that should be valid Python to set the running
     // parameters in order for a given renormalization scale.
     std::string RunningParametersAsPython() const;
+
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual void UpdateSelfForNewParameterPoint(
+            LagrangianParameterManager const& lagrangianParameterManager )
+    { ; /* This does nothing. */ }
 
 
   protected:

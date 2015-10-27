@@ -79,10 +79,10 @@ namespace VevaciousPlusPlus
     if( slhaBlock != NULL )
     {
       activeNormalSlhaParameters.push_back(
-                                        SlhaInterpolatedParameterFunctionoid(
-                                            numberOfDistinctActiveParameters,
-                                                                   slhaBlock,
-                                                             indexString ) );
+                                          SlhaInterpolatedParameterFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                                     slhaBlock,
+                                                               indexString ) );
       // We tersely update numberOfDistinctActiveParameters with
       // post-increment ++ so that the pair has the correct index.
       return std::pair< bool, size_t >( true,

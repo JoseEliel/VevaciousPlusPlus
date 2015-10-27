@@ -21,15 +21,15 @@ namespace VevaciousPlusPlus
 
 
     // This should return the value of the requested parameter at the requested
-    // scale as an alternative to adding it to the list of parameters evaluated
-    // by ParametersAtScale. It is almost certain to be much slower if used to
-    // obtain parameters repeatedly for different scales at the same parameter
-    // point, but is more efficient if there are some parameters which do not
-    // need to be evaluated for the potential but still depend on Lagrangian
-    // parameters, for example when evaluating the VEVs of the DSB vacuum for
-    // the parameter point.
+    // scale (exp( logarithmOfScale )) as an alternative to adding it to the
+    // list of parameters evaluated by ParameterValues. It is almost certain to
+    // be much slower if used to obtain parameters repeatedly for different
+    // scales at the same parameter point, but is more efficient if there are
+    // some parameters which do not need to be evaluated for the potential but
+    // still depend on Lagrangian parameters, for example when evaluating the
+    // VEVs of the DSB vacuum for the parameter point.
     virtual double OnceOffParameter( std::string const& parameterName,
-                                     double const evaluationScale ) = 0;
+                                     double const logarithmOfScale ) = 0;
 
     // This should check whether the given string is understood as a Lagrangian
     // parameter and return a pair of the bool indicating whether it was a
@@ -51,7 +51,7 @@ namespace VevaciousPlusPlus
     // RegisterParameter correctly match the parameter with its element in the
     // returned vector.
     virtual std::vector< double >
-    ParametersAtScale( double evaluationScale ) const = 0;
+    ParameterValues( double logarithmOfScale ) const = 0;
 
     // This just runs the internal PrepareNewParameterPoint method then updates
     // the observers.
@@ -70,13 +70,13 @@ namespace VevaciousPlusPlus
     // code which throws an exception, as a derived class may not need to write
     // Python as the CosmoTransitions Python code may not be needed.
     virtual std::string ParametersAsPython() const
-    { return std::string( "def LagrangianParameters( Q ): raise"
+    { return std::string( "def LagrangianParameters( lnQ ): raise"
                           " NotImplementedError( \"A C++ class derived from"
                           " Vevacious::LagrangainParameterManager did not"
                           " override the ParametersAsPython() method to"
                           " provide valid Python code to return the values of"
-                          " the Lagrangian parameters at the scale Q as an"
-                          " array.\")");}
+                          " the Lagrangian parameters at the scale given by"
+                          " exp(lnQ) as an array.\")");}
 
 
   protected:

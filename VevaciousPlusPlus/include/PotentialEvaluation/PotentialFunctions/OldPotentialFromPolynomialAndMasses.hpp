@@ -8,7 +8,7 @@
 #ifndef OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 #define OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
-#include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "LagrangianParameterManagement/RunningParameterManager.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "../PotentialFunction.hpp"
@@ -26,7 +26,7 @@
 namespace VevaciousPlusPlus
 {
   class OldPotentialFromPolynomialAndMasses : public PotentialFunction,
-                                           public IWritesPythonPotential
+                                              public IWritesPythonPotential
   {
   public:
     OldPotentialFromPolynomialAndMasses( std::string const& modelFilename,

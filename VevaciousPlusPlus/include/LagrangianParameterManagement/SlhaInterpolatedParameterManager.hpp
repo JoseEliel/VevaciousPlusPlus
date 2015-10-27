@@ -23,15 +23,15 @@ namespace VevaciousPlusPlus
 
 
     // This should return the value of the requested parameter at the requested
-    // scale as an alternative to adding it to the list of parameters evaluated
-    // by ParametersAtScale. It is almost certain to be much slower if used to
-    // obtain parameters repeatedly for different scales at the same parameter
-    // point, but is more efficient if there are some parameters which do not
-    // need to be evaluated for the potential but still depend on Lagrangian
-    // parameters, for example when evaluating the VEVs of the DSB vacuum for
-    // the parameter point.
+    // scale (exp( logarithmOfScale )) as an alternative to adding it to the
+    // list of parameters evaluated by ParameterValues. It is almost certain to
+    // be much slower if used to obtain parameters repeatedly for different
+    // scales at the same parameter point, but is more efficient if there are
+    // some parameters which do not need to be evaluated for the potential but
+    // still depend on Lagrangian parameters, for example when evaluating the
+    // VEVs of the DSB vacuum for the parameter point.
     virtual double OnceOffParameter( std::string const& parameterName,
-                                     double const evaluationScale ) = 0;
+                                     double const logarithmOfScale ) = 0;
 
     // This checks to see if the parameter name has already been registered,
     // and if so, returns true paired with the index to its functionoid. If
@@ -48,12 +48,16 @@ namespace VevaciousPlusPlus
     virtual std::pair< bool, size_t >
     RegisterParameter( std::string const& parameterName );
 
-    // This should return a vector of the values of the Lagrangian parameters
+    // This returns a vector of the values of the Lagrangian parameters
     // evaluated at the given scale, ordered so that the indices given out by
     // RegisterParameter correctly match the parameter with its element in the
     // returned vector.
     virtual std::vector< double >
-    ParametersAtScale( double evaluationScale ) const = 0;
+    ParameterValues( double const logarithmOfScale ) const
+    { The order in which the parameters are filled is important as e.g.
+    Bmu is mAsq/sinbeta cosbeta which will depend on tanbeta which is a derived
+    functionoid so will have to have been registered earlier than Bmu and be
+    evaluated earlier. }
 
     // This should write a function in the form
     // def LagrangianParameters( Q ): return ...
@@ -70,6 +74,9 @@ namespace VevaciousPlusPlus
                           " provide valid Python code to return the values of"
                           " the Lagrangian parameters at the scale Q as an"
                           " array.\")"); }
+
+    //
+    SlhaInterpolatedParameterFunctionoid const& FunctionoidAtIndex
 
 
   protected:

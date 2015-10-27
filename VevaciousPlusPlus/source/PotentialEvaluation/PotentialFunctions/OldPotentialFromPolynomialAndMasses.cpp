@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../../include/PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
 
 #include "VevaciousPlusPlus.hpp"
 
