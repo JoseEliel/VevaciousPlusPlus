@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
     // This returns the parameter value at firstChoiceIndex if it is non-zero,
     // otherwise it returns the parameter value at secondChoiceIndex.
     virtual double operator()( double const logarithmOfScale,
-                       std::vector< double > const& interpolatedValues ) const
+                        std::vector< double > const& interpolatedValues ) const
     { return ( ( interpolatedValues[ firstChoiceIndex ] == 0.0 ) ?
                    interpolatedValues[ secondChoiceIndex ] :
                    interpolatedValues[ firstChoiceIndex ] ); }
@@ -74,7 +74,8 @@ namespace VevaciousPlusPlus
                                             int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
-    stringBuilder << PythonIndent( indentationSpaces )
+    stringBuilder << std::setprecision( 12 )
+    << PythonIndent( indentationSpaces )
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = FirstIfNonzeroOtherwiseSecond( parameterValues[ "
     << firstChoiceIndex

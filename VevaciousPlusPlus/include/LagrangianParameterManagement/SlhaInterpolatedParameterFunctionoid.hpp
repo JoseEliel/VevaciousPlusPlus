@@ -28,53 +28,28 @@ namespace VevaciousPlusPlus
     virtual ~SlhaInterpolatedParameterFunctionoid();
 
 
-    // This returns the value of the functionoid for the given logarithm of the
-    // scale.
-    double operator()( double const logarithmOfScale ) const
-    { return scaleLogarithmPowerCoefficients( logarithmOfScale ); }
+    // This should return the value of the functionoid for the given logarithm
+    // of the scale.
+    virtual double operator()( double const logarithmOfScale ) const = 0;
 
-    // This returns the value of the functionoid for the given logarithm of the
-    // scale. It ignores the values of the other parameters.
-    double operator()( double const logarithmOfScale,
-                       std::vector< double > const& interpolatedValues ) const
-    { return scaleLogarithmPowerCoefficients( logarithmOfScale ); }
+    // This should return the value of the functionoid for the given logarithm
+    // of the scale. It should ignore the values of the other parameters.
+    virtual double operator()( double const logarithmOfScale,
+                   std::vector< double > const& interpolatedValues ) const = 0;
 
-    // This re-calculates the coefficients of the polynomial of the logarithm
-    // of the scale used in evaluating the functionoid.
-    void UpdateForNewSlhaParameters();
+    // This should re-calculate the coefficients of the polynomial of the
+    // logarithm of the scale used in evaluating the functionoid.
+    virtual void UpdateForNewSlhaParameters() = 0;
 
     // This is for creating a Python version of the potential.
-    virtual std::string PythonParameterEvaluation() const;
+    virtual std::string
+    PythonParameterEvaluation( int const indentationSpaces ) const = 0;
 
 
   protected:
     LHPC::SLHA::SparseManyIndexedBlock< double > const& slhaBlock;
     std::vector< int > const indexVector;
-    SimplePolynomial scaleLogarithmPowerCoefficients;
   };
-
-
-
-
-
-  // This is for creating a Python version of the potential.
-  inline std::string
-  SlhaInterpolatedParameterFunctionoid::PythonParameterEvaluation() const
-  {
-    std::vector< double > const&
-    scaleCoefficients( scaleLogarithmPowerCoefficients.CoefficientVector() );
-    std::stringstream stringBuilder;
-    stringBuilder << std::setprecision( 12 ) << "( " << scaleCoefficients[ 0 ];
-    for( size_t whichPower( 1 );
-         whichPower < scaleCoefficients.size();
-         ++whichPower )
-    {
-      stringBuilder << " + ( " << scaleCoefficients[ whichPower ]
-      << " ) * lnQ**" << whichPower;
-    }
-    stringBuilder << " )";
-    return stringBuilder.str();
-  }
 
 } /* namespace VevaciousPlusPlus */
 

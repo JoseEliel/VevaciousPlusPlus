@@ -10,15 +10,22 @@
 namespace VevaciousPlusPlus
 {
 
-  SlhaHiggsMixingBilinearFunctionoid::SlhaHiggsMixingBilinearFunctionoid()
+  SlhaHiggsMixingBilinearFunctionoid::SlhaHiggsMixingBilinearFunctionoid(
+       SlhaInterpolatedParameterFunctionoid const& treePseudoscalarMassSquared,
+                                    SlhaTwoSourceFunctionoid const& tanBeta ) :
+    SlhaDerivedFunctionoid(),
+    treePseudoscalarMassSquared( treePseudoscalarMassSquared ),
+    treePseudoscalarMassSquaredIndex(
+                           treePseudoscalarMassSquared.IndexInValuesVector() ),
+    tanBeta( tanBeta ),
+    tanBetaIndex( tanBeta.IndexInValuesVector() )
   {
-    // TODO Auto-generated constructor stub
-
+    // This constructor is just an initialization list.
   }
 
   SlhaHiggsMixingBilinearFunctionoid::~SlhaHiggsMixingBilinearFunctionoid()
   {
-    // TODO Auto-generated destructor stub
+    // This does nothing.
   }
 
 } /* namespace VevaciousPlusPlus */

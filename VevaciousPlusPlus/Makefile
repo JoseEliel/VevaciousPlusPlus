@@ -101,6 +101,8 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaLinearlyInterpolatedBlockEntry.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaPolynomialFitBlockEntry.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaSourcedParameterFunctionoid.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \

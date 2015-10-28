@@ -134,7 +134,8 @@ namespace VevaciousPlusPlus
                                             int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
-    stringBuilder << PythonIndent( indentationSpaces )
+    stringBuilder << std::setprecision( 12 )
+    << PythonIndent( indentationSpaces )
     << "SlhaDsbHiggsVevFunctionoid_sarahValue = parameterValues[ "
     << sarahHmixIndex() << " ]" << PythonNewlineThenIndent( indentationSpaces )
     << "if ( SlhaDsbHiggsVevFunctionoid_sarahValue != 0.0 ):"
