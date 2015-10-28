@@ -92,14 +92,16 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(SLHADERIVEDFUNCTIONOIDS)/SlhaDsbHiggsVevFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaHiggsMixingBilinearFunctionoid.cpp \
  $(SLHADERIVEDFUNCTIONOIDS)/SlhaTwoSourceFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaSourcedParameterFunctionoid.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
