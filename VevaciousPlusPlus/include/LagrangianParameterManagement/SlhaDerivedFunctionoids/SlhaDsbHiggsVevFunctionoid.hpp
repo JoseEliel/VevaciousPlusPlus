@@ -20,7 +20,7 @@ namespace VevaciousPlusPlus
     SlhaDsbHiggsVevFunctionoid(
             SlhaInterpolatedParameterFunctionoid const& sarahHiggsVevComponent,
        SlhaInterpolatedParameterFunctionoid const& slhaHiggsVevEuclideanLength,
-                                SlhaTanBetaFunctionoid const& tanBeta,
+                                SlhaTwoSourceFunctionoid const& tanBeta,
                                 bool const sinNotCos );
     virtual ~SlhaDsbHiggsVevFunctionoid();
 
@@ -37,7 +37,7 @@ namespace VevaciousPlusPlus
     // the doublet which gives mass to the down-type or up-type quarks
     // respectively, with beta calculated from the value of the functionoid
     // evaluating tan(beta).
-    virtual double OnceOffValue( double const logarithmOfScale ) const;
+    virtual double operator()( double const logarithmOfScale ) const;
 
     // This returns the value of the DSB VEV for the neutral component of the
     // functionoid's Higgs doublet. If HMIX has an entry for the component of
@@ -64,7 +64,7 @@ namespace VevaciousPlusPlus
     size_t const sarahHmixIndex;
     SlhaInterpolatedParameterFunctionoid const& slhaHiggsVevEuclideanLength;
     size_t const slhaHmixIndex;
-    SlhaTanBetaFunctionoid const& tanBeta;
+    SlhaTwoSourceFunctionoid const& tanBeta;
     size_t const tanBetaIndex;
     double (*cosOrSin)( double );
     std::string cosOrSinPythonString;
@@ -86,7 +86,7 @@ namespace VevaciousPlusPlus
   // the doublet which gives mass to the down-type or up-type quarks
   // respectively, with beta calculated from the value of the functionoid
   // evaluating tan(beta).
-  inline double SlhaDsbHiggsVevFunctionoid::OnceOffValue(
+  inline double SlhaDsbHiggsVevFunctionoid::operator()(
                                           double const logarithmOfScale ) const
   {
     double sarahValue( sarahHiggsVevComponent( logarithmOfScale ) );
@@ -97,8 +97,7 @@ namespace VevaciousPlusPlus
     else
     {
       return ( slhaHiggsVevEuclideanLength( logarithmOfScale )
-               * (*cosOrSin)( atan( tanBeta.OnceOffValue(
-                                                      logarithmOfScale ) ) ) );
+               * (*cosOrSin)( atan( tanBeta( logarithmOfScale ) ) ) );
     }
   }
 

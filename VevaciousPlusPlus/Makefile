@@ -92,7 +92,7 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(SLHADERIVEDFUNCTIONOIDS)/SlhaDsbHiggsVevFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaTanBetaFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaTwoSourceFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoid.cpp \

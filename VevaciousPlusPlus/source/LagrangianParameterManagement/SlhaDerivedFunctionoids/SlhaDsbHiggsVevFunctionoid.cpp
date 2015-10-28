@@ -13,7 +13,7 @@ namespace VevaciousPlusPlus
   SlhaDsbHiggsVevFunctionoid::SlhaDsbHiggsVevFunctionoid(
             SlhaInterpolatedParameterFunctionoid const& sarahHiggsVevComponent,
        SlhaInterpolatedParameterFunctionoid const& slhaHiggsVevEuclideanLength,
-                                         SlhaTanBetaFunctionoid const& tanBeta,
+                                         SlhaTwoSourceFunctionoid const& tanBeta,
                                                        bool const sinNotCos ) :
     SlhaDerivedFunctionoid(),
     sarahHiggsVevComponent( sarahHiggsVevComponent ),

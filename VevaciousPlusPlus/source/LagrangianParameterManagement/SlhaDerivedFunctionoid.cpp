@@ -11,7 +11,6 @@ namespace VevaciousPlusPlus
 {
 
   SlhaDerivedFunctionoid::SlhaDerivedFunctionoid() :
-    indexInValuesVector( 0 ),
     isActive( false )
   {
     // This constructor is just an initialization list.

@@ -11,11 +11,13 @@
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"
 #include "BasicFunctions/SimplePolynomial.hpp"
+#include "SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaInterpolatedParameterFunctionoid
+  class SlhaInterpolatedParameterFunctionoid :
+                                         public SlhaSourcedParameterFunctionoid
   {
   public:
     SlhaInterpolatedParameterFunctionoid( size_t const indexInValuesVector,
@@ -26,11 +28,15 @@ namespace VevaciousPlusPlus
     virtual ~SlhaInterpolatedParameterFunctionoid();
 
 
-    size_t IndexInValuesVector() const { return indexInValuesVector; }
-
     // This returns the value of the functionoid for the given logarithm of the
     // scale.
     double operator()( double const logarithmOfScale ) const
+    { return scaleLogarithmPowerCoefficients( logarithmOfScale ); }
+
+    // This returns the value of the functionoid for the given logarithm of the
+    // scale. It ignores the values of the other parameters.
+    double operator()( double const logarithmOfScale,
+                       std::vector< double > const& interpolatedValues ) const
     { return scaleLogarithmPowerCoefficients( logarithmOfScale ); }
 
     // This re-calculates the coefficients of the polynomial of the logarithm
@@ -45,7 +51,6 @@ namespace VevaciousPlusPlus
     LHPC::SLHA::SparseManyIndexedBlock< double > const& slhaBlock;
     std::vector< int > const indexVector;
     SimplePolynomial scaleLogarithmPowerCoefficients;
-    size_t indexInValuesVector;
   };
 
 

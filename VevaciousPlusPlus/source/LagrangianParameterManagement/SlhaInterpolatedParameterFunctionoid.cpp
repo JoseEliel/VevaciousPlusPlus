@@ -14,22 +14,22 @@ namespace VevaciousPlusPlus
                                               size_t const indexInValuesVector,
                  LHPC::SLHA::SparseManyIndexedBlock< double > const& slhaBlock,
                                              std::string const& indexString ) :
+    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
     slhaBlock( slhaBlock ),
     indexVector( BOL::StringParser::stringToIntVector( indexString ) ),
     scaleLogarithmPowerCoefficients( std::vector< double > ( 1,
-                                                             0.0 ) ),
-    indexInValuesVector( indexInValuesVector )
+                                                             0.0 ) )
   {
     // This constructor is just an initialization list.
   }
 
   SlhaInterpolatedParameterFunctionoid::SlhaInterpolatedParameterFunctionoid(
                      SlhaInterpolatedParameterFunctionoid const& copySource ) :
+    SlhaSourcedParameterFunctionoid( copySource.indexInValuesVector ),
     slhaBlock( copySource.slhaBlock ),
     indexVector( copySource.indexVector ),
     scaleLogarithmPowerCoefficients(
-                                  copySource.scaleLogarithmPowerCoefficients ),
-    indexInValuesVector( copySource.indexInValuesVector )
+                                   copySource.scaleLogarithmPowerCoefficients )
   {
     // This constructor is just an initialization list.
   }
