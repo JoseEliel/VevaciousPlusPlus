@@ -21,8 +21,8 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaInterpolatedParameterFunctionoid( size_t const indexInValuesVector,
-                 LHPC::SLHA::SparseManyIndexedBlock< double > const& slhaBlock,
-                                          std::string const& indexString );
+                              LHPC::SlhaSimplisticInterpreter const& lhaParser,
+                                          std::string const& parameterName );
     SlhaInterpolatedParameterFunctionoid(
                       SlhaInterpolatedParameterFunctionoid const& copySource );
     virtual ~SlhaInterpolatedParameterFunctionoid();
@@ -47,8 +47,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    LHPC::SLHA::SparseManyIndexedBlock< double > const& slhaBlock;
-    std::vector< int > const indexVector;
+    std::string parameterName;
+    LHPC::SlhaSimplisticInterpreter const& lhaParser;
   };
 
 } /* namespace VevaciousPlusPlus */

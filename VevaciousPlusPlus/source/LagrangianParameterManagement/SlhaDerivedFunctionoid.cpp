@@ -11,6 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   SlhaDerivedFunctionoid::SlhaDerivedFunctionoid() :
+    SlhaSourcedParameterFunctionoid(),
     isActive( false )
   {
     // This constructor is just an initialization list.

@@ -11,8 +11,8 @@ namespace VevaciousPlusPlus
 {
 
   SlhaTwoSourceFunctionoid::SlhaTwoSourceFunctionoid(
-            SlhaInterpolatedParameterFunctionoid const& firstChoiceFunctionoid,
-        SlhaInterpolatedParameterFunctionoid const& secondChoiceFunctionoid ) :
+                 SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid,
+             SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid ) :
     SlhaDerivedFunctionoid(),
     firstChoiceFunctionoid( firstChoiceFunctionoid ),
     firstChoiceIndex( firstChoiceFunctionoid.IndexInValuesVector() ),

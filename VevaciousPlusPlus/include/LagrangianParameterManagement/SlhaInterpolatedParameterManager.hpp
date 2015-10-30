@@ -75,9 +75,6 @@ namespace VevaciousPlusPlus
                           " the Lagrangian parameters at the scale Q as an"
                           " array.\")"); }
 
-    //
-    SlhaInterpolatedParameterFunctionoid const& FunctionoidAtIndex
-
 
   protected:
     size_t numberOfDistinctActiveParameters;

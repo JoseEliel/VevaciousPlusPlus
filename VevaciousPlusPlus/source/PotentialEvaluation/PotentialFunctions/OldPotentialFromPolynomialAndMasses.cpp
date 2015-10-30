@@ -15,13 +15,14 @@ namespace VevaciousPlusPlus
   OldPotentialFromPolynomialAndMasses::digitChars( "0123456789" );
   std::string const
   OldPotentialFromPolynomialAndMasses::dotAndDigits( "."
-                              + OldPotentialFromPolynomialAndMasses::digitChars );
-  std::string const OldPotentialFromPolynomialAndMasses::allowedVariableInitials(
+                           + OldPotentialFromPolynomialAndMasses::digitChars );
+  std::string const
+  OldPotentialFromPolynomialAndMasses::allowedVariableInitials(
                                                    "qwertyuiopasdfghjklzxcvbnm"
                                                 "QWERTYUIOPASDFGHJKLZXCVBNM" );
   std::string const OldPotentialFromPolynomialAndMasses::allowedVariableChars(
-                      OldPotentialFromPolynomialAndMasses::allowedVariableInitials
-                                 + OldPotentialFromPolynomialAndMasses::digitChars
+                   OldPotentialFromPolynomialAndMasses::allowedVariableInitials
+                              + OldPotentialFromPolynomialAndMasses::digitChars
                                                                       + "_~" );
   double const OldPotentialFromPolynomialAndMasses::piSquared(
        boost::math::double_constants::pi * boost::math::double_constants::pi );

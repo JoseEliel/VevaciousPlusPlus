@@ -24,12 +24,14 @@ namespace VevaciousPlusPlus
     // scale (exp( logarithmOfScale )) as an alternative to adding it to the
     // list of parameters evaluated by ParameterValues. It is almost certain to
     // be much slower if used to obtain parameters repeatedly for different
-    // scales at the same parameter point, but is more efficient if there are
-    // some parameters which do not need to be evaluated for the potential but
-    // still depend on Lagrangian parameters, for example when evaluating the
-    // VEVs of the DSB vacuum for the parameter point.
+    // scales at the same parameter point, but is more efficient for the rest
+    // of the execution of Vevacious, which depends on the speed of evaluation
+    // of the potential, if there are some parameters which do not need to be
+    // evaluated for the potential but still depend on Lagrangian parameters,
+    // for example when evaluating the VEVs of the DSB vacuum for the parameter
+    // point.
     virtual double OnceOffParameter( std::string const& parameterName,
-                                     double const logarithmOfScale ) = 0;
+                                     double const logarithmOfScale ) const = 0;
 
     // This should check whether the given string is understood as a Lagrangian
     // parameter and return a pair of the bool indicating whether it was a
@@ -39,7 +41,7 @@ namespace VevaciousPlusPlus
     // function created by ParametersAsPython. It would be inconvenient to
     // throw an exception for an invalid parameter input string as it is
     // expected that sometimes strings for fields will be passed in when
-    // parsing a model file where certain fields have been deselected as
+    // parsing a model file where certain fields have been de-selected as
     // variable fields. Hence calls of this method would always be wrapped in
     // try-catch, making the whole thing a bit more complicated than it has to
     // be, in my opinion.
@@ -63,9 +65,10 @@ namespace VevaciousPlusPlus
     FormatVariable( std::string const& unformattedVariable ) const;
 
     // This should write a function in the form
-    // def LagrangianParameters( Q ): return ...
+    // def LagrangianParameters( lnQ ): return ...
     // to return an array of the values of the Lagrangian parameters evaluated
-    // at the scale Q, in the order in which a call to ParametersAtScale would
+    // at the scale exp(lnQ) (i.e. the logarithm of the scale is given as the
+    // argument), in the order in which a call to ParametersAtScale would
     // return them internal to this C++ code. By default it produces Python
     // code which throws an exception, as a derived class may not need to write
     // Python as the CosmoTransitions Python code may not be needed.
@@ -81,7 +84,7 @@ namespace VevaciousPlusPlus
 
   protected:
     // This should prepare the LagrangianParameterManager for a new parameter
-    // point. It is expected  that newInput is the name of a file containing
+    // point. It is expected that newInput is the name of a file containing
     // input required to evaluate the Lagrangian parameters (even the values
     // of the parameters themselves, such as given by an SLHA file), but
     // could itself be an encoding of the new input directly if a derived class

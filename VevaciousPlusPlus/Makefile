@@ -93,8 +93,11 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(SLHADERIVEDFUNCTIONOIDS)/SlhaDsbHiggsVevFunctionoid.cpp \
  $(SLHADERIVEDFUNCTIONOIDS)/SlhaHiggsMixingBilinearFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaMassSquaredDiagonalFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaTrilinearDiagonalFunctionoid.cpp \
  $(SLHADERIVEDFUNCTIONOIDS)/SlhaTwoSourceFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoid.cpp \

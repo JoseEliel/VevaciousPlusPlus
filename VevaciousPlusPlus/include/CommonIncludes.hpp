@@ -9,6 +9,7 @@
 #define STANDARDINCLUDES_HPP_
 
 
+#include <algorithm>
 #include <cstdlib>
 #include <cmath>
 #include <complex>
@@ -18,11 +19,12 @@
 #include <sstream>
 #include <fstream>
 #include <utility>
+#include <ctime>
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
-#include <ctime>
+#include <set>
 #include "BOLlib/include/BOLlib.hpp"
 #include "SLHA.hpp"
 

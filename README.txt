@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * README.txt                                                                *
+ * README.txt                                              *
  *                                                                           *
  *  Created on: Feb 14, 2014                                                 *
  *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)                     *
@@ -10,7 +10,7 @@
  *      minima of a quantum field theory potential energy function, and to   *
  *      calculate quantum and thermal tunneling out of a given desired       *
  *      symmetry-breaking vacuum if possible. It is a re-write of Vevacious  *
- *      by Ben O'Leary, Florian Staub, JosŽ Eliel Camargo Molina, and Werner *
+ *      by Ben O'Leary, Florian Staub, Josï¿½ Eliel Camargo Molina, and Werner *
  *      Porod.                                                               *
  *                                                                           *
  *      VevaciousPlusPlus is free software: you can redistribute it and/or   *
@@ -24,7 +24,8 @@
  *      General Public License for more details.                             *
  *                                                                           *
  *      You should have received a copy of the GNU General Public License    *
- *      (in HoTTMiLC/GNU_public_license.txt ) along with VevaciousPlusPlus.  *
+ *      (in VevaciousPlusPlus/GNU_public_license.txt ) along with            *
+ *      VevaciousPlusPlus.                                                   *
  *      If not, see <http://www.gnu.org/licenses/>.                          *
  *      A full list of the files of VevaciousPlusPlus is at the end of this  *
  *      file.                                                                *
@@ -32,6 +33,8 @@
 
  Now that the legalese preamble is out of the way, the description of the code
  and how to use it can begin!
+
+REQUIRES LesHouchesParserClasses (LHPC) version 0.8.12 or later!
 
  VevaciousPlusPlus is a program written fully in C++ to try to find all the
  minima of a loop-corrected potential and to calculate tunneling out of a
@@ -45,8 +48,8 @@
  VevaciousPlusPlus is an implementation of the process of attempting to find
  the minima of a quantum field theory potential with loop and thermal
  corrections, as decided upon by the collaboration of
- JosŽ Eliel Camargo Molina (elielx@gmail.com),
- Bjšrn Garbrecht (garbrecht@tum.de),
+ Josï¿½ Eliel Camargo Molina (elielx@gmail.com),
+ Bjï¿½rn Garbrecht (garbrecht@tum.de),
  Ben O'Leary (benjamin.oleary@gmail.com),
  Werner Porod (porod@physik.uni-wuerzburg.de), and
  Florian Staub (florian.staub@googlemail.com). This README file was written by

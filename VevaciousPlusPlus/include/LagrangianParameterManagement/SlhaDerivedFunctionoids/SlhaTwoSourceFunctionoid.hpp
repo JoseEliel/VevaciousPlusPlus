@@ -18,8 +18,8 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaTwoSourceFunctionoid(
-            SlhaInterpolatedParameterFunctionoid const& firstChoiceFunctionoid,
-         SlhaInterpolatedParameterFunctionoid const& secondChoiceFunctionoid );
+                 SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid,
+              SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid );
     virtual ~SlhaTwoSourceFunctionoid();
 
 
@@ -42,9 +42,9 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaInterpolatedParameterFunctionoid const& firstChoiceFunctionoid;
+    SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid;
     size_t const firstChoiceIndex;
-    SlhaInterpolatedParameterFunctionoid const& secondChoiceFunctionoid;
+    SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid;
     size_t const secondChoiceIndex;
   };
 

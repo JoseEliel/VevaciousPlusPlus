@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
   public:
     SlhaHiggsMixingBilinearFunctionoid(
        SlhaInterpolatedParameterFunctionoid const& treePseudoscalarMassSquared,
-                                      SlhaTwoSourceFunctionoid const& tanBeta);
+                                     SlhaTwoSourceFunctionoid const& tanBeta );
     virtual ~SlhaHiggsMixingBilinearFunctionoid();
 
 
