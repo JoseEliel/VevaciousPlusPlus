@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
   public:
     PolynomialGradientTargetSystem( PolynomialSum const& potentialPolynomial,
                                     size_t const numberOfVariables,
-                                    ParameterUpdatePropagator& previousPropagator,
+                                 ParameterUpdatePropagator& previousPropagator,
                             std::vector< size_t > const& fieldsAssumedPositive,
                             std::vector< size_t > const& fieldsAssumedNegative,
                                 bool const treeLevelMinimaOnlyAsValidSolutions,
@@ -43,6 +43,12 @@ namespace VevaciousPlusPlus
     // is public, so special ranges for particular variables can be given to
     // over-write the values given by this function.
     virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
+
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual void UpdateSelfForNewParameterPoint(
+                 LagrangianParameterManager const& lagrangianParameterManager )
+    { ; /* This does nothing. */ }
 
     std::vector< PolynomialSum > const& TargetSystem() const
     { return targetSystem; }

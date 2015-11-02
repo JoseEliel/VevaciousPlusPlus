@@ -100,7 +100,7 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoid.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \

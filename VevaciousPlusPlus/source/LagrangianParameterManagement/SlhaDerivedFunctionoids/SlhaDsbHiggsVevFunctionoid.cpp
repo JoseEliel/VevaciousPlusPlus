@@ -11,15 +11,13 @@ namespace VevaciousPlusPlus
 {
 
   SlhaDsbHiggsVevFunctionoid::SlhaDsbHiggsVevFunctionoid(
-            SlhaInterpolatedParameterFunctionoid const& sarahHiggsVevComponent,
-       SlhaInterpolatedParameterFunctionoid const& slhaHiggsVevEuclideanLength,
-                                         SlhaTwoSourceFunctionoid const& tanBeta,
+                                             size_t const indexInValuesVector,
+                     SlhaSourcedParameterFunctionoid const& vevEuclideanLength,
+                                SlhaSourcedParameterFunctionoid const& tanBeta,
                                                        bool const sinNotCos ) :
-    SlhaDerivedFunctionoid(),
-    sarahHiggsVevComponent( sarahHiggsVevComponent ),
-    sarahHmixIndex( sarahHiggsVevComponent.IndexInValuesVector() ),
-    slhaHiggsVevEuclideanLength( slhaHiggsVevEuclideanLength ),
-    slhaHmixIndex( slhaHiggsVevEuclideanLength.IndexInValuesVector() ),
+    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
+    vevEuclideanLength( vevEuclideanLength ),
+    vevIndex( vevEuclideanLength.IndexInValuesVector() ),
     tanBeta( tanBeta ),
     tanBetaIndex( tanBeta.IndexInValuesVector() ),
     cosOrSin( &cos ),

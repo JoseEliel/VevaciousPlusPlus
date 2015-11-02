@@ -54,6 +54,12 @@ namespace VevaciousPlusPlus
     // propagating the push to the set of dependent SlhaUpdatePropagators.
     virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
 
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual void UpdateSelfForNewParameterPoint(
+                 LagrangianParameterManager const& lagrangianParameterManager )
+    { ; /* This does nothing. */ }
+
     virtual PolynomialGradientTargetSystem* HomotopyContinuationTargetSystem()
     { return &homotopyContinuationTargetSystem; }
 

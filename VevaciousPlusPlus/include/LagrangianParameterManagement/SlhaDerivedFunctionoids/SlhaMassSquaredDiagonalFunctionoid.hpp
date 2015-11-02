@@ -9,15 +9,16 @@
 #define SLHAMASSSQUAREDDIAGONALFUNCTIONOID_HPP_
 
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaDerivedFunctionoid.hpp"
+#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaMassSquaredDiagonalFunctionoid : public SlhaDerivedFunctionoid
+  class SlhaMassSquaredDiagonalFunctionoid :
+                                         public SlhaSourcedParameterFunctionoid
   {
   public:
-    SlhaMassSquaredDiagonalFunctionoid(
+    SlhaMassSquaredDiagonalFunctionoid( size_t const indexInValuesVector,
                              SlhaSourcedParameterFunctionoid const& squareMass,
                            SlhaSourcedParameterFunctionoid const& linearMass );
     virtual ~SlhaMassSquaredDiagonalFunctionoid();

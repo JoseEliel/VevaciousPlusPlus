@@ -11,13 +11,6 @@ namespace VevaciousPlusPlus
 {
 
   SlhaSourcedParameterFunctionoid::SlhaSourcedParameterFunctionoid(
-                           LHPC::SlhaSimplisticInterpreter const& lhaParser ) :
-    indexInValuesVector( -1 )
-  {
-    // This constructor is just an initialization list.
-  }
-
-  SlhaSourcedParameterFunctionoid::SlhaSourcedParameterFunctionoid(
                                            size_t const indexInValuesVector ) :
     indexInValuesVector( indexInValuesVector )
   {

@@ -16,8 +16,7 @@ namespace VevaciousPlusPlus
   class SlhaSourcedParameterFunctionoid
   {
   public:
-    SlhaSourcedParameterFunctionoid();
-    SlhaSourcedParameterFunctionoid( size_t const indexInValuesVector);
+    SlhaSourcedParameterFunctionoid( size_t const indexInValuesVector );
     virtual ~SlhaSourcedParameterFunctionoid();
 
 

@@ -70,6 +70,24 @@ namespace VevaciousPlusPlus
             LagrangianParameterManager const& lagrangianParameterManager )
     { ; /* This does nothing. */ }
 
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual double OnceOffParameter( std::string const& parameterName,
+                                     double const logarithmOfScale ) const
+    { return 0.0; }
+
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual std::pair< bool, size_t >
+    RegisterParameter( std::string const& parameterName )
+    { return std::make_pair( false, -1 ); }
+
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual std::vector< double >
+    ParameterValues( double logarithmOfScale ) const
+    { return std::vector< double >( 0, 0.0 ); }
+
 
   protected:
     // This puts all index brackets into a consistent form.
@@ -107,6 +125,11 @@ namespace VevaciousPlusPlus
     // This makes a name based on how many functionoids are already in
     // parameterFunctionoidPointers.
     std::string FunctionoidName() const;
+
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual void PrepareNewParameterPoint( std::string const& newInput )
+    { ; /* This does nothing. */ }
   };
 
 

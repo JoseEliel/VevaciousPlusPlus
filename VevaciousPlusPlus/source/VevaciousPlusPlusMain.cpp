@@ -18,6 +18,37 @@ int main( int argumentCount,
                                       "input",
                                       "VevaciousPlusPlusMainInput.xml" );
 
+  // debugging:
+  /**/std::cout << std::endl << "debugging:"
+  << std::endl
+  << "Testing old and new potential functions.";
+  std::cout << std::endl;/**/
+  std::string slhaFileName( "CMSSM_CCB.slha.out" );
+  std::string oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
+
+  VevaciousPlusPlus::RunningParameterManager slhaManager;
+  VevaciousPlusPlus::FixedScaleOneLoopPotential
+  oldFixedScale( oldModelFilename,
+                 10.0,
+                 true,
+                 0.5,
+                 slhaManager );
+
+  VevaciousPlusPlus::RgeImprovedOneLoopPotential
+  oldRgeImproved( oldModelFilename,
+                  10.0,
+                  true,
+                  0.5,
+                  slhaManager );
+
+  slhaManager.UpdateSlhaData( slhaFileName );
+
+  // debugging:
+  /**/std::cout << std::endl << "debugging:"
+  << std::endl
+  << "End of testing old and new potential functions.";
+  std::cout << std::endl;/**/
+
   // The default is to construct the VevaciousPlusPlus object with an input
   // initialization file name, which will create a PotentialMinimizer and
   // TunnelingCalculator internal to the VevaciousPlusPlus object, managing

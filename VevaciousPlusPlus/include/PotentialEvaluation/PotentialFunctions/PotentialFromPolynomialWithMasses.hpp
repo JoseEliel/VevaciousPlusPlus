@@ -8,17 +8,17 @@
 #ifndef POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 
-#include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "LagrangianParameterManagement/RunningParameterManager.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
-#include "../PotentialFunction.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
-#include "../MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
-#include "../MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
-#include "../MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
-#include "../MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
-#include "../OldMassesSquaredCalculator.hpp"
-#include "../ThermalFunctions.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
+#include "PotentialEvaluation/OldMassesSquaredCalculator.hpp"
+#include "PotentialEvaluation/ThermalFunctions.hpp"
 #include "IWritesPythonPotential.hpp"
 #include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
 

@@ -11,9 +11,10 @@ namespace VevaciousPlusPlus
 {
 
   SlhaHiggsMixingBilinearFunctionoid::SlhaHiggsMixingBilinearFunctionoid(
-       SlhaInterpolatedParameterFunctionoid const& treePseudoscalarMassSquared,
-                                    SlhaTwoSourceFunctionoid const& tanBeta ) :
-    SlhaDerivedFunctionoid(),
+                                              size_t const indexInValuesVector,
+            SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared,
+                             SlhaSourcedParameterFunctionoid const& tanBeta ) :
+    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
     treePseudoscalarMassSquared( treePseudoscalarMassSquared ),
     treePseudoscalarMassSquaredIndex(
                            treePseudoscalarMassSquared.IndexInValuesVector() ),

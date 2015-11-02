@@ -11,6 +11,8 @@
 #include "CommonIncludes.hpp"
 #include "LagrangianParameterManager.hpp"
 #include "SlhaInterpolatedParameterFunctionoid.hpp"
+#include "SlhaLinearlyInterpolatedBlockEntry.hpp"
+#include "SlhaPolynomialFitBlockEntry.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -18,6 +20,9 @@ namespace VevaciousPlusPlus
   class LesHouchesAccordBlockEntryManager : public LagrangianParameterManager
   {
   public:
+    static std::string const blockNameSeparationCharacters;
+
+    LesHouchesAccordBlockEntryManager( std::string const& validBlocksString );
     LesHouchesAccordBlockEntryManager(
                                   std::set< std::string > const& validBlocks );
     virtual ~LesHouchesAccordBlockEntryManager();
@@ -39,12 +44,7 @@ namespace VevaciousPlusPlus
 
     // This checks to see if the parameter name has already been registered,
     // and if so, returns true paired with the index to its functionoid. If
-    // not, then it checks to see if the parameter name corresponds to an entry
-    // in a valid LHA block, and if so, adds an interpolation functionoid to
-    // the set of functionoids and returns true paired with the index of the
-    // new functionoid. If the parameter name does not fall into any of the
-    // above cases, then false is returned, paired with -1, rolling over to the
-    // maximum value of size_t as it is unsigned.
+    // not, then it returns the result of RegisterUnregisteredParameter.
     virtual std::pair< bool, size_t >
     RegisterParameter( std::string const& parameterName );
 
@@ -96,10 +96,36 @@ namespace VevaciousPlusPlus
                                                   parameterName.find( '[' ) ) )
               != validBlocks.end() ); }
 
+    // This adds a new LhaBlockEntryInterpolator for the given parameter
+    // to activeInterpolatedParameters and activeParametersToIndices, and
+    // returns a reference to it.
+    SlhaInterpolatedParameterFunctionoid const&
+    AddNewBlockEntry( std::string const& parameterName );
+
+    // This checks to see if the parameter name corresponds to an entry in a
+    // valid LHA block, and if so, adds an interpolation functionoid to the set
+    // of functionoids and returns true paired with the index of the new
+    // functionoid. Otherwise false is returned, paired with -1, rolling over
+    // to the maximum value of size_t as it is unsigned. It can be over-ridden
+    // to allow for checks for special cases first, for example.
+    virtual std::pair< bool, size_t >
+    RegisterUnregisteredParameter( std::string const& parameterName )
+    { return ( RefersToValidBlock( parameterName ) ?
+               std::pair< bool, size_t >( true,
+                    AddNewBlockEntry( parameterName ).IndexInValuesVector() ) :
+               std::pair< bool, size_t >( false,
+                                          -1 ) ); }
+
     // This returns a string which is the concatenated set of strings from
     // parameter functionoids giving their Python evaluations.
     virtual std::string
     ParametersInPythonFunction( unsigned int const indentationSpaces ) const;
+
+    // This ensures that the given parameter exists in
+    // activeInterpolatedParameters and activeParametersToIndices, and returns
+    // a reference to its SlhaInterpolatedParameterFunctionoid.
+    SlhaInterpolatedParameterFunctionoid const&
+    RegisterBlockEntry( std::string const& parameterName );
   };
 
 
@@ -123,17 +149,34 @@ namespace VevaciousPlusPlus
   {
     if( !(RefersToValidBlock( parameterName )) )
     {
-      throw
-      std::runtime_error(
-             "LesHouchesAccordBlockEntryManager::OnceOffParameter could not"
-             " find a block corresponding to that in \"" << parameterName
-             << "\"." );
+      std::stringstream errorBuilder;
+      errorBuilder
+      << "LesHouchesAccordBlockEntryManager::OnceOffParameter could not"
+      << " find a block corresponding to that in \"" << parameterName << "\".";
+      throw std::runtime_error( errorBuilder.str() );
     }
     LhaBlockEntryInterpolator parameterInterpolator( 0,
                                                      lhaParser,
                                                      parameterName );
     parameterInterpolator.UpdateForNewSlhaParameters();
     return parameterInterpolator( logarithmOfScale );
+  }
+
+  // This checks to see if the parameter name has already been registered,
+  // and if so, returns true paired with the index to its functionoid. If
+  // not, then it returns the result of RegisterUnregisteredParameter.
+  inline std::pair< bool, size_t >
+  LesHouchesAccordBlockEntryManager::RegisterParameter(
+                                             std::string const& parameterName )
+  {
+    std::string const nameAfterFormat( FormatVariable( parameterName ) );
+    std::map< std::string, size_t >::const_iterator
+    alreadyExistsResult( activeParametersToIndices.find( nameAfterFormat ) );
+    if( alreadyExistsResult != activeParametersToIndices.end() )
+    {
+      return std::pair< bool, size_t >( true, alreadyExistsResult->second );
+    }
+    return RegisterUnregisteredParameter( nameAfterFormat );
   }
 
   // This returns a vector of the values of the Lagrangian parameters in
@@ -191,6 +234,25 @@ namespace VevaciousPlusPlus
     {
       parameterInterpolator->UpdateForNewSlhaParameters();
     }
+  }
+
+  // This adds a new LhaBlockEntryInterpolator for the given parameter
+  // to activeInterpolatedParameters and activeParametersToIndices, and
+  // returns a reference to it.
+  inline SlhaInterpolatedParameterFunctionoid const&
+  LesHouchesAccordBlockEntryManager::AddNewBlockEntry(
+                                             std::string const& parameterName )
+  {
+    activeInterpolatedParameters.push_back( LhaBlockEntryInterpolator(
+                                              numberOfDistinctActiveParameters,
+                                                                     lhaParser,
+                                                             parameterName ) );
+    // We map the parameter name to the index of the newly-created
+    // LhaBlockEntryInterpolator, tersely updating
+    // numberOfDistinctActiveParameters with post-increment ++.
+    activeParametersToIndices[ parameterName ]
+    = numberOfDistinctActiveParameters++;
+    return activeInterpolatedParameters.back();
   }
 
   // This returns a string which is the concatenated set of strings from

@@ -9,17 +9,18 @@
 #define SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaDerivedFunctionoid.hpp"
+#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaHiggsMixingBilinearFunctionoid : public SlhaDerivedFunctionoid
+  class SlhaHiggsMixingBilinearFunctionoid :
+                                         public SlhaSourcedParameterFunctionoid
   {
   public:
-    SlhaHiggsMixingBilinearFunctionoid(
-       SlhaInterpolatedParameterFunctionoid const& treePseudoscalarMassSquared,
-                                     SlhaTwoSourceFunctionoid const& tanBeta );
+    SlhaHiggsMixingBilinearFunctionoid( size_t const indexInValuesVector,
+            SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared,
+                              SlhaSourcedParameterFunctionoid const& tanBeta );
     virtual ~SlhaHiggsMixingBilinearFunctionoid();
 
 
@@ -47,9 +48,9 @@ namespace VevaciousPlusPlus
     static double SinBetaCosBeta( double const tanBeta )
     { return ( tanBeta / ( 1.0 + ( tanBeta * tanBeta ) ) ); }
 
-    SlhaInterpolatedParameterFunctionoid const& treePseudoscalarMassSquared;
+    SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared;
     size_t const treePseudoscalarMassSquaredIndex;
-    SlhaTwoSourceFunctionoid const& tanBeta;
+    SlhaSourcedParameterFunctionoid const& tanBeta;
     size_t const tanBetaIndex;
   };
 

@@ -9,6 +9,7 @@
 #define SLHAMANAGER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LagrangianParameterManager.hpp"
 
 namespace VevaciousPlusPlus
 {

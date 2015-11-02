@@ -60,6 +60,13 @@ namespace VevaciousPlusPlus
     virtual PolynomialGradientTargetSystem* HomotopyContinuationTargetSystem()
     { return &homotopyContinuationTargetSystem; }
 
+    // This is just a dummy to make things work while I have it side-by-side to
+    // the new version for comparison.
+    virtual void UpdateSelfForNewParameterPoint(
+                 LagrangianParameterManager const& lagrangianParameterManager )
+    { ; /* This does nothing. */ }
+
+
 
   protected:
     double logarithmOfMinimumRenormalizationScale;

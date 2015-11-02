@@ -9,15 +9,15 @@
 #define SLHATWOSOURCEFUNCTIONOID_HPP_
 
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaDerivedFunctionoid.hpp"
+#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaTwoSourceFunctionoid : public SlhaDerivedFunctionoid
+  class SlhaTwoSourceFunctionoid : public SlhaSourcedParameterFunctionoid
   {
   public:
-    SlhaTwoSourceFunctionoid(
+    SlhaTwoSourceFunctionoid( size_t const indexInValuesVector,
                  SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid,
               SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid );
     virtual ~SlhaTwoSourceFunctionoid();

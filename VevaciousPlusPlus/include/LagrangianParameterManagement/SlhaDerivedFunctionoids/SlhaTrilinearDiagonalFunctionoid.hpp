@@ -9,15 +9,16 @@
 #define SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaDerivedFunctionoid.hpp"
+#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaTrilinearDiagonalFunctionoid : public SlhaDerivedFunctionoid
+  class SlhaTrilinearDiagonalFunctionoid :
+                                         public SlhaSourcedParameterFunctionoid
   {
   public:
-    SlhaTrilinearDiagonalFunctionoid(
+    SlhaTrilinearDiagonalFunctionoid( size_t const indexInValuesVector,
                         SlhaSourcedParameterFunctionoid const& directTrilinear,
                     SlhaSourcedParameterFunctionoid const& trilinearOverYukawa,
                     SlhaSourcedParameterFunctionoid const& appropriateYukawa );

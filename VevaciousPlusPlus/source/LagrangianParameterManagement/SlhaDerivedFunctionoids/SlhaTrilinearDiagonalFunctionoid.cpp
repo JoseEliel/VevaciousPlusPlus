@@ -11,10 +11,11 @@ namespace VevaciousPlusPlus
 {
 
   SlhaTrilinearDiagonalFunctionoid::SlhaTrilinearDiagonalFunctionoid(
+                                              size_t const indexInValuesVector,
                         SlhaSourcedParameterFunctionoid const& directTrilinear,
                     SlhaSourcedParameterFunctionoid const& trilinearOverYukawa,
                    SlhaSourcedParameterFunctionoid const& appropriateYukawa ) :
-    SlhaDerivedFunctionoid(),
+    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
     directTrilinear( directTrilinear ),
     directTrilinearIndex( directTrilinear.IndexInValuesVector() ),
     trilinearOverYukawa( trilinearOverYukawa ),

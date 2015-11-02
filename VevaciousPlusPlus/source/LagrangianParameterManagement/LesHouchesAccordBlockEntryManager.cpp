@@ -9,6 +9,47 @@
 
 namespace VevaciousPlusPlus
 {
+  std::string const
+  LesHouchesAccordBlockEntryManager::blockNameSeparationCharacters(
+                                                                 " ,;\t\n\r" );
+
+  LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
+                                       std::string const& validBlocksString ) :
+    LagrangianParameterManager(),
+    numberOfDistinctActiveParameters( 0 ),
+    activeParametersToIndices(),
+    activeInterpolatedParameters(),
+    validBlocks(),
+    lhaParser()
+  {
+    size_t wordStart( validBlocksString.find_first_of(
+                                             blockNameSeparationCharacters ) );
+    size_t wordEnd( 0 );
+    // If there are any more chars in validBlocks that are not in
+    // blockSeparators, we have at least one substring to add.
+    while( wordStart != std::string::npos )
+    {
+      wordEnd = validBlocksString.find_first_of( blockNameSeparationCharacters,
+                                                 wordStart );
+      validBlocks.insert( validBlocksString.substr( wordStart,
+                                                   ( wordEnd - wordStart ) ) );
+      if( wordEnd == std::string::npos )
+      {
+        break;
+      }
+      wordStart
+      = validBlocksString.find_first_not_of( blockNameSeparationCharacters,
+                                             wordEnd );
+    }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "LesHouchesAccordBlockEntryManager using SlhaPolynomialFitBlockEntry"
+        " objects! Probably should change this to"
+        " SlhaLinearlyInterpolatedBlockEntry objects.";
+    std::cout << std::endl;/**/
+  }
 
   LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
                                  std::set< std::string > const& validBlocks ) :
@@ -34,45 +75,42 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This checks to see if the parameter name has already been registered,
-  // and if so, returns true paired with the index to its functionoid. If
-  // not, then it checks to see if the parameter name corresponds to an entry
-  // in a valid LHA block, and if so, adds an interpolation functionoid to
-  // the set of functionoids and returns true paired with the index of the
-  // new functionoid. If the parameter name does not fall into any of the
-  // above cases, then false is returned, paired with -1, rolling over to the
-  // maximum value of size_t as it is unsigned.
-  std::pair< bool, size_t >
-  LesHouchesAccordBlockEntryManager::RegisterParameter(
+  // This ensures that the given parameter exists in
+  // activeInterpolatedParameters and activeParametersToIndices, and returns a
+  // reference to its SlhaInterpolatedParameterFunctionoid.
+  SlhaInterpolatedParameterFunctionoid const&
+  LesHouchesAccordBlockEntryManager::RegisterBlockEntry(
                                              std::string const& parameterName )
   {
     std::map< std::string, size_t >::const_iterator
     alreadyExistsResult( activeParametersToIndices.find( parameterName ) );
     if( alreadyExistsResult != activeParametersToIndices.end() )
     {
-      return std::pair< bool, size_t >( true, alreadyExistsResult->second );
+      // If the parameter is already active, we unfortunately need to do a
+      // linear search through activeInterpolatedParameters looking for the
+      // LhaBlockEntryInterpolator with the matching index.
+      for( std::vector< LhaBlockEntryInterpolator >::const_iterator
+           activeBlockParameter( activeInterpolatedParameters.begin() );
+           activeBlockParameter < activeInterpolatedParameters.end();
+           ++activeBlockParameter )
+      {
+        if( activeBlockParameter->IndexInValuesVector()
+            == alreadyExistsResult->second )
+        {
+          return (*activeBlockParameter);
+        }
+      }
+      std::stringstream errorBuilder;
+      errorBuilder
+      << "LesHouchesAccordBlockEntryManager::RegisterBlockEntry found the"
+      << " index " << alreadyExistsResult->second << " for \""
+      << parameterName << "\" but no LhaBlockEntryInterpolator in"
+      << " activeInterpolatedParameters had that index.";
+      throw std::out_of_range( errorBuilder.str() );
     }
 
-    // If it has not already been registered, we check whether it is a valid
-    // LHA block parameter which has not yet been registered.
-    if( RefersToValidBlock( parameterName ) )
-    {
-      activeInterpolatedParameters.push_back( LhaBlockEntryInterpolator(
-                                              numberOfDistinctActiveParameters,
-                                                                     lhaParser,
-                                                             parameterName ) );
-      // We tersely update numberOfDistinctActiveParameters with
-      // post-increment ++ so that the pair has the correct index.
-      return std::pair< bool, size_t >( true,
-                                        numberOfDistinctActiveParameters++ );
-    }
-
-    // If parameterName did not correspond to an existing parameter or a
-    // valid new LHA block entry parameter, then we return false with the
-    // maximum size_t, which should cause out-of-range exceptions if used
-    // despite the false.
-    return std::pair< bool, size_t >( false,
-                                      -1 );
+    // If the parameter wasn't already active, we add it.
+    return AddNewBlockEntry( parameterName );
   }
 
 } /* namespace VevaciousPlusPlus */
