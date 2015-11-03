@@ -14,6 +14,7 @@
 #include <cmath>
 #include <complex>
 #include <cstdio>
+#include <cctype>
 #include <iostream>
 #include <iomanip>
 #include <sstream>

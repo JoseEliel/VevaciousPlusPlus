@@ -101,6 +101,7 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
