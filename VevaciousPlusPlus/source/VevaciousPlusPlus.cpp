@@ -494,7 +494,7 @@ namespace VevaciousPlusPlus
     if( className.compare( "FixedScaleOneLoopPotential" ) == 0 )
     {
       ownedPotentialFunction
-      = new FixedScaleOneLoopPotential( modelFilename,
+      = new OldFixedScaleOneLoopPotential( modelFilename,
                                         scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                         assumedPositiveOrNegativeTolerance,
@@ -503,7 +503,7 @@ namespace VevaciousPlusPlus
     else if( className.compare( "RgeImprovedOneLoopPotential" ) == 0 )
     {
       ownedPotentialFunction
-      = new RgeImprovedOneLoopPotential( modelFilename,
+      = new OldRgeImprovedOneLoopPotential( modelFilename,
                                          scaleRangeMinimumFactor,
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                          assumedPositiveOrNegativeTolerance,

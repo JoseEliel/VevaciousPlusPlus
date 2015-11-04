@@ -8,23 +8,20 @@
 #ifndef POTENTIALFUNCTION_HPP_
 #define POTENTIALFUNCTION_HPP_
 
-#include "../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
 
 namespace VevaciousPlusPlus
 {
   class PotentialFunction : public ParameterUpdatePropagator
   {
   public:
-    PotentialFunction( ParameterUpdatePropagator& parameterUpdatePropagator );
+    PotentialFunction();
     PotentialFunction( PotentialFunction const& copySource );
     virtual ~PotentialFunction();
 
 
-    size_t NumberOfFieldVariables() const
-    { return numberOfFields; }
+    size_t NumberOfFieldVariables() const{ return numberOfFields; }
 
     std::vector< std::string > const& FieldNames() const{ return fieldNames; }
 
@@ -77,19 +74,7 @@ namespace VevaciousPlusPlus
                                     0.0 ); }
 
 
-    // There are a few functions that return objects which the derived class
-    // might not have but might be asked for by code anyway. It's not ideal to
-    // have code dedicated to "this might or might not be able to do that", but
-    // it's a lot better than dynamic casting at runtime.
-
-    // This should give out a pointer to the PolynomialGradientTargetSystem
-    // appropriate to this potential, if it has one.
-    virtual PolynomialGradientTargetSystem* HomotopyContinuationTargetSystem()
-    { return NULL; }
-
-
   protected:
-    ParameterUpdatePropagator& parameterUpdatePropagator;
     std::vector< std::string > fieldNames;
     size_t numberOfFields;
     std::vector< std::string > dsbFieldInputStrings;

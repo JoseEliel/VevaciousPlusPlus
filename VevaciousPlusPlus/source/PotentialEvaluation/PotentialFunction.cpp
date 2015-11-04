@@ -10,10 +10,7 @@
 namespace VevaciousPlusPlus
 {
 
-  PotentialFunction::PotentialFunction(
-                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
-    ParameterUpdatePropagator( parameterUpdatePropagator ),
-    parameterUpdatePropagator( parameterUpdatePropagator ),
+  PotentialFunction::PotentialFunction() :
     fieldNames(),
     numberOfFields( 0 ),
     dsbFieldInputStrings(),
@@ -23,8 +20,6 @@ namespace VevaciousPlusPlus
   }
 
   PotentialFunction::PotentialFunction( PotentialFunction const& copySource ) :
-    ParameterUpdatePropagator( copySource.parameterUpdatePropagator ),
-    parameterUpdatePropagator( parameterUpdatePropagator ),
     fieldNames( copySource.fieldNames ),
     numberOfFields( copySource.numberOfFields ),
     dsbFieldInputStrings( copySource.dsbFieldInputStrings ),

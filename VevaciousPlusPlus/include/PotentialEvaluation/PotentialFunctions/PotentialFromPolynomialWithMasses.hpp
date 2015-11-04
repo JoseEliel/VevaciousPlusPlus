@@ -8,16 +8,16 @@
 #ifndef POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 
-#include "LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "BasicFunctions/PolynomialSum.hpp"
+#include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
-#include "PotentialEvaluation/OldMassesSquaredCalculator.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
 #include "IWritesPythonPotential.hpp"
 #include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
@@ -30,7 +30,7 @@ namespace VevaciousPlusPlus
   public:
     PotentialFromPolynomialWithMasses( std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
-                        ParameterUpdatePropagator& parameterUpdatePropagator );
+                      LagrangianParameterManager& lagrangianParameterManager );
     virtual ~PotentialFromPolynomialWithMasses();
 
 

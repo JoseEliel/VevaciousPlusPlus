@@ -11,8 +11,6 @@
 #include "CommonIncludes.hpp"
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
-#include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 #include "PotentialMinimization/PotentialMinimizer.hpp"
 #include "PotentialMinimization/GradientFromStartingPoints.hpp"
 #include "PotentialMinimization/StartingPointFinder.hpp"
@@ -33,7 +31,9 @@
 #include "LagrangianParameterManagement/LesHouchesAccordBlockEntryManager.hpp"
 #include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
 #include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldFixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldRgeImprovedOneLoopPotential.hpp"
 
 
 namespace VevaciousPlusPlus

@@ -55,6 +55,10 @@ namespace VevaciousPlusPlus
     virtual std::vector< double >
     ParameterValues( double logarithmOfScale ) const = 0;
 
+    // This should return a scale which is appropriate for using for a
+    // fixed-scale calculation for the current parameter point.
+    virtual double AppropriateFixedScaleForParameterPoint() const = 0;
+
     // This just runs the internal PrepareNewParameterPoint method then updates
     // the observers.
     virtual void NewParameterPoint( std::string const& newInput );

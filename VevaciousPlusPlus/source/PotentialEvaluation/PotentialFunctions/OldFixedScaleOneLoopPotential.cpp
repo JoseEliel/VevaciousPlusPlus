@@ -1,16 +1,16 @@
 /*
- * RgeImprovedOneLoopPotential.cpp
+ * OldFixedScaleOneLoopPotential.cpp
  *
  *  Created on: Mar 13, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldFixedScaleOneLoopPotential.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
+  OldFixedScaleOneLoopPotential::OldFixedScaleOneLoopPotential(
                                               std::string const& modelFilename,
                                           double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
@@ -21,8 +21,7 @@ namespace VevaciousPlusPlus
                        treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       assumedPositiveOrNegativeTolerance,
                                       runningParameterManager ),
-    logarithmOfMinimumRenormalizationScale( 0.0 ),
-    logarithmOfMaximumRenormalizationScale( 0.0 ),
+    inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,
@@ -34,13 +33,10 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-   OldPotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses ) :
+  OldFixedScaleOneLoopPotential::OldFixedScaleOneLoopPotential(
+         OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
     OldPotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
-    logarithmOfMinimumRenormalizationScale( log(
-                                        currentMinimumRenormalizationScale ) ),
-    logarithmOfMaximumRenormalizationScale( log(
-                                        currentMaximumRenormalizationScale ) ),
+    inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,
                                       numberOfFields,
                                       *this,
@@ -52,7 +48,7 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()
+  OldFixedScaleOneLoopPotential::~OldFixedScaleOneLoopPotential()
   {
     // This does nothing.
   }
@@ -62,74 +58,34 @@ namespace VevaciousPlusPlus
   // strongly peaked around expectation values (in GeV) for the fields given
   // by the values of fieldConfiguration and temperature in GeV given by
   // temperatureValue.
-  double RgeImprovedOneLoopPotential::operator()(
+  double OldFixedScaleOneLoopPotential::operator()(
                                std::vector< double > const& fieldConfiguration,
                                           double const temperatureValue ) const
   {
     std::vector< double > cappedFieldConfiguration( fieldConfiguration );
     double const squaredLengthBeyondCap( CapFieldConfiguration(
                                                   cappedFieldConfiguration ) );
-    double renormalizationScaleSquared( RenormalizationScaleSquared(
-                                                      cappedFieldConfiguration,
-                                                          temperatureValue ) );
-    double logarithmOfScale( 0.5 * log( renormalizationScaleSquared ) );
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       scalarSquareMasses,
-                                      scalarMassesSquaredWithFactors,
-                                      logarithmOfScale );
+                                      scalarMassesSquaredWithFactors );
     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       fermionSquareMasses,
-                                      fermionMassesSquaredWithFactors,
-                                      logarithmOfScale );
+                                      fermionMassesSquaredWithFactors );
     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
                                       vectorSquareMasses,
-                                      vectorMassesSquaredWithFactors,
-                                      logarithmOfScale );
+                                      vectorMassesSquaredWithFactors );
     return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
-             + treeLevelPotential( cappedFieldConfiguration,
-                                 logarithmOfScale )
-             + polynomialLoopCorrections( cappedFieldConfiguration,
-                                          logarithmOfScale )
+             + treeLevelPotential( cappedFieldConfiguration )
+             + polynomialLoopCorrections( cappedFieldConfiguration )
              + LoopAndThermalCorrections( cappedFieldConfiguration,
                                           scalarMassesSquaredWithFactors,
                                           fermionMassesSquaredWithFactors,
                                           vectorMassesSquaredWithFactors,
-                                         ( 1.0 / renormalizationScaleSquared ),
+                                          inverseRenormalizationScaleSquared,
                                           temperatureValue ) );
-  }
-
-  // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  void RgeImprovedOneLoopPotential::UpdateSelfForNewSlha(
-                                               SlhaManager const& slhaManager )
-  {
-    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
-    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
-                                        * currentMinimumRenormalizationScale );
-    logarithmOfMinimumRenormalizationScale
-    = log( currentMinimumRenormalizationScale );
-    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
-    if( currentMaximumRenormalizationScale
-        < ( scaleRangeMinimumFactor * currentMinimumRenormalizationScale ) )
-    {
-      currentMaximumRenormalizationScale
-      = ( scaleRangeMinimumFactor * currentMinimumRenormalizationScale );
-    }
-    squareOfMaximumRenormalizationScale = ( currentMaximumRenormalizationScale
-                                        * currentMaximumRenormalizationScale );
-    logarithmOfMaximumRenormalizationScale
-    = log( currentMaximumRenormalizationScale );
-    std::vector< double > fieldOrigin( numberOfFields,
-                                       0.0 );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      dsbFieldValueInputs[ fieldIndex ]
-      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
-    }
   }
 
 } /* namespace VevaciousPlusPlus */

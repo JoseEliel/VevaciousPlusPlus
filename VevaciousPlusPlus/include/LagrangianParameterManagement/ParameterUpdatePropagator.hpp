@@ -28,6 +28,9 @@ namespace VevaciousPlusPlus
     LagrangianParameterManager const& GetLagrangianParameterManager() const
     { return lagrangianParameterManager; }
 
+    LagrangianParameterManager& GetLagrangianParameterManager()
+    { return lagrangianParameterManager; }
+
     // This should perform all relevant updates for the new parameter point
     // except for propagating the push to the set of dependent
     // ParameterUpdatePropagator objects.

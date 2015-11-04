@@ -57,6 +57,11 @@ namespace VevaciousPlusPlus
     virtual std::vector< double >
     ParameterValues( double const logarithmOfScale ) const;
 
+    // This returns the lowest scale above zero (not including zero) which was
+    // in the set of scales read for fixedScaleDefiningBlock last read in.
+    virtual double AppropriateFixedScaleForParameterPoint() const
+    { return lhaParser.getLowestScale( fixedScaleDefiningBlock ); }
+
     // This writes a function in the form
     // def LagrangianParameters( lnQ ): return ...
     // to return an array of the values of the Lagrangian parameters evaluated
@@ -82,6 +87,7 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator > activeInterpolatedParameters;
     std::set< std::string > validBlocks;
     LHPC::SlhaSimplisticInterpreter lhaParser;
+    std::string fixedScaleDefiningBlock;
 
 
     // This updates the SLHA file parser with the file with name given by

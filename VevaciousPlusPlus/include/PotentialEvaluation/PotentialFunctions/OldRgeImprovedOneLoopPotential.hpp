@@ -1,12 +1,12 @@
 /*
- * RgeImprovedOneLoopPotential.hpp
+ * OldRgeImprovedOneLoopPotential.hpp
  *
  *  Created on: Mar 13, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef RGEIMPROVEDONELOOPPOTENTIAL_HPP_
-#define RGEIMPROVEDONELOOPPOTENTIAL_HPP_
+#ifndef OLDRGEIMPROVEDONELOOPPOTENTIAL_HPP_
+#define OLDRGEIMPROVEDONELOOPPOTENTIAL_HPP_
 
 #include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
 #include "../../LagrangianParameterManagement/SlhaManager.hpp"
@@ -19,17 +19,17 @@
 namespace VevaciousPlusPlus
 {
 
-  class RgeImprovedOneLoopPotential : public OldPotentialFromPolynomialAndMasses
+  class OldRgeImprovedOneLoopPotential : public OldPotentialFromPolynomialAndMasses
   {
   public:
-    RgeImprovedOneLoopPotential( std::string const& modelFilename,
+    OldRgeImprovedOneLoopPotential( std::string const& modelFilename,
                                  double const scaleRangeMinimumFactor,
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
                             RunningParameterManager& runningParameterManager );
-    RgeImprovedOneLoopPotential(
+    OldRgeImprovedOneLoopPotential(
     OldPotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );
-    virtual ~RgeImprovedOneLoopPotential();
+    virtual ~OldRgeImprovedOneLoopPotential();
 
 
     // This returns the energy density in GeV^4 of the potential for a state
@@ -102,7 +102,7 @@ namespace VevaciousPlusPlus
 
 
   // This returns the square of an appropriate renormalization scale.
-  inline double RgeImprovedOneLoopPotential::RenormalizationScaleSquared(
+  inline double OldRgeImprovedOneLoopPotential::RenormalizationScaleSquared(
                                std::vector< double > const& fieldConfiguration,
                                           double const temperatureValue ) const
   {
@@ -123,7 +123,7 @@ namespace VevaciousPlusPlus
   // massSquaredMatrices, with all functionoids evaluated at the last scale
   // which was used to update them.
   inline void
-  RgeImprovedOneLoopPotential::AddMassesSquaredWithMultiplicity(
+  OldRgeImprovedOneLoopPotential::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
             std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
                std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors,
@@ -142,7 +142,7 @@ namespace VevaciousPlusPlus
   }
 
   // This returns the square of the Euclidean distance between the two vacua.
-  inline double RgeImprovedOneLoopPotential::ScaleSquaredRelevantToTunneling(
+  inline double OldRgeImprovedOneLoopPotential::ScaleSquaredRelevantToTunneling(
                                            PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum ) const
   {
@@ -156,7 +156,7 @@ namespace VevaciousPlusPlus
   // Python code written by WriteAsPython. By default Q is left as the lowest
   // scale given by the blocks of the SLHA file.
   inline std::string
-  RgeImprovedOneLoopPotential::SetScaleForPythonPotentialCall() const
+  OldRgeImprovedOneLoopPotential::SetScaleForPythonPotentialCall() const
   {
     std::stringstream stringBuilder;
     stringBuilder
@@ -175,4 +175,4 @@ namespace VevaciousPlusPlus
   }
 
 } /* namespace VevaciousPlusPlus */
-#endif /* RGEIMPROVEDONELOOPPOTENTIAL_HPP_ */
+#endif /* OLDRGEIMPROVEDONELOOPPOTENTIAL_HPP_ */

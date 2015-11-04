@@ -38,11 +38,10 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialWithMasses::PotentialFromPolynomialWithMasses(
                                               std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
-                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
-    PotentialFunction( parameterUpdatePropagator ),
+                     LagrangianParameterManager& lagrangianParameterManager ) :
+    PotentialFunction(),
     IWritesPythonPotential(),
-    lagrangianParameterManager(
-                   parameterUpdatePropagator.GetLagrangianParameterManager() ),
+    lagrangianParameterManager( lagrangianParameterManager ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -355,7 +354,7 @@ namespace VevaciousPlusPlus
   // This is just for derived classes.
   PotentialFromPolynomialWithMasses::PotentialFromPolynomialWithMasses(
                      LagrangianParameterManager& lagrangianParameterManager ) :
-    PotentialFunction( parameterUpdatePropagator ),
+    PotentialFunction(),
     IWritesPythonPotential(),
     lagrangianParameterManager( lagrangianParameterManager ),
     treeLevelPotential(),
@@ -379,7 +378,7 @@ namespace VevaciousPlusPlus
 
   // This is just for derived classes.
   PotentialFromPolynomialWithMasses::PotentialFromPolynomialWithMasses(
-                         PotentialFromPolynomialWithMasses const& copySource ) :
+                        PotentialFromPolynomialWithMasses const& copySource ) :
     PotentialFunction( copySource ),
     IWritesPythonPotential(),
     lagrangianParameterManager( copySource.lagrangianParameterManager ),
@@ -832,7 +831,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream returnStream;
     returnStream << "fieldNames, dsbFieldInputStrings:" << std::endl;
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {

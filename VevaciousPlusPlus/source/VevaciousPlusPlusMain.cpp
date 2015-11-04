@@ -27,14 +27,14 @@ int main( int argumentCount,
   std::string oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
 
   VevaciousPlusPlus::RunningParameterManager slhaManager;
-  VevaciousPlusPlus::FixedScaleOneLoopPotential
+  VevaciousPlusPlus::OldFixedScaleOneLoopPotential
   oldFixedScale( oldModelFilename,
                  10.0,
                  true,
                  0.5,
                  slhaManager );
 
-  VevaciousPlusPlus::RgeImprovedOneLoopPotential
+  VevaciousPlusPlus::OldRgeImprovedOneLoopPotential
   oldRgeImproved( oldModelFilename,
                   10.0,
                   true,

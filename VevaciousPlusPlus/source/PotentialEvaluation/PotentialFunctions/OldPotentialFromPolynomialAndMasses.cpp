@@ -42,8 +42,9 @@ namespace VevaciousPlusPlus
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFunction( runningParameterManager ),
+    PotentialFunction(),
     IWritesPythonPotential(),
+    ParameterUpdatePropagator( runningParameterManager ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( -1.0 ),

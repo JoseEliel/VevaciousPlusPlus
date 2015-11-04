@@ -1,32 +1,31 @@
 /*
  * FixedScaleOneLoopPotential.hpp
  *
- *  Created on: Mar 13, 2014
+ *  Created on: Nov 4, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #ifndef FIXEDSCALEONELOOPPOTENTIAL_HPP_
 #define FIXEDSCALEONELOOPPOTENTIAL_HPP_
 
-#include "../../LagrangianParameterManagement/RunningParameterManager.hpp"
-#include "../../LagrangianParameterManagement/SlhaManager.hpp"
 #include "CommonIncludes.hpp"
-#include "OldPotentialFromPolynomialAndMasses.hpp"
+#include "PotentialFromPolynomialWithMasses.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include "LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class FixedScaleOneLoopPotential : public OldPotentialFromPolynomialAndMasses
+  class FixedScaleOneLoopPotential : public PotentialFromPolynomialWithMasses,
+                                     public ParameterUpdatePropagator
   {
   public:
     FixedScaleOneLoopPotential( std::string const& modelFilename,
-                                double const scaleRangeMinimumFactor,
-            bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
-                           RunningParameterManager& runningParameterManager );
+                        ParameterUpdatePropagator& parameterUpdatePropagator );
     FixedScaleOneLoopPotential(
-          OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
+                      PotentialFromPolynomialWithMasses const& potentialToCopy,
+                        ParameterUpdatePropagator& parameterUpdatePropagator );
     virtual ~FixedScaleOneLoopPotential();
 
 
@@ -34,81 +33,48 @@ namespace VevaciousPlusPlus
     // strongly peaked around expectation values (in GeV) for the fields given
     // by the values of fieldConfiguration and temperature in GeV given by
     // temperatureValue.
-    virtual double operator()( std::vector< double > const& fieldConfiguration,
-                               double const temperatureValue = 0.0 ) const;
+    virtual double
+    operator()( std::vector< double > const& fieldConfiguration,
+                double const temperatureValue = 0.0 ) const;
 
-    // This returns the tree-level potential energy density evaluated at the
-    // correct scale.
+    // This returns the tree-level evaluation, ignoring the temperature.
     virtual double
     QuickApproximation( std::vector< double > const& fieldConfiguration,
-                        double const temperatureValue = 0.0 );
+                        double const temperatureValue = 0.0 )
+    { return treeLevelPotential( fieldConfiguration ); }
 
-    // This returns the square of the renormalization scale.
+    // This returns the square of the current renormalization scale.
     virtual double
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum ) const
-    { return ( currentMinimumRenormalizationScale
-               * currentMinimumRenormalizationScale ); }
+                                PotentialMinimum const& trueVacuum ) const
+    { return ( renormalizationScale * renormalizationScale ); }
 
-    // This performs all relevant updates for the new SLHA data except for
-    // propagating the push to the set of dependent SlhaUpdatePropagators.
-    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager );
-
-    // This is just a dummy to make things work while I have it side-by-side to
-    // the new version for comparison.
+    // This updates the scale used for the loop corrections based on the
+    // appropriate scale from lagrangianParameterManager.
     virtual void UpdateSelfForNewParameterPoint(
-                 LagrangianParameterManager const& lagrangianParameterManager )
-    { ; /* This does nothing. */ }
-
-    virtual PolynomialGradientTargetSystem* HomotopyContinuationTargetSystem()
-    { return &homotopyContinuationTargetSystem; }
+                LagrangianParameterManager const& lagrangianParameterManager );
 
 
   protected:
+    double renormalizationScale;
     double inverseRenormalizationScaleSquared;
-    PolynomialGradientTargetSystem homotopyContinuationTargetSystem;
   };
 
 
 
 
-  // This returns the tree-level potential energy density evaluated at the
-  // correct scale.
-  inline double FixedScaleOneLoopPotential::QuickApproximation(
-                               std::vector< double > const& fieldConfiguration,
-                                                double const temperatureValue )
-  {
-    return treeLevelPotential( fieldConfiguration );
-  }
 
-  // This sets dsbFieldValueInputs based on the SLHA file just read in.
-  inline void FixedScaleOneLoopPotential::UpdateSelfForNewSlha(
-                                               SlhaManager const& slhaManager )
+  // This updates the scale used for the loop corrections based on the
+  // appropriate scale from lagrangianParameterManager.
+  inline void FixedScaleOneLoopPotential::UpdateSelfForNewParameterPoint(
+                 LagrangianParameterManager const& lagrangianParameterManager )
   {
-    currentMinimumRenormalizationScale = runningParameters.LowestBlockScale();
-    squareOfMinimumRenormalizationScale = ( currentMinimumRenormalizationScale
-                                        * currentMinimumRenormalizationScale );
+    renormalizationScale
+    = lagrangianParameterManager.AppropriateFixedScaleForParameterPoint();
     inverseRenormalizationScaleSquared
-    = ( 1.0 / squareOfMinimumRenormalizationScale );
-    currentMaximumRenormalizationScale = runningParameters.HighestBlockScale();
-    if( currentMaximumRenormalizationScale
-        < ( scaleRangeMinimumFactor * currentMinimumRenormalizationScale ) )
-    {
-      currentMaximumRenormalizationScale
-      = ( scaleRangeMinimumFactor * currentMinimumRenormalizationScale );
-    }
-    squareOfMaximumRenormalizationScale = ( currentMaximumRenormalizationScale
-                                        * currentMaximumRenormalizationScale );
-    std::vector< double > fieldOrigin( numberOfFields,
-                                       0.0 );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      dsbFieldValueInputs[ fieldIndex ]
-      = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
-    }
+    = ( 1.0 / ( renormalizationScale * renormalizationScale ) );
   }
 
 } /* namespace VevaciousPlusPlus */
+
 #endif /* FIXEDSCALEONELOOPPOTENTIAL_HPP_ */
