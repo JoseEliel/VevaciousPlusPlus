@@ -29,6 +29,10 @@
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 #include "LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include "LagrangianParameterManagement/LesHouchesAccordBlockEntryManager.hpp"
+#include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
+#include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
 
 

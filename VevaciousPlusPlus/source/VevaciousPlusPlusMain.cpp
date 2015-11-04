@@ -43,6 +43,48 @@ int main( int argumentCount,
 
   slhaManager.UpdateSlhaData( slhaFileName );
 
+
+  BOL::AsciiXmlParser lhaManagerParser;
+  lhaManagerParser.openRootElementOfFile(
+      "/home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/"
+      "ModelFiles/LagrangianParameters/"
+      "MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml" );
+  std::string specialCases( "" );
+  std::string validBlocks( "" );
+  while( lhaManagerParser.readNextElement() )
+  {
+    if( lhaManagerParser.currentElementNameMatches( "SpecialCases" ) )
+    {
+      specialCases = lhaManagerParser.getTrimmedCurrentElementContent();
+    }
+    else if( lhaManagerParser.currentElementNameMatches( "ValidBlocks" ) )
+    {
+      specialCases = lhaManagerParser.getTrimmedCurrentElementContent();
+    }
+  }
+  lhaManagerParser.closeFile();
+  VevaciousPlusPlus::LesHouchesAccordBlockEntryManager*
+  lhaParameterManager( NULL );
+  if( specialCases == "SarahMssm" )
+  {
+    lhaParameterManager
+    = new VevaciousPlusPlus::SlhaCompatibleWithSarahManager( validBlocks );
+  }
+  else if( specialCases == "SlhaMssm" )
+  {
+    lhaParameterManager
+    = new VevaciousPlusPlus::SlhaBlocksWithSpecialCasesManager( validBlocks );
+  }
+  else
+  {
+    lhaParameterManager
+    = new VevaciousPlusPlus::LesHouchesAccordBlockEntryManager( validBlocks );
+  }
+  lhaParameterManager->NewParameterPoint( slhaFileName );
+
+  // Cleaning up.
+  delete lhaParameterManager;
+
   // debugging:
   /**/std::cout << std::endl << "debugging:"
   << std::endl

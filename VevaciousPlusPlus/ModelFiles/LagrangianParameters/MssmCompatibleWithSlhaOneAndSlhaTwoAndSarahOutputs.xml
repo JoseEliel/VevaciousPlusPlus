@@ -1,0 +1,120 @@
+<LhaBlockParameterManagerInitializationFile>
+
+  <ParameterManagerDetails
+   ParameterManagerName="MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs"
+   VevaciousMajorVersion="2" VevaciousMinorVersion="0" />
+
+  <!-- This LHA block parameter file was created by Ben O'Leary. -->
+
+  <SpecialCases>
+    <!-- This tells Vevacious to prepare certain special cases because there
+         are certain values which are not printed directly in blocks according
+         to the offical SUSY Les Houches Accords standard.
+
+         The setting SarahMssm tells Vevacious to set up a parameter manager
+         which understands keywords specific to output from the SPhenoMSSM 
+         produced by SARAH and also the keywords specific to using output
+         conforming to the SLHA1 and SLHA2 standards.
+
+         The SLHA1/2 keywords:
+         * DsbVd, DsbVu: the VEVs for Hd and Hu respectively at the SM-like
+           vacuum, because only v = sqrt(vd^2 + vu^2) and tan(beta) = vu/vd
+           are printed in HMIX.
+         * Bmu (m3Sq is an alternative alias): the bilinear soft SUSY-breaking
+           parameter, of dimension mass^2, coupling the Hd and Hu scalar
+           fields, because only mA^2 = ( Bmu / (sin(beta) * cos(beta) ) and
+           tan(beta) are given in HMIX.
+         * Te11, Te22, Te33, Td11, Td22, Td33, Tu11, Tu22, Tu33: the diagonal
+           entries of the trilinear soft SUSY-breaking terms corresponding to
+           TE[1,1] etc. in the official SLHA2 standard. Unfortunately, SLHA1
+           output only prints the diagonal A terms, which have to be multiplied
+           with the Yukawa couplings to get the actual trilinear couplings (of
+           dimension mass^1) in the Lagrangian. Hence to accept both SLHA1 and
+           SLHA2 output, Te11 has to be a special case, checking for the TE
+           block first, then if necessary checking for AE and YE and
+           multiplying the values, and so on.
+         * TE[1,1] and so on are also set to be special case aliases of the
+           above, rather than looked for directly.
+         * Msl211, Msl222, Msl233, Mse211, Mse222, Mse233, Msq211, Msq222,
+           Msq233, Msu211, Msu222, Msu233, Msd211, Msd222, Msd233: the diagonal
+           soft SUSY-breaking mass-squared terms for the sfermions
+           corresponding to MSL2[1,1] and so on in the official SLHA2 standard.
+           Unfortunately, SLHA1 output only prints the positive square roots of
+           these Lagrangian parameters, in various entries in MSOFT. Hence to
+           accept both SLHA1 and SLHA2 output, Msl211 has to be a special case,
+           checking for the MSL2 block first, then if necessary checking for
+           MSOFT[31] and squaring it, and so on.
+         * MSL2[1,1] and so on are also set to be special case aliases of the
+           above, rather than looked for directly.
+
+         The SARAH keywords:
+         * DsbVd, DsbVu: the same as DsbVd and DsbVu above, except first
+           looking for their values directly in HMIX[102] and HMIX[103]
+           respectively.
+         * Bmu: the same as Bmu above, except first looking for its value in
+           HMIX[101].
+         * muTree, BmuTree, mHdSqTree, mHuSqTree: these are the tree-level
+           values of mu, Bmu, m^2_Hd, m^2_Hu respectively in the
+           Liebler-Porod-Staub scheme printed by SARAH-generated SPheno (where
+           the SM-like vacuum VEVs are constant at every loop order), taking
+           the values in TREEHMIX[1], TREEHMIX[101], TREEMSOFT[21],
+           TREEMSOFT[22] respectively first, defaulting to the values in the
+           blocks without TREE prepended if the TREE-prepended values are
+           absent.
+         * muLoop, BmuLoop, mHdSqLoop, mHuSqLoop: these are the 1-loop-level
+           values of the above, taking the values in LOOPHMIX[1] etc. first.
+         
+         The other valid values for this element provided in Vevacious 2.0.00
+         are SlhaMssm, to have only the SLHA1/2 keywords, or nothing at all,
+         so that no keywords are used at all, in which case the potential
+         object should only ever ask the parameter manager object for values
+         printed directly in LHA blocks found in the parameter point file. -->
+    SarahMssm
+  </SpecialCases>
+
+  <!-- Every block that will be read in from a file in the (SUSY) Les Houches
+       Accords format should be enumerated here, separated by whitespace -
+       i.e. spaces, tabs, newlines. Also permitted for readability are commas
+       and semicolons, as valid block names should just be single strings of
+       alphanumeric characters. Block names are NOT case-sensitive (following
+       the SLHA conventions). Any blocks not explicitly mentioned here will be
+       considered invalid requests when the potential function object requests
+       values from the parameter manager object!
+       N.B.: Only a subset of possible LHA-style blocks are permitted: those
+       where each line is of the form of a set of integer indices followed by a
+       single floating-point number. The number of indices is not limited.
+       For a block named BLAH, the elements are referred to as BLAH[ 1 ] or
+       BLAH[ 2, 3 ] or BLAH[4,5,6] and so on for blocks with 1, 2 or 3 indices
+       respectively and so on. Also, blocks which are just a single line with
+       a single floating-point number are permitted, but must be referred to
+       with empty square brackets: BLAH[] (e.g. the ALPHA block of the
+       original SUSY Les Houches Accords). -->
+  <ValidBlocks>
+    GAUGE
+    HMIX
+    MSOFT
+    MSQ2
+    MSU2
+    MSD2
+    MSL2
+    MSE2
+    YU
+    TU
+    AU
+    YD
+    TD
+    AD
+    YE
+    TE
+    AE
+    <!-- The blocks prepended with TREE and LOOP are for compatibility with
+         output from SARAH-generated SPheno, so that the Lieber-Porod-Staub
+         scheme (where the SM-like vacuum VEVs are constant at every loop
+         order) values can be fully expressed. -->
+    TREEHMIX
+    LOOPHMIX
+    TREEMSOFT
+    LOOPMSOFT
+  </ValidBlocks>
+
+</LhaBlockParameterManagerInitializationFile>
