@@ -13,7 +13,7 @@ namespace VevaciousPlusPlus
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
                                               std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
-                        ParameterUpdatePropagator& parameterUpdatePropagator) :
+                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
     PotentialFromPolynomialWithMasses( modelFilename,
                                        assumedPositiveOrNegativeTolerance,
                    parameterUpdatePropagator.GetLagrangianParameterManager() ),

@@ -103,7 +103,6 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaLinearlyInterpolatedBlockEntry.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaPolynomialFitBlockEntry.cpp \

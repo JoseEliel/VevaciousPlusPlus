@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "LagrangianParameterManagement/RunningParameterManager.hpp"
 
 namespace VevaciousPlusPlus
 {

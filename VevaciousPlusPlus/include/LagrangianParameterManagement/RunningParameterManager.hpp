@@ -88,6 +88,11 @@ namespace VevaciousPlusPlus
     ParameterValues( double logarithmOfScale ) const
     { return std::vector< double >( 0, 0.0 ); }
 
+    // This returns a scale which is appropriate for using for a fixed-scale
+    // calculation for the current parameter point.
+    virtual double AppropriateFixedScaleForParameterPoint() const
+    { return lowestBlockScale; }
+
 
   protected:
     // This puts all index brackets into a consistent form.
