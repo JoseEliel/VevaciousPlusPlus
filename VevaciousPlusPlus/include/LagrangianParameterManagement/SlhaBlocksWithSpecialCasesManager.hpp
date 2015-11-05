@@ -23,9 +23,17 @@ namespace VevaciousPlusPlus
                                        public LesHouchesAccordBlockEntryManager
   {
   public:
-    SlhaBlocksWithSpecialCasesManager( std::string const& validBlocksString );
+    SlhaBlocksWithSpecialCasesManager( std::string const& validBlocksString,
+                                       std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                       std::string const& fixedScaleType,
+                                       std::string const& fixedScaleArgument );
     SlhaBlocksWithSpecialCasesManager(
-                                  std::set< std::string > const& validBlocks );
+                                 std::set< std::string > const& validBlocksSet,
+                                       std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                       std::string const& fixedScaleType,
+                                       std::string const& fixedScaleArgument );
     virtual ~SlhaBlocksWithSpecialCasesManager();
 
 

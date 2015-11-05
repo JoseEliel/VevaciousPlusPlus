@@ -22,9 +22,17 @@ namespace VevaciousPlusPlus
                                        public SlhaBlocksWithSpecialCasesManager
   {
   public:
-    SlhaCompatibleWithSarahManager( std::string const& validBlocksString );
+    SlhaCompatibleWithSarahManager( std::string const& validBlocksString,
+                                    std::string const& minimumScaleType,
+                                    std::string const& minimumScaleArgument,
+                                    std::string const& fixedScaleType,
+                                    std::string const& fixedScaleArgument );
     SlhaCompatibleWithSarahManager(
-                                  std::set< std::string > const& validBlocks );
+                                 std::set< std::string > const& validBlocksSet,
+                                    std::string const& minimumScaleType,
+                                    std::string const& minimumScaleArgument,
+                                    std::string const& fixedScaleType,
+                                    std::string const& fixedScaleArgument );
     virtual ~SlhaCompatibleWithSarahManager();
 
 

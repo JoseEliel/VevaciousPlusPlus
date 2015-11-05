@@ -51,6 +51,10 @@ int main( int argumentCount,
       "MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml" );
   std::string specialCases( "" );
   std::string validBlocks( "" );
+  std::string minimumScaleType( "" );
+  std::string minimumScaleArgument( "" );
+  std::string fixedScaleType( "" );
+  std::string fixedScaleArgument( "" );
   while( lhaManagerParser.readNextElement() )
   {
     if( lhaManagerParser.currentElementNameMatches( "SpecialCases" ) )
@@ -59,7 +63,46 @@ int main( int argumentCount,
     }
     else if( lhaManagerParser.currentElementNameMatches( "ValidBlocks" ) )
     {
-      specialCases = lhaManagerParser.getTrimmedCurrentElementContent();
+      validBlocks = lhaManagerParser.getTrimmedCurrentElementContent();
+    }
+    else if( lhaManagerParser.currentElementNameMatches(
+                                              "RenormalizationScaleChoices" ) )
+    {
+      BOL::AsciiXmlParser scaleChoiceParser;
+      scaleChoiceParser.loadString(
+                          lhaManagerParser.getTrimmedCurrentElementContent() );
+      while( scaleChoiceParser.readNextElement() )
+      {
+        BOL::AsciiXmlParser elementParser;
+        elementParser.loadString(
+                         scaleChoiceParser.getTrimmedCurrentElementContent() );
+        std::string evaluationType( "" );
+        std::string evaluationArgument( "" );
+        while( elementParser.readNextElement() )
+        {
+          if( elementParser.currentElementNameMatches( "EvaluationType" ) )
+          {
+            evaluationType = elementParser.getTrimmedCurrentElementContent();
+          }
+          else if( elementParser.currentElementNameMatches(
+                                                       "EvaluationArgument" ) )
+          {
+            evaluationArgument
+            = elementParser.getTrimmedCurrentElementContent();
+          }
+        }
+        if( scaleChoiceParser.currentElementNameMatches( "FixedScaleChoice" ) )
+        {
+          fixedScaleType = evaluationType;
+          fixedScaleArgument = evaluationArgument;
+        }
+        else if( scaleChoiceParser.currentElementNameMatches(
+                                                        "MinimumScaleBound" ) )
+        {
+          minimumScaleType = evaluationType;
+          minimumScaleArgument = evaluationArgument;
+        }
+      }
     }
   }
   lhaManagerParser.closeFile();
@@ -68,17 +111,29 @@ int main( int argumentCount,
   if( specialCases == "SarahMssm" )
   {
     lhaParameterManager
-    = new VevaciousPlusPlus::SlhaCompatibleWithSarahManager( validBlocks );
+    = new VevaciousPlusPlus::SlhaCompatibleWithSarahManager( validBlocks,
+                                                             minimumScaleType,
+                                                          minimumScaleArgument,
+                                                             fixedScaleType,
+                                                          fixedScaleArgument );
   }
   else if( specialCases == "SlhaMssm" )
   {
     lhaParameterManager
-    = new VevaciousPlusPlus::SlhaBlocksWithSpecialCasesManager( validBlocks );
+    = new VevaciousPlusPlus::SlhaBlocksWithSpecialCasesManager( validBlocks,
+                                                              minimumScaleType,
+                                                          minimumScaleArgument,
+                                                                fixedScaleType,
+                                                          fixedScaleArgument );
   }
   else
   {
     lhaParameterManager
-    = new VevaciousPlusPlus::LesHouchesAccordBlockEntryManager( validBlocks );
+    = new VevaciousPlusPlus::LesHouchesAccordBlockEntryManager( validBlocks,
+                                                              minimumScaleType,
+                                                          minimumScaleArgument,
+                                                                fixedScaleType,
+                                                          fixedScaleArgument );
   }
   lhaParameterManager->NewParameterPoint( slhaFileName );
 

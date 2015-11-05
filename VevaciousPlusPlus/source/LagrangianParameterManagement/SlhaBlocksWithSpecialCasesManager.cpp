@@ -11,8 +11,16 @@ namespace VevaciousPlusPlus
 {
 
   SlhaBlocksWithSpecialCasesManager::SlhaBlocksWithSpecialCasesManager(
-                                       std::string const& validBlocksString ) :
-    LesHouchesAccordBlockEntryManager( validBlocksString ),
+                                          std::string const& validBlocksString,
+                                           std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                             std::string const& fixedScaleType,
+                                      std::string const& fixedScaleArgument ) :
+    LesHouchesAccordBlockEntryManager( validBlocksString,
+                                       minimumScaleType,
+                                       minimumScaleArgument,
+                                       fixedScaleType,
+                                       fixedScaleArgument ),
     activeDerivedParameters(),
     aliasesToSwitchStrings()
   {
@@ -20,8 +28,16 @@ namespace VevaciousPlusPlus
   }
 
   SlhaBlocksWithSpecialCasesManager::SlhaBlocksWithSpecialCasesManager(
-                                 std::set< std::string > const& validBlocks ) :
-    LesHouchesAccordBlockEntryManager( validBlocks ),
+                                 std::set< std::string > const& validBlocksSet,
+                                           std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                             std::string const& fixedScaleType,
+                                      std::string const& fixedScaleArgument ) :
+    LesHouchesAccordBlockEntryManager( validBlocks,
+                                       minimumScaleType,
+                                       minimumScaleArgument,
+                                       fixedScaleType,
+                                       fixedScaleArgument ),
     activeDerivedParameters(),
     aliasesToSwitchStrings()
   {

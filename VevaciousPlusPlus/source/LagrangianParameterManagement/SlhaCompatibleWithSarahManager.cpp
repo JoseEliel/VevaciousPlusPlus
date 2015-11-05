@@ -11,15 +11,31 @@ namespace VevaciousPlusPlus
 {
 
   SlhaCompatibleWithSarahManager::SlhaCompatibleWithSarahManager(
-                                       std::string const& validBlocksString ) :
-    SlhaBlocksWithSpecialCasesManager( validBlocksString )
+                                          std::string const& validBlocksString,
+                                           std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                             std::string const& fixedScaleType,
+                                      std::string const& fixedScaleArgument ) :
+    SlhaBlocksWithSpecialCasesManager( validBlocksString,
+                                       minimumScaleType,
+                                       minimumScaleArgument,
+                                       fixedScaleType,
+                                       fixedScaleArgument )
   {
     InitializeSarahAliases();
   }
 
   SlhaCompatibleWithSarahManager::SlhaCompatibleWithSarahManager(
-                                 std::set< std::string > const& validBlocks ) :
-    SlhaBlocksWithSpecialCasesManager( validBlocks )
+                                 std::set< std::string > const& validBlocksSet,
+                                           std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                             std::string const& fixedScaleType,
+                                      std::string const& fixedScaleArgument ) :
+    SlhaBlocksWithSpecialCasesManager( validBlocks,
+                                       minimumScaleType,
+                                       minimumScaleArgument,
+                                       fixedScaleType,
+                                       fixedScaleArgument )
   {
     InitializeSarahAliases();
   }
