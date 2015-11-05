@@ -36,16 +36,6 @@ namespace VevaciousPlusPlus
     operator()( std::vector< double > const& fieldConfiguration,
                 double const temperatureValue = 0.0 ) const = 0;
 
-    // This returns operator(), but could be over-ridden so that a partial
-    // result from a derived class could be returned, such as say the
-    // tree-level part of a potential that builds on it with loop
-    // corrections.
-    virtual double
-    QuickApproximation( std::vector< double > const& fieldConfiguration,
-                        double const temperatureValue = 0.0 )
-    { return (*this)( fieldConfiguration,
-                      temperatureValue ); }
-
     // This numerically evaluates the gradient at fieldConfiguration based on
     // steps of numericalStepSize GeV in each field direction and places the
     // gradient in gradientVector. Derived classes which can analytically

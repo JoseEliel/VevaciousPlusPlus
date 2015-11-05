@@ -6,6 +6,108 @@
 
   <!-- This LHA block parameter file was created by Ben O'Leary. -->
 
+  <!-- PLEASE TAKE NOTE! There are 3 XML elements, each with long explanatory
+       comments. -->
+
+  <RenormalizationScaleChoices>
+    <!-- Vevacious needs to be able to decide what scale to use for a
+         fixed-scale calculation if given a potential function which uses just
+         a single scale in its evaluation, and Vevacious also needs to be able
+         to put a lower bound on the renormalization scale used if given a
+         potential function which evaluates the Lagrangian parameters at
+         different renormalization scales, so as to avoid issues with taking
+         logarithms of zero and also, pertinent to this kind of Lagrangian
+         parameter management (through an instance of the
+         LesHouchesAccordBlockEntryManager class or a class derived from it),
+         to avoid extrapolating parameters far away from the values given in
+         the LHA file.
+
+         The fixed-scale element is called FixedScaleChoice and the
+         minimum-scale element is called MinimumScaleBound.
+
+         Each element consists of two child elements: EvaluationType and
+         EvaluationArgument.
+
+         EvaluationType can be "FixedNumber", in which case
+         EvaluationArgument should be a fixed number, e.g.
+      <EvaluationType>
+        FixedNumber
+      </EvaluationType>
+      <EvaluationArgument>
+        91.1876
+      </EvaluationArgument>
+         would use the central value of the Z mass given by the Particle Data
+         Group live listings on 2015-11-05.
+
+         EvaluationType can be "BlockLowestScale", in which case
+         EvaluationArgument should be the name of a block which will be read in
+         the parameter point's LHA file, and the lowest scale explicitly given
+         for that block will be used, e.g.
+      <EvaluationType>
+        BlockLowestScale
+      </EvaluationType>
+      <EvaluationArgument>
+        GAUGE
+      </EvaluationArgument>
+         would use the value given after "GAUGE Q=" in the LHA file.
+
+         EvaluationType can be "BlockEntry", in which case
+         EvaluationArgument should be the name of a block which will be read in
+         the parameter point's LHA file followed by an index or set of indices
+         in square brackets, and the value in that block (the copy of the block
+         in the file with the lowest scale if multiple blocks of the same name
+         are in a single file) with that index or those indices will be used,
+         e.g.
+      <EvaluationType>
+        BlockEntry
+      </EvaluationType>
+      <EvaluationArgument>
+        SMINPUTS[4]
+      </EvaluationArgument>
+         would use the value given with index 4 in the SMINPUTS block in the
+         LHA file (which is the input Z mass), while
+      <EvaluationArgument>
+        MSU2[3,3]
+      </EvaluationArgument>
+         would use the value with indices (3, 3) in the MSU2 block (which is
+         the (3, 3) entry in the soft SUSY-breaking up-type squark mass-squared
+         matrix).
+
+         Finally, EvaluationType can be "SqrtAbs", in which case
+         EvaluationArgument should be the same as for "BlockEntry", but in this
+         case the square root of the absolute value of the entry will be used,
+         e.g.
+      <EvaluationType>
+        SqrtAbs
+      </EvaluationType>
+      <EvaluationArgument>
+        MSOFT[22]
+      </EvaluationArgument>
+         would use the square root of the absolute value of the value given
+         with index 22 in the MSOFT block in the LHA file (which is the soft
+         SUSY-breaking mass-squared parameter for Hu, which is often
+         negative). -->
+
+    <FixedScaleChoice>
+      <EvaluationType>
+        BlockLowestScale
+      </EvaluationType>
+      <EvaluationArgument>
+        GAUGE
+      </EvaluationArgument>
+    </FixedScaleChoice>
+
+    <MinimumScaleBound>
+      <EvaluationType>
+        fixed
+      </EvaluationType>
+      <EvaluationArgument>
+        91.1876
+      </EvaluationArgument>
+    </MinimumScaleBound>
+
+  </RenormalizationScaleChoice>
+
   <SpecialCases>
     <!-- This tells Vevacious to prepare certain special cases because there
          are certain values which are not printed directly in blocks according

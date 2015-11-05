@@ -36,7 +36,7 @@ namespace VevaciousPlusPlus
     // This returns the value of the functionoid for the given logarithm of the
     // scale. It ignores the values of the other parameters.
     virtual double operator()( double const logarithmOfScale,
-                       std::vector< double > const& interpolatedValues ) const
+                        std::vector< double > const& interpolatedValues ) const
     { return scaleLogarithmPowerCoefficients( logarithmOfScale ); }
 
     // This re-calculates the coefficients of the polynomial of the logarithm

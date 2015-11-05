@@ -40,34 +40,51 @@ namespace VevaciousPlusPlus
     // This does nothing.
   }
 
-  // This returns the energy density in GeV^4 of the potential for a state
-  // strongly peaked around expectation values (in GeV) for the fields given
-  // by the values of fieldConfiguration and temperature in GeV given by
-  // temperatureValue.
-  double FixedScaleOneLoopPotential::operator()(
-                               std::vector< double > const& fieldConfiguration,
-                                          double const temperatureValue ) const
+
+  // This updates the scale used for the loop corrections based on the
+  // appropriate scale from lagrangianParameterManager, and updates all
+  // components used to evaluate the potential to use the Lagrangian
+  // parameters evaluated at that scale.
+  void FixedScaleOneLoopPotential::UpdateSelfForNewParameterPoint(
+                 LagrangianParameterManager const& lagrangianParameterManager )
   {
-    std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      scalarSquareMasses,
-                                      scalarMassesSquaredWithFactors );
-    std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      fermionSquareMasses,
-                                      fermionMassesSquaredWithFactors );
-    std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      vectorSquareMasses,
-                                      vectorMassesSquaredWithFactors );
-    return ( treeLevelPotential( fieldConfiguration )
-             + polynomialLoopCorrections( fieldConfiguration )
-             + LoopAndThermalCorrections( fieldConfiguration,
-                                          scalarMassesSquaredWithFactors,
-                                          fermionMassesSquaredWithFactors,
-                                          vectorMassesSquaredWithFactors,
-                                          inverseRenormalizationScaleSquared,
-                                          temperatureValue ) );
+    renormalizationScale
+    = lagrangianParameterManager.AppropriateFixedScaleForParameterPoint();
+    inverseRenormalizationScaleSquared
+    = ( 1.0 / ( renormalizationScale * renormalizationScale ) );
+    std::vector< double > const
+    fixedParameterValues( lagrangianParameterManager.ParameterValues(
+                                               log( renormalizationScale ) ) );
+    treeLevelPotential.UpdateForFixedScale( fixedParameterValues );
+    polynomialLoopCorrections.UpdateForFixedScale( fixedParameterValues );
+    for( std::vector< RealMassesSquaredMatrix >::iterator
+         massMatrix( scalarMassSquaredMatrices.begin() );
+         massMatrix < scalarMassSquaredMatrices.end();
+         ++massMatrix )
+    {
+      massMatrix->UpdateForFixedScale( fixedParameterValues );
+    }
+    for( std::vector< SymmetricComplexMassMatrix >::iterator
+         massMatrix( fermionMassMatrices.begin() );
+         massMatrix < fermionMassMatrices.end();
+         ++massMatrix )
+    {
+      massMatrix->UpdateForFixedScale( fixedParameterValues );
+    }
+    for( std::vector< ComplexMassSquaredMatrix >::iterator
+         massMatrix( fermionMassSquaredMatrices.begin() );
+         massMatrix < fermionMassSquaredMatrices.end();
+         ++massMatrix )
+    {
+      massMatrix->UpdateForFixedScale( fixedParameterValues );
+    }
+    for( std::vector< RealMassesSquaredMatrix >::iterator
+         massMatrix( vectorMassSquaredMatrices.begin() );
+         massMatrix < vectorMassSquaredMatrices.end();
+         ++massMatrix )
+    {
+      massMatrix->UpdateForFixedScale( fixedParameterValues );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

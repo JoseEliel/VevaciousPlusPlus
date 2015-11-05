@@ -20,7 +20,6 @@
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
 #include "IWritesPythonPotential.hpp"
-#include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -90,7 +89,7 @@ namespace VevaciousPlusPlus
     // This evaluates the one-loop potential with thermal corrections assuming
     // that the squared masses were evaluated at the given scale correctly.
     double
-    LoopAndThermalCorrections( std::vector< double > const& fieldConfiguration,
+    LoopAndThermalCorrections(
           std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
          std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
           std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
@@ -146,6 +145,7 @@ namespace VevaciousPlusPlus
     void AddToCorrections(
          std::vector< DoubleVectorWithDouble > const& massesSquaredWithFactors,
                            double const inverseScaleSquared,
+                           bool const temperatureGreaterThanZero,
                            double const inverseTemperatureSquared,
                            double const subtractFromLogarithm,
                            double (*ThermalFunction)( double const ),

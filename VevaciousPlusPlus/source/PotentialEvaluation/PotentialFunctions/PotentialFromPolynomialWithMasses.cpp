@@ -148,7 +148,7 @@ namespace VevaciousPlusPlus
       if( !( equalsPosition < ( elementLines[ lineIndex ].size() - 1 ) ) )
       {
         std::string errorMessage(
-                 "Field given no value in DsbMinimum! (Offending line = \"" );
+                  "Field given no value in DsbMinimum! (Offending line = \"" );
         errorMessage.append( elementLines[ lineIndex ] );
         errorMessage.append( "\")" );
         throw std::runtime_error( errorMessage );
@@ -434,19 +434,16 @@ namespace VevaciousPlusPlus
   // that the squared masses were evaluated at the given scale correctly.
   double
   PotentialFromPolynomialWithMasses::LoopAndThermalCorrections(
-                               std::vector< double > const& fieldConfiguration,
           std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
          std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
           std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
                                               double const inverseScaleSquared,
                                           double const temperatureValue ) const
   {
-    double inverseTemperatureSquared( 1.0 );
-    if( temperatureValue > 0.0 )
-    {
-      inverseTemperatureSquared
-      = ( 1.0 / ( temperatureValue * temperatureValue ) );
-    }
+    bool const temperatureGreaterThanZero( temperatureValue > 0.0 );
+    double const inverseTemperatureSquared( temperatureGreaterThanZero ?
+                            ( 1.0 / ( temperatureValue * temperatureValue ) ) :
+                                            -1.0 );
     double totalQuantumCorrections( 0.0 );
     double totalThermalCorrections( 0.0 );
 
@@ -454,6 +451,7 @@ namespace VevaciousPlusPlus
     double scalarThermalCorrections( 0.0 );
     AddToCorrections( scalarMassesSquaredWithFactors,
                       inverseScaleSquared,
+                      temperatureGreaterThanZero,
                       inverseTemperatureSquared,
                       1.5,
                       &(ThermalFunctions::BosonicJ),
@@ -469,6 +467,7 @@ namespace VevaciousPlusPlus
     double fermionThermalCorrections( 0.0 );
     AddToCorrections( fermionMassesSquaredWithFactors,
                       inverseScaleSquared,
+                      temperatureGreaterThanZero,
                       inverseTemperatureSquared,
                       1.5,
                       &(ThermalFunctions::FermionicJ),
@@ -487,6 +486,7 @@ namespace VevaciousPlusPlus
     double vectorThermalCorrections( 0.0 );
     AddToCorrections( vectorMassesSquaredWithFactors,
                       inverseScaleSquared,
+                      temperatureGreaterThanZero,
                       inverseTemperatureSquared,
                       vectorMassCorrectionConstant,
                       &(ThermalFunctions::BosonicJ),
@@ -780,6 +780,7 @@ namespace VevaciousPlusPlus
   void PotentialFromPolynomialWithMasses::AddToCorrections(
          std::vector< DoubleVectorWithDouble > const& massesSquaredWithFactors,
                                               double const inverseScaleSquared,
+                                         bool const temperatureGreaterThanZero,
                                         double const inverseTemperatureSquared,
                                             double const subtractFromLogarithm,
                                      double (*ThermalFunction)( double const ),
@@ -806,14 +807,14 @@ namespace VevaciousPlusPlus
         {
           massSquared = -massSquared;
         }
-        if( massSquared > 1.0 )
+        if( massSquared > 0.0 )
         {
           currentQuantumCorrection += ( massSquared * massSquared
                                         * ( log( massSquared
                                                  * inverseScaleSquared )
                                             - subtractFromLogarithm ) );
         }
-        if( inverseTemperatureSquared > 0.0 )
+        if( temperatureGreaterThanZero )
         {
           currentThermalCorrection += (*ThermalFunction)( massSquared
                                                  * inverseTemperatureSquared );

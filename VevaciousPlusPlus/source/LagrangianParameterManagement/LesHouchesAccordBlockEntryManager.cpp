@@ -13,14 +13,23 @@ namespace VevaciousPlusPlus
   LesHouchesAccordBlockEntryManager::blockNameSeparationCharacters(
                                                                  " ,;\t\n\r" );
 
+
   LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
-                                       std::string const& validBlocksString ) :
+                                          std::string const& validBlocksString,
+                                           std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                             std::string const& fixedScaleType,
+                                      std::string const& fixedScaleArgument ) :
     LagrangianParameterManager(),
     numberOfDistinctActiveParameters( 0 ),
     activeParametersToIndices(),
     activeInterpolatedParameters(),
     validBlocks(),
-    lhaParser()
+    lhaParser(),
+    minimumScaleType( minimumScaleType ),
+    minimumScaleArgument( minimumScaleArgument ),
+    fixedScaleType( fixedScaleType ),
+    fixedScaleArgument( fixedScaleArgument )
   {
     size_t wordStart( validBlocksString.find_first_of(
                                              blockNameSeparationCharacters ) );
@@ -52,13 +61,21 @@ namespace VevaciousPlusPlus
   }
 
   LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
-                                 std::set< std::string > const& validBlocks ) :
+                                 std::set< std::string > const& validBlocksSet,
+                                           std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                             std::string const& fixedScaleType,
+                                      std::string const& fixedScaleArgument ) :
     LagrangianParameterManager(),
     numberOfDistinctActiveParameters( 0 ),
     activeParametersToIndices(),
     activeInterpolatedParameters(),
-    validBlocks( validBlocks ),
-    lhaParser()
+    validBlocks( validBlocksSet ),
+    lhaParser(),
+    minimumScaleType( minimumScaleType ),
+    minimumScaleArgument( minimumScaleArgument ),
+    fixedScaleType( fixedScaleType ),
+    fixedScaleArgument( fixedScaleArgument )
   {
     // debugging:
     /**/std::cout << std::endl << "debugging:"

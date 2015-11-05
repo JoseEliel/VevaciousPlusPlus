@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "SlhaPolynomialFitBlockEntry.hpp"
+#include "LagrangianParameterManagement/SlhaPolynomialFitBlockEntry.hpp"
 
 namespace VevaciousPlusPlus
 {

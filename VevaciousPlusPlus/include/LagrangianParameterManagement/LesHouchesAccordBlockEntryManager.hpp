@@ -22,9 +22,17 @@ namespace VevaciousPlusPlus
   public:
     static std::string const blockNameSeparationCharacters;
 
-    LesHouchesAccordBlockEntryManager( std::string const& validBlocksString );
+    LesHouchesAccordBlockEntryManager( std::string const& validBlocksString,
+                                       std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                       std::string const& fixedScaleType,
+                                       std::string const& fixedScaleArgument );
     LesHouchesAccordBlockEntryManager(
-                                  std::set< std::string > const& validBlocks );
+                                 std::set< std::string > const& validBlocksSet,
+                                       std::string const& minimumScaleType,
+                                       std::string const& minimumScaleArgument,
+                                       std::string const& fixedScaleType,
+                                       std::string const& fixedScaleArgument );
     virtual ~LesHouchesAccordBlockEntryManager();
 
 
@@ -60,7 +68,14 @@ namespace VevaciousPlusPlus
     // This returns the lowest scale above zero (not including zero) which was
     // in the set of scales read for fixedScaleDefiningBlock last read in.
     virtual double AppropriateFixedScaleForParameterPoint() const
-    { return lhaParser.getLowestScale( fixedScaleDefiningBlock ); }
+    { return GetScale( fixedScaleType,
+                       fixedScaleArgument ); }
+
+    // This should return the minimum scale which is appropriate for evaluating
+    // the Lagrangian parameters at the current parameter point.
+    virtual double MinimumEvaluationScale() const
+    { return GetScale( minimumScaleType,
+                       minimumScaleArgument ); }
 
     // This writes a function in the form
     // def LagrangianParameters( lnQ ): return ...
@@ -87,7 +102,10 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator > activeInterpolatedParameters;
     std::set< std::string > validBlocks;
     LHPC::SlhaSimplisticInterpreter lhaParser;
-    std::string fixedScaleDefiningBlock;
+    std::string const minimumScaleType;
+    std::string const minimumScaleArgument;
+    std::string const fixedScaleType;
+    std::string const fixedScaleArgument;
 
 
     // This updates the SLHA file parser with the file with name given by
@@ -132,6 +150,11 @@ namespace VevaciousPlusPlus
     // a reference to its SlhaInterpolatedParameterFunctionoid.
     SlhaInterpolatedParameterFunctionoid const&
     RegisterBlockEntry( std::string const& parameterName );
+
+    // This returns the appropriate scale for the given type of evaluation and
+    // its argument.
+    double GetScale( std::string const& evaluationType,
+                     std::string const& evaluationArgument ) const;
   };
 
 
@@ -278,6 +301,33 @@ namespace VevaciousPlusPlus
       << "\n";
     }
     return stringBuilder.str();
+  }
+
+  // This returns the appropriate scale for the given type of evaluation and
+  // its argument.
+  inline double LesHouchesAccordBlockEntryManager::GetScale(
+                                             std::string const& evaluationType,
+                                  std::string const& evaluationArgument ) const
+  {
+    switch( evaluationType )
+    {
+      case "FixedNumber":
+        return atof( evaluationArgument.c_str() );
+        break;
+      case "BlockLowestScale":
+        return lhaParser.getLowestScale( evaluationArgument );
+        break;
+      case "BlockEntry":
+        return atof( lhaParser( evaluationArgument ).c_str() );
+        break;
+      case "SqrtAbs":
+        return sqrt( abs( atof( lhaParser( evaluationArgument ).c_str() ) ) );
+        break;
+      default:
+        throw std::runtime_error( evaluationType
+                                  + " is not a valid scale evaluation type!" );
+        break;
+    }
   }
 
 } /* namespace VevaciousPlusPlus */
