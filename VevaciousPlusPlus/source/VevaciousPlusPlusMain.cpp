@@ -23,8 +23,8 @@ int main( int argumentCount,
   << std::endl
   << "Testing old and new potential functions.";
   std::cout << std::endl;/**/
-  std::string slhaFileName( "CMSSM_CCB.slha.out" );
-  std::string oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
+  std::string const slhaFileName( "CMSSM_CCB.slha.out" );
+  std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
 
   VevaciousPlusPlus::RunningParameterManager slhaManager;
   VevaciousPlusPlus::OldFixedScaleOneLoopPotential
@@ -136,6 +136,16 @@ int main( int argumentCount,
                                                           fixedScaleArgument );
   }
   lhaParameterManager->NewParameterPoint( slhaFileName );
+  std::string const
+  newModelFilename( "NewFormatRealMssmWithStauAndStopVevsPotential.vin" );
+  VevaciousPlusPlus::FixedScaleOneLoopPotential
+  newFixedScale( newModelFilename,
+                 0.5,
+                 *lhaParameterManager );
+
+  VevaciousPlusPlus::RgeImprovedOneLoopPotential
+  newRgeImproved( newFixedScale,
+                  *lhaParameterManager );
 
   // Cleaning up.
   delete lhaParameterManager;

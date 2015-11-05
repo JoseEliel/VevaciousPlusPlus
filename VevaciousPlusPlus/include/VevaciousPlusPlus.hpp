@@ -34,6 +34,8 @@
 #include "PotentialEvaluation/PotentialFunctions/OldFixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
 #include "PotentialEvaluation/PotentialFunctions/OldRgeImprovedOneLoopPotential.hpp"
+#include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
+#include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 
 
 namespace VevaciousPlusPlus

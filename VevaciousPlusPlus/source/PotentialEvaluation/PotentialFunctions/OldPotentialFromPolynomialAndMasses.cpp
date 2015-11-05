@@ -429,7 +429,7 @@ namespace VevaciousPlusPlus
   // same order as they are for the field configurations as internal to this
   // C++ code. It uses the virtual function SetScaleForPythonPotentialCall.
   void OldPotentialFromPolynomialAndMasses::WriteAsPython(
-                                       std::string const pythonFilename ) const
+                                      std::string const& pythonFilename ) const
   {
     std::ofstream pythonFile( pythonFilename.c_str() );
     pythonFile << std::setprecision( 12 );

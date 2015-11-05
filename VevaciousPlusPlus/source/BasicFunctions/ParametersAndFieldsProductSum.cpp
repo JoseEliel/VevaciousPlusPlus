@@ -42,7 +42,7 @@ namespace VevaciousPlusPlus
     }
     else
     {
-      for( std::vector< PolynomialTerm >::const_iterator
+      for( std::vector< ParametersAndFieldsProduct >::const_iterator
            parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
            parametersAndFieldsProduct < parametersAndFieldsProducts.end();
            ++parametersAndFieldsProduct )

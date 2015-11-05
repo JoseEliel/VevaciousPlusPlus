@@ -27,7 +27,7 @@ namespace VevaciousPlusPlus
     // in pythonFilename for fv being an array of floating-point numbers in the
     // same order as they are for the field configurations as internal to this
     // C++ code.
-    virtual void WriteAsPython( std::string const pythonFilename ) const = 0;
+    virtual void WriteAsPython( std::string const& pythonFilename ) const = 0;
   };
 
 } /* namespace VevaciousPlusPlus */

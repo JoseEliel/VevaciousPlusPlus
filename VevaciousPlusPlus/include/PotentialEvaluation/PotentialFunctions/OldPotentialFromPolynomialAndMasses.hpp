@@ -44,7 +44,7 @@ namespace VevaciousPlusPlus
     // in pythonFilename for fv being an array of floating-point numbers in the
     // same order as they are for the field configurations as internal to this
     // C++ code. It uses the virtual function SetScaleForPythonPotentialCall.
-    virtual void WriteAsPython( std::string const pythonFilename ) const;
+    virtual void WriteAsPython( std::string const& pythonFilename ) const;
 
     // This is for debugging.
     std::string AsDebuggingString() const;

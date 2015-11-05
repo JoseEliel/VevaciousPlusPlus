@@ -43,6 +43,13 @@ namespace VevaciousPlusPlus
     PolynomialApproximation() const
     { return treeLevelPotential; }
 
+    // This writes the potential as
+    // def PotentialFunction( fv ): return ...
+    // in pythonFilename for fv being an array of floating-point numbers in the
+    // same order as they are for the field configurations as internal to this
+    // C++ code. It uses the virtual function WriteActualPythonFunction.
+    virtual void WriteAsPython( std::string const& pythonFilename ) const;
+
     // This is for debugging.
     std::string AsDebuggingString() const;
 
@@ -151,6 +158,40 @@ namespace VevaciousPlusPlus
                            double (*ThermalFunction)( double const ),
                            double& cumulativeQuantumCorrection,
                            double& cumulativeThermalCorrection ) const;
+
+    // This should return a string that is valid Python indented by
+    // indentationSpaces spaces to evaluate the potential in three functions:
+    // TreeLevelPotential( fv ), JustLoopCorrectedPotential( fv ), and
+    // LoopAndThermallyCorrectedPotential( fv ).
+     virtual std::string
+     WriteActualPythonFunction( unsigned int indentationSpaces ) const = 0;
+     /*
+      * TreeLevelContribution( fv,\n"
+       "                        lp )
+       PolynomialLoopCorrections( fv,\n)
+       "                               lp )
+       JustLoopCorrection( massesSquaredWithFactors,\n"
+       "                        subtractionConstant,\n"
+       "                        invQSq )
+       LoopAndThermalCorrection( massesSquaredWithFactors,\n"
+       "                              subtractionConstant,\n"
+       "                              invQSq,\n"
+       "                              invTSq,\n"
+       "                              JFunction )
+       ScalarMassesSquaredWithFactors( fv,\n"
+       "                                    lp )
+       FermionMassesSquaredWithFactors( fv,\n"
+       "                                     lp )
+       VectorMassesSquaredWithFactors( fv,\n"
+       "                                    lp )
+       JustLoopCorrections( fv,\n"
+       "                         lp,\n"
+       "                         invQSq )
+       LoopAndThermalCorrections( fv,\n"
+       "                               lp,\n"
+       "                               invQSq,\n"
+       "                               invTSq )
+      */
   };
 
 
