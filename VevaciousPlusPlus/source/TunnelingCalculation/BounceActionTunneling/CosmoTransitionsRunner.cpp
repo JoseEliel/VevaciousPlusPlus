@@ -118,8 +118,8 @@ namespace VevaciousPlusPlus
     std::string underlyingPotential( "JustLoopCorrectedPotential" );
     if( tunnelingTemperature > 0.0 )
     {
-      pythonFile << "VPD.invTSq = "
-      << ( 1.0 / ( tunnelingTemperature * tunnelingTemperature ) ) << "\n";
+      pythonFile
+      << "VPD.SetGlobalTemperature( " << tunnelingTemperature << " )\n";
       tunnelingSymmetryDimensionMinusOne = 2;
       underlyingPotential.assign( "LoopAndThermallyCorrectedPotential" );
     }

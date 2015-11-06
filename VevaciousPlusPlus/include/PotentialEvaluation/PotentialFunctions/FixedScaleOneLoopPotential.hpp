@@ -50,6 +50,12 @@ namespace VevaciousPlusPlus
     virtual void UpdateSelfForNewParameterPoint(
                 LagrangianParameterManager const& lagrangianParameterManager );
 
+    // This returns a string that is valid Python with no indentation to
+    // evaluate the potential in three functions:
+    // TreeLevelPotential( fv ), JustLoopCorrectedPotential( fv ), and
+    // LoopAndThermallyCorrectedPotential( fv ).
+    virtual std::string WriteActualPythonFunction() const;
+
 
   protected:
     double renormalizationScale;

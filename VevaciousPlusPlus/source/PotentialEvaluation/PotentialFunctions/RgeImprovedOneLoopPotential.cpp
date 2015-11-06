@@ -55,7 +55,11 @@ namespace VevaciousPlusPlus
     {
       scaleSquared += ( (*fieldValue) * (*fieldValue) );
     }
-    scaleSquared = std::min( scaleSquared, minimumScaleSquared );
+
+    // Of course, if minimumScaleSquared is *greater than* scaleSquared then we
+    // need to use minimumScaleSquared as scaleSquared is below the minimum
+    // allowed, hence using std::max.
+    scaleSquared = std::max( scaleSquared, minimumScaleSquared );
     // The logarithm of the scale is of course half the logarithm of the square
     // of the scale.
     std::vector< double > const
@@ -86,5 +90,41 @@ namespace VevaciousPlusPlus
                                           ( 1.0 / scaleSquared ),
                                           temperatureValue ) );
   }
+
+  // This returns a string that is valid Python with no indentation to evaluate
+  // the potential in three functions:
+  // TreeLevelPotential( fv ), JustLoopCorrectedPotential( fv ), and
+  // LoopAndThermallyCorrectedPotential( fv ).
+   std::string RgeImprovedOneLoopPotential::WriteActualPythonFunction() const
+   {
+     std::stringstream stringBuilder;
+     stringBuilder << std::setprecision( 12 );
+     stringBuilder << "def AppropriateScaleSquared( fv ):\n"
+     "  return max( " << minimumScaleSquared << ",\n"
+     "              ( temperatureSquare + sum( f**2 for f in fv ) ) )\n"
+     "\n"
+     "def TreeLevelPotential( fv ):\n"
+     "  scaleSquared = AppropriateScaleSquared( fv )\n"
+     "  lp = LagrangianParameters( 0.5 * math.log( scaleSquared ) )\n"
+     "  return TreeLevelContribution( fv, lp )\n"
+     "\n"
+     "def JustLoopCorrectedPotential( fv ):\n"
+     "  scaleSquared = AppropriateScaleSquared( fv )\n"
+     "  lp = LagrangianParameters( 0.5 * math.log( scaleSquared ) )\n"
+     "  return ( TreeLevelContribution( fv, lp )\n"
+     "           + PolynomialLoopCorrections( fv, lp )\n"
+     "           + JustLoopCorrections( fv, lp, ( 1.0 / scaleSquared ) ) )\n"
+     "\n"
+     "def LoopAndThermallyCorrectedPotential( fv ):\n"
+     "  scaleSquared = AppropriateScaleSquared( fv )\n"
+     "  lp = LagrangianParameters( 0.5 * math.log( scaleSquared ) )\n"
+     "  return ( TreeLevelContribution( fv, lp )\n"
+     "           + PolynomialLoopCorrections( fv, lp )\n"
+     "           + LoopAndThermalCorrections( fv,\n"
+     "                                        lp,\n"
+     "                                        ( 1.0 / scaleSquared ),\n"
+     "                                        temperatureInverseSquare ) )\n";
+     return stringBuilder.str();
+   }
 
 } /* namespace VevaciousPlusPlus */

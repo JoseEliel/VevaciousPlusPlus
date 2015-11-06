@@ -159,39 +159,11 @@ namespace VevaciousPlusPlus
                            double& cumulativeQuantumCorrection,
                            double& cumulativeThermalCorrection ) const;
 
-    // This should return a string that is valid Python indented by
-    // indentationSpaces spaces to evaluate the potential in three functions:
+    // This should return a string that is valid Python with no indentedation
+    // to evaluate the potential in three functions:
     // TreeLevelPotential( fv ), JustLoopCorrectedPotential( fv ), and
     // LoopAndThermallyCorrectedPotential( fv ).
-     virtual std::string
-     WriteActualPythonFunction( unsigned int indentationSpaces ) const = 0;
-     /*
-      * TreeLevelContribution( fv,\n"
-       "                        lp )
-       PolynomialLoopCorrections( fv,\n)
-       "                               lp )
-       JustLoopCorrection( massesSquaredWithFactors,\n"
-       "                        subtractionConstant,\n"
-       "                        invQSq )
-       LoopAndThermalCorrection( massesSquaredWithFactors,\n"
-       "                              subtractionConstant,\n"
-       "                              invQSq,\n"
-       "                              invTSq,\n"
-       "                              JFunction )
-       ScalarMassesSquaredWithFactors( fv,\n"
-       "                                    lp )
-       FermionMassesSquaredWithFactors( fv,\n"
-       "                                     lp )
-       VectorMassesSquaredWithFactors( fv,\n"
-       "                                    lp )
-       JustLoopCorrections( fv,\n"
-       "                         lp,\n"
-       "                         invQSq )
-       LoopAndThermalCorrections( fv,\n"
-       "                               lp,\n"
-       "                               invQSq,\n"
-       "                               invTSq )
-      */
+    virtual std::string WriteActualPythonFunction() const = 0;
   };
 
 

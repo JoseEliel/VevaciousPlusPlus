@@ -87,4 +87,41 @@ namespace VevaciousPlusPlus
     }
   }
 
+  // This returns a string that is valid Python with no indentation to evaluate
+  // the potential in three functions:
+  // TreeLevelPotential( fv ), JustLoopCorrectedPotential( fv ), and
+  // LoopAndThermallyCorrectedPotential( fv ).
+   std::string FixedScaleOneLoopPotential::WriteActualPythonFunction() const
+   {
+     std::stringstream stringBuilder;
+     stringBuilder << std::setprecision( 12 );
+     stringBuilder
+     << "fixedScaleInverseSquare = " << inverseRenormalizationScaleSquared
+     << "\n"
+     "\n"
+     "def TreeLevelPotential( fv ):\n"
+     "  return TreeLevelContribution( fv,\n"
+     "                                fixedScaleLagrangianParameters )\n"
+     "\n"
+     "def JustLoopCorrectedPotential( fv ):\n"
+     "  return ( TreeLevelContribution( fv,\n"
+     "                                  fixedScaleLagrangianParameters )\n"
+     "           + PolynomialLoopCorrections( fv,\n"
+     "                                      fixedScaleLagrangianParameters )\n"
+     "           + JustLoopCorrections( fv,\n"
+     "                                  fixedScaleLagrangianParameters,\n"
+     "                                  fixedScaleInverseSquare ) )\n"
+     "\n"
+     "def LoopAndThermallyCorrectedPotential( fv ):\n"
+     "  return ( TreeLevelContribution( fv,\n"
+     "                                  fixedScaleLagrangianParameters )\n"
+     "           + PolynomialLoopCorrections( fv,\n"
+     "                                      fixedScaleLagrangianParameters )\n"
+     "           + LoopAndThermalCorrections( fv,\n"
+     "                                       fixedScaleLagrangianParameters,\n"
+     "                                        fixedScaleInverseSquare\n"
+     "                                        temperatureInverseSquare ) )\n";
+     return stringBuilder.str();
+   }
+
 } /* namespace VevaciousPlusPlus */

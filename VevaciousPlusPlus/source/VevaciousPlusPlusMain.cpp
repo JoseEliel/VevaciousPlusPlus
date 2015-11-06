@@ -147,6 +147,38 @@ int main( int argumentCount,
   newRgeImproved( newFixedScale,
                   *lhaParameterManager );
 
+  double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
+                                         oldFixedScale.FieldValuesOrigin() ) );
+  double const
+  oldFixedOriginLoop( oldFixedScale( oldFixedScale.FieldValuesOrigin() ) );
+
+  double const oldRgeOriginTree( oldRgeImproved.QuickApproximation(
+                                        oldRgeImproved.FieldValuesOrigin() ) );
+  double const
+  oldRgeOriginLoop( oldRgeImproved( oldRgeImproved.FieldValuesOrigin() ) );
+
+  double const newFixedOriginTree( newFixedScale.PolynomialApproximation()(
+                                         newFixedScale.FieldValuesOrigin() ) );
+  double const
+  newFixedOriginLoop( newFixedScale( newFixedScale.FieldValuesOrigin() ) );
+
+  double const newRgeOriginTree( newRgeImproved.PolynomialApproximation()(
+                                        newRgeImproved.FieldValuesOrigin() ) );
+  double const
+  newRgeOriginLoop( newRgeImproved( newRgeImproved.FieldValuesOrigin() ) );
+
+  std::cout  << std::endl
+  << "oldFixedOriginTree = " << oldFixedOriginTree
+  << ", newFixedOriginTree = " << newFixedOriginTree << std::endl
+  << "oldRgeOriginTree = " << oldRgeOriginTree
+  << ", newRgeOriginTree = " << newRgeOriginTree << std::endl
+  << "oldFixedOriginLoop = " << oldFixedOriginLoop
+  << ", newFixedOriginLoop = " << newFixedOriginLoop << std::endl
+  << "oldRgeOriginLoop = " << oldRgeOriginLoop
+  << ", newRgeOriginLoop = " << newRgeOriginLoop << std::endl;
+  std::cout << std::endl;
+
+
   // Cleaning up.
   delete lhaParameterManager;
 
