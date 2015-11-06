@@ -13,26 +13,25 @@ namespace VevaciousPlusPlus
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
                                               std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
-                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
+                     LagrangianParameterManager& lagrangianParameterManager ) :
     PotentialFromPolynomialWithMasses( modelFilename,
                                        assumedPositiveOrNegativeTolerance,
-                   parameterUpdatePropagator.GetLagrangianParameterManager() ),
-    ParameterUpdatePropagator( parameterUpdatePropagator ),
+                                       lagrangianParameterManager ),
+    BOL::PushedToObserver< LagrangianParameterManager >(),
     renormalizationScale( -1.0 ),
     inverseRenormalizationScaleSquared( -1.0 )
   {
-    // This constructor is just an initialization list.
+    lagrangianParameterManager.registerObserver( this );
   }
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
-                    PotentialFromPolynomialWithMasses const& potentialToCopy,
-                      ParameterUpdatePropagator& parameterUpdatePropagator ) :
+                   PotentialFromPolynomialWithMasses const& potentialToCopy ) :
     PotentialFromPolynomialWithMasses( potentialToCopy ),
-    ParameterUpdatePropagator( parameterUpdatePropagator ),
+    BOL::PushedToObserver< LagrangianParameterManager >(),
     renormalizationScale( -1.0 ),
     inverseRenormalizationScaleSquared( -1.0 )
   {
-    // This constructor is just an initialization list.
+    lagrangianParameterManager.registerObserver( this );
   }
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
@@ -45,7 +44,7 @@ namespace VevaciousPlusPlus
   // appropriate scale from lagrangianParameterManager, and updates all
   // components used to evaluate the potential to use the Lagrangian
   // parameters evaluated at that scale.
-  void FixedScaleOneLoopPotential::UpdateSelfForNewParameterPoint(
+  void FixedScaleOneLoopPotential::respondToPush(
                  LagrangianParameterManager const& lagrangianParameterManager )
   {
     renormalizationScale

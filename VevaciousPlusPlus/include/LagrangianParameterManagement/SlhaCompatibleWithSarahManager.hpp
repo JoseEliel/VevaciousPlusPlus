@@ -81,14 +81,14 @@ namespace VevaciousPlusPlus
     // parameter, returning either a found SARAH special case, or otherwise the
     // result of SlhaBlocksWithSpecialCasesManager::SlhaOneOrTwoSpecialCase.
     std::pair< bool, size_t > SarahSpecialCaseDefaultingToSlhaOneOrTwo(
-                                             std::string const& switchString );
+                                               std::string const& caseString );
 
     // This adds a special case for switchString to be mapped to a
     // SlhaTwoSourceFunctionoid looking preferentially at an interpolated block
     // called (sarahPrefix + slhaName) then defaulting to the block called just
     // slhaName.
     std::pair< bool, size_t >
-    RegisterSarahPrefixedSlhaBlock( std::string const& switchString,
+    RegisterSarahPrefixedSlhaBlock( std::string const& caseString,
                                     std::string const& sarahPrefix,
                                     std::string const& slhaName );
   };
@@ -105,8 +105,8 @@ namespace VevaciousPlusPlus
                                              std::string const& parameterName )
   {
     std::map< std::string, std::string >::const_iterator
-    aliasToSwitchString( aliasesToSwitchStrings.find( parameterName ) );
-    if( aliasToSwitchString == aliasesToSwitchStrings.end() )
+    aliasToSwitchString( aliasesToCaseStrings.find( parameterName ) );
+    if( aliasToSwitchString == aliasesToCaseStrings.end() )
     {
       return std::pair< bool, size_t >( false,
                                         -1 );
@@ -121,7 +121,7 @@ namespace VevaciousPlusPlus
   // slhaName.
   inline std::pair< bool, size_t >
   SlhaCompatibleWithSarahManager::RegisterSarahPrefixedSlhaBlock(
-                                               std::string const& switchString,
+                                                 std::string const& caseString,
                                                 std::string const& sarahPrefix,
                                                   std::string const& slhaName )
   {
@@ -129,10 +129,10 @@ namespace VevaciousPlusPlus
     sarahFunctionoid( RegisterBlockEntry( sarahPrefix + slhaName ) );
     SlhaSourcedParameterFunctionoid const&
     shouldBeDrbarFunctionoid( RegisterBlockEntry( slhaName ) );
-    return AddNewDerivedParameter( switchString,
-            new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
-                                          sarahFunctionoid,
-                                          shouldBeDrbarFunctionoid ) );
+    return AddNewDerivedParameter( caseString,
+                new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
+                                              sarahFunctionoid,
+                                              shouldBeDrbarFunctionoid ) );
   }
 
 } /* namespace VevaciousPlusPlus */

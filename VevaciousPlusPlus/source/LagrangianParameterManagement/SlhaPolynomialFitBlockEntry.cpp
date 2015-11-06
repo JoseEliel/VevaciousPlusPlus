@@ -46,7 +46,7 @@ namespace VevaciousPlusPlus
     // the logarithm of the scale based on how many explicit values of the
     // parameter at different scales we have.
     std::list< std::pair< double, std::string > >
-    scalesWithStrings( lhaParser.getScalesPairedWithValues( parameterName ) );
+    scalesWithStrings( lhaParser->getScalesPairedWithValues( parameterName ) );
     size_t const numberOfScales( scalesWithStrings.size() );
 
     // First we guard against no block found (in which case the value is set

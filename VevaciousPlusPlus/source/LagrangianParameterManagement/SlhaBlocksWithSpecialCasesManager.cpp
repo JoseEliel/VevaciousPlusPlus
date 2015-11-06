@@ -22,7 +22,7 @@ namespace VevaciousPlusPlus
                                        fixedScaleType,
                                        fixedScaleArgument ),
     activeDerivedParameters(),
-    aliasesToSwitchStrings()
+    aliasesToCaseStrings()
   {
     InitializeSlhaOneOrTwoAliases();
   }
@@ -39,7 +39,7 @@ namespace VevaciousPlusPlus
                                        fixedScaleType,
                                        fixedScaleArgument ),
     activeDerivedParameters(),
-    aliasesToSwitchStrings()
+    aliasesToCaseStrings()
   {
     InitializeSlhaOneOrTwoAliases();
   }
@@ -58,10 +58,10 @@ namespace VevaciousPlusPlus
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaBlocksWithSpecialCasesManager::InitializeSlhaOneOrTwoAliases()
   {
-    aliasesToSwitchStrings[ "DsbVd" ] = "DsbVd";
-    aliasesToSwitchStrings[ "DsbVu" ] = "DsbVu";
-    aliasesToSwitchStrings[ "Bmu" ]
-    = aliasesToSwitchStrings[ "m3Sq" ] = "Bmu";
+    aliasesToCaseStrings[ "DsbVd" ] = "DsbVd";
+    aliasesToCaseStrings[ "DsbVu" ] = "DsbVu";
+    aliasesToCaseStrings[ "Bmu" ]
+    = aliasesToCaseStrings[ "m3Sq" ] = "Bmu";
     CoverAllCasesForSlhaBlock( "Te11",
                                "TE[1,1]" );
     CoverAllCasesForSlhaBlock( "Te22",
@@ -116,170 +116,197 @@ namespace VevaciousPlusPlus
   // parameter.
   std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::SlhaOneOrTwoSpecialCase(
-                                              std::string const& switchString )
+                                                std::string const& caseString )
   {
-    switch( switchString )
+    if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
     {
-      case "DsbVd":
-      case "DsbVu":
-        SlhaSourcedParameterFunctionoid const&
-        vevLength( RegisterBlockEntry( "HMIX[ 3 ]" ) );
-        SlhaSourcedParameterFunctionoid const&
-        tanBeta( RegisterBlockEntry( "HMIX[ 2 ]" ) );
+      SlhaSourcedParameterFunctionoid const&
+      vevLength( RegisterBlockEntry( "HMIX[ 3 ]" ) );
+      SlhaSourcedParameterFunctionoid const&
+      tanBeta( RegisterBlockEntry( "HMIX[ 2 ]" ) );
 
-        return AddNewDerivedParameter( switchString,
-            new SlhaDsbHiggsVevFunctionoid( numberOfDistinctActiveParameters,
-                                            vevLength,
-                                            tanBeta,
-                                            ( switchString == "DsbVu" ) ) );
-        break;
-      case "Bmu":
-        SlhaSourcedParameterFunctionoid const&
-        treePseudoscalarMassSquared( RegisterBlockEntry( "HMIX[ 4 ]" ) );
-        SlhaSourcedParameterFunctionoid const&
-        tanBeta( RegisterBlockEntry( "HMIX[ 2 ]" ) );
-        return AddNewDerivedParameter( switchString,
-                                      new SlhaHiggsMixingBilinearFunctionoid(
-                                            numberOfDistinctActiveParameters,
-                                                 treePseudoscalarMassSquared,
-                                                                 tanBeta ) );
-      case "Te11":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
+      return AddNewDerivedParameter( caseString,
+                                     new SlhaDsbHiggsVevFunctionoid(
+                                             numberOfDistinctActiveParameters,
+                                                                     vevLength,
+                                                                     tanBeta,
+                                                 ( caseString == "DsbVu" ) ) );
+    }
+    else if( caseString == "Bmu" )
+    {
+      SlhaSourcedParameterFunctionoid const&
+      treePseudoscalarMassSquared( RegisterBlockEntry( "HMIX[ 4 ]" ) );
+      SlhaSourcedParameterFunctionoid const&
+      tanBeta( RegisterBlockEntry( "HMIX[ 2 ]" ) );
+      return AddNewDerivedParameter( caseString,
+                                     new SlhaHiggsMixingBilinearFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                   treePseudoscalarMassSquared,
+                                                                   tanBeta ) );
+    }
+    else if( caseString == "Te11" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'E',
+                                                      '1' );
+    }
+    else if( caseString == "Te22" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'E',
+                                                      '2' );
+    }
+    else if( caseString == "Te33" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'E',
+                                                      '3' );
+    }
+    else if( caseString == "Td11" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'D',
+                                                      '1' );
+    }
+    else if( caseString == "Td22" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'D',
+                                                      '2' );
+    }
+    else if( caseString == "Td33" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'D',
+                                                      '3' );
+    }
+    else if( caseString == "Tu11" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'U',
+                                                      '1' );
+    }
+    else if( caseString == "Tu22" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'U',
+                                                      '2' );
+    }
+    else if( caseString == "Tu33" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                      'U',
+                                                      '3' );
+    }
+    else if( caseString == "Msl211" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'L',
+                                                        '1',
+                                                        "31" );
+    }
+    else if( caseString == "Msl222" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'L',
+                                                        '1',
+                                                        "32" );
+    }
+    else if( caseString == "Msl233" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'L',
+                                                        '1',
+                                                        "33" );
+    }
+    else if( caseString == "Mse211" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'E',
-                                                        '1' );
-        break;
-      case "Te22":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
+                                                        '1',
+                                                        "34" );
+    }
+    else if( caseString == "Mse222" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'E',
-                                                        '2' );
-        break;
-      case "Te33":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
+                                                        '2',
+                                                        "35" );
+    }
+    else if( caseString == "Mse233" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'E',
-                                                        '3' );
-        break;
-      case "Td11":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
-                                                        'D',
-                                                        '1' );
-        break;
-      case "Td22":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
-                                                        'D',
-                                                        '2' );
-        break;
-      case "Td33":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
-                                                        'D',
-                                                        '3' );
-        break;
-      case "Tu11":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
+                                                        '3',
+                                                        "36" );
+    }
+    else if( caseString == "Msq211" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                          'Q',
+                                                          '1',
+                                                          "41" );
+    }
+    else if( caseString == "Msq222" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'Q',
+                                                        '1',
+                                                        "42" );
+    }
+    else if( caseString == "Msq233" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'Q',
+                                                        '1',
+                                                        "43" );
+    }
+    else if( caseString == "Msu211" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'U',
-                                                        '1' );
-        break;
-      case "Tu22":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
+                                                        '1',
+                                                        "44" );
+    }
+    else if( caseString == "Msu222" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'U',
-                                                        '2' );
-        break;
-      case "Tu33":
-        return RegisterSlhaOneOrTwoCompatibleTrilinear( switchString,
+                                                        '2',
+                                                        "45" );
+    }
+    else if( caseString == "Msu233" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'U',
-                                                        '3' );
-        break;
-      case "Msl211":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'L',
-                                                         '1',
-                                                         "31" );
-        break;
-      case "Msl222":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'L',
-                                                         '1',
-                                                         "32" );
-        break;
-      case "Msl233":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'L',
-                                                         '1',
-                                                         "33" );
-        break;
-      case "Mse211":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'E',
-                                                         '1',
-                                                         "34" );
-        break;
-      case "Mse222":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'E',
-                                                         '2',
-                                                         "35" );
-        break;
-      case "Mse233":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'E',
-                                                         '3',
-                                                         "36" );
-        break;
-      case "Msq211":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'Q',
-                                                         '1',
-                                                         "41" );
-        break;
-      case "Msq222":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'Q',
-                                                         '1',
-                                                         "42" );
-        break;
-      case "Msq233":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'Q',
-                                                         '1',
-                                                         "43" );
-        break;
-      case "Msu211":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'U',
-                                                         '1',
-                                                         "44" );
-        break;
-      case "Msu222":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'U',
-                                                         '2',
-                                                         "45" );
-        break;
-      case "Msu233":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'U',
-                                                         '3',
-                                                         "46" );
-      case "Msd211":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'D',
-                                                         '1',
-                                                         "47" );
-        break;
-      case "Msd222":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'D',
-                                                         '2',
-                                                         "48" );
-        break;
-      case "Msd233":
-        return RegisterSlhaOneOrTwoCompatibleMassSquared( switchString,
-                                                         'D',
-                                                         '3',
-                                                         "49" );
-        break;
-      default:
-        return std::pair< bool, size_t >( false,
-                                          -1 );
+                                                        '3',
+                                                        "46" );
+    }
+    else if( caseString == "Msd211" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'D',
+                                                        '1',
+                                                        "47" );
+    }
+    else if( caseString == "Msd222" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'D',
+                                                        '2',
+                                                        "48" );
+    }
+    else if( caseString == "Msd233" )
+    {
+      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                        'D',
+                                                        '3',
+                                                        "49" );
+    }
+    else
+    {
+      return std::pair< bool, size_t >( false,
+                                        -1 );
     }
   }
 

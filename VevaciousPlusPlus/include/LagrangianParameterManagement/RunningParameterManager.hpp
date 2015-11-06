@@ -27,7 +27,7 @@ namespace VevaciousPlusPlus
     typedef LHPC::SLHA::SparseManyIndexedBlock< double > RestrictedSlhaBlock;
 
     // This puts all variables with index brackets into a consistent form.
-    static std::string
+    virtual std::string
     FormatVariable( std::string const& unformattedVariable );
 
 
@@ -101,7 +101,7 @@ namespace VevaciousPlusPlus
 
   protected:
     // This puts all index brackets into a consistent form.
-    static std::string
+    virtual std::string
     FormatIndexBracketContent( std::string const& unformattedBracketContent );
 
     std::vector< ParameterFunctionoid* > parameterFunctionoidPointers;

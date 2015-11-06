@@ -44,7 +44,8 @@ namespace VevaciousPlusPlus
                            RunningParameterManager& runningParameterManager ) :
     PotentialFunction(),
     IWritesPythonPotential(),
-    ParameterUpdatePropagator( runningParameterManager ),
+    ParameterUpdatePropagator(
+                     runningParameterManager.GetLagrangianParameterManager() ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( -1.0 ),
@@ -314,7 +315,7 @@ namespace VevaciousPlusPlus
                                     massSquaredMatrix.ElementAt( lineIndex ) );
         }
         if( massSquaredMatrix.GetSpinType()
-            == OldMassesSquaredCalculator::gaugeBoson )
+            == MassesSquaredCalculator::gaugeBoson )
         {
           vectorMassSquaredMatrices.push_back( massSquaredMatrix );
         }
@@ -733,8 +734,10 @@ namespace VevaciousPlusPlus
   // This is just for derived classes.
   OldPotentialFromPolynomialAndMasses::OldPotentialFromPolynomialAndMasses(
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFunction( runningParameterManager ),
+    PotentialFunction(),
     IWritesPythonPotential(),
+    ParameterUpdatePropagator(
+                     runningParameterManager.GetLagrangianParameterManager() ),
     runningParameters( runningParameterManager ),
     dsbFieldValuePolynomials(),
     currentMinimumRenormalizationScale( -1.0 ),
@@ -767,6 +770,8 @@ namespace VevaciousPlusPlus
                          OldPotentialFromPolynomialAndMasses const& copySource ) :
     PotentialFunction( copySource ),
     IWritesPythonPotential(),
+    ParameterUpdatePropagator(
+                copySource.runningParameters.GetLagrangianParameterManager() ),
     runningParameters( copySource.runningParameters ),
     dsbFieldValuePolynomials( copySource.dsbFieldValuePolynomials ),
     currentMinimumRenormalizationScale(

@@ -13,7 +13,7 @@
 
 namespace VevaciousPlusPlus
 {
-  class PotentialFunction : public ParameterUpdatePropagator
+  class PotentialFunction
   {
   public:
     PotentialFunction();

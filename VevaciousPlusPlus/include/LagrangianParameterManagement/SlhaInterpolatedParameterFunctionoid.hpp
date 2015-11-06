@@ -48,7 +48,7 @@ namespace VevaciousPlusPlus
 
   protected:
     std::string parameterName;
-    LHPC::SlhaSimplisticInterpreter const& lhaParser;
+    LHPC::SlhaSimplisticInterpreter const* lhaParser;
   };
 
 } /* namespace VevaciousPlusPlus */

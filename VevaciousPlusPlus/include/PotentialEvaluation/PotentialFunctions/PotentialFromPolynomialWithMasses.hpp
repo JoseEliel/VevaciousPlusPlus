@@ -20,6 +20,7 @@
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
 #include "IWritesPythonPotential.hpp"
+#include "VersionInformation.hpp"
 
 namespace VevaciousPlusPlus
 {

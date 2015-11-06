@@ -39,21 +39,21 @@ namespace VevaciousPlusPlus
 
   protected:
     std::vector< SlhaSourcedParameterFunctionoid* > activeDerivedParameters;
-    std::map< std::string, std::string > aliasesToSwitchStrings;
+    std::map< std::string, std::string > aliasesToCaseStrings;
 
     // This adds all the valid aliases to aliasesToSwitchStrings.
     void InitializeSlhaOneOrTwoAliases();
 
     // This adds newParameter to activeDerivedParameters and updates
     // numberOfDistinctActiveParameters and activeParametersToIndices (all
-    // aliases in aliasesToSwitchStrings which map to switchString are added
+    // aliases in aliasesToCaseStrings which map to caseString are added
     // mapping to the index of this parameter), and returns true paired with
     // the index of newParameter. (The index mapped to in
     // activeParametersToIndices and used as part of the return value is based
     // on numberOfDistinctActiveParameters before it gets incremented, rather
     // than using newParameter->IndexInValuesVector().)
     std::pair< bool, size_t >
-    AddNewDerivedParameter( std::string const& switchString,
+    AddNewDerivedParameter( std::string const& caseString,
                             SlhaSourcedParameterFunctionoid* newParameter );
 
     // This checks parameterName against all the special cases. If the
@@ -65,7 +65,7 @@ namespace VevaciousPlusPlus
     // This adds the parameter based on the alias given by switchString for the
     // parameter.
     std::pair< bool, size_t >
-    SlhaOneOrTwoSpecialCase( std::string const& switchString );
+    SlhaOneOrTwoSpecialCase( std::string const& caseString );
 
     // This registers the required TX[0,0], AX[0,0], and YX[0,0] parameters
     // where X is replaced by sfermionType and 0 by generationIndex, and then
@@ -73,7 +73,7 @@ namespace VevaciousPlusPlus
     // SlhaTrilinearDiagonalFunctionoid constructed with those parameter
     // functionoids.
     std::pair< bool, size_t >
-    RegisterSlhaOneOrTwoCompatibleTrilinear( std::string const& switchString,
+    RegisterSlhaOneOrTwoCompatibleTrilinear( std::string const& caseString,
                                              char const sfermionType,
                                              char const generationIndex );
 
@@ -83,7 +83,7 @@ namespace VevaciousPlusPlus
     // SlhaMassSquaredDiagonalFunctionoid constructed with those parameter
     // functionoids.
     std::pair< bool, size_t >
-    RegisterSlhaOneOrTwoCompatibleMassSquared( std::string const& switchString,
+    RegisterSlhaOneOrTwoCompatibleMassSquared( std::string const& caseString,
                                                char const sfermionType,
                                                char const generationIndex,
                                                std::string const& msoftIndex );
@@ -92,7 +92,7 @@ namespace VevaciousPlusPlus
     // switchString itself, and every upper-/lowercase combination of
     // blockString (after the indices bracket has been put in the correct
     // format, and only changing the cases of the block name characters).
-    void CoverAllCasesForSlhaBlock( std::string const& switchString,
+    void CoverAllCasesForSlhaBlock( std::string const& caseString,
                                     std::string const& blockString );
 
     // This finds the functionoid in activeDerivedParameters which has the
@@ -101,6 +101,10 @@ namespace VevaciousPlusPlus
     SlhaSourcedParameterFunctionoid const*
     FindActiveDerivedParameter( size_t const soughtIndex ) const;
   };
+
+
+
+
 
   // This adds newParameter to activeDerivedParameters and updates
   // numberOfDistinctActiveParameters and activeParametersToIndices (all
@@ -112,16 +116,16 @@ namespace VevaciousPlusPlus
   // than using newParameter->IndexInValuesVector().)
   inline std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::AddNewDerivedParameter(
-                                               std::string const& switchString,
+                                                 std::string const& caseString,
                                 SlhaSourcedParameterFunctionoid* newParameter )
   {
     activeDerivedParameters.push_back( newParameter );
     for( std::map< std::string, std::string >::const_iterator
-         aliasToSwitchString( aliasesToSwitchStrings.begin() );
-         aliasToSwitchString < aliasesToSwitchStrings.end();
+         aliasToSwitchString( aliasesToCaseStrings.begin() );
+         aliasToSwitchString != aliasesToCaseStrings.end();
          ++aliasToSwitchString )
     {
-      if( aliasToSwitchString->second == switchString )
+      if( aliasToSwitchString->second == caseString )
       {
         activeParametersToIndices[ aliasToSwitchString->first ]
         = numberOfDistinctActiveParameters;
@@ -141,8 +145,8 @@ namespace VevaciousPlusPlus
                                              std::string const& parameterName )
   {
     std::map< std::string, std::string >::const_iterator
-    aliasToSwitchString( aliasesToSwitchStrings.find( parameterName ) );
-    if( aliasToSwitchString == aliasesToSwitchStrings.end() )
+    aliasToSwitchString( aliasesToCaseStrings.find( parameterName ) );
+    if( aliasToSwitchString == aliasesToCaseStrings.end() )
     {
       return std::pair< bool, size_t >( false,
                                         -1 );
@@ -158,7 +162,7 @@ namespace VevaciousPlusPlus
   // functionoids.
   inline std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::RegisterSlhaOneOrTwoCompatibleTrilinear(
-                                               std::string const& switchString,
+                                                 std::string const& caseString,
                                                        char const sfermionType,
                                                    char const generationIndex )
   {
@@ -173,7 +177,7 @@ namespace VevaciousPlusPlus
     blockNameWithIndices[ 0 ] = 'Y';
     SlhaSourcedParameterFunctionoid const&
     appropriateYukawa( RegisterBlockEntry( blockNameWithIndices ) );
-    return AddNewDerivedParameter( switchString,
+    return AddNewDerivedParameter( caseString,
                                    new SlhaTrilinearDiagonalFunctionoid(
                                             numberOfDistinctActiveParameters,
                                                              directTrilinear,
@@ -188,7 +192,7 @@ namespace VevaciousPlusPlus
   // functionoids.
   inline std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::RegisterSlhaOneOrTwoCompatibleMassSquared(
-                                               std::string const& switchString,
+                                                 std::string const& caseString,
                                                        char const sfermionType,
                                                     char const generationIndex,
                                                 std::string const& msoftIndex )
@@ -203,7 +207,7 @@ namespace VevaciousPlusPlus
     blockNameWithIndices.append( "]" );
     SlhaSourcedParameterFunctionoid const&
     linearMass( RegisterBlockEntry( blockNameWithIndices  ) );
-    return AddNewDerivedParameter( switchString,
+    return AddNewDerivedParameter( caseString,
                                    new SlhaMassSquaredDiagonalFunctionoid(
                                               numberOfDistinctActiveParameters,
                                                                     squareMass,
@@ -215,10 +219,10 @@ namespace VevaciousPlusPlus
   // blockString (after the indices bracket has been put in the correct
   // format, and only changing the cases of the block name characters).
   inline void SlhaBlocksWithSpecialCasesManager::CoverAllCasesForSlhaBlock(
-                                               std::string const& switchString,
+                                                 std::string const& caseString,
                                                std::string const& blockString )
   {
-    aliasesToSwitchStrings[ switchString ] = switchString;
+    aliasesToCaseStrings[ caseString ] = caseString;
     std::string blockAfterFormat( FormatVariable( blockString ) );
     size_t const lastBlockNameCharacter( blockAfterFormat.find( '[',
                                                                 1 ) );
@@ -228,10 +232,10 @@ namespace VevaciousPlusPlus
     {
       blockAfterFormat[ characterIndex ]
       = toupper( blockAfterFormat[ characterIndex ] );
-      aliasesToSwitchStrings[ blockAfterFormat ] = switchString;
+      aliasesToCaseStrings[ blockAfterFormat ] = caseString;
       blockAfterFormat[ characterIndex ]
       = tolower( blockAfterFormat[ characterIndex ] );
-      aliasesToSwitchStrings[ blockAfterFormat ] = switchString;
+      aliasesToCaseStrings[ blockAfterFormat ] = caseString;
     }
   }
 

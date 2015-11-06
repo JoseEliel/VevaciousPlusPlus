@@ -11,21 +11,19 @@
 #include "CommonIncludes.hpp"
 #include "PotentialFromPolynomialWithMasses.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   class FixedScaleOneLoopPotential : public PotentialFromPolynomialWithMasses,
-                                     public ParameterUpdatePropagator
+                     public BOL::PushedToObserver< LagrangianParameterManager >
   {
   public:
     FixedScaleOneLoopPotential( std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
-                        ParameterUpdatePropagator& parameterUpdatePropagator );
+                      LagrangianParameterManager& lagrangianParameterManager );
     FixedScaleOneLoopPotential(
-                      PotentialFromPolynomialWithMasses const& potentialToCopy,
-                        ParameterUpdatePropagator& parameterUpdatePropagator );
+                    PotentialFromPolynomialWithMasses const& potentialToCopy );
     virtual ~FixedScaleOneLoopPotential();
 
 
@@ -47,7 +45,7 @@ namespace VevaciousPlusPlus
     // appropriate scale from lagrangianParameterManager, and updates all
     // components used to evaluate the potential to use the Lagrangian
     // parameters evaluated at that scale.
-    virtual void UpdateSelfForNewParameterPoint(
+    virtual void respondToPush(
                 LagrangianParameterManager const& lagrangianParameterManager );
 
     // This returns a string that is valid Python with no indentation to

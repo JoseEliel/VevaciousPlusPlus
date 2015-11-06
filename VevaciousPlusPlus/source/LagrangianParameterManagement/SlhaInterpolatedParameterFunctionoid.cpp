@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
                                            std::string const& parameterName ) :
     SlhaSourcedParameterFunctionoid( indexInValuesVector ),
     parameterName( parameterName ),
-    lhaParser( lhaParser )
+    lhaParser( &lhaParser )
   {
     // This constructor is just an initialization list.
   }

@@ -8,7 +8,7 @@
 #ifndef HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 #define HOMOTOPYCONTINUATIONTARGETSYSTEM_HPP_
 
-#include "../../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
+#include "../../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus

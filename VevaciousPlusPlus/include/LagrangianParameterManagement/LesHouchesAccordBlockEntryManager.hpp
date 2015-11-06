@@ -291,7 +291,7 @@ namespace VevaciousPlusPlus
                                    unsigned int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
-    for( std::vector< LhaBlockEntryInterpolator >::iterator
+    for( std::vector< LhaBlockEntryInterpolator >::const_iterator
          activeParameter( activeInterpolatedParameters.begin() );
          activeParameter < activeInterpolatedParameters.end();
          ++activeParameter )
@@ -309,24 +309,26 @@ namespace VevaciousPlusPlus
                                              std::string const& evaluationType,
                                   std::string const& evaluationArgument ) const
   {
-    switch( evaluationType )
+    if( evaluationType == "FixedNumber" )
     {
-      case "FixedNumber":
-        return atof( evaluationArgument.c_str() );
-        break;
-      case "BlockLowestScale":
-        return lhaParser.getLowestScale( evaluationArgument );
-        break;
-      case "BlockEntry":
-        return atof( lhaParser( evaluationArgument ).c_str() );
-        break;
-      case "SqrtAbs":
-        return sqrt( abs( atof( lhaParser( evaluationArgument ).c_str() ) ) );
-        break;
-      default:
-        throw std::runtime_error( evaluationType
+      return atof( evaluationArgument.c_str() );
+    }
+    else if( evaluationType == "BlockLowestScale" )
+    {
+      return lhaParser.getLowestScale( evaluationArgument );
+    }
+    else if( evaluationType == "BlockEntry" )
+    {
+      return atof( lhaParser( evaluationArgument ).c_str() );
+    }
+    else if( evaluationType == "SqrtAbs" )
+    {
+      return sqrt( abs( atof( lhaParser( evaluationArgument ).c_str() ) ) );
+    }
+    else
+    {
+      throw std::runtime_error( evaluationType
                                   + " is not a valid scale evaluation type!" );
-        break;
     }
   }
 

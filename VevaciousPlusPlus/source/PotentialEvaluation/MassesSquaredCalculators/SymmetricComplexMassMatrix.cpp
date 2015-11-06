@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "PotentialEvaluation/MassesSquaredCalculators/OldSymmetricComplexMassMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
 
 namespace VevaciousPlusPlus
 {

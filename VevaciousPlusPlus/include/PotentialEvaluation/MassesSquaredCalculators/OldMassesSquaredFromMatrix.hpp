@@ -15,7 +15,7 @@
 namespace VevaciousPlusPlus
 {
   template< typename ElementType > class OldMassesSquaredFromMatrix :
-                                              public OldMassesSquaredCalculator
+                                                 public MassesSquaredCalculator
   {
   public:
     typedef typename
@@ -26,6 +26,17 @@ namespace VevaciousPlusPlus
     OldMassesSquaredFromMatrix( OldMassesSquaredFromMatrix const& copySource );
     OldMassesSquaredFromMatrix();
     virtual ~OldMassesSquaredFromMatrix();
+
+    // This is a dummy function while I am still doing side-by-side comparison.
+    virtual std::vector< double >
+    MassesSquared( std::vector< double > const& parameterValues,
+                   std::vector< double > const& fieldConfiguration ) const
+   { return MassesSquared( fieldConfiguration ); }
+
+    // This is a dummy function while I am still doing side-by-side comparison.
+    virtual void
+    UpdateForFixedScale( std::vector< double > const& parameterValues )
+   { ; /* Thus does nothing. */ }
 
 
     // This returns the eigenvalues of the matrix, with all functionoids
@@ -65,7 +76,7 @@ namespace VevaciousPlusPlus
   OldMassesSquaredFromMatrix< ElementType >::OldMassesSquaredFromMatrix(
                                                            size_t numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
-    OldMassesSquaredCalculator( attributeMap ),
+    MassesSquaredCalculator( attributeMap ),
     numberOfRows( numberOfRows )
   {
     // This constructor is just an initialization list.
@@ -74,7 +85,7 @@ namespace VevaciousPlusPlus
   template< typename ElementType > inline
   OldMassesSquaredFromMatrix< ElementType >::OldMassesSquaredFromMatrix(
                    OldMassesSquaredFromMatrix< ElementType > const& copySource ) :
-    OldMassesSquaredCalculator( copySource ),
+    MassesSquaredCalculator( copySource ),
     numberOfRows( copySource.numberOfRows )
   {
     // This constructor is just an initialization list.
@@ -82,7 +93,7 @@ namespace VevaciousPlusPlus
 
   template< typename ElementType > inline
   OldMassesSquaredFromMatrix< ElementType >::OldMassesSquaredFromMatrix() :
-    OldMassesSquaredCalculator(),
+    MassesSquaredCalculator(),
     numberOfRows( 0 )
   {
     // This constructor is just an initialization list.

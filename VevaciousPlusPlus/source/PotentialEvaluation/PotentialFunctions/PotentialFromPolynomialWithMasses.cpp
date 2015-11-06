@@ -7,8 +7,6 @@
 
 #include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialWithMasses.hpp"
 
-#include "VevaciousPlusPlus.hpp"
-
 namespace VevaciousPlusPlus
 {
   std::string const
@@ -537,7 +535,7 @@ namespace VevaciousPlusPlus
          ++whichMatrix )
     {
       pythonFile << "    massSquaredMatrix = numpy.array( [ ";
-      for( std::vector< PolynomialSum >::const_iterator
+      for( std::vector< ParametersAndFieldsProductSum >::const_iterator
            matrixElement( whichMatrix->MatrixElements().begin() );
            matrixElement < whichMatrix->MatrixElements().end();
            ++matrixElement )
@@ -631,7 +629,7 @@ namespace VevaciousPlusPlus
     "             + ( ( totalThermalCorrections * thermalFactor )\n"
     "                 / ( invTSq**2 ) ) )\n"
     "\n"
-    << WriteActualPythonFunction( 0 ) << "\n"
+    << WriteActualPythonFunction() << "\n"
     "\n"
     "# This can be changed to use just the tree-level potential, or the\n"
     "# loop-corrected potential without thermal corrections.\n"

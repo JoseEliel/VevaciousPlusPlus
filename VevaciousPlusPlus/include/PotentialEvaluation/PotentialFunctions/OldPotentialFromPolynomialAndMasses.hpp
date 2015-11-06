@@ -70,9 +70,9 @@ namespace VevaciousPlusPlus
     double squareOfMaximumRenormalizationScale;
     PolynomialSum treeLevelPotential;
     PolynomialSum polynomialLoopCorrections;
-    std::vector< OldMassesSquaredCalculator* > scalarSquareMasses;
-    std::vector< OldMassesSquaredCalculator* > fermionSquareMasses;
-    std::vector< OldMassesSquaredCalculator* > vectorSquareMasses;
+    std::vector< MassesSquaredCalculator* > scalarSquareMasses;
+    std::vector< MassesSquaredCalculator* > fermionSquareMasses;
+    std::vector< MassesSquaredCalculator* > vectorSquareMasses;
     std::vector< OldRealMassesSquaredMatrix > scalarMassSquaredMatrices;
     std::vector< OldSymmetricComplexMassMatrix > fermionMassMatrices;
     std::vector< OldComplexMassSquaredMatrix > fermionMassSquaredMatrices;
@@ -180,7 +180,7 @@ namespace VevaciousPlusPlus
   inline std::string OldPotentialFromPolynomialAndMasses::FormatVariable(
                                  std::string const& unformattedVariable ) const
   {
-    return RunningParameterManager::FormatVariable( unformattedVariable );
+    return runningParameters.FormatVariable( unformattedVariable );
   }
 
   // This interprets stringToParse as a sum of real polynomial terms and sets

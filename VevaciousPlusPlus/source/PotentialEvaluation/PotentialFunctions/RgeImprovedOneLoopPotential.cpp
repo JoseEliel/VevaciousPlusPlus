@@ -13,24 +13,22 @@ namespace VevaciousPlusPlus
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
                                               std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
-                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
+                     LagrangianParameterManager& lagrangianParameterManager ) :
     PotentialFromPolynomialWithMasses( modelFilename,
                                        assumedPositiveOrNegativeTolerance,
-                   parameterUpdatePropagator.GetLagrangianParameterManager() ),
-    ParameterUpdatePropagator( parameterUpdatePropagator ),
+                                       lagrangianParameterManager ),
+    BOL::PushedToObserver< LagrangianParameterManager >(),
     minimumScaleSquared( -1.0 )
   {
-    // This constructor is just an initialization list.
+    lagrangianParameterManager.registerObserver( this );
   }
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
-                      PotentialFromPolynomialWithMasses const& potentialToCopy,
-                       ParameterUpdatePropagator& parameterUpdatePropagator ) :
+                   PotentialFromPolynomialWithMasses const& potentialToCopy ) :
     PotentialFromPolynomialWithMasses( potentialToCopy ),
-    ParameterUpdatePropagator( parameterUpdatePropagator ),
     minimumScaleSquared( -1.0 )
   {
-    // This constructor is just an initialization list.
+    lagrangianParameterManager.registerObserver( this );
   }
 
   RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()

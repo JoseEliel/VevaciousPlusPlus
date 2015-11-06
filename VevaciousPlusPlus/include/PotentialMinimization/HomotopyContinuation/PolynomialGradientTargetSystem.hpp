@@ -8,7 +8,7 @@
 #ifndef POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 #define POLYNOMIALGRADIENTTARGETSYSTEM_HPP_
 
-#include "../../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
+#include "../../LagrangianParameterManagement/SlhaManager.hpp"
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"
 #include "HomotopyContinuationTargetSystem.hpp"

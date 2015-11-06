@@ -8,8 +8,8 @@
 #ifndef COMPLEXMASSSQUAREDMATRIX_HPP_
 #define COMPLEXMASSSQUAREDMATRIX_HPP_
 
-#include "CommonIncludes.hpp"
 #include "BaseComplexMassMatrix.hpp"
+#include "CommonIncludes.hpp"
 #include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
 #include "Eigen/Dense"
 #include "MassesSquaredFromMatrix.hpp"

@@ -8,7 +8,7 @@
 #ifndef TUNNELINGCALCULATOR_HPP_
 #define TUNNELINGCALCULATOR_HPP_
 
-#include "../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
+#include "../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 

@@ -67,7 +67,7 @@ namespace VevaciousPlusPlus
   inline void RealMassesSquaredMatrix::UpdateForFixedScale(
                                  std::vector< double > const& parameterValues )
   {
-    for( std::vector< ParametersAndFieldsProduct >::iterator
+    for( std::vector< ParametersAndFieldsProductSum >::iterator
          parametersAndFieldsProduct( matrixElements.begin() );
          parametersAndFieldsProduct < matrixElements.end();
          ++parametersAndFieldsProduct )

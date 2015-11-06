@@ -8,7 +8,7 @@
 #ifndef FIELDPOLYNOMIALSWITHSCALE_HPP_
 #define FIELDPOLYNOMIALSWITHSCALE_HPP_
 
-#include "../../LagrangianParameterManagement/SlhaUpdatePropagator.hpp"
+#include "../../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "PolynomialGradientTargetSystem.hpp"
 #include "BasicFunctions/PolynomialTerm.hpp"

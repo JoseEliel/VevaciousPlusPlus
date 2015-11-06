@@ -360,10 +360,13 @@ namespace VevaciousPlusPlus
                                      "Hom4ps2Argument",
                                      homotopyType );
     }
-    return new Hom4ps2Runner(
+    throw std::runtime_error(
+        "temporarily disabled VevaciousPlusPlus::SetUpHom4ps2Runner" );
+    return NULL;
+    /*return new Hom4ps2Runner(
                  *(ownedPotentialFunction->HomotopyContinuationTargetSystem()),
                               pathToHom4ps2,
-                              homotopyType );
+                              homotopyType );*/
   }
 
   // This decides on the derived class to use for ownedTunnelingCalculator and

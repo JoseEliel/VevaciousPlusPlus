@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
     MassesSquaredFromMatrix< double >( numberOfRows,
                                        attributeMap ),
     matrixElements( ( numberOfRows * numberOfRows ),
-                    PolynomialSum() )
+                    ParametersAndFieldsProductSum() )
   {
     // This constructor is just an initialization list.
   }

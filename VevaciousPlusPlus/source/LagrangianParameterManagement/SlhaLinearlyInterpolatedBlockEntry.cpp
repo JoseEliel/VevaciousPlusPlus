@@ -43,7 +43,7 @@ namespace VevaciousPlusPlus
   void SlhaLinearlyInterpolatedBlockEntry::UpdateForNewSlhaParameters()
   {
     std::list< std::pair< double, std::string > >
-    scalesWithStrings( lhaParser.getScalesPairedWithValues( parameterName ) );
+    scalesWithStrings( lhaParser->getScalesPairedWithValues( parameterName ) );
     size_t const numberOfScales( scalesWithStrings.size() );
 
     // First we guard against no block found (in which case the value is set
