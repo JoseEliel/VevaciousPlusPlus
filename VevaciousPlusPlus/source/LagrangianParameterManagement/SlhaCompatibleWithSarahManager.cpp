@@ -47,20 +47,53 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This adds all the valid aliases to aliasesToSwitchStrings.
+  void SlhaCompatibleWithSarahManager::InitializeSarahAliases()
+  {
+    // Putting the simple block names as special cases for SARAH means that
+    // a SARAH-generated model file which assumes the extra SARAH blocks will
+    // still work with non-SARAH SLHA files, to the extent that the DRbar
+    // values will be used as both the SARAH tree and loop values.
+    MapCaseStringAndSlhaBlockToCaseString( "DsbVd",
+                                           "HMIX[102]" );
+    MapCaseStringAndSlhaBlockToCaseString( "DsbVu",
+                                           "HMIX[103]" );
+    // The constructor for the base SlhaBlocksWithSpecialCasesManager covers
+    // adding the basic Bmu to the alias mapping, even though this derived
+    // class over-writes what ends up as its functionoid.
+    MapCaseStringAndSlhaBlockToCaseString( "Bmu",
+                                           "HMIX[101]" );
+    MapCaseStringAndSlhaBlockToCaseString( "muTree",
+                                           "TREEHMIX[1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "muLoop",
+                                           "LOOPHMIX[1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "BmuTree",
+                                           "TREEHMIX[101]" );
+    MapCaseStringAndSlhaBlockToCaseString( "BmuLoop",
+                                           "LOOPHMIX[101]" );
+    MapCaseStringAndSlhaBlockToCaseString( "mHdSqTree",
+                                           "TREEMSOFT[ 21 ]" );
+    MapCaseStringAndSlhaBlockToCaseString( "mHdSqLoop",
+                                           "LOOPMSOFT[ 21 ]" );
+    MapCaseStringAndSlhaBlockToCaseString( "mHuSqTree",
+                                           "TREEMSOFT[ 22 ]" );
+    MapCaseStringAndSlhaBlockToCaseString( "mHuSqLoop",
+                                           "LOOPMSOFT[ 22 ]" );
+  }
+
   // This adds the parameter based on the alias given by switchString for the
   // parameter.
   std::pair< bool, size_t >
-  SlhaCompatibleWithSarahManager::SarahSpecialCaseDefaultingToSlhaOneOrTwo(
+  SlhaCompatibleWithSarahManager::RegisterUnregisteredSpecialCase(
                                                 std::string const& caseString )
   {
-
     if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
     {
       bool upNotDown( caseString == "DsbVu" );
       SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
              RegisterBlockEntry( upNotDown ? "HMIX[ 103 ]" : "HMIX[ 102 ]" ) );
       std::pair< bool, size_t >
-      slhaResult( SlhaOneOrTwoSpecialCase( caseString ) );
+      slhaResult( RegisterUnregisteredSpecialCase( caseString ) );
       SlhaSourcedParameterFunctionoid const&
       slhaFunctionoid( *(FindActiveDerivedParameter( slhaResult.second )) );
       // This will overwrite activeParametersToIndices[ switchString ] to
@@ -73,12 +106,13 @@ namespace VevaciousPlusPlus
                                               sarahFunctionoid,
                                               slhaFunctionoid ) );
     }
-    else if( caseString =="Bmu" )
+    else if( caseString == "Bmu" )
     {
       SlhaSourcedParameterFunctionoid const&
       sarahFunctionoid( RegisterBlockEntry( "HMIX[ 101 ]" ) );
-      std::pair< bool, size_t >
-      slhaResult( SlhaOneOrTwoSpecialCase( caseString ) );
+      std::pair< bool, size_t > slhaResult(
+            SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredSpecialCase(
+                                                                caseString ) );
       SlhaSourcedParameterFunctionoid const&
       slhaFunctionoid( *(FindActiveDerivedParameter( slhaResult.second )) );
       // This will overwrite activeParametersToIndices[ switchString ] to
@@ -108,7 +142,7 @@ namespace VevaciousPlusPlus
       SlhaSourcedParameterFunctionoid const&
       sarahFunctionoid( RegisterBlockEntry( "TREEHMIX[ 101 ]" ) );
       std::pair< bool, size_t >
-      shouldBeDrbarResult( SarahSpecialCaseDefaultingToSlhaOneOrTwo( "Bmu" ) );
+      shouldBeDrbarResult( RegisterParameter( "Bmu" ) );
       SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
                  *(FindActiveDerivedParameter( shouldBeDrbarResult.second )) );
       // This will overwrite activeParametersToIndices[ switchString ] to
@@ -126,7 +160,7 @@ namespace VevaciousPlusPlus
       SlhaSourcedParameterFunctionoid const&
       sarahFunctionoid( RegisterBlockEntry( "LOOPHMIX[ 101 ]" ) );
       std::pair< bool, size_t >
-      shouldBeDrbarResult( SarahSpecialCaseDefaultingToSlhaOneOrTwo( "Bmu" ) );
+      shouldBeDrbarResult( RegisterParameter( "Bmu" ) );
       SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
                  *(FindActiveDerivedParameter( shouldBeDrbarResult.second )) );
       // This will overwrite activeParametersToIndices[ switchString ] to
@@ -165,7 +199,9 @@ namespace VevaciousPlusPlus
     }
     else
     {
-      return SlhaOneOrTwoSpecialCase( caseString );
+      return
+      SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredSpecialCase(
+                                                                  caseString );
     }
   }
 

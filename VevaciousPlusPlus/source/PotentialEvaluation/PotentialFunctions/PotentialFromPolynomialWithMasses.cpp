@@ -54,8 +54,8 @@ namespace VevaciousPlusPlus
     fieldsAssumedNegative(),
     assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
-    BOL::AsciiXmlParser fileParser( false );
-    BOL::AsciiXmlParser elementParser( false );
+    BOL::AsciiXmlParser fileParser( true );
+    BOL::AsciiXmlParser elementParser( true );
     BOL::VectorlikeArray< std::string > elementLines;
     bool successfullyReadElement(
                            fileParser.openRootElementOfFile( modelFilename ) );
@@ -78,7 +78,7 @@ namespace VevaciousPlusPlus
       throw std::runtime_error( "Could not parse <FieldVariables>." );
     }
     BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
+                                  fileParser.getTrimmedCurrentElementContent(),
                                     elementLines,
                                     '\n');
     std::string readFieldName( "" );
@@ -1007,6 +1007,7 @@ namespace VevaciousPlusPlus
           // for parsing later.
           wordEnd += 1;
         }
+
         // For comparison, we need the string to be in the proper format:
         std::string variableString( lagrangianParameterManager.FormatVariable(
                                                stringToParse.substr( wordStart,
@@ -1059,7 +1060,7 @@ namespace VevaciousPlusPlus
              fieldIndex < fieldNames.size();
              ++fieldIndex )
         {
-          if( fieldNames[ fieldIndex ].compare( variableString ) == 0 )
+          if( fieldNames[ fieldIndex ] == variableString )
           {
             // If it is a field name, we raise its power in the polynomial term
             // and return position of the char just after the parsed chars.

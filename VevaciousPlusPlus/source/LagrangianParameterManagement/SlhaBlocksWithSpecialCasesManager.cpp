@@ -62,60 +62,60 @@ namespace VevaciousPlusPlus
     aliasesToCaseStrings[ "DsbVu" ] = "DsbVu";
     aliasesToCaseStrings[ "Bmu" ]
     = aliasesToCaseStrings[ "m3Sq" ] = "Bmu";
-    CoverAllCasesForSlhaBlock( "Te11",
-                               "TE[1,1]" );
-    CoverAllCasesForSlhaBlock( "Te22",
-                               "TE[2,2]" );
-    CoverAllCasesForSlhaBlock( "Te33",
-                               "TE[3,3]" );
-    CoverAllCasesForSlhaBlock( "Td11",
-                               "TD[1,1]" );
-    CoverAllCasesForSlhaBlock( "Td22",
-                               "TD[2,2]" );
-    CoverAllCasesForSlhaBlock( "Td33",
-                               "TD[3,3]" );
-    CoverAllCasesForSlhaBlock( "Tu11",
-                               "TU[1,1]" );
-    CoverAllCasesForSlhaBlock( "Tu22",
-                               "TU[2,2]" );
-    CoverAllCasesForSlhaBlock( "Tu33",
-                               "TU[3,3]" );
-    CoverAllCasesForSlhaBlock( "Msl211",
-                               "MSL2[1,1]" );
-    CoverAllCasesForSlhaBlock( "Msl222",
-                               "MSL2[2,2]" );
-    CoverAllCasesForSlhaBlock( "Msl233",
-                               "MSL2[3,3]" );
-    CoverAllCasesForSlhaBlock( "Mse211",
-                               "MSE2[1,1]" );
-    CoverAllCasesForSlhaBlock( "Mse222",
-                               "MSE2[2,2]" );
-    CoverAllCasesForSlhaBlock( "Mse233",
-                               "MSE2[3,3]" );
-    CoverAllCasesForSlhaBlock( "Msq211",
-                               "MSQ2[1,1]" );
-    CoverAllCasesForSlhaBlock( "Msq222",
-                               "MSQ2[2,2]" );
-    CoverAllCasesForSlhaBlock( "Msq233",
-                               "MSQ2[3,3]" );
-    CoverAllCasesForSlhaBlock( "Msu211",
-                               "MSU2[1,1]" );
-    CoverAllCasesForSlhaBlock( "Msu222",
-                               "MSU2[2,2]" );
-    CoverAllCasesForSlhaBlock( "Msu233",
-                               "MSU2[3,3]" );
-    CoverAllCasesForSlhaBlock( "Msd211",
-                               "MSD2[1,1]" );
-    CoverAllCasesForSlhaBlock( "Msd222",
-                               "MSD2[2,2]" );
-    CoverAllCasesForSlhaBlock( "Msd233",
-                               "MSD2[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Te11",
+                                           "TE[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Te22",
+                                           "TE[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Te33",
+                                           "TE[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Td11",
+                                           "TD[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Td22",
+                                           "TD[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Td33",
+                                           "TD[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Tu11",
+                                           "TU[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Tu22",
+                                           "TU[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Tu33",
+                                           "TU[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msl211",
+                                           "MSL2[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msl222",
+                                           "MSL2[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msl233",
+                                           "MSL2[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Mse211",
+                                           "MSE2[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Mse222",
+                                           "MSE2[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Mse233",
+                                           "MSE2[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msq211",
+                                           "MSQ2[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msq222",
+                                           "MSQ2[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msq233",
+                                           "MSQ2[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msu211",
+                                           "MSU2[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msu222",
+                                           "MSU2[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msu233",
+                                           "MSU2[3,3]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msd211",
+                                           "MSD2[1,1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msd222",
+                                           "MSD2[2,2]" );
+    MapCaseStringAndSlhaBlockToCaseString( "Msd233",
+                                           "MSD2[3,3]" );
   }
 
   // This adds the parameter based on the alias given by switchString for the
   // parameter.
   std::pair< bool, size_t >
-  SlhaBlocksWithSpecialCasesManager::SlhaOneOrTwoSpecialCase(
+  SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredSpecialCase(
                                                 std::string const& caseString )
   {
     if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
@@ -209,14 +209,14 @@ namespace VevaciousPlusPlus
     {
       return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'L',
-                                                        '1',
+                                                        '2',
                                                         "32" );
     }
     else if( caseString == "Msl233" )
     {
       return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'L',
-                                                        '1',
+                                                        '3',
                                                         "33" );
     }
     else if( caseString == "Mse211" )
@@ -251,14 +251,14 @@ namespace VevaciousPlusPlus
     {
       return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'Q',
-                                                        '1',
+                                                        '2',
                                                         "42" );
     }
     else if( caseString == "Msq233" )
     {
       return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
                                                         'Q',
-                                                        '1',
+                                                        '3',
                                                         "43" );
     }
     else if( caseString == "Msu211" )

@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
     fixedScaleType( fixedScaleType ),
     fixedScaleArgument( fixedScaleArgument )
   {
-    size_t wordStart( validBlocksString.find_first_of(
+    size_t wordStart( validBlocksString.find_first_not_of(
                                              blockNameSeparationCharacters ) );
     size_t wordEnd( 0 );
     // If there are any more chars in validBlocks that are not in
@@ -128,6 +128,90 @@ namespace VevaciousPlusPlus
 
     // If the parameter wasn't already active, we add it.
     return AddNewBlockEntry( parameterName );
+  }
+
+
+  // This puts all variables with index brackets into a consistent form,
+  // putting all those which are a valid block name followed by index brackets
+  // into uppercase, to account for SLHA block name case insensitivity.
+  std::string LesHouchesAccordBlockEntryManager::FormatVariable(
+                                    std::string const& variableToFormat ) const
+  {
+    std::string const
+    trimmedVariable( LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                          variableToFormat ) );
+    size_t openBracket( trimmedVariable.find( '[' ) );
+    if( openBracket == std::string::npos )
+    {
+      return trimmedVariable;
+    }
+    std::stringstream formattedStream;
+    std::string const blockName( BlockNamePart( trimmedVariable ) );
+    if( validBlocks.find( blockName ) != validBlocks.end() )
+    {
+      formattedStream << blockName;
+    }
+    else
+    {
+      formattedStream << trimmedVariable.substr( 0,
+                                                 openBracket );
+    }
+    formattedStream
+    << '['
+    << FormatIndexBracketContent( trimmedVariable.substr( ( openBracket + 1 ),
+                               ( trimmedVariable.size() - openBracket - 2 ) ) )
+    << ']';
+    return formattedStream.str();
+  }
+
+  // This is mainly for debugging.
+  std::string LesHouchesAccordBlockEntryManager::AsDebuggingString()
+  {
+    std::stringstream stringBuilder;
+
+    stringBuilder
+    << "numberOfDistinctActiveParameters = "
+    << numberOfDistinctActiveParameters << std::endl
+    << "activeParametersToIndices = { ";
+    for( std::map< std::string, size_t >::const_iterator
+         parameterToIndex( activeParametersToIndices.begin() );
+         parameterToIndex != activeParametersToIndices.end();
+         ++parameterToIndex )
+    {
+      if( parameterToIndex != activeParametersToIndices.begin() )
+      {
+        stringBuilder << "," << std::endl;
+      }
+      stringBuilder
+      << "[ \"" << parameterToIndex->first << "\", "
+      << parameterToIndex->second << " ]";
+    }
+    stringBuilder << " }" << std::endl;
+    stringBuilder
+    << "activeInterpolatedParameters.size() = "
+    << activeInterpolatedParameters.size()
+    << " (not in the mood to write code to display contents right now)"
+    << std::endl
+    << "validBlocks = { ";
+    for( std::set< std::string >::const_iterator
+         validBlock( validBlocks.begin() );
+         validBlock != validBlocks.end();
+         ++validBlock )
+    {
+      if( validBlock != validBlocks.begin() )
+      {
+        stringBuilder << "," << std::endl;
+      }
+      stringBuilder
+      << "\"" << *validBlock << "\"";
+    }
+    stringBuilder << " }"
+    << std::endl << "minimumScaleType = \"" << minimumScaleType << "\""
+    << std::endl << "minimumScaleArgument = \"" << minimumScaleArgument << "\""
+    << std::endl << "fixedScaleType = \"" << fixedScaleType << "\""
+    << std::endl << "fixedScaleArgument = \"" << fixedScaleArgument << "\""
+    << std::endl;
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

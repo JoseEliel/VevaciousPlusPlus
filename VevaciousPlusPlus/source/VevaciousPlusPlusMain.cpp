@@ -27,10 +27,16 @@ int main( int argumentCount,
   std::string const slhaFileName( "CMSSM_CCB.slha.out" );
 
   BOL::AsciiXmlParser lhaManagerParser;
-  lhaManagerParser.openRootElementOfFile(
+  bool const successfulOpening( lhaManagerParser.openRootElementOfFile(
       "/home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/"
       "ModelFiles/LagrangianParameters/"
-      "MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml" );
+      "MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml" ) );
+  std::cout
+  << std::endl
+  << "successfulOpening = " << successfulOpening;
+  std::cout << std::endl;
+
+
   std::string specialCases( "" );
   std::string validBlocks( "" );
   std::string minimumScaleType( "" );
@@ -39,6 +45,12 @@ int main( int argumentCount,
   std::string fixedScaleArgument( "" );
   while( lhaManagerParser.readNextElement() )
   {
+    std::cout
+    << std::endl
+    << "lhaManagerParser.getCurrentElementName() = "
+    << lhaManagerParser.getCurrentElementName();
+    std::cout << std::endl;
+
     if( lhaManagerParser.currentElementNameMatches( "SpecialCases" ) )
     {
       specialCases = lhaManagerParser.getTrimmedCurrentElementContent();
@@ -88,6 +100,17 @@ int main( int argumentCount,
     }
   }
   lhaManagerParser.closeFile();
+
+  std::cout
+  << std::endl << "specialCases = \"" << specialCases << "\""
+  << std::endl << "validBlocks = \"" << validBlocks << "\""
+  << std::endl << "fixedScaleType = \"" << fixedScaleType << "\""
+  << std::endl << "fixedScaleArgument = \"" << fixedScaleArgument << "\""
+  << std::endl << "minimumScaleType = \"" << minimumScaleType << "\""
+  << std::endl << "minimumScaleArgument = \"" << minimumScaleArgument << "\"";
+  std::cout << std::endl;
+
+
   VevaciousPlusPlus::LesHouchesAccordBlockEntryManager*
   lhaParameterManager( NULL );
   if( specialCases == "SarahMssm" )
@@ -117,7 +140,6 @@ int main( int argumentCount,
                                                                 fixedScaleType,
                                                           fixedScaleArgument );
   }
-  lhaParameterManager->NewParameterPoint( slhaFileName );
 
   std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
 
@@ -131,14 +153,11 @@ int main( int argumentCount,
                  slhaManager );
 
   VevaciousPlusPlus::OldRgeImprovedOneLoopPotential
-  oldRgeImproved( oldModelFilename,
-                  10.0,
-                  true,
-                  0.5,
-                  slhaManager );
+  oldRgeImproved( oldFixedScale );
 
   slhaManager.UpdateSlhaData( slhaFileName );
-
+  oldFixedScale.UpdateSelfForNewSlha( slhaManager );
+  oldRgeImproved.UpdateSelfForNewSlha( slhaManager );
 
   std::string const
   newModelFilename( "NewFormatRealMssmWithStauAndStopVevsPotential.vin" );
@@ -149,6 +168,15 @@ int main( int argumentCount,
 
   VevaciousPlusPlus::RgeImprovedOneLoopPotential
   newRgeImproved( newFixedScale );
+
+
+  lhaParameterManager->NewParameterPoint( slhaFileName );
+
+  std::cout
+  << std::endl
+  << "Parameter manager = " << lhaParameterManager->AsDebuggingString();
+  std::cout << std::endl;
+
 
   double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
                                          oldFixedScale.FieldValuesOrigin() ) );

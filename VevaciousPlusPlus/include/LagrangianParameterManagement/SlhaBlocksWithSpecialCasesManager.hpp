@@ -58,14 +58,15 @@ namespace VevaciousPlusPlus
 
     // This checks parameterName against all the special cases. If the
     // parameter name is not recognized as a valid special case, then the
-    // returned pair is false paired with (size_t)(-1).
+    // LesHouchesAccordBlockEntryManager result is returned, otherwise the
+    // special case is registered and returned.
     virtual std::pair< bool, size_t >
     RegisterUnregisteredParameter( std::string const& parameterName );
 
     // This adds the parameter based on the alias given by switchString for the
     // parameter.
-    std::pair< bool, size_t >
-    SlhaOneOrTwoSpecialCase( std::string const& caseString );
+    virtual std::pair< bool, size_t >
+    RegisterUnregisteredSpecialCase( std::string const& caseString );
 
     // This registers the required TX[0,0], AX[0,0], and YX[0,0] parameters
     // where X is replaced by sfermionType and 0 by generationIndex, and then
@@ -88,12 +89,12 @@ namespace VevaciousPlusPlus
                                                char const generationIndex,
                                                std::string const& msoftIndex );
 
-    // This maps a set of strings to switchString in aliasesToSwitchStrings:
-    // switchString itself, and every upper-/lowercase combination of
-    // blockString (after the indices bracket has been put in the correct
-    // format, and only changing the cases of the block name characters).
-    void CoverAllCasesForSlhaBlock( std::string const& caseString,
-                                    std::string const& blockString );
+    // This maps both caseString and the format-corrected version of
+    // blockString to caseString in aliasesToSwitchStrings.
+    void MapCaseStringAndSlhaBlockToCaseString( std::string const& caseString,
+                                               std::string const& blockString )
+    { aliasesToCaseStrings[ caseString ]
+      = aliasesToCaseStrings[ FormatVariable( blockString ) ] = caseString; }
 
     // This finds the functionoid in activeDerivedParameters which has the
     // given index (which is not its position in the activeDerivedParameters
@@ -139,19 +140,23 @@ namespace VevaciousPlusPlus
 
   // This checks parameterName against all the special cases. If the
   // parameter name is not recognized as a valid special case, then the
-  // returned pair is false paired with (size_t)(-1).
+  // LesHouchesAccordBlockEntryManager result is returned, otherwise the
+  // special case is registered and returned.
   inline std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredParameter(
                                              std::string const& parameterName )
   {
     std::map< std::string, std::string >::const_iterator
     aliasToSwitchString( aliasesToCaseStrings.find( parameterName ) );
-    if( aliasToSwitchString == aliasesToCaseStrings.end() )
+    if( aliasToSwitchString != aliasesToCaseStrings.end() )
     {
-      return std::pair< bool, size_t >( false,
-                                        -1 );
+      return RegisterUnregisteredSpecialCase( aliasToSwitchString->second );
     }
-    return SlhaOneOrTwoSpecialCase( aliasToSwitchString->second );
+    else
+    {
+      return LesHouchesAccordBlockEntryManager::RegisterUnregisteredParameter(
+                                                               parameterName );
+    }
   }
 
 
@@ -166,7 +171,7 @@ namespace VevaciousPlusPlus
                                                        char const sfermionType,
                                                    char const generationIndex )
   {
-    std::string blockNameWithIndices( "TX[0,0]" );
+    std::string blockNameWithIndices( "T?[?,?]" );
     blockNameWithIndices[ 1 ] = sfermionType;
     blockNameWithIndices[ 3 ] = blockNameWithIndices[ 5 ] = generationIndex;
     SlhaSourcedParameterFunctionoid const&
@@ -197,7 +202,7 @@ namespace VevaciousPlusPlus
                                                     char const generationIndex,
                                                 std::string const& msoftIndex )
   {
-    std::string blockNameWithIndices( "MSX2[0,0]" );
+    std::string blockNameWithIndices( "MS?2[?,?]" );
     blockNameWithIndices[ 2 ] = sfermionType;
     blockNameWithIndices[ 5 ] = blockNameWithIndices[ 7 ] = generationIndex;
     SlhaSourcedParameterFunctionoid const&
@@ -212,31 +217,6 @@ namespace VevaciousPlusPlus
                                               numberOfDistinctActiveParameters,
                                                                     squareMass,
                                                                 linearMass ) );
-  }
-
-  // This maps a set of strings to switchString in aliasesToSwitchStrings:
-  // switchString itself, and every upper-/lowercase combination of
-  // blockString (after the indices bracket has been put in the correct
-  // format, and only changing the cases of the block name characters).
-  inline void SlhaBlocksWithSpecialCasesManager::CoverAllCasesForSlhaBlock(
-                                                 std::string const& caseString,
-                                               std::string const& blockString )
-  {
-    aliasesToCaseStrings[ caseString ] = caseString;
-    std::string blockAfterFormat( FormatVariable( blockString ) );
-    size_t const lastBlockNameCharacter( blockAfterFormat.find( '[',
-                                                                1 ) );
-    for( size_t characterIndex( 0 );
-         characterIndex < lastBlockNameCharacter;
-         ++characterIndex )
-    {
-      blockAfterFormat[ characterIndex ]
-      = toupper( blockAfterFormat[ characterIndex ] );
-      aliasesToCaseStrings[ blockAfterFormat ] = caseString;
-      blockAfterFormat[ characterIndex ]
-      = tolower( blockAfterFormat[ characterIndex ] );
-      aliasesToCaseStrings[ blockAfterFormat ] = caseString;
-    }
   }
 
   // This finds the functionoid in activeDerivedParameters which has the

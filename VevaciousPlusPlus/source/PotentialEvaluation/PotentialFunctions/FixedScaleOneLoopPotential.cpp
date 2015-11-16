@@ -17,7 +17,7 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialWithMasses( modelFilename,
                                        assumedPositiveOrNegativeTolerance,
                                        lagrangianParameterManager ),
-    BOL::PushedToObserver< LagrangianParameterManager >(),
+    BOL::BasicObserver(),
     renormalizationScale( -1.0 ),
     inverseRenormalizationScaleSquared( -1.0 )
   {
@@ -27,7 +27,7 @@ namespace VevaciousPlusPlus
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
                    PotentialFromPolynomialWithMasses const& potentialToCopy ) :
     PotentialFromPolynomialWithMasses( potentialToCopy ),
-    BOL::PushedToObserver< LagrangianParameterManager >(),
+    BOL::BasicObserver(),
     renormalizationScale( -1.0 ),
     inverseRenormalizationScaleSquared( -1.0 )
   {
@@ -44,9 +44,14 @@ namespace VevaciousPlusPlus
   // appropriate scale from lagrangianParameterManager, and updates all
   // components used to evaluate the potential to use the Lagrangian
   // parameters evaluated at that scale.
-  void FixedScaleOneLoopPotential::respondToPush(
-                 LagrangianParameterManager const& lagrangianParameterManager )
+  void FixedScaleOneLoopPotential::respondToObservedSignal()
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "FixedScaleOneLoopPotential::respondToObservedSignal() called.";
+    std::cout << std::endl;/**/
+
     renormalizationScale
     = lagrangianParameterManager.AppropriateFixedScaleForParameterPoint();
     inverseRenormalizationScaleSquared
@@ -84,6 +89,97 @@ namespace VevaciousPlusPlus
     {
       massMatrix->UpdateForFixedScale( fixedParameterValues );
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "renormalizationScale = " << renormalizationScale
+    << ", inverseRenormalizationScaleSquared = "
+    << inverseRenormalizationScaleSquared
+    << ", log( renormalizationScale ) = "
+    << log( renormalizationScale )
+    << std::endl
+    << "fixedParameterValues = { ";
+    for( std::vector< double >::const_iterator
+         parameterValue( fixedParameterValues.begin() );
+         parameterValue < fixedParameterValues.end();
+         ++parameterValue )
+    {
+      std::cout << *parameterValue << ",";
+    }
+    std::cout << " }" << std::endl;
+    std::vector< double > fieldConfiguration( FieldValuesOrigin() );
+    std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      scalarSquareMasses,
+                                      scalarMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      fermionSquareMasses,
+                                      fermionMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                      vectorSquareMasses,
+                                      vectorMassesSquaredWithFactors );
+    std::cout << "For origin:"
+    << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( scalarMassesSquaredWithFactors.begin() );
+         massesWithFactor < scalarMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " }";
+    }
+    std::cout << std::endl << "}"
+    << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( fermionMassesSquaredWithFactors.begin() );
+         massesWithFactor < fermionMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " }";
+    }
+    std::cout << std::endl << "}"
+    << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( vectorMassesSquaredWithFactors.begin() );
+         massesWithFactor < vectorMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " }";
+    }
+    std::cout << std::endl << "}";
+    std::cout << std::endl;/**/
   }
 
   // This returns a string that is valid Python with no indentation to evaluate

@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
 {
 
   class FixedScaleOneLoopPotential : public PotentialFromPolynomialWithMasses,
-                     public BOL::PushedToObserver< LagrangianParameterManager >
+                                     public BOL::BasicObserver
   {
   public:
     FixedScaleOneLoopPotential( std::string const& modelFilename,
@@ -45,8 +45,7 @@ namespace VevaciousPlusPlus
     // appropriate scale from lagrangianParameterManager, and updates all
     // components used to evaluate the potential to use the Lagrangian
     // parameters evaluated at that scale.
-    virtual void respondToPush(
-                LagrangianParameterManager const& lagrangianParameterManager );
+    virtual void respondToObservedSignal();
 
     // This returns a string that is valid Python with no indentation to
     // evaluate the potential in three functions:

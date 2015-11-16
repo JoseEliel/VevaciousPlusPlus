@@ -17,7 +17,7 @@ namespace VevaciousPlusPlus
 {
 
   class RgeImprovedOneLoopPotential : public PotentialFromPolynomialWithMasses,
-                     public BOL::PushedToObserver< LagrangianParameterManager >
+                                      public BOL::BasicObserver
   {
   public:
     RgeImprovedOneLoopPotential( std::string const& modelFilename,
@@ -47,8 +47,7 @@ namespace VevaciousPlusPlus
     // parameters (as just using the Euclidean length of the field
     // configuration would lead to taking the logarithm of 0 when evaluating
     // the potential at the field origin).
-    virtual void respondToPush(
-                LagrangianParameterManager const& lagrangianParameterManager );
+    virtual void respondToObservedSignal();
 
     // This returns a string that is valid Python with no indentation to
     // evaluate the potential in three functions:
@@ -69,8 +68,7 @@ namespace VevaciousPlusPlus
   // parameters (as just using the Euclidean length of the field
   // configuration would lead to taking the logarithm of 0 when evaluating
   // the potential at the field origin).
-  inline void RgeImprovedOneLoopPotential::respondToPush(
-                 LagrangianParameterManager const& lagrangianParameterManager )
+  inline void RgeImprovedOneLoopPotential::respondToObservedSignal()
   {
     double const
     minimumScale( lagrangianParameterManager.MinimumEvaluationScale() );

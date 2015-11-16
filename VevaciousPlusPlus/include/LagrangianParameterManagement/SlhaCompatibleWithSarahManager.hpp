@@ -38,50 +38,13 @@ namespace VevaciousPlusPlus
 
   protected:
     // This adds all the valid aliases to aliasesToSwitchStrings.
-    void InitializeSarahAliases()
-    {
-      // Putting the simple block names as special cases for SARAH means that
-      // a SARAH-generated model file which assumes the extra SARAH blocks will
-      // still work with non-SARAH SLHA files, to the extent that the DRbar
-      // values will be used as both the SARAH tree and loop values.
-      CoverAllCasesForSlhaBlock( "DsbVd",
-                                 "HMIX[102]" );
-      CoverAllCasesForSlhaBlock( "DsbVu",
-                                 "HMIX[103]" );
-      // The constructor for the base SlhaBlocksWithSpecialCasesManager covers
-      // adding the basic Bmu to the alias mapping, even though this derived
-      // class over-writes what ends up as its functionoid.
-      CoverAllCasesForSlhaBlock( "Bmu",
-                                 "HMIX[101]" );
-      CoverAllCasesForSlhaBlock( "muTree",
-                                 "TREEHMIX[1]" );
-      CoverAllCasesForSlhaBlock( "muLoop",
-                                 "LOOPHMIX[1]" );
-      CoverAllCasesForSlhaBlock( "BmuTree",
-                                 "TREEHMIX[101]" );
-      CoverAllCasesForSlhaBlock( "BmuLoop",
-                                 "LOOPHMIX[101]" );
-      CoverAllCasesForSlhaBlock( "mHdSqTree",
-                                 "TREEMSOFT[ 21 ]" );
-      CoverAllCasesForSlhaBlock( "mHdSqLoop",
-                                 "LOOPMSOFT[ 21 ]" );
-      CoverAllCasesForSlhaBlock( "mHuSqTree",
-                                 "TREEMSOFT[ 22 ]" );
-      CoverAllCasesForSlhaBlock( "mHuSqLoop",
-                                 "LOOPMSOFT[ 22 ]" );
-    }
-
-    // This checks parameterName against all the special cases. If the
-    // parameter name is not recognized as a valid special case, then the
-    // returned pair is false paired with (size_t)(-1).
-    virtual std::pair< bool, size_t >
-    RegisterUnregisteredParameter( std::string const& parameterName );
+    void InitializeSarahAliases();
 
     // This adds the parameter based on the alias given by switchString for the
     // parameter, returning either a found SARAH special case, or otherwise the
     // result of SlhaBlocksWithSpecialCasesManager::SlhaOneOrTwoSpecialCase.
-    std::pair< bool, size_t > SarahSpecialCaseDefaultingToSlhaOneOrTwo(
-                                               std::string const& caseString );
+    virtual std::pair< bool, size_t >
+    RegisterUnregisteredSpecialCase(  std::string const& caseString );
 
     // This adds a special case for switchString to be mapped to a
     // SlhaTwoSourceFunctionoid looking preferentially at an interpolated block
@@ -96,24 +59,6 @@ namespace VevaciousPlusPlus
 
 
 
-
-  // This checks parameterName against all the special cases. If the
-  // parameter name is not recognized as a valid special case, then the
-  // returned pair is false paired with (size_t)(-1).
-  inline std::pair< bool, size_t >
-  SlhaCompatibleWithSarahManager::RegisterUnregisteredParameter(
-                                             std::string const& parameterName )
-  {
-    std::map< std::string, std::string >::const_iterator
-    aliasToSwitchString( aliasesToCaseStrings.find( parameterName ) );
-    if( aliasToSwitchString == aliasesToCaseStrings.end() )
-    {
-      return std::pair< bool, size_t >( false,
-                                        -1 );
-    }
-    return
-      SarahSpecialCaseDefaultingToSlhaOneOrTwo( aliasToSwitchString->second );
-  }
 
   // This adds a special case for switchString to be mapped to a
   // SlhaTwoSourceFunctionoid looking preferentially at an interpolated block

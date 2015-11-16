@@ -77,6 +77,13 @@ namespace VevaciousPlusPlus
     { return GetScale( minimumScaleType,
                        minimumScaleArgument ); }
 
+    // This puts all variables with index brackets into a consistent form,
+    // putting all those which are a valid block name followed by index
+    // brackets into uppercase, to account for SLHA block name case
+    // insensitivity.
+    virtual std::string
+    FormatVariable( std::string const& variableToFormat ) const;
+
     // This writes a function in the form
     // def LagrangianParameters( lnQ ): return ...
     // to return an array of the values of the Lagrangian parameters evaluated
@@ -84,6 +91,9 @@ namespace VevaciousPlusPlus
     // argument), in the order in which a call to ParametersAtScale would
     // return them internal to this C++ code.
     virtual std::string ParametersAsPython() const;
+
+    // This is mainly for debugging.
+    std::string AsDebuggingString();
 
 
   protected:
@@ -116,9 +126,8 @@ namespace VevaciousPlusPlus
     // This finds the block name part of parameterName, returns true if the
     // block name is found in validBlocks.
     bool RefersToValidBlock( std::string const& parameterName ) const
-    { return( validBlocks.find( parameterName.substr( 0,
-                                                  parameterName.find( '[' ) ) )
-              != validBlocks.end() ); }
+    { return ( validBlocks.find( BlockNamePart( parameterName ) )
+               != validBlocks.end() ); }
 
     // This adds a new LhaBlockEntryInterpolator for the given parameter
     // to activeInterpolatedParameters and activeParametersToIndices, and
@@ -155,6 +164,10 @@ namespace VevaciousPlusPlus
     // its argument.
     double GetScale( std::string const& evaluationType,
                      std::string const& evaluationArgument ) const;
+
+    // This returns the substring of parameterName up to '[', converted
+    // completely to uppercase, or an empty string if there was no '['.
+    std::string BlockNamePart( std::string const& parameterName ) const;
   };
 
 
@@ -205,7 +218,10 @@ namespace VevaciousPlusPlus
     {
       return std::pair< bool, size_t >( true, alreadyExistsResult->second );
     }
-    return RegisterUnregisteredParameter( nameAfterFormat );
+    else
+    {
+      return RegisterUnregisteredParameter( nameAfterFormat );
+    }
   }
 
   // This returns a vector of the values of the Lagrangian parameters in
@@ -330,6 +346,22 @@ namespace VevaciousPlusPlus
       throw std::runtime_error( evaluationType
                                   + " is not a valid scale evaluation type!" );
     }
+  }
+
+  // This returns the substring of parameterName up to '[', converted
+  // completely to uppercase, or an empty string if there was no '['.
+  inline std::string LesHouchesAccordBlockEntryManager::BlockNamePart(
+                                       std::string const& parameterName ) const
+  {
+    size_t openBracket( parameterName.find( '[' ) );
+    if( openBracket == std::string::npos )
+    {
+      return "";
+    }
+    std::string blockName( parameterName.substr( 0,
+                                                 openBracket ) );
+    LHPC::ParsingUtilities::TransformToUppercase( blockName );
+    return blockName;
   }
 
 } /* namespace VevaciousPlusPlus */

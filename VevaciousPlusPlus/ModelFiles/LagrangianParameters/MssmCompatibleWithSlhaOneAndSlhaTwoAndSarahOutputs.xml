@@ -99,14 +99,14 @@
 
     <MinimumScaleBound>
       <EvaluationType>
-        fixed
+        FixedNumber
       </EvaluationType>
       <EvaluationArgument>
         91.1876
       </EvaluationArgument>
     </MinimumScaleBound>
 
-  </RenormalizationScaleChoice>
+  </RenormalizationScaleChoices>
 
   <SpecialCases>
     <!-- This tells Vevacious to prepare certain special cases because there

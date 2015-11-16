@@ -70,7 +70,7 @@ namespace VevaciousPlusPlus
     // This puts all variables with index brackets into a consistent form. It
     // can be overridden if necessary.
     virtual std::string
-    FormatVariable( std::string const& unformattedVariable ) const;
+    FormatVariable( std::string const& variableToFormat ) const;
 
     // This should write a function in the form
     // def LagrangianParameters( lnQ ): return ...
@@ -106,6 +106,13 @@ namespace VevaciousPlusPlus
     // overridden if necessary.
     virtual std::string FormatIndexBracketContent(
                           std::string const& unformattedBracketContent ) const;
+
+    // This returns "everything up to the '['" paired with "everything within
+    // the '[' to the ']' (not including the brackets themselves), throwing
+    // exceptions if there anything other than either no square brackets, or a
+    // single '[' with a single ']' coming after it.
+    std::pair< std::string, std::string >
+    SeparateIndexBracket( std::string const& stringToSeparate ) const;
   };
 
 
@@ -123,24 +130,17 @@ namespace VevaciousPlusPlus
 
   // This puts all variables with index brackets into a consistent form.
   inline std::string LagrangianParameterManager::FormatVariable(
-                                 std::string const& unformattedVariable ) const
+                                    std::string const& variableToFormat ) const
   {
-    size_t openBracket( unformattedVariable.find( '[' ) );
-    if( openBracket == std::string::npos )
+    std::pair< std::string, std::string > const
+    separatedVariable( SeparateIndexBracket( variableToFormat ) );
+    if( separatedVariable.second.empty() )
     {
-      return std::string( unformattedVariable );
-    }
-    if( unformattedVariable[ unformattedVariable.size() - 1 ] != ']' )
-    {
-      throw std::runtime_error(
-                         "In parsing model file, [...] not closed properly." );
+      return separatedVariable.first;
     }
     std::stringstream formattedStream;
-    formattedStream << unformattedVariable.substr( 0,
-                                                   openBracket ) << '['
-    << FormatIndexBracketContent( unformattedVariable.substr(
-                                                           ( openBracket + 1 ),
-                   ( unformattedVariable.size() - openBracket - 2 ) ) ) << ']';
+    formattedStream << separatedVariable.first << '['
+    << FormatIndexBracketContent( separatedVariable.second ) << ']';
     return formattedStream.str();
   }
 
@@ -148,10 +148,12 @@ namespace VevaciousPlusPlus
   inline std::string LagrangianParameterManager::FormatIndexBracketContent(
                            std::string const& unformattedBracketContent ) const
   {
-    std::vector< int > indicesVector( BOL::StringParser::stringToIntVector(
-                                                 unformattedBracketContent ) );
+    std::vector< std::string > const
+    indicesVector( LHPC::ParsingUtilities::SplitBySubstrings(
+                                                     unformattedBracketContent,
+                                                              " \t\n\r,;" ) );
     std::stringstream indicesStream;
-    for( std::vector< int >::iterator
+    for( std::vector< std::string >::const_iterator
          whichIndex( indicesVector.begin() );
          whichIndex < indicesVector.end();
          ++whichIndex )
@@ -160,7 +162,7 @@ namespace VevaciousPlusPlus
       {
         indicesStream << ',';
       }
-      indicesStream << *whichIndex;
+      indicesStream << atoi( whichIndex->c_str() );
     }
     return indicesStream.str();
   }
