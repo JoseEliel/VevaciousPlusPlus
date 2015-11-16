@@ -37,10 +37,6 @@ namespace VevaciousPlusPlus
                                      PotentialMinimum const& trueVacuum );
 
 
-    // This doesn't do anything here.
-    virtual void UpdateSelfForNewSlha( SlhaManager const& slhaManager ){}
-
-
   protected:
     static double const maximumPowerOfNaturalExponent;
     static double const maximumAllowedTemperature;

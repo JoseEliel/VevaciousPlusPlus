@@ -133,7 +133,7 @@ namespace VevaciousPlusPlus
     // which was used to update them.
     void AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
        std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const;
 
     // This evaluates the sum of corrections for the degrees of freedom with
@@ -207,10 +207,10 @@ namespace VevaciousPlusPlus
   inline void
   OldPotentialFromPolynomialAndMasses::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
         std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors ) const
   {
-    for( std::vector< OldMassesSquaredCalculator* >::const_iterator
+    for( std::vector< MassesSquaredCalculator* >::const_iterator
          whichMatrix( massSquaredMatrices.begin() );
          whichMatrix < massSquaredMatrices.end();
          ++whichMatrix )

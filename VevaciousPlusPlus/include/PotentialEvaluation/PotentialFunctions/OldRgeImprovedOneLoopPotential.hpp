@@ -85,7 +85,7 @@ namespace VevaciousPlusPlus
     // exponent of logarithmOfScale.
     void AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
                std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors,
                                          double const logarithmOfScale ) const;
 
@@ -125,11 +125,11 @@ namespace VevaciousPlusPlus
   inline void
   OldRgeImprovedOneLoopPotential::AddMassesSquaredWithMultiplicity(
                                std::vector< double > const& fieldConfiguration,
-            std::vector< OldMassesSquaredCalculator* > const& massSquaredMatrices,
+            std::vector< MassesSquaredCalculator* > const& massSquaredMatrices,
                std::vector< DoubleVectorWithDouble >& massesSquaredWithFactors,
                                           double const logarithmOfScale ) const
   {
-    for( std::vector< OldMassesSquaredCalculator* >::const_iterator
+    for( std::vector< MassesSquaredCalculator* >::const_iterator
          whichMatrix( massSquaredMatrices.begin() );
          whichMatrix < massSquaredMatrices.end();
          ++whichMatrix )

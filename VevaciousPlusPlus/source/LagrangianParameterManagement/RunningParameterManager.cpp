@@ -10,8 +10,10 @@
 namespace VevaciousPlusPlus
 {
 
-  RunningParameterManager::RunningParameterManager() :
+  RunningParameterManager::RunningParameterManager(
+                     LagrangianParameterManager& lagrangianParameterManager ) :
     SlhaManager(),
+    ParameterUpdatePropagator( lagrangianParameterManager ),
     parameterFunctionoidPointers(),
     parameterFunctionoidMap(),
     parameterFinder(),

@@ -47,9 +47,9 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaInterpolatedParameterFunctionoid const& squareMass;
+    SlhaSourcedParameterFunctionoid const& squareMass;
     size_t const squareMassIndex;
-    SlhaInterpolatedParameterFunctionoid const& linearMass;
+    SlhaSourcedParameterFunctionoid const& linearMass;
     size_t const linearMassIndex;
   };
 

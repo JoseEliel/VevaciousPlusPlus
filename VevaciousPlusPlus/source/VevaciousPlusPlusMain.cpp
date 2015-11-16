@@ -23,26 +23,8 @@ int main( int argumentCount,
   << std::endl
   << "Testing old and new potential functions.";
   std::cout << std::endl;/**/
+
   std::string const slhaFileName( "CMSSM_CCB.slha.out" );
-  std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
-
-  VevaciousPlusPlus::RunningParameterManager slhaManager;
-  VevaciousPlusPlus::OldFixedScaleOneLoopPotential
-  oldFixedScale( oldModelFilename,
-                 10.0,
-                 true,
-                 0.5,
-                 slhaManager );
-
-  VevaciousPlusPlus::OldRgeImprovedOneLoopPotential
-  oldRgeImproved( oldModelFilename,
-                  10.0,
-                  true,
-                  0.5,
-                  slhaManager );
-
-  slhaManager.UpdateSlhaData( slhaFileName );
-
 
   BOL::AsciiXmlParser lhaManagerParser;
   lhaManagerParser.openRootElementOfFile(
@@ -136,6 +118,28 @@ int main( int argumentCount,
                                                           fixedScaleArgument );
   }
   lhaParameterManager->NewParameterPoint( slhaFileName );
+
+  std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
+
+  VevaciousPlusPlus::RunningParameterManager
+  slhaManager( *lhaParameterManager );
+  VevaciousPlusPlus::OldFixedScaleOneLoopPotential
+  oldFixedScale( oldModelFilename,
+                 10.0,
+                 true,
+                 0.5,
+                 slhaManager );
+
+  VevaciousPlusPlus::OldRgeImprovedOneLoopPotential
+  oldRgeImproved( oldModelFilename,
+                  10.0,
+                  true,
+                  0.5,
+                  slhaManager );
+
+  slhaManager.UpdateSlhaData( slhaFileName );
+
+
   std::string const
   newModelFilename( "NewFormatRealMssmWithStauAndStopVevsPotential.vin" );
   VevaciousPlusPlus::FixedScaleOneLoopPotential
@@ -144,8 +148,7 @@ int main( int argumentCount,
                  *lhaParameterManager );
 
   VevaciousPlusPlus::RgeImprovedOneLoopPotential
-  newRgeImproved( newFixedScale,
-                  *lhaParameterManager );
+  newRgeImproved( newFixedScale );
 
   double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
                                          oldFixedScale.FieldValuesOrigin() ) );

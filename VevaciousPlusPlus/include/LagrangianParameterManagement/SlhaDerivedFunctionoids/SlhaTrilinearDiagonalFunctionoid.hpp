@@ -48,11 +48,11 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaInterpolatedParameterFunctionoid const& directTrilinear;
+    SlhaSourcedParameterFunctionoid const& directTrilinear;
     size_t const directTrilinearIndex;
-    SlhaInterpolatedParameterFunctionoid const& trilinearOverYukawa;
+    SlhaSourcedParameterFunctionoid const& trilinearOverYukawa;
     size_t const trilinearOverYukawaIndex;
-    SlhaInterpolatedParameterFunctionoid const& appropriateYukawa;
+    SlhaSourcedParameterFunctionoid const& appropriateYukawa;
     size_t const appropriateYukawaIndex;
   };
 

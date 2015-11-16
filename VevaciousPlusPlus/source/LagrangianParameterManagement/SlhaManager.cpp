@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   SlhaManager::SlhaManager() :
-    BOL::BasicObserved()
+    LagrangianParameterManager()
   {
     // This constructor is just an initialization list.
   }

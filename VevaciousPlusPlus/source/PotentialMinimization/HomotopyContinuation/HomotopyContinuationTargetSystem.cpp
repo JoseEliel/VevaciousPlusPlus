@@ -11,15 +11,15 @@ namespace VevaciousPlusPlus
 {
 
   HomotopyContinuationTargetSystem::HomotopyContinuationTargetSystem(
-                                   ParameterUpdatePropagator& previousPropagator ) :
+                              ParameterUpdatePropagator& previousPropagator ) :
     ParameterUpdatePropagator( previousPropagator )
   {
     // This constructor is just an initialization list.
   }
 
   HomotopyContinuationTargetSystem::HomotopyContinuationTargetSystem(
-                                                   SlhaManager& slhaManager ) :
-    ParameterUpdatePropagator( slhaManager )
+                     LagrangianParameterManager& lagrangianParameterManager ) :
+    ParameterUpdatePropagator( lagrangianParameterManager )
   {
     // This constructor is just an initialization list.
   }

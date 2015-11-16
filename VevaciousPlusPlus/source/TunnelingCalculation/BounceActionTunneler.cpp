@@ -78,8 +78,7 @@ namespace VevaciousPlusPlus
                                      double const survivalProbabilityThreshold,
                                               size_t const temperatureAccuracy,
                                       double const vacuumSeparationFraction ) :
-    TunnelingCalculator( potentialFunction,
-                         tunnelingStrategy,
+    TunnelingCalculator( tunnelingStrategy,
                          survivalProbabilityThreshold ),
     potentialFunction( potentialFunction ),
     temperatureAccuracy( temperatureAccuracy ),

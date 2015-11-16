@@ -83,9 +83,11 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
  $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
+ $(POTENTIALFUNCTIONS)/OldFixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialWithMasses.cpp \
  $(POTENTIALFUNCTIONS)/OldPotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
+ $(POTENTIALFUNCTIONS)/OldRgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/MassesSquaredCalculator.cpp \
  source/PotentialEvaluation/OldMassesSquaredCalculator.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \

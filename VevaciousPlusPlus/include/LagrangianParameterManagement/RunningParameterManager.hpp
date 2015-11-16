@@ -31,7 +31,8 @@ namespace VevaciousPlusPlus
     FormatVariable( std::string const& unformattedVariable );
 
 
-    RunningParameterManager();
+    RunningParameterManager(
+                      LagrangianParameterManager& lagrangianParameterManager );
     virtual ~RunningParameterManager();
 
 

@@ -8,13 +8,12 @@
 #ifndef TUNNELINGCALCULATOR_HPP_
 #define TUNNELINGCALCULATOR_HPP_
 
-#include "../LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class TunnelingCalculator : public ParameterUpdatePropagator
+  class TunnelingCalculator
   {
   public:
     enum TunnelingStrategy
@@ -27,8 +26,7 @@ namespace VevaciousPlusPlus
       NotSet
     };
 
-    TunnelingCalculator( ParameterUpdatePropagator& slhaUpdatePropagator,
-                         TunnelingStrategy const tunnelingStrategy = NotSet,
+    TunnelingCalculator( TunnelingStrategy const tunnelingStrategy = NotSet,
                          double const survivalProbabilityThreshold = 0.01 );
     virtual ~TunnelingCalculator();
 

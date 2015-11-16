@@ -17,8 +17,9 @@ namespace VevaciousPlusPlus
   {
   public:
     HomotopyContinuationTargetSystem(
-                                    ParameterUpdatePropagator& previousPropagator );
-    HomotopyContinuationTargetSystem( SlhaManager& slhaManager );
+                               ParameterUpdatePropagator& previousPropagator );
+    HomotopyContinuationTargetSystem(
+                      LagrangianParameterManager& lagrangianParameterManager );
     virtual ~HomotopyContinuationTargetSystem();
 
 

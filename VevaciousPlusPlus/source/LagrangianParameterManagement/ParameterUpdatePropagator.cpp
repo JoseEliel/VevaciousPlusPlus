@@ -12,8 +12,8 @@ namespace VevaciousPlusPlus
 
   ParameterUpdatePropagator::ParameterUpdatePropagator(
                               ParameterUpdatePropagator& previousPropagator ) :
-    BOL::PushedToObserver< ParameterUpdatePropagator >(),
-    BOL::PushingObserved< ParameterUpdatePropagator >(),
+    BOL::PushedToObserver< LagrangianParameterManager >(),
+    BOL::PushingObserved< LagrangianParameterManager >(),
     lagrangianParameterManager( previousPropagator.lagrangianParameterManager )
   {
     previousPropagator.registerObserver( this );
@@ -21,8 +21,8 @@ namespace VevaciousPlusPlus
 
   ParameterUpdatePropagator::ParameterUpdatePropagator(
                      LagrangianParameterManager& lagrangianParameterManager ) :
-    BOL::PushedToObserver< ParameterUpdatePropagator >(),
-    BOL::PushingObserved< ParameterUpdatePropagator >(),
+    BOL::PushedToObserver< LagrangianParameterManager >(),
+    BOL::PushingObserved< LagrangianParameterManager >(),
     lagrangianParameterManager( lagrangianParameterManager )
   {
     lagrangianParameterManager.registerObserver( this );

@@ -34,7 +34,7 @@ namespace VevaciousPlusPlus
   }
 
   OldFixedScaleOneLoopPotential::OldFixedScaleOneLoopPotential(
-         OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
+      OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses ) :
     OldPotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
     inverseRenormalizationScaleSquared( -1.0 ),
     homotopyContinuationTargetSystem( treeLevelPotential,

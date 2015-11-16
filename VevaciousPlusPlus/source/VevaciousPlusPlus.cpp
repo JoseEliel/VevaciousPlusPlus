@@ -55,7 +55,12 @@ namespace VevaciousPlusPlus
     ownedTunnelingCalculator( NULL ),
     currentTime()
   {
-    ownedSlhaManager = new RunningParameterManager();
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Really have to sort out this constructor.";
+    std::cout << std::endl;/**/
+    //ownedSlhaManager = new RunningParameterManager();
     slhaManager = ownedSlhaManager;
     std::string potentialClass( "FixedScaleOneLoopPotential" );
     std::string potentialArguments( "" );
