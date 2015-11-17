@@ -55,6 +55,115 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This is mainly for debugging.
+  std::string SlhaBlocksWithSpecialCasesManager::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << LesHouchesAccordBlockEntryManager::AsDebuggingString()
+    << std::endl;
+    stringBuilder << "activeDerivedParameters = { " << std::endl;
+    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+         derivedParameter( activeDerivedParameters.begin() );
+         derivedParameter < activeDerivedParameters.end();
+         ++derivedParameter )
+    {
+      stringBuilder << (*derivedParameter)->AsDebuggingString() << std::endl;
+    }
+    stringBuilder << "}" << std::endl << "aliasesToCaseStrings = { ";
+    for( std::map< std::string, std::string >::const_iterator
+         aliasToCase( aliasesToCaseStrings.begin() );
+         aliasToCase != aliasesToCaseStrings.end();
+         ++aliasToCase )
+    {
+      if( aliasToCase != aliasesToCaseStrings.begin() )
+      {
+        stringBuilder << "," << std::endl;
+      }
+      stringBuilder
+      << "[ \"" << aliasToCase->first << "\", "
+      << aliasToCase->second << " ]";
+    }
+    stringBuilder << " }";
+
+    std::list< SlhaSourcedParameterFunctionoid const* > parameterSortingList;
+    typedef LesHouchesAccordBlockEntryManager::LhaBlockEntryInterpolator
+            BaseInterpolator;
+    for( std::vector< BaseInterpolator >::const_iterator
+         baseInterpolator( referenceSafeActiveParameters.begin() );
+         baseInterpolator < referenceSafeActiveParameters.end();
+         ++baseInterpolator )
+    {
+      parameterSortingList.push_back( &(*baseInterpolator) );
+    }
+    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+         derivedParameter( activeDerivedParameters.begin() );
+         derivedParameter < activeDerivedParameters.end();
+         ++derivedParameter )
+    {
+      parameterSortingList.push_back( *derivedParameter );
+    }
+    parameterSortingList.sort( &SortParameterByIndex );
+    typedef std::pair< std::string, SlhaSourcedParameterFunctionoid const* >
+    nameAndParameter;
+    std::vector< nameAndParameter > sortedNamesAndParameters;
+    for( std::list< SlhaSourcedParameterFunctionoid const* >::const_iterator
+         sortedParameter( parameterSortingList.begin() );
+         sortedParameter != parameterSortingList.end();
+         ++sortedParameter )
+    {
+      sortedNamesAndParameters.push_back( std::make_pair( "unknown",
+                                                          *sortedParameter ) );
+    }
+    for( std::map< std::string, size_t >::const_iterator
+         parameterToIndex( activeParametersToIndices.begin() );
+         parameterToIndex != activeParametersToIndices.end();
+         ++parameterToIndex )
+    {
+      std::string& parameterName(
+                  sortedNamesAndParameters[ parameterToIndex->second ].first );
+      if( parameterName == "unknown" )
+      {
+        parameterName = parameterToIndex->first;
+      }
+      else
+      {
+        parameterName.append( ", " ).append( parameterToIndex->first );
+      }
+    }
+    double const
+    outputLogScale( log( AppropriateFixedScaleForParameterPoint() ) );
+    stringBuilder
+    << std::endl << "Sorted parameters at scale "
+    << AppropriateFixedScaleForParameterPoint() << " (log = " << outputLogScale
+    << ")= {" << std::endl;
+    for( std::vector< nameAndParameter >::const_iterator
+         sortedNameAndParameter( sortedNamesAndParameters.begin() );
+         sortedNameAndParameter < sortedNamesAndParameters.end();
+         ++sortedNameAndParameter )
+    {
+      if( sortedNameAndParameter != sortedNamesAndParameters.begin() )
+      {
+        stringBuilder << "," << std::endl;
+      }
+
+      stringBuilder  << sortedNameAndParameter->second->IndexInValuesVector()
+      << ": \"" << sortedNameAndParameter->first << "\" = ";
+      // debugging:
+      /**/
+      if( sortedNameAndParameter->second->IndexInValuesVector() < 15 )
+      {
+        stringBuilder << (*sortedNameAndParameter->second)( outputLogScale );
+      }
+      else
+      {
+        stringBuilder << "not available until I sort out these bugs";
+      }
+      /**/
+    }
+    stringBuilder << " }" << std::endl;
+    return stringBuilder.str();
+  }
+
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaBlocksWithSpecialCasesManager::InitializeSlhaOneOrTwoAliases()
   {
@@ -121,9 +230,9 @@ namespace VevaciousPlusPlus
     if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
     {
       SlhaSourcedParameterFunctionoid const&
-      vevLength( RegisterBlockEntry( "HMIX[ 3 ]" ) );
+      vevLength( RegisterBlockEntry( FormatVariable( "HMIX[ 3 ]" ) ) );
       SlhaSourcedParameterFunctionoid const&
-      tanBeta( RegisterBlockEntry( "HMIX[ 2 ]" ) );
+      tanBeta( RegisterBlockEntry( FormatVariable( "HMIX[ 2 ]" ) ) );
 
       return AddNewDerivedParameter( caseString,
                                      new SlhaDsbHiggsVevFunctionoid(
@@ -134,10 +243,10 @@ namespace VevaciousPlusPlus
     }
     else if( caseString == "Bmu" )
     {
+      SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared(
+                         RegisterBlockEntry( FormatVariable( "HMIX[ 4 ]" ) ) );
       SlhaSourcedParameterFunctionoid const&
-      treePseudoscalarMassSquared( RegisterBlockEntry( "HMIX[ 4 ]" ) );
-      SlhaSourcedParameterFunctionoid const&
-      tanBeta( RegisterBlockEntry( "HMIX[ 2 ]" ) );
+      tanBeta( RegisterBlockEntry( FormatVariable( "HMIX[ 2 ]" ) ) );
       return AddNewDerivedParameter( caseString,
                                      new SlhaHiggsMixingBilinearFunctionoid(
                                               numberOfDistinctActiveParameters,

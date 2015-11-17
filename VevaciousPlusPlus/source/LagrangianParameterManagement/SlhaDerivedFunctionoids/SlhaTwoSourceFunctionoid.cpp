@@ -12,13 +12,11 @@ namespace VevaciousPlusPlus
 
   SlhaTwoSourceFunctionoid::SlhaTwoSourceFunctionoid(
                                               size_t const indexInValuesVector,
-                 SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid,
-             SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid ) :
+                                                 size_t const firstChoiceIndex,
+                                            size_t const secondChoiceIndex  ) :
     SlhaSourcedParameterFunctionoid( indexInValuesVector ),
-    firstChoiceFunctionoid( firstChoiceFunctionoid ),
-    firstChoiceIndex( firstChoiceFunctionoid.IndexInValuesVector() ),
-    secondChoiceFunctionoid( secondChoiceFunctionoid ),
-    secondChoiceIndex( secondChoiceFunctionoid.IndexInValuesVector() )
+    firstChoiceIndex( firstChoiceIndex ),
+    secondChoiceIndex( secondChoiceIndex )
   {
     // This constructor is just an initialization list.
   }

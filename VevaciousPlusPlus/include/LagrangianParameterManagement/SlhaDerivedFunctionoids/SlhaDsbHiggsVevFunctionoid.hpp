@@ -47,6 +47,9 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
 
   protected:
     SlhaSourcedParameterFunctionoid const& vevEuclideanLength;
@@ -71,6 +74,23 @@ namespace VevaciousPlusPlus
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = " << cosOrSinPythonString << "( math.atan( parameterValues[ "
     << tanBetaIndex << " ] ) )";
+    return stringBuilder.str();
+  }
+
+  // This is mainly for debugging.
+  inline std::string
+  SlhaDsbHiggsVevFunctionoid::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
+    stringBuilder << "vevIndex = " << vevIndex << std::endl;
+    stringBuilder << "vevEuclideanLength = "
+    << vevEuclideanLength.AsDebuggingString() << std::endl;
+    stringBuilder << "tanBetaIndex = " << tanBetaIndex << std::endl;
+    stringBuilder << "tanBeta = " << tanBeta.AsDebuggingString() << std::endl;
+    stringBuilder
+    << "cosOrSinPythonString = " << cosOrSinPythonString << std::endl;
     return stringBuilder.str();
   }
 

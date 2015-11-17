@@ -47,6 +47,10 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const
+    { return scaleLogarithmPowerCoefficients.AsDebuggingString(); }
+
 
   protected:
     SimplePolynomial scaleLogarithmPowerCoefficients;

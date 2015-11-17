@@ -18,15 +18,10 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaTwoSourceFunctionoid( size_t const indexInValuesVector,
-                 SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid,
-              SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid );
+                              size_t const firstChoiceIndex,
+                              size_t const secondChoiceIndex );
     virtual ~SlhaTwoSourceFunctionoid();
 
-
-    // This evaluates firstChoiceFunctionoid( logarithmOfScale ) and if it is
-    // non-zero returns that value. Otherwise it returns
-    // secondChoiceFunctionoid( logarithmOfScale ).
-    virtual double operator()( double const logarithmOfScale ) const;
 
     // This returns the parameter value at firstChoiceIndex if it is non-zero,
     // otherwise it returns the parameter value at secondChoiceIndex.
@@ -40,34 +35,18 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
 
   protected:
-    SlhaSourcedParameterFunctionoid const& firstChoiceFunctionoid;
     size_t const firstChoiceIndex;
-    SlhaSourcedParameterFunctionoid const& secondChoiceFunctionoid;
     size_t const secondChoiceIndex;
   };
 
 
 
 
-
-  // This evaluates firstChoiceFunctionoid( logarithmOfScale ) and if it is
-  // non-zero returns that value. Otherwise it returns
-  // secondChoiceFunctionoid( logarithmOfScale ).
-  inline double
-  SlhaTwoSourceFunctionoid::operator()( double const logarithmOfScale ) const
-  {
-    double firstChoiceValue( firstChoiceFunctionoid( logarithmOfScale ) );
-    if( firstChoiceValue == 0.0 )
-    {
-      return secondChoiceFunctionoid( logarithmOfScale );
-    }
-    else
-    {
-      return firstChoiceValue;
-    }
-  }
 
   // This is for creating a Python version of the potential.
   inline std::string SlhaTwoSourceFunctionoid::PythonParameterEvaluation(
@@ -80,6 +59,17 @@ namespace VevaciousPlusPlus
     << " ] = FirstIfNonzeroOtherwiseSecond( parameterValues[ "
     << firstChoiceIndex
     << " ], parameterValues[ " << secondChoiceIndex << " ] )";
+    return stringBuilder.str();
+  }
+
+  // This is mainly for debugging.
+  inline std::string SlhaTwoSourceFunctionoid::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
+    stringBuilder << "firstChoiceIndex = " << firstChoiceIndex << std::endl;
+    stringBuilder << "secondChoiceIndex = " << secondChoiceIndex << std::endl;
     return stringBuilder.str();
   }
 

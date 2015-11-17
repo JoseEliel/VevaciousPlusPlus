@@ -23,7 +23,8 @@ namespace VevaciousPlusPlus
     LagrangianParameterManager(),
     numberOfDistinctActiveParameters( 0 ),
     activeParametersToIndices(),
-    activeInterpolatedParameters(),
+    referenceSafeActiveParameters(),
+    referenceUnsafeActiveParameters(),
     validBlocks(),
     lhaParser(),
     minimumScaleType( minimumScaleType ),
@@ -69,7 +70,8 @@ namespace VevaciousPlusPlus
     LagrangianParameterManager(),
     numberOfDistinctActiveParameters( 0 ),
     activeParametersToIndices(),
-    activeInterpolatedParameters(),
+    referenceSafeActiveParameters(),
+    referenceUnsafeActiveParameters(),
     validBlocks( validBlocksSet ),
     lhaParser(),
     minimumScaleType( minimumScaleType ),
@@ -88,7 +90,12 @@ namespace VevaciousPlusPlus
 
   LesHouchesAccordBlockEntryManager::~LesHouchesAccordBlockEntryManager()
   {
-    // This does nothing.
+    for( size_t deletionIndex( 0 );
+         deletionIndex < referenceSafeActiveParameters.size();
+         ++deletionIndex )
+    {
+      delete referenceSafeActiveParameters[ deletionIndex ];
+    }
   }
 
 
@@ -106,12 +113,12 @@ namespace VevaciousPlusPlus
       // If the parameter is already active, we unfortunately need to do a
       // linear search through activeInterpolatedParameters looking for the
       // LhaBlockEntryInterpolator with the matching index.
-      for( std::vector< LhaBlockEntryInterpolator >::const_iterator
-           activeBlockParameter( activeInterpolatedParameters.begin() );
-           activeBlockParameter < activeInterpolatedParameters.end();
+      for( std::vector< LhaBlockEntryInterpolator* >::const_iterator
+           activeBlockParameter( referenceSafeActiveParameters.begin() );
+           activeBlockParameter < referenceSafeActiveParameters.end();
            ++activeBlockParameter )
       {
-        if( activeBlockParameter->IndexInValuesVector()
+        if( (*activeBlockParameter)->IndexInValuesVector()
             == alreadyExistsResult->second )
         {
           return (*activeBlockParameter);
@@ -127,7 +134,7 @@ namespace VevaciousPlusPlus
     }
 
     // If the parameter wasn't already active, we add it.
-    return AddNewBlockEntry( parameterName );
+    return CreateNewBlockEntry( parameterName );
   }
 
 
@@ -165,10 +172,9 @@ namespace VevaciousPlusPlus
   }
 
   // This is mainly for debugging.
-  std::string LesHouchesAccordBlockEntryManager::AsDebuggingString()
+  std::string LesHouchesAccordBlockEntryManager::AsDebuggingString() const
   {
     std::stringstream stringBuilder;
-
     stringBuilder
     << "numberOfDistinctActiveParameters = "
     << numberOfDistinctActiveParameters << std::endl
@@ -187,12 +193,26 @@ namespace VevaciousPlusPlus
       << parameterToIndex->second << " ]";
     }
     stringBuilder << " }" << std::endl;
+    stringBuilder << "referenceSafeActiveParameters = { " << std::endl;
+    for( std::vector< LhaBlockEntryInterpolator* >::const_iterator
+         interpolatedParameter( referenceSafeActiveParameters.begin() );
+         interpolatedParameter < referenceSafeActiveParameters.end();
+         ++interpolatedParameter )
+    {
+      stringBuilder
+      << (*interpolatedParameter)->AsDebuggingString() << std::endl;
+    }
     stringBuilder
-    << "activeInterpolatedParameters.size() = "
-    << activeInterpolatedParameters.size()
-    << " (not in the mood to write code to display contents right now)"
-    << std::endl
-    << "validBlocks = { ";
+    << "}" << std::endl << "referenceUnsafeActiveParameters = { " << std::endl;
+    for( std::vector< LhaBlockEntryInterpolator >::const_iterator
+         interpolatedParameter( referenceUnsafeActiveParameters.begin() );
+         interpolatedParameter < referenceUnsafeActiveParameters.end();
+         ++interpolatedParameter )
+    {
+      stringBuilder
+      << interpolatedParameter->AsDebuggingString() << std::endl;
+    }
+    stringBuilder << "}" << std::endl << "validBlocks = { ";
     for( std::set< std::string >::const_iterator
          validBlock( validBlocks.begin() );
          validBlock != validBlocks.end();

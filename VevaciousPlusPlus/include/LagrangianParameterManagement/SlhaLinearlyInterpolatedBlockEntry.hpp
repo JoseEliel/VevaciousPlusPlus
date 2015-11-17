@@ -50,6 +50,9 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
 
   protected:
     std::vector< std::pair< double, double > > logScalesWithValues;
@@ -80,6 +83,29 @@ namespace VevaciousPlusPlus
 
 
 
+
+  // This is mainly for debugging.
+  inline std::string
+  SlhaLinearlyInterpolatedBlockEntry::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "lastIndex = " << lastIndex << ", logScalesWithValues = { [ ";
+    for( std::vector< std::pair< double, double > >::const_iterator
+         logScaleWithValue( logScalesWithValues.begin() );
+         logScaleWithValue < logScalesWithValues.end();
+         ++logScaleWithValue )
+    {
+      if( logScaleWithValue != logScalesWithValues.begin() )
+      {
+        stringBuilder << " ], [ ";
+      }
+      stringBuilder
+      << logScaleWithValue->first << " , " << logScaleWithValue->second;
+    }
+    stringBuilder << " ] }";
+    return stringBuilder.str();
+  }
 
   // This finds the index of the smallest logarithm of the scale which is
   // larger than logarithmOfScale and returns the interpolation (or possibly

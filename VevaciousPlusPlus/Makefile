@@ -29,7 +29,7 @@ MINUITLIBNAME=Minuit2
 MINUITINCLUDEDIR=/home/bol/BOL/ProjectDependencies/Minuit2/include/
 #MINUITLIBDIR=./MINUIT/include/
 MINUITLIBDIR=/home/bol/BOL/ProjectDependencies/Minuit2/lib/
-DEBUGFLAGS=
+DEBUGFLAGS=-g
 INCLUDES=-I./include/ \
  -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
 CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)

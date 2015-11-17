@@ -41,6 +41,9 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
 
   protected:
     // This returns the value of sin(beta) * cos(beta) given the value of
@@ -69,6 +72,22 @@ namespace VevaciousPlusPlus
     << " ] = ( ( parameterValues[ " << treePseudoscalarMassSquaredIndex
     << " ] * parameterValues[ " << tanBetaIndex
     << " ] ) / ( 1.0 + ( parameterValues[ \" << tanBetaIndex << \" ] )**2 ) )";
+    return stringBuilder.str();
+  }
+
+  // This is mainly for debugging.
+  inline std::string
+  SlhaHiggsMixingBilinearFunctionoid::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
+    stringBuilder << "treePseudoscalarMassSquaredIndex = "
+    << treePseudoscalarMassSquaredIndex << std::endl;
+    stringBuilder << "treePseudoscalarMassSquared = "
+    << treePseudoscalarMassSquared.AsDebuggingString() << std::endl;
+    stringBuilder << "tanBetaIndex = " << tanBetaIndex << std::endl;
+    stringBuilder << "tanBeta = " << tanBeta.AsDebuggingString() << std::endl;
     return stringBuilder.str();
   }
 

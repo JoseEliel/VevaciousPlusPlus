@@ -45,6 +45,9 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
 
   protected:
     SlhaSourcedParameterFunctionoid const& squareMass;
@@ -88,6 +91,22 @@ namespace VevaciousPlusPlus
     << " ] = FirstIfNonzeroOtherwiseSecond( parameterValues[ "
     << squareMassIndex
     << " ], ( ( parameterValues[ " << linearMassIndex << " ] )**2 ) )";
+    return stringBuilder.str();
+  }
+
+  // This is mainly for debugging.
+  inline std::string
+  SlhaMassSquaredDiagonalFunctionoid::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
+    stringBuilder << "squareMassIndex = " << squareMassIndex << std::endl;
+    stringBuilder
+    << "squareMass = " << squareMass.AsDebuggingString() << std::endl;
+    stringBuilder << "linearMassIndex = " << linearMassIndex << std::endl;
+    stringBuilder
+    << "linearMass = " << linearMass.AsDebuggingString() << std::endl;
     return stringBuilder.str();
   }
 

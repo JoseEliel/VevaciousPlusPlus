@@ -177,6 +177,9 @@ int main( int argumentCount,
   << "Parameter manager = " << lhaParameterManager->AsDebuggingString();
   std::cout << std::endl;
 
+  std::vector< double > const fieldOrigin( oldFixedScale.FieldValuesOrigin() );
+  std::vector< double > unitHd( fieldOrigin );
+  unitHd.front() = 1.0;
 
   double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
                                          oldFixedScale.FieldValuesOrigin() ) );
@@ -208,6 +211,26 @@ int main( int argumentCount,
   << "oldRgeOriginLoop = " << oldRgeOriginLoop
   << ", newRgeOriginLoop = " << newRgeOriginLoop << std::endl;
   std::cout << std::endl;
+
+  std::cout  << std::endl
+  << "oldFixed tree: at origin = "
+  << oldFixedScale.QuickApproximation( fieldOrigin )
+  << ", at unitHd = " << oldFixedScale.QuickApproximation( unitHd )
+  << std::endl
+  << "oldRge tree: at origin = "
+  << oldRgeImproved.QuickApproximation( fieldOrigin )
+  << ", at unitHd = " << oldRgeImproved.QuickApproximation( unitHd )
+  << std::endl
+  << "newFixed tree: at origin = "
+  << newFixedScale.PolynomialApproximation()( fieldOrigin )
+  << ", at unitHd = " << newFixedScale.PolynomialApproximation()( unitHd )
+  << std::endl
+  << "newRge tree: at origin = "
+  << newRgeImproved.PolynomialApproximation()( fieldOrigin )
+  << ", at unitHd = " << newRgeImproved.PolynomialApproximation()( unitHd )
+  << std::endl;
+  std::cout << std::endl;
+
 
 
   // Cleaning up.

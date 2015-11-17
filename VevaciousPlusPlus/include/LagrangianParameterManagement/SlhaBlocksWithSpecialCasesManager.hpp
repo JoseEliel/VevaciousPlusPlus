@@ -37,7 +37,17 @@ namespace VevaciousPlusPlus
     virtual ~SlhaBlocksWithSpecialCasesManager();
 
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
+
   protected:
+    static bool
+    SortParameterByIndex( SlhaSourcedParameterFunctionoid const* firstPointer,
+                         SlhaSourcedParameterFunctionoid const* secondPointer )
+    { return ( firstPointer->IndexInValuesVector()
+               < secondPointer->IndexInValuesVector() ); }
+
     std::vector< SlhaSourcedParameterFunctionoid* > activeDerivedParameters;
     std::map< std::string, std::string > aliasesToCaseStrings;
 
@@ -48,10 +58,7 @@ namespace VevaciousPlusPlus
     // numberOfDistinctActiveParameters and activeParametersToIndices (all
     // aliases in aliasesToCaseStrings which map to caseString are added
     // mapping to the index of this parameter), and returns true paired with
-    // the index of newParameter. (The index mapped to in
-    // activeParametersToIndices and used as part of the return value is based
-    // on numberOfDistinctActiveParameters before it gets incremented, rather
-    // than using newParameter->IndexInValuesVector().)
+    // the index of newParameter.
     std::pair< bool, size_t >
     AddNewDerivedParameter( std::string const& caseString,
                             SlhaSourcedParameterFunctionoid* newParameter );
@@ -111,16 +118,14 @@ namespace VevaciousPlusPlus
   // numberOfDistinctActiveParameters and activeParametersToIndices (all
   // aliases in aliasesToSwitchStrings which map to switchString are added
   // mapping to the index of this parameter), and returns true paired with
-  // the index of newParameter. (The index mapped to in
-  // activeParametersToIndices and used as part of the return value is based
-  // on numberOfDistinctActiveParameters before it gets incremented, rather
-  // than using newParameter->IndexInValuesVector().)
+  // the index of newParameter.
   inline std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::AddNewDerivedParameter(
                                                  std::string const& caseString,
                                 SlhaSourcedParameterFunctionoid* newParameter )
   {
     activeDerivedParameters.push_back( newParameter );
+    ++numberOfDistinctActiveParameters;
     for( std::map< std::string, std::string >::const_iterator
          aliasToSwitchString( aliasesToCaseStrings.begin() );
          aliasToSwitchString != aliasesToCaseStrings.end();
@@ -129,13 +134,11 @@ namespace VevaciousPlusPlus
       if( aliasToSwitchString->second == caseString )
       {
         activeParametersToIndices[ aliasToSwitchString->first ]
-        = numberOfDistinctActiveParameters;
+        = newParameter->IndexInValuesVector();
       }
     }
-    // We tersely update numberOfDistinctActiveParameters with
-    // post-increment ++ so that the pair has the correct index.
     return std::pair< bool, size_t >( true,
-                                      numberOfDistinctActiveParameters++ );
+                                      newParameter->IndexInValuesVector() );
   }
 
   // This checks parameterName against all the special cases. If the
@@ -174,14 +177,14 @@ namespace VevaciousPlusPlus
     std::string blockNameWithIndices( "T?[?,?]" );
     blockNameWithIndices[ 1 ] = sfermionType;
     blockNameWithIndices[ 3 ] = blockNameWithIndices[ 5 ] = generationIndex;
-    SlhaSourcedParameterFunctionoid const&
-    directTrilinear( RegisterBlockEntry( blockNameWithIndices ) );
+    SlhaSourcedParameterFunctionoid const& directTrilinear(
+                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
     blockNameWithIndices[ 0 ] = 'A';
-    SlhaSourcedParameterFunctionoid const&
-    trilinearOverYukawa( RegisterBlockEntry( blockNameWithIndices ) );
+    SlhaSourcedParameterFunctionoid const& trilinearOverYukawa(
+                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
     blockNameWithIndices[ 0 ] = 'Y';
-    SlhaSourcedParameterFunctionoid const&
-    appropriateYukawa( RegisterBlockEntry( blockNameWithIndices ) );
+    SlhaSourcedParameterFunctionoid const& appropriateYukawa(
+                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
     return AddNewDerivedParameter( caseString,
                                    new SlhaTrilinearDiagonalFunctionoid(
                                             numberOfDistinctActiveParameters,
@@ -205,13 +208,13 @@ namespace VevaciousPlusPlus
     std::string blockNameWithIndices( "MS?2[?,?]" );
     blockNameWithIndices[ 2 ] = sfermionType;
     blockNameWithIndices[ 5 ] = blockNameWithIndices[ 7 ] = generationIndex;
-    SlhaSourcedParameterFunctionoid const&
-    squareMass( RegisterBlockEntry( blockNameWithIndices ) );
+    SlhaSourcedParameterFunctionoid const& squareMass(
+                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
     blockNameWithIndices.assign( "MSOFT[" );
     blockNameWithIndices.append( msoftIndex );
     blockNameWithIndices.append( "]" );
     SlhaSourcedParameterFunctionoid const&
-    linearMass( RegisterBlockEntry( blockNameWithIndices  ) );
+    linearMass( RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
     return AddNewDerivedParameter( caseString,
                                    new SlhaMassSquaredDiagonalFunctionoid(
                                               numberOfDistinctActiveParameters,

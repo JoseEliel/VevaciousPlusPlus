@@ -70,10 +70,27 @@ namespace VevaciousPlusPlus
                                                 std::string const& sarahPrefix,
                                                   std::string const& slhaName )
   {
-    SlhaSourcedParameterFunctionoid const&
-    sarahFunctionoid( RegisterBlockEntry( sarahPrefix + slhaName ) );
-    SlhaSourcedParameterFunctionoid const&
-    shouldBeDrbarFunctionoid( RegisterBlockEntry( slhaName ) );
+    SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
+              RegisterBlockEntry( FormatVariable( sarahPrefix + slhaName ) ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "sarahFunctionoid.AsDebuggingString() =" << std::endl;
+    std::cout << sarahFunctionoid.AsDebuggingString() << std::endl;
+    std::cout << std::endl;/**/
+
+    SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
+                            RegisterBlockEntry( FormatVariable( slhaName ) ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "sarahFunctionoid.AsDebuggingString() =" << std::endl;
+    std::cout << sarahFunctionoid.AsDebuggingString() << std::endl;
+    std::cout << "shouldBeDrbarFunctionoid.AsDebuggingString() =" << std::endl;
+    std::cout << shouldBeDrbarFunctionoid.AsDebuggingString() << std::endl;
+    std::cout << std::endl;/**/
     return AddNewDerivedParameter( caseString,
                 new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
                                               sarahFunctionoid,

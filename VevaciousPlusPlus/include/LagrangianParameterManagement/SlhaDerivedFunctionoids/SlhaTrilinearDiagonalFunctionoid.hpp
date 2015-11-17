@@ -46,6 +46,9 @@ namespace VevaciousPlusPlus
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const;
+
 
   protected:
     SlhaSourcedParameterFunctionoid const& directTrilinear;
@@ -92,6 +95,28 @@ namespace VevaciousPlusPlus
     << directTrilinearIndex
     << " ], ( parameterValues[ " << trilinearOverYukawaIndex
     << " ] * parameterValues[ " << appropriateYukawaIndex << " ] ) )";
+    return stringBuilder.str();
+  }
+
+  // This is mainly for debugging.
+  inline std::string
+  SlhaTrilinearDiagonalFunctionoid::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
+    stringBuilder
+    << "directTrilinearIndex = " << directTrilinearIndex << std::endl;
+    stringBuilder << "directTrilinear = "
+    << directTrilinear.AsDebuggingString() << std::endl;
+    stringBuilder << "trilinearOverYukawaIndex = "
+    << trilinearOverYukawaIndex << std::endl;
+    stringBuilder << "trilinearOverYukawa = "
+    << trilinearOverYukawa.AsDebuggingString() << std::endl;
+    stringBuilder
+    << "appropriateYukawaIndex = " << appropriateYukawaIndex << std::endl;
+    stringBuilder << "appropriateYukawa = "
+    << appropriateYukawa.AsDebuggingString() << std::endl;
     return stringBuilder.str();
   }
 

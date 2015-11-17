@@ -93,7 +93,7 @@ namespace VevaciousPlusPlus
     virtual std::string ParametersAsPython() const;
 
     // This is mainly for debugging.
-    std::string AsDebuggingString();
+    virtual std::string AsDebuggingString() const;
 
 
   protected:
@@ -109,7 +109,8 @@ namespace VevaciousPlusPlus
     // been registered in activeParametersToIndices.
     size_t numberOfDistinctActiveParameters;
     std::map< std::string, size_t > activeParametersToIndices;
-    std::vector< LhaBlockEntryInterpolator > activeInterpolatedParameters;
+    std::vector< LhaBlockEntryInterpolator* > referenceSafeActiveParameters;
+    std::vector< LhaBlockEntryInterpolator > referenceUnsafeActiveParameters;
     std::set< std::string > validBlocks;
     LHPC::SlhaSimplisticInterpreter lhaParser;
     std::string const minimumScaleType;
@@ -118,9 +119,26 @@ namespace VevaciousPlusPlus
     std::string const fixedScaleArgument;
 
 
+    std::pair< bool, size_t >
+    RegisterNewParameter( SlhaSourcedParameterFunctionoid const& newParameter,
+                          std::string const& parameterName )
+    { return RegisterNewParameter( newParameter,
+                                   std::vector< std::string >( 1,
+                                                           parameterName ) ); }
+
+    // This sets all names in parameterNames to map to newParameter, increments
+    // numberOfDistinctActiveParameters, and returns true paired with the index
+    // given by newParameter.
+    std::pair< bool, size_t >
+    RegisterNewParameter( SlhaSourcedParameterFunctionoid const& newParameter,
+                          std::vector< std::string > const& parameterNames );
+
     // This updates the SLHA file parser with the file with name given by
     // newInput and then, once the blocks have been updated, tells each
-    // parameter to update itself.
+    // parameter in referenceSafeActiveParameters to update itself, and sets up
+    // referenceUnsafeActiveParameters as a contiguous array of
+    // LhaBlockEntryInterpolator objects copied from the objects pointed at by
+    // the pointers in referenceSafeActiveParameters.
     virtual void PrepareNewParameterPoint( std::string const& newInput );
 
     // This finds the block name part of parameterName, returns true if the
@@ -133,7 +151,7 @@ namespace VevaciousPlusPlus
     // to activeInterpolatedParameters and activeParametersToIndices, and
     // returns a reference to it.
     SlhaInterpolatedParameterFunctionoid const&
-    AddNewBlockEntry( std::string const& parameterName );
+    CreateNewBlockEntry( std::string const& parameterName );
 
     // This checks to see if the parameter name corresponds to an entry in a
     // valid LHA block, and if so, adds an interpolation functionoid to the set
@@ -144,8 +162,8 @@ namespace VevaciousPlusPlus
     virtual std::pair< bool, size_t >
     RegisterUnregisteredParameter( std::string const& parameterName )
     { return ( RefersToValidBlock( parameterName ) ?
-               std::pair< bool, size_t >( true,
-                    AddNewBlockEntry( parameterName ).IndexInValuesVector() ) :
+               RegisterNewParameter( CreateNewBlockEntry( parameterName ),
+                                     parameterName ) :
                std::pair< bool, size_t >( false,
                                           -1 ) ); }
 
@@ -237,8 +255,8 @@ namespace VevaciousPlusPlus
     std::vector< double >
     parameterValues( numberOfDistinctActiveParameters );
     for( std::vector< LhaBlockEntryInterpolator >::const_iterator
-         parameterInterpolator( activeInterpolatedParameters.begin() );
-         parameterInterpolator < activeInterpolatedParameters.end();
+         parameterInterpolator( referenceUnsafeActiveParameters.begin() );
+         parameterInterpolator < referenceUnsafeActiveParameters.end();
          ++parameterInterpolator )
     {
       parameterValues[ parameterInterpolator->IndexInValuesVector() ]
@@ -265,19 +283,49 @@ namespace VevaciousPlusPlus
     return stringBuilder.str();
   }
 
+  // This sets all names in parameterNames to map to newParameter, increments
+  // numberOfDistinctActiveParameters, and returns true paired with the index
+  // given by newParameter.
+  std::pair< bool, size_t >
+  LesHouchesAccordBlockEntryManager::RegisterNewParameter(
+                           SlhaSourcedParameterFunctionoid const& newParameter,
+                             std::vector< std::string > const& parameterNames )
+  {
+    ++numberOfDistinctActiveParameters;
+    for( std::vector< std::string >::iterator
+         parameterName( parameterNames.begin() );
+         parameterName < parameterNames.end();
+         ++parameterName )
+    {
+      activeParametersToIndices[ *parameterName ]
+      = newParameter.IndexInValuesVector();
+    }
+    return std::pair< bool, size_t >( true,
+                                      newParameter.IndexInValuesVector() );
+  }
+
   // This updates the SLHA file parser with the file with name given by
   // newInput and then, once the blocks have been updated, tells each
-  // parameter to update itself.
+  // parameter in referenceSafeActiveParameters to update itself, and sets up
+  // referenceUnsafeActiveParameters as a contiguous array of
+  // LhaBlockEntryInterpolator objects copied from the objects pointed at by
+  // the pointers in referenceSafeActiveParameters.
   inline void LesHouchesAccordBlockEntryManager::PrepareNewParameterPoint(
                                                   std::string const& newInput )
   {
     lhaParser.readFile( newInput );
-    for( std::vector< LhaBlockEntryInterpolator >::iterator
-         parameterInterpolator( activeInterpolatedParameters.begin() );
-         parameterInterpolator < activeInterpolatedParameters.end();
-         ++parameterInterpolator )
+    size_t const
+    numberOfActiveInterpolators( referenceSafeActiveParameters.size() );
+    referenceUnsafeActiveParameters.resize( numberOfActiveInterpolators );
+
+    for( size_t parameterIndex( 0 );
+         parameterIndex < numberOfActiveInterpolators;
+         ++parameterIndex )
     {
-      parameterInterpolator->UpdateForNewSlhaParameters();
+      referenceSafeActiveParameters[
+                                parameterIndex ]->UpdateForNewSlhaParameters();
+      referenceUnsafeActiveParameters[ parameterIndex ]
+      = *(referenceSafeActiveParameters[ parameterIndex ]);
     }
   }
 
@@ -285,19 +333,14 @@ namespace VevaciousPlusPlus
   // to activeInterpolatedParameters and activeParametersToIndices, and
   // returns a reference to it.
   inline SlhaInterpolatedParameterFunctionoid const&
-  LesHouchesAccordBlockEntryManager::AddNewBlockEntry(
+  LesHouchesAccordBlockEntryManager::CreateNewBlockEntry(
                                              std::string const& parameterName )
   {
-    activeInterpolatedParameters.push_back( LhaBlockEntryInterpolator(
+    referenceSafeActiveParameters.push_back( new LhaBlockEntryInterpolator(
                                               numberOfDistinctActiveParameters,
                                                                      lhaParser,
                                                              parameterName ) );
-    // We map the parameter name to the index of the newly-created
-    // LhaBlockEntryInterpolator, tersely updating
-    // numberOfDistinctActiveParameters with post-increment ++.
-    activeParametersToIndices[ parameterName ]
-    = numberOfDistinctActiveParameters++;
-    return activeInterpolatedParameters.back();
+    return *(referenceSafeActiveParameters.back());
   }
 
   // This returns a string which is the concatenated set of strings from
@@ -308,8 +351,8 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     for( std::vector< LhaBlockEntryInterpolator >::const_iterator
-         activeParameter( activeInterpolatedParameters.begin() );
-         activeParameter < activeInterpolatedParameters.end();
+         activeParameter( referenceUnsafeActiveParameters.begin() );
+         activeParameter < referenceUnsafeActiveParameters.end();
          ++activeParameter )
     {
       stringBuilder

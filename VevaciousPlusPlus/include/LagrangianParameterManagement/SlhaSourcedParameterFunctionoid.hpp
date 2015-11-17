@@ -22,16 +22,6 @@ namespace VevaciousPlusPlus
 
     size_t IndexInValuesVector() const { return indexInValuesVector; }
 
-    // This should return the value of the parameter at the requested scale
-    // (exp( logarithmOfScale )) as an alternative to using a set of parameters
-    // already evaluated at the scale. It is almost certain to be much slower
-    // if used to obtain parameters repeatedly for different scales at the same
-    // parameter point, but is more efficient for parameters which do not need
-    // to be evaluated for the potential but still depend on Lagrangian
-    // parameters, for example when evaluating the VEVs of the DSB vacuum for
-    // the parameter point.
-    virtual double operator()( double const logarithmOfScale ) const = 0;
-
     // This should return the value of the functionoid for the given logarithm
     // of the scale, using the values of the parameters directly interpolated
     // from the values explicitly given in the SLHA file, given by
@@ -44,6 +34,9 @@ namespace VevaciousPlusPlus
     // potential, indented by indentationSpaces spaces.
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const = 0;
+
+    // This is mainly for debugging.
+    virtual std::string AsDebuggingString() const = 0;
 
 
   protected:

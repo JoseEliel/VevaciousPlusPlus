@@ -90,8 +90,9 @@ namespace VevaciousPlusPlus
     if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
     {
       bool upNotDown( caseString == "DsbVu" );
-      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
-             RegisterBlockEntry( upNotDown ? "HMIX[ 103 ]" : "HMIX[ 102 ]" ) );
+      SlhaSourcedParameterFunctionoid const&
+      sarahFunctionoid( RegisterBlockEntry( FormatVariable(
+                               upNotDown ? "HMIX[ 103 ]" : "HMIX[ 102 ]" ) ) );
       std::pair< bool, size_t >
       slhaResult( RegisterUnregisteredSpecialCase( caseString ) );
       SlhaSourcedParameterFunctionoid const&
@@ -108,8 +109,8 @@ namespace VevaciousPlusPlus
     }
     else if( caseString == "Bmu" )
     {
-      SlhaSourcedParameterFunctionoid const&
-      sarahFunctionoid( RegisterBlockEntry( "HMIX[ 101 ]" ) );
+      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
+                       RegisterBlockEntry( FormatVariable( "HMIX[ 101 ]" ) ) );
       std::pair< bool, size_t > slhaResult(
             SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredSpecialCase(
                                                                 caseString ) );
@@ -139,10 +140,10 @@ namespace VevaciousPlusPlus
     }
     else if( caseString == "BmuTree" )
     {
-      SlhaSourcedParameterFunctionoid const&
-      sarahFunctionoid( RegisterBlockEntry( "TREEHMIX[ 101 ]" ) );
+      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
+                   RegisterBlockEntry( FormatVariable( "TREEHMIX[ 101 ]" ) ) );
       std::pair< bool, size_t >
-      shouldBeDrbarResult( RegisterParameter( "Bmu" ) );
+      shouldBeDrbarResult( RegisterParameter( FormatVariable( "Bmu" ) ) );
       SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
                  *(FindActiveDerivedParameter( shouldBeDrbarResult.second )) );
       // This will overwrite activeParametersToIndices[ switchString ] to
@@ -157,10 +158,10 @@ namespace VevaciousPlusPlus
     }
     else if( caseString == "BmuLoop" )
     {
-      SlhaSourcedParameterFunctionoid const&
-      sarahFunctionoid( RegisterBlockEntry( "LOOPHMIX[ 101 ]" ) );
+      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
+                   RegisterBlockEntry( FormatVariable( "LOOPHMIX[ 101 ]" ) ) );
       std::pair< bool, size_t >
-      shouldBeDrbarResult( RegisterParameter( "Bmu" ) );
+      shouldBeDrbarResult( RegisterParameter( FormatVariable( "Bmu" ) ) );
       SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
                  *(FindActiveDerivedParameter( shouldBeDrbarResult.second )) );
       // This will overwrite activeParametersToIndices[ switchString ] to
