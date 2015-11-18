@@ -295,29 +295,10 @@ namespace VevaciousPlusPlus
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaBlocksWithSpecialCasesManager::InitializeSlhaOneOrTwoAliases()
   {
-    // First the blocks required for the special cases need to be added to
-    // validBlocks.
-    /* Actually, maybe they don't.
-    validBlocks.insert( "HMIX" );
-    validBlocks.insert( "TE" );
-    validBlocks.insert( "YE" );
-    validBlocks.insert( "AE" );
-    validBlocks.insert( "TD" );
-    validBlocks.insert( "YD" );
-    validBlocks.insert( "AD" );
-    validBlocks.insert( "TU" );
-    validBlocks.insert( "YU" );
-    validBlocks.insert( "AU" );
-    validBlocks.insert( "MSOFT" );
-    validBlocks.insert( "MSL2" );
-    validBlocks.insert( "MSE2" );
-    validBlocks.insert( "MSQ2" );
-    validBlocks.insert( "MSU2" );
-    validBlocks.insert( "MSD2" );
     aliasesToCaseStrings[ "DsbVd" ] = "DsbVd";
     aliasesToCaseStrings[ "DsbVu" ] = "DsbVu";
     aliasesToCaseStrings[ "Bmu" ]
-    = aliasesToCaseStrings[ "m3Sq" ] = "Bmu";*/
+    = aliasesToCaseStrings[ "m3Sq" ] = "Bmu";
 
     MapCaseStringAndSlhaBlockToCaseString( "Te11",
                                            "TE[1,1]" );

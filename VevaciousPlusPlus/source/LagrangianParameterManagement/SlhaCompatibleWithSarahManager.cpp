@@ -50,16 +50,6 @@ namespace VevaciousPlusPlus
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaCompatibleWithSarahManager::InitializeSarahAliases()
   {
-    // First the blocks required for the special cases need to be added to
-    // validBlocks.
-    /* Actually, maybe they don't.
-    validBlocks.insert( "HMIX" );
-    validBlocks.insert( "TREEHMIX" );
-    validBlocks.insert( "LOOPHMIX" );
-    validBlocks.insert( "MSOFT" );
-    validBlocks.insert( "TREEMSOFT" );
-    validBlocks.insert( "LOOPMSOFT" );*/
-
     // Putting the simple block names as special cases for SARAH means that
     // a SARAH-generated model file which assumes the extra SARAH blocks will
     // still work with non-SARAH SLHA files, to the extent that the DRbar
