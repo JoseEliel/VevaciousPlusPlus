@@ -18,20 +18,11 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaDsbHiggsVevFunctionoid( size_t const indexInValuesVector,
-                     SlhaSourcedParameterFunctionoid const& vevEuclideanLength,
-                                SlhaSourcedParameterFunctionoid const& tanBeta,
+                                size_t const vevIndex,
+                                size_t const tanBetaIndex,
                                 bool const sinNotCos );
     virtual ~SlhaDsbHiggsVevFunctionoid();
 
-
-    // This returns the value of the DSB VEV for the neutral component of the
-    // functionoid's Higgs doublet: HMIX[3] times either cos(beta) or sin(beta)
-    // is returned depending on whether this functionoid is for the doublet
-    // which gives mass to the down-type or up-type quarks respectively, with
-    // beta calculated from the value of the functionoid evaluating tan(beta).
-    virtual double operator()( double const logarithmOfScale ) const
-    { return ( vevEuclideanLength( logarithmOfScale )
-               * (*cosOrSin)( atan( tanBeta( logarithmOfScale ) ) ) ); }
 
     // This returns the value of the DSB VEV for the neutral component of the
     // functionoid's Higgs doublet: HMIX[3] times either cos(beta) or sin(beta)
@@ -43,6 +34,15 @@ namespace VevaciousPlusPlus
     {return ( interpolatedValues[ vevIndex ]
               * (*cosOrSin)( atan( interpolatedValues[ tanBetaIndex ] ) ) ); }
 
+    // This returns the value of the DSB VEV for the neutral component of the
+    // functionoid's Higgs doublet: HMIX[3] times either cos(beta) or sin(beta)
+    // is returned depending on whether this functionoid is for the doublet
+    // which gives mass to the down-type or up-type quarks respectively, with
+    // beta calculated from the value of the functionoid evaluating tan(beta).
+    double operator()( double const vevEuclideanLength,
+                       double const tanBeta ) const
+    { return ( vevEuclideanLength * (*cosOrSin)( atan( tanBeta ) ) ); }
+
     // This is for creating a Python version of the potential.
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
@@ -52,9 +52,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaSourcedParameterFunctionoid const& vevEuclideanLength;
     size_t const vevIndex;
-    SlhaSourcedParameterFunctionoid const& tanBeta;
     size_t const tanBetaIndex;
     double (*cosOrSin)( double );
     std::string cosOrSinPythonString;
@@ -85,10 +83,7 @@ namespace VevaciousPlusPlus
     stringBuilder
     << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
     stringBuilder << "vevIndex = " << vevIndex << std::endl;
-    stringBuilder << "vevEuclideanLength = "
-    << vevEuclideanLength.AsDebuggingString() << std::endl;
     stringBuilder << "tanBetaIndex = " << tanBetaIndex << std::endl;
-    stringBuilder << "tanBeta = " << tanBeta.AsDebuggingString() << std::endl;
     stringBuilder
     << "cosOrSinPythonString = " << cosOrSinPythonString << std::endl;
     return stringBuilder.str();

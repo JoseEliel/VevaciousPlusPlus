@@ -37,6 +37,20 @@ namespace VevaciousPlusPlus
     virtual ~SlhaBlocksWithSpecialCasesManager();
 
 
+    // This returns the value of the requested parameter at the requested scale
+    // (exp( logarithmOfScale )) as an alternative to adding it to the list of
+    // parameters evaluated by ParameterValues. It is almost certain to
+    // be much slower (as it searches for the appropriate block and then makes
+    // a new functionoid) if used to obtain parameters repeatedly for
+    // different scales at the same parameter point, but is more efficient for
+    // the rest of the execution of Vevacious, which depends on the speed of
+    // evaluation of the potential, if there are some parameters which do not
+    // need to be evaluated for the potential but still depend on Lagrangian
+    // parameters, for example when evaluating the VEVs of the DSB vacuum for
+    // the parameter point.
+    virtual double OnceOffParameter( std::string const& parameterName,
+                                     double const logarithmOfScale ) const;
+
     // This is mainly for debugging.
     virtual std::string AsDebuggingString() const;
 
@@ -53,6 +67,12 @@ namespace VevaciousPlusPlus
 
     // This adds all the valid aliases to aliasesToSwitchStrings.
     void InitializeSlhaOneOrTwoAliases();
+
+    // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
+    // there doesn't seem to be an elegant way of using the common code as
+    // there is too much entanglement with registering new parameters or not.
+    virtual double OnceOffSpecialCase( std::string const& parameterName,
+                                       double const logarithmOfScale ) const;
 
     // This adds newParameter to activeDerivedParameters and updates
     // numberOfDistinctActiveParameters and activeParametersToIndices (all
@@ -85,6 +105,14 @@ namespace VevaciousPlusPlus
                                              char const sfermionType,
                                              char const generationIndex );
 
+    // This creates a temporary functionoid and passes it parameter values from
+    // OnceOff(...) to return the appropriate value for caseString.
+    double
+    OnceOffSlhaOneOrTwoCompatibleTrilinear( std::string const& caseString,
+                                            char const sfermionType,
+                                            char const generationIndex,
+                                         double const logarithmOfScale ) const;
+
     // This registers the required M2X[0,0] and MSOFT[msoftIndex] parameters
     // where X is replaced by sfermionType and 0 by generationIndex, and then
     // returns the result of AddNewDerivedParameter using a new
@@ -94,7 +122,16 @@ namespace VevaciousPlusPlus
     RegisterSlhaOneOrTwoCompatibleMassSquared( std::string const& caseString,
                                                char const sfermionType,
                                                char const generationIndex,
-                                               std::string const& msoftIndex );
+                                               unsigned int const msoftIndex );
+
+    // This creates a temporary functionoid and passes it parameter values from
+    // OnceOff(...) to return the appropriate value for caseString.
+    double
+    OnceOffSlhaOneOrTwoCompatibleMassSquared( std::string const& caseString,
+                                              char const sfermionType,
+                                              char const generationIndex,
+                                              unsigned int const msoftIndex,
+                                         double const logarithmOfScale ) const;
 
     // This maps both caseString and the format-corrected version of
     // blockString to caseString in aliasesToSwitchStrings.
@@ -102,17 +139,41 @@ namespace VevaciousPlusPlus
                                                std::string const& blockString )
     { aliasesToCaseStrings[ caseString ]
       = aliasesToCaseStrings[ FormatVariable( blockString ) ] = caseString; }
-
-    // This finds the functionoid in activeDerivedParameters which has the
-    // given index (which is not its position in the activeDerivedParameters
-    // vector, importantly).
-    SlhaSourcedParameterFunctionoid const*
-    FindActiveDerivedParameter( size_t const soughtIndex ) const;
   };
 
 
 
 
+
+  // This returns the value of the requested parameter at the requested scale
+  // (exp( logarithmOfScale )) as an alternative to adding it to the list of
+  // parameters evaluated by ParameterValues. It is almost certain to
+  // be much slower (as it searches for the appropriate block and then makes
+  // a new functionoid) if used to obtain parameters repeatedly for
+  // different scales at the same parameter point, but is more efficient for
+  // the rest of the execution of Vevacious, which depends on the speed of
+  // evaluation of the potential, if there are some parameters which do not
+  // need to be evaluated for the potential but still depend on Lagrangian
+  // parameters, for example when evaluating the VEVs of the DSB vacuum for
+  // the parameter point.
+  inline double SlhaBlocksWithSpecialCasesManager::OnceOffParameter(
+                                              std::string const& parameterName,
+                                          double const logarithmOfScale ) const
+  {
+    std::map< std::string, std::string >::const_iterator
+    aliasToSwitchString( aliasesToCaseStrings.find( parameterName ) );
+    if( aliasToSwitchString != aliasesToCaseStrings.end() )
+    {
+      return OnceOffSpecialCase( aliasToSwitchString->second,
+                                 logarithmOfScale );
+    }
+    else
+    {
+      return
+      LesHouchesAccordBlockEntryManager::OnceOffParameter( parameterName,
+                                                           logarithmOfScale );
+    }
+  }
 
   // This adds newParameter to activeDerivedParameters and updates
   // numberOfDistinctActiveParameters and activeParametersToIndices (all
@@ -125,7 +186,6 @@ namespace VevaciousPlusPlus
                                 SlhaSourcedParameterFunctionoid* newParameter )
   {
     activeDerivedParameters.push_back( newParameter );
-    ++numberOfDistinctActiveParameters;
     for( std::map< std::string, std::string >::const_iterator
          aliasToSwitchString( aliasesToCaseStrings.begin() );
          aliasToSwitchString != aliasesToCaseStrings.end();
@@ -137,8 +197,8 @@ namespace VevaciousPlusPlus
         = newParameter->IndexInValuesVector();
       }
     }
-    return std::pair< bool, size_t >( true,
-                                      newParameter->IndexInValuesVector() );
+    return RegisterNewParameter( *newParameter,
+                                 caseString );
   }
 
   // This checks parameterName against all the special cases. If the
@@ -162,7 +222,6 @@ namespace VevaciousPlusPlus
     }
   }
 
-
   // This registers the required TX[0,0], AX[0,0], and YX[0,0] parameters
   // where X is replaced by sfermionType and 0 by generationIndex, and then
   // returns the result of AddNewDerivedParameter using a new
@@ -177,20 +236,50 @@ namespace VevaciousPlusPlus
     std::string blockNameWithIndices( "T?[?,?]" );
     blockNameWithIndices[ 1 ] = sfermionType;
     blockNameWithIndices[ 3 ] = blockNameWithIndices[ 5 ] = generationIndex;
-    SlhaSourcedParameterFunctionoid const& directTrilinear(
-                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
+    size_t const
+    directTrilinearIndex( RegisterBlockEntry( blockNameWithIndices ) );
     blockNameWithIndices[ 0 ] = 'A';
-    SlhaSourcedParameterFunctionoid const& trilinearOverYukawa(
-                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
+    size_t const
+    trilinearOverYukawaIndex( RegisterBlockEntry( blockNameWithIndices ) );
     blockNameWithIndices[ 0 ] = 'Y';
-    SlhaSourcedParameterFunctionoid const& appropriateYukawa(
-                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
+    size_t const
+    appropriateYukawaIndex( RegisterBlockEntry( blockNameWithIndices ) );
     return AddNewDerivedParameter( caseString,
                                    new SlhaTrilinearDiagonalFunctionoid(
-                                            numberOfDistinctActiveParameters,
-                                                             directTrilinear,
-                                                         trilinearOverYukawa,
-                                                       appropriateYukawa ) );
+                                              numberOfDistinctActiveParameters,
+                                                          directTrilinearIndex,
+                                                      trilinearOverYukawaIndex,
+                                                    appropriateYukawaIndex ) );
+  }
+
+  // This creates a temporary functionoid and passes it parameter values from
+  // OnceOff(...) to return the appropriate value for caseString.
+  inline double
+  SlhaBlocksWithSpecialCasesManager::OnceOffSlhaOneOrTwoCompatibleTrilinear(
+                                                 std::string const& caseString,
+                                                       char const sfermionType,
+                                                    char const generationIndex,
+                                          double const logarithmOfScale ) const
+  {
+    std::string blockNameWithIndices( "T?[?,?]" );
+    blockNameWithIndices[ 1 ] = sfermionType;
+    blockNameWithIndices[ 3 ] = blockNameWithIndices[ 5 ] = generationIndex;
+    double const directTrilinear( OnceOffParameter( blockNameWithIndices,
+                                                    logarithmOfScale ) );
+    blockNameWithIndices[ 0 ] = 'A';
+    double const trilinearOverYukawa( OnceOffParameter( blockNameWithIndices,
+                                                    logarithmOfScale ) );
+    blockNameWithIndices[ 0 ] = 'Y';
+    double const appropriateYukawa( OnceOffParameter( blockNameWithIndices,
+                                                      logarithmOfScale ) );
+
+    SlhaTrilinearDiagonalFunctionoid temporaryParameter( 0,
+                                                         0,
+                                                         0,
+                                                         0 );
+    return temporaryParameter( directTrilinear,
+                               trilinearOverYukawa,
+                               appropriateYukawa );
   }
 
   // This registers the required M2X[0,0] and MSOFT[msoftIndex] parameters
@@ -203,51 +292,47 @@ namespace VevaciousPlusPlus
                                                  std::string const& caseString,
                                                        char const sfermionType,
                                                     char const generationIndex,
-                                                std::string const& msoftIndex )
+                                                unsigned int const msoftIndex )
   {
     std::string blockNameWithIndices( "MS?2[?,?]" );
     blockNameWithIndices[ 2 ] = sfermionType;
     blockNameWithIndices[ 5 ] = blockNameWithIndices[ 7 ] = generationIndex;
-    SlhaSourcedParameterFunctionoid const& squareMass(
-                RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
-    blockNameWithIndices.assign( "MSOFT[" );
-    blockNameWithIndices.append( msoftIndex );
-    blockNameWithIndices.append( "]" );
-    SlhaSourcedParameterFunctionoid const&
-    linearMass( RegisterBlockEntry( FormatVariable( blockNameWithIndices ) ) );
+    size_t const squareMassIndex( RegisterBlockEntry(blockNameWithIndices ) );
+    std::stringstream msoftBuilder;
+    msoftBuilder << "MSOFT[" << msoftIndex << "]";
+    size_t const linearMassIndex( RegisterBlockEntry( msoftBuilder.str() ) );
     return AddNewDerivedParameter( caseString,
                                    new SlhaMassSquaredDiagonalFunctionoid(
                                               numberOfDistinctActiveParameters,
-                                                                    squareMass,
-                                                                linearMass ) );
+                                                               squareMassIndex,
+                                                           linearMassIndex ) );
   }
 
-  // This finds the functionoid in activeDerivedParameters which has the
-  // given index (which is not its position in the activeDerivedParameters
-  // vector, importantly).
-  inline SlhaSourcedParameterFunctionoid const*
-  SlhaBlocksWithSpecialCasesManager::FindActiveDerivedParameter(
-                                               size_t const soughtIndex ) const
+
+  // This creates a temporary functionoid and passes it parameter values from
+  // OnceOff(...) to return the appropriate value for caseString.
+  inline double
+  SlhaBlocksWithSpecialCasesManager::OnceOffSlhaOneOrTwoCompatibleMassSquared(
+                                                 std::string const& caseString,
+                                                       char const sfermionType,
+                                                    char const generationIndex,
+                                                 unsigned int const msoftIndex,
+                                          double const logarithmOfScale ) const
   {
-    // We unfortunately need to do a linear search through
-    // activeDerivedParameters to find the functionoid with the matching
-    // index.
-    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
-         activeParameter( activeDerivedParameters.begin() );
-         activeParameter < activeDerivedParameters.end();
-         ++activeParameter )
-    {
-      if( (*activeParameter)->IndexInValuesVector() == soughtIndex )
-      {
-        return (*activeParameter);
-      }
-    }
-    std::stringstream errorBuilder;
-    errorBuilder
-    << "SlhaBlocksWithSpecialCasesManager::FindActiveDerivedParameter( "
-    << soughtIndex << " ) found no SlhaSourcedParameterFunctionoid* in"
-    << " activeDerivedParameters with that index.";
-    throw std::out_of_range( errorBuilder.str() );
+    std::string blockNameWithIndices( "MS?2[?,?]" );
+    blockNameWithIndices[ 2 ] = sfermionType;
+    blockNameWithIndices[ 5 ] = blockNameWithIndices[ 7 ] = generationIndex;
+    double const squareMass( OnceOffParameter( blockNameWithIndices,
+                                               logarithmOfScale ) );
+    std::stringstream msoftBuilder;
+    msoftBuilder << "MSOFT[" << msoftIndex << "]";
+    double const linearMass( OnceOffParameter( msoftBuilder.str(),
+                                               logarithmOfScale ) );
+    SlhaMassSquaredDiagonalFunctionoid temporaryParameter( 0,
+                                                           0,
+                                                           0 );
+    return temporaryParameter( squareMass,
+                               linearMass );
   }
 
 } /* namespace VevaciousPlusPlus */

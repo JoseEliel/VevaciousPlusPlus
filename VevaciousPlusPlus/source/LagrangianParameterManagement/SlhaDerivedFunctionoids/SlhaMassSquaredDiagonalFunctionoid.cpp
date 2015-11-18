@@ -12,13 +12,11 @@ namespace VevaciousPlusPlus
 
   SlhaMassSquaredDiagonalFunctionoid::SlhaMassSquaredDiagonalFunctionoid(
                                               size_t const indexInValuesVector,
-                             SlhaSourcedParameterFunctionoid const& squareMass,
-                          SlhaSourcedParameterFunctionoid const& linearMass ) :
+                                                  size_t const squareMassIndex,
+                                               size_t const linearMassIndex ) :
     SlhaSourcedParameterFunctionoid( indexInValuesVector ),
-    squareMass( squareMass ),
-    squareMassIndex( squareMass.IndexInValuesVector() ),
-    linearMass( linearMass ),
-    linearMassIndex( linearMass.IndexInValuesVector() )
+    squareMassIndex( squareMassIndex ),
+    linearMassIndex( linearMassIndex )
   {
     // This constructor is just an initialization list.
   }

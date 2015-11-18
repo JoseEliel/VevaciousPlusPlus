@@ -19,16 +19,10 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaHiggsMixingBilinearFunctionoid( size_t const indexInValuesVector,
-            SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared,
-                              SlhaSourcedParameterFunctionoid const& tanBeta );
+                                 size_t const treePseudoscalarMassSquaredIndex,
+                                        size_t const tanBetaIndex );
     virtual ~SlhaHiggsMixingBilinearFunctionoid();
 
-
-    // This returns sin(beta) * cos(beta) * mA^2 evaluated at the scale given
-    // through logarithmOfScale.
-    virtual double operator()( double const logarithmOfScale ) const
-    { return ( SinBetaCosBeta( tanBeta( logarithmOfScale ) )
-               * treePseudoscalarMassSquared( logarithmOfScale ) ); }
 
     // This returns sin(beta) * cos(beta) * mA^2 evaluated from the given
     // parameters.
@@ -36,6 +30,12 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& interpolatedValues ) const
     { return ( SinBetaCosBeta( interpolatedValues[ tanBetaIndex ] )
                * interpolatedValues[ treePseudoscalarMassSquaredIndex ] ); }
+
+    // This returns sin(beta) * cos(beta) * mA^2 evaluated at the scale given
+    // through logarithmOfScale.
+    double operator()( double const tanBeta,
+                       double const treePseudoscalarMassSquared ) const
+    { return ( SinBetaCosBeta( tanBeta ) * treePseudoscalarMassSquared ); }
 
     // This is for creating a Python version of the potential.
     virtual std::string
@@ -51,9 +51,7 @@ namespace VevaciousPlusPlus
     static double SinBetaCosBeta( double const tanBeta )
     { return ( tanBeta / ( 1.0 + ( tanBeta * tanBeta ) ) ); }
 
-    SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared;
     size_t const treePseudoscalarMassSquaredIndex;
-    SlhaSourcedParameterFunctionoid const& tanBeta;
     size_t const tanBetaIndex;
   };
 
@@ -84,10 +82,7 @@ namespace VevaciousPlusPlus
     << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
     stringBuilder << "treePseudoscalarMassSquaredIndex = "
     << treePseudoscalarMassSquaredIndex << std::endl;
-    stringBuilder << "treePseudoscalarMassSquared = "
-    << treePseudoscalarMassSquared.AsDebuggingString() << std::endl;
     stringBuilder << "tanBetaIndex = " << tanBetaIndex << std::endl;
-    stringBuilder << "tanBeta = " << tanBeta.AsDebuggingString() << std::endl;
     return stringBuilder.str();
   }
 

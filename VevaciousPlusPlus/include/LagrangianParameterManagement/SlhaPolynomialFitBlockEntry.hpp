@@ -48,8 +48,7 @@ namespace VevaciousPlusPlus
     PythonParameterEvaluation( int const indentationSpaces ) const;
 
     // This is mainly for debugging.
-    virtual std::string AsDebuggingString() const
-    { return scaleLogarithmPowerCoefficients.AsDebuggingString(); }
+    virtual std::string AsDebuggingString() const;
 
 
   protected:
@@ -81,6 +80,18 @@ namespace VevaciousPlusPlus
     stringBuilder << " )";
     return stringBuilder.str();
   }
+
+  // This is mainly for debugging.
+   inline std::string SlhaPolynomialFitBlockEntry::AsDebuggingString() const
+   {
+     std::stringstream stringBuilder;
+     stringBuilder << "IndexInValuesVector() = " << IndexInValuesVector()
+     << ", scaleLogarithmPowerCoefficients = "
+     << scaleLogarithmPowerCoefficients.AsDebuggingString();
+     return stringBuilder.str();
+   }
+
+
 
 } /* namespace VevaciousPlusPlus */
 

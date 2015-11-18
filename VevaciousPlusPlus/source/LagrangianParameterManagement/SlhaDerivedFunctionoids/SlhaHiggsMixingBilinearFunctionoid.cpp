@@ -12,14 +12,11 @@ namespace VevaciousPlusPlus
 
   SlhaHiggsMixingBilinearFunctionoid::SlhaHiggsMixingBilinearFunctionoid(
                                               size_t const indexInValuesVector,
-            SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared,
-                             SlhaSourcedParameterFunctionoid const& tanBeta ) :
+                                 size_t const treePseudoscalarMassSquaredIndex,
+                                                  size_t const tanBetaIndex ) :
     SlhaSourcedParameterFunctionoid( indexInValuesVector ),
-    treePseudoscalarMassSquared( treePseudoscalarMassSquared ),
-    treePseudoscalarMassSquaredIndex(
-                           treePseudoscalarMassSquared.IndexInValuesVector() ),
-    tanBeta( tanBeta ),
-    tanBetaIndex( tanBeta.IndexInValuesVector() )
+    treePseudoscalarMassSquaredIndex( treePseudoscalarMassSquaredIndex ),
+    tanBetaIndex( tanBetaIndex )
   {
     // This constructor is just an initialization list.
   }

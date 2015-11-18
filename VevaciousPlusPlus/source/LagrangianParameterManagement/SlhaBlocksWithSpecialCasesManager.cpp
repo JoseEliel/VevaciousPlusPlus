@@ -55,6 +55,141 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
+  // there doesn't seem to be an elegant way of using the common code as
+  // there is too much entanglement with registering new parameters or not.
+  double SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase(
+                                                 std::string const& caseString,
+                                          double const logarithmOfScale ) const
+  {
+    if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
+    {
+      SlhaDsbHiggsVevFunctionoid temporaryParameter( 0,
+                                                     0,
+                                                     0,
+                                                   ( caseString == "DsbVu" ) );
+      return temporaryParameter( OnceOffParameter( "HMIX[ 3 ]",
+                                                   logarithmOfScale ),
+                                 OnceOffParameter( "HMIX[ 2 ]",
+                                                   logarithmOfScale ) );
+    }
+    else if( caseString == "Bmu" )
+    {
+      SlhaHiggsMixingBilinearFunctionoid temporaryParameter( 0,
+                                                             0,
+                                                             0 );
+      return temporaryParameter( OnceOffParameter( "HMIX[ 4 ]",
+                                                   logarithmOfScale ),
+                                 OnceOffParameter( "HMIX[ 2 ]",
+                                                   logarithmOfScale ) );
+    }
+    else if( ( caseString == "Te11" )
+             ||
+             ( caseString == "Te22" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Td11" )
+             ||
+             ( caseString == "Td22" )
+             ||
+             ( caseString == "Td33" )
+             ||
+             ( caseString == "Tu11" )
+             ||
+             ( caseString == "Tu22" )
+             ||
+             ( caseString == "Tu33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" ) )
+    {
+      return OnceOffSlhaOneOrTwoCompatibleTrilinear( caseString,
+                                                    toupper( caseString[ 1 ] ),
+                                                     caseString[ 2 ],
+                                                     logarithmOfScale );
+    }
+    else if( ( caseString == "Msl211" )
+             ||
+             ( caseString == "Msl222" )
+             ||
+             ( caseString == "Msl233" )
+             ||
+             ( caseString == "Mse211" )
+             ||
+             ( caseString == "Mse222" )
+             ||
+             ( caseString == "Mse233" )
+             ||
+             ( caseString == "Msq211" )
+             ||
+             ( caseString == "Msq222" )
+             ||
+             ( caseString == "Msq233" )
+             ||
+             ( caseString == "Msu211" )
+             ||
+             ( caseString == "Msu222" )
+             ||
+             ( caseString == "Msu233" )
+             ||
+             ( caseString == "Msd211" )
+             ||
+             ( caseString == "Msd222" )
+             ||
+             ( caseString == "Msd233" ) )
+    {
+      // First determine the MSOFT index of the 1st generation, assuming that
+      // it is the L doublet and then checking for other sfermion types.
+      unsigned int msoftIndex( 31 );
+      if( caseString[ 2 ] == 'e' )
+      {
+        msoftIndex = 34;
+      }
+      else if( caseString[ 2 ] == 'q' )
+      {
+        msoftIndex = 41;
+      }
+      else if( caseString[ 2 ] == 'u' )
+      {
+        msoftIndex = 44;
+      }
+      else if( caseString[ 2 ] == 'd' )
+      {
+        msoftIndex = 47;
+      }
+      // Next add 1 or 2 if the generation index is '2' or '3' respectively.
+      if( caseString[ 4 ] == '2' )
+      {
+        msoftIndex += 1;
+      }
+      else if( caseString[ 4 ] == '3' )
+      {
+        msoftIndex += 2;
+      }
+      return OnceOffSlhaOneOrTwoCompatibleMassSquared( caseString,
+                                                    toupper( caseString[ 2 ] ),
+                                                       caseString[ 4 ],
+                                                       msoftIndex,
+                                                       logarithmOfScale );
+    }
+    else
+    {
+      std::stringstream errorBuilder;
+      errorBuilder
+      << "SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase could not find"
+      << " a case corresponding to \"" << caseString << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+  }
+
   // This is mainly for debugging.
   std::string SlhaBlocksWithSpecialCasesManager::AsDebuggingString() const
   {
@@ -80,20 +215,20 @@ namespace VevaciousPlusPlus
         stringBuilder << "," << std::endl;
       }
       stringBuilder
-      << "[ \"" << aliasToCase->first << "\", "
-      << aliasToCase->second << " ]";
+      << "[ \"" << aliasToCase->first << "\", \""
+      << aliasToCase->second << "\" ]";
     }
     stringBuilder << " }";
 
     std::list< SlhaSourcedParameterFunctionoid const* > parameterSortingList;
-    typedef LesHouchesAccordBlockEntryManager::LhaBlockEntryInterpolator
-            BaseInterpolator;
-    for( std::vector< BaseInterpolator >::const_iterator
+    typedef LesHouchesAccordBlockEntryManager::LhaBlockEntryInterpolator*
+            InterpolatorPointer;
+    for( std::vector< InterpolatorPointer >::const_iterator
          baseInterpolator( referenceSafeActiveParameters.begin() );
          baseInterpolator < referenceSafeActiveParameters.end();
          ++baseInterpolator )
     {
-      parameterSortingList.push_back( &(*baseInterpolator) );
+      parameterSortingList.push_back( *baseInterpolator );
     }
     for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
          derivedParameter( activeDerivedParameters.begin() );
@@ -132,10 +267,12 @@ namespace VevaciousPlusPlus
     }
     double const
     outputLogScale( log( AppropriateFixedScaleForParameterPoint() ) );
+    std::vector< double > const
+    parameterValues( ParameterValues( outputLogScale ) );
     stringBuilder
     << std::endl << "Sorted parameters at scale "
     << AppropriateFixedScaleForParameterPoint() << " (log = " << outputLogScale
-    << ")= {" << std::endl;
+    << ") = {" << std::endl;
     for( std::vector< nameAndParameter >::const_iterator
          sortedNameAndParameter( sortedNamesAndParameters.begin() );
          sortedNameAndParameter < sortedNamesAndParameters.end();
@@ -147,18 +284,9 @@ namespace VevaciousPlusPlus
       }
 
       stringBuilder  << sortedNameAndParameter->second->IndexInValuesVector()
-      << ": \"" << sortedNameAndParameter->first << "\" = ";
-      // debugging:
-      /**/
-      if( sortedNameAndParameter->second->IndexInValuesVector() < 15 )
-      {
-        stringBuilder << (*sortedNameAndParameter->second)( outputLogScale );
-      }
-      else
-      {
-        stringBuilder << "not available until I sort out these bugs";
-      }
-      /**/
+      << ": \"" << sortedNameAndParameter->first << "\" = "
+      << (*sortedNameAndParameter->second)( outputLogScale,
+                                            parameterValues );
     }
     stringBuilder << " }" << std::endl;
     return stringBuilder.str();
@@ -167,10 +295,30 @@ namespace VevaciousPlusPlus
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaBlocksWithSpecialCasesManager::InitializeSlhaOneOrTwoAliases()
   {
+    // First the blocks required for the special cases need to be added to
+    // validBlocks.
+    /* Actually, maybe they don't.
+    validBlocks.insert( "HMIX" );
+    validBlocks.insert( "TE" );
+    validBlocks.insert( "YE" );
+    validBlocks.insert( "AE" );
+    validBlocks.insert( "TD" );
+    validBlocks.insert( "YD" );
+    validBlocks.insert( "AD" );
+    validBlocks.insert( "TU" );
+    validBlocks.insert( "YU" );
+    validBlocks.insert( "AU" );
+    validBlocks.insert( "MSOFT" );
+    validBlocks.insert( "MSL2" );
+    validBlocks.insert( "MSE2" );
+    validBlocks.insert( "MSQ2" );
+    validBlocks.insert( "MSU2" );
+    validBlocks.insert( "MSD2" );
     aliasesToCaseStrings[ "DsbVd" ] = "DsbVd";
     aliasesToCaseStrings[ "DsbVu" ] = "DsbVu";
     aliasesToCaseStrings[ "Bmu" ]
-    = aliasesToCaseStrings[ "m3Sq" ] = "Bmu";
+    = aliasesToCaseStrings[ "m3Sq" ] = "Bmu";*/
+
     MapCaseStringAndSlhaBlockToCaseString( "Te11",
                                            "TE[1,1]" );
     MapCaseStringAndSlhaBlockToCaseString( "Te22",
@@ -229,188 +377,120 @@ namespace VevaciousPlusPlus
   {
     if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
     {
-      SlhaSourcedParameterFunctionoid const&
-      vevLength( RegisterBlockEntry( FormatVariable( "HMIX[ 3 ]" ) ) );
-      SlhaSourcedParameterFunctionoid const&
-      tanBeta( RegisterBlockEntry( FormatVariable( "HMIX[ 2 ]" ) ) );
-
+      size_t const vevIndex( RegisterParameter( "HMIX[ 3 ]" ).second );
+      size_t const tanBetaIndex( RegisterParameter( "HMIX[ 2 ]" ).second );
       return AddNewDerivedParameter( caseString,
                                      new SlhaDsbHiggsVevFunctionoid(
                                              numberOfDistinctActiveParameters,
-                                                                     vevLength,
-                                                                     tanBeta,
+                                                                     vevIndex,
+                                                                  tanBetaIndex,
                                                  ( caseString == "DsbVu" ) ) );
     }
     else if( caseString == "Bmu" )
     {
-      SlhaSourcedParameterFunctionoid const& treePseudoscalarMassSquared(
-                         RegisterBlockEntry( FormatVariable( "HMIX[ 4 ]" ) ) );
-      SlhaSourcedParameterFunctionoid const&
-      tanBeta( RegisterBlockEntry( FormatVariable( "HMIX[ 2 ]" ) ) );
+      size_t const treePseudoscalarMassSquaredIndex(
+                                     RegisterParameter( "HMIX[ 4 ]" ).second );
+      size_t const tanBetaIndex( RegisterParameter( "HMIX[ 2 ]" ).second );
       return AddNewDerivedParameter( caseString,
                                      new SlhaHiggsMixingBilinearFunctionoid(
                                               numberOfDistinctActiveParameters,
-                                                   treePseudoscalarMassSquared,
-                                                                   tanBeta ) );
+                                              treePseudoscalarMassSquaredIndex,
+                                                              tanBetaIndex ) );
     }
-    else if( caseString == "Te11" )
+    else if( ( caseString == "Te11" )
+             ||
+             ( caseString == "Te22" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Td11" )
+             ||
+             ( caseString == "Td22" )
+             ||
+             ( caseString == "Td33" )
+             ||
+             ( caseString == "Tu11" )
+             ||
+             ( caseString == "Tu22" )
+             ||
+             ( caseString == "Tu33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" )
+             ||
+             ( caseString == "Te33" ) )
     {
       return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'E',
-                                                      '1' );
+                                                    toupper( caseString[ 1 ] ),
+                                                      caseString[ 2 ] );
     }
-    else if( caseString == "Te22" )
+    else if( ( caseString == "Msl211" )
+             ||
+             ( caseString == "Msl222" )
+             ||
+             ( caseString == "Msl233" )
+             ||
+             ( caseString == "Mse211" )
+             ||
+             ( caseString == "Mse222" )
+             ||
+             ( caseString == "Mse233" )
+             ||
+             ( caseString == "Msq211" )
+             ||
+             ( caseString == "Msq222" )
+             ||
+             ( caseString == "Msq233" )
+             ||
+             ( caseString == "Msu211" )
+             ||
+             ( caseString == "Msu222" )
+             ||
+             ( caseString == "Msu233" )
+             ||
+             ( caseString == "Msd211" )
+             ||
+             ( caseString == "Msd222" )
+             ||
+             ( caseString == "Msd233" ) )
     {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'E',
-                                                      '2' );
-    }
-    else if( caseString == "Te33" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'E',
-                                                      '3' );
-    }
-    else if( caseString == "Td11" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'D',
-                                                      '1' );
-    }
-    else if( caseString == "Td22" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'D',
-                                                      '2' );
-    }
-    else if( caseString == "Td33" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'D',
-                                                      '3' );
-    }
-    else if( caseString == "Tu11" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'U',
-                                                      '1' );
-    }
-    else if( caseString == "Tu22" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'U',
-                                                      '2' );
-    }
-    else if( caseString == "Tu33" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleTrilinear( caseString,
-                                                      'U',
-                                                      '3' );
-    }
-    else if( caseString == "Msl211" )
-    {
+      // First determine the MSOFT index of the 1st generation, assuming that
+      // it is the L doublet and then checking for other sfermion types.
+      unsigned int msoftIndex( 31 );
+      if( caseString[ 2 ] == 'e' )
+      {
+        msoftIndex = 34;
+      }
+      else if( caseString[ 2 ] == 'q' )
+      {
+        msoftIndex = 41;
+      }
+      else if( caseString[ 2 ] == 'u' )
+      {
+        msoftIndex = 44;
+      }
+      else if( caseString[ 2 ] == 'd' )
+      {
+        msoftIndex = 47;
+      }
+      // Next add 1 or 2 if the generation index is '2' or '3' respectively.
+      if( caseString[ 4 ] == '2' )
+      {
+        msoftIndex += 1;
+      }
+      else if( caseString[ 4 ] == '3' )
+      {
+        msoftIndex += 2;
+      }
       return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'L',
-                                                        '1',
-                                                        "31" );
-    }
-    else if( caseString == "Msl222" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'L',
-                                                        '2',
-                                                        "32" );
-    }
-    else if( caseString == "Msl233" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'L',
-                                                        '3',
-                                                        "33" );
-    }
-    else if( caseString == "Mse211" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'E',
-                                                        '1',
-                                                        "34" );
-    }
-    else if( caseString == "Mse222" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'E',
-                                                        '2',
-                                                        "35" );
-    }
-    else if( caseString == "Mse233" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'E',
-                                                        '3',
-                                                        "36" );
-    }
-    else if( caseString == "Msq211" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                          'Q',
-                                                          '1',
-                                                          "41" );
-    }
-    else if( caseString == "Msq222" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'Q',
-                                                        '2',
-                                                        "42" );
-    }
-    else if( caseString == "Msq233" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'Q',
-                                                        '3',
-                                                        "43" );
-    }
-    else if( caseString == "Msu211" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'U',
-                                                        '1',
-                                                        "44" );
-    }
-    else if( caseString == "Msu222" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'U',
-                                                        '2',
-                                                        "45" );
-    }
-    else if( caseString == "Msu233" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'U',
-                                                        '3',
-                                                        "46" );
-    }
-    else if( caseString == "Msd211" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'D',
-                                                        '1',
-                                                        "47" );
-    }
-    else if( caseString == "Msd222" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'D',
-                                                        '2',
-                                                        "48" );
-    }
-    else if( caseString == "Msd233" )
-    {
-      return RegisterSlhaOneOrTwoCompatibleMassSquared( caseString,
-                                                        'D',
-                                                        '3',
-                                                        "49" );
+                                                    toupper( caseString[ 2 ] ),
+                                                        caseString[ 4 ],
+                                                        msoftIndex );
     }
     else
     {

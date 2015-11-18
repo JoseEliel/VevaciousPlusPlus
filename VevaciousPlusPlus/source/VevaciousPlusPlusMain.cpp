@@ -45,12 +45,6 @@ int main( int argumentCount,
   std::string fixedScaleArgument( "" );
   while( lhaManagerParser.readNextElement() )
   {
-    std::cout
-    << std::endl
-    << "lhaManagerParser.getCurrentElementName() = "
-    << lhaManagerParser.getCurrentElementName();
-    std::cout << std::endl;
-
     if( lhaManagerParser.currentElementNameMatches( "SpecialCases" ) )
     {
       specialCases = lhaManagerParser.getTrimmedCurrentElementContent();
@@ -100,16 +94,6 @@ int main( int argumentCount,
     }
   }
   lhaManagerParser.closeFile();
-
-  std::cout
-  << std::endl << "specialCases = \"" << specialCases << "\""
-  << std::endl << "validBlocks = \"" << validBlocks << "\""
-  << std::endl << "fixedScaleType = \"" << fixedScaleType << "\""
-  << std::endl << "fixedScaleArgument = \"" << fixedScaleArgument << "\""
-  << std::endl << "minimumScaleType = \"" << minimumScaleType << "\""
-  << std::endl << "minimumScaleArgument = \"" << minimumScaleArgument << "\"";
-  std::cout << std::endl;
-
 
   VevaciousPlusPlus::LesHouchesAccordBlockEntryManager*
   lhaParameterManager( NULL );

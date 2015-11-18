@@ -19,19 +19,12 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaTrilinearDiagonalFunctionoid( size_t const indexInValuesVector,
-                        SlhaSourcedParameterFunctionoid const& directTrilinear,
-                    SlhaSourcedParameterFunctionoid const& trilinearOverYukawa,
-                    SlhaSourcedParameterFunctionoid const& appropriateYukawa );
+                                      size_t const directTrilinearIndex,
+                                      size_t const trilinearOverYukawaIndex,
+                                      size_t const appropriateYukawaIndex );
     virtual ~SlhaTrilinearDiagonalFunctionoid();
 
-
-    // This returns trilinear coupling evaluated at the scale given
-    // through logarithmOfScale either from its direct value printed in the TL,
-    // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
-    // appropriate Yukawa coupling.
-    virtual double operator()( double const logarithmOfScale ) const;
-
-    // This returns trilinear coupling evaluated at the scale given
+    // This returns the trilinear coupling evaluated at the scale given
     // through logarithmOfScale either from its direct value printed in the TL,
     // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
     // appropriate Yukawa coupling.
@@ -42,6 +35,17 @@ namespace VevaciousPlusPlus
                      * interpolatedValues[ appropriateYukawaIndex ] ):
                    interpolatedValues[ directTrilinearIndex ] ); }
 
+    // This returns the trilinear coupling evaluated at the scale given
+    // through logarithmOfScale either from its direct value printed in the TL,
+    // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
+    // appropriate Yukawa coupling.
+    double operator()( double const directTrilinear,
+                       double const trilinearOverYukawa,
+                       double const appropriateYukawa ) const
+    { return ( ( directTrilinear != 0.0 ) ?
+               directTrilinear :
+               ( trilinearOverYukawa * appropriateYukawa ) ); }
+
     // This is for creating a Python version of the potential.
     virtual std::string
     PythonParameterEvaluation( int const indentationSpaces ) const;
@@ -51,36 +55,14 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaSourcedParameterFunctionoid const& directTrilinear;
     size_t const directTrilinearIndex;
-    SlhaSourcedParameterFunctionoid const& trilinearOverYukawa;
     size_t const trilinearOverYukawaIndex;
-    SlhaSourcedParameterFunctionoid const& appropriateYukawa;
     size_t const appropriateYukawaIndex;
   };
 
 
 
 
-
-  // This returns trilinear coupling evaluated at the scale given
-  // through logarithmOfScale either from its direct value printed in the TL,
-  // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
-  // appropriate Yukawa coupling.
-  inline double SlhaTrilinearDiagonalFunctionoid::operator()(
-                                          double const logarithmOfScale ) const
-  {
-    double directValue( directTrilinear( logarithmOfScale ) );
-    if( directValue == 0.0 )
-    {
-      return ( trilinearOverYukawa( logarithmOfScale )
-               * appropriateYukawa( logarithmOfScale ) );
-    }
-    else
-    {
-      return directValue;
-    }
-  }
 
   // This is for creating a Python version of the potential.
   inline std::string
@@ -107,16 +89,10 @@ namespace VevaciousPlusPlus
     << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
     stringBuilder
     << "directTrilinearIndex = " << directTrilinearIndex << std::endl;
-    stringBuilder << "directTrilinear = "
-    << directTrilinear.AsDebuggingString() << std::endl;
     stringBuilder << "trilinearOverYukawaIndex = "
     << trilinearOverYukawaIndex << std::endl;
-    stringBuilder << "trilinearOverYukawa = "
-    << trilinearOverYukawa.AsDebuggingString() << std::endl;
     stringBuilder
     << "appropriateYukawaIndex = " << appropriateYukawaIndex << std::endl;
-    stringBuilder << "appropriateYukawa = "
-    << appropriateYukawa.AsDebuggingString() << std::endl;
     return stringBuilder.str();
   }
 

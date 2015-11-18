@@ -12,16 +12,13 @@ namespace VevaciousPlusPlus
 
   SlhaTrilinearDiagonalFunctionoid::SlhaTrilinearDiagonalFunctionoid(
                                               size_t const indexInValuesVector,
-                        SlhaSourcedParameterFunctionoid const& directTrilinear,
-                    SlhaSourcedParameterFunctionoid const& trilinearOverYukawa,
-                   SlhaSourcedParameterFunctionoid const& appropriateYukawa ) :
+                                             size_t const directTrilinearIndex,
+                                         size_t const trilinearOverYukawaIndex,
+                                        size_t const appropriateYukawaIndex ) :
     SlhaSourcedParameterFunctionoid( indexInValuesVector ),
-    directTrilinear( directTrilinear ),
-    directTrilinearIndex( directTrilinear.IndexInValuesVector() ),
-    trilinearOverYukawa( trilinearOverYukawa ),
-    trilinearOverYukawaIndex( trilinearOverYukawa.IndexInValuesVector() ),
-    appropriateYukawa( appropriateYukawa ),
-    appropriateYukawaIndex( appropriateYukawa.IndexInValuesVector() )
+    directTrilinearIndex( directTrilinearIndex ),
+    trilinearOverYukawaIndex( trilinearOverYukawaIndex ),
+    appropriateYukawaIndex( appropriateYukawaIndex )
   {
     // This constructor is just an initialization list.
   }

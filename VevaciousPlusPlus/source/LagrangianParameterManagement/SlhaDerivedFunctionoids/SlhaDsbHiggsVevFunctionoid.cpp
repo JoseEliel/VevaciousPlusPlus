@@ -12,14 +12,12 @@ namespace VevaciousPlusPlus
 
   SlhaDsbHiggsVevFunctionoid::SlhaDsbHiggsVevFunctionoid(
                                              size_t const indexInValuesVector,
-                     SlhaSourcedParameterFunctionoid const& vevEuclideanLength,
-                                SlhaSourcedParameterFunctionoid const& tanBeta,
+                                                         size_t const vevIndex,
+                                                     size_t const tanBetaIndex,
                                                        bool const sinNotCos ) :
     SlhaSourcedParameterFunctionoid( indexInValuesVector ),
-    vevEuclideanLength( vevEuclideanLength ),
-    vevIndex( vevEuclideanLength.IndexInValuesVector() ),
-    tanBeta( tanBeta ),
-    tanBetaIndex( tanBeta.IndexInValuesVector() ),
+    vevIndex( vevIndex ),
+    tanBetaIndex( tanBetaIndex ),
     cosOrSin( &cos ),
     cosOrSinPythonString( "math.cos" )
   {

@@ -50,6 +50,16 @@ namespace VevaciousPlusPlus
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaCompatibleWithSarahManager::InitializeSarahAliases()
   {
+    // First the blocks required for the special cases need to be added to
+    // validBlocks.
+    /* Actually, maybe they don't.
+    validBlocks.insert( "HMIX" );
+    validBlocks.insert( "TREEHMIX" );
+    validBlocks.insert( "LOOPHMIX" );
+    validBlocks.insert( "MSOFT" );
+    validBlocks.insert( "TREEMSOFT" );
+    validBlocks.insert( "LOOPMSOFT" );*/
+
     // Putting the simple block names as special cases for SARAH means that
     // a SARAH-generated model file which assumes the extra SARAH blocks will
     // still work with non-SARAH SLHA files, to the extent that the DRbar
@@ -81,122 +91,236 @@ namespace VevaciousPlusPlus
                                            "LOOPMSOFT[ 22 ]" );
   }
 
+  // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
+  // there doesn't seem to be an elegant way of using the common code as
+  // there is too much entanglement with registering new parameters or not.
+  double SlhaCompatibleWithSarahManager::OnceOffSpecialCase(
+                                                 std::string const& caseString,
+                                          double const logarithmOfScale ) const
+  {
+    if( ( caseString == "Bmu" )
+        ||
+        ( caseString == "DsbVd" )
+        ||
+        ( caseString == "DsbVu" ) )
+    {
+      // Assume that the special case is "Bmu" and then change if it is "DsbVd"
+      // or "DsbVu".
+      std::string sarahBlock( "HMIX[ 101 ]" );
+      if( caseString == "DsbVd" )
+      {
+        sarahBlock = "HMIX[ 102 ]";
+      }
+      else if( caseString == "DsbVu" )
+      {
+        sarahBlock = "HMIX[ 103 ]";
+      }
+      SlhaTwoSourceFunctionoid temporaryParameter( 0,
+                                                   0,
+                                                   0 );
+      return temporaryParameter( OnceOffParameter( sarahBlock,
+                                                   logarithmOfScale ),
+             SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase( caseString,
+                                                          logarithmOfScale ) );
+    }
+    else if( ( caseString == "muTree" )
+             ||
+             ( caseString == "muLoop" )
+             ||
+             ( caseString == "BmuTree" )
+             ||
+             ( caseString == "BmuLoop" )
+             ||
+             ( caseString == "mHdSqTree" )
+             ||
+             ( caseString == "mHdSqLoop" )
+             ||
+             ( caseString == "mHuSqTree" )
+             ||
+             ( caseString == "mHuSqLoop" ) )
+    {
+      std::string baseCase( caseString.substr( 0,
+                                               caseString.size() - 4 ) );
+      std::string const
+      treeOrLoop( ( caseString[ caseString.size() - 1 ] == 'e' ) ?
+                  "TREE" :
+                  "LOOP" );
+      std::string sarahBlockEntry( "error" );
+      if( baseCase == "Bmu" )
+      {
+        sarahBlockEntry = FormatVariable( treeOrLoop + "HMIX[ 101 ]" );
+      }
+      else
+      {
+        if( baseCase == "mu" )
+        {
+          baseCase = "HMIX[ 1 ]";
+        }
+        else if( baseCase == "mHdSq" )
+        {
+          baseCase = "MSOFT[ 21 ]";
+        }
+        else if( baseCase == "mHuSq" )
+        {
+          baseCase = "MSOFT[ 22 ]";
+        }
+        sarahBlockEntry = FormatVariable( treeOrLoop + baseCase );
+      }
+
+      SlhaTwoSourceFunctionoid temporaryParameter( 0,
+                                                   0,
+                                                   0 );
+      return
+      temporaryParameter( OnceOffBlockEntry( ( treeOrLoop + baseCase ),
+                                             logarithmOfScale ),
+                          OnceOffParameter( baseCase,
+                                            logarithmOfScale ) );
+    }
+    else
+    {
+      return SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase( caseString,
+                                                            logarithmOfScale );
+    }
+  }
+
   // This adds the parameter based on the alias given by switchString for the
   // parameter.
   std::pair< bool, size_t >
   SlhaCompatibleWithSarahManager::RegisterUnregisteredSpecialCase(
                                                 std::string const& caseString )
   {
-    if( ( caseString == "DsbVd" ) || ( caseString == "DsbVu" ) )
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "SlhaCompatibleWithSarahManager::RegisterUnregisteredSpecialCase( \""
+    << caseString << "\" ) called.";
+    std::cout << std::endl;/**/
+
+    if( ( caseString == "Bmu" )
+        ||
+        ( caseString == "DsbVd" )
+        ||
+        ( caseString == "DsbVu" ) )
     {
-      bool upNotDown( caseString == "DsbVu" );
-      SlhaSourcedParameterFunctionoid const&
-      sarahFunctionoid( RegisterBlockEntry( FormatVariable(
-                               upNotDown ? "HMIX[ 103 ]" : "HMIX[ 102 ]" ) ) );
-      std::pair< bool, size_t >
-      slhaResult( RegisterUnregisteredSpecialCase( caseString ) );
-      SlhaSourcedParameterFunctionoid const&
-      slhaFunctionoid( *(FindActiveDerivedParameter( slhaResult.second )) );
-      // This will overwrite activeParametersToIndices[ switchString ] to
-      // map switchString to numberOfDistinctActiveParameters as its index in
-      // the values vector (corresponding now to the new
-      // SlhaTwoSourceFunctionoid), rather than to slhaFunctionoid as was set
-      // by SlhaOneOrTwoSpecialCase( switchString ).
-      return AddNewDerivedParameter( caseString,
-                new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
-                                              sarahFunctionoid,
-                                              slhaFunctionoid ) );
-    }
-    else if( caseString == "Bmu" )
-    {
-      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
-                       RegisterBlockEntry( FormatVariable( "HMIX[ 101 ]" ) ) );
-      std::pair< bool, size_t > slhaResult(
+      // Assume that the special case is "Bmu" and then change if it is "DsbVd"
+      // or "DsbVu".
+      std::string sarahBlockEntry( "HMIX[ 101 ]" );
+      if( caseString == "DsbVd" )
+      {
+        sarahBlockEntry = "HMIX[ 102 ]";
+      }
+      else if( caseString == "DsbVu" )
+      {
+        sarahBlockEntry = "HMIX[ 103 ]";
+      }
+
+      // Since what sarahBlockEntry contains is already an alias for caseString
+      // (so as to have potential function files designed by SARAH work with
+      // pure SLHA files, which may or may not be a good idea), we have to look
+      // for the block entry functionoid directly, and create it if it doesn't
+      // exist, rather than recursing through
+      // LesHouchesAccordBlockEntryManager::RegisterParameter(sarahBlockEntry),
+      // which will just come back here through
+      // SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredParameter
+      // finding sarahBlockEntry as an alias for caseString, then calling the
+      // derived override of RegisterUnregisteredSpecialCase, bringing us back
+      // here.
+      size_t const sarahIndex( RegisterBlockEntry( sarahBlockEntry ) );
+
+      // Since the control flow got to here, the parameter to which caseString
+      // refers is definitely not already registered, so it's not a problem to
+      // directly register it here, yielding the pure SLHA special case.
+      size_t const pureSlhaIndex(
             SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredSpecialCase(
-                                                                caseString ) );
-      SlhaSourcedParameterFunctionoid const&
-      slhaFunctionoid( *(FindActiveDerivedParameter( slhaResult.second )) );
-      // This will overwrite activeParametersToIndices[ switchString ] to
-      // map switchString to numberOfDistinctActiveParameters as its index in
-      // the values vector (corresponding now to the new
-      // SlhaTwoSourceFunctionoid), rather than to slhaFunctionoid as was set
-      // by SlhaOneOrTwoSpecialCase( switchString ).
+                                                         caseString ).second );
+
+      // This will overwrite activeParametersToIndices[ caseString ] to map
+      // caseString to numberOfDistinctActiveParameters as its index in the
+      // values vector (corresponding now to the new SlhaTwoSourceFunctionoid),
+      // rather than to the pure SLHA functionoid as was set by
+      // RegisterParameter( caseString ) (or previous to that).
       return AddNewDerivedParameter( caseString,
-                new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
-                                              sarahFunctionoid,
-                                              slhaFunctionoid ) );
+                                     new SlhaTwoSourceFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                                   sarahIndex,
+                                                             pureSlhaIndex ) );
     }
-    else if( caseString == "muTree" )
+    else if( ( caseString == "muTree" )
+             ||
+             ( caseString == "muLoop" )
+             ||
+             ( caseString == "BmuTree" )
+             ||
+             ( caseString == "BmuLoop" )
+             ||
+             ( caseString == "mHdSqTree" )
+             ||
+             ( caseString == "mHdSqLoop" )
+             ||
+             ( caseString == "mHuSqTree" )
+             ||
+             ( caseString == "mHuSqLoop" ) )
     {
-      return RegisterSarahPrefixedSlhaBlock( caseString,
-                                             "TREE",
-                                             "HMIX[ 1 ]" );
-    }
-    else if( caseString == "muLoop" )
-    {
-      return RegisterSarahPrefixedSlhaBlock( caseString,
-                                             "LOOP",
-                                             "HMIX[ 1 ]" );
-    }
-    else if( caseString == "BmuTree" )
-    {
-      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
-                   RegisterBlockEntry( FormatVariable( "TREEHMIX[ 101 ]" ) ) );
-      std::pair< bool, size_t >
-      shouldBeDrbarResult( RegisterParameter( FormatVariable( "Bmu" ) ) );
-      SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
-                 *(FindActiveDerivedParameter( shouldBeDrbarResult.second )) );
-      // This will overwrite activeParametersToIndices[ switchString ] to
-      // map switchString to numberOfDistinctActiveParameters as its index in
-      // the values vector (corresponding now to the new
-      // SlhaTwoSourceFunctionoid), rather than to shouldBeDrbarFunctionoid
-      // as was set by SarahSpecialCaseDefaultingToSlhaOneOrTwo( "Bmu" ).
+      std::string baseCase( caseString.substr( 0,
+                                               caseString.size() - 4 ) );
+      std::string const
+      treeOrLoop( ( caseString[ caseString.size() - 1 ] == 'e' ) ?
+                  "TREE" :
+                  "LOOP" );
+      std::string sarahBlockEntry( "error" );
+      if( baseCase == "Bmu" )
+      {
+        sarahBlockEntry = FormatVariable( treeOrLoop + "HMIX[ 101 ]" );
+      }
+      else
+      {
+        if( baseCase == "mu" )
+        {
+          baseCase = "HMIX[ 1 ]";
+        }
+        else if( baseCase == "mHdSq" )
+        {
+          baseCase = "MSOFT[ 21 ]";
+        }
+        else if( baseCase == "mHuSq" )
+        {
+          baseCase = "MSOFT[ 22 ]";
+        }
+        sarahBlockEntry = FormatVariable( treeOrLoop + baseCase );
+      }
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "caseString = \"" << caseString << "\", baseCase = \"" << baseCase
+      << "\", treeOrLoop + baseCase = \"" << ( treeOrLoop + baseCase )
+      << "\", sarahBlockEntry = \"" << sarahBlockEntry << "\"";
+      std::cout << std::endl;/**/
+
+      // Since what sarahBlockEntry contains might already be an alias for
+      // caseString (so as to have potential function files designed by SARAH
+      // work with pure SLHA files, which may or may not be a good idea), we
+      // have to look for the block entry functionoid directly, and create it
+      // if it doesn't exist, rather than recursing through
+      // LesHouchesAccordBlockEntryManager::RegisterParameter(sarahBlockEntry),
+      // which will just come back here through
+      // SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredParameter
+      // finding sarahBlockEntry as an alias for caseString, then calling the
+      // derived override of RegisterUnregisteredSpecialCase, bringing us back
+      // here.
+      size_t const sarahIndex( RegisterBlockEntry( sarahBlockEntry ) );
+      size_t const pureSlhaIndex( RegisterParameter( baseCase ).second );
+
+      // This will overwrite activeParametersToIndices[ caseString ] to map
+      // caseString to numberOfDistinctActiveParameters as its index in the
+      // values vector (corresponding now to the new SlhaTwoSourceFunctionoid),
+      // rather than to the pure SLHA functionoid as was set by
+      // RegisterParameter( caseString ) (or previous to that).
       return AddNewDerivedParameter( caseString,
-                new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
-                                              sarahFunctionoid,
-                                              shouldBeDrbarFunctionoid ) );
-    }
-    else if( caseString == "BmuLoop" )
-    {
-      SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
-                   RegisterBlockEntry( FormatVariable( "LOOPHMIX[ 101 ]" ) ) );
-      std::pair< bool, size_t >
-      shouldBeDrbarResult( RegisterParameter( FormatVariable( "Bmu" ) ) );
-      SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
-                 *(FindActiveDerivedParameter( shouldBeDrbarResult.second )) );
-      // This will overwrite activeParametersToIndices[ switchString ] to
-      // map switchString to numberOfDistinctActiveParameters as its index in
-      // the values vector (corresponding now to the new
-      // SlhaTwoSourceFunctionoid), rather than to shouldBeDrbarFunctionoid
-      // as was set by SarahSpecialCaseDefaultingToSlhaOneOrTwo( "Bmu" ).
-      return AddNewDerivedParameter( caseString,
-                new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
-                                              sarahFunctionoid,
-                                              shouldBeDrbarFunctionoid ) );
-    }
-    else if( caseString == "mHdSqTree" )
-    {
-      return RegisterSarahPrefixedSlhaBlock( caseString,
-                                             "TREE",
-                                             "MSOFT[ 21 ]" );
-    }
-    else if( caseString == "mHdSqLoop" )
-    {
-      return RegisterSarahPrefixedSlhaBlock( caseString,
-                                             "LOOP",
-                                             "MSOFT[ 21 ]" );
-    }
-    else if( caseString == "mHuSqTree" )
-    {
-      return RegisterSarahPrefixedSlhaBlock( caseString,
-                                             "TREE",
-                                             "MSOFT[ 22 ]" );
-    }
-    else if( caseString == "mHuSqLoop" )
-    {
-      return RegisterSarahPrefixedSlhaBlock( caseString,
-                                             "LOOP",
-                                             "MSOFT[ 22 ]" );
+                                     new SlhaTwoSourceFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                                   sarahIndex,
+                                                             pureSlhaIndex ) );
     }
     else
     {

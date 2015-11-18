@@ -27,9 +27,16 @@ namespace VevaciousPlusPlus
     // otherwise it returns the parameter value at secondChoiceIndex.
     virtual double operator()( double const logarithmOfScale,
                         std::vector< double > const& interpolatedValues ) const
-    { return ( ( interpolatedValues[ firstChoiceIndex ] == 0.0 ) ?
-                   interpolatedValues[ secondChoiceIndex ] :
-                   interpolatedValues[ firstChoiceIndex ] ); }
+    { return ( ( interpolatedValues[ firstChoiceIndex ] != 0.0 ) ?
+               interpolatedValues[ firstChoiceIndex ] :
+               interpolatedValues[ secondChoiceIndex ] ); }
+
+    // This returns the first parameter value if it is non-zero, otherwise the
+    // second parameter value.
+    double operator()( double const firstChoiceValue,
+                       double const secondChoiceValue ) const
+    { return
+      ( ( firstChoiceValue != 0.0 ) ? firstChoiceValue : secondChoiceValue ); }
 
     // This is for creating a Python version of the potential.
     virtual std::string

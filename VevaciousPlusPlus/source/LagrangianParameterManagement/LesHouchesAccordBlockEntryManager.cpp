@@ -99,45 +99,6 @@ namespace VevaciousPlusPlus
   }
 
 
-  // This ensures that the given parameter exists in
-  // activeInterpolatedParameters and activeParametersToIndices, and returns a
-  // reference to its SlhaInterpolatedParameterFunctionoid.
-  SlhaInterpolatedParameterFunctionoid const&
-  LesHouchesAccordBlockEntryManager::RegisterBlockEntry(
-                                             std::string const& parameterName )
-  {
-    std::map< std::string, size_t >::const_iterator
-    alreadyExistsResult( activeParametersToIndices.find( parameterName ) );
-    if( alreadyExistsResult != activeParametersToIndices.end() )
-    {
-      // If the parameter is already active, we unfortunately need to do a
-      // linear search through activeInterpolatedParameters looking for the
-      // LhaBlockEntryInterpolator with the matching index.
-      for( std::vector< LhaBlockEntryInterpolator* >::const_iterator
-           activeBlockParameter( referenceSafeActiveParameters.begin() );
-           activeBlockParameter < referenceSafeActiveParameters.end();
-           ++activeBlockParameter )
-      {
-        if( (*activeBlockParameter)->IndexInValuesVector()
-            == alreadyExistsResult->second )
-        {
-          return (*activeBlockParameter);
-        }
-      }
-      std::stringstream errorBuilder;
-      errorBuilder
-      << "LesHouchesAccordBlockEntryManager::RegisterBlockEntry found the"
-      << " index " << alreadyExistsResult->second << " for \""
-      << parameterName << "\" but no LhaBlockEntryInterpolator in"
-      << " activeInterpolatedParameters had that index.";
-      throw std::out_of_range( errorBuilder.str() );
-    }
-
-    // If the parameter wasn't already active, we add it.
-    return CreateNewBlockEntry( parameterName );
-  }
-
-
   // This puts all variables with index brackets into a consistent form,
   // putting all those which are a valid block name followed by index brackets
   // into uppercase, to account for SLHA block name case insensitivity.

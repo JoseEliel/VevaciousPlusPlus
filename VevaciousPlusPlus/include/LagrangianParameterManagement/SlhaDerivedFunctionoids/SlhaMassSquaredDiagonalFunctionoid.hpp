@@ -19,27 +19,31 @@ namespace VevaciousPlusPlus
   {
   public:
     SlhaMassSquaredDiagonalFunctionoid( size_t const indexInValuesVector,
-                             SlhaSourcedParameterFunctionoid const& squareMass,
-                           SlhaSourcedParameterFunctionoid const& linearMass );
+                                        size_t const squareMassIndex,
+                                        size_t const linearMassIndex );
     virtual ~SlhaMassSquaredDiagonalFunctionoid();
 
 
-    // This returns trilinear coupling evaluated at the scale given
-    // through logarithmOfScale either from its direct value printed in the TL,
-    // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
-    // appropriate Yukawa coupling.
-    virtual double operator()( double const logarithmOfScale ) const;
-
-    // This returns trilinear coupling evaluated at the scale given
-    // through logarithmOfScale either from its direct value printed in the TL,
-    // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
-    // appropriate Yukawa coupling.
+    // This returns the mass-squared parameter evaluated at the scale given
+    // through logarithmOfScale either from its direct value printed in the
+    // MSL2, MSE2, MSQ2, MSD2, or MSU2 blocks, or by squaring the appropriate
+    // value from the MSOFT block.
     virtual double operator()( double const logarithmOfScale,
                         std::vector< double > const& interpolatedValues ) const
     { return ( ( interpolatedValues[ squareMassIndex ] == 0.0 ) ?
-                   ( interpolatedValues[ linearMassIndex ]
-                     * interpolatedValues[ linearMassIndex ] ):
-                   interpolatedValues[ squareMassIndex ] ); }
+               ( interpolatedValues[ linearMassIndex ]
+                 * interpolatedValues[ linearMassIndex ] ) :
+               interpolatedValues[ squareMassIndex ] ); }
+
+    // This returns the mass-squared parameter evaluated at the scale given
+    // through logarithmOfScale either from its direct value printed in the
+    // MSL2, MSE2, MSQ2, MSD2, or MSU2 blocks, or by squaring the appropriate
+    // value from the MSOFT block.
+    double operator()( double const squareMass,
+                       double const linearMass ) const
+    { return ( ( squareMass != 0.0 ) ?
+               squareMass :
+               ( linearMass * linearMass ) ); }
 
     // This is for creating a Python version of the potential.
     virtual std::string
@@ -50,34 +54,12 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    SlhaSourcedParameterFunctionoid const& squareMass;
     size_t const squareMassIndex;
-    SlhaSourcedParameterFunctionoid const& linearMass;
     size_t const linearMassIndex;
   };
 
 
 
-
-
-  // This returns trilinear coupling evaluated at the scale given
-  // through logarithmOfScale either from its direct value printed in the TL,
-  // TE, TQ, TD, or TU blocks, or by multiplying the A-value with the
-  // appropriate Yukawa coupling.
-  inline double SlhaMassSquaredDiagonalFunctionoid::operator()(
-                                          double const logarithmOfScale ) const
-  {
-    double directValue( squareMass( logarithmOfScale ) );
-    if( directValue == 0.0 )
-    {
-      double linearValue( linearMass( logarithmOfScale ) );
-      return ( linearValue * linearValue );
-    }
-    else
-    {
-      return directValue;
-    }
-  }
 
   // This is for creating a Python version of the potential.
   inline std::string
@@ -102,11 +84,7 @@ namespace VevaciousPlusPlus
     stringBuilder
     << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
     stringBuilder << "squareMassIndex = " << squareMassIndex << std::endl;
-    stringBuilder
-    << "squareMass = " << squareMass.AsDebuggingString() << std::endl;
     stringBuilder << "linearMassIndex = " << linearMassIndex << std::endl;
-    stringBuilder
-    << "linearMass = " << linearMass.AsDebuggingString() << std::endl;
     return stringBuilder.str();
   }
 

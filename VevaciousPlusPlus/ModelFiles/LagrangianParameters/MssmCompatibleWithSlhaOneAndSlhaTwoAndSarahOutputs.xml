@@ -209,14 +209,6 @@
     YE
     TE
     AE
-    <!-- The blocks prepended with TREE and LOOP are for compatibility with
-         output from SARAH-generated SPheno, so that the Lieber-Porod-Staub
-         scheme (where the SM-like vacuum VEVs are constant at every loop
-         order) values can be fully expressed. -->
-    TREEHMIX
-    LOOPHMIX
-    TREEMSOFT
-    LOOPMSOFT
   </ValidBlocks>
 
 </LhaBlockParameterManagerInitializationFile>

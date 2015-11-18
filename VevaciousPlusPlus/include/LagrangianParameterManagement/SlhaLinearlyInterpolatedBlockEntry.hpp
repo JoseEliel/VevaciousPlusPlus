@@ -90,7 +90,8 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder
-    << "lastIndex = " << lastIndex << ", logScalesWithValues = { [ ";
+    << "IndexInValuesVector() = " << IndexInValuesVector()
+    << ", lastIndex = " << lastIndex << ", logScalesWithValues = { [ ";
     for( std::vector< std::pair< double, double > >::const_iterator
          logScaleWithValue( logScalesWithValues.begin() );
          logScaleWithValue < logScalesWithValues.end();

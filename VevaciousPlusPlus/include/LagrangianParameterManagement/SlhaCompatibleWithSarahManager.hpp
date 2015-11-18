@@ -40,62 +40,18 @@ namespace VevaciousPlusPlus
     // This adds all the valid aliases to aliasesToSwitchStrings.
     void InitializeSarahAliases();
 
+    // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
+    // there doesn't seem to be an elegant way of using the common code as
+    // there is too much entanglement with registering new parameters or not.
+    virtual double OnceOffSpecialCase( std::string const& parameterName,
+                                       double const logarithmOfScale ) const;
+
     // This adds the parameter based on the alias given by switchString for the
     // parameter, returning either a found SARAH special case, or otherwise the
     // result of SlhaBlocksWithSpecialCasesManager::SlhaOneOrTwoSpecialCase.
     virtual std::pair< bool, size_t >
     RegisterUnregisteredSpecialCase(  std::string const& caseString );
-
-    // This adds a special case for switchString to be mapped to a
-    // SlhaTwoSourceFunctionoid looking preferentially at an interpolated block
-    // called (sarahPrefix + slhaName) then defaulting to the block called just
-    // slhaName.
-    std::pair< bool, size_t >
-    RegisterSarahPrefixedSlhaBlock( std::string const& caseString,
-                                    std::string const& sarahPrefix,
-                                    std::string const& slhaName );
   };
-
-
-
-
-
-  // This adds a special case for switchString to be mapped to a
-  // SlhaTwoSourceFunctionoid looking preferentially at an interpolated block
-  // called (sarahPrefix + slhaName) then defaulting to the block called just
-  // slhaName.
-  inline std::pair< bool, size_t >
-  SlhaCompatibleWithSarahManager::RegisterSarahPrefixedSlhaBlock(
-                                                 std::string const& caseString,
-                                                std::string const& sarahPrefix,
-                                                  std::string const& slhaName )
-  {
-    SlhaSourcedParameterFunctionoid const& sarahFunctionoid(
-              RegisterBlockEntry( FormatVariable( sarahPrefix + slhaName ) ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "sarahFunctionoid.AsDebuggingString() =" << std::endl;
-    std::cout << sarahFunctionoid.AsDebuggingString() << std::endl;
-    std::cout << std::endl;/**/
-
-    SlhaSourcedParameterFunctionoid const& shouldBeDrbarFunctionoid(
-                            RegisterBlockEntry( FormatVariable( slhaName ) ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "sarahFunctionoid.AsDebuggingString() =" << std::endl;
-    std::cout << sarahFunctionoid.AsDebuggingString() << std::endl;
-    std::cout << "shouldBeDrbarFunctionoid.AsDebuggingString() =" << std::endl;
-    std::cout << shouldBeDrbarFunctionoid.AsDebuggingString() << std::endl;
-    std::cout << std::endl;/**/
-    return AddNewDerivedParameter( caseString,
-                new SlhaTwoSourceFunctionoid( numberOfDistinctActiveParameters,
-                                              sarahFunctionoid,
-                                              shouldBeDrbarFunctionoid ) );
-  }
 
 } /* namespace VevaciousPlusPlus */
 
