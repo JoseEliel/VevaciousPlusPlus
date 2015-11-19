@@ -847,6 +847,7 @@ namespace VevaciousPlusPlus
     }
 
     bool positiveTerm( true );
+
     // We know that stringToParse[ 0 ] is not whitespace.
     size_t wordStart( 0 );
     if( stringToParse[ 0 ] == '-' )
@@ -858,6 +859,7 @@ namespace VevaciousPlusPlus
     {
       wordStart = 1;
     }
+
     // Now we have skipped any initial '+' or '-', so we start the 1st term.
     ParametersAndFieldsProduct polynomialTerm;
     if( !positiveTerm )
@@ -870,6 +872,7 @@ namespace VevaciousPlusPlus
                                                        wordStart,
                                                        polynomialTerm,
                                                        imaginaryTerm );
+
     // After parsing the 1st word, we keep parsing words until the end of
     // stringToParse is reached.
     while( wordStart != std::string::npos )
@@ -901,6 +904,7 @@ namespace VevaciousPlusPlus
           polynomialTerm.MultiplyByConstant( -1.0 );
         }
       }
+
       // Now we parse the next word.
       wordStart = PutNextNumberOrVariableIntoPolynomial( stringToParse,
                                                          (++wordStart),
@@ -1008,7 +1012,7 @@ namespace VevaciousPlusPlus
           wordEnd += 1;
         }
 
-        // For comparison, we need the string to be in the proper format:
+        // For comparison, we need the string to be in the proper format.
         std::string variableString( lagrangianParameterManager.FormatVariable(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
@@ -1023,7 +1027,7 @@ namespace VevaciousPlusPlus
                 == std::string::npos ) )
           {
             // Only positive integers are allowed as exponents. It's easier to
-            // also demand that no '+' or whitespace chars are allowed.
+            // also demand that no '+' or whitespace characters are allowed.
             throw std::runtime_error(
                               "Model file had invalid exponent after \'^\'." );
           }
@@ -1034,7 +1038,8 @@ namespace VevaciousPlusPlus
           = BOL::StringParser::stringToInt( stringToParse.substr( wordStart,
                                                    ( wordEnd - wordStart ) ) );
         }
-        // First we check for the imaginary unit:
+
+        // First we check for the imaginary unit.
         if( ( variableString.size() == 1 )
             &&
             ( ( variableString[ 0 ] == 'i' )
@@ -1055,7 +1060,8 @@ namespace VevaciousPlusPlus
           }
           return wordEnd;
         }
-        // Next we check for a field name:
+
+        // Next we check for a field name.
         for( size_t fieldIndex( 0 );
              fieldIndex < fieldNames.size();
              ++fieldIndex )
@@ -1063,12 +1069,14 @@ namespace VevaciousPlusPlus
           if( fieldNames[ fieldIndex ] == variableString )
           {
             // If it is a field name, we raise its power in the polynomial term
-            // and return position of the char just after the parsed chars.
+            // and return position of the char just after the parsed
+            // characters.
             polynomialTerm.RaiseFieldPower( fieldIndex,
                                             powerInt );
             return wordEnd;
           }
         }
+
         // If we get to here, it wasn't a field name, so we check whether it's
         // a Lagrangian parameter known to lagrangianParameterManager.
         std::pair< bool, size_t >

@@ -153,17 +153,32 @@ int main( int argumentCount,
   VevaciousPlusPlus::RgeImprovedOneLoopPotential
   newRgeImproved( newFixedScale );
 
-
   lhaParameterManager->NewParameterPoint( slhaFileName );
 
-  std::cout
+  /*std::cout
   << std::endl
   << "Parameter manager = " << lhaParameterManager->AsDebuggingString();
   std::cout << std::endl;
+  std::cout << "Old fixed tree = "
+   << oldFixedScale.TreeLevelPotential().AsDebuggingString();
+  std::cout << std::endl;
+  std::cout << "New fixed tree = "
+  << newFixedScale.PolynomialApproximation().AsDebuggingString();
+  std::cout << std::endl;
+  std::cout << "Old RGE tree = "
+   << oldRgeImproved.TreeLevelPotential().AsDebuggingString();
+  std::cout << std::endl;
+  std::cout << "New RGE tree = "
+  << newRgeImproved.PolynomialApproximation().AsDebuggingString();
+  std::cout << std::endl;*/
+
 
   std::vector< double > const fieldOrigin( oldFixedScale.FieldValuesOrigin() );
   std::vector< double > unitHd( fieldOrigin );
   unitHd.front() = 1.0;
+  std::vector< double >
+  fixedParameterValues( lhaParameterManager->ParameterValues(
+      log( lhaParameterManager->AppropriateFixedScaleForParameterPoint() ) ) );
 
   double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
                                          oldFixedScale.FieldValuesOrigin() ) );
@@ -181,6 +196,7 @@ int main( int argumentCount,
   newFixedOriginLoop( newFixedScale( newFixedScale.FieldValuesOrigin() ) );
 
   double const newRgeOriginTree( newRgeImproved.PolynomialApproximation()(
+                                                          fixedParameterValues,
                                         newRgeImproved.FieldValuesOrigin() ) );
   double const
   newRgeOriginLoop( newRgeImproved( newRgeImproved.FieldValuesOrigin() ) );
@@ -210,11 +226,85 @@ int main( int argumentCount,
   << ", at unitHd = " << newFixedScale.PolynomialApproximation()( unitHd )
   << std::endl
   << "newRge tree: at origin = "
-  << newRgeImproved.PolynomialApproximation()( fieldOrigin )
-  << ", at unitHd = " << newRgeImproved.PolynomialApproximation()( unitHd )
+  << newRgeImproved.PolynomialApproximation()( fixedParameterValues,
+                                               fieldOrigin )
+  << ", at unitHd = "
+  << newRgeImproved.PolynomialApproximation()( fixedParameterValues,
+                                               unitHd )
   << std::endl;
-  std::cout << std::endl;
 
+  std::cout << std::endl
+  << "Fixed scale parameter values = { ";
+  for( std::vector< double >::const_iterator
+       parameterValue( fixedParameterValues.begin() );
+       parameterValue < fixedParameterValues.end();
+       ++parameterValue )
+  {
+    std::cout << *parameterValue << ", ";
+  }
+  std::cout << "}"<< std::endl;
+  std::cout
+  << std::endl
+  << "Random field configurations!" << std::endl;
+  std::vector< double > randomConfiguration( fieldOrigin );
+  for( unsigned int randomCount( 0 );
+       randomCount < 10;
+       ++randomCount )
+  {
+    for( std::vector< double >::iterator
+         fieldValue( randomConfiguration.begin() );
+         fieldValue < randomConfiguration.end();
+         ++fieldValue )
+    {
+      *fieldValue
+      = BOL::UsefulStuff::flatRandomDouble( ( -200.0 * randomCount ),
+                                            ( 200.0 * randomCount ) );
+    }
+
+    double const oldFixedRandomLoop( oldFixedScale( randomConfiguration ) );
+    double const newFixedRandomLoop( newFixedScale( randomConfiguration ) );
+    double const oldRgeRandomLoop( oldRgeImproved( randomConfiguration ) );
+    double const newRgeRandomLoop( newRgeImproved( randomConfiguration ) );
+
+    std::cout
+    << std::endl
+    << oldFixedScale.FieldConfigurationAsMathematica( randomConfiguration )
+    << std::endl
+    << " - level\t\tOld fixed\t\tNew fixed\t\tOld RGE  \t\tNew RGE  "
+    << std::endl
+    << " - tree:\t\t"
+    << oldFixedScale.QuickApproximation( randomConfiguration )
+    << "\t\t"
+    << newFixedScale.PolynomialApproximation()( randomConfiguration )
+    << "\t\t"
+    << oldRgeImproved.QuickApproximation( randomConfiguration )
+    << "\t\t"
+    << newRgeImproved.PolynomialApproximation()( fixedParameterValues,
+                                                 randomConfiguration )
+    << std::endl;
+    std::cout
+    << " - loop abs:\t\t"
+    << oldFixedRandomLoop
+    << "\t\t"
+    << newFixedRandomLoop
+    << "\t\t"
+    << oldRgeRandomLoop
+    << "\t\t"
+    << newRgeRandomLoop;
+    std::cout << std::endl;
+    std::cout
+    << " - loop rel:\t\t"
+    << ( oldFixedRandomLoop - oldFixedOriginLoop )
+    << "\t\t"
+    << ( newFixedRandomLoop - newFixedOriginLoop )
+    << "\t\t"
+    << ( oldRgeRandomLoop - oldRgeOriginLoop )
+    << "\t\t"
+    << ( newRgeRandomLoop - newRgeOriginLoop );
+    std::cout << std::endl;
+
+  }
+  std::cout << std::endl;
 
 
   // Cleaning up.

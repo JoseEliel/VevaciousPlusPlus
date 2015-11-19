@@ -179,13 +179,6 @@ namespace VevaciousPlusPlus
   SlhaCompatibleWithSarahManager::RegisterUnregisteredSpecialCase(
                                                 std::string const& caseString )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "SlhaCompatibleWithSarahManager::RegisterUnregisteredSpecialCase( \""
-    << caseString << "\" ) called.";
-    std::cout << std::endl;/**/
-
     if( ( caseString == "Bmu" )
         ||
         ( caseString == "DsbVd" )
@@ -278,14 +271,6 @@ namespace VevaciousPlusPlus
         }
         sarahBlockEntry = FormatVariable( treeOrLoop + baseCase );
       }
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "caseString = \"" << caseString << "\", baseCase = \"" << baseCase
-      << "\", treeOrLoop + baseCase = \"" << ( treeOrLoop + baseCase )
-      << "\", sarahBlockEntry = \"" << sarahBlockEntry << "\"";
-      std::cout << std::endl;/**/
 
       // Since what sarahBlockEntry contains might already be an alias for
       // caseString (so as to have potential function files designed by SARAH

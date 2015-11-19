@@ -88,6 +88,93 @@ namespace VevaciousPlusPlus
                                       vectorSquareMasses,
                                       vectorMassesSquaredWithFactors,
                                       logarithmOfScale );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl << "OldRgeImprovedOneLoopPotential::operator()( "
+    << FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", T =" << temperatureValue
+    << " ) called. squaredLengthBeyondCap = " << squaredLengthBeyondCap
+    << ", cappedFieldConfiguration = "
+    << FieldConfigurationAsMathematica( cappedFieldConfiguration )
+    << ", renormalizationScaleSquared = "
+    << renormalizationScaleSquared
+    << ", sqrt( renormalizationScaleSquared ) = "
+    << sqrt( renormalizationScaleSquared )
+    << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( scalarMassesSquaredWithFactors.begin() );
+         massesWithFactor < scalarMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << "}"
+    << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( fermionMassesSquaredWithFactors.begin() );
+         massesWithFactor < fermionMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << "}"
+    << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( vectorMassesSquaredWithFactors.begin() );
+         massesWithFactor < vectorMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << " }";
+    std::cout << std::endl;
+    std::cout << "treeLevelPotential = "
+    << treeLevelPotential( cappedFieldConfiguration );
+    std::cout << std::endl;
+    std::cout << "polynomialLoopCorrections = "
+    << polynomialLoopCorrections( cappedFieldConfiguration )
+    // << std::endl << polynomialLoopCorrections.AsDebuggingString();
+    << std::endl;
+    std::cout << "LoopAndThermalCorrections = "
+    << LoopAndThermalCorrections( cappedFieldConfiguration,
+                                  scalarMassesSquaredWithFactors,
+                                  fermionMassesSquaredWithFactors,
+                                  vectorMassesSquaredWithFactors,
+                                  ( 1.0 / renormalizationScaleSquared ),
+                                  temperatureValue );
+    std::cout << std::endl;*/
+
     return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
              + treeLevelPotential( cappedFieldConfiguration,
                                  logarithmOfScale )
@@ -130,6 +217,24 @@ namespace VevaciousPlusPlus
       dsbFieldValueInputs[ fieldIndex ]
       = dsbFieldValuePolynomials[ fieldIndex ]( fieldOrigin );
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "At end of OldRgeImprovedOneLoopPotential::UpdateSelfForNewSlha(...),"
+    << " currentMinimumRenormalizationScale = "
+    << currentMinimumRenormalizationScale
+    << ", squareOfMinimumRenormalizationScale = "
+    << squareOfMinimumRenormalizationScale
+    << ", logarithmOfMinimumRenormalizationScale = "
+    << logarithmOfMinimumRenormalizationScale
+    << ", currentMaximumRenormalizationScale = "
+    << currentMaximumRenormalizationScale
+    << ", squareOfMaximumRenormalizationScale = "
+    << squareOfMaximumRenormalizationScale
+    << ", logarithmOfMaximumRenormalizationScale = "
+    << logarithmOfMaximumRenormalizationScale;
+    std::cout << std::endl;/**/
   }
 
 } /* namespace VevaciousPlusPlus */

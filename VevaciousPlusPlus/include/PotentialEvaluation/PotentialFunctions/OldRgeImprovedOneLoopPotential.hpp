@@ -48,6 +48,9 @@ namespace VevaciousPlusPlus
                   ( 0.5 * log( RenormalizationScaleSquared( fieldConfiguration,
                                                     temperatureValue ) ) ) ); }
 
+    virtual PolynomialSum const& TreeLevelPotential() const
+    { return treeLevelPotential; }
+
     // This returns the square of the Euclidean distance between the two vacua.
     virtual double
     ScaleSquaredRelevantToTunneling( PotentialMinimum const& falseVacuum,
@@ -106,6 +109,9 @@ namespace VevaciousPlusPlus
                                std::vector< double > const& fieldConfiguration,
                                           double const temperatureValue ) const
   {
+    /* Old way of doing things. I decided that a hard cut-off would be better.
+     * It certainly was better for comparing with the fixed-scale potential
+     * functions.
     double renormalizationScaleSquared( squareOfMinimumRenormalizationScale
                                    + ( temperatureValue * temperatureValue ) );
     for( std::vector< double >::const_iterator
@@ -115,7 +121,17 @@ namespace VevaciousPlusPlus
     {
       renormalizationScaleSquared += ( (*whichField) * (*whichField) );
     }
-    return renormalizationScaleSquared;
+    return renormalizationScaleSquared;*/
+    double renormalizationScaleSquared( temperatureValue * temperatureValue );
+    for( std::vector< double >::const_iterator
+         whichField( fieldConfiguration.begin() );
+         whichField < fieldConfiguration.end();
+         ++whichField )
+    {
+      renormalizationScaleSquared += ( (*whichField) * (*whichField) );
+    }
+    return std::max( renormalizationScaleSquared,
+                     squareOfMinimumRenormalizationScale );
   }
 
   // This appends the masses-squared and multiplicity from each

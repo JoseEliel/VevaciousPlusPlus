@@ -37,6 +37,23 @@ namespace VevaciousPlusPlus
     std::vector< ParametersAndFieldsProductSum > const& MatrixElements() const
     { return matrixElements; }
 
+    // This returns a matrix of the values of the elements for a field
+    // configuration given by fieldConfiguration, using the values for the
+    // Lagrangian parameters found in parameterValues.
+    Eigen::MatrixXd
+    DebugCurrentValues( std::vector< double > const& parameterValues,
+                        std::vector< double > const& fieldConfiguration ) const
+    { return CurrentValues( parameterValues,
+                            fieldConfiguration ); }
+
+    // This returns a matrix of the values of the elements for a field
+    // configuration given by fieldConfiguration, using the values for the
+    // Lagrangian parameters from the last call of UpdateForFixedScale.
+    Eigen::MatrixXd DebugCurrentValues(
+                       std::vector< double > const& fieldConfiguration ) const
+    { return CurrentValues( fieldConfiguration ); }
+
+
 
     // This is mainly for debugging:
     std::string AsString() const;

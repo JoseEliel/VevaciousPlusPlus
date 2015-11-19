@@ -102,7 +102,7 @@
         FixedNumber
       </EvaluationType>
       <EvaluationArgument>
-        91.1876
+        <!-- 91.1876 --> 1000.0
       </EvaluationArgument>
     </MinimumScaleBound>
 

@@ -81,19 +81,12 @@ namespace VevaciousPlusPlus
 
     // debugging:
     /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "scalarSquareMasses = {" << std::endl;
-    for( std::vector< OldRealMassesSquaredMatrix >::const_iterator
-         scalarMatrix( scalarMassSquaredMatrices.begin() );
-         scalarMatrix < scalarMassSquaredMatrices.end();
-         ++scalarMatrix )
-    {
-      std::cout << std::endl << scalarMatrix->AsString() << std::endl;
-    }
-    std::cout << std::endl << "}" << std::endl;
-    std::cout << std::endl;*/
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    << std::endl << "OldFixedScaleOneLoopPotential::operator()( "
+    << FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", T =" << temperatureValue
+    << " ) called. squaredLengthBeyondCap = " << squaredLengthBeyondCap
+    << ", cappedFieldConfiguration = "
+    << FieldConfigurationAsMathematica( cappedFieldConfiguration )
     << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
     for( std::vector< DoubleVectorWithDouble >::const_iterator
          massesWithFactor( scalarMassesSquaredWithFactors.begin() );
@@ -110,9 +103,9 @@ namespace VevaciousPlusPlus
       {
         std::cout << *massSquared << ",";
       }
-      std::cout << " }";
+      std::cout << " } ]" << std::endl;
     }
-    std::cout << std::endl << "}"
+    std::cout << "}"
     << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
     for( std::vector< DoubleVectorWithDouble >::const_iterator
          massesWithFactor( fermionMassesSquaredWithFactors.begin() );
@@ -129,9 +122,9 @@ namespace VevaciousPlusPlus
       {
         std::cout << *massSquared << ",";
       }
-      std::cout << " }";
+      std::cout << " } ]" << std::endl;
     }
-    std::cout << std::endl << "}"
+    std::cout << "}"
     << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
     for( std::vector< DoubleVectorWithDouble >::const_iterator
          massesWithFactor( vectorMassesSquaredWithFactors.begin() );
@@ -148,10 +141,25 @@ namespace VevaciousPlusPlus
       {
         std::cout << *massSquared << ",";
       }
-      std::cout << " }";
+      std::cout << " } ]" << std::endl;
     }
-    std::cout << std::endl << "}";
-    std::cout << std::endl;/**/
+    std::cout << " }";
+    std::cout << std::endl;
+    std::cout << "treeLevelPotential = "
+    << treeLevelPotential( cappedFieldConfiguration );
+    std::cout << std::endl;
+    std::cout << "polynomialLoopCorrections = "
+    << polynomialLoopCorrections( cappedFieldConfiguration )
+    // << std::endl << polynomialLoopCorrections.AsDebuggingString();
+    << std::endl;
+    std::cout << "LoopAndThermalCorrections = "
+    << LoopAndThermalCorrections( cappedFieldConfiguration,
+                                  scalarMassesSquaredWithFactors,
+                                  fermionMassesSquaredWithFactors,
+                                  vectorMassesSquaredWithFactors,
+                                  inverseRenormalizationScaleSquared,
+                                  temperatureValue );
+    std::cout << std::endl;*/
 
     return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
              + treeLevelPotential( cappedFieldConfiguration )

@@ -153,6 +153,7 @@ namespace VevaciousPlusPlus
   // constructed.
   inline void ParametersAndFieldsProduct::ResetValues()
   {
+    isValid = true;
     coefficientConstant = 1.0;
     fieldProductByIndex.clear();
     fieldPowersByIndex.clear();

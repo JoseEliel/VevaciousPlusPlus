@@ -55,6 +55,16 @@ namespace VevaciousPlusPlus
       scaleSquared += ( (*fieldValue) * (*fieldValue) );
     }
 
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "RgeImprovedOneLoopPotential::operator()( "
+    << FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", T =" << temperatureValue
+    << " ) called. Before comparing, scaleSquared = " << scaleSquared
+    << ", minimumScaleSquared = " << minimumScaleSquared;
+    std::cout << std::endl;*/
+
     // Of course, if minimumScaleSquared is *greater than* scaleSquared then we
     // need to use minimumScaleSquared as scaleSquared is below the minimum
     // allowed, hence using std::max.
@@ -64,6 +74,191 @@ namespace VevaciousPlusPlus
     std::vector< double > const
     parameterValues( lagrangianParameterManager.ParameterValues(
                                              ( 0.5 * log( scaleSquared ) ) ) );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "parameterValues = { ";
+    for( std::vector< double >::const_iterator
+         parameterValue( parameterValues.begin() );
+         parameterValue < parameterValues.end();
+         ++parameterValue )
+    {
+      std::cout << *parameterValue << ", ";
+    }
+    std::cout << "}, treeLevelPotential = "
+    << treeLevelPotential.AsDebuggingString();
+    std::vector< double > fieldOrigin( FieldValuesOrigin() );
+    std::vector< DoubleVectorWithDouble > originScalarMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( parameterValues,
+                                      fieldOrigin,
+                                      scalarSquareMasses,
+                                      originScalarMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble >
+    originFermionMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( parameterValues,
+                                      fieldOrigin,
+                                      fermionSquareMasses,
+                                      originFermionMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > originVectorMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( parameterValues,
+                                      fieldOrigin,
+                                      vectorSquareMasses,
+                                      originVectorMassesSquaredWithFactors );
+    std::cout << "For origin:"
+    << std::endl << "originScalarMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( originScalarMassesSquaredWithFactors.begin() );
+         massesWithFactor < originScalarMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << "}"
+    << std::endl << "originFermionMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( originFermionMassesSquaredWithFactors.begin() );
+         massesWithFactor < originFermionMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << "}"
+    << std::endl << "originVectorMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( originVectorMassesSquaredWithFactors.begin() );
+         massesWithFactor < originVectorMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << "}"
+    << std::endl
+    << "Before fixed scale update,"
+    << " vectorMassSquaredMatrices.front().DebugCurrentValues() with"
+    << " parameters = " << std::endl
+    << vectorMassSquaredMatrices.front().DebugCurrentValues( parameterValues,
+                                                             fieldOrigin )
+    << std::endl
+    << " vectorMassSquaredMatrices.front().DebugCurrentValues() without"
+    << " parameters = " << std::endl
+    << vectorMassSquaredMatrices.front().DebugCurrentValues( fieldOrigin )
+    << std::endl;
+    std::cout
+    << " vectorMassSquaredMatrices.front().AsString() = { "
+    << vectorMassSquaredMatrices.front().AsString()
+    << std::endl;
+    std::vector< RealMassesSquaredMatrix >
+    updatedVectorMassSquareds( vectorMassSquaredMatrices );
+    std::vector< MassesSquaredCalculator* > updatedPointers;
+    for( std::vector< RealMassesSquaredMatrix >::iterator
+         massMatrix( updatedVectorMassSquareds.begin() );
+         massMatrix < updatedVectorMassSquareds.end();
+         ++massMatrix )
+    {
+      massMatrix->UpdateForFixedScale( parameterValues );
+      updatedPointers.push_back( &(*massMatrix) );
+    }
+    std::cout << std::endl
+    << "After fixed scale update,"
+    << " updatedVectorMassSquareds.front().DebugCurrentValues() with"
+    << " parameters = " << std::endl
+    << updatedVectorMassSquareds.front().DebugCurrentValues( parameterValues,
+                                                             fieldOrigin )
+    << std::endl
+    << " updatedVectorMassSquareds.front().DebugCurrentValues() without"
+    << " parameters = " << std::endl
+    << updatedVectorMassSquareds.front().DebugCurrentValues( fieldOrigin )
+    << std::endl;
+    std::cout
+    << " updatedVectorMassSquareds.front().AsString() = { "
+    << updatedVectorMassSquareds.front().AsString()
+    << std::endl;
+    originVectorMassesSquaredWithFactors.clear();
+    AddMassesSquaredWithMultiplicity( parameterValues,
+                                      fieldOrigin,
+                                      updatedPointers,
+                                      originVectorMassesSquaredWithFactors );
+    std::cout
+    << "After fixed scale update, originVectorMassesSquaredWithFactors with"
+    << " parameterValues passed in = {"
+    << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( originVectorMassesSquaredWithFactors.begin() );
+         massesWithFactor < originVectorMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << "}" << std::endl;
+    originVectorMassesSquaredWithFactors.clear();
+    AddMassesSquaredWithMultiplicity( fieldOrigin,
+                                      updatedPointers,
+                                      originVectorMassesSquaredWithFactors );
+    std::cout
+    << "After fixed scale update, originVectorMassesSquaredWithFactors without"
+    << " parameterValues passed in = {"
+    << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( originVectorMassesSquaredWithFactors.begin() );
+         massesWithFactor < originVectorMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      std::cout
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        std::cout << *massSquared << ",";
+      }
+      std::cout << " } ]" << std::endl;
+    }
+    std::cout << " }" << std::endl;
+    std::cout << std::endl;*/
+
     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
     AddMassesSquaredWithMultiplicity( parameterValues,
                                       fieldConfiguration,

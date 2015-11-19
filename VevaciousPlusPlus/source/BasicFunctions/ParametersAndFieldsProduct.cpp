@@ -80,6 +80,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream returnStream;
     returnStream
+    << "isValid = " << isValid << std::endl
     << "coefficientConstant = " << coefficientConstant << std::endl
     << "fieldProductByIndex = {";
     for( std::vector< size_t >::const_iterator

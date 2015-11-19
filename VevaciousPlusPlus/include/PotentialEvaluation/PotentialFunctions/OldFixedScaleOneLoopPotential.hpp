@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager );
     OldFixedScaleOneLoopPotential(
-          OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
+       OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
     virtual ~OldFixedScaleOneLoopPotential();
 
 
@@ -42,6 +42,9 @@ namespace VevaciousPlusPlus
     virtual double
     QuickApproximation( std::vector< double > const& fieldConfiguration,
                         double const temperatureValue = 0.0 );
+
+    virtual PolynomialSum const& TreeLevelPotential() const
+    { return treeLevelPotential; }
 
     // This returns the square of the renormalization scale.
     virtual double

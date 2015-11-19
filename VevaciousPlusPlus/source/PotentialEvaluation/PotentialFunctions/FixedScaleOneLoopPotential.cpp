@@ -47,10 +47,10 @@ namespace VevaciousPlusPlus
   void FixedScaleOneLoopPotential::respondToObservedSignal()
   {
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "FixedScaleOneLoopPotential::respondToObservedSignal() called.";
-    std::cout << std::endl;/**/
+    std::cout << std::endl;*/
 
     renormalizationScale
     = lagrangianParameterManager.AppropriateFixedScaleForParameterPoint();
@@ -59,7 +59,32 @@ namespace VevaciousPlusPlus
     std::vector< double > const
     fixedParameterValues( lagrangianParameterManager.ParameterValues(
                                                log( renormalizationScale ) ) );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "FixedScaleOneLoopPotential::respondToObservedSignal(): before updating"
+    << "treeLevelPotential, treeLevelPotential = "
+    << treeLevelPotential.AsDebuggingString();
+    std::cout << std::endl;*/
+
     treeLevelPotential.UpdateForFixedScale( fixedParameterValues );
+
+    // debugging:
+    /*std::cout << std::endl << "debugging:"
+    << std::endl
+    << "fixedParameterValues = { ";
+    for( std::vector< double >::const_iterator
+         parameterValue( fixedParameterValues.begin() );
+         parameterValue < fixedParameterValues.end();
+         ++parameterValue )
+    {
+      std::cout << *parameterValue << ", ";
+    }
+    std::cout << "}, now treeLevelPotential = "
+    << treeLevelPotential.AsDebuggingString();
+    std::cout << std::endl;*/
+
     polynomialLoopCorrections.UpdateForFixedScale( fixedParameterValues );
     for( std::vector< RealMassesSquaredMatrix >::iterator
          massMatrix( scalarMassSquaredMatrices.begin() );
@@ -91,7 +116,7 @@ namespace VevaciousPlusPlus
     }
 
     // debugging:
-    /**/std::cout << std::endl << "debugging:"
+    /*std::cout << std::endl << "debugging:"
     << std::endl
     << "renormalizationScale = " << renormalizationScale
     << ", inverseRenormalizationScaleSquared = "
@@ -138,9 +163,9 @@ namespace VevaciousPlusPlus
       {
         std::cout << *massSquared << ",";
       }
-      std::cout << " }";
+      std::cout << " } ]" << std::endl;
     }
-    std::cout << std::endl << "}"
+    std::cout << "}"
     << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
     for( std::vector< DoubleVectorWithDouble >::const_iterator
          massesWithFactor( fermionMassesSquaredWithFactors.begin() );
@@ -157,9 +182,9 @@ namespace VevaciousPlusPlus
       {
         std::cout << *massSquared << ",";
       }
-      std::cout << " }";
+      std::cout << " } ]" << std::endl;
     }
-    std::cout << std::endl << "}"
+    std::cout << "}"
     << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
     for( std::vector< DoubleVectorWithDouble >::const_iterator
          massesWithFactor( vectorMassesSquaredWithFactors.begin() );
@@ -176,10 +201,10 @@ namespace VevaciousPlusPlus
       {
         std::cout << *massSquared << ",";
       }
-      std::cout << " }";
+      std::cout << " } ]" << std::endl;
     }
-    std::cout << std::endl << "}";
-    std::cout << std::endl;/**/
+    std::cout << "}";
+    std::cout << std::endl;*/
   }
 
   // This returns a string that is valid Python with no indentation to evaluate

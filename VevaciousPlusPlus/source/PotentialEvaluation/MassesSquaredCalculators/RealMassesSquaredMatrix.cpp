@@ -58,7 +58,8 @@ namespace VevaciousPlusPlus
     {
       valuesMatrix.coeffRef( rowIndex,
                              rowIndex )
-      = matrixElements[ rowsTimesLength + rowIndex ]( fieldConfiguration );
+      = matrixElements[ rowsTimesLength + rowIndex ]( parameterValues,
+                                                      fieldConfiguration );
       for( size_t columnIndex( rowIndex + 1 );
            columnIndex < numberOfRows;
            ++columnIndex )

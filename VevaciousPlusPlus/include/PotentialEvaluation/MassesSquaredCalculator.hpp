@@ -54,8 +54,7 @@ namespace VevaciousPlusPlus
     << std::endl
     << "Remember to remove this function!";
     std::cout << std::endl;/**/
-    throw std::runtime_error( "no longer supported!" );
-    return std::vector< double >();}
+    throw std::runtime_error( "no longer supported!" ); }
 
     // This returns the number of identical copies of this mass-squared matrix
     // that the model has.
