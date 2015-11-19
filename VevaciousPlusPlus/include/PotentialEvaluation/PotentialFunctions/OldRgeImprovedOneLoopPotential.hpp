@@ -19,7 +19,8 @@
 namespace VevaciousPlusPlus
 {
 
-  class OldRgeImprovedOneLoopPotential : public OldPotentialFromPolynomialAndMasses
+  class OldRgeImprovedOneLoopPotential :
+                                     public OldPotentialFromPolynomialAndMasses
   {
   public:
     OldRgeImprovedOneLoopPotential( std::string const& modelFilename,
@@ -28,7 +29,7 @@ namespace VevaciousPlusPlus
                                double const assumedPositiveOrNegativeTolerance,
                             RunningParameterManager& runningParameterManager );
     OldRgeImprovedOneLoopPotential(
-    OldPotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses );
+                       OldPotentialFromPolynomialAndMasses const& copySource );
     virtual ~OldRgeImprovedOneLoopPotential();
 
 
@@ -158,7 +159,8 @@ namespace VevaciousPlusPlus
   }
 
   // This returns the square of the Euclidean distance between the two vacua.
-  inline double OldRgeImprovedOneLoopPotential::ScaleSquaredRelevantToTunneling(
+  inline double
+  OldRgeImprovedOneLoopPotential::ScaleSquaredRelevantToTunneling(
                                            PotentialMinimum const& falseVacuum,
                                      PotentialMinimum const& trueVacuum ) const
   {

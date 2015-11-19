@@ -47,7 +47,7 @@ namespace VevaciousPlusPlus
     { return foundMinima; }
 
     // This returns the minimum corresponding to the desired symmetry breaking.
-    PotentialMinimum const& DsbVacuum() const{ return dsbVacuum; }
+    PotentialMinimum const& DsbVacuum() const { return dsbVacuum; }
 
     // This returns the set of minima which were found to be lower than the DSB
     // minimum.
@@ -59,12 +59,11 @@ namespace VevaciousPlusPlus
     // minimum from panicVacua which is closest to dsbVacuum.
     PotentialMinimum const& PanicVacuum() const { return panicVacuum; }
 
-    bool DsbVacuumIsStable() const{ return panicVacua.empty(); }
+    bool DsbVacuumIsStable() const { return panicVacua.empty(); }
 
-    bool DsbVacuumIsMetastable() const{ return !(panicVacua.empty()); }
+    bool DsbVacuumIsMetastable() const { return !(panicVacua.empty()); }
 
-    std::vector< std::string > const& FieldNames() const
-    { return potentialFunction.FieldNames(); }
+    PotentialFunction& PotentialFunction() { return potentialFunction; }
 
 
   protected:

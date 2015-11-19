@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
   class BounceAlongPathWithThreshold : public BounceActionTunneler
   {
   public:
-    BounceAlongPathWithThreshold( PotentialFunction& potentialFunction,
+    BounceAlongPathWithThreshold(
                            std::vector< BouncePathFinder* > const& pathFinders,
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
@@ -51,7 +51,8 @@ namespace VevaciousPlusPlus
     // tunnelingTemperature, or an upper bound if the upper bound drops below
     // actionThreshold during the course of the calculation. The vacua are
     // assumed to already be the minima at tunnelingTemperature.
-    virtual double BounceAction( PotentialMinimum const& falseVacuum,
+    virtual double BounceAction( PotentialFunction& potentialFunction,
+                                 PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
                                  double const tunnelingTemperature );
 
@@ -60,8 +61,10 @@ namespace VevaciousPlusPlus
     // the integral already passes a threshold, and sets
     // dominantTemperatureInGigaElectronVolts to be the temperature with the
     // lowest survival probability.
-    virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
+    virtual void
+    ContinueThermalTunneling( PotentialFunction& potentialFunction,
+                              PotentialMinimum const& falseVacuum,
+                              PotentialMinimum const& trueVacuum,
                              double const potentialAtOriginAtZeroTemperature );
 
 
@@ -72,7 +75,8 @@ namespace VevaciousPlusPlus
     // tunnelingTemperature, or an upper bound if the upper bound drops below
     // actionThreshold during the course of the calculation. The vacua are
     // assumed to already be the minima at tunnelingTemperature.
-    double BoundedBounceAction( PotentialMinimum const& falseVacuum,
+    double BoundedBounceAction( PotentialFunction& potentialFunction,
+                                PotentialMinimum const& falseVacuum,
                                 PotentialMinimum const& trueVacuum,
                                 double const tunnelingTemperature,
                                 double const actionThreshold,
@@ -90,6 +94,7 @@ namespace VevaciousPlusPlus
   // actionThreshold during the course of the calculation. The vacua are
   // assumed to already be the minima at tunnelingTemperature.
   inline double BounceAlongPathWithThreshold::BounceAction(
+                                          PotentialFunction& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                             double const tunnelingTemperature )
@@ -109,7 +114,8 @@ namespace VevaciousPlusPlus
       actionThreshold = ( log( -solitonicFactorTimesFourVolume
                                / log( survivalProbabilityThreshold ) ) );
     }
-    return BoundedBounceAction( falseVacuum,
+    return BoundedBounceAction( potentialFunction,
+                                falseVacuum,
                                 trueVacuum,
                                 tunnelingTemperature,
                                 actionThreshold,

@@ -18,7 +18,8 @@ namespace VevaciousPlusPlus
                                        assumedPositiveOrNegativeTolerance,
                                        lagrangianParameterManager ),
     BOL::BasicObserver(),
-    minimumScaleSquared( -1.0 )
+    minimumScaleSquared( -1.0 ),
+    maximumScaleSquared( -1.0 )
   {
     lagrangianParameterManager.registerObserver( this );
   }
@@ -27,7 +28,8 @@ namespace VevaciousPlusPlus
                    PotentialFromPolynomialWithMasses const& potentialToCopy ) :
     PotentialFromPolynomialWithMasses( potentialToCopy ),
     BOL::BasicObserver(),
-    minimumScaleSquared( -1.0 )
+    minimumScaleSquared( -1.0 ),
+    maximumScaleSquared( -1.0 )
   {
     lagrangianParameterManager.registerObserver( this );
   }
@@ -62,13 +64,19 @@ namespace VevaciousPlusPlus
     << FieldConfigurationAsMathematica( fieldConfiguration )
     << ", T =" << temperatureValue
     << " ) called. Before comparing, scaleSquared = " << scaleSquared
-    << ", minimumScaleSquared = " << minimumScaleSquared;
+    << ", minimumScaleSquared = " << minimumScaleSquared
+    << ", maximumScaleSquared = " << maximumScaleSquared;
     std::cout << std::endl;*/
 
-    // Of course, if minimumScaleSquared is *greater than* scaleSquared then we
-    // need to use minimumScaleSquared as scaleSquared is below the minimum
-    // allowed, hence using std::max.
-    scaleSquared = std::max( scaleSquared, minimumScaleSquared );
+    if( scaleSquared < minimumScaleSquared )
+    {
+      scaleSquared = minimumScaleSquared;
+    }
+    else if( scaleSquared > maximumScaleSquared )
+    {
+      scaleSquared = maximumScaleSquared;
+    }
+
     // The logarithm of the scale is of course half the logarithm of the square
     // of the scale.
     std::vector< double > const

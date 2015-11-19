@@ -15,12 +15,16 @@ namespace VevaciousPlusPlus
                                            std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                              std::string const& fixedScaleType,
-                                      std::string const& fixedScaleArgument ) :
+                                         std::string const& fixedScaleArgument,
+                                           std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument ) :
     LesHouchesAccordBlockEntryManager( validBlocksString,
                                        minimumScaleType,
                                        minimumScaleArgument,
                                        fixedScaleType,
-                                       fixedScaleArgument ),
+                                       fixedScaleArgument,
+                                       maximumScaleType,
+                                       maximumScaleArgument ),
     activeDerivedParameters(),
     aliasesToCaseStrings()
   {
@@ -32,12 +36,25 @@ namespace VevaciousPlusPlus
                                            std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                              std::string const& fixedScaleType,
-                                      std::string const& fixedScaleArgument ) :
+                                         std::string const& fixedScaleArgument,
+                                           std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument ) :
     LesHouchesAccordBlockEntryManager( validBlocks,
                                        minimumScaleType,
                                        minimumScaleArgument,
                                        fixedScaleType,
-                                       fixedScaleArgument ),
+                                       fixedScaleArgument,
+                                       maximumScaleType,
+                                       maximumScaleArgument ),
+    activeDerivedParameters(),
+    aliasesToCaseStrings()
+  {
+    InitializeSlhaOneOrTwoAliases();
+  }
+
+  SlhaBlocksWithSpecialCasesManager::SlhaBlocksWithSpecialCasesManager(
+                                             std::string const& xmlFileName ) :
+    LesHouchesAccordBlockEntryManager( xmlFileName ),
     activeDerivedParameters(),
     aliasesToCaseStrings()
   {

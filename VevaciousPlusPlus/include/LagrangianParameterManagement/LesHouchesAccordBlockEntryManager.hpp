@@ -26,13 +26,18 @@ namespace VevaciousPlusPlus
                                        std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                        std::string const& fixedScaleType,
-                                       std::string const& fixedScaleArgument );
+                                       std::string const& fixedScaleArgument,
+                                       std::string const& maximumScaleType,
+                                     std::string const& maximumScaleArgument );
     LesHouchesAccordBlockEntryManager(
                                  std::set< std::string > const& validBlocksSet,
                                        std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                        std::string const& fixedScaleType,
-                                       std::string const& fixedScaleArgument );
+                                       std::string const& fixedScaleArgument,
+                                       std::string const& maximumScaleType,
+                                     std::string const& maximumScaleArgument );
+    LesHouchesAccordBlockEntryManager( std::string const& xmlFileName );
     virtual ~LesHouchesAccordBlockEntryManager();
 
 
@@ -67,17 +72,23 @@ namespace VevaciousPlusPlus
     virtual std::vector< double >
     ParameterValues( double const logarithmOfScale ) const;
 
+    // This should return the minimum scale which is appropriate for evaluating
+    // the Lagrangian parameters at the current parameter point.
+    virtual double MinimumEvaluationScale() const
+    { return GetScale( minimumScaleType,
+                       minimumScaleArgument ); }
+
     // This returns the lowest scale above zero (not including zero) which was
     // in the set of scales read for fixedScaleDefiningBlock last read in.
     virtual double AppropriateFixedScaleForParameterPoint() const
     { return GetScale( fixedScaleType,
                        fixedScaleArgument ); }
 
-    // This should return the minimum scale which is appropriate for evaluating
+    // This should return the maximum scale which is appropriate for evaluating
     // the Lagrangian parameters at the current parameter point.
-    virtual double MinimumEvaluationScale() const
-    { return GetScale( minimumScaleType,
-                       minimumScaleArgument ); }
+    virtual double MaximumEvaluationScale() const
+    { return GetScale( maximumScaleType,
+                       maximumScaleArgument ); }
 
     // This puts all variables with index brackets into a consistent form,
     // putting all those which are a valid block name followed by index
@@ -119,7 +130,13 @@ namespace VevaciousPlusPlus
     std::string const minimumScaleArgument;
     std::string const fixedScaleType;
     std::string const fixedScaleArgument;
+    std::string const maximumScaleType;
+    std::string const maximumScaleArgument;
 
+
+    // This parses validBlocksString into a set of valid block names and
+    // inserts them into validBlocks.
+    void ParseValidBlocks( std::string const& validBlocksString );
 
     // This sets parameterName to map to newParameter, increments
     // numberOfDistinctActiveParameters, and returns true paired with the index
@@ -253,6 +270,33 @@ namespace VevaciousPlusPlus
     stringBuilder << ParametersInPythonFunction( 2 );
     stringBuilder << "  return parameterValues\n\n";
     return stringBuilder.str();
+  }
+
+  // This parses validBlocksString into a set of valid block names and
+  // inserts them into validBlocks.
+  inline void LesHouchesAccordBlockEntryManager::ParseValidBlocks(
+                                         std::string const& validBlocksString )
+  {
+    size_t wordStart( validBlocksString.find_first_not_of(
+                                             blockNameSeparationCharacters ) );
+    size_t wordEnd( 0 );
+    // If there are any more chars in validBlocks that are not in
+    // blockSeparators, we have at least one substring to add.
+    while( wordStart != std::string::npos )
+    {
+      wordEnd
+      = validBlocksString.find_first_of( blockNameSeparationCharacters,
+                                         wordStart );
+      validBlocks.insert( validBlocksString.substr( wordStart,
+                                                   ( wordEnd - wordStart ) ) );
+      if( wordEnd == std::string::npos )
+      {
+        break;
+      }
+      wordStart
+      = validBlocksString.find_first_not_of( blockNameSeparationCharacters,
+                                             wordEnd );
+    }
   }
 
   // This sets parameterName to map to newParameter, increments

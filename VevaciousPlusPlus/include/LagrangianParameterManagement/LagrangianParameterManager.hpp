@@ -55,13 +55,17 @@ namespace VevaciousPlusPlus
     virtual std::vector< double >
     ParameterValues( double logarithmOfScale ) const = 0;
 
+    // This should return the minimum scale which is appropriate for evaluating
+    // the Lagrangian parameters at the current parameter point.
+    virtual double MinimumEvaluationScale() const = 0;
+
     // This should return a scale which is appropriate for using for a
     // fixed-scale calculation for the current parameter point.
     virtual double AppropriateFixedScaleForParameterPoint() const = 0;
 
     // This should return the minimum scale which is appropriate for evaluating
     // the Lagrangian parameters at the current parameter point.
-    virtual double MinimumEvaluationScale() const = 0;
+    virtual double MaximumEvaluationScale() const = 0;
 
     // This just runs the internal PrepareNewParameterPoint method then updates
     // the observers.

@@ -19,7 +19,9 @@ namespace VevaciousPlusPlus
                                            std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                              std::string const& fixedScaleType,
-                                      std::string const& fixedScaleArgument ) :
+                                         std::string const& fixedScaleArgument,
+                                           std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument ) :
     LagrangianParameterManager(),
     numberOfDistinctActiveParameters( 0 ),
     activeParametersToIndices(),
@@ -30,28 +32,10 @@ namespace VevaciousPlusPlus
     minimumScaleType( minimumScaleType ),
     minimumScaleArgument( minimumScaleArgument ),
     fixedScaleType( fixedScaleType ),
-    fixedScaleArgument( fixedScaleArgument )
+    fixedScaleArgument( fixedScaleArgument ),
+    maximumScaleType( maximumScaleType ),
+    maximumScaleArgument( maximumScaleArgument )
   {
-    size_t wordStart( validBlocksString.find_first_not_of(
-                                             blockNameSeparationCharacters ) );
-    size_t wordEnd( 0 );
-    // If there are any more chars in validBlocks that are not in
-    // blockSeparators, we have at least one substring to add.
-    while( wordStart != std::string::npos )
-    {
-      wordEnd = validBlocksString.find_first_of( blockNameSeparationCharacters,
-                                                 wordStart );
-      validBlocks.insert( validBlocksString.substr( wordStart,
-                                                   ( wordEnd - wordStart ) ) );
-      if( wordEnd == std::string::npos )
-      {
-        break;
-      }
-      wordStart
-      = validBlocksString.find_first_not_of( blockNameSeparationCharacters,
-                                             wordEnd );
-    }
-
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
@@ -59,6 +43,8 @@ namespace VevaciousPlusPlus
         " objects! Probably should change this to"
         " SlhaLinearlyInterpolatedBlockEntry objects.";
     std::cout << std::endl;/**/
+
+    ParseValidBlocks( validBlocksString );
   }
 
   LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
@@ -66,7 +52,9 @@ namespace VevaciousPlusPlus
                                            std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                              std::string const& fixedScaleType,
-                                      std::string const& fixedScaleArgument ) :
+                                         std::string const& fixedScaleArgument,
+                                           std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument ) :
     LagrangianParameterManager(),
     numberOfDistinctActiveParameters( 0 ),
     activeParametersToIndices(),
@@ -77,7 +65,9 @@ namespace VevaciousPlusPlus
     minimumScaleType( minimumScaleType ),
     minimumScaleArgument( minimumScaleArgument ),
     fixedScaleType( fixedScaleType ),
-    fixedScaleArgument( fixedScaleArgument )
+    fixedScaleArgument( fixedScaleArgument ),
+    maximumScaleType( maximumScaleType ),
+    maximumScaleArgument( maximumScaleArgument )
   {
     // debugging:
     /**/std::cout << std::endl << "debugging:"
@@ -86,6 +76,87 @@ namespace VevaciousPlusPlus
         " objects! Probably should change this to"
         " SlhaLinearlyInterpolatedBlockEntry objects.";
     std::cout << std::endl;/**/
+  }
+
+  LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
+                                             std::string const& xmlFileName ) :
+    LagrangianParameterManager(),
+    numberOfDistinctActiveParameters( 0 ),
+    activeParametersToIndices(),
+    referenceSafeActiveParameters(),
+    referenceUnsafeActiveParameters(),
+    validBlocks(),
+    lhaParser(),
+    minimumScaleType( "FixedNumber" ),
+    minimumScaleArgument( "1.0" ),
+    fixedScaleType( "FixedNumber" ),
+    fixedScaleArgument( "1.0" ),
+    maximumScaleType( "FixedNumber" ),
+    maximumScaleArgument( "1.0" )
+  {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "LesHouchesAccordBlockEntryManager using SlhaPolynomialFitBlockEntry"
+        " objects! Probably should change this to"
+        " SlhaLinearlyInterpolatedBlockEntry objects.";
+    std::cout << std::endl;/**/
+
+    BOL::AsciiXmlParser fileParser;
+    fileParser.openRootElementOfFile( xmlFileName );
+    std::string renormalizationScaleChoices;
+    while( fileParser.readNextElement() )
+    {
+      if( fileParser.currentElementNameMatches(
+                                              "RenormalizationScaleChoices" ) )
+      {
+        BOL::AsciiXmlParser elementParser;
+        elementParser.loadString(
+                                fileParser.getTrimmedCurrentElementContent() );
+        while( elementParser.readNextElement() )
+        {
+          BOL::AsciiXmlParser choiceParser;
+          choiceParser.loadString(
+                            elementParser.getTrimmedCurrentElementContent() );
+          std::string evaluationType( "" );
+          std::string evaluationArgument( "" );
+          while( choiceParser.readNextElement() )
+          {
+            if( choiceParser.currentElementNameMatches( "EvaluationType" ) )
+            {
+              evaluationType = elementParser.getTrimmedCurrentElementContent();
+            }
+            else if( choiceParser.currentElementNameMatches(
+                                                       "EvaluationArgument" ) )
+            {
+              evaluationArgument
+              = elementParser.getTrimmedCurrentElementContent();
+            }
+          }
+          if( elementParser.currentElementNameMatches( "MinimumScaleBound" ) )
+          {
+            minimumScaleType = evaluationType;
+            minimumScaleArgument = evaluationArgument;
+          }
+          else if( elementParser.currentElementNameMatches(
+                                                         "FixedScaleChoice" ) )
+          {
+            fixedScaleType = evaluationType;
+            fixedScaleArgument = evaluationArgument;
+          }
+          else if( elementParser.currentElementNameMatches(
+                                                        "MaximumScaleBound" ) )
+          {
+            maximumScaleType = evaluationType;
+            maximumScaleArgument = evaluationArgument;
+          }
+        }
+      }
+      else if( fileParser.currentElementNameMatches( "ValidBlocks" ) )
+      {
+        ParseValidBlocks( fileParser.getTrimmedCurrentElementContent() );
+      }
+    }
   }
 
   LesHouchesAccordBlockEntryManager::~LesHouchesAccordBlockEntryManager()

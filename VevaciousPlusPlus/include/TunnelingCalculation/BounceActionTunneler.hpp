@@ -23,7 +23,7 @@ namespace VevaciousPlusPlus
   class BounceActionTunneler : public TunnelingCalculator
   {
   public:
-    BounceActionTunneler( PotentialFunction& potentialFunction,
+    BounceActionTunneler(
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                           double const survivalProbabilityThreshold,
                           size_t const temperatureAccuracy,
@@ -33,8 +33,10 @@ namespace VevaciousPlusPlus
 
     // This decides what virtual tunneling calculation functions to call based
     // on tunnelingStrategy.
-    virtual void CalculateTunneling( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum );
+    virtual void
+    CalculateTunneling( PotentialFunction const& potentialFunction,
+                        PotentialMinimum const& falseVacuum,
+                        PotentialMinimum const& trueVacuum );
 
 
   protected:
@@ -47,21 +49,18 @@ namespace VevaciousPlusPlus
     static double const fourVolumeOfKnownUniverseOverGevFourth;
     static double const lnOfThermalIntegrationFactor;
 
-    PotentialFunction const& potentialFunction;
     size_t const temperatureAccuracy;
     std::pair< double, double > rangeOfMaxTemperatureForOriginToFalse;
     std::pair< double, double > rangeOfMaxTemperatureForOriginToTrue;
 
-    MinuitPotentialMinimizer thermalPotentialMinimizer;
-    // PotentialMinimum evaporationMinimum;
-    // PotentialMinimum criticalMinimum;
-    // bool criticalRatherThanEvaporation;
     double const vacuumSeparationFractionSquared;
 
 
     // This is a hook to allow for derived classes to prepare things common to
     // both quantum and thermal tunneling. By default, it does nothing.
-    virtual void PrepareCommonExtras(){}
+    virtual void
+    PrepareCommonExtras( PotentialFunction const& potentialFunction )
+    { ; /* By default, does nothing. */ }
 
     // This should return either the dimensionless bounce action integrated
     // over four dimensions (for zero temperature) or the dimensionful bounce
@@ -69,21 +68,24 @@ namespace VevaciousPlusPlus
     // tunneling from falseVacuum to trueVacuum at temperature
     // tunnelingTemperature. The vacua are assumed to already be the minima at
     // tunnelingTemperature.
-    virtual double BounceAction( PotentialMinimum const& falseVacuum,
+    virtual double BounceAction( PotentialFunction const& potentialFunction,
+                                 PotentialMinimum const& falseVacuum,
                                  PotentialMinimum const& trueVacuum,
                                  double const tunnelingTemperature ) = 0;
 
     // This sets quantumSurvivalProbability, quantumLifetimeInSeconds, and
     // logOfMinusLogOfQuantumProbability appropriately.
     virtual void
-    CalculateQuantumTunneling( PotentialMinimum const& falseVacuum,
+    CalculateQuantumTunneling( PotentialFunction const& potentialFunction,
+                               PotentialMinimum const& falseVacuum,
                                PotentialMinimum const& trueVacuum );
 
     // This sets thermalSurvivalProbability,
     // dominantTemperatureInGigaElectronVolts, and
     // logOfMinusLogOfThermalProbability appropriately.
     virtual void
-    CalculateThermalTunneling( PotentialMinimum const& falseVacuum,
+    CalculateThermalTunneling( PotentialFunction const& potentialFunction,
+                               PotentialMinimum const& falseVacuum,
                                PotentialMinimum const& trueVacuum );
 
     // This sets rangeOfMaxTemperatureForOriginToFalse and
@@ -91,8 +93,10 @@ namespace VevaciousPlusPlus
     // are just above and just below the maximum temperatures for tunneling to
     // be possible from the origin to the false vacuum and true vacuum
     // respectively. The temperatures are capped at the Planck temperature.
-    void SetUpMaximumTemperatureRanges( PotentialMinimum const& falseVacuum,
-                                        PotentialMinimum const& trueVacuum,
+    void
+    SetUpMaximumTemperatureRanges( PotentialFunction const& potentialFunction,
+                                   PotentialMinimum const& falseVacuum,
+                                   PotentialMinimum const& trueVacuum,
                              double const potentialAtOriginAtZeroTemperature );
 
     // This sets rangeOfMaxTemperature to be the temperatures which are just
@@ -100,6 +104,7 @@ namespace VevaciousPlusPlus
     // possible from the origin to zeroTemperatureVacuum. The temperatures are
     // capped at the Planck temperature.
     void SetMaximumTunnelingTemperatureRange(
+                                    PotentialFunction const& potentialFunction,
                             std::pair< double, double >& rangeOfMaxTemperature,
                                  PotentialMinimum const& zeroTemperatureVacuum,
                              double const potentialAtOriginAtZeroTemperature );
@@ -110,13 +115,16 @@ namespace VevaciousPlusPlus
     // called after guarding against the case where the field origin is deeper
     // than the DSB vacuum at zero temperature, which would make cooling into
     // the DSB vacuum implausible.
-    virtual void ContinueThermalTunneling( PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum,
+    virtual void
+    ContinueThermalTunneling( PotentialFunction const& potentialFunction,
+                              PotentialMinimum const& falseVacuum,
+                              PotentialMinimum const& trueVacuum,
                          double const potentialAtOriginAtZeroTemperature ) = 0;
 
     // This returns true if the temperature is below that at which tunneling
     // from the field origin to zeroTemperatureVacuum becomes impossible.
-    bool BelowCriticalTemperature( double const temperatureGuess,
+    bool BelowCriticalTemperature( PotentialFunction const& potentialFunction,
+                                   double const temperatureGuess,
                                PotentialMinimum const& zeroTemperatureVacuum );
 
     // This returns a number of points which should be appropriate for
@@ -142,6 +150,7 @@ namespace VevaciousPlusPlus
   // be possible from the origin to the false vacuum and true vacuum
   // respectively. The temperatures are capped at the Planck temperature.
   inline void BounceActionTunneler::SetUpMaximumTemperatureRanges(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
@@ -151,22 +160,25 @@ namespace VevaciousPlusPlus
     << " the false vacuum at "
     << falseVacuum.AsMathematica( potentialFunction.FieldNames() )
     << " becomes impossible." << std::endl;
-    SetMaximumTunnelingTemperatureRange( rangeOfMaxTemperatureForOriginToFalse,
-                                        falseVacuum,
-                                        potentialAtOriginAtZeroTemperature );
+    SetMaximumTunnelingTemperatureRange( potentialFunction,
+                                         rangeOfMaxTemperatureForOriginToFalse,
+                                         falseVacuum,
+                                         potentialAtOriginAtZeroTemperature );
     std::cout << std::endl
     << "Looking for temperature at which tunneling from the field origin to"
     << " the true vacuum at "
     << trueVacuum.AsMathematica( potentialFunction.FieldNames() )
     << " becomes impossible." << std::endl;
-    SetMaximumTunnelingTemperatureRange( rangeOfMaxTemperatureForOriginToTrue,
-                                        trueVacuum,
-                                        potentialAtOriginAtZeroTemperature );
+    SetMaximumTunnelingTemperatureRange( potentialFunction,
+                                         rangeOfMaxTemperatureForOriginToTrue,
+                                         trueVacuum,
+                                         potentialAtOriginAtZeroTemperature );
   }
 
   // This returns true if the temperature is below that at which tunneling
   // from the field origin to zeroTemperatureVacuum becomes impossible.
   inline bool BounceActionTunneler::BelowCriticalTemperature(
+                                    PotentialFunction const& potentialFunction,
                                                  double const temperatureGuess,
                                 PotentialMinimum const& zeroTemperatureVacuum )
   {
@@ -180,6 +192,7 @@ namespace VevaciousPlusPlus
     }
     else
     {
+      MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
       thermalPotentialMinimizer.SetTemperature( temperatureGuess );
       return ( ( thermalPotentialMinimizer(
                    zeroTemperatureVacuum.FieldConfiguration() ).FunctionValue()

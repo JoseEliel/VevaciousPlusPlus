@@ -20,13 +20,16 @@ namespace VevaciousPlusPlus
   // NULL, and no other function sets them, there should be no problem with
   // the destructor calling delete on these pointers, as they do not get set to
   // point at the addresses of the given components.
-  VevaciousPlusPlus::VevaciousPlusPlus( SlhaManager& slhaManager,
-                                        PotentialMinimizer& potentialMinimizer,
+  VevaciousPlusPlus::VevaciousPlusPlus( PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
-    slhaManager( &slhaManager ),
-    ownedSlhaManager( NULL ),
-    potentialFunction( NULL ),
+    lagrangianParameterManager(
+      &(potentialMinimizer.PotentialFunction().LagrangianParameterManager()) ),
+    ownedLagrangianParameterManager( NULL ),
+    slhaManager(
+         potentialMinimizer.PotentialFunction().LagrangianParameterManager() ),
+    potentialFunction( &(potentialMinimizer.PotentialFunction()) ),
     ownedPotentialFunction( NULL ),
+    oldPotentialFunction( NULL ),
     potentialMinimizer( &potentialMinimizer ),
     ownedPotentialMinimizer( NULL ),
     tunnelingCalculator( &tunnelingCalculator ),
@@ -45,8 +48,9 @@ namespace VevaciousPlusPlus
   // compilers.
   VevaciousPlusPlus::VevaciousPlusPlus(
                                   std::string const& initializationFileName ) :
+    lagrangianParameterManager( NULL ),
+    ownedLagrangianParameterManager( NULL ),
     slhaManager( NULL ),
-    ownedSlhaManager( NULL ),
     potentialFunction( NULL ),
     ownedPotentialFunction( NULL ),
     potentialMinimizer( NULL ),
@@ -58,57 +62,51 @@ namespace VevaciousPlusPlus
     // debugging:
     /**/std::cout << std::endl << "debugging:"
     << std::endl
-    << "Really have to sort out this constructor.";
+    << "Really have to sort out this constructor. Remember to remove"
+    << " slhaManager!";
     std::cout << std::endl;/**/
-    //ownedSlhaManager = new RunningParameterManager();
-    slhaManager = ownedSlhaManager;
-    std::string potentialClass( "FixedScaleOneLoopPotential" );
-    std::string potentialArguments( "" );
-    std::string minimizerClass( "GradientFromStartingPoints" );
-    std::string minimizerArguments( "" );
-    std::string tunnelingClass( "BounceAlongPathWithThreshold" );
-    std::string tunnelingArguments( "" );
+
+    std::string potentialFunctionInitializationFilename( "error" );
+    std::string potentialMinimizerInitializationFilename( "error" );
+    std::string tunnelingCalculatorInitializationFilename( "error" );
     BOL::AsciiXmlParser fileParser;
     fileParser.openRootElementOfFile( initializationFileName );
     while( fileParser.readNextElement() )
     {
-      ReadClassAndArguments( fileParser,
-                             "PotentialClass",
-                             potentialClass,
-                             potentialArguments );
-      ReadClassAndArguments( fileParser,
-                             "MinimizerClass",
-                             minimizerClass,
-                             minimizerArguments );
-      ReadClassAndArguments( fileParser,
-                             "TunnelingClass",
-                             tunnelingClass,
-                             tunnelingArguments );
+      if( fileParser.currentElementNameMatches(
+                                      "PotentialFunctionInitializationFile" ) )
+      {
+        potentialFunctionInitializationFilename
+        = fileParser.getTrimmedCurrentElementContent();
+      }
+      else if( fileParser.currentElementNameMatches(
+                                     "PotentialMinimizerInitializationFile" ) )
+      {
+        potentialMinimizerInitializationFilename
+        = fileParser.getTrimmedCurrentElementContent();
+      }
+      else if( fileParser.currentElementNameMatches(
+                                    "TunnelingCalculatorInitializationFile" ) )
+      {
+        tunnelingCalculatorInitializationFilename
+        = fileParser.getTrimmedCurrentElementContent();
+      }
     }
 
     // Now we know the overall picture of what components to set up.
     // ALL SUB-COMPONENTS FOR potentialMinimizer AND tunnelingCalculator ARE
     // MEMORY-MANAGED BY THE COMPONENTS THEMSELVES! The VevaciousPlusPlus
     // destructor only deletes ownedTunnelingCalculator,
-    // ownedPotentialMinimizer, and ownedPotentialFunction, while
-    // this constructor is allocating much more memory than that. Everything
-    // would be clear if we restricted ourselves to requiring a C++11-compliant
-    // compiler, as then we could have the constructors use std::unique_ptrs,
-    // but alas, we're sticking to C++98.
-
-    // First the potential function: since the only options are both derived
-    // from PotentialFromPolynomialAndMasses with no specific extra arguments,
-    // we extract them from the XML here.
-    potentialFunction = SetUpPotentialFunction( potentialClass,
-                                                potentialArguments );
-
-    // Next the potential minimizer:
-    potentialMinimizer = SetUpPotentialMinimizer( minimizerClass,
-                                                  minimizerArguments );
-
-    // Finally the tunneling calculator:
-    tunnelingCalculator = SetUpTunnelingCalculator( tunnelingClass,
-                                                    tunnelingArguments );
+    // ownedPotentialMinimizer, ownedPotentialFunction, and
+    // ownedLagrangianParameterManager, while this constructor is allocating
+    // much more memory than that. Everything would be clear if we restricted
+    // ourselves to requiring a C++11-compliant compiler, as then we could have
+    // the constructors use std::unique_ptrs, but, alas, we're sticking to
+    // C++98.
+    SetUpLagrangianParametersAndPotential(
+                                     potentialFunctionInitializationFilename );
+    SetUpPotentialMinimizer( potentialMinimizerInitializationFilename );
+    SetUpTunnelingCalculator( tunnelingCalculatorInitializationFilename );
   }
 
   VevaciousPlusPlus::~VevaciousPlusPlus()
@@ -116,23 +114,28 @@ namespace VevaciousPlusPlus
     delete ownedTunnelingCalculator;
     delete ownedPotentialMinimizer;
     delete ownedPotentialFunction;
-    delete ownedSlhaManager;
+    delete oldPotentialFunction;
+    delete slhaManager;
+    delete ownedLagrangianParameterManager;
   }
 
 
-  // This runs the point parameterized in the given file.
-  void VevaciousPlusPlus::RunPoint( std::string const& parameterFilename )
+  // This runs the point parameterized by newInput, which for the default
+  // case gives the name of a file with the input parameters, but could in
+  // principle itself contain all the necessary parameters.
+  void VevaciousPlusPlus::RunPoint( std::string const& newInput )
   {
     time( &currentTime );
     std::cout
     << std::endl
-    << "Running " << parameterFilename << " starting at "
+    << "Running \"" << newInput << "\" starting at "
     << ctime( &currentTime );
     std::cout << std::endl;
     BOL::BasicTimer stageTimer;
     BOL::BasicTimer totalTimer;
 
-    slhaManager->UpdateSlhaData( parameterFilename );
+    lagrangianParameterManager->NewParameterPoint( newInput );
+    slhaManager->UpdateSlhaData( newInput );
     potentialMinimizer->FindMinima( 0.0 );
 
     time( &currentTime );
@@ -145,7 +148,9 @@ namespace VevaciousPlusPlus
     if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       stageTimer.setStartTime();
-      tunnelingCalculator->CalculateTunneling( potentialMinimizer->DsbVacuum(),
+      tunnelingCalculator->CalculateTunneling(
+                                       potentialMinimizer->PotentialFunction(),
+                                               potentialMinimizer->DsbVacuum(),
                                            potentialMinimizer->PanicVacuum() );
 
       time( &currentTime );
@@ -191,13 +196,13 @@ namespace VevaciousPlusPlus
     xmlFile << "stable\n"
     "  </StableOrMetastable>\n"
     << potentialMinimizer->DsbVacuum().AsVevaciousXmlElement( "DsbVacuum",
-                                            potentialMinimizer->FieldNames() );
+                                             potentialFunction->FieldNames() );
     if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       xmlFile
       << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
                                                                 "PanicVacuum",
-                                            potentialMinimizer->FieldNames() );
+                                             potentialFunction->FieldNames() );
       if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
       {
         xmlFile << "  <ZeroTemperatureDsbSurvival>\n"
@@ -351,7 +356,7 @@ namespace VevaciousPlusPlus
     << "BLOCK VEVACIOUSFIELDNAMES # Field names for each index\n"
     "# [index] [field name in \"\"]\n";
     std::vector< std::string > const&
-    fieldNames( potentialMinimizer->FieldNames() );
+    fieldNames( potentialFunction->FieldNames() );
     for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
@@ -467,63 +472,6 @@ namespace VevaciousPlusPlus
       return TunnelingCalculator::JustQuantum;
     }
     return TunnelingCalculator::NoTunneling;
-  }
-
-  // This decides on the derived class to use for ownedPotentialFunction and
-  // constructs it with the arguments parsed from constructorArguments.
-  PotentialFunction*
-  VevaciousPlusPlus::SetUpPotentialFunction( std::string const& className,
-                                      std::string const& constructorArguments )
-  {
-    std::string modelFilename( "./ModelFiles/SM.vin" );
-    double scaleRangeMinimumFactor( 10.0 );
-    bool treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions( false );
-    double assumedPositiveOrNegativeTolerance( 1.0 );
-    BOL::AsciiXmlParser elementParser;
-    elementParser.loadString( constructorArguments );
-    while( elementParser.readNextElement() )
-    {
-      InterpretElementIfNameMatches( elementParser,
-                                     "ModelFile",
-                                     modelFilename );
-      InterpretElementIfNameMatches( elementParser,
-                                     "ScaleRangeMinimumFactor",
-                                     scaleRangeMinimumFactor );
-      InterpretElementIfNameMatches( elementParser,
-                                     "RollOnlyMinima",
-                     treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions );
-      InterpretElementIfNameMatches( elementParser,
-                                     "AssumedPositiveOrNegativeTolerance",
-                                     assumedPositiveOrNegativeTolerance );
-    }
-    if( className.compare( "FixedScaleOneLoopPotential" ) == 0 )
-    {
-      ownedPotentialFunction
-      = new OldFixedScaleOneLoopPotential( modelFilename,
-                                        scaleRangeMinimumFactor,
-                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
-                                        assumedPositiveOrNegativeTolerance,
-                                        *ownedSlhaManager );
-    }
-    else if( className.compare( "RgeImprovedOneLoopPotential" ) == 0 )
-    {
-      ownedPotentialFunction
-      = new OldRgeImprovedOneLoopPotential( modelFilename,
-                                         scaleRangeMinimumFactor,
-                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
-                                         assumedPositiveOrNegativeTolerance,
-                                         *ownedSlhaManager );
-    }
-    else
-    {
-      std::stringstream errorStream;
-      errorStream
-      << "<PotentialClass> was not a recognized form! The only types currently"
-      << " valid are \"FixedScaleOneLoopPotential\" and"
-      << " \"RgeImprovedOneLoopPotential\".";
-      throw std::runtime_error( errorStream.str() );
-    }
-    return ownedPotentialFunction;
   }
 
   // This decides on the derived class (based on GradientMinimizer) to use

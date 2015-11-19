@@ -11,7 +11,7 @@
 #include "CommonIncludes.hpp"
 #include "PotentialFromPolynomialWithMasses.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -58,6 +58,7 @@ namespace VevaciousPlusPlus
 
   protected:
     double minimumScaleSquared;
+    double maximumScaleSquared;
   };
 
 
@@ -73,6 +74,18 @@ namespace VevaciousPlusPlus
     double const
     minimumScale( lagrangianParameterManager.MinimumEvaluationScale() );
     minimumScaleSquared = ( minimumScale * minimumScale );
+    double const
+    maximumScale( lagrangianParameterManager.MaximumEvaluationScale() );
+    maximumScaleSquared = ( maximumScale * maximumScale );
+    if( minimumScale > maximumScale )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder
+      << "Somehow minimum allowed scale (" << minimumScale
+      << " GeV) is greater than the maximum allowed scale (" << maximumScale
+      << ") for this parameter point.";
+      throw std::runtime_error( errorBuilder.str() );
+    }
   }
 
 } /* namespace VevaciousPlusPlus */

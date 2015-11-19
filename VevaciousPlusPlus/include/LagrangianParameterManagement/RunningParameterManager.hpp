@@ -91,13 +91,18 @@ namespace VevaciousPlusPlus
 
     // This returns a scale which is appropriate for using for a fixed-scale
     // calculation for the current parameter point.
+    virtual double MinimumEvaluationScale() const
+    { return lowestBlockScale; }
+
+    // This returns a scale which is appropriate for using for a fixed-scale
+    // calculation for the current parameter point.
     virtual double AppropriateFixedScaleForParameterPoint() const
     { return lowestBlockScale; }
 
     // This returns a scale which is appropriate for using for a fixed-scale
     // calculation for the current parameter point.
-    virtual double MinimumEvaluationScale() const
-    { return lowestBlockScale; }
+    virtual double MaximumEvaluationScale() const
+    { return highestBlockScale; }
 
 
   protected:

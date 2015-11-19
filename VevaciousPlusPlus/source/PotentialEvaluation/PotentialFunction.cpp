@@ -10,7 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  PotentialFunction::PotentialFunction() :
+  PotentialFunction::PotentialFunction(
+                     LagrangianParameterManager& lagrangianParameterManager ) :
+    lagrangianParameterManager( lagrangianParameterManager ),
     fieldNames(),
     numberOfFields( 0 ),
     dsbFieldInputStrings(),
@@ -20,6 +22,7 @@ namespace VevaciousPlusPlus
   }
 
   PotentialFunction::PotentialFunction( PotentialFunction const& copySource ) :
+    lagrangianParameterManager( copySource.lagrangianParameterManager ),
     fieldNames( copySource.fieldNames ),
     numberOfFields( copySource.numberOfFields ),
     dsbFieldInputStrings( copySource.dsbFieldInputStrings ),

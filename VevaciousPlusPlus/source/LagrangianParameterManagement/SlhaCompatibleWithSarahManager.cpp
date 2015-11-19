@@ -40,6 +40,13 @@ namespace VevaciousPlusPlus
     InitializeSarahAliases();
   }
 
+  SlhaCompatibleWithSarahManager::SlhaCompatibleWithSarahManager(
+                                             std::string const& xmlFileName ) :
+    SlhaBlocksWithSpecialCasesManager( xmlFileName )
+  {
+    InitializeSarahAliases();
+  }
+
   SlhaCompatibleWithSarahManager::~SlhaCompatibleWithSarahManager()
   {
     // This does nothing beyond what the base SlhaBlocksWithSpecialCasesManager

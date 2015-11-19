@@ -50,8 +50,7 @@ namespace VevaciousPlusPlus
     // possibilities can use the other constructor, which takes the name of an
     // initialization file, and then creates the components based on the data
     // in that file.
-    VevaciousPlusPlus( SlhaManager& slhaManager,
-                       PotentialMinimizer& potentialMinimizer,
+    VevaciousPlusPlus( PotentialMinimizer& potentialMinimizer,
                        TunnelingCalculator& tunnelingCalculator );
 
     // This is the constructor that we expect to be used in normal use: it
@@ -66,8 +65,10 @@ namespace VevaciousPlusPlus
     virtual ~VevaciousPlusPlus();
 
 
-    // This runs the point parameterized in the given file.
-    void RunPoint( std::string const& parameterFilename );
+    // This runs the point parameterized by newInput, which for the default
+    // case gives the name of a file with the input parameters, but could in
+    // principle itself contain all the necessary parameters.
+    void RunPoint( std::string const& newInput );
 
     // This writes the results as an XML file.
     void WriteXmlResults( std::string const& xmlFilename );
@@ -78,6 +79,16 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // This reads the current element of outerParser and if its name matches
+    // elementName, it puts the contents of the child element <ClassType> into
+    // className and <ConstructorArguments> into constructorArguments, both
+    // stripped of whitespace.
+    static void ReadClassAndArguments( BOL::AsciiXmlParser const& outerParser,
+                                       std::string const& elementName,
+                                       std::string& className,
+                                       std::string& constructorArguments );
+
+
     // This puts the content of the current element of xmlParser into
     // contentDestination, trimmed of leading and trailing whitespace, if the
     // element's name matches elementName.
@@ -113,14 +124,155 @@ namespace VevaciousPlusPlus
                                    bool& contentDestination );
 
 
-    // This reads the current element of outerParser and if its name matches
-    // elementName, it puts the contents of the child element <ClassType> into
-    // className and <ConstructorArguments> into constructorArguments, both
-    // stripped of whitespace.
-    static void ReadClassAndArguments( BOL::AsciiXmlParser const& outerParser,
-                                       std::string const& elementName,
-                                       std::string& className,
-                                       std::string& constructorArguments );
+    LagrangianParameterManager* lagrangianParameterManager;
+    LagrangianParameterManager* ownedLagrangianParameterManager;
+    SlhaManager* slhaManager;
+    PotentialFunction* potentialFunction;
+    PotentialFunction* oldPotentialFunction;
+    OldPotentialFromPolynomialAndMasses* ownedPotentialFunction;
+    PotentialMinimizer* potentialMinimizer;
+    PotentialMinimizer* ownedPotentialMinimizer;
+    TunnelingCalculator* tunnelingCalculator;
+    TunnelingCalculator* ownedTunnelingCalculator;
+    time_t currentTime;
+
+
+    // This sets up ownedLagrangianParameterManager and ownedPotentialFunction
+    // according to the XML elements in the file given by
+    // potentialFunctionInitializationFilename, also setting
+    // lagrangianParameterManager to be ownedLagrangianParameterManager and
+    // potentialFunction to be ownedPotentialFunction.
+    void SetUpLagrangianParametersAndPotential(
+                  std::string const& potentialFunctionInitializationFilename )
+    {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.openRootElementOfFile(
+                                     potentialFunctionInitializationFilename );
+      std::string lagrangianParameterManagerClass( "error" );
+      std::string lagrangianParameterManagerArguments( "error" );
+      std::string potentialFunctionClass( "error" );
+      std::string potentialFunctionArguments( "error" );
+      // The root element of this file should have child elements
+      // <LagrangianParameterManagerClass> and <PotentialFunctionClass>.
+      while( xmlParser.readNextElement() )
+      {
+        ReadClassAndArguments( xmlParser,
+                               "LagrangianParameterManagerClass",
+                               lagrangianParameterManagerClass,
+                               lagrangianParameterManagerArguments );
+        ReadClassAndArguments( xmlParser,
+                               "PotentialFunctionClass",
+                               potentialFunctionClass,
+                               potentialFunctionArguments );
+      }
+      xmlParser.loadString( lagrangianParameterManagerArguments );
+      std::string scaleAndBlockFilename( "error" );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ScaleAndBlockFile",
+                                       scaleAndBlockFilename );
+      }
+      if( lagrangianParameterManagerClass == "SlhaCompatibleWithSarahManager" )
+      {
+        ownedLagrangianParameterManager
+        = new SlhaCompatibleWithSarahManager( scaleAndBlockFilename );
+      }
+      else if( lagrangianParameterManagerClass
+               == "SlhaBlocksWithSpecialCasesManager" )
+      {
+        ownedLagrangianParameterManager
+        = new SlhaBlocksWithSpecialCasesManager( scaleAndBlockFilename );
+      }
+      else if( lagrangianParameterManagerClass
+               == "LesHouchesAccordBlockEntryManager" )
+      {
+        ownedLagrangianParameterManager
+        = new LesHouchesAccordBlockEntryManager( scaleAndBlockFilename );
+      }
+      else
+      {
+        std::stringstream errorBuilder;
+        errorBuilder << "Read \"" << lagrangianParameterManagerClass
+        << "\" as a Lagrangian parameter manager class, but this is not one of"
+        << " the known types (\"LesHouchesAccordBlockEntryManager\" or"
+        << " \"SlhaBlocksWithSpecialCasesManager\" or"
+        << " \"SlhaCompatibleWithSarahManager\").";
+        throw std::runtime_error( errorBuilder.str() );
+      }
+      lagrangianParameterManager = ownedLagrangianParameterManager;
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "Remember to remove slhaManager and oldPotentialFunction!";
+      std::cout << std::endl;/**/
+
+      slhaManager
+      = new RunningParameterManager( *ownedLagrangianParameterManager );
+
+      xmlParser.loadString( lagrangianParameterManagerArguments );
+      std::string modelFilename( "error" );
+      double assumedPositiveOrNegativeTolerance( 1.0 );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ModelFile",
+                                       modelFilename );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "AssumedPositiveOrNegativeTolerance",
+                                       assumedPositiveOrNegativeTolerance );
+      }
+
+      if( potentialFunctionClass == "FixedScaleOneLoopPotential" )
+      {
+        ownedPotentialFunction
+        = new FixedScaleOneLoopPotential( modelFilename,
+                                          assumedPositiveOrNegativeTolerance,
+                                          *ownedLagrangianParameterManager );
+        oldPotentialFunction
+        = new OldFixedScaleOneLoopPotential( modelFilename,
+                                             10.0,
+                                             false,
+                                            assumedPositiveOrNegativeTolerance,
+                                             *slhaManager );
+      }
+      else if( potentialFunctionClass == "RgeImprovedOneLoopPotential" )
+      {
+        ownedPotentialFunction
+        = new RgeImprovedOneLoopPotential( modelFilename,
+                                           assumedPositiveOrNegativeTolerance,
+                                           *ownedLagrangianParameterManager );
+        oldPotentialFunction
+        = new OldRgeImprovedOneLoopPotential( modelFilename,
+                                              10.0,
+                                              false,
+                                            assumedPositiveOrNegativeTolerance,
+                                              *slhaManager );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<PotentialClass> was not a recognized form! The only types"
+        << " currently valid are \"FixedScaleOneLoopPotential\" and"
+        << " \"RgeImprovedOneLoopPotential\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+      potentialFunction = ownedPotentialFunction;
+    }
+
+    void SetUpPotentialMinimizer(
+                 std::string const& potentialMinimizerInitializationFilename )
+    {
+
+    }
+    void SetUpTunnelingCalculator(
+                std::string const& tunnelingCalculatorInitializationFilename )
+    {
+
+    }
+
 
     // This interprets the given string as the appropriate element of the
     // TunnelingCalculator::TunnelingStrategy enum.
@@ -133,21 +285,6 @@ namespace VevaciousPlusPlus
     CheckSurvivalProbabilityThreshold( double survivalProbabilityThreshold );
 
 
-    SlhaManager* slhaManager;
-    RunningParameterManager* ownedSlhaManager;
-    PotentialFunction* potentialFunction;
-    OldPotentialFromPolynomialAndMasses* ownedPotentialFunction;
-    PotentialMinimizer* potentialMinimizer;
-    PotentialMinimizer* ownedPotentialMinimizer;
-    TunnelingCalculator* tunnelingCalculator;
-    TunnelingCalculator* ownedTunnelingCalculator;
-    time_t currentTime;
-
-
-    // This decides on the derived class to use for ownedPotentialFunction and
-    // constructs it with the arguments parsed from constructorArguments.
-    PotentialFunction* SetUpPotentialFunction( std::string const& className,
-                                     std::string const& constructorArguments );
 
     // This decides on the derived class to use for ownedPotentialMinimizer and
     // constructs it with the arguments parsed from constructorArguments.

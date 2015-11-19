@@ -37,9 +37,7 @@ namespace VevaciousPlusPlus
                                               std::string const& modelFilename,
                                double const assumedPositiveOrNegativeTolerance,
                      LagrangianParameterManager& lagrangianParameterManager ) :
-    PotentialFunction(),
-    IWritesPythonPotential(),
-    lagrangianParameterManager( lagrangianParameterManager ),
+    PotentialFunction( lagrangianParameterManager ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),

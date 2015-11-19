@@ -19,13 +19,11 @@
 #include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
-#include "IWritesPythonPotential.hpp"
 #include "VersionInformation.hpp"
 
 namespace VevaciousPlusPlus
 {
-  class PotentialFromPolynomialWithMasses : public PotentialFunction,
-                                            public IWritesPythonPotential
+  class PotentialFromPolynomialWithMasses : public PotentialFunction
   {
   public:
     PotentialFromPolynomialWithMasses( std::string const& modelFilename,
@@ -70,7 +68,6 @@ namespace VevaciousPlusPlus
     static std::string const positiveByConvention;
     static std::string const negativeByConvention;
 
-    LagrangianParameterManager& lagrangianParameterManager;
     ParametersAndFieldsProductSum treeLevelPotential;
     ParametersAndFieldsProductSum polynomialLoopCorrections;
     std::vector< MassesSquaredCalculator* > scalarSquareMasses;

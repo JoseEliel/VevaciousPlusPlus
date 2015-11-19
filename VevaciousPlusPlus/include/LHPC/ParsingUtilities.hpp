@@ -104,7 +104,7 @@ namespace LHPC
     size_t
     wordStart( stringToSplit.find_first_not_of( separationCharacters ) );
     size_t wordEnd( 0 );
-    // If there are any more chars in validBlocks that are not in
+    // If there are any more characters in validBlocks which are not in
     // blockSeparators, we have at least one substring to add.
     while( wordStart != std::string::npos )
     {

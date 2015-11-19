@@ -9,6 +9,7 @@
 #define TUNNELINGCALCULATOR_HPP_
 
 #include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
@@ -40,8 +41,10 @@ namespace VevaciousPlusPlus
     // dominantTemperatureInGigaElectronVolts appropriately. Each of these
     // which is not calculated by the strategy should be left with negative
     // values.
-    virtual void CalculateTunneling( PotentialMinimum const& falseVacuum,
-                                     PotentialMinimum const& trueVacuum ) = 0;
+    virtual void
+    CalculateTunneling( PotentialFunction const& potentialFunction,
+                        PotentialMinimum const& falseVacuum,
+                        PotentialMinimum const& trueVacuum ) = 0;
 
     double QuantumSurvivalProbability() const
     { return quantumSurvivalProbability; }

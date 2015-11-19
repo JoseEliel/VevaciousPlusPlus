@@ -11,7 +11,6 @@ namespace VevaciousPlusPlus
 {
 
   BounceAlongPathWithThreshold::BounceAlongPathWithThreshold(
-                                          PotentialFunction& potentialFunction,
                            std::vector< BouncePathFinder* > const& pathFinders,
                                 BounceActionCalculator* const actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
@@ -20,8 +19,7 @@ namespace VevaciousPlusPlus
                                         unsigned int const temperatureAccuracy,
                                     unsigned int const pathPotentialResolution,
                                       double const vacuumSeparationFraction ) :
-    BounceActionTunneler( potentialFunction,
-                          tunnelingStrategy,
+    BounceActionTunneler( tunnelingStrategy,
                           survivalProbabilityThreshold,
                           temperatureAccuracy,
                           vacuumSeparationFraction ),
@@ -52,6 +50,7 @@ namespace VevaciousPlusPlus
   // dominantTemperatureInGigaElectronVolts to be the temperature with the
   // lowest survival probability.
   void BounceAlongPathWithThreshold::ContinueThermalTunneling(
+                                          PotentialFunction& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
@@ -72,6 +71,7 @@ namespace VevaciousPlusPlus
     double const temperatureStep( rangeOfMaxTemperatureForOriginToTrue.first
                  / static_cast< double >( thermalIntegrationResolution + 1 ) );
     double currentTemperature( temperatureStep );
+    MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
     thermalPotentialMinimizer.SetTemperature( currentTemperature );
     PotentialMinimum thermalFalseVacuum( thermalPotentialMinimizer(
                                           falseVacuum.FieldConfiguration() ) );
@@ -91,7 +91,8 @@ namespace VevaciousPlusPlus
                  / ( temperatureStep * exp( lnOfThermalIntegrationFactor ) ) );
     double actionThreshold( -currentTemperature
       * log( currentTemperature * currentTemperature * thresholdDecayWidth ) );
-    double bounceOverTemperature( BoundedBounceAction( thermalFalseVacuum,
+    double bounceOverTemperature( BoundedBounceAction( potentialFunction,
+                                                       thermalFalseVacuum,
                                                        thermalTrueVacuum,
                                                        currentTemperature,
                                                        actionThreshold,
@@ -152,7 +153,8 @@ namespace VevaciousPlusPlus
       actionThreshold = ( -currentTemperature
                           * log( currentTemperature * currentTemperature
                              * ( thresholdDecayWidth - partialDecayWidth ) ) );
-      bounceOverTemperature = ( BoundedBounceAction( thermalFalseVacuum,
+      bounceOverTemperature = ( BoundedBounceAction( potentialFunction,
+                                                     thermalFalseVacuum,
                                                      thermalTrueVacuum,
                                                      currentTemperature,
                                                      actionThreshold,
@@ -198,6 +200,7 @@ namespace VevaciousPlusPlus
   // course of the calculation. The vacua are assumed to already be the minima
   // at tunnelingTemperature.
   double BounceAlongPathWithThreshold::BoundedBounceAction(
+                                          PotentialFunction& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                              double const tunnelingTemperature,

@@ -13,8 +13,6 @@ namespace VevaciousPlusPlus
   CosmoTransitionsRunner::pythonPotentialFilenameBase( "VevaciousPotential" );
 
   CosmoTransitionsRunner::CosmoTransitionsRunner(
-                                       IWritesPythonPotential& pythonPotential,
-                                          PotentialFunction& potentialFunction,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
                                               size_t const temperatureAccuracy,
@@ -24,12 +22,10 @@ namespace VevaciousPlusPlus
                                                     size_t const maxOuterLoops,
                                  size_t const thermalStraightPathFitResolution,
                                       double const vacuumSeparationFraction ) :
-    BounceActionTunneler( potentialFunction,
-                          tunnelingStrategy,
+    BounceActionTunneler( tunnelingStrategy,
                           survivalProbabilityThreshold,
                           temperatureAccuracy,
                           vacuumSeparationFraction ),
-    pythonPotential( pythonPotential ),
     pathToCosmotransitions( pathToCosmotransitions ),
     resolutionOfDsbVacuum( resolutionOfDsbVacuum ),
     maxInnerLoops( maxInnerLoops ),
@@ -47,14 +43,15 @@ namespace VevaciousPlusPlus
 
   // This returns either the dimensionless bounce action integrated over four
   // dimensions (for zero temperature) or the dimensionful bounce action
-  // integrated over three dimensions (for non-zero temperature) for tunneling
-  // from falseVacuum to trueVacuum at temperature tunnelingTemperature. It
-  // does so by writing and running a Python program using the potential from
-  // pythonPotentialFilename for CosmoTransitions to use to calculate the
-  // bounce action at tunnelingTemperature. The vacua are assumed to already be
-  // the minima at tunnelingTemperature.
-  double
-  CosmoTransitionsRunner::BounceAction( PotentialMinimum const& falseVacuum,
+  // integrated over three dimensions (for non-zero temperature) for
+  // tunneling from falseVacuum to trueVacuum at temperature
+  // tunnelingTemperature. It does so by writing and running a Python program
+  // using the potential from pythonPotentialFilename for CosmoTransitions to
+  // use to calculate the bounce action at tunnelingTemperature. The vacua
+  // are assumed to already be the minima at tunnelingTemperature.
+  double CosmoTransitionsRunner::BounceAction(
+                                    PotentialFunction const& potentialFunction,
+                                        PotentialMinimum const& falseVacuum,
                                         PotentialMinimum const& trueVacuum,
                                         double const tunnelingTemperature )
   {
@@ -196,11 +193,12 @@ namespace VevaciousPlusPlus
   // This calculates the evaporation and critical temperatures, then writes
   // and runs a Python program using the potential from
   // pythonPotentialFilename for CosmoTransitions to get an estimate of the
-  // thermal dependence of the action, then uses Minuit2 to find the
-  // optimal tunneling temperature, then writes and runs another Python
-  // program to use CosmoTransitions to calculate the thermal action at this
-  // optimal temperature.
+  // thermal dependence of the action, then uses Minuit2 to find the optimal
+  // tunneling temperature, then writes and runs another Python program to
+  // use CosmoTransitions to calculate the thermal action at this optimal
+  // temperature.
   void CosmoTransitionsRunner::ContinueThermalTunneling(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
@@ -243,7 +241,8 @@ namespace VevaciousPlusPlus
       currentTemperature += stepTemperature;
     }
     std::vector< double > straightPathActions;
-    CalculateStraightPathActions( falseVacuum,
+    CalculateStraightPathActions( potentialFunction,
+                                  falseVacuum,
                                   trueVacuum,
                                   fitTemperatures,
                                   straightPathActions );
@@ -269,6 +268,7 @@ namespace VevaciousPlusPlus
 
     // Finally we allow CosmoTransitions to calculate the action at our best
     // guess of the optimal tunneling temperature with full path deformation.
+    MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
     thermalPotentialMinimizer.SetTemperature(
                                       dominantTemperatureInGigaElectronVolts );
     // We assume that dominantTemperatureInGigaElectronVolts is high enough
@@ -287,7 +287,8 @@ namespace VevaciousPlusPlus
       = thermalPotentialMinimizer( falseVacuum.FieldConfiguration() );
     }
 
-    double thermalAction( BounceAction( thermalFalseVacuum,
+    double thermalAction( BounceAction( potentialFunction,
+                                        thermalFalseVacuum,
                   thermalPotentialMinimizer( trueVacuum.FieldConfiguration() ),
                                     dominantTemperatureInGigaElectronVolts ) );
     logOfMinusLogOfThermalProbability = ( lnOfThermalIntegrationFactor
@@ -297,10 +298,11 @@ namespace VevaciousPlusPlus
     SetThermalSurvivalProbability();
   }
 
-  // This uses a BubbleShootingOnPathInFieldSpace object at different
-  // temperatures to fill straightPathActions based on straight paths between
-  // the thermal vacua.
+  // This uses a BubbleShootingOnSpline object at different temperatures to
+  // fill straightPathActions based on straight paths between the thermal
+  // vacua. It uses the given potentialFunction rather than pythonPotential.
   void CosmoTransitionsRunner::InteralGuessFromStraightPaths(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                   std::vector< double > const& fitTemperatures,
@@ -321,6 +323,7 @@ namespace VevaciousPlusPlus
     PotentialMinimum thermalFalseVacuum( falseVacuum );
     PotentialMinimum thermalTrueVacuum( trueVacuum );
     std::vector< std::vector< double > > straightPath( 2 );
+    MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
     for( std::vector< double >::const_iterator
          fitTemperature( fitTemperatures.begin() );
          fitTemperature < fitTemperatures.end();
@@ -363,6 +366,7 @@ namespace VevaciousPlusPlus
   // number of deformations to get a set of actions at temperatures, and then
   // reads in the file created to fill straightPathActions.
   void CosmoTransitionsRunner::FitFromCosmoTransitionsStraightPaths(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                   std::vector< double > const& fitTemperatures,
@@ -412,6 +416,7 @@ namespace VevaciousPlusPlus
     "# [ temperature, true vacuum array, false vacuum array].\n"
     "fitTuples = [ ";
 
+    MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
     PotentialMinimum thermalFalseVacuum( thermalPotentialMinimizer(
                                           falseVacuum.FieldConfiguration() ) );
     PotentialMinimum thermalTrueVacuum( thermalPotentialMinimizer(

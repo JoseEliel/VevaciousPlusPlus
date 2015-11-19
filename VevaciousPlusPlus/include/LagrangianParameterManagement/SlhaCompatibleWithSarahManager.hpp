@@ -33,6 +33,7 @@ namespace VevaciousPlusPlus
                                     std::string const& minimumScaleArgument,
                                     std::string const& fixedScaleType,
                                     std::string const& fixedScaleArgument );
+    SlhaCompatibleWithSarahManager( std::string const& xmlFileName );
     virtual ~SlhaCompatibleWithSarahManager();
 
 

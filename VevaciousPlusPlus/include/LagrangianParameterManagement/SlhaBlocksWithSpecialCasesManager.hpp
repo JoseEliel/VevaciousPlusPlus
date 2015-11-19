@@ -27,13 +27,18 @@ namespace VevaciousPlusPlus
                                        std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                        std::string const& fixedScaleType,
-                                       std::string const& fixedScaleArgument );
+                                       std::string const& fixedScaleArgument,
+                                       std::string const& maximumScaleType,
+                                     std::string const& maximumScaleArgument );
     SlhaBlocksWithSpecialCasesManager(
                                  std::set< std::string > const& validBlocksSet,
                                        std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                        std::string const& fixedScaleType,
-                                       std::string const& fixedScaleArgument );
+                                       std::string const& fixedScaleArgument,
+                                       std::string const& maximumScaleType,
+                                     std::string const& maximumScaleArgument );
+    SlhaBlocksWithSpecialCasesManager( std::string const& xmlFileName );
     virtual ~SlhaBlocksWithSpecialCasesManager();
 
 

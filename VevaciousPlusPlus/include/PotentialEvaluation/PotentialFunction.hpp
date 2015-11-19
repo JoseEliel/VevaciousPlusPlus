@@ -16,10 +16,14 @@ namespace VevaciousPlusPlus
   class PotentialFunction
   {
   public:
-    PotentialFunction();
+    PotentialFunction(
+                      LagrangianParameterManager& lagrangianParameterManager );
     PotentialFunction( PotentialFunction const& copySource );
     virtual ~PotentialFunction();
 
+
+    LagrangianParameterManager& LagrangianParameterManager()
+    { return lagrangianParameterManager; }
 
     size_t NumberOfFieldVariables() const{ return numberOfFields; }
 
@@ -35,6 +39,19 @@ namespace VevaciousPlusPlus
     virtual double
     operator()( std::vector< double > const& fieldConfiguration,
                 double const temperatureValue = 0.0 ) const = 0;
+
+    // If overridden, this should write the potential as
+    // def PotentialFunction( fv ): return ...
+    // in pythonFilename for fv being an array of floating-point numbers in the
+    // same order as they are for the field configurations as internal to this
+    // C++ code. It is necessary to allow CosmoTransitionsRunner to create
+    // Python code to use with the CosmoTransitions Python code, but the
+    // intention is that this is optional, so not all potential functions have
+    // to implement this - as long as they do not get used in conjuction with
+    // CosmoTransitionsRunner or anything else which uses this function!
+    virtual void WriteAsPython( std::string const& pythonFilename ) const
+    { throw std::runtime_error(
+            "PotentialFunction::WriteAsPython(..) needs to be overridden." ); }
 
     // This numerically evaluates the gradient at fieldConfiguration based on
     // steps of numericalStepSize GeV in each field direction and places the
@@ -65,6 +82,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    LagrangianParameterManager& lagrangianParameterManager;
     std::vector< std::string > fieldNames;
     size_t numberOfFields;
     std::vector< std::string > dsbFieldInputStrings;

@@ -17,7 +17,8 @@
 namespace VevaciousPlusPlus
 {
 
-  class OldFixedScaleOneLoopPotential : public OldPotentialFromPolynomialAndMasses
+  class OldFixedScaleOneLoopPotential :
+                                     public OldPotentialFromPolynomialAndMasses
   {
   public:
     OldFixedScaleOneLoopPotential( std::string const& modelFilename,
@@ -26,7 +27,7 @@ namespace VevaciousPlusPlus
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager );
     OldFixedScaleOneLoopPotential(
-       OldPotentialFromPolynomialAndMasses& potentialFromPolynomialAndMasses );
+                             OldPotentialFromPolynomialAndMasses& copySource );
     virtual ~OldFixedScaleOneLoopPotential();
 
 

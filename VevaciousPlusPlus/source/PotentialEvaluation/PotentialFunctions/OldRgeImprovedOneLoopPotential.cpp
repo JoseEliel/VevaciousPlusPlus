@@ -35,8 +35,8 @@ namespace VevaciousPlusPlus
   }
 
   OldRgeImprovedOneLoopPotential::OldRgeImprovedOneLoopPotential(
-   OldPotentialFromPolynomialAndMasses const& potentialFromPolynomialAndMasses ) :
-    OldPotentialFromPolynomialAndMasses( potentialFromPolynomialAndMasses ),
+                      OldPotentialFromPolynomialAndMasses const& copySource ) :
+    OldPotentialFromPolynomialAndMasses( copySource ),
     logarithmOfMinimumRenormalizationScale( log(
                                         currentMinimumRenormalizationScale ) ),
     logarithmOfMaximumRenormalizationScale( log(
@@ -46,7 +46,7 @@ namespace VevaciousPlusPlus
                                       *this,
                                       fieldsAssumedPositive,
                                       fieldsAssumedNegative,
-                      treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
+                       treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                       assumedPositiveOrNegativeTolerance )
   {
     // This constructor is just an initialization list.

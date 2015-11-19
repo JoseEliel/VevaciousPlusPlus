@@ -73,19 +73,13 @@ namespace VevaciousPlusPlus
 
 
   BounceActionTunneler::BounceActionTunneler(
-                                          PotentialFunction& potentialFunction,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
                                               size_t const temperatureAccuracy,
                                       double const vacuumSeparationFraction ) :
     TunnelingCalculator( tunnelingStrategy,
                          survivalProbabilityThreshold ),
-    potentialFunction( potentialFunction ),
     temperatureAccuracy( temperatureAccuracy ),
-    thermalPotentialMinimizer( potentialFunction ),
-    // evaporationMinimum(),
-    // criticalMinimum(),
-    // criticalRatherThanEvaporation( true ),
     vacuumSeparationFractionSquared( vacuumSeparationFraction
                                      * vacuumSeparationFraction )
   {
@@ -101,6 +95,7 @@ namespace VevaciousPlusPlus
   // This decides what virtual tunneling calculation functions to call based
   // on tunnelingStrategy.
   void BounceActionTunneler::CalculateTunneling(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
@@ -122,31 +117,37 @@ namespace VevaciousPlusPlus
     PrepareCommonExtras();
     if( tunnelingStrategy == JustQuantum )
     {
-      CalculateQuantumTunneling( falseVacuum,
+      CalculateQuantumTunneling( potentialFunction,
+                                 falseVacuum,
                                  trueVacuum );
     }
     else if( tunnelingStrategy == JustThermal )
     {
-      CalculateThermalTunneling( falseVacuum,
+      CalculateThermalTunneling( potentialFunction,
+                                 falseVacuum,
                                  trueVacuum );
     }
     else if( tunnelingStrategy == QuantumThenThermal )
     {
-      CalculateQuantumTunneling( falseVacuum,
+      CalculateQuantumTunneling( potentialFunction,
+                                 falseVacuum,
                                  trueVacuum );
       if( quantumSurvivalProbability > survivalProbabilityThreshold )
       {
-        CalculateThermalTunneling( falseVacuum,
+        CalculateThermalTunneling( potentialFunction,
+                                   falseVacuum,
                                    trueVacuum );
       }
     }
     else if( tunnelingStrategy == ThermalThenQuantum )
     {
-      CalculateThermalTunneling( falseVacuum,
+      CalculateThermalTunneling( potentialFunction,
+                                 falseVacuum,
                                  trueVacuum );
       if( thermalSurvivalProbability > survivalProbabilityThreshold )
       {
-        CalculateQuantumTunneling( falseVacuum,
+        CalculateQuantumTunneling( potentialFunction,
+                                   falseVacuum,
                                    trueVacuum );
       }
     }
@@ -163,10 +164,12 @@ namespace VevaciousPlusPlus
   // This sets quantumSurvivalProbability and quantumLifetimeInSeconds
   // appropriately.
   void BounceActionTunneler::CalculateQuantumTunneling(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
-    double quantumAction( BounceAction( falseVacuum,
+    double quantumAction( BounceAction( potentialFunction,
+                                        falseVacuum,
                                         trueVacuum,
                                         0.0 ) );
     double const fourthRootOfSolitonicFactor( sqrt(
@@ -228,6 +231,7 @@ namespace VevaciousPlusPlus
   // This should set thermalSurvivalProbability and
   // dominantTemperatureInGigaElectronVolts appropriately.
   void BounceActionTunneler::CalculateThermalTunneling(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
@@ -253,10 +257,12 @@ namespace VevaciousPlusPlus
       = -exp( maximumPowerOfNaturalExponent );
       return;
     }
-    SetUpMaximumTemperatureRanges( falseVacuum,
+    SetUpMaximumTemperatureRanges( potentialFunction,
+                                   falseVacuum,
                                    trueVacuum,
                                    potentialAtOriginAtZeroTemperature );
-    ContinueThermalTunneling( falseVacuum,
+    ContinueThermalTunneling( potentialFunction,
+                              falseVacuum,
                               trueVacuum,
                               potentialAtOriginAtZeroTemperature );
   }
@@ -267,6 +273,7 @@ namespace VevaciousPlusPlus
   // be possible from the origin to the false vacuum and true vacuum
   // respectively. The temperatures are capped at the Planck temperature.
   void BounceActionTunneler::SetMaximumTunnelingTemperatureRange(
+                                    PotentialFunction const& potentialFunction,
                             std::pair< double, double >& rangeOfMaxTemperature,
                                  PotentialMinimum const& zeroTemperatureVacuum,
                               double const potentialAtOriginAtZeroTemperature )
@@ -286,7 +293,8 @@ namespace VevaciousPlusPlus
     std::cout << "Trying " << temperatureGuess << " GeV.";
     std::cout << std::endl;
 
-    while( BelowCriticalTemperature( temperatureGuess,
+    while( BelowCriticalTemperature( potentialFunction,
+                                     temperatureGuess,
                                      zeroTemperatureVacuum ) )
     {
       temperatureGuess += temperatureGuess;
@@ -296,7 +304,8 @@ namespace VevaciousPlusPlus
         std::cout << "... too low. Trying the Planck scale:"
         << temperatureGuess << " GeV.";
         std::cout << std::endl;
-        if( BelowCriticalTemperature( temperatureGuess,
+        if( BelowCriticalTemperature( potentialFunction,
+                                      temperatureGuess,
                                       zeroTemperatureVacuum ) )
         {
           rangeOfMaxTemperature.first = maximumAllowedTemperature;
@@ -318,7 +327,8 @@ namespace VevaciousPlusPlus
     // halve temperatureGuess and see if it is still too high, & if so, keep
     // halving.
     temperatureGuess = ( 0.5 * temperatureGuess );
-    while( !(BelowCriticalTemperature( temperatureGuess,
+    while( !(BelowCriticalTemperature( potentialFunction,
+                                       temperatureGuess,
                                        zeroTemperatureVacuum )) )
     {
       temperatureGuess = ( 0.5 * temperatureGuess );
@@ -340,7 +350,8 @@ namespace VevaciousPlusPlus
                                * rangeOfMaxTemperature.second );
       std::cout << "Trying " << temperatureGuess << " GeV.";
       std::cout << std::endl;
-      if( BelowCriticalTemperature( temperatureGuess,
+      if( BelowCriticalTemperature( potentialFunction,
+                                    temperatureGuess,
                                     zeroTemperatureVacuum ) )
       {
         rangeOfMaxTemperature.first = temperatureGuess;
