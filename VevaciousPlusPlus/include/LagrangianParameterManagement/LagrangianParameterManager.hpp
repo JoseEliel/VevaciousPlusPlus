@@ -48,12 +48,12 @@ namespace VevaciousPlusPlus
     virtual std::pair< bool, size_t >
     RegisterParameter( std::string const& parameterName ) = 0;
 
-    // This should return a vector of the values of the Lagrangian parameters
-    // evaluated at the given scale, ordered so that the indices given out by
-    // RegisterParameter correctly match the parameter with its element in the
-    // returned vector.
-    virtual std::vector< double >
-    ParameterValues( double logarithmOfScale ) const = 0;
+    // This should fill the given vector with the values of the Lagrangian
+    // parameters evaluated at the given scale, ordered so that the indices
+    // given out by RegisterParameter correctly match the parameter with its
+    // element in the vector.
+    virtual void ParameterValues( double logarithmOfScale,
+                          std::vector< double >& destinationVector ) const = 0;
 
     // This should return the minimum scale which is appropriate for evaluating
     // the Lagrangian parameters at the current parameter point.
@@ -61,7 +61,7 @@ namespace VevaciousPlusPlus
 
     // This should return a scale which is appropriate for using for a
     // fixed-scale calculation for the current parameter point.
-    virtual double AppropriateFixedScaleForParameterPoint() const = 0;
+    virtual double AppropriateSingleFixedScale() const = 0;
 
     // This should return the minimum scale which is appropriate for evaluating
     // the Lagrangian parameters at the current parameter point.

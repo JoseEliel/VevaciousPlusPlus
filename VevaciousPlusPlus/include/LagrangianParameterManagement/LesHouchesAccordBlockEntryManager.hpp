@@ -63,14 +63,14 @@ namespace VevaciousPlusPlus
     virtual std::pair< bool, size_t >
     RegisterParameter( std::string const& parameterName );
 
-    // This returns a vector of the values of the Lagrangian parameters in
-    // activeInterpolatedParameters evaluated at the given scale, ordered so
+    // This fills the given vector with the values of the Lagrangian parameters
+    // in activeInterpolatedParameters evaluated at the given scale, ordered so
     // that the indices given out by RegisterParameter correctly match the
-    // parameter with its element in the returned vector. There may be gaps if
-    // a derived class has registered parameters other than those in
+    // parameter with its element in the vector. There may be gaps if a derived
+    // class has registered parameters other than those in
     // activeInterpolatedParameters.
-    virtual std::vector< double >
-    ParameterValues( double const logarithmOfScale ) const;
+    virtual void ParameterValues( double const logarithmOfScale,
+                              std::vector< double >& destinationVector ) const;
 
     // This should return the minimum scale which is appropriate for evaluating
     // the Lagrangian parameters at the current parameter point.
@@ -80,7 +80,7 @@ namespace VevaciousPlusPlus
 
     // This returns the lowest scale above zero (not including zero) which was
     // in the set of scales read for fixedScaleDefiningBlock last read in.
-    virtual double AppropriateFixedScaleForParameterPoint() const
+    virtual double AppropriateSingleFixedScale() const
     { return GetScale( fixedScaleType,
                        fixedScaleArgument ); }
 
@@ -231,27 +231,25 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This returns a vector of the values of the Lagrangian parameters in
-  // activeInterpolatedParameters evaluated at the given scale, ordered so
+  // This fills the given vector with the values of the Lagrangian parameters
+  // in activeInterpolatedParameters evaluated at the given scale, ordered so
   // that the indices given out by RegisterParameter correctly match the
-  // parameter with its element in the returned vector. There may be gaps if
-  // a derived class has registered parameters other than those in
+  // parameter with its element in the vector. There may be gaps if a derived
+  // class has registered parameters other than those in
   // activeInterpolatedParameters.
-  inline std::vector< double >
-  LesHouchesAccordBlockEntryManager::ParameterValues(
-                                          double const logarithmOfScale ) const
+  inline void LesHouchesAccordBlockEntryManager::ParameterValues(
+                                                 double const logarithmOfScale,
+                               std::vector< double >& destinationVector ) const
   {
-    std::vector< double >
-    parameterValues( numberOfDistinctActiveParameters );
+    destinationVector.resize( numberOfDistinctActiveParameters );
     for( std::vector< LhaBlockEntryInterpolator >::const_iterator
          parameterInterpolator( referenceUnsafeActiveParameters.begin() );
-         parameterInterpolator < referenceUnsafeActiveParameters.end();
+         parameterInterpolator != referenceUnsafeActiveParameters.end();
          ++parameterInterpolator )
     {
-      parameterValues[ parameterInterpolator->IndexInValuesVector() ]
+      destinationVector[ parameterInterpolator->IndexInValuesVector() ]
       = (*parameterInterpolator)( logarithmOfScale );
     }
-    return parameterValues;
   }
 
   // This writes a function in the form

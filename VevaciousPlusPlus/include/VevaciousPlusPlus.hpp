@@ -125,11 +125,11 @@ namespace VevaciousPlusPlus
 
 
     LagrangianParameterManager* lagrangianParameterManager;
-    LagrangianParameterManager* ownedLagrangianParameterManager;
+    LesHouchesAccordBlockEntryManager* ownedLagrangianParameterManager;
     SlhaManager* slhaManager;
     PotentialFunction* potentialFunction;
     PotentialFunction* oldPotentialFunction;
-    OldPotentialFromPolynomialAndMasses* ownedPotentialFunction;
+    PotentialFromPolynomialWithMasses* ownedPotentialFunction;
     PotentialMinimizer* potentialMinimizer;
     PotentialMinimizer* ownedPotentialMinimizer;
     TunnelingCalculator* tunnelingCalculator;
@@ -137,14 +137,17 @@ namespace VevaciousPlusPlus
     time_t currentTime;
 
 
-    // This sets up ownedLagrangianParameterManager and ownedPotentialFunction
-    // according to the XML elements in the file given by
-    // potentialFunctionInitializationFilename, also setting
-    // lagrangianParameterManager to be ownedLagrangianParameterManager and
-    // potentialFunction to be ownedPotentialFunction.
-    void SetUpLagrangianParametersAndPotential(
+    // This creates a new LagrangianParameterManager and a new
+    // PotentialFunction according to the XML elements in the file given by
+    // potentialFunctionInitializationFilename and returns pointers to them.
+    std::pair< LesHouchesAccordBlockEntryManager*,
+               PotentialFromPolynomialWithMasses* >
+    CreateLagrangianParameterManagerAndPotentialFunction(
                   std::string const& potentialFunctionInitializationFilename )
     {
+      LesHouchesAccordBlockEntryManager*
+      createdLagrangianParameterManager( NULL );
+      PotentialFromPolynomialWithMasses* createdPotentialFunction( NULL );
       BOL::AsciiXmlParser xmlParser;
       xmlParser.openRootElementOfFile(
                                      potentialFunctionInitializationFilename );
@@ -152,6 +155,7 @@ namespace VevaciousPlusPlus
       std::string lagrangianParameterManagerArguments( "error" );
       std::string potentialFunctionClass( "error" );
       std::string potentialFunctionArguments( "error" );
+
       // The root element of this file should have child elements
       // <LagrangianParameterManagerClass> and <PotentialFunctionClass>.
       while( xmlParser.readNextElement() )
@@ -165,42 +169,9 @@ namespace VevaciousPlusPlus
                                potentialFunctionClass,
                                potentialFunctionArguments );
       }
-      xmlParser.loadString( lagrangianParameterManagerArguments );
-      std::string scaleAndBlockFilename( "error" );
-      while( xmlParser.readNextElement() )
-      {
-        InterpretElementIfNameMatches( xmlParser,
-                                       "ScaleAndBlockFile",
-                                       scaleAndBlockFilename );
-      }
-      if( lagrangianParameterManagerClass == "SlhaCompatibleWithSarahManager" )
-      {
-        ownedLagrangianParameterManager
-        = new SlhaCompatibleWithSarahManager( scaleAndBlockFilename );
-      }
-      else if( lagrangianParameterManagerClass
-               == "SlhaBlocksWithSpecialCasesManager" )
-      {
-        ownedLagrangianParameterManager
-        = new SlhaBlocksWithSpecialCasesManager( scaleAndBlockFilename );
-      }
-      else if( lagrangianParameterManagerClass
-               == "LesHouchesAccordBlockEntryManager" )
-      {
-        ownedLagrangianParameterManager
-        = new LesHouchesAccordBlockEntryManager( scaleAndBlockFilename );
-      }
-      else
-      {
-        std::stringstream errorBuilder;
-        errorBuilder << "Read \"" << lagrangianParameterManagerClass
-        << "\" as a Lagrangian parameter manager class, but this is not one of"
-        << " the known types (\"LesHouchesAccordBlockEntryManager\" or"
-        << " \"SlhaBlocksWithSpecialCasesManager\" or"
-        << " \"SlhaCompatibleWithSarahManager\").";
-        throw std::runtime_error( errorBuilder.str() );
-      }
-      lagrangianParameterManager = ownedLagrangianParameterManager;
+      createdLagrangianParameterManager
+      = CreateLagrangianParameterManager( lagrangianParameterManagerClass,
+                                         lagrangianParameterManagerArguments );
 
       // debugging:
       /**/std::cout << std::endl << "debugging:"
@@ -209,9 +180,66 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;/**/
 
       slhaManager
-      = new RunningParameterManager( *ownedLagrangianParameterManager );
+      = new RunningParameterManager( *createdLagrangianParameterManager );
 
-      xmlParser.loadString( lagrangianParameterManagerArguments );
+      createdPotentialFunction
+      = CreatePotentialFunction( potentialFunctionClass,
+                                 potentialFunctionArguments,
+                                 *createdLagrangianParameterManager );
+      return std::pair< LesHouchesAccordBlockEntryManager*,
+                        PotentialFromPolynomialWithMasses* >(
+                                             createdLagrangianParameterManager,
+                                                    createdPotentialFunction );
+    }
+
+    // This creates a new LagrangianParameterManager based on the given
+    // arguments and returns a pointer to it.
+    LesHouchesAccordBlockEntryManager*
+    CreateLagrangianParameterManager( std::string const& classChoice,
+                                     std::string const& constructorArguments )
+    {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      std::string scaleAndBlockFilename( "error" );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ScaleAndBlockFile",
+                                       scaleAndBlockFilename );
+      }
+      if( classChoice == "SlhaCompatibleWithSarahManager" )
+      {
+        return new SlhaCompatibleWithSarahManager( scaleAndBlockFilename );
+      }
+      else if( classChoice == "SlhaBlocksWithSpecialCasesManager" )
+      {
+        return new SlhaBlocksWithSpecialCasesManager( scaleAndBlockFilename );
+      }
+      else if( classChoice == "LesHouchesAccordBlockEntryManager" )
+      {
+        return new LesHouchesAccordBlockEntryManager( scaleAndBlockFilename );
+      }
+      else
+      {
+        std::stringstream errorBuilder;
+        errorBuilder << "Read \"" << classChoice
+        << "\" as a Lagrangian parameter manager class, but this is not one of"
+        << " the known types (\"LesHouchesAccordBlockEntryManager\" or"
+        << " \"SlhaBlocksWithSpecialCasesManager\" or"
+        << " \"SlhaCompatibleWithSarahManager\").";
+        throw std::runtime_error( errorBuilder.str() );
+      }
+    }
+
+    // This creates a new PotentialFunction based on the given arguments and
+    // returns a pointer to it.
+    PotentialFromPolynomialWithMasses*
+    CreatePotentialFunction( std::string const& classChoice,
+                             std::string const& constructorArguments,
+                LagrangianParameterManager const& lagrangianParameterManager )
+    {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
       std::string modelFilename( "error" );
       double assumedPositiveOrNegativeTolerance( 1.0 );
       while( xmlParser.readNextElement() )
@@ -223,51 +251,223 @@ namespace VevaciousPlusPlus
                                        "AssumedPositiveOrNegativeTolerance",
                                        assumedPositiveOrNegativeTolerance );
       }
-
-      if( potentialFunctionClass == "FixedScaleOneLoopPotential" )
+      if( classChoice == "FixedScaleOneLoopPotential" )
       {
-        ownedPotentialFunction
-        = new FixedScaleOneLoopPotential( modelFilename,
-                                          assumedPositiveOrNegativeTolerance,
-                                          *ownedLagrangianParameterManager );
         oldPotentialFunction
         = new OldFixedScaleOneLoopPotential( modelFilename,
                                              10.0,
                                              false,
                                             assumedPositiveOrNegativeTolerance,
                                              *slhaManager );
+        return new FixedScaleOneLoopPotential( modelFilename,
+                                            assumedPositiveOrNegativeTolerance,
+                                               *lagrangianParameterManager );
       }
-      else if( potentialFunctionClass == "RgeImprovedOneLoopPotential" )
+      else if( classChoice == "RgeImprovedOneLoopPotential" )
       {
-        ownedPotentialFunction
-        = new RgeImprovedOneLoopPotential( modelFilename,
-                                           assumedPositiveOrNegativeTolerance,
-                                           *ownedLagrangianParameterManager );
         oldPotentialFunction
         = new OldRgeImprovedOneLoopPotential( modelFilename,
                                               10.0,
                                               false,
                                             assumedPositiveOrNegativeTolerance,
                                               *slhaManager );
+        return new RgeImprovedOneLoopPotential( modelFilename,
+                                            assumedPositiveOrNegativeTolerance,
+                                                *lagrangianParameterManager );
       }
       else
       {
         std::stringstream errorStream;
         errorStream
-        << "<PotentialClass> was not a recognized form! The only types"
+        << "<PotentialClass> was not a recognized class! The only options"
         << " currently valid are \"FixedScaleOneLoopPotential\" and"
         << " \"RgeImprovedOneLoopPotential\".";
         throw std::runtime_error( errorStream.str() );
       }
-      potentialFunction = ownedPotentialFunction;
     }
 
-    void SetUpPotentialMinimizer(
+    // This creates a PotentialMinimizer according to the XML elements in the
+    // file given by potentialMinimizerInitializationFilename and returns
+    // a pointer to it.
+    PotentialMinimizer* CreatePotentialMinimizer(
+                    PotentialFromPolynomialWithMasses const& potentialFunction,
                  std::string const& potentialMinimizerInitializationFilename )
     {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.openRootElementOfFile(
+                                    potentialMinimizerInitializationFilename );
+      std::string classChoice( "error" );
+      std::string constructorArguments( "error" );
 
+      // The root element of this file should have a single child element
+      // <PotentialMinimizerClass>.
+      while( xmlParser.readNextElement() )
+      {
+        ReadClassAndArguments( xmlParser,
+                               "PotentialMinimizerClass",
+                               classChoice,
+                               constructorArguments );
+      }
+      return CreatePotentialMinimizer( potentialFunction,
+                                       classChoice,
+                                       constructorArguments );
     }
-    void SetUpTunnelingCalculator(
+
+    // This creates a new PotentialMinimizer based on the given arguments and
+    // returns a pointer to it.
+    PotentialMinimizer* CreatePotentialMinimizer(
+                    PotentialFromPolynomialWithMasses const& potentialFunction,
+                                                std::string const& classChoice,
+                                     std::string const& constructorArguments )
+    {
+      if( classChoice == "GradientFromStartingPoints" )
+      {
+        return new CreateGradientFromStartingPoints( potentialFunction,
+                                                     constructorArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<PotentialMinimizerClass> was not a recognized class! The only"
+        << " option currently valid is \"GradientFromStartingPoints\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+    }
+
+    // This creates a new GradientFromStartingPoints based on the given
+    // arguments and returns a pointer to it.
+    GradientFromStartingPoints* CreateGradientFromStartingPoints(
+                    PotentialFromPolynomialWithMasses const& potentialFunction,
+                                     std::string const& constructorArguments )
+    {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      std::string startingPointFinderClass( "error" );
+      std::string startingPointFinderArguments( "error" );
+      std::string gradientMinimizerClass( "error" );
+      std::string gradientMinimizerArguments( "error" );
+      double extremumSeparationThresholdFraction( 0.05 );
+      double nonDsbRollingToDsbScalingFactor( 4.0 );
+      // The <ConstructorArguments> for this class should have child elements
+      // <StartingPointFinderClass> and <GradientMinimizerClass>, and
+      // optionally <ExtremumSeparationThresholdFraction> and
+      // <NonDsbRollingToDsbScalingFactor>.
+      while( xmlParser.readNextElement() )
+      {
+        ReadClassAndArguments( xmlParser,
+                               "StartingPointFinderClass",
+                               startingPointFinderClass,
+                               startingPointFinderArguments );
+        ReadClassAndArguments( xmlParser,
+                               "GradientMinimizerClass",
+                               gradientMinimizerClass,
+                               gradientMinimizerArguments );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ExtremumSeparationThresholdFraction",
+                                       extremumSeparationThresholdFraction );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "NonDsbRollingToDsbScalingFactor",
+                                       nonDsbRollingToDsbScalingFactor );
+      }
+      StartingPointFinder*
+      startingPointFinder( CreateStartingPointFinder( potentialFunction,
+                                                      startingPointFinderClass,
+                                              startingPointFinderArguments ) );
+      GradientMinimizer*
+      gradientMinimizer( CreateGradientMinimizer( potentialFunction,
+                                                  gradientMinimizerClass,
+                                                gradientMinimizerArguments ) );
+      return new GradientFromStartingPoints( potentialFunction,
+                                             startingPointFinder,
+                                             gradientMinimizer,
+                                           extremumSeparationThresholdFraction,
+                                             nonDsbRollingToDsbScalingFactor );
+    }
+
+    // This creates a new StartingPointFinder based on the given arguments and
+    // returns a pointer to it.
+    StartingPointFinder* CreateStartingPointFinder(
+                    PotentialFromPolynomialWithMasses const& potentialFunction,
+                                                std::string const& classChoice,
+                                     std::string const& constructorArguments )
+    {
+      if( classChoice == "PolynomialAtFixedScalesSolver" )
+      {
+        return new CreatePolynomialAtFixedScalesSolver( potentialFunction,
+                                                        constructorArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<StartingPointFinderClass> was not a recognized class! The only"
+        << " option currently valid is \"PolynomialAtFixedScalesSolver\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+    }
+
+    // This creates a new PolynomialAtFixedScalesSolver based on the given
+    // arguments and returns a pointer to it.
+    PolynomialAtFixedScalesSolver*
+    CreatePolynomialAtFixedScalesSolver(
+                                    PotentialFunction const& potentialFunction,
+                                      std::string const& constructorArguments )
+    {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      std::string polynomialSystemSolverClass( "error" );
+      std::string polynomialSystemSolverArguments( "error" );
+      int numberOfScales( 10 );
+      // The <ConstructorArguments> for this class should have child elements
+      // <StartingPointFinderClass> and <GradientMinimizerClass>, and
+      // optionally <ExtremumSeparationThresholdFraction> and
+      // <NonDsbRollingToDsbScalingFactor>.
+      while( xmlParser.readNextElement() )
+      {
+        ReadClassAndArguments( xmlParser,
+                               "StartingPointFinderClass",
+                               startingPointFinderClass,
+                               startingPointFinderArguments );
+        ReadClassAndArguments( xmlParser,
+                               "GradientMinimizerClass",
+                               gradientMinimizerClass,
+                               gradientMinimizerArguments );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ExtremumSeparationThresholdFraction",
+                                       extremumSeparationThresholdFraction );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "NonDsbRollingToDsbScalingFactor",
+                                       nonDsbRollingToDsbScalingFactor );
+      }
+    }
+
+    // This creates a new GradientMinimizer based on the given arguments and
+    // returns a pointer to it.
+    GradientMinimizer*
+    CreateGradientMinimizer( PotentialFunction const& potentialFunction,
+                             std::string const& classChoice,
+                             std::string const& constructorArguments )
+    {
+      if( classChoice == "MinuitPotentialMinimizer" )
+      {
+        return new CreateMinuitPotentialMinimizer( potentialFunction,
+                                                   constructorArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<GradientMinimizerClass> was not a recognized class! The only"
+        << " option currently valid is \"MinuitPotentialMinimizer\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+    }
+
+    // This creates a TunnelingCalculator according to the XML elements in the
+    // file given by tunnelingCalculatorInitializationFilename and returns
+    // a pointer to it.
+    TunnelingCalculator* CreateTunnelingCalculator(
                 std::string const& tunnelingCalculatorInitializationFilename )
     {
 

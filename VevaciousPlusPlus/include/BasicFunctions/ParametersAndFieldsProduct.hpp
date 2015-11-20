@@ -100,6 +100,17 @@ namespace VevaciousPlusPlus
     ParametersAndFieldsProduct
     PartialDerivative( size_t const fieldIndex ) const;
 
+    // This multiplies the coefficient with the relevant values from the given
+    // Lagrangian parameters.
+    double
+    CoefficientFactor( std::vector< double > const& parameterValues ) const
+    { return ElementProduct( coefficientConstant,
+                             parameterValues,
+                             parameterIndices ); }
+
+    std::vector< size_t > const& FieldPowersByIndex() const
+    { return fieldPowersByIndex; }
+
     // This returns the sum of the powers of the fields.
     size_t FieldPower() const{ return fieldProductByIndex.size(); }
 
@@ -159,28 +170,6 @@ namespace VevaciousPlusPlus
     fieldPowersByIndex.clear();
     parameterIndices.clear();
     totalCoefficientForFixedScale = 1.0;
-  }
-
-  // This returns a ParametersAndFieldsProduct that is the partial derivative
-  // with respect to the field with index fieldIndex.
-  inline ParametersAndFieldsProduct
-  ParametersAndFieldsProduct::PartialDerivative(
-                                                size_t const fieldIndex ) const
-  {
-    ParametersAndFieldsProduct returnTerm( *this );
-    returnTerm.coefficientConstant *= fieldPowersByIndex[ fieldIndex ];
-    returnTerm.fieldPowersByIndex[ fieldIndex ] -= 1;
-    returnTerm.fieldProductByIndex.clear();
-    for( size_t whichField( 0 );
-         whichField < fieldPowersByIndex.size();
-         ++whichField )
-    {
-        returnTerm.fieldProductByIndex.insert(
-                                          returnTerm.fieldProductByIndex.end(),
-                                   returnTerm.fieldPowersByIndex[ whichField ],
-                                               whichField );
-    }
-    return returnTerm;
   }
 
   // This returns doubleToMultiply multiplied by the field product using the

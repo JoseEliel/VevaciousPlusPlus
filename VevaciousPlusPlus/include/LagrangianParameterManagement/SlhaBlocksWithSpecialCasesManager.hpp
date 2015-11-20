@@ -56,16 +56,17 @@ namespace VevaciousPlusPlus
     virtual double OnceOffParameter( std::string const& parameterName,
                                      double const logarithmOfScale ) const;
 
-    // This returns a vector of the values of the Lagrangian parameters in
-    // activeInterpolatedParameters evaluated at the given scale, ordered so
+    // This fills the given vector with the values of the Lagrangian parameters
+    // in activeInterpolatedParameters evaluated at the given scale, ordered so
     // that the indices given out by RegisterParameter correctly match the
-    // parameter with its element in the returned vector. First it calls the
-    // base version from LesHouchesAccordBlockEntryManager, then passes in the
+    // parameter with its element in the vector. First it calls the base
+    // version from LesHouchesAccordBlockEntryManager, then passes in the
     // vector in order to the functionoids in activeDerivedParameters, as each
     // derived parameter functionoid relies on the parameter values with
     // indices less than its own.
-    virtual std::vector< double >
-    ParameterValues( double const logarithmOfScale ) const;
+    virtual void
+    ParameterValues( double const logarithmOfScale,
+                     std::vector< double >& destinationVector ) const;
 
     // This is mainly for debugging.
     virtual std::string AsDebuggingString() const;
@@ -191,30 +192,29 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This returns a vector of the values of the Lagrangian parameters in
-  // activeInterpolatedParameters evaluated at the given scale, ordered so
+  // This fills the given vector with the values of the Lagrangian parameters
+  // in activeInterpolatedParameters evaluated at the given scale, ordered so
   // that the indices given out by RegisterParameter correctly match the
-  // parameter with its element in the returned vector. First it calls the
-  // base version from LesHouchesAccordBlockEntryManager, then passes in the
+  // parameter with its element in the vector. First it calls the base
+  // version from LesHouchesAccordBlockEntryManager, then passes in the
   // vector in order to the functionoids in activeDerivedParameters, as each
   // derived parameter functionoid relies on the parameter values with
   // indices less than its own.
-  inline std::vector< double >
-  SlhaBlocksWithSpecialCasesManager::ParameterValues(
-                                          double const logarithmOfScale ) const
+  inline void SlhaBlocksWithSpecialCasesManager::ParameterValues(
+                                                 double const logarithmOfScale,
+                              std::vector< double >& destinationVector ) const
   {
-    std::vector< double > parameterValues(
-    LesHouchesAccordBlockEntryManager::ParameterValues( logarithmOfScale ) );
+    LesHouchesAccordBlockEntryManager::ParameterValues( logarithmOfScale,
+                                                        destinationVector );
     for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
          parameterInterpolator( activeDerivedParameters.begin() );
          parameterInterpolator < activeDerivedParameters.end();
          ++parameterInterpolator )
     {
-      parameterValues[ (*parameterInterpolator)->IndexInValuesVector() ]
+      destinationVector[ (*parameterInterpolator)->IndexInValuesVector() ]
       = (*(*parameterInterpolator))( logarithmOfScale,
-                                     parameterValues );
+                                     destinationVector );
     }
-    return parameterValues;
   }
 
   // This adds newParameter to activeDerivedParameters and updates

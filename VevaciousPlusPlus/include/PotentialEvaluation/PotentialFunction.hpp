@@ -22,6 +22,9 @@ namespace VevaciousPlusPlus
     virtual ~PotentialFunction();
 
 
+    LagrangianParameterManager const& LagrangianParameterManager() const
+    { return lagrangianParameterManager; }
+
     LagrangianParameterManager& LagrangianParameterManager()
     { return lagrangianParameterManager; }
 

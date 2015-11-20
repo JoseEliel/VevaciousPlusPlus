@@ -283,12 +283,12 @@ namespace VevaciousPlusPlus
       }
     }
     double const
-    outputLogScale( log( AppropriateFixedScaleForParameterPoint() ) );
+    outputLogScale( log( AppropriateSingleFixedScale() ) );
     std::vector< double > const
     parameterValues( ParameterValues( outputLogScale ) );
     stringBuilder
     << std::endl << "Sorted parameters at scale "
-    << AppropriateFixedScaleForParameterPoint() << " (log = " << outputLogScale
+    << AppropriateSingleFixedScale() << " (log = " << outputLogScale
     << ") = {" << std::endl;
     for( std::vector< nameAndParameter >::const_iterator
          sortedNameAndParameter( sortedNamesAndParameters.begin() );

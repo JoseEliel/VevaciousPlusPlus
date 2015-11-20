@@ -53,12 +53,12 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;*/
 
     renormalizationScale
-    = lagrangianParameterManager.AppropriateFixedScaleForParameterPoint();
+    = lagrangianParameterManager.AppropriateSingleFixedScale();
     inverseRenormalizationScaleSquared
     = ( 1.0 / ( renormalizationScale * renormalizationScale ) );
-    std::vector< double > const
-    fixedParameterValues( lagrangianParameterManager.ParameterValues(
-                                               log( renormalizationScale ) ) );
+    std::vector< double > fixedParameterValues;
+    lagrangianParameterManager.ParameterValues( log( renormalizationScale ),
+                                                fixedParameterValues );
 
     // debugging:
     /*std::cout << std::endl << "debugging:"

@@ -39,6 +39,36 @@ namespace VevaciousPlusPlus
   }
 
 
+  // This returns a ParametersAndFieldsProduct that is the partial derivative
+  // with respect to the field with index fieldIndex.
+  ParametersAndFieldsProduct ParametersAndFieldsProduct::PartialDerivative(
+                                                size_t const fieldIndex ) const
+  {
+    if( !(NonZeroDerivative( fieldIndex )) )
+    {
+      ParametersAndFieldsProduct returnTerm;
+      returnTerm.coefficientConstant = 0.0;
+      returnTerm.totalCoefficientForFixedScale = 0.0;
+      return returnTerm;
+    }
+    ParametersAndFieldsProduct returnTerm( *this );
+    returnTerm.coefficientConstant *= fieldPowersByIndex[ fieldIndex ];
+    returnTerm.totalCoefficientForFixedScale
+    *= fieldPowersByIndex[ fieldIndex ];
+    returnTerm.fieldPowersByIndex[ fieldIndex ] -= 1;
+    returnTerm.fieldProductByIndex.clear();
+    for( size_t whichField( 0 );
+         whichField < fieldPowersByIndex.size();
+         ++whichField )
+    {
+        returnTerm.fieldProductByIndex.insert(
+                                          returnTerm.fieldProductByIndex.end(),
+                                   returnTerm.fieldPowersByIndex[ whichField ],
+                                               whichField );
+    }
+    return returnTerm;
+  }
+
   // This returns a string that should be valid Python assuming that the
   // field configuration is given as an array called "fv" and that the
   // Lagrangian parameters are in an array called "lp".

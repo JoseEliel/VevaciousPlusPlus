@@ -103,10 +103,20 @@ namespace VevaciousPlusPlus
     // ourselves to requiring a C++11-compliant compiler, as then we could have
     // the constructors use std::unique_ptrs, but, alas, we're sticking to
     // C++98.
-    SetUpLagrangianParametersAndPotential(
-                                     potentialFunctionInitializationFilename );
-    SetUpPotentialMinimizer( potentialMinimizerInitializationFilename );
-    SetUpTunnelingCalculator( tunnelingCalculatorInitializationFilename );
+    std::pair< LesHouchesAccordBlockEntryManager*,
+               PotentialFromPolynomialWithMasses* >
+    lagrangianParameterManagerAndPotentialFunction(
+                          CreateLagrangianParameterManagerAndPotentialFunction(
+                                   potentialFunctionInitializationFilename ) );
+    lagrangianParameterManager = ownedLagrangianParameterManager
+    = lagrangianParameterManagerAndPotentialFunction.first;
+    potentialFunction = ownedPotentialFunction
+    = lagrangianParameterManagerAndPotentialFunction.second;
+    ownedPotentialMinimizer
+    = CreatePotentialMinimizer( *ownedPotentialFunction,
+                                potentialMinimizerInitializationFilename );
+    ownedTunnelingCalculator
+    = CreateTunnelingCalculator( tunnelingCalculatorInitializationFilename );
   }
 
   VevaciousPlusPlus::~VevaciousPlusPlus()

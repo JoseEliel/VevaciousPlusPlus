@@ -96,7 +96,7 @@ namespace VevaciousPlusPlus
 
     // This returns a scale which is appropriate for using for a fixed-scale
     // calculation for the current parameter point.
-    virtual double AppropriateFixedScaleForParameterPoint() const
+    virtual double AppropriateSingleFixedScale() const
     { return lowestBlockScale; }
 
     // This returns a scale which is appropriate for using for a fixed-scale

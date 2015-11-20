@@ -2,7 +2,7 @@
  * ParsingUtilities.hpp
  *
  *  Created on: Nov 16, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #ifndef LHPC_PARSINGUTILITIES_HPP_

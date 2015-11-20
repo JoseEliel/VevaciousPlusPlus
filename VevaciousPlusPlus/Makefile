@@ -44,6 +44,7 @@ LAGRANGIANPARAMETERMANAGEMENT= source/LagrangianParameterManagement/
 SLHADERIVEDFUNCTIONOIDS= $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoids/
 POTENTIALEVALUATION= source/PotentialMinimization/
 HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
+STARTINGPOINTGENERATION= $(POTENTIALEVALUATION)/StartingPointGeneration/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
 SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
@@ -111,6 +112,7 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaSourcedParameterFunctionoid.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
+ $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \

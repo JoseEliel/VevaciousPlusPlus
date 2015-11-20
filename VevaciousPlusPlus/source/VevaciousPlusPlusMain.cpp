@@ -178,7 +178,7 @@ int main( int argumentCount,
   unitHd.front() = 1.0;
   std::vector< double >
   fixedParameterValues( lhaParameterManager->ParameterValues(
-      log( lhaParameterManager->AppropriateFixedScaleForParameterPoint() ) ) );
+      log( lhaParameterManager->AppropriateSingleFixedScale() ) ) );
 
   double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
                                          oldFixedScale.FieldValuesOrigin() ) );

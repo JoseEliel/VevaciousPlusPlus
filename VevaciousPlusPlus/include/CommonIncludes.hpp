@@ -27,6 +27,7 @@
 #include <map>
 #include <set>
 #include "LHPC/ParsingUtilities.hpp"
+#include "LHPC/VectorUtilities.hpp"
 #include "BOLlib/include/BOLlib.hpp"
 #include "SLHA.hpp"
 
