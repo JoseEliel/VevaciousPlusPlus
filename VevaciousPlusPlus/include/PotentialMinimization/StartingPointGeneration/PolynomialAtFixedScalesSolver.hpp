@@ -38,10 +38,7 @@ namespace VevaciousPlusPlus
     // used or discarded depend on numberOfScales.
     // If numberOfScales is 1, the scale used is
     // potentialFunction.LagrangianParameterManager(
-    //                               ).AppropriateFixedScaleForParameterPoint()
-    // and any solutions with Euclidean length larger than (100 *
-    // potentialFunction.LagrangianParameterManager().MaximumEvaluationScale())
-    // are discarded.
+    //                               ).AppropriateFixedScaleForParameterPoint().
     // If numberOfScales is 2 or more, the lowest scale used is
     // potentialFunction.LagrangianParameterManager().MinimumEvaluationScale()
     // and the highest scale used is
@@ -55,9 +52,8 @@ namespace VevaciousPlusPlus
     // scale or larger than the scale above the current scale are discarded.
     // Using the above example, from the solution set found at 10^5, any
     // solutions with length less than 10^3 or greater than 10^7 are discarded.
-    // The lowest scale does not discard any solution for being too small, but
-    // the highest scale does discard solutions which are too large, using an
-    // upper limit of 100 * the highest scale.
+    // The lowest scale does not discard any solution for being too small, and
+    // the highest scale does not discard any solutions for being too large.
     virtual void
     operator()( std::vector< std::vector< double > >& startingPoints ) const;
 
@@ -76,7 +72,8 @@ namespace VevaciousPlusPlus
     // This uses polynomialSystemSolver to solve the system at the scale given
     // by exp(logCurrentScale), discarding solutions with Euclidean length
     // smaller than lowerSolutionLengthBound or greater than
-    // upperSolutionLengthBound.
+    // upperSolutionLengthBound. (If upperSolutionLengthBound is <= 0.0, then
+    // the upper limit is not applied.)
     void AddSolutions( std::vector< std::vector< double > >& startingPoints,
                        double const logCurrentScale,
                        double const lowerSolutionLengthBound,
