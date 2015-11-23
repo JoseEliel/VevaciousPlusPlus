@@ -104,41 +104,19 @@ int main( int argumentCount,
   }
   lhaManagerParser.closeFile();
 
-  VevaciousPlusPlus::LesHouchesAccordBlockEntryManager*
-  lhaParameterManager( NULL );
-  if( specialCases == "SarahMssm" )
-  {
-    lhaParameterManager
-    = new VevaciousPlusPlus::SlhaCompatibleWithSarahManager( validBlocks,
-                                                             minimumScaleType,
-                                                          minimumScaleArgument,
-                                                             fixedScaleType,
-                                                            fixedScaleArgument,
-                                                             maximumScaleType,
-                                                         maximumScaleArgument );
-  }
-  else if( specialCases == "SlhaMssm" )
-  {
-    lhaParameterManager
-    = new VevaciousPlusPlus::SlhaBlocksWithSpecialCasesManager( validBlocks,
-                                                              minimumScaleType,
-                                                          minimumScaleArgument,
-                                                                fixedScaleType,
-                                                            fixedScaleArgument,
-                                                            maximumScaleType,
-                                                        maximumScaleArgument );
-  }
-  else
-  {
-    lhaParameterManager
-    = new VevaciousPlusPlus::LesHouchesAccordBlockEntryManager( validBlocks,
+  // Overwriting scale choices for RGE-improved comparison with fixed-case:
+  minimumScaleType = fixedScaleType = maximumScaleType = "FixedNumber";
+  minimumScaleArgument = fixedScaleArgument = maximumScaleArgument = "1000.0";
+
+  VevaciousPlusPlus::LesHouchesAccordBlockEntryManager* lhaParameterManager(
+                         new VevaciousPlusPlus::SlhaCompatibleWithSarahManager(
+                                                                   validBlocks,
                                                               minimumScaleType,
                                                           minimumScaleArgument,
                                                                 fixedScaleType,
                                                             fixedScaleArgument,
                                                               maximumScaleType,
-                                                        maximumScaleArgument );
-  }
+                                                      maximumScaleArgument ) );
 
   std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
 
@@ -329,8 +307,10 @@ int main( int argumentCount,
   std::vector< std::vector< double > > oldHom4ps2Results;
   VevaciousPlusPlus::OldHom4ps2Runner oldHom4ps2Runner(
                          *(oldFixedScale.HomotopyContinuationTargetSystem()),
-                                pathToHom4ps2,
-                                homotopyType );
+                                                        pathToHom4ps2,
+                                                        homotopyType );
+  oldFixedScale.HomotopyContinuationTargetSystem()->UpdateSelfForNewSlha(
+                                                                 slhaManager );
   oldHom4ps2Runner( oldHom4ps2Results );
 
   std::vector< std::vector< double > > newHom4ps2Results;

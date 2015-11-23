@@ -99,7 +99,16 @@ namespace VevaciousPlusPlus
   void
   OldHom4ps2Runner::WriteHom4p2Input( std::string const& hom4ps2InputFilename )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "OldHom4ps2Runner::WriteHom4p2Input( \"" << hom4ps2InputFilename
+    << "\" ) called. targetSystem.TargetSystem().size() = "
+    << targetSystem.TargetSystem().size();
+    std::cout << std::endl;/**/
+
     variableNames.clear();
+    // std::string const variablePrefix( "v" );
     for( size_t whichVariable( 0 );
          whichVariable < targetSystem.TargetSystem().size();
          ++whichVariable )
@@ -107,6 +116,20 @@ namespace VevaciousPlusPlus
       variableNames.push_back( variableNamer.intToString( whichVariable ) );
       nameToIndexMap[ variableNames.back() ] = whichVariable;
     }
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "variableNames = { ";
+    for( std::vector< std::string >::const_iterator
+         variableName( variableNames.begin() );
+         variableName != variableNames.end();
+         ++variableName )
+    {
+      std::cout << *variableName << ", ";
+    }
+    std::cout << "}";
+    std::cout << std::endl;/**/
 
     std::ofstream hom4ps2Input( hom4ps2InputFilename.c_str() );
     hom4ps2Input << "{\n";
@@ -212,6 +235,14 @@ namespace VevaciousPlusPlus
                                                               1.0 );
       }
     }
+
+    std::cout
+    << std::endl
+    << "-----------------" << std::endl << "Parsed "
+    << ( complexSolutions.size() / numberOfVariables )
+    << " complex solutions from HOM4PS2."
+    << std::endl;
+    std::cout << std::endl;
   }
 
 } /* namespace VevaciousPlusPlus */

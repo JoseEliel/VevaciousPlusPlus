@@ -114,9 +114,9 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      nameBuilder.str( fieldNamePrefix );
+      nameBuilder.str( "" );
       nameBuilder << ( fieldIndex + 1 );
-      variableNames[ fieldIndex ] = nameBuilder.str();
+      variableNames[ fieldIndex ] = ( fieldNamePrefix + nameBuilder.str() );
       nameToIndexMap[ variableNames[ fieldIndex ] ] = fieldIndex;
 
       // debugging:
@@ -151,7 +151,6 @@ namespace VevaciousPlusPlus
                                  PolynomialConstraint const& constraintToWrite,
                         std::vector< std::string > const& variableNames ) const
   {
-    size_t const numberOfFields( variableNames.size() );
     std::stringstream stringBuilder;
     bool firstTermWritten( false );
     for( std::vector< FactorWithPowers >::const_iterator
@@ -175,7 +174,7 @@ namespace VevaciousPlusPlus
         }
 
         for( size_t fieldIndex( 0 );
-             fieldIndex < numberOfFields;
+             fieldIndex < factorWithPowers->second.size();
              ++fieldIndex )
         {
           if( factorWithPowers->second[ fieldIndex ] > 0 )
@@ -337,6 +336,14 @@ namespace VevaciousPlusPlus
         solutionIsReal = true;
       }
     }
+
+    std::cout
+    << std::endl
+    << "-----------------" << std::endl << "Parsed "
+    << ( complexSolutions.size() / numberOfVariables )
+    << " complex solutions from HOM4PS2."
+    << std::endl;
+    std::cout << std::endl;
   }
 
 } /* namespace VevaciousPlusPlus */

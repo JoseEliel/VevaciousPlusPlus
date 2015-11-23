@@ -20,8 +20,8 @@ namespace VevaciousPlusPlus
   {
   public:
     OldHom4ps2Runner( PolynomialGradientTargetSystem& targetSystem,
-                   std::string const& pathToHom4ps2,
-                   std::string const& homotopyType );
+                      std::string const& pathToHom4ps2,
+                      std::string const& homotopyType );
     virtual ~OldHom4ps2Runner();
 
 

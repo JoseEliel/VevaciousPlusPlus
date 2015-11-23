@@ -117,6 +117,13 @@ namespace VevaciousPlusPlus
   PolynomialSystemSolver::AllSignFlips( std::vector< double > solutionToFlip,
                               std::vector< std::vector< double > >& signFlips )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Either PolynomialSystemSolver::AllSignFlips(..., ...) is getting stuck"
+    << " or whatever is calling it is getting stuck.";
+    std::cout << std::endl;/**/
+
     signFlips.push_back( solutionToFlip );
     size_t const numberOfElements( solutionToFlip.size() );
     for( size_t flipIndex( 0 );
