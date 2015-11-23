@@ -126,12 +126,12 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator > referenceUnsafeActiveParameters;
     std::set< std::string > validBlocks;
     LHPC::SlhaSimplisticInterpreter lhaParser;
-    std::string const minimumScaleType;
-    std::string const minimumScaleArgument;
-    std::string const fixedScaleType;
-    std::string const fixedScaleArgument;
-    std::string const maximumScaleType;
-    std::string const maximumScaleArgument;
+    std::string minimumScaleType;
+    std::string minimumScaleArgument;
+    std::string fixedScaleType;
+    std::string fixedScaleArgument;
+    std::string maximumScaleType;
+    std::string maximumScaleArgument;
 
 
     // This parses validBlocksString into a set of valid block names and

@@ -284,8 +284,9 @@ namespace VevaciousPlusPlus
     }
     double const
     outputLogScale( log( AppropriateSingleFixedScale() ) );
-    std::vector< double > const
-    parameterValues( ParameterValues( outputLogScale ) );
+    std::vector< double > parameterValues;
+    ParameterValues( outputLogScale,
+                     parameterValues );
     stringBuilder
     << std::endl << "Sorted parameters at scale "
     << AppropriateSingleFixedScale() << " (log = " << outputLogScale

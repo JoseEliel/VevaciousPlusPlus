@@ -32,9 +32,31 @@
              "PolynomialAtFixedScalesSolver", and
              <ConstructorArguments> must give SOMETHING. -->
         <ClassType>
-          PolynomialAtFixedScalesHomotopyContinuation
+          PolynomialAtFixedScalesSolver
         </ClassType>
         <ConstructorArguments>
+          <NumberOfScales>
+            <!-- If this number is 1, only 1 scale will be used for the
+                 Lagrangian parameters and the polynomial approximation to the
+                 potential will only be solved at this scale. The scale used
+                 will be the "appropriate single scale" given by the Lagrangian
+                 parameter manager.
+                 
+                 If a number greater than 1 is given, then this number of
+                 scales will be generated in a geometric sequence from the
+                 minimum scale given by the Lagrangian parameter manager to the
+                 maximum scale it gives. For example, if this number were 5 and
+                 the minimum and maximum scales 10^2 GeV and 10^14 GeV
+                 respectively, then the scales used would be:
+                 10^2 GeV, 10^5 GeV, 10^8 GeV, 10^11 GeV, and 10^14 GeV.
+                 Solutions found at each scale are only kept if their Euclidean
+                 length does not reach to another of the used scales. Still
+                 with the above example, if at 10^5 GeV a solution were found
+                 where the square root of the sum of the squares of the field
+                 values were smaller than 10^2 GeV or greater than 10^8 GeV,
+                 such a solution would be discarded. -->
+            1
+          </NumberOfScales>
           <ReturnOnlyPolynomialMinima>
             <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if
                  true then the starting points for gradient-based minimization
@@ -57,7 +79,7 @@
                  which is the bottleneck. -->
             No
           </ReturnOnlyPolynomialMinima>
-          <HomotopyContinuationSolver>
+          <PolynomialSystemSolver>
             <!-- Currently <ClassType> must be "Hom4ps2Runner", and
                  <ConstructorArguments> must give the path to the directory
                  with the hom4ps2 executable by <PathToHom4ps2> and the
@@ -80,8 +102,15 @@
                      but 2 seems more reliable. -->
                 2
               </Hom4ps2Argument>
+              <ResolutionSize>
+                <!-- Solutions within a hypercube with side length given by
+                     this number are considered to be the same solution, and
+                     also imaginary parts of solutions are considered to be
+                     zero if they are less than this number. -->
+                1.0
+              </ResolutionSize>
             </ConstructorArguments>
-          </HomotopyContinuationSolver>
+          </PolynomialSystemSolver>
         </ConstructorArguments>
       </StartingPointFinderClass>
       <GradientMinimizerClass>

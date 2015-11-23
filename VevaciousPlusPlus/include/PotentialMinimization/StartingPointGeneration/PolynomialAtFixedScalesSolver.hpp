@@ -9,7 +9,7 @@
 #define POLYNOMIALATFIXEDSCALESSOLVER_HPP_
 
 #include "CommonIncludes.hpp"
-#include "StartingPointFinder.hpp"
+#include "PotentialMinimization/StartingPointFinder.hpp"
 #include "PolynomialSystemSolver.hpp"
 #include "BasicFunctions/ParametersAndFieldsProduct.hpp"
 #include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
@@ -25,7 +25,7 @@ namespace VevaciousPlusPlus
     PolynomialAtFixedScalesSolver(
                     ParametersAndFieldsProductSum const& polynomialToExtremize,
                   LagrangianParameterManager const& lagrangianParameterManager,
-                  PolynomialSystemSolver* const polynomialSystemSolver,
+                          PolynomialSystemSolver* const polynomialSystemSolver,
                                    unsigned int const numberOfScales,
                                    bool const returnOnlyPolynomialMinima,
                                    unsigned int const numberOfFields );
@@ -37,12 +37,11 @@ namespace VevaciousPlusPlus
     // puts them into startingPoints. The scale used and whether solutions are
     // used or discarded depend on numberOfScales.
     // If numberOfScales is 1, the scale used is
-    // potentialFunction.LagrangianParameterManager(
-    //                               ).AppropriateFixedScaleForParameterPoint().
+    // lagrangianParameterManager.AppropriateSingleFixedScale().
     // If numberOfScales is 2 or more, the lowest scale used is
-    // potentialFunction.LagrangianParameterManager().MinimumEvaluationScale()
+    // lagrangianParameterManager.MinimumEvaluationScale()
     // and the highest scale used is
-    // potentialFunction.LagrangianParameterManager().MaximumEvaluationScale().
+    // lagrangianParameterManager.MaximumEvaluationScale().
     // Intermediate scales form a geometric sequence between these scales.
     // For example, if numberOfScales is 5, the lowest scale is 10^3, and the
     // highest is 10^11, the scales used would be 10^3, 10^5, 10^7, 10^9, and

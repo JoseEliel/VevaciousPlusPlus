@@ -26,13 +26,17 @@ namespace VevaciousPlusPlus
                                     std::string const& minimumScaleType,
                                     std::string const& minimumScaleArgument,
                                     std::string const& fixedScaleType,
-                                    std::string const& fixedScaleArgument );
+                                    std::string const& fixedScaleArgument,
+                                    std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument );
     SlhaCompatibleWithSarahManager(
                                  std::set< std::string > const& validBlocksSet,
                                     std::string const& minimumScaleType,
                                     std::string const& minimumScaleArgument,
                                     std::string const& fixedScaleType,
-                                    std::string const& fixedScaleArgument );
+                                    std::string const& fixedScaleArgument,
+                                    std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument );
     SlhaCompatibleWithSarahManager( std::string const& xmlFileName );
     virtual ~SlhaCompatibleWithSarahManager();
 

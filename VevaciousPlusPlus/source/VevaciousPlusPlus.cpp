@@ -22,12 +22,11 @@ namespace VevaciousPlusPlus
   // point at the addresses of the given components.
   VevaciousPlusPlus::VevaciousPlusPlus( PotentialMinimizer& potentialMinimizer,
                                    TunnelingCalculator& tunnelingCalculator ) :
-    lagrangianParameterManager(
-      &(potentialMinimizer.PotentialFunction().LagrangianParameterManager()) ),
+    lagrangianParameterManager( &(potentialMinimizer.GetPotentialFunction(
+                                          ).GetLagrangianParameterManager()) ),
     ownedLagrangianParameterManager( NULL ),
-    slhaManager(
-         potentialMinimizer.PotentialFunction().LagrangianParameterManager() ),
-    potentialFunction( &(potentialMinimizer.PotentialFunction()) ),
+    slhaManager( NULL ),
+    // potentialFunction( &(potentialMinimizer.GetPotentialFunction()) ),
     ownedPotentialFunction( NULL ),
     oldPotentialFunction( NULL ),
     potentialMinimizer( &potentialMinimizer ),
@@ -51,7 +50,7 @@ namespace VevaciousPlusPlus
     lagrangianParameterManager( NULL ),
     ownedLagrangianParameterManager( NULL ),
     slhaManager( NULL ),
-    potentialFunction( NULL ),
+    // potentialFunction( NULL ),
     ownedPotentialFunction( NULL ),
     potentialMinimizer( NULL ),
     ownedPotentialMinimizer( NULL ),
@@ -110,7 +109,8 @@ namespace VevaciousPlusPlus
                                    potentialFunctionInitializationFilename ) );
     lagrangianParameterManager = ownedLagrangianParameterManager
     = lagrangianParameterManagerAndPotentialFunction.first;
-    potentialFunction = ownedPotentialFunction
+    // potentialFunction =
+    ownedPotentialFunction
     = lagrangianParameterManagerAndPotentialFunction.second;
     ownedPotentialMinimizer
     = CreatePotentialMinimizer( *ownedPotentialFunction,
@@ -159,7 +159,7 @@ namespace VevaciousPlusPlus
     {
       stageTimer.setStartTime();
       tunnelingCalculator->CalculateTunneling(
-                                       potentialMinimizer->PotentialFunction(),
+                                    potentialMinimizer->GetPotentialFunction(),
                                                potentialMinimizer->DsbVacuum(),
                                            potentialMinimizer->PanicVacuum() );
 
@@ -203,16 +203,18 @@ namespace VevaciousPlusPlus
     {
       xmlFile << "meta";
     }
+    std::vector< std::string > const&
+    fieldNames( potentialMinimizer->GetPotentialFunction().FieldNames() );
     xmlFile << "stable\n"
     "  </StableOrMetastable>\n"
     << potentialMinimizer->DsbVacuum().AsVevaciousXmlElement( "DsbVacuum",
-                                             potentialFunction->FieldNames() );
+                                                              fieldNames );
     if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       xmlFile
       << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
                                                                 "PanicVacuum",
-                                             potentialFunction->FieldNames() );
+                                                                fieldNames );
       if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
       {
         xmlFile << "  <ZeroTemperatureDsbSurvival>\n"
@@ -366,7 +368,7 @@ namespace VevaciousPlusPlus
     << "BLOCK VEVACIOUSFIELDNAMES # Field names for each index\n"
     "# [index] [field name in \"\"]\n";
     std::vector< std::string > const&
-    fieldNames( potentialFunction->FieldNames() );
+    fieldNames( potentialMinimizer->GetPotentialFunction().FieldNames() );
     for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
@@ -641,8 +643,7 @@ namespace VevaciousPlusPlus
                                      maxOuterLoops );
     }
     CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
-    return new CosmoTransitionsRunner( *ownedPotentialFunction,
-                                       *ownedPotentialFunction,
+    return new CosmoTransitionsRunner(
                               InterpretTunnelingStrategy( tunnelingStrategy ),
                                        survivalProbabilityThreshold,
                                        temperatureAccuracy,
@@ -711,8 +712,7 @@ namespace VevaciousPlusPlus
       << "<TunnelPathFinders> produced no valid tunnel path finding objects!";
       throw std::runtime_error( errorStream.str() );
     }
-    return new BounceAlongPathWithThreshold( *ownedPotentialFunction,
-                                             pathFinders,
+    return new BounceAlongPathWithThreshold( pathFinders,
                           SetUpBounceActionCalculator( bouncePotentialFitClass,
                                                  bouncePotentialFitArguments ),
                                InterpretTunnelingStrategy( tunnelingStrategy ),
@@ -774,8 +774,8 @@ namespace VevaciousPlusPlus
   {
     // The <ConstructorArguments> for this class should have child elements
     // <NumberOfPathSegments>, <MinuitStrategy> and <MinuitTolerance>.
-    int numberOfPathSegments( 100 );
-    int minuitStrategy( 1 );
+    unsigned int numberOfPathSegments( 100 );
+    unsigned int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
@@ -791,10 +791,9 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    return new MinuitOnPotentialOnParallelPlanes( *potentialFunction,
-                                 static_cast< size_t >( numberOfPathSegments ),
+    return new MinuitOnPotentialOnParallelPlanes( numberOfPathSegments,
                                                   minuitStrategy,
-                      static_cast< unsigned int >( minuitToleranceFraction ) );
+                                                  minuitToleranceFraction );
   }
 
   // This parses arguments from constructorArguments and uses them to
@@ -852,14 +851,13 @@ namespace VevaciousPlusPlus
           BOL::StringParser::stringToDouble( weightsStrings[ weightIndex ] ) );
     }
 
-    return new MinuitOnPotentialPerpendicularToPath( *potentialFunction,
-                                 static_cast< size_t >( numberOfPathSegments ),
+    return new MinuitOnPotentialPerpendicularToPath( numberOfPathSegments,
                                                      numberOfAllowedWorsenings,
                                                   convergenceThresholdFraction,
                                                      minuitDampingFraction,
                                                    neighborDisplacementWeights,
                                                      minuitStrategy,
-                      static_cast< unsigned int >( minuitToleranceFraction ) );
+                                                     minuitToleranceFraction );
   }
 
   // This parses arguments from constructorArguments and uses them to
@@ -924,14 +922,13 @@ namespace VevaciousPlusPlus
     << " class does not yet exist!";
     std::cout << std::endl;
     return NULL;/**/
-    /*return new MinuitOnPathNormalInertialPotential( *potentialFunction,
-                                 static_cast< size_t >( numberOfPathSegments ),
+    /*return new MinuitOnPathNormalInertialPotential( numberOfPathSegments,
                                                      numberOfAllowedWorsenings,
                                                   convergenceThresholdFraction,
                                                      minuitDampingFraction,
                                                    neighborDisplacementWeights,
                                                      minuitStrategy,
-                    static_cast< unsigned int >( minuitToleranceFraction ) );*/
+                                                   minuitToleranceFraction );*/
   }
 
   // This parses arguments from constructorArguments and uses them to
@@ -942,7 +939,7 @@ namespace VevaciousPlusPlus
                                       std::string const& constructorArguments )
   {
     double lengthScaleResolutionForBounce( 0.05 );
-    int shootAttemptsForBounce( 32 );
+    unsigned int shootAttemptsForBounce( 32 );
 
     BOL::AsciiXmlParser xmlParser;
     xmlParser.loadString( constructorArguments );
@@ -956,9 +953,9 @@ namespace VevaciousPlusPlus
                                      shootAttemptsForBounce );
     }
 
-    return new BubbleShootingOnPathInFieldSpace( *potentialFunction,
-                                                lengthScaleResolutionForBounce,
-                                                 shootAttemptsForBounce );
+    return
+    new BubbleShootingOnPathInFieldSpace( lengthScaleResolutionForBounce,
+                                          shootAttemptsForBounce );
   }
 
 } /* namespace VevaciousPlusPlus */

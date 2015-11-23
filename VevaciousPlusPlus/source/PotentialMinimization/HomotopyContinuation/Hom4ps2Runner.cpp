@@ -1,7 +1,7 @@
 /*
  * Hom4ps2Runner.cpp
  *
- *  Created on: Apr 14, 2014
+ *  Created on: Nov 23, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
@@ -9,22 +9,14 @@
 
 namespace VevaciousPlusPlus
 {
+  std::string const Hom4ps2Runner::fieldNamePrefix( "fv" );
 
-  Hom4ps2Runner::Hom4ps2Runner( PolynomialGradientTargetSystem& targetSystem,
-                                std::string const& pathToHom4ps2,
-                                std::string const& homotopyType ) :
-    HomotopyContinuationSolver( targetSystem ),
-    targetSystem( targetSystem ),
+  Hom4ps2Runner::Hom4ps2Runner( std::string const& pathToHom4ps2,
+                                std::string const& homotopyType,
+                                double const resolutionSize ) :
     pathToHom4ps2( pathToHom4ps2 ),
     homotopyType( homotopyType ),
-    variableNamer( 4,
-                   '0',
-                   6,
-                   2,
-                   "v" ),
-    complexSolutions(),
-    variableNames(),
-    nameToIndexMap()
+    resolutionSize( resolutionSize )
   {
     // This constructor is just an initialization list.
   }
@@ -38,7 +30,8 @@ namespace VevaciousPlusPlus
   // This uses HOM4PS2 to fill startingPoints with all the extrema of
   // targetSystem.TargetPolynomialGradient().
   void Hom4ps2Runner::operator()(
-                         std::vector< std::vector< double > >& startingPoints )
+                      std::vector< PolynomialConstraint > const& systemToSolve,
+                  std::vector< std::vector< double > >& systemSolutions ) const
   {
     char originalWorkingDirectory[ PATH_MAX ];
     if( NULL == getcwd( originalWorkingDirectory,
@@ -61,9 +54,15 @@ namespace VevaciousPlusPlus
       throw std::runtime_error(
                            "could not change directory to HOM4PS2 directory" );
     }
-    std::string hom4ps2InputFilename( "./VevaciousHomotopyContinuation.txt" );
 
-    WriteHom4p2Input( hom4ps2InputFilename );
+    std::string hom4ps2InputFilename( "./VevaciousHomotopyContinuation.txt" );
+    std::vector< std::string > variableNames( systemToSolve.size(),
+                                              "" );
+    std::map< std::string, size_t > nameToIndexMap;
+    WriteHom4p2Input( systemToSolve,
+                      variableNames,
+                      nameToIndexMap,
+                      hom4ps2InputFilename );
 
     std::cout
     << std::endl
@@ -82,7 +81,10 @@ namespace VevaciousPlusPlus
     // At this point, we are in the directory with hom4ps2 & data.roots, so
     // now we fill purelyRealSolutionSets.
     ParseHom4ps2Output( "./data.roots",
-                        startingPoints );
+                        systemSolutions,
+                        variableNames,
+                        nameToIndexMap,
+                        systemToSolve );
 
     // Now we return to the original working directory so as to avoid confusing
     // the user.
@@ -94,36 +96,109 @@ namespace VevaciousPlusPlus
     }
   }
 
-
-  void
-  Hom4ps2Runner::WriteHom4p2Input( std::string const& hom4ps2InputFilename )
+  // This sets up the variable names in variableNames and nameToIndexMap,
+  // then writes systemToSolve using these names in the correct form for
+  // HOM4PS2 in a file with name hom4ps2InputFilename.
+  void Hom4ps2Runner::WriteHom4p2Input(
+                      std::vector< PolynomialConstraint > const& systemToSolve,
+                                     std::vector< std::string >& variableNames,
+                               std::map< std::string, size_t >& nameToIndexMap,
+                                std::string const& hom4ps2InputFilename ) const
   {
-    variableNames.clear();
-    for( size_t whichVariable( 0 );
-         whichVariable < targetSystem.TargetSystem().size();
-         ++whichVariable )
+    size_t const numberOfFields( systemToSolve.size() );
+    std::stringstream nameBuilder;
+    nameBuilder << numberOfFields;
+    nameBuilder.width( nameBuilder.str().size() );
+    nameBuilder.fill( '0' );
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
     {
-      variableNames.push_back( variableNamer.intToString( whichVariable ) );
-      nameToIndexMap[ variableNames.back() ] = whichVariable;
+      nameBuilder.str( fieldNamePrefix );
+      nameBuilder << ( fieldIndex + 1 );
+      variableNames[ fieldIndex ] = nameBuilder.str();
+      nameToIndexMap[ variableNames[ fieldIndex ] ] = fieldIndex;
+
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "variableNames[ " << fieldIndex << " ] = \""
+      << variableNames[ fieldIndex ] << "\"";
+      std::cout << std::endl;/**/
     }
 
     std::ofstream hom4ps2Input( hom4ps2InputFilename.c_str() );
     hom4ps2Input << "{\n";
-    for( std::vector< PolynomialSum >::const_iterator
-         whichConstraint( targetSystem.TargetSystem().begin() );
-         whichConstraint < targetSystem.TargetSystem().end();
-         ++whichConstraint )
+    for( std::vector< PolynomialConstraint >::const_iterator
+         constraintToWrite( systemToSolve.begin() );
+         constraintToWrite != systemToSolve.end();
+         ++constraintToWrite )
     {
       hom4ps2Input
-      << whichConstraint->AsStringAtCurrentScale( variableNames ) << ";\n";
+      << WriteConstraint( *constraintToWrite,
+                          variableNames ) << ";\n";
     }
     hom4ps2Input << "}\n";
     hom4ps2Input.close();
   }
 
+  // This returns the constraint as a string of terms joined by '+' or '-'
+  // appropriately, where each term is of the form
+  // coefficient " * " variableName[ fieldIndex ] "^" appropriate power
+  // (without writing any power part if the power is only 1, and without
+  // writing the field name at all if its power is 0).
+  std::string Hom4ps2Runner::WriteConstraint(
+                                 PolynomialConstraint const& constraintToWrite,
+                        std::vector< std::string > const& variableNames ) const
+  {
+    size_t const numberOfFields( variableNames.size() );
+    std::stringstream stringBuilder;
+    bool firstTermWritten( false );
+    for( std::vector< FactorWithPowers >::const_iterator
+         factorWithPowers( constraintToWrite.begin() );
+         factorWithPowers != constraintToWrite.end();
+         ++factorWithPowers )
+    {
+      if( factorWithPowers->first != 0.0 )
+      {
+        if( !firstTermWritten )
+        {
+          stringBuilder << factorWithPowers->first;
+        }
+        else if( factorWithPowers->first < 0.0 )
+        {
+          stringBuilder << " - " << -(factorWithPowers->first);
+        }
+        else
+        {
+          stringBuilder << " + " << factorWithPowers->first;
+        }
+
+        for( size_t fieldIndex( 0 );
+             fieldIndex < numberOfFields;
+             ++fieldIndex )
+        {
+          if( factorWithPowers->second[ fieldIndex ] > 0 )
+          {
+            stringBuilder << " * " << variableNames[ fieldIndex ];
+            if( factorWithPowers->second[ fieldIndex ] > 1 )
+            {
+              stringBuilder << "^" << factorWithPowers->second[ fieldIndex ];
+            }
+          }
+        }
+        firstTermWritten = true;
+      }
+    }
+    return stringBuilder.str();
+  }
+
   void
   Hom4ps2Runner::ParseHom4ps2Output( std::string const& hom4ps2OutputFilename,
-                 std::vector< std::vector< double > >& purelyRealSolutionSets )
+                  std::vector< std::vector< double > >& purelyRealSolutionSets,
+                               std::vector< std::string > const& variableNames,
+                         std::map< std::string, size_t > const& nameToIndexMap,
+               std::vector< PolynomialConstraint > const& systemToSolve ) const
   {
     std::cout
     << std::endl
@@ -131,16 +206,20 @@ namespace VevaciousPlusPlus
     << std::endl ;
     std::cout << std::endl;
 
-    complexSolutions.clear();
-    purelyRealSolutionSets.clear();
+    std::vector< std::complex< long double > > complexSolutions;
     BOL::CommentedTextParser tadpoleSolutionsFile( "###",
                                                    false );
     bool successfulOperation( tadpoleSolutionsFile.openFile(
                                                      hom4ps2OutputFilename ) );
     if( !successfulOperation )
     {
-      throw std::runtime_error( "could not open " + hom4ps2OutputFilename );
+      std::stringstream errorBuilder;
+      errorBuilder
+      << "Could not open " <<  hom4ps2OutputFilename
+      << " to write input file for HOM4PS2.";
+      throw std::runtime_error( errorBuilder.str() );
     }
+
     // First we pick out lines corresponding to solutions until we find
     // "The order of variables :" which comes after all solutions have been
     // printed.
@@ -151,9 +230,9 @@ namespace VevaciousPlusPlus
     while( tadpoleSolutionsFile.readNextNonEmptyLineOfFileWithoutComment(
                                                                  lineString ) )
     {
-      if( '(' == lineString[ 0 ] )
+      if( lineString[ 0 ] == '(' )
       {
-        // If the above conditions are satisfied, lineString now contains the
+        // If the above condition is satisfied, lineString now contains the
         // root as a complex number, in the form where zero is
         // "(  0.0000000000000000E+00 ,  0.0000000000000000E+00)"
         BOL::StringParser::substituteCharacterWith( lineString,
@@ -166,49 +245,96 @@ namespace VevaciousPlusPlus
         >> currentComplexNumber.real() >> currentComplexNumber.imag();
         complexSolutions.push_back( currentComplexNumber );
       }
-      else if( 0 == lineString.compare( "The order of variables :" ) )
+      else if( lineString == "The order of variables :" )
       {
         break;
       }
     }
+
     // At this point, the line "The order of variables :" should have been
     // found. If it hasn't, the file is malformed, but we carry on regardless,
     // looking for the variables in order:
-    size_t numberOfVariables( variableNames.size() );
-    std::vector< size_t > indexOrder( numberOfVariables );
-    size_t whichVariable( 0 );
+    size_t const numberOfVariables( variableNames.size() );
+    std::vector< size_t > indexOrder( numberOfVariables,
+                                      -1 );
+    std::map< std::string, size_t >::const_iterator indexFinder;
+    size_t variableIndex( 0 );
     while( tadpoleSolutionsFile.readNextNonEmptyLineOfFileWithoutComment(
                                                                  lineString ) )
     {
-      if( 0 == lineString.compare(
-                         "===============>   HOM4PS-2.0   <===============" ) )
+      if( lineString == "===============>   HOM4PS-2.0   <===============" )
       {
         break;
       }
-      indexOrder[ whichVariable ]
-      = nameToIndexMap[ BOL::StringParser::trimFromFrontAndBack(
-                                                                lineString ) ];
-      ++whichVariable;
+      indexFinder = nameToIndexMap.find(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                                lineString ) );
+      if( indexFinder == nameToIndexMap.end() )
+      {
+        std::stringstream errorBuilder;
+        errorBuilder
+        << "Hom4ps2Runner::ParseHom4ps2Output managed to find a variable name"
+        << " (\""
+        << LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack( lineString )
+        << "\") in the HOM4PS2 output which it did not create.";
+        throw
+        std::runtime_error( errorBuilder.str() );
+      }
+      indexOrder[ variableIndex ] = indexFinder->second;
+      ++variableIndex;
     }
 
-    std::vector< std::complex< double > >
-    candidateRealSolution( numberOfVariables );
-    size_t solutionIndex;
+    std::vector< double > candidateRealSolution( numberOfVariables,
+                                                 0.0 );
+    bool solutionIsReal( true );
+    size_t solutionIndex( 0 );
     for( size_t complexIndex( 0 );
          complexIndex < complexSolutions.size();
          ++complexIndex )
     {
-      solutionIndex = ( complexIndex % numberOfVariables );
-      candidateRealSolution[ indexOrder[ solutionIndex ] ].real()
-      = complexSolutions[ complexIndex ].real();
-      candidateRealSolution[ indexOrder[ solutionIndex ] ].imag()
-      = complexSolutions[ complexIndex ].imag();
-      if( solutionIndex == ( numberOfVariables - 1 ) )
+      if( abs( complexSolutions[ complexIndex ].imag() ) > resolutionSize )
       {
-        targetSystem.AppendPureRealSolutionAndValidSignFlips(
-                                                         candidateRealSolution,
-                                                      purelyRealSolutionSets,
-                                                              1.0 );
+        solutionIsReal = false;
+
+        // debugging:
+        /**/std::cout << std::endl << "debugging:"
+        << std::endl
+        << "Discarded solution "
+        << ( ( complexIndex / numberOfVariables ) + 1 )
+        << " because variable " << ( ( complexIndex % numberOfVariables ) + 1 )
+        << " (in HOM4PS2 order) has non-zero imaginary part.";
+        std::cout << std::endl;/**/
+      }
+      if( solutionIsReal )
+      {
+        candidateRealSolution[ indexOrder[ solutionIndex ] ]
+        = complexSolutions[ complexIndex ].real();
+      }
+
+      // The conditional increments solutionIndex regardless of whether the
+      // body happens.
+      // If we have gone through another full set of values for a solution,
+      // we append the solution if it is real, also adding all possible
+      // sign-flip variations because we have observed HOM4PS2 failing to find
+      // all of the sign-flip variations of solutions every so often.
+      if( (++solutionIndex) == numberOfVariables )
+      {
+        if( solutionIsReal )
+        {
+          // debugging:
+          /**/std::cout << std::endl << "debugging:"
+          << std::endl
+          << "Trying solution " << ( ( complexIndex / numberOfVariables ) + 1 )
+          << " and sign flips.";
+          std::cout << std::endl;/**/
+
+          AppendSolutionAndValidSignFlips( candidateRealSolution,
+                                           purelyRealSolutionSets,
+                                           systemToSolve,
+                                           resolutionSize );
+        }
+        solutionIndex = 0;
+        solutionIsReal = true;
       }
     }
   }

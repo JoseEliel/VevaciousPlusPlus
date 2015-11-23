@@ -21,9 +21,7 @@ namespace VevaciousPlusPlus
   class MinuitOnPotentialOnParallelPlanes : public MinuitOnHypersurfaces
   {
   public:
-    MinuitOnPotentialOnParallelPlanes(
-                                    PotentialFunction const& potentialFunction,
-                                       size_t const numberOfPathSegments,
+    MinuitOnPotentialOnParallelPlanes( size_t const numberOfPathSegments,
                                        unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnPotentialOnParallelPlanes();

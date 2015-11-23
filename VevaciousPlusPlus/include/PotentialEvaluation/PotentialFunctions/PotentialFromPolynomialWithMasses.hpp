@@ -8,10 +8,11 @@
 #ifndef POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 
-#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
+#include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
@@ -19,7 +20,6 @@
 #include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
-#include "VersionInformation.hpp"
 
 namespace VevaciousPlusPlus
 {

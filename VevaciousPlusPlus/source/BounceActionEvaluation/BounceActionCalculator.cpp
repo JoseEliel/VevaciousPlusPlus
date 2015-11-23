@@ -10,11 +10,9 @@
 namespace VevaciousPlusPlus
 {
 
-  BounceActionCalculator::BounceActionCalculator(
-                                 PotentialFunction const& potentialFunction ) :
-    potentialFunction( potentialFunction )
+  BounceActionCalculator::BounceActionCalculator()
   {
-    // This constructor is just an initialization list.
+    // This does nothing.
   }
 
   BounceActionCalculator::~BounceActionCalculator()
@@ -31,6 +29,7 @@ namespace VevaciousPlusPlus
   void BounceActionCalculator::PlotBounceConfiguration(
                                                   TunnelPath const& tunnelPath,
                                             BubbleProfile const& bubbleProfile,
+                                  std::vector< std::string > const& fieldNames,
                                  std::vector< std::string > const& fieldColors,
                                                std::string const& plotFilename,
                                      unsigned int const plotResolution ) const
@@ -39,9 +38,8 @@ namespace VevaciousPlusPlus
                                                   plotFilename );
     double const radialStepSize( bubbleProfile.MaximumPlotRadius()
                                  / static_cast< double >( plotResolution ) );
-
     size_t numberOfPlottedFields( std::min( fieldColors.size(),
-                                potentialFunction.NumberOfFieldVariables() ) );
+                                            tunnelPath.NumberOfFields() ) );
     BOL::TwoDimensionalDataPlotter::PlotDataVector plotData;
     BOL::TwoDimensionalDataPlotter::DoublePairVectorWithStringPair fieldData;
     for( size_t fieldIndex( 0 );
@@ -51,14 +49,13 @@ namespace VevaciousPlusPlus
       if( !(fieldColors[ fieldIndex ].empty()) )
       {
         fieldData.second.first.assign( fieldColors[ fieldIndex ] );
-        fieldData.second.second.assign(
-                                potentialFunction.FieldNames()[ fieldIndex ] );
+        fieldData.second.second.assign( fieldNames[ fieldIndex ] );
         plotData.push_back( fieldData );
       }
     }
     numberOfPlottedFields = plotData.size();
     std::vector< double >
-    fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
+    fieldConfiguration( tunnelPath.NumberOfFields() );
     std::cout << "Bubble profile:" << std::endl;
     for( unsigned int plotIndex( 0 );
          plotIndex < plotResolution;

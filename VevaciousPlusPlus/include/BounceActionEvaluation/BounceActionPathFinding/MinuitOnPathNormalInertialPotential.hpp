@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
 {
 
   class MinuitOnPathNormalInertialPotential
-      : public MinuitOnPotentialPerpendicularToPath
+                                  : public MinuitOnPotentialPerpendicularToPath
   {
   public:
     MinuitOnPathNormalInertialPotential();

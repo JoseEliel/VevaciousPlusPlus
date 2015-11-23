@@ -20,6 +20,13 @@ namespace LHPC
   public:
     // This returns the Euclidean length squared.
     static double LengthSquared( std::vector< double > const& givenVector );
+
+    // This returns true if each element in firstVector is within hypercubeSide
+    // of the corresponding element in secondVector.
+    static bool
+    DifferenceIsWithinHypercube( std::vector< double > const& firstVector,
+                                 std::vector< double > const& secondVector,
+                                 double const hypercubeSide );
   };
 
 
@@ -39,6 +46,31 @@ namespace LHPC
       lengthSquared += ( (*vectorElement) * (*vectorElement) );
     }
     return lengthSquared;
+  }
+
+  // This returns true if each element in firstVector is within hypercubeSide
+  // of the corresponding element in secondVector.
+  inline bool VectorUtilities::DifferenceIsWithinHypercube(
+                                      std::vector< double > const& firstVector,
+                                     std::vector< double > const& secondVector,
+                                                   double const hypercubeSide )
+  {
+    size_t const numberOfElements( firstVector.size() );
+    if( secondVector.size() != numberOfElements )
+    {
+      return false;
+    }
+    for( size_t elementIndex( 0 );
+         elementIndex < numberOfElements;
+         ++elementIndex )
+    {
+      if( abs( firstVector[ elementIndex ] - secondVector[ elementIndex ] )
+          > hypercubeSide )
+      {
+        return false;
+      }
+    }
+    return true;
   }
 }
 

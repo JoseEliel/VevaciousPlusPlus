@@ -200,7 +200,7 @@ namespace VevaciousPlusPlus
   void CosmoTransitionsRunner::ContinueThermalTunneling(
                                     PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum,
+                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
   {
     // We are going to fit a function that diverges at
@@ -315,9 +315,9 @@ namespace VevaciousPlusPlus
                                 * falseVacuum.SquareDistanceTo( trueVacuum ) );
 
     straightPathActions.clear();
-    BubbleShootingOnPathInFieldSpace actionCalculator( potentialFunction,
-                      ( 1.0 / static_cast< double >( resolutionOfDsbVacuum ) ),
-                                                       32 );
+    BubbleShootingOnPathInFieldSpace
+    actionCalculator( ( 1.0 / static_cast< double >( resolutionOfDsbVacuum ) ),
+                      32 );
     // The number of shoot attempts doesn't need to be fixed at 32, but it is
     // unlikely that anyone will ever want to change it.
     PotentialMinimum thermalFalseVacuum( falseVacuum );
@@ -357,7 +357,7 @@ namespace VevaciousPlusPlus
                                               thresholdSeparationSquared );
       BubbleProfile* bubbleProfile( actionCalculator( straightSplinePath,
                                                     potentialApproximation ) );
-      straightPathActions.push_back( bubbleProfile->bounceAction );
+      straightPathActions.push_back( bubbleProfile->BounceAction() );
       delete bubbleProfile;
     }
   }

@@ -43,6 +43,8 @@ int main( int argumentCount,
   std::string minimumScaleArgument( "" );
   std::string fixedScaleType( "" );
   std::string fixedScaleArgument( "" );
+  std::string maximumScaleType( "" );
+  std::string maximumScaleArgument( "" );
   while( lhaManagerParser.readNextElement() )
   {
     if( lhaManagerParser.currentElementNameMatches( "SpecialCases" ) )
@@ -79,16 +81,23 @@ int main( int argumentCount,
             = elementParser.getTrimmedCurrentElementContent();
           }
         }
-        if( scaleChoiceParser.currentElementNameMatches( "FixedScaleChoice" ) )
+        if( scaleChoiceParser.currentElementNameMatches(
+                                                        "MinimumScaleBound" ) )
+        {
+          minimumScaleType = evaluationType;
+          minimumScaleArgument = evaluationArgument;
+        }
+        else if( scaleChoiceParser.currentElementNameMatches(
+                                                         "FixedScaleChoice" ) )
         {
           fixedScaleType = evaluationType;
           fixedScaleArgument = evaluationArgument;
         }
         else if( scaleChoiceParser.currentElementNameMatches(
-                                                        "MinimumScaleBound" ) )
+                                                        "MaximumScaleBound" ) )
         {
-          minimumScaleType = evaluationType;
-          minimumScaleArgument = evaluationArgument;
+          maximumScaleType = evaluationType;
+          maximumScaleArgument = evaluationArgument;
         }
       }
     }
@@ -104,7 +113,9 @@ int main( int argumentCount,
                                                              minimumScaleType,
                                                           minimumScaleArgument,
                                                              fixedScaleType,
-                                                          fixedScaleArgument );
+                                                            fixedScaleArgument,
+                                                             maximumScaleType,
+                                                         maximumScaleArgument );
   }
   else if( specialCases == "SlhaMssm" )
   {
@@ -113,7 +124,9 @@ int main( int argumentCount,
                                                               minimumScaleType,
                                                           minimumScaleArgument,
                                                                 fixedScaleType,
-                                                          fixedScaleArgument );
+                                                            fixedScaleArgument,
+                                                            maximumScaleType,
+                                                        maximumScaleArgument );
   }
   else
   {
@@ -122,7 +135,9 @@ int main( int argumentCount,
                                                               minimumScaleType,
                                                           minimumScaleArgument,
                                                                 fixedScaleType,
-                                                          fixedScaleArgument );
+                                                            fixedScaleArgument,
+                                                              maximumScaleType,
+                                                        maximumScaleArgument );
   }
 
   std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
@@ -176,9 +191,10 @@ int main( int argumentCount,
   std::vector< double > const fieldOrigin( oldFixedScale.FieldValuesOrigin() );
   std::vector< double > unitHd( fieldOrigin );
   unitHd.front() = 1.0;
-  std::vector< double >
-  fixedParameterValues( lhaParameterManager->ParameterValues(
-      log( lhaParameterManager->AppropriateSingleFixedScale() ) ) );
+  std::vector< double > fixedParameterValues;
+  lhaParameterManager->ParameterValues(
+                     log( lhaParameterManager->AppropriateSingleFixedScale() ),
+                                        fixedParameterValues );
 
   double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
                                          oldFixedScale.FieldValuesOrigin() ) );
@@ -306,6 +322,94 @@ int main( int argumentCount,
   }
   std::cout << std::endl;
 
+  std::string const
+  pathToHom4ps2( "/home/bol/BOL/ProjectDependencies/HOM4PS2/" );
+  std::string const homotopyType( "2" );
+
+  std::vector< std::vector< double > > oldHom4ps2Results;
+  VevaciousPlusPlus::OldHom4ps2Runner oldHom4ps2Runner(
+                         *(oldFixedScale.HomotopyContinuationTargetSystem()),
+                                pathToHom4ps2,
+                                homotopyType );
+  oldHom4ps2Runner( oldHom4ps2Results );
+
+  std::vector< std::vector< double > > newHom4ps2Results;
+  VevaciousPlusPlus::PolynomialSystemSolver*
+  newHom4ps2Runner( new VevaciousPlusPlus::Hom4ps2Runner( pathToHom4ps2,
+                                                          homotopyType,
+                                                          1.0 ) );
+  VevaciousPlusPlus::PolynomialAtFixedScalesSolver
+  newSolver( newFixedScale.PolynomialApproximation(),
+             *lhaParameterManager,
+             newHom4ps2Runner,
+             1,
+             false,
+             newFixedScale.NumberOfFieldVariables() );
+  newSolver( newHom4ps2Results );
+
+  std::list< std::vector< double > > vectorSorter( oldHom4ps2Results.begin(),
+                                                   oldHom4ps2Results.end() );
+  vectorSorter.sort();
+  oldHom4ps2Results.assign( vectorSorter.begin(),
+                            vectorSorter.end() );
+  vectorSorter.assign( newHom4ps2Results.begin(),
+                       newHom4ps2Results.end() );
+  vectorSorter.sort();
+  newHom4ps2Results.assign( vectorSorter.begin(),
+                            vectorSorter.end() );
+
+  size_t const numberOfSolutions( std::max( oldHom4ps2Results.size(),
+                                            newHom4ps2Results.size() ) );
+  size_t const numberOfFields( fieldOrigin.size() );
+
+  for( size_t solutionIndex( 0 );
+       solutionIndex < numberOfSolutions;
+       ++solutionIndex )
+  {
+    std::cout
+    << std::endl
+    << "Old\t\t\tNew"
+    << std::endl
+    << "{ ";
+    for( size_t fieldIndex( 0 );
+         fieldIndex < newFixedScale.NumberOfFieldVariables();
+         ++fieldIndex )
+    {
+      if( fieldIndex > 0 )
+      {
+        std::cout << std::endl;
+        std::cout << "  ";
+      }
+
+      if( solutionIndex < oldHom4ps2Results.size() )
+      {
+        std::cout << oldHom4ps2Results[ solutionIndex ][ fieldIndex ];
+      }
+      else
+      {
+        std::cout << "missing";
+      }
+      if( fieldIndex < ( numberOfFields - 1 ) )
+      {
+        std::cout << ",";
+      }
+      std::cout << "\t\t";
+      if( solutionIndex < newHom4ps2Results.size() )
+      {
+        std::cout << newHom4ps2Results[ solutionIndex ][ fieldIndex ];
+      }
+      else
+      {
+        std::cout << "missing";
+      }
+      if( fieldIndex < ( numberOfFields - 1 ) )
+      {
+        std::cout << ",";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << " }" << std::endl;
+  }
 
   // Cleaning up.
   delete lhaParameterManager;

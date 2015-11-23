@@ -14,7 +14,6 @@
 #include "PotentialMinimization/PotentialMinimizer.hpp"
 #include "PotentialMinimization/GradientFromStartingPoints.hpp"
 #include "PotentialMinimization/StartingPointFinder.hpp"
-#include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
 #include "PotentialMinimization/GradientMinimizer.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
@@ -36,6 +35,10 @@
 #include "PotentialEvaluation/PotentialFunctions/OldRgeImprovedOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
+#include "PotentialMinimization/StartingPointGeneration/PolynomialSystemSolver.hpp"
+#include "PotentialMinimization/StartingPointGeneration/PolynomialAtFixedScalesSolver.hpp"
+#include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
+#include "PotentialMinimization/HomotopyContinuation/OldHom4ps2Runner.hpp"
 
 
 namespace VevaciousPlusPlus
@@ -114,6 +117,14 @@ namespace VevaciousPlusPlus
                                    int& contentDestination );
 
     // This puts the content of the current element of xmlParser into
+    // contentDestination, interpreted as an int represented in ASCII, if the
+    // element's name matches elementName.
+    static void
+    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+                                   std::string const& elementName,
+                                   unsigned int& contentDestination );
+
+    // This puts the content of the current element of xmlParser into
     // contentDestination, interpreted as a bool represented by
     // case-insensitive "yes/no" or "y/n" or "true/false" or "t/f" or "0/1",
     // if the element's name matches elementName. If the element content
@@ -126,10 +137,10 @@ namespace VevaciousPlusPlus
 
     LagrangianParameterManager* lagrangianParameterManager;
     LesHouchesAccordBlockEntryManager* ownedLagrangianParameterManager;
-    SlhaManager* slhaManager;
-    PotentialFunction* potentialFunction;
-    PotentialFunction* oldPotentialFunction;
+    RunningParameterManager* slhaManager;
+    // PotentialFunction* potentialFunction;
     PotentialFromPolynomialWithMasses* ownedPotentialFunction;
+    PotentialFunction* oldPotentialFunction;
     PotentialMinimizer* potentialMinimizer;
     PotentialMinimizer* ownedPotentialMinimizer;
     TunnelingCalculator* tunnelingCalculator;
@@ -194,9 +205,9 @@ namespace VevaciousPlusPlus
 
     // This creates a new LagrangianParameterManager based on the given
     // arguments and returns a pointer to it.
-    LesHouchesAccordBlockEntryManager*
+    static LesHouchesAccordBlockEntryManager*
     CreateLagrangianParameterManager( std::string const& classChoice,
-                                     std::string const& constructorArguments )
+                                      std::string const& constructorArguments )
     {
       BOL::AsciiXmlParser xmlParser;
       xmlParser.loadString( constructorArguments );
@@ -236,7 +247,7 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialWithMasses*
     CreatePotentialFunction( std::string const& classChoice,
                              std::string const& constructorArguments,
-                LagrangianParameterManager const& lagrangianParameterManager )
+                       LagrangianParameterManager& lagrangianParameterManager )
     {
       BOL::AsciiXmlParser xmlParser;
       xmlParser.loadString( constructorArguments );
@@ -261,7 +272,7 @@ namespace VevaciousPlusPlus
                                              *slhaManager );
         return new FixedScaleOneLoopPotential( modelFilename,
                                             assumedPositiveOrNegativeTolerance,
-                                               *lagrangianParameterManager );
+                                               lagrangianParameterManager );
       }
       else if( classChoice == "RgeImprovedOneLoopPotential" )
       {
@@ -273,7 +284,7 @@ namespace VevaciousPlusPlus
                                               *slhaManager );
         return new RgeImprovedOneLoopPotential( modelFilename,
                                             assumedPositiveOrNegativeTolerance,
-                                                *lagrangianParameterManager );
+                                                lagrangianParameterManager );
       }
       else
       {
@@ -289,9 +300,9 @@ namespace VevaciousPlusPlus
     // This creates a PotentialMinimizer according to the XML elements in the
     // file given by potentialMinimizerInitializationFilename and returns
     // a pointer to it.
-    PotentialMinimizer* CreatePotentialMinimizer(
+    static PotentialMinimizer* CreatePotentialMinimizer(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
-                 std::string const& potentialMinimizerInitializationFilename )
+                  std::string const& potentialMinimizerInitializationFilename )
     {
       BOL::AsciiXmlParser xmlParser;
       xmlParser.openRootElementOfFile(
@@ -315,15 +326,15 @@ namespace VevaciousPlusPlus
 
     // This creates a new PotentialMinimizer based on the given arguments and
     // returns a pointer to it.
-    PotentialMinimizer* CreatePotentialMinimizer(
+    static PotentialMinimizer* CreatePotentialMinimizer(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                                 std::string const& classChoice,
                                      std::string const& constructorArguments )
     {
       if( classChoice == "GradientFromStartingPoints" )
       {
-        return new CreateGradientFromStartingPoints( potentialFunction,
-                                                     constructorArguments );
+        return CreateGradientFromStartingPoints( potentialFunction,
+                                                 constructorArguments );
       }
       else
       {
@@ -337,7 +348,7 @@ namespace VevaciousPlusPlus
 
     // This creates a new GradientFromStartingPoints based on the given
     // arguments and returns a pointer to it.
-    GradientFromStartingPoints* CreateGradientFromStartingPoints(
+    static GradientFromStartingPoints* CreateGradientFromStartingPoints(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                      std::string const& constructorArguments )
     {
@@ -387,15 +398,15 @@ namespace VevaciousPlusPlus
 
     // This creates a new StartingPointFinder based on the given arguments and
     // returns a pointer to it.
-    StartingPointFinder* CreateStartingPointFinder(
+    static StartingPointFinder* CreateStartingPointFinder(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                                 std::string const& classChoice,
                                      std::string const& constructorArguments )
     {
       if( classChoice == "PolynomialAtFixedScalesSolver" )
       {
-        return new CreatePolynomialAtFixedScalesSolver( potentialFunction,
-                                                        constructorArguments );
+        return CreatePolynomialAtFixedScalesSolver( potentialFunction,
+                                                    constructorArguments );
       }
       else
       {
@@ -409,50 +420,108 @@ namespace VevaciousPlusPlus
 
     // This creates a new PolynomialAtFixedScalesSolver based on the given
     // arguments and returns a pointer to it.
-    PolynomialAtFixedScalesSolver*
-    CreatePolynomialAtFixedScalesSolver(
-                                    PotentialFunction const& potentialFunction,
-                                      std::string const& constructorArguments )
+    static PolynomialAtFixedScalesSolver* CreatePolynomialAtFixedScalesSolver(
+                    PotentialFromPolynomialWithMasses const& potentialFunction,
+                                     std::string const& constructorArguments )
     {
       BOL::AsciiXmlParser xmlParser;
       xmlParser.loadString( constructorArguments );
+      unsigned int numberOfScales( 10 );
+      bool returnOnlyPolynomialMinima( false );
       std::string polynomialSystemSolverClass( "error" );
       std::string polynomialSystemSolverArguments( "error" );
-      int numberOfScales( 10 );
       // The <ConstructorArguments> for this class should have child elements
       // <StartingPointFinderClass> and <GradientMinimizerClass>, and
       // optionally <ExtremumSeparationThresholdFraction> and
       // <NonDsbRollingToDsbScalingFactor>.
       while( xmlParser.readNextElement() )
       {
-        ReadClassAndArguments( xmlParser,
-                               "StartingPointFinderClass",
-                               startingPointFinderClass,
-                               startingPointFinderArguments );
-        ReadClassAndArguments( xmlParser,
-                               "GradientMinimizerClass",
-                               gradientMinimizerClass,
-                               gradientMinimizerArguments );
         InterpretElementIfNameMatches( xmlParser,
-                                       "ExtremumSeparationThresholdFraction",
-                                       extremumSeparationThresholdFraction );
+                                       "NumberOfScales",
+                                       numberOfScales );
         InterpretElementIfNameMatches( xmlParser,
-                                       "NonDsbRollingToDsbScalingFactor",
-                                       nonDsbRollingToDsbScalingFactor );
+                                       "ReturnOnlyPolynomialMinima",
+                                       returnOnlyPolynomialMinima );
+        ReadClassAndArguments( xmlParser,
+                               "PolynomialSystemSolver",
+                               polynomialSystemSolverClass,
+                               polynomialSystemSolverArguments );
       }
+      PolynomialSystemSolver*
+      polynomialSystemSolver( CreatePolynomialSystemSolver(
+                                                   polynomialSystemSolverClass,
+                                           polynomialSystemSolverArguments ) );
+      return new PolynomialAtFixedScalesSolver(
+                                   potentialFunction.PolynomialApproximation(),
+                             potentialFunction.GetLagrangianParameterManager(),
+                                                polynomialSystemSolver,
+                                                numberOfScales,
+                                                returnOnlyPolynomialMinima,
+                                  potentialFunction.NumberOfFieldVariables() );
+    }
+
+    // This creates a new PolynomialSystemSolver based on the given arguments
+    // and returns a pointer to it.
+    static PolynomialSystemSolver*
+    CreatePolynomialSystemSolver( std::string const& classChoice,
+                                  std::string const& constructorArguments )
+    {
+      if( classChoice == "Hom4ps2Runner" )
+      {
+        return CreateHom4ps2Runner( constructorArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<PolynomialSystemSolver> was not a recognized class! The only"
+        << " option currently valid is \"Hom4ps2Runner\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+    }
+
+    // This creates a new Hom4ps2Runner based on the given arguments and
+    // returns a pointer to it.
+    static Hom4ps2Runner*
+    CreateHom4ps2Runner( std::string const& constructorArguments )
+    {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      std::string pathToHom4ps2( "error" );
+      std::string homotopyType( "error" );
+      double resolutionSize( 1.0 );
+      // The <ConstructorArguments> for this class should have child elements
+      // <StartingPointFinderClass> and <GradientMinimizerClass>, and
+      // optionally <ExtremumSeparationThresholdFraction> and
+      // <NonDsbRollingToDsbScalingFactor>.
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "PathToHom4ps2",
+                                       pathToHom4ps2 );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "HomotopyType",
+                                       homotopyType );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ResolutionSize",
+                                       resolutionSize );
+      }
+      return new Hom4ps2Runner( pathToHom4ps2,
+                                homotopyType,
+                                resolutionSize );
     }
 
     // This creates a new GradientMinimizer based on the given arguments and
     // returns a pointer to it.
-    GradientMinimizer*
+    static GradientMinimizer*
     CreateGradientMinimizer( PotentialFunction const& potentialFunction,
                              std::string const& classChoice,
                              std::string const& constructorArguments )
     {
       if( classChoice == "MinuitPotentialMinimizer" )
       {
-        return new CreateMinuitPotentialMinimizer( potentialFunction,
-                                                   constructorArguments );
+        return CreateMinuitPotentialMinimizer( potentialFunction,
+                                               constructorArguments );
       }
       else
       {
@@ -464,15 +533,310 @@ namespace VevaciousPlusPlus
       }
     }
 
+    // This creates a new MinuitPotentialMinimizer based on the given arguments
+    // and returns a pointer to it.
+    static MinuitPotentialMinimizer*
+    CreateMinuitPotentialMinimizer( PotentialFunction const& potentialFunction,
+                                    std::string const& constructorArguments )
+    {
+      double errorFraction( 0.1 );
+      double errorMinimum( 1.0 );
+      int minuitStrategy( 1 );
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "InitialStepSizeFraction",
+                                       errorFraction );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "MinimumInitialStepSize",
+                                       errorMinimum );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "MinuitStrategy",
+                                       minuitStrategy );
+      }
+      return new MinuitPotentialMinimizer( potentialFunction,
+                                           errorFraction,
+                                           errorMinimum,
+                                           minuitStrategy );
+    }
+
     // This creates a TunnelingCalculator according to the XML elements in the
     // file given by tunnelingCalculatorInitializationFilename and returns
     // a pointer to it.
-    TunnelingCalculator* CreateTunnelingCalculator(
+    static TunnelingCalculator* CreateTunnelingCalculator(
                 std::string const& tunnelingCalculatorInitializationFilename )
     {
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.openRootElementOfFile(
+                                   tunnelingCalculatorInitializationFilename );
+      std::string classChoice( "error" );
+      std::string constructorArguments( "error" );
 
+      // The root element of this file should have a single child element
+      // <PotentialMinimizerClass>.
+      while( xmlParser.readNextElement() )
+      {
+        ReadClassAndArguments( xmlParser,
+                               "TunnelingClass",
+                               classChoice,
+                               constructorArguments );
+      }
+      return CreateTunnelingCalculator( classChoice,
+                                        constructorArguments );
     }
 
+    // This creates a new PotentialMinimizer based on the given arguments and
+    // returns a pointer to it.
+    static TunnelingCalculator*
+    CreateTunnelingCalculator( std::string const& classChoice,
+                               std::string const& constructorArguments )
+    {
+      if( classChoice == "CosmoTransitionsRunner" )
+      {
+        return CreateCosmoTransitionsRunner( constructorArguments );
+      }
+      else if( classChoice == "BounceAlongPathWithThreshold" )
+      {
+        return CreateBounceAlongPathWithThreshold( constructorArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<TunnelingClass> was not a recognized class! The only"
+        << " options currently valid are \"BounceAlongPathWithThreshold\" or"
+        << " \"CosmoTransitionsRunner\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+    }
+
+    // This creates a new CosmoTransitionsRunner based on the given arguments
+    // and returns a pointer to it.
+    static CosmoTransitionsRunner*
+    CreateCosmoTransitionsRunner( std::string const& constructorArguments )
+    {
+      // The <ConstructorArguments> for this class should have child elements
+      // <TunnelingStrategy>, <SurvivalProbabilityThreshold>,
+      // <CriticalTemperatureAccuracy>, <EvaporationBarrierResolution>,
+      // <PathToCosmotransitions>, <PathResolution>, <MaxInnerLoops>, and
+      // <MaxOuterLoops>.
+      std::string tunnelingStrategy( "ThermalThenQuantum" );
+      double survivalProbabilityThreshold( 0.1 );
+      int thermalStraightPathFitResolution( 5 );
+      int temperatureAccuracy( 7 );
+      std::string pathToCosmotransitions( "./cosmoTransitions/" );
+      int resolutionOfDsbVacuum( 20 );
+      double vacuumSeparationFraction( 0.2 );
+      int maxInnerLoops( 10 );
+      int maxOuterLoops( 10 );
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "TunnelingStrategy",
+                                       tunnelingStrategy );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "SurvivalProbabilityThreshold",
+                                       survivalProbabilityThreshold );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ThermalActionResolution",
+                                       thermalStraightPathFitResolution );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "CriticalTemperatureAccuracy",
+                                       temperatureAccuracy );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "PathToCosmotransitions",
+                                       pathToCosmotransitions );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "PathResolution",
+                                       resolutionOfDsbVacuum );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "MinimumVacuumSeparationFraction",
+                                       vacuumSeparationFraction );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "MaxInnerLoops",
+                                       maxInnerLoops );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "MaxOuterLoops",
+                                       maxOuterLoops );
+      }
+      CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
+
+      return new CosmoTransitionsRunner(
+                               InterpretTunnelingStrategy( tunnelingStrategy ),
+                                         survivalProbabilityThreshold,
+                                         temperatureAccuracy,
+                                         pathToCosmotransitions,
+                                         resolutionOfDsbVacuum,
+                                         maxInnerLoops,
+                                         maxOuterLoops,
+                                         thermalStraightPathFitResolution,
+                                         vacuumSeparationFraction );
+    }
+
+    // This creates a new CosmoTransitionsRunner based on the given arguments
+    // and returns a pointer to it.
+    static BounceAlongPathWithThreshold* CreateBounceAlongPathWithThreshold(
+                                      std::string const& constructorArguments )
+    {
+      std::string tunnelPathFinders( "" );
+      std::string bouncePotentialFitClass( "BubbleShootingOnSpline" );
+      std::string bouncePotentialFitArguments( "" );
+      std::string tunnelingStrategy( "ThermalThenQuantum" );
+      double survivalProbabilityThreshold( 0.1 );
+      int thermalIntegrationResolution( 5 );
+      int temperatureAccuracy( 7 );
+      int resolutionOfPathPotential( 100 );
+      double vacuumSeparationFraction( 0.2 );
+
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "TunnelingStrategy",
+                                       tunnelingStrategy );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "SurvivalProbabilityThreshold",
+                                       survivalProbabilityThreshold );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "ThermalActionResolution",
+                                       thermalIntegrationResolution );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "CriticalTemperatureAccuracy",
+                                       temperatureAccuracy );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "PathResolution",
+                                       resolutionOfPathPotential );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "MinimumVacuumSeparationFraction",
+                                       vacuumSeparationFraction );
+        ReadClassAndArguments( xmlParser,
+                               "BouncePotentialFit",
+                               bouncePotentialFitClass,
+                               bouncePotentialFitArguments );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "TunnelPathFinders",
+                                       tunnelPathFinders );
+      }
+      CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
+      std::vector< BouncePathFinder* >
+      pathFinders( CreateBouncePathFinders( tunnelPathFinders ) );
+      if( pathFinders.empty() )
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<TunnelPathFinders> produced no valid tunnel-path-finding"
+        << " objects!";
+        throw std::runtime_error( errorStream.str() );
+      }
+
+      BounceActionCalculator* bounceActionCalculator(
+                         CreateBounceActionCalculator( bouncePotentialFitClass,
+                                               bouncePotentialFitArguments ) );
+
+      return new BounceAlongPathWithThreshold( pathFinders,
+                                               bounceActionCalculator,
+                               InterpretTunnelingStrategy( tunnelingStrategy ),
+                                               survivalProbabilityThreshold,
+                                               thermalIntegrationResolution,
+                                               temperatureAccuracy,
+                                               resolutionOfPathPotential,
+                                               vacuumSeparationFraction );
+    }
+
+    // This parses the XMl of tunnelPathFinders to construct a set of
+    // BouncePathFinder instances, filling pathFinders with pointers to them.
+    static std::vector< BouncePathFinder* >
+    CreateBouncePathFinders( std::string const& tunnelPathFinders )
+    {
+      std::vector< BouncePathFinder* > pathFinders;
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( tunnelPathFinders );
+      std::string classType( "" );
+      std::string constructorArguments( "" );
+      while( xmlParser.readNextElement() )
+      {
+        classType.clear();
+        constructorArguments.clear();
+        ReadClassAndArguments( xmlParser,
+                               "PathFinder",
+                               classType,
+                               constructorArguments );
+        if( !( classType.empty()
+               ||
+               constructorArguments.empty() ) )
+        {
+          if( classType.compare( "MinuitOnPotentialOnParallelPlanes" ) == 0 )
+          {
+            pathFinders.push_back( CreateMinuitOnPotentialOnParallelPlanes(
+                                                      constructorArguments ) );
+          }
+          else if( classType.compare( "MinuitOnPotentialPerpendicularToPath" )
+                   == 0 )
+          {
+            pathFinders.push_back( CreateMinuitOnPotentialPerpendicularToPath(
+                                                      constructorArguments ) );
+          }
+          else if( classType.compare( "MinuitOnPathPerpendicularForces" )
+                   == 0 )
+          {
+            pathFinders.push_back( CreateMinuitOnPathNormalInertialPotential(
+                                                      constructorArguments ) );
+          }
+        }
+      }
+      return pathFinders;
+    }
+
+    // This creates a new BounceActionCalculator based on the given arguments
+    // and returns a pointer to it.
+    static BounceActionCalculator*
+    CreateBounceActionCalculator( std::string const& classChoice,
+                                  std::string const& constructorArguments )
+    {
+      if( classChoice == "BubbleShootingOnPathInFieldSpace" )
+      {
+        return CreateBubbleShootingOnPathInFieldSpace( constructorArguments );
+      }
+      else
+      {
+        std::stringstream errorStream;
+        errorStream
+        << "<BouncePotentialFit> was not a recognized class! The only"
+        << " option currently valid is \"BubbleShootingOnPathInFieldSpace\".";
+        throw std::runtime_error( errorStream.str() );
+      }
+    }
+
+    // This creates a new BubbleShootingOnPathInFieldSpace based on the given
+    // arguments and returns a pointer to it.
+    static BubbleShootingOnPathInFieldSpace*
+    CreateBubbleShootingOnPathInFieldSpace(
+                                      std::string const& constructorArguments )
+    {
+      double lengthScaleResolutionForBounce( 0.05 );
+      int shootAttemptsForBounce( 32 );
+
+      BOL::AsciiXmlParser xmlParser;
+      xmlParser.loadString( constructorArguments );
+      while( xmlParser.readNextElement() )
+      {
+        InterpretElementIfNameMatches( xmlParser,
+                                       "RadialResolution",
+                                       lengthScaleResolutionForBounce );
+        InterpretElementIfNameMatches( xmlParser,
+                                       "NumberShootAttemptsAllowed",
+                                       shootAttemptsForBounce );
+      }
+
+      return
+      new BubbleShootingOnPathInFieldSpace( lengthScaleResolutionForBounce,
+                                            shootAttemptsForBounce );
+    }
 
     // This interprets the given string as the appropriate element of the
     // TunnelingCalculator::TunnelingStrategy enum.
@@ -534,23 +898,23 @@ namespace VevaciousPlusPlus
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
     // extremize the bounce action.
-    BouncePathFinder* CreateMinuitOnPotentialOnParallelPlanes(
+    static BouncePathFinder* CreateMinuitOnPotentialOnParallelPlanes(
                                      std::string const& constructorArguments );
 
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPotentialPerpendicularToPath instance to use to try
     // to extremize the bounce action.
-    BouncePathFinder* CreateMinuitOnPotentialPerpendicularToPath(
+    static BouncePathFinder* CreateMinuitOnPotentialPerpendicularToPath(
                                      std::string const& constructorArguments );
 
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPathNormalInertialPotential instance to use to try
     // to extremize the bounce action.
-    BouncePathFinder* CreateMinuitOnPathNormalInertialPotential(
+    static BouncePathFinder* CreateMinuitOnPathNormalInertialPotential(
                                      std::string const& constructorArguments );
 
-    // This decides on the derived class (based on BounceActionCalculator) to use
-    // to extremize the bounce action to use to calculate the tunneling
+    // This decides on the derived class (based on BounceActionCalculator) to
+    // use to extremize the bounce action to use to calculate the tunneling
     // probability and constructs it with the arguments parsed from
     // constructorArguments.
     BounceActionCalculator*
@@ -558,8 +922,8 @@ namespace VevaciousPlusPlus
                                  std::string const& constructorArguments );
 
     // This parses arguments from constructorArguments and uses them to
-    // construct a BubbleShootingOnPathInFieldSpace instance to use to calculate
-    // the bounce action on given paths.
+    // construct a BubbleShootingOnPathInFieldSpace instance to use to
+    // calculate the bounce action on given paths.
     BounceActionCalculator* SetUpBubbleShootingOnPathInFieldSpace(
                                      std::string const& constructorArguments );
   };
@@ -608,6 +972,22 @@ namespace VevaciousPlusPlus
     {
       contentDestination = BOL::StringParser::stringToInt(
                              ( xmlParser.getTrimmedCurrentElementContent() ) );
+    }
+  }
+
+  // This puts the content of the current element of xmlParser into
+  // contentDestination, interpreted as an int represented in ASCII, if the
+  // element's name matches elementName.
+  inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
+                                          BOL::AsciiXmlParser const& xmlParser,
+                                                std::string const& elementName,
+                                             unsigned int& contentDestination )
+  {
+    if( xmlParser.currentElementNameMatches( elementName ) )
+    {
+      contentDestination
+      = static_cast< unsigned int >( BOL::StringParser::stringToInt(
+                           ( xmlParser.getTrimmedCurrentElementContent() ) ) );
     }
   }
 

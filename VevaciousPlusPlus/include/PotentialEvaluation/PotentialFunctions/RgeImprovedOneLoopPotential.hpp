@@ -10,8 +10,8 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialFromPolynomialWithMasses.hpp"
-#include "PotentialMinimization/PotentialMinimum.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {

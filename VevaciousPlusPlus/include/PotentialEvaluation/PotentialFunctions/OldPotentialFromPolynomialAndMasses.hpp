@@ -8,10 +8,11 @@
 #ifndef OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 #define OLDPOTENTIALFROMPOLYNOMIALANDMASSES_HPP_
 
-#include "LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
-#include "LagrangianParameterManagement/RunningParameterManager.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
+#include "VersionInformation.hpp"
+#include "LagrangianParameterManagement/ParameterUpdatePropagator.hpp"
+#include "LagrangianParameterManagement/RunningParameterManager.hpp"
 #include "../PotentialFunction.hpp"
 #include "BasicFunctions/PolynomialSum.hpp"
 #include "../MassesSquaredCalculators/OldComplexMassSquaredMatrix.hpp"
@@ -21,13 +22,11 @@
 #include "../OldMassesSquaredCalculator.hpp"
 #include "../ThermalFunctions.hpp"
 #include "PotentialMinimization/HomotopyContinuation/PolynomialGradientTargetSystem.hpp"
-#include "IWritesPythonPotential.hpp"
 #include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
 
 namespace VevaciousPlusPlus
 {
   class OldPotentialFromPolynomialAndMasses : public PotentialFunction,
-                                              public IWritesPythonPotential,
                                               public ParameterUpdatePropagator
   {
   public:

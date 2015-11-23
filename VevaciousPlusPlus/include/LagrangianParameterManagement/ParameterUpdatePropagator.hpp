@@ -8,8 +8,8 @@
 #ifndef PARAMETERUPDATEPROPAGATOR_HPP_
 #define PARAMETERUPDATEPROPAGATOR_HPP_
 
-#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "CommonIncludes.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 
 namespace VevaciousPlusPlus
 {

@@ -50,7 +50,7 @@ namespace VevaciousPlusPlus
   // dominantTemperatureInGigaElectronVolts to be the temperature with the
   // lowest survival probability.
   void BounceAlongPathWithThreshold::ContinueThermalTunneling(
-                                          PotentialFunction& potentialFunction,
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
@@ -200,7 +200,7 @@ namespace VevaciousPlusPlus
   // course of the calculation. The vacua are assumed to already be the minima
   // at tunnelingTemperature.
   double BounceAlongPathWithThreshold::BoundedBounceAction(
-                                          PotentialFunction& potentialFunction,
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                              double const tunnelingTemperature,
@@ -214,7 +214,8 @@ namespace VevaciousPlusPlus
                                                     std::vector< double >( 0 ),
                                                       tunnelingTemperature ) );
 
-    actionCalculator->ResetVacua( falseVacuum,
+    actionCalculator->ResetVacua( potentialFunction,
+                                  falseVacuum,
                                   trueVacuum,
                                   tunnelingTemperature );
 
@@ -229,7 +230,7 @@ namespace VevaciousPlusPlus
                                                           pathPotential ) );
 
     std::cout << std::endl
-    << "Initial path bounce action = " << bestBubble->bounceAction;
+    << "Initial path bounce action = " << bestBubble->BounceAction();
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
@@ -251,9 +252,10 @@ namespace VevaciousPlusPlus
       << "Passing best path so far to next path finder.";
       std::cout << std::endl;
 
-      (*pathFinder)->SetVacuaAndTemperature( falseVacuum,
-                                             trueVacuum,
-                                             tunnelingTemperature );
+      (*pathFinder)->SetPotentialAndVacuaAndTemperature(potentialFunction,
+                                                        falseVacuum,
+                                                        trueVacuum,
+                                                        tunnelingTemperature );
       TunnelPath const* currentPath( bestPath );
       BubbleProfile const* currentBubble( bestBubble );
 
@@ -303,7 +305,7 @@ namespace VevaciousPlusPlus
         delete bubbleDeleter;
         delete pathDeleter;
 
-        if( nextBubble->bounceAction < bestBubble->bounceAction )
+        if( nextBubble->BounceAction() < bestBubble->BounceAction() )
         {
           // If nextBubble was an improvement on bestBubble, what bestPath
           // currently points at gets marked for deletion either on the next
@@ -328,13 +330,13 @@ namespace VevaciousPlusPlus
         currentPath = nextPath;
 
         std::cout << std::endl
-        << "bounce action for new path = " << currentBubble->bounceAction;
+        << "bounce action for new path = " << currentBubble->BounceAction();
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
         }
         std::cout << ", lowest bounce action so far = "
-        << bestBubble->bounceAction;
+        << bestBubble->BounceAction();
         if( currentPath->NonZeroTemperature() )
         {
           std::cout << " GeV";
@@ -346,7 +348,7 @@ namespace VevaciousPlusPlus
         }
         std::cout << ".";
         std::cout << std::endl;
-      } while( ( bestBubble->bounceAction > actionThreshold )
+      } while( ( bestBubble->BounceAction() > actionThreshold )
                &&
                (*pathFinder)->PathCanBeImproved( *currentBubble ) );
       // At the end of the loop, these point at the last tried path and bubble
@@ -356,7 +358,7 @@ namespace VevaciousPlusPlus
 
       // We don't bother with the rest of the path finders if the action has
       // already dropped below the threshold.
-      if( bestBubble->bounceAction < actionThreshold )
+      if( bestBubble->BounceAction() < actionThreshold )
       {
         std::cout
         << std::endl
@@ -370,7 +372,7 @@ namespace VevaciousPlusPlus
 
     std::cout << std::endl
     << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
-    << bestBubble->bounceAction;
+    << bestBubble->BounceAction();
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
@@ -383,7 +385,7 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
-    double const bounceAction( bestBubble->bounceAction );
+    double const bounceAction( bestBubble->BounceAction() );
     delete bestBubble;
     delete bestPath;
     return bounceAction;

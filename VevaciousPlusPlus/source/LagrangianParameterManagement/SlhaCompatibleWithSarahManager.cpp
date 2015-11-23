@@ -15,12 +15,16 @@ namespace VevaciousPlusPlus
                                            std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                              std::string const& fixedScaleType,
-                                      std::string const& fixedScaleArgument ) :
+                                         std::string const& fixedScaleArgument,
+                                           std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument ) :
     SlhaBlocksWithSpecialCasesManager( validBlocksString,
                                        minimumScaleType,
                                        minimumScaleArgument,
                                        fixedScaleType,
-                                       fixedScaleArgument )
+                                       fixedScaleArgument,
+                                       maximumScaleType,
+                                       maximumScaleArgument )
   {
     InitializeSarahAliases();
   }
@@ -30,12 +34,16 @@ namespace VevaciousPlusPlus
                                            std::string const& minimumScaleType,
                                        std::string const& minimumScaleArgument,
                                              std::string const& fixedScaleType,
-                                      std::string const& fixedScaleArgument ) :
-    SlhaBlocksWithSpecialCasesManager( validBlocks,
+                                         std::string const& fixedScaleArgument,
+                                           std::string const& maximumScaleType,
+                                    std::string const& maximumScaleArgument ) :
+    SlhaBlocksWithSpecialCasesManager( validBlocksSet,
                                        minimumScaleType,
                                        minimumScaleArgument,
                                        fixedScaleType,
-                                       fixedScaleArgument )
+                                       fixedScaleArgument,
+                                       maximumScaleType,
+                                       maximumScaleArgument )
   {
     InitializeSarahAliases();
   }

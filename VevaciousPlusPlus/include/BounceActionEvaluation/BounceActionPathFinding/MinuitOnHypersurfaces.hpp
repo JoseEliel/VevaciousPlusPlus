@@ -15,8 +15,8 @@
 #include "MinuitPathFinder.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "../PathParameterization/LinearSplineThroughNodes.hpp"
-#include "../../MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -33,8 +33,7 @@ namespace VevaciousPlusPlus
                                    Eigen::VectorXd& eigenVector );
 
 
-    MinuitOnHypersurfaces( PotentialFunction const& potentialFunction,
-                           size_t const numberOfPathSegments,
+    MinuitOnHypersurfaces( size_t const numberOfPathSegments,
                            unsigned int const minuitStrategy = 1,
                            double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnHypersurfaces();
@@ -54,18 +53,24 @@ namespace VevaciousPlusPlus
     virtual double
     operator()( std::vector< double > const& nodeParameterization ) const;
 
-    // This sets the vacua to be those given, and resets the nodes to describe
-    // a straight path between the new vacua, as well as setting
-    // pathTemperature and currentMinuitTolerance appropriately.
-    virtual void SetVacuaAndTemperature( PotentialMinimum const& falseVacuum,
-                                         PotentialMinimum const& trueVacuum,
-                                         double const pathTemperature = 0.0 );
+    // This sets the potential function and vacua to be those given (also
+    // noting the maximum allowed scale as the maximum Euclidean length for
+    // field configurations, and also the number of fields which vary for the
+    // potential), and resets the nodes to describe a straight path between the
+    // new vacua, as well as setting pathTemperature and currentMinuitTolerance
+    // appropriately.
+    virtual void SetPotentialAndVacuaAndTemperature(
+                                    PotentialFunction const& potentialFunction,
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                          double const pathTemperature = 0.0 );
 
 
   protected:
-    PotentialFunction const& potentialFunction;
+    PotentialFunction const* potentialFunction;
     double potentialAtOrigin;
-    size_t const numberOfFields;
+    double maximumFieldVectorLengthSquared;
+    size_t numberOfFields;
     size_t const numberOfVaryingNodes;
     double segmentAuxiliaryLength;
     std::vector< std::vector< double > > returnPathNodes;
@@ -84,6 +89,16 @@ namespace VevaciousPlusPlus
     std::vector< double > const nodeZeroParameterization;
     Eigen::VectorXd minuitResultAsUntransformedVector;
 
+
+    // This caps the field configuration so that the square of its Euclidean
+    // length is not longer than maximumFieldVectorLengthSquared, then
+    // evaluates the difference between potentialFunction->operator() on the
+    // capped field configuration at pathTemperature and potentialAtOrigin, and
+    // returns that difference, plus an extra amount if the field configuration
+    // had to be capped, where the extra amount is the square of the amount that
+    // the configuration's length squared exceeded
+    // maximumFieldVectorLengthSquared.
+    double PotentialValue( std::vector< double > fieldConfiguration ) const;
 
     // This sets up reflectionMatrix to be the Householder reflection matrix
     // which reflects the axis of field 0 to be parallel to
@@ -199,19 +214,28 @@ namespace VevaciousPlusPlus
       += ( transformedNode( fieldIndex ) * transformedNode( fieldIndex ) );
     }
     return ( ( parameterizationLengthSquared * parameterizationLengthSquared )
-             + potentialFunction( fieldConfiguration,
-                                  pathTemperature )
-             - potentialAtOrigin );
+             + PotentialValue( fieldConfiguration ) );
   }
 
-  // This sets the vacua to be those given, and resets the nodes to describe a
-  // straight path between the new vacua, as well as setting pathTemperature
-  // and currentMinuitTolerance appropriately.
-  inline void MinuitOnHypersurfaces::SetVacuaAndTemperature(
+  // This sets the potential function and vacua to be those given (also
+  // noting the maximum allowed scale as the maximum Euclidean length for
+  // field configurations, and also the number of fields which vary for the
+  // potential), and resets the nodes to describe a straight path between the
+  // new vacua, as well as setting pathTemperature and currentMinuitTolerance
+  // appropriately.
+  inline void MinuitOnHypersurfaces::SetPotentialAndVacuaAndTemperature(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                                  double const pathTemperature )
   {
+    this->potentialFunction = &potentialFunction;
+    numberOfFields = potentialFunction.NumberOfFieldVariables();
+    double const
+    maximumFieldVectorLength( potentialFunction.GetLagrangianParameterManager(
+                                                  ).MaximumEvaluationScale() );
+    maximumFieldVectorLengthSquared
+    = ( maximumFieldVectorLength * maximumFieldVectorLength );
     this->pathTemperature = pathTemperature;
     potentialAtOrigin
     = potentialFunction( potentialFunction.FieldValuesOrigin(),
@@ -220,6 +244,27 @@ namespace VevaciousPlusPlus
                             trueVacuum );
     SetCurrentMinuitTolerance( falseVacuum,
                                trueVacuum );
+  }
+
+  // This caps the field configuration so that the square of its Euclidean
+  // length is not longer than maximumFieldVectorLengthSquared, then
+  // evaluates the difference between potentialFunction->operator() on the
+  // capped field configuration at pathTemperature and potentialAtOrigin, and
+  // returns that difference, plus an extra amount if the field configuration
+  // had to be capped, where the extra amount is the square of the amount that
+  // the configuration's length squared exceeded
+  // maximumFieldVectorLengthSquared.
+  inline double MinuitOnHypersurfaces::PotentialValue(
+                               std::vector< double > fieldConfiguration ) const
+  {
+    double const squaredLengthBeyondCap(
+                          MinuitHypersphereBoundAlternative::CapVariableVector(
+                                                            fieldConfiguration,
+                                           maximumFieldVectorLengthSquared ) );
+    return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
+             + (*potentialFunction)( fieldConfiguration,
+                                     pathTemperature )
+             - potentialAtOrigin );
   }
 
   // This takes the numberOfFields-1-dimensional vector and prepends a 0 to

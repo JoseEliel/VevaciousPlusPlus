@@ -79,7 +79,7 @@ namespace VevaciousPlusPlus
 
     // The logarithm of the scale is of course half the logarithm of the square
     // of the scale.
-    std::vector< double > const parameterValues;
+    std::vector< double > parameterValues;
     lagrangianParameterManager.ParameterValues( ( 0.5 * log( scaleSquared ) ),
                                                 parameterValues );
 

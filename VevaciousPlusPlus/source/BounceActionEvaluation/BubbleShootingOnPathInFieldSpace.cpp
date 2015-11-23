@@ -13,10 +13,9 @@ namespace VevaciousPlusPlus
   BubbleShootingOnPathInFieldSpace::radiusDifferenceThreshold( 0.01 );
 
   BubbleShootingOnPathInFieldSpace::BubbleShootingOnPathInFieldSpace(
-                                    PotentialFunction const& potentialFunction,
                                             double const lengthScaleResolution,
                                                  size_t const shootAttempts ) :
-    BounceActionCalculator( potentialFunction ),
+    BounceActionCalculator(),
     lengthScaleResolution( lengthScaleResolution ),
     radialStepSize( -1.0 ),
     estimatedRadialMaximum( -1.0 ),
@@ -261,15 +260,15 @@ namespace VevaciousPlusPlus
     // 2 pi^2 (quantum) or 4 pi (thermal):
     if( nonZeroTemperature )
     {
-      bubbleProfile->bounceAction = ( bounceAction
-                                      * 2.0
-                                      * boost::math::double_constants::pi );
+      bubbleProfile->BounceAction() = ( bounceAction
+                                        * 2.0
+                                        * boost::math::double_constants::pi );
     }
     else
     {
-      bubbleProfile->bounceAction = ( bounceAction
-                                      * boost::math::double_constants::pi
-                                      * boost::math::double_constants::pi );
+      bubbleProfile->BounceAction() = ( bounceAction
+                                        * boost::math::double_constants::pi
+                                        * boost::math::double_constants::pi );
     }
     return bubbleProfile;
   }
@@ -282,6 +281,7 @@ namespace VevaciousPlusPlus
   void BubbleShootingOnPathInFieldSpace::PlotBounceConfiguration(
                                                   TunnelPath const& tunnelPath,
                                             BubbleProfile const& bubbleProfile,
+                                  std::vector< std::string > const& fieldNames,
                                  std::vector< std::string > const& fieldColors,
                                              unsigned int const plotResolution,
                                 std::string const& gnuplotCommandIncludingPath,
@@ -296,7 +296,7 @@ namespace VevaciousPlusPlus
 
     std::cout << std::endl;
     size_t numberOfPlottedFields( std::min( fieldColors.size(),
-                                potentialFunction.NumberOfFieldVariables() ) );
+                                            tunnelPath.NumberOfFields() ) );
     BOL::TwoDimensionalDataPlotter::PlotDataVector plotData;
     BOL::TwoDimensionalDataPlotter::DoublePairVectorWithStringPair fieldData;
     for( size_t fieldIndex( 0 );
@@ -306,14 +306,13 @@ namespace VevaciousPlusPlus
       if( !(fieldColors[ fieldIndex ].empty()) )
       {
         fieldData.second.first.assign( fieldColors[ fieldIndex ] );
-        fieldData.second.second.assign(
-            potentialFunction.FieldNames()[ fieldIndex ] );
+        fieldData.second.second.assign( fieldNames[ fieldIndex ] );
         plotData.push_back( fieldData );
       }
     }
     numberOfPlottedFields = plotData.size();
     std::vector< double >
-    fieldConfiguration( potentialFunction.NumberOfFieldVariables() );
+    fieldConfiguration( tunnelPath.NumberOfFields() );
     for( size_t radiusIndex( 0 );
          radiusIndex < plotResolution;
          ++radiusIndex )

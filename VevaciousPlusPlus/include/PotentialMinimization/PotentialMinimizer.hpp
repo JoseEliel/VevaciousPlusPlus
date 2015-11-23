@@ -17,7 +17,7 @@ namespace VevaciousPlusPlus
   class PotentialMinimizer
   {
   public:
-    PotentialMinimizer( PotentialFunction const& potentialFunction );
+    PotentialMinimizer( PotentialFunction& potentialFunction );
     virtual ~PotentialMinimizer();
 
 
@@ -63,11 +63,13 @@ namespace VevaciousPlusPlus
 
     bool DsbVacuumIsMetastable() const { return !(panicVacua.empty()); }
 
-    PotentialFunction& PotentialFunction() { return potentialFunction; }
+    PotentialFunction const& GetPotentialFunction() const
+    { return potentialFunction; }
+    PotentialFunction& GetPotentialFunction() { return potentialFunction; }
 
 
   protected:
-    PotentialFunction const& potentialFunction;
+    PotentialFunction& potentialFunction;
     std::vector< PotentialMinimum > foundMinima;
     PotentialMinimum dsbVacuum;
     std::vector< PotentialMinimum > panicVacua;

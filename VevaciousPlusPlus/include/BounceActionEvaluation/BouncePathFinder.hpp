@@ -9,6 +9,7 @@
 #define BOUNCEPATHFINDER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "PathParameterization/TunnelPath.hpp"
 #include "BubbleProfile.hpp"
@@ -25,8 +26,10 @@ namespace VevaciousPlusPlus
 
     // This should reset the BouncePathFinder and set pathTemperature
     // appropriately.
-    virtual void SetVacuaAndTemperature( PotentialMinimum const& falseVacuum,
-                                         PotentialMinimum const& trueVacuum,
+    virtual void SetPotentialAndVacuaAndTemperature(
+                                    PotentialFunction const& potentialFunction,
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
                                       double const pathTemperature = 0.0 ) = 0;
 
     // This should prompt the derived class instance to assess whether the path

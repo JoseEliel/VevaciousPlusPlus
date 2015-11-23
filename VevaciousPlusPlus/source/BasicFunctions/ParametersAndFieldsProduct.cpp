@@ -2,7 +2,7 @@
  * ParametersAndFieldsProduct.cpp
  *
  *  Created on: Oct 8, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #include "BasicFunctions/ParametersAndFieldsProduct.hpp"

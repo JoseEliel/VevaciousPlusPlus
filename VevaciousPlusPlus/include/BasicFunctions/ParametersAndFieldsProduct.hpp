@@ -2,7 +2,7 @@
  * ParametersAndFieldsProduct.hpp
  *
  *  Created on: Oct 8, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #ifndef PARAMETERSANDFIELDSPRODUCT_HPP_
@@ -46,10 +46,10 @@ namespace VevaciousPlusPlus
     double operator()( std::vector< double > const& parameterValues,
                        std::vector< double > const& fieldConfiguration ) const
     { return ElementProduct( ElementProduct( coefficientConstant,
-                                             fieldConfiguration,
-                                             fieldProductByIndex ),
-                             parameterValues,
-                             parameterIndices ); }
+                                             parameterValues,
+                                             parameterIndices ),
+                             fieldConfiguration,
+                             fieldProductByIndex ); }
 
     // This multiplies the relevant field values with the coefficient and the
     // values of the Lagrangian parameters from the last call of
@@ -124,18 +124,18 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    // This returns doubleToMultiply multiplied by the product of elements of
+    // valueVector at the indices given by indexVector.
+    static double ElementProduct( double doubleToMultiply,
+                                  std::vector< double > const& valueVector,
+                                  std::vector< size_t > const& indexVector );
+
     bool isValid;
     double coefficientConstant;
     std::vector< size_t > fieldProductByIndex;
     std::vector< size_t > fieldPowersByIndex;
     std::vector< size_t > parameterIndices;
     double totalCoefficientForFixedScale;
-
-    // This returns doubleToMultiply multiplied by the product of elements of
-    // valueVector at the indices given by indexVector.
-    double ElementProduct( double doubleToMultiply,
-                           std::vector< double > const& valueVector,
-                           std::vector< size_t > const& indexVector ) const;
   };
 
 
@@ -172,12 +172,13 @@ namespace VevaciousPlusPlus
     totalCoefficientForFixedScale = 1.0;
   }
 
+
   // This returns doubleToMultiply multiplied by the field product using the
   // values in fieldConfiguration.
   inline double
   ParametersAndFieldsProduct::ElementProduct( double doubleToMultiply,
                                       std::vector< double > const& valueVector,
-                               std::vector< size_t > const& indexVector ) const
+                                     std::vector< size_t > const& indexVector )
   {
     for( std::vector< size_t >::const_iterator
          elementIndex( indexVector.begin() );

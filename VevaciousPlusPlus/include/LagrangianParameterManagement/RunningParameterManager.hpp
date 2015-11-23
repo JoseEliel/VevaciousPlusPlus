@@ -68,7 +68,7 @@ namespace VevaciousPlusPlus
     // This is just a dummy to make things work while I have it side-by-side to
     // the new version for comparison.
     virtual void UpdateSelfForNewParameterPoint(
-            LagrangianParameterManager const& lagrangianParameterManager )
+                 LagrangianParameterManager const& lagrangianParameterManager )
     { ; /* This does nothing. */ }
 
     // This is just a dummy to make things work while I have it side-by-side to
@@ -85,9 +85,9 @@ namespace VevaciousPlusPlus
 
     // This is just a dummy to make things work while I have it side-by-side to
     // the new version for comparison.
-    virtual std::vector< double >
-    ParameterValues( double logarithmOfScale ) const
-    { return std::vector< double >( 0, 0.0 ); }
+    virtual void ParameterValues( double logarithmOfScale,
+                               std::vector< double >& destinationVector ) const
+    { ; /* This does nothing. */ }
 
     // This returns a scale which is appropriate for using for a fixed-scale
     // calculation for the current parameter point.

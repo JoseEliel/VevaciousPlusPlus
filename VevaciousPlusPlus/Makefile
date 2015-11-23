@@ -42,10 +42,10 @@ PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
 LAGRANGIANPARAMETERMANAGEMENT= source/LagrangianParameterManagement/
 SLHADERIVEDFUNCTIONOIDS= $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoids/
-POTENTIALEVALUATION= source/PotentialMinimization/
-HOMOTOPYCONTINUATION= $(POTENTIALEVALUATION)/HomotopyContinuation/
-STARTINGPOINTGENERATION= $(POTENTIALEVALUATION)/StartingPointGeneration/
-GRADIENTBASEDMINIMIZATION= $(POTENTIALEVALUATION)/GradientBasedMinimization/
+POTENTIALMINIMIZATION= source/PotentialMinimization/
+HOMOTOPYCONTINUATION= $(POTENTIALMINIMIZATION)/HomotopyContinuation/
+STARTINGPOINTGENERATION= $(POTENTIALMINIMIZATION)/StartingPointGeneration/
+GRADIENTBASEDMINIMIZATION= $(POTENTIALMINIMIZATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
 SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/BasicFunctions/ParametersAndFieldsProductSum.cpp \
@@ -113,9 +113,11 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \
+ $(STARTINGPOINTGENERATION)/PolynomialSystemSolver.cpp \
  $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
  $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
+ $(HOMOTOPYCONTINUATION)/OldHom4ps2Runner.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
  $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \
  $(HOMOTOPYCONTINUATION)/PolynomialGradientTargetSystem.cpp \
@@ -123,7 +125,6 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialMinimization/GradientMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimum.cpp \
- source/PotentialMinimization/StartingPointFinder.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \

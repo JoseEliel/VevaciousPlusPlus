@@ -10,15 +10,15 @@
 namespace VevaciousPlusPlus
 {
   MinuitOnHypersurfaces::MinuitOnHypersurfaces(
-                                    PotentialFunction const& potentialFunction,
                                              size_t const numberOfPathSegments,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
     MinuitPathFinder( minuitStrategy,
                       minuitToleranceFraction ),
-    potentialFunction( potentialFunction ),
+    potentialFunction( NULL ),
     potentialAtOrigin( -1.0 ),
-    numberOfFields( potentialFunction.NumberOfFieldVariables() ),
+    maximumFieldVectorLengthSquared( -1.0 ),
+    numberOfFields( 0 ),
     numberOfVaryingNodes( numberOfPathSegments - 1 ),
     segmentAuxiliaryLength( 1.0
                             / static_cast< double > ( numberOfPathSegments ) ),

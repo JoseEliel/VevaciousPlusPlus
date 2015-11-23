@@ -11,7 +11,6 @@ namespace VevaciousPlusPlus
 {
 
   MinuitOnPotentialPerpendicularToPath::MinuitOnPotentialPerpendicularToPath(
-                                    PotentialFunction const& potentialFunction,
                                              size_t const numberOfPathSegments,
                                            int const numberOfAllowedWorsenings,
                                     double const nodeMovementThresholdFraction,
@@ -19,8 +18,7 @@ namespace VevaciousPlusPlus
                        std::vector< double > const neighborDisplacementWeights,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
-     MinuitOnHypersurfaces( potentialFunction,
-                            numberOfPathSegments,
+     MinuitOnHypersurfaces( numberOfPathSegments,
                             minuitStrategy,
                             minuitToleranceFraction ),
      numberOfAllowedWorsenings( numberOfAllowedWorsenings ),

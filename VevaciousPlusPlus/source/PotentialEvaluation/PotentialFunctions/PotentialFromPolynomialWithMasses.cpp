@@ -386,7 +386,7 @@ namespace VevaciousPlusPlus
     "# The Lagrangian parameters evaluated at the appropriate scale from the\n"
     "# C++ parameter manager are held in the following global array.\n"
     "fixedScaleLagrangianParameters = LagrangianParameters( math.log( "
-    << lagrangianParameterManager.AppropriateFixedScaleForParameterPoint()
+    << lagrangianParameterManager.AppropriateSingleFixedScale()
     << " ) )\n"
     "\n"
     "# In the following functions, the field configuration is given by fv\n"
@@ -680,9 +680,7 @@ namespace VevaciousPlusPlus
   // This is just for derived classes.
   PotentialFromPolynomialWithMasses::PotentialFromPolynomialWithMasses(
                      LagrangianParameterManager& lagrangianParameterManager ) :
-    PotentialFunction(),
-    IWritesPythonPotential(),
-    lagrangianParameterManager( lagrangianParameterManager ),
+    PotentialFunction( lagrangianParameterManager ),
     treeLevelPotential(),
     polynomialLoopCorrections(),
     scalarSquareMasses(),
@@ -706,8 +704,6 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialWithMasses::PotentialFromPolynomialWithMasses(
                         PotentialFromPolynomialWithMasses const& copySource ) :
     PotentialFunction( copySource ),
-    IWritesPythonPotential(),
-    lagrangianParameterManager( copySource.lagrangianParameterManager ),
     treeLevelPotential( copySource.treeLevelPotential ),
     polynomialLoopCorrections( copySource.polynomialLoopCorrections ),
     scalarSquareMasses(),

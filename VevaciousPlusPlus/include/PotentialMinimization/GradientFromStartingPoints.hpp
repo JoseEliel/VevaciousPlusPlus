@@ -13,8 +13,8 @@
 #include "StartingPointFinder.hpp"
 #include "GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "HomotopyContinuation/Hom4ps2Runner.hpp"
 #include "GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
+#include "HomotopyContinuation/OldHom4ps2Runner.hpp"
 
 namespace VevaciousPlusPlus
 {

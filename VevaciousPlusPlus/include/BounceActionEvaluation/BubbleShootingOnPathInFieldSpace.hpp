@@ -24,9 +24,7 @@ namespace VevaciousPlusPlus
   class BubbleShootingOnPathInFieldSpace : public BounceActionCalculator
   {
   public:
-    BubbleShootingOnPathInFieldSpace(
-                                    PotentialFunction const& potentialFunction,
-                                      double const lengthScaleResolution,
+    BubbleShootingOnPathInFieldSpace( double const lengthScaleResolution,
                                       size_t const shootAttempts );
     virtual ~BubbleShootingOnPathInFieldSpace();
 
@@ -39,7 +37,8 @@ namespace VevaciousPlusPlus
     // by infinity, but we cannot integrate to infinity, so we choose
     // estimatedRadialMaximum to be initially twice the length scale, as it
     // gets extended over the course of the calculation anyway if necessary.
-    virtual void ResetVacua( PotentialMinimum const& falseVacuum,
+    virtual void ResetVacua( PotentialFunction const& potentialFunction,
+                             PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
                              double const tunnelingTemperature );
 
@@ -60,8 +59,9 @@ namespace VevaciousPlusPlus
     // should not be plotted.
     virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
                                           BubbleProfile const& bubbleProfile,
+                                  std::vector< std::string > const& fieldNames,
                                  std::vector< std::string > const& fieldColors,
-                                 unsigned int const plotResolution,
+                                          unsigned int const plotResolution,
                                 std::string const& gnuplotCommandIncludingPath,
                                        std::string const& plotFilename ) const;
 
@@ -96,6 +96,7 @@ namespace VevaciousPlusPlus
   // estimatedRadialMaximum to be initially twice the length scale, as it
   // gets extended over the course of the calculation anyway if necessary.
   inline void BubbleShootingOnPathInFieldSpace::ResetVacua(
+                                    PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
                                             double const tunnelingTemperature )

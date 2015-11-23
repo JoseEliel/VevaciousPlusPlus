@@ -114,7 +114,7 @@ namespace VevaciousPlusPlus
 
       return;
     }
-    PrepareCommonExtras();
+    PrepareCommonExtras( potentialFunction );
     if( tunnelingStrategy == JustQuantum )
     {
       CalculateQuantumTunneling( potentialFunction,

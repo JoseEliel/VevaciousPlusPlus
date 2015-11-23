@@ -7,8 +7,6 @@
 
 #include "PotentialEvaluation/PotentialFunctions/OldPotentialFromPolynomialAndMasses.hpp"
 
-#include "VevaciousPlusPlus.hpp"
-
 namespace VevaciousPlusPlus
 {
   std::string const
@@ -42,8 +40,8 @@ namespace VevaciousPlusPlus
             bool const treeLevelMinimaOnlyAsValidHomotopyContinuationSolutions,
                                double const assumedPositiveOrNegativeTolerance,
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFunction(),
-    IWritesPythonPotential(),
+    PotentialFunction(
+                     runningParameterManager.GetLagrangianParameterManager() ),
     ParameterUpdatePropagator(
                      runningParameterManager.GetLagrangianParameterManager() ),
     runningParameters( runningParameterManager ),
@@ -734,8 +732,8 @@ namespace VevaciousPlusPlus
   // This is just for derived classes.
   OldPotentialFromPolynomialAndMasses::OldPotentialFromPolynomialAndMasses(
                            RunningParameterManager& runningParameterManager ) :
-    PotentialFunction(),
-    IWritesPythonPotential(),
+    PotentialFunction(
+                     runningParameterManager.GetLagrangianParameterManager() ),
     ParameterUpdatePropagator(
                      runningParameterManager.GetLagrangianParameterManager() ),
     runningParameters( runningParameterManager ),
@@ -767,9 +765,8 @@ namespace VevaciousPlusPlus
 
   // This is just for derived classes.
   OldPotentialFromPolynomialAndMasses::OldPotentialFromPolynomialAndMasses(
-                         OldPotentialFromPolynomialAndMasses const& copySource ) :
+                      OldPotentialFromPolynomialAndMasses const& copySource ) :
     PotentialFunction( copySource ),
-    IWritesPythonPotential(),
     ParameterUpdatePropagator(
                 copySource.runningParameters.GetLagrangianParameterManager() ),
     runningParameters( copySource.runningParameters ),

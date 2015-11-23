@@ -20,7 +20,7 @@ namespace VevaciousPlusPlus
   class BounceActionCalculator
   {
   public:
-    BounceActionCalculator( PotentialFunction const& potentialFunction );
+    BounceActionCalculator();
     virtual ~BounceActionCalculator();
 
 
@@ -28,22 +28,10 @@ namespace VevaciousPlusPlus
     // paths between the given vacua, possibly because it might need to set up
     // things based on characteristic energy scales for example. By default it
     // does nothing.
-    virtual void ResetVacua( PotentialMinimum const& falseVacuum,
+    virtual void ResetVacua( PotentialFunction const& potentialFunction,
+                             PotentialMinimum const& falseVacuum,
                              PotentialMinimum const& trueVacuum,
                              double const tunnelingTemperature ){}
-
-    // This should prepare the BounceActionCalculator for a path or set of
-    // paths between the given vacua, possibly because it might need to set up
-    // things based on characteristic energy scales for example. By default it
-    // does nothing.
-    virtual void ResetVacua( std::vector< double > const& falseVacuum,
-                             std::vector< double > const& trueVacuum,
-                             double const tunnelingTemperature )
-    { ResetVacua( PotentialMinimum( falseVacuum,
-                                    potentialFunction( falseVacuum ) ),
-                  PotentialMinimum( trueVacuum,
-                                    potentialFunction( trueVacuum ) ),
-                  tunnelingTemperature ); }
 
     // This should calculate the bubble profile and bounce action along the
     // path given by tunnelPath and return them in a new BubbleProfile object,
@@ -65,12 +53,10 @@ namespace VevaciousPlusPlus
     // should not be plotted.
     virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
                                           BubbleProfile const& bubbleProfile,
+                                  std::vector< std::string > const& fieldNames,
                                  std::vector< std::string > const& fieldColors,
                                           std::string const& plotFilename,
                                      unsigned int const plotResolution ) const;
-
-  protected:
-    PotentialFunction const& potentialFunction;
   };
 
 } /* namespace VevaciousPlusPlus */

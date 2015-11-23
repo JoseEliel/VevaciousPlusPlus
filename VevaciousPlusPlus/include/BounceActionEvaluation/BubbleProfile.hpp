@@ -29,7 +29,8 @@ namespace VevaciousPlusPlus
 
     // The bounce action for the bubble profile is kept along with it, to save
     // having to constantly pass 2 arguments when improving the tunneling path.
-    double bounceAction;
+    double BounceAction() const { return bounceAction; }
+    double& BounceAction() { return bounceAction; }
 
 
     // This should set up the bubble profile in terms of the auxiliary variable
@@ -50,6 +51,10 @@ namespace VevaciousPlusPlus
     // This should return the maximum radial value up to which a profile can be
     // reasonably plotted.
     virtual double MaximumPlotRadius() const = 0;
+
+
+  protected:
+    double bounceAction;
   };
 
 } /* namespace VevaciousPlusPlus */

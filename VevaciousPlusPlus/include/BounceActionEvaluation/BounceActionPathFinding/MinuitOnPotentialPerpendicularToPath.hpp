@@ -21,9 +21,7 @@ namespace VevaciousPlusPlus
   class MinuitOnPotentialPerpendicularToPath : public MinuitOnHypersurfaces
   {
   public:
-    MinuitOnPotentialPerpendicularToPath(
-                                    PotentialFunction const& potentialFunction,
-                                          size_t const numberOfPathSegments,
+    MinuitOnPotentialPerpendicularToPath( size_t const numberOfPathSegments,
                                        int const numberOfAllowedWorsenings = 3,
                              double const nodeMovementThresholdFraction = 0.05,
                                           double const dampingFactor = 0.75,
@@ -94,11 +92,11 @@ namespace VevaciousPlusPlus
     {
       return false;
     }
-    if( bubbleFromLastPath.bounceAction >= bounceBeforeLastPath )
+    if( bubbleFromLastPath.BounceAction() >= bounceBeforeLastPath )
     {
       ++numberOfWorseningsSoFar;
     }
-    bounceBeforeLastPath = bubbleFromLastPath.bounceAction;
+    bounceBeforeLastPath = bubbleFromLastPath.BounceAction();
     return ( numberOfAllowedWorsenings > numberOfWorseningsSoFar );
   }
 

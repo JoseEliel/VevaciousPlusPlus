@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -22,10 +23,10 @@ namespace VevaciousPlusPlus
     virtual ~PotentialFunction();
 
 
-    LagrangianParameterManager const& LagrangianParameterManager() const
+    LagrangianParameterManager const& GetLagrangianParameterManager() const
     { return lagrangianParameterManager; }
 
-    LagrangianParameterManager& LagrangianParameterManager()
+    LagrangianParameterManager& GetLagrangianParameterManager()
     { return lagrangianParameterManager; }
 
     size_t NumberOfFieldVariables() const{ return numberOfFields; }
