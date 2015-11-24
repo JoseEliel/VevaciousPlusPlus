@@ -33,19 +33,20 @@ namespace VevaciousPlusPlus
   {
     size_t const numberOfElements( givenSolution.size() );
     double originalValue( 0.0 );
-    double positivePartialSlope( 0.0 );
     double negativePartialSlope( 0.0 );
+    double positivePartialSlope( 0.0 );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfElements;
          ++fieldIndex )
     {
       originalValue = givenSolution[ fieldIndex ];
-      givenSolution[ fieldIndex ] = ( originalValue + resolutionSize );
-      positivePartialSlope = PartialSlope( systemToSolve[ fieldIndex ],
-                                           givenSolution );
       givenSolution[ fieldIndex ] = ( originalValue - resolutionSize );
       negativePartialSlope = PartialSlope( systemToSolve[ fieldIndex ],
                                            givenSolution );
+      givenSolution[ fieldIndex ] = ( originalValue + resolutionSize );
+      positivePartialSlope = PartialSlope( systemToSolve[ fieldIndex ],
+                                           givenSolution );
+
       if( ( ( positivePartialSlope > 0.0 )
             &&
             ( negativePartialSlope > 0.0 ) )
@@ -69,7 +70,6 @@ namespace VevaciousPlusPlus
   {
     double partialSlope( 0.0 );
     double polynomialValue( 0.0 );
-    size_t const numberOfFields( fieldConfiguration.size() );
     for( std::vector< FactorWithPowers >::const_iterator
          factorWithPowers( fieldConstraint.begin() );
          factorWithPowers != fieldConstraint.end();
@@ -77,7 +77,7 @@ namespace VevaciousPlusPlus
     {
       polynomialValue = factorWithPowers->first;
       for( size_t fieldIndex( 0 );
-           fieldIndex < numberOfFields;
+           fieldIndex < factorWithPowers->second.size();
            ++fieldIndex )
       {
         if( factorWithPowers->second[ fieldIndex ] > 0 )

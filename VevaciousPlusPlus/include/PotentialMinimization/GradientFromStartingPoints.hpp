@@ -24,7 +24,7 @@ namespace VevaciousPlusPlus
   class GradientFromStartingPoints : public PotentialMinimizer
   {
   public:
-    GradientFromStartingPoints( PotentialFunction const& potentialFunction,
+    GradientFromStartingPoints( PotentialFunction& potentialFunction,
                                 StartingPointFinder* const startingPointFinder,
                                 GradientMinimizer* const gradientMinimizer,
                               double const extremumSeparationThresholdFraction,

@@ -59,16 +59,20 @@ namespace VevaciousPlusPlus
             // We take advantage of the Hessian being real and symmetric to
             // avoid bothering to calculate half of the off-diagonal second
             // derivatives.
+            ParametersAndFieldsProduct const&
+            firstDerivative( minimizationConditions[ fieldIndex ].back() );
+            std::vector< ParametersAndFieldsProductSum >&
+            fieldRow( polynomialHermitian[ fieldIndex ] );
             for( size_t secondFieldIndex( 0 );
                  secondFieldIndex <= fieldIndex;
                  ++secondFieldIndex )
             {
-              if( polynomialTerm->NonZeroDerivative( secondFieldIndex ) )
+              if( firstDerivative.NonZeroDerivative( secondFieldIndex ) )
               {
-                polynomialHermitian[ fieldIndex ][
-                                secondFieldIndex ].ParametersAndFieldsProducts(
+                fieldRow[ secondFieldIndex ].ParametersAndFieldsProducts(
                                                                    ).push_back(
-                       polynomialTerm->PartialDerivative( secondFieldIndex ) );
+                                             firstDerivative.PartialDerivative(
+                                                          secondFieldIndex ) );
               }
             }
           }

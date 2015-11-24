@@ -8,6 +8,11 @@
 
 #include "CommonIncludes.hpp"
 #include "VevaciousPlusPlus.hpp"
+#include "LagrangianParameterManagement/RunningParameterManager.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldFixedScaleOneLoopPotential.hpp"
+#include "PotentialEvaluation/PotentialFunctions/OldRgeImprovedOneLoopPotential.hpp"
+#include "PotentialMinimization/HomotopyContinuation/OldHom4ps2Runner.hpp"
+
 
 int main( int argumentCount,
           char** argumentCharArrays )
@@ -323,7 +328,7 @@ int main( int argumentCount,
              *lhaParameterManager,
              newHom4ps2Runner,
              1,
-             false,
+             true,
              newFixedScale.NumberOfFieldVariables() );
   newSolver( newHom4ps2Results );
 

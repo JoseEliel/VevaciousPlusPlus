@@ -106,25 +106,20 @@ namespace VevaciousPlusPlus
                                 std::string const& hom4ps2InputFilename ) const
   {
     size_t const numberOfFields( systemToSolve.size() );
+    variableNames.resize( numberOfFields );
     std::stringstream nameBuilder;
     nameBuilder << numberOfFields;
-    nameBuilder.width( nameBuilder.str().size() );
+    size_t const numberOfDigits( nameBuilder.str().size() );
     nameBuilder.fill( '0' );
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
       nameBuilder.str( "" );
+      nameBuilder.width( numberOfDigits );
       nameBuilder << ( fieldIndex + 1 );
       variableNames[ fieldIndex ] = ( fieldNamePrefix + nameBuilder.str() );
       nameToIndexMap[ variableNames[ fieldIndex ] ] = fieldIndex;
-
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "variableNames[ " << fieldIndex << " ] = \""
-      << variableNames[ fieldIndex ] << "\"";
-      std::cout << std::endl;/**/
     }
 
     std::ofstream hom4ps2Input( hom4ps2InputFilename.c_str() );
@@ -250,10 +245,23 @@ namespace VevaciousPlusPlus
       }
     }
 
+    size_t const numberOfVariables( variableNames.size() );
+    size_t const
+    numberOfComplexSolutions( complexSolutions.size() / numberOfVariables );
+    if( ( numberOfComplexSolutions * numberOfVariables )
+        != complexSolutions.size() )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "Parsed " << complexSolutions.size()
+      << " values from the output of HOM4PS2, but it should have been a"
+      << " multiple of " << numberOfVariables << " as there are "
+      << numberOfVariables << " variables.";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
     // At this point, the line "The order of variables :" should have been
     // found. If it hasn't, the file is malformed, but we carry on regardless,
     // looking for the variables in order:
-    size_t const numberOfVariables( variableNames.size() );
     std::vector< size_t > indexOrder( numberOfVariables,
                                       -1 );
     std::map< std::string, size_t >::const_iterator indexFinder;
@@ -283,57 +291,41 @@ namespace VevaciousPlusPlus
       ++variableIndex;
     }
 
+    // Now we divide complexSolutions into sets of numberOfVariables complex
+    // values, and any which are purely real (within a tolerance of
+    // resolutionSize) are kept, along with any valid sign-flip variations.
     std::vector< double > candidateRealSolution( numberOfVariables,
                                                  0.0 );
     bool solutionIsReal( true );
-    size_t solutionIndex( 0 );
-    for( size_t complexIndex( 0 );
-         complexIndex < complexSolutions.size();
-         ++complexIndex )
+    size_t currentStartIndex( 0 );
+    for( size_t solutionIndex( 0 );
+         solutionIndex < numberOfComplexSolutions;
+         ++solutionIndex )
     {
-      if( abs( complexSolutions[ complexIndex ].imag() ) > resolutionSize )
+      solutionIsReal = true;
+      for( size_t variableIndex( 0 );
+           variableIndex < numberOfVariables;
+           ++variableIndex )
       {
-        solutionIsReal = false;
-
-        // debugging:
-        /**/std::cout << std::endl << "debugging:"
-        << std::endl
-        << "Discarded solution "
-        << ( ( complexIndex / numberOfVariables ) + 1 )
-        << " because variable " << ( ( complexIndex % numberOfVariables ) + 1 )
-        << " (in HOM4PS2 order) has non-zero imaginary part.";
-        std::cout << std::endl;/**/
+        if( abs( complexSolutions[ currentStartIndex + variableIndex ].imag() )
+            > resolutionSize )
+        {
+          solutionIsReal = false;
+          break;
+        }
+        else
+        {
+          candidateRealSolution[ indexOrder[ variableIndex ] ]
+          = complexSolutions[ currentStartIndex + variableIndex ].real();
+        }
       }
+      currentStartIndex += numberOfVariables;
       if( solutionIsReal )
       {
-        candidateRealSolution[ indexOrder[ solutionIndex ] ]
-        = complexSolutions[ complexIndex ].real();
-      }
-
-      // The conditional increments solutionIndex regardless of whether the
-      // body happens.
-      // If we have gone through another full set of values for a solution,
-      // we append the solution if it is real, also adding all possible
-      // sign-flip variations because we have observed HOM4PS2 failing to find
-      // all of the sign-flip variations of solutions every so often.
-      if( (++solutionIndex) == numberOfVariables )
-      {
-        if( solutionIsReal )
-        {
-          // debugging:
-          /**/std::cout << std::endl << "debugging:"
-          << std::endl
-          << "Trying solution " << ( ( complexIndex / numberOfVariables ) + 1 )
-          << " and sign flips.";
-          std::cout << std::endl;/**/
-
-          AppendSolutionAndValidSignFlips( candidateRealSolution,
-                                           purelyRealSolutionSets,
-                                           systemToSolve,
-                                           resolutionSize );
-        }
-        solutionIndex = 0;
-        solutionIsReal = true;
+        AppendSolutionAndValidSignFlips( candidateRealSolution,
+                                         purelyRealSolutionSets,
+                                         systemToSolve,
+                                         resolutionSize );
       }
     }
 
@@ -341,7 +333,9 @@ namespace VevaciousPlusPlus
     << std::endl
     << "-----------------" << std::endl << "Parsed "
     << ( complexSolutions.size() / numberOfVariables )
-    << " complex solutions from HOM4PS2."
+    << " complex solutions from HOM4PS2. After trying sign-flip variations,"
+    << " returning " << purelyRealSolutionSets.size()
+    << " purely real solutions."
     << std::endl;
     std::cout << std::endl;
   }

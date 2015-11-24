@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   PotentialMinimizer::PotentialMinimizer(
-                                 PotentialFunction const& potentialFunction ) :
+                                       PotentialFunction& potentialFunction ) :
     potentialFunction( potentialFunction ),
     foundMinima(),
     dsbVacuum(),

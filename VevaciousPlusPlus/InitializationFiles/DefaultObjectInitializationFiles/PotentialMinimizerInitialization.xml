@@ -30,7 +30,8 @@
       <StartingPointFinderClass>
         <!-- Currently <ClassType> must be
              "PolynomialAtFixedScalesSolver", and
-             <ConstructorArguments> must give SOMETHING. -->
+             <ConstructorArguments> must give <NumberOfScales>,
+             <ReturnOnlyPolynomialMinima>, and <PolynomialSystemSolver>. -->
         <ClassType>
           PolynomialAtFixedScalesSolver
         </ClassType>
