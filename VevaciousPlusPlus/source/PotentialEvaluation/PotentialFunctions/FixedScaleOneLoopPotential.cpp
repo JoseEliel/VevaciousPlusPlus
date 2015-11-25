@@ -46,12 +46,6 @@ namespace VevaciousPlusPlus
   // parameters evaluated at that scale.
   void FixedScaleOneLoopPotential::respondToObservedSignal()
   {
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::respondToObservedSignal() called.";
-    std::cout << std::endl;*/
-
     renormalizationScale
     = lagrangianParameterManager.AppropriateSingleFixedScale();
     inverseRenormalizationScaleSquared
@@ -59,32 +53,9 @@ namespace VevaciousPlusPlus
     std::vector< double > fixedParameterValues;
     lagrangianParameterManager.ParameterValues( log( renormalizationScale ),
                                                 fixedParameterValues );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "FixedScaleOneLoopPotential::respondToObservedSignal(): before updating"
-    << "treeLevelPotential, treeLevelPotential = "
-    << treeLevelPotential.AsDebuggingString();
-    std::cout << std::endl;*/
+    UpdateDsbValues( log( renormalizationScale ) );
 
     treeLevelPotential.UpdateForFixedScale( fixedParameterValues );
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "fixedParameterValues = { ";
-    for( std::vector< double >::const_iterator
-         parameterValue( fixedParameterValues.begin() );
-         parameterValue < fixedParameterValues.end();
-         ++parameterValue )
-    {
-      std::cout << *parameterValue << ", ";
-    }
-    std::cout << "}, now treeLevelPotential = "
-    << treeLevelPotential.AsDebuggingString();
-    std::cout << std::endl;*/
-
     polynomialLoopCorrections.UpdateForFixedScale( fixedParameterValues );
     for( std::vector< RealMassesSquaredMatrix >::iterator
          massMatrix( scalarMassSquaredMatrices.begin() );
@@ -114,97 +85,6 @@ namespace VevaciousPlusPlus
     {
       massMatrix->UpdateForFixedScale( fixedParameterValues );
     }
-
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl
-    << "renormalizationScale = " << renormalizationScale
-    << ", inverseRenormalizationScaleSquared = "
-    << inverseRenormalizationScaleSquared
-    << ", log( renormalizationScale ) = "
-    << log( renormalizationScale )
-    << std::endl
-    << "fixedParameterValues = { ";
-    for( std::vector< double >::const_iterator
-         parameterValue( fixedParameterValues.begin() );
-         parameterValue < fixedParameterValues.end();
-         ++parameterValue )
-    {
-      std::cout << *parameterValue << ",";
-    }
-    std::cout << " }" << std::endl;
-    std::vector< double > fieldConfiguration( FieldValuesOrigin() );
-    std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      scalarSquareMasses,
-                                      scalarMassesSquaredWithFactors );
-    std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      fermionSquareMasses,
-                                      fermionMassesSquaredWithFactors );
-    std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
-    AddMassesSquaredWithMultiplicity( fieldConfiguration,
-                                      vectorSquareMasses,
-                                      vectorMassesSquaredWithFactors );
-    std::cout << "For origin:"
-    << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
-    for( std::vector< DoubleVectorWithDouble >::const_iterator
-         massesWithFactor( scalarMassesSquaredWithFactors.begin() );
-         massesWithFactor < scalarMassesSquaredWithFactors.end();
-         ++massesWithFactor )
-    {
-      std::cout
-      << "[ factor: " << massesWithFactor->second
-      << ", masses-squared: { ";
-      for( std::vector< double >::const_iterator
-           massSquared( massesWithFactor->first.begin() );
-           massSquared < massesWithFactor->first.end();
-           ++massSquared )
-      {
-        std::cout << *massSquared << ",";
-      }
-      std::cout << " } ]" << std::endl;
-    }
-    std::cout << "}"
-    << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
-    for( std::vector< DoubleVectorWithDouble >::const_iterator
-         massesWithFactor( fermionMassesSquaredWithFactors.begin() );
-         massesWithFactor < fermionMassesSquaredWithFactors.end();
-         ++massesWithFactor )
-    {
-      std::cout
-      << "[ factor: " << massesWithFactor->second
-      << ", masses-squared: { ";
-      for( std::vector< double >::const_iterator
-           massSquared( massesWithFactor->first.begin() );
-           massSquared < massesWithFactor->first.end();
-           ++massSquared )
-      {
-        std::cout << *massSquared << ",";
-      }
-      std::cout << " } ]" << std::endl;
-    }
-    std::cout << "}"
-    << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
-    for( std::vector< DoubleVectorWithDouble >::const_iterator
-         massesWithFactor( vectorMassesSquaredWithFactors.begin() );
-         massesWithFactor < vectorMassesSquaredWithFactors.end();
-         ++massesWithFactor )
-    {
-      std::cout
-      << "[ factor: " << massesWithFactor->second
-      << ", masses-squared: { ";
-      for( std::vector< double >::const_iterator
-           massSquared( massesWithFactor->first.begin() );
-           massSquared < massesWithFactor->first.end();
-           ++massSquared )
-      {
-        std::cout << *massSquared << ",";
-      }
-      std::cout << " } ]" << std::endl;
-    }
-    std::cout << "}";
-    std::cout << std::endl;*/
   }
 
   // This returns a string that is valid Python with no indentation to evaluate
@@ -239,8 +119,113 @@ namespace VevaciousPlusPlus
      "                                      fixedScaleLagrangianParameters )\n"
      "           + LoopAndThermalCorrections( fv,\n"
      "                                       fixedScaleLagrangianParameters,\n"
-     "                                        fixedScaleInverseSquare\n"
+     "                                        fixedScaleInverseSquare,\n"
      "                                        temperatureInverseSquare ) )\n";
+     return stringBuilder.str();
+   }
+
+   // This is for debugging.
+   std::string FixedScaleOneLoopPotential::PrintEvaluation(
+                               std::vector< double > const& fieldConfiguration,
+                                          double const temperatureValue ) const
+   {
+     std::stringstream stringBuilder;
+     std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
+     AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                       scalarSquareMasses,
+                                       scalarMassesSquaredWithFactors );
+     std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
+     AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                       fermionSquareMasses,
+                                       fermionMassesSquaredWithFactors );
+     std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
+     AddMassesSquaredWithMultiplicity( fieldConfiguration,
+                                       vectorSquareMasses,
+                                       vectorMassesSquaredWithFactors );
+
+     stringBuilder << "FixedScaleOneLoopPotential::PrintEvaluation( "
+     << FieldConfigurationAsMathematica( fieldConfiguration )
+     << ", T =" << temperatureValue << " ) called."
+     << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
+     for( std::vector< DoubleVectorWithDouble >::const_iterator
+          massesWithFactor( scalarMassesSquaredWithFactors.begin() );
+          massesWithFactor < scalarMassesSquaredWithFactors.end();
+          ++massesWithFactor )
+     {
+       stringBuilder
+       << "[ factor: " << massesWithFactor->second
+       << ", masses-squared: { ";
+       for( std::vector< double >::const_iterator
+            massSquared( massesWithFactor->first.begin() );
+            massSquared < massesWithFactor->first.end();
+            ++massSquared )
+       {
+         stringBuilder << *massSquared << ",";
+       }
+       stringBuilder << " } ]" << std::endl;
+     }
+     stringBuilder << "}"
+     << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
+     for( std::vector< DoubleVectorWithDouble >::const_iterator
+          massesWithFactor( fermionMassesSquaredWithFactors.begin() );
+          massesWithFactor < fermionMassesSquaredWithFactors.end();
+          ++massesWithFactor )
+     {
+       stringBuilder
+       << "[ factor: " << massesWithFactor->second
+       << ", masses-squared: { ";
+       for( std::vector< double >::const_iterator
+            massSquared( massesWithFactor->first.begin() );
+            massSquared < massesWithFactor->first.end();
+            ++massSquared )
+       {
+         stringBuilder << *massSquared << ",";
+       }
+       stringBuilder << " } ]" << std::endl;
+     }
+     stringBuilder << "}"
+     << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
+     for( std::vector< DoubleVectorWithDouble >::const_iterator
+          massesWithFactor( vectorMassesSquaredWithFactors.begin() );
+          massesWithFactor < vectorMassesSquaredWithFactors.end();
+          ++massesWithFactor )
+     {
+       stringBuilder
+       << "[ factor: " << massesWithFactor->second
+       << ", masses-squared: { ";
+       for( std::vector< double >::const_iterator
+            massSquared( massesWithFactor->first.begin() );
+            massSquared < massesWithFactor->first.end();
+            ++massSquared )
+       {
+         stringBuilder << *massSquared << ",";
+       }
+       stringBuilder << " } ]" << std::endl;
+     }
+     stringBuilder << " }";
+     stringBuilder << std::endl;
+     stringBuilder << "treeLevelPotential = "
+     << treeLevelPotential( fieldConfiguration );
+     stringBuilder << std::endl;
+     stringBuilder << "polynomialLoopCorrections = "
+     << polynomialLoopCorrections( fieldConfiguration )
+     << std::endl;
+     stringBuilder << "LoopAndThermalCorrections = "
+     << LoopAndThermalCorrections( scalarMassesSquaredWithFactors,
+                                   fermionMassesSquaredWithFactors,
+                                   vectorMassesSquaredWithFactors,
+                                   inverseRenormalizationScaleSquared,
+                                   temperatureValue );
+     stringBuilder << std::endl;
+
+     stringBuilder
+     << "Total value = " << ( treeLevelPotential( fieldConfiguration )
+                              + polynomialLoopCorrections( fieldConfiguration )
+                   + LoopAndThermalCorrections( scalarMassesSquaredWithFactors,
+                                               fermionMassesSquaredWithFactors,
+                                                vectorMassesSquaredWithFactors,
+                                            inverseRenormalizationScaleSquared,
+                                                temperatureValue ) );
      return stringBuilder.str();
    }
 

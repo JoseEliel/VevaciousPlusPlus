@@ -57,7 +57,7 @@ namespace VevaciousPlusPlus
       scaleLogarithmPowerCoefficients.CoefficientVector().assign( 1,
                                                      (( numberOfScales == 0 ) ?
                                                           0.0 :
-      BOL::StringParser::stringToDouble( scalesWithStrings.front().second )) );
+                      std::atof( scalesWithStrings.front().second.c_str() )) );
     }
     else
     {
@@ -88,7 +88,7 @@ namespace VevaciousPlusPlus
                                                      powerIndex );
         }
         scaleDependenceVector( scaleIndex++ )
-        = BOL::StringParser::stringToDouble( (listIterator++)->second );
+        = std::atof( (listIterator++)->second.c_str() );
         // Post-increments on last use of each variable. Yey terseness.
       }
 

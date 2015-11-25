@@ -129,10 +129,11 @@ int main( int argumentCount,
   slhaManager( *lhaParameterManager );
   VevaciousPlusPlus::OldFixedScaleOneLoopPotential
   oldFixedScale( oldModelFilename,
-                 10.0,
+                 20.0,
                  true,
                  0.5,
                  slhaManager );
+  std::vector< double > const fieldOrigin( oldFixedScale.FieldValuesOrigin() );
 
   VevaciousPlusPlus::OldRgeImprovedOneLoopPotential
   oldRgeImproved( oldFixedScale );
@@ -152,6 +153,17 @@ int main( int argumentCount,
   newRgeImproved( newFixedScale );
 
   lhaParameterManager->NewParameterPoint( slhaFileName );
+  std::vector< double > fixedParameterValues;
+  lhaParameterManager->ParameterValues(
+                     log( lhaParameterManager->AppropriateSingleFixedScale() ),
+                                        fixedParameterValues );
+  double const oldFixedOriginLoop( oldFixedScale( fieldOrigin ) );
+  double const oldRgeOriginLoop( oldRgeImproved( fieldOrigin ) );
+  double const newFixedOriginLoop( newFixedScale( fieldOrigin ) );
+  double const newRgeOriginLoop( newRgeImproved( fieldOrigin ) );
+
+  oldFixedScale.WriteAsPython( "OldFixedPython.py" );
+  newFixedScale.WriteAsPython( "NewFixedPython.py" );
 
   /*std::cout
   << std::endl
@@ -168,10 +180,9 @@ int main( int argumentCount,
   std::cout << std::endl;
   std::cout << "New RGE tree = "
   << newRgeImproved.PolynomialApproximation().AsDebuggingString();
-  std::cout << std::endl;*/
+  std::cout << std::endl;
 
 
-  std::vector< double > const fieldOrigin( oldFixedScale.FieldValuesOrigin() );
   std::vector< double > unitHd( fieldOrigin );
   unitHd.front() = 1.0;
   std::vector< double > fixedParameterValues;
@@ -179,26 +190,15 @@ int main( int argumentCount,
                      log( lhaParameterManager->AppropriateSingleFixedScale() ),
                                         fixedParameterValues );
 
-  double const oldFixedOriginTree( oldFixedScale.QuickApproximation(
-                                         oldFixedScale.FieldValuesOrigin() ) );
   double const
-  oldFixedOriginLoop( oldFixedScale( oldFixedScale.FieldValuesOrigin() ) );
-
-  double const oldRgeOriginTree( oldRgeImproved.QuickApproximation(
-                                        oldRgeImproved.FieldValuesOrigin() ) );
+  oldFixedOriginTree( oldFixedScale.QuickApproximation( fieldOrigin ) );
   double const
-  oldRgeOriginLoop( oldRgeImproved( oldRgeImproved.FieldValuesOrigin() ) );
-
-  double const newFixedOriginTree( newFixedScale.PolynomialApproximation()(
-                                         newFixedScale.FieldValuesOrigin() ) );
+  oldRgeOriginTree( oldRgeImproved.QuickApproximation( fieldOrigin ) );
   double const
-  newFixedOriginLoop( newFixedScale( newFixedScale.FieldValuesOrigin() ) );
-
+  newFixedOriginTree( newFixedScale.PolynomialApproximation()( fieldOrigin ) );
   double const newRgeOriginTree( newRgeImproved.PolynomialApproximation()(
                                                           fixedParameterValues,
-                                        newRgeImproved.FieldValuesOrigin() ) );
-  double const
-  newRgeOriginLoop( newRgeImproved( newRgeImproved.FieldValuesOrigin() ) );
+                                                               fieldOrigin ) );
 
   std::cout  << std::endl
   << "oldFixedOriginTree = " << oldFixedOriginTree
@@ -260,11 +260,6 @@ int main( int argumentCount,
                                             ( 200.0 * randomCount ) );
     }
 
-    double const oldFixedRandomLoop( oldFixedScale( randomConfiguration ) );
-    double const newFixedRandomLoop( newFixedScale( randomConfiguration ) );
-    double const oldRgeRandomLoop( oldRgeImproved( randomConfiguration ) );
-    double const newRgeRandomLoop( newRgeImproved( randomConfiguration ) );
-
     std::cout
     << std::endl
     << oldFixedScale.FieldConfigurationAsMathematica( randomConfiguration )
@@ -304,7 +299,77 @@ int main( int argumentCount,
 
   }
   std::cout << std::endl;
+  std::cout
+  << std::endl
+  << "Random field configurations at random temperatures!" << std::endl;
+  double randomTemperature( 0.0 );
+  for( unsigned int randomCount( 0 );
+       randomCount < 10;
+       ++randomCount )
+  {
+    for( std::vector< double >::iterator
+         fieldValue( randomConfiguration.begin() );
+         fieldValue < randomConfiguration.end();
+         ++fieldValue )
+    {
+      *fieldValue
+      = BOL::UsefulStuff::flatRandomDouble( ( -200.0 * randomCount ),
+                                            ( 200.0 * randomCount ) );
+    }
+    randomTemperature
+    = BOL::UsefulStuff::flatRandomDouble( 0.0,
+                                          ( 100.0 * randomCount ) );
 
+    double const oldFixedRandomLoop( oldFixedScale( randomConfiguration,
+                                                    randomTemperature ) );
+    double const newFixedRandomLoop( newFixedScale( randomConfiguration,
+                                                    randomTemperature ) );
+    double const oldRgeRandomLoop( oldRgeImproved( randomConfiguration,
+                                                   randomTemperature ) );
+    double const newRgeRandomLoop( newRgeImproved( randomConfiguration,
+                                                   randomTemperature ) );
+
+    std::cout
+    << std::endl
+    << oldFixedScale.FieldConfigurationAsMathematica( randomConfiguration )
+    << " T = " << randomTemperature << std::endl
+    << " - level\t\tOld fixed\t\tNew fixed\t\tOld RGE  \t\tNew RGE  "
+    << std::endl
+    << " - tree:\t\t"
+    << oldFixedScale.QuickApproximation( randomConfiguration )
+    << "\t\t"
+    << newFixedScale.PolynomialApproximation()( randomConfiguration )
+    << "\t\t"
+    << oldRgeImproved.QuickApproximation( randomConfiguration )
+    << "\t\t"
+    << newRgeImproved.PolynomialApproximation()( fixedParameterValues,
+                                                 randomConfiguration )
+    << std::endl;
+    std::cout
+    << " - loop abs:\t\t"
+    << oldFixedRandomLoop
+    << "\t\t"
+    << newFixedRandomLoop
+    << "\t\t"
+    << oldRgeRandomLoop
+    << "\t\t"
+    << newRgeRandomLoop;
+    std::cout << std::endl;
+    std::cout
+    << " - loop rel:\t\t"
+    << ( oldFixedRandomLoop - oldFixedOriginLoop )
+    << "\t\t"
+    << ( newFixedRandomLoop - newFixedOriginLoop )
+    << "\t\t"
+    << ( oldRgeRandomLoop - oldRgeOriginLoop )
+    << "\t\t"
+    << ( newRgeRandomLoop - newRgeOriginLoop );
+    std::cout << std::endl;
+
+  }
+  std::cout << std::endl;*/
+
+  /*
   std::string const
   pathToHom4ps2( "/home/bol/BOL/ProjectDependencies/HOM4PS2/" );
   std::string const homotopyType( "2" );
@@ -323,14 +388,15 @@ int main( int argumentCount,
   newHom4ps2Runner( new VevaciousPlusPlus::Hom4ps2Runner( pathToHom4ps2,
                                                           homotopyType,
                                                           1.0 ) );
-  VevaciousPlusPlus::PolynomialAtFixedScalesSolver
-  newSolver( newFixedScale.PolynomialApproximation(),
-             *lhaParameterManager,
-             newHom4ps2Runner,
-             1,
-             true,
-             newFixedScale.NumberOfFieldVariables() );
-  newSolver( newHom4ps2Results );
+  VevaciousPlusPlus::PolynomialAtFixedScalesSolver*
+  newSolver( new VevaciousPlusPlus::PolynomialAtFixedScalesSolver(
+                                      newFixedScale.PolynomialApproximation(),
+                                                          *lhaParameterManager,
+                                                              newHom4ps2Runner,
+                                                                   1,
+                                                                   true,
+                                    newFixedScale.NumberOfFieldVariables() ) );
+  (*newSolver)( newHom4ps2Results );
 
   std::list< std::vector< double > > vectorSorter( oldHom4ps2Results.begin(),
                                                    oldHom4ps2Results.end() );
@@ -395,6 +461,66 @@ int main( int argumentCount,
     }
     std::cout << " }" << std::endl;
   }
+
+  VevaciousPlusPlus::MinuitPotentialMinimizer oldRoller( oldFixedScale,
+                                                         0.1,
+                                                         1.0,
+                                                         1 );
+  VevaciousPlusPlus::MinuitPotentialMinimizer*
+  newRoller( new VevaciousPlusPlus::MinuitPotentialMinimizer( newFixedScale,
+                                                              0.1,
+                                                              1.0,
+                                                              1 ) );
+
+  for( std::vector< std::vector< double > >::const_iterator
+       treeSolution( newHom4ps2Results.begin() );
+       treeSolution != newHom4ps2Results.end();
+       ++treeSolution )
+  {
+    VevaciousPlusPlus::PotentialMinimum
+    oldMinimum( oldRoller( *treeSolution ) );
+    VevaciousPlusPlus::PotentialMinimum
+    newMinimum( (*newRoller)( *treeSolution ) );
+    std::cout
+    << std::endl
+    << "Starting point \t\t\t\t"
+    << newFixedScale.FieldConfigurationAsMathematica( *treeSolution )
+    << std::endl << "New roller with old potential => \t"
+    << newFixedScale.FieldConfigurationAsMathematica(
+                                              oldMinimum.FieldConfiguration() )
+    << std::endl << "New roller with new potential => \t"
+    << newFixedScale.FieldConfigurationAsMathematica(
+                                              newMinimum.FieldConfiguration() )
+    << std::endl << "Potential difference from origin: old(old) = "
+    << ( oldFixedScale( oldMinimum.FieldConfiguration() )
+         - oldFixedOriginLoop )
+    << ", old(new) = " << ( oldFixedScale( newMinimum.FieldConfiguration() )
+                            - oldFixedOriginLoop )
+    << ", new(old) = " << ( newFixedScale( oldMinimum.FieldConfiguration() )
+                            - newFixedOriginLoop )
+    << ", new(new) = " << ( newFixedScale( newMinimum.FieldConfiguration() )
+                            - newFixedOriginLoop );
+    std::cout << std::endl;
+  }
+
+  std::vector< double > fieldConfiguration( newHom4ps2Results.back() );
+  std::cout
+  << std::endl
+  << oldFixedScale.PrintEvaluation( fieldConfiguration )
+  << std::endl
+  << newFixedScale.PrintEvaluation( fieldConfiguration );
+  std::cout << std::endl;
+
+
+
+  VevaciousPlusPlus::GradientFromStartingPoints newMinimizer( newFixedScale,
+                                                              newSolver,
+                                                              newRoller,
+                                                              0.05,
+                                                              4.0 );
+
+  newMinimizer.FindMinima( 0.0 );
+  */
 
   // Cleaning up.
   delete lhaParameterManager;

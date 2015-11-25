@@ -79,88 +79,6 @@ namespace VevaciousPlusPlus
                                       vectorSquareMasses,
                                       vectorMassesSquaredWithFactors );
 
-    // debugging:
-    /*std::cout << std::endl << "debugging:"
-    << std::endl << "OldFixedScaleOneLoopPotential::operator()( "
-    << FieldConfigurationAsMathematica( fieldConfiguration )
-    << ", T =" << temperatureValue
-    << " ) called. squaredLengthBeyondCap = " << squaredLengthBeyondCap
-    << ", cappedFieldConfiguration = "
-    << FieldConfigurationAsMathematica( cappedFieldConfiguration )
-    << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
-    for( std::vector< DoubleVectorWithDouble >::const_iterator
-         massesWithFactor( scalarMassesSquaredWithFactors.begin() );
-         massesWithFactor < scalarMassesSquaredWithFactors.end();
-         ++massesWithFactor )
-    {
-      std::cout
-      << "[ factor: " << massesWithFactor->second
-      << ", masses-squared: { ";
-      for( std::vector< double >::const_iterator
-           massSquared( massesWithFactor->first.begin() );
-           massSquared < massesWithFactor->first.end();
-           ++massSquared )
-      {
-        std::cout << *massSquared << ",";
-      }
-      std::cout << " } ]" << std::endl;
-    }
-    std::cout << "}"
-    << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
-    for( std::vector< DoubleVectorWithDouble >::const_iterator
-         massesWithFactor( fermionMassesSquaredWithFactors.begin() );
-         massesWithFactor < fermionMassesSquaredWithFactors.end();
-         ++massesWithFactor )
-    {
-      std::cout
-      << "[ factor: " << massesWithFactor->second
-      << ", masses-squared: { ";
-      for( std::vector< double >::const_iterator
-           massSquared( massesWithFactor->first.begin() );
-           massSquared < massesWithFactor->first.end();
-           ++massSquared )
-      {
-        std::cout << *massSquared << ",";
-      }
-      std::cout << " } ]" << std::endl;
-    }
-    std::cout << "}"
-    << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
-    for( std::vector< DoubleVectorWithDouble >::const_iterator
-         massesWithFactor( vectorMassesSquaredWithFactors.begin() );
-         massesWithFactor < vectorMassesSquaredWithFactors.end();
-         ++massesWithFactor )
-    {
-      std::cout
-      << "[ factor: " << massesWithFactor->second
-      << ", masses-squared: { ";
-      for( std::vector< double >::const_iterator
-           massSquared( massesWithFactor->first.begin() );
-           massSquared < massesWithFactor->first.end();
-           ++massSquared )
-      {
-        std::cout << *massSquared << ",";
-      }
-      std::cout << " } ]" << std::endl;
-    }
-    std::cout << " }";
-    std::cout << std::endl;
-    std::cout << "treeLevelPotential = "
-    << treeLevelPotential( cappedFieldConfiguration );
-    std::cout << std::endl;
-    std::cout << "polynomialLoopCorrections = "
-    << polynomialLoopCorrections( cappedFieldConfiguration )
-    // << std::endl << polynomialLoopCorrections.AsDebuggingString();
-    << std::endl;
-    std::cout << "LoopAndThermalCorrections = "
-    << LoopAndThermalCorrections( cappedFieldConfiguration,
-                                  scalarMassesSquaredWithFactors,
-                                  fermionMassesSquaredWithFactors,
-                                  vectorMassesSquaredWithFactors,
-                                  inverseRenormalizationScaleSquared,
-                                  temperatureValue );
-    std::cout << std::endl;*/
-
     return ( ( squaredLengthBeyondCap * squaredLengthBeyondCap )
              + treeLevelPotential( cappedFieldConfiguration )
              + polynomialLoopCorrections( cappedFieldConfiguration )
@@ -170,6 +88,120 @@ namespace VevaciousPlusPlus
                                           vectorMassesSquaredWithFactors,
                                           inverseRenormalizationScaleSquared,
                                           temperatureValue ) );
+  }
+
+  // This is for debugging.
+  std::string OldFixedScaleOneLoopPotential::PrintEvaluation(
+                              std::vector< double > const& fieldConfiguration,
+                                         double const temperatureValue ) const
+  {
+    std::stringstream stringBuilder;
+    std::vector< double > cappedFieldConfiguration( fieldConfiguration );
+    double const squaredLengthBeyondCap( CapFieldConfiguration(
+                                                  cappedFieldConfiguration ) );
+
+    std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
+                                      scalarSquareMasses,
+                                      scalarMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
+                                      fermionSquareMasses,
+                                      fermionMassesSquaredWithFactors );
+    std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors;
+    AddMassesSquaredWithMultiplicity( cappedFieldConfiguration,
+                                      vectorSquareMasses,
+                                      vectorMassesSquaredWithFactors );
+
+    stringBuilder << "OldFixedScaleOneLoopPotential::PrintEvaluation( "
+    << FieldConfigurationAsMathematica( fieldConfiguration )
+    << ", T =" << temperatureValue << " ) called. squaredLengthBeyondCap = "
+    << squaredLengthBeyondCap
+    << ", cappedFieldConfiguration = "
+    << FieldConfigurationAsMathematica( cappedFieldConfiguration )
+    << std::endl << "scalarMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( scalarMassesSquaredWithFactors.begin() );
+         massesWithFactor < scalarMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      stringBuilder
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        stringBuilder << *massSquared << ",";
+      }
+      stringBuilder << " } ]" << std::endl;
+    }
+    stringBuilder << "}"
+    << std::endl << "fermionMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( fermionMassesSquaredWithFactors.begin() );
+         massesWithFactor < fermionMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      stringBuilder
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        stringBuilder << *massSquared << ",";
+      }
+      stringBuilder << " } ]" << std::endl;
+    }
+    stringBuilder << "}"
+    << std::endl << "vectorMassesSquaredWithFactors = {" << std::endl;
+    for( std::vector< DoubleVectorWithDouble >::const_iterator
+         massesWithFactor( vectorMassesSquaredWithFactors.begin() );
+         massesWithFactor < vectorMassesSquaredWithFactors.end();
+         ++massesWithFactor )
+    {
+      stringBuilder
+      << "[ factor: " << massesWithFactor->second
+      << ", masses-squared: { ";
+      for( std::vector< double >::const_iterator
+           massSquared( massesWithFactor->first.begin() );
+           massSquared < massesWithFactor->first.end();
+           ++massSquared )
+      {
+        stringBuilder << *massSquared << ",";
+      }
+      stringBuilder << " } ]" << std::endl;
+    }
+    stringBuilder << " }";
+    stringBuilder << std::endl;
+    stringBuilder << "treeLevelPotential = "
+    << treeLevelPotential( cappedFieldConfiguration );
+    stringBuilder << std::endl;
+    stringBuilder << "polynomialLoopCorrections = "
+    << polynomialLoopCorrections( cappedFieldConfiguration )
+    << std::endl;
+    stringBuilder << "LoopAndThermalCorrections = "
+    << LoopAndThermalCorrections( cappedFieldConfiguration,
+                                  scalarMassesSquaredWithFactors,
+                                  fermionMassesSquaredWithFactors,
+                                  vectorMassesSquaredWithFactors,
+                                  inverseRenormalizationScaleSquared,
+                                  temperatureValue );
+    stringBuilder << std::endl;
+
+    stringBuilder
+    << "Total value = " << ( treeLevelPotential( cappedFieldConfiguration )
+                        + polynomialLoopCorrections( cappedFieldConfiguration )
+                         + LoopAndThermalCorrections( cappedFieldConfiguration,
+                                                scalarMassesSquaredWithFactors,
+                                               fermionMassesSquaredWithFactors,
+                                                vectorMassesSquaredWithFactors,
+                                            inverseRenormalizationScaleSquared,
+                                                      temperatureValue ) );
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

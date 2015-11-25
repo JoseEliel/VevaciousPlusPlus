@@ -75,6 +75,7 @@ namespace VevaciousPlusPlus
     {
       throw std::runtime_error( "Could not parse <FieldVariables>." );
     }
+
     BOL::StringParser::parseByChar(
                                   fileParser.getTrimmedCurrentElementContent(),
                                     elementLines,
@@ -131,9 +132,10 @@ namespace VevaciousPlusPlus
     {
       throw std::runtime_error( "Could not parse <DsbMinimum>." );
     }
+
     elementLines.clearEntries();
     BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
+                                  fileParser.getTrimmedCurrentElementContent(),
                                     elementLines,
                                     '\n');
     for( int lineIndex( 0 );
@@ -187,11 +189,11 @@ namespace VevaciousPlusPlus
     std::string
     renormalizationScheme( fileParser.getCurrentElementAttributes().find(
                                            "RenormalizationScheme" )->second );
-    if( renormalizationScheme.compare( "MSBAR" ) == 0 )
+    if( renormalizationScheme == "MSBAR" )
     {
       vectorMassCorrectionConstant = ( 5.0 / 6.0 );
     }
-    else if( renormalizationScheme.compare( "DRBAR" ) == 0 )
+    else if( renormalizationScheme == "DRBAR" )
     {
       vectorMassCorrectionConstant = 1.5;
     }
@@ -576,7 +578,7 @@ namespace VevaciousPlusPlus
     "                                    VectorMassesSquaredWithFactors( fv,\n"
     "                                                                  lp ),\n"
     "                                " << vectorMassCorrectionConstant << ",\n"
-    "                                            invQSq )\\n\" )\n"
+    "                                            invQSq )\n"
     "    totalQuantumCorrections += ( 3.0 * currentCorrection )\n"
     "    return ( totalQuantumCorrections * loopFactor )\n"
     "\n"

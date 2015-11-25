@@ -63,8 +63,8 @@ namespace VevaciousPlusPlus
       }
       else
       {
-        logScalesWithValues[ 0 ].second = BOL::StringParser::stringToDouble(
-                                            scalesWithStrings.front().second );
+        logScalesWithValues[ 0 ].second
+        = std::atof( scalesWithStrings.front().second.c_str() );
         logScalesWithValues[ 1 ].second = logScalesWithValues[ 0 ].second;
       }
     }
@@ -81,7 +81,7 @@ namespace VevaciousPlusPlus
       {
         logScalesWithValues[ scaleIndex ].first = log( listIterator->first );
         logScalesWithValues[ scaleIndex++ ].second
-        = BOL::StringParser::stringToDouble( (listIterator++)->second );
+        = std::atof( (listIterator++)->second.c_str() );
         // Post-increments on last use of each variable. Yey terseness.
       }
       lastIndex = ( numberOfScales - 1 );
@@ -96,47 +96,56 @@ namespace VevaciousPlusPlus
     stringBuilder << std::setprecision( 12 )
     << PythonIndent( indentationSpaces );
 
-    for( size_t whichIndex( 1 );
-         whichIndex <= lastIndex;
-         ++whichIndex )
+    if( lastIndex == 1 )
     {
-      // The first iteration should print "if (...):".
-      // The subsequent iterations should have newlines before printing.
-      // Iterations after the first but before the last should print
-      // "elif(...):" after the newline.
-      // The last iterations should print "else:" after the newline.
-      if( whichIndex > 1 )
-      {
-        stringBuilder
-        << PythonNewlineThenIndent( indentationSpaces ) << "el";
-      }
-      if( whichIndex < lastIndex )
-      {
-        stringBuilder
-        << "if ( lnQ < " << logScalesWithValues[ whichIndex ].first << " ):";
-      }
-      else
-      {
-        stringBuilder << "se:";
-      }
-
       stringBuilder
-      << PythonNewlineThenIndent( indentationSpaces + 2 )
       << "parameterValues[ " << IndexInValuesVector() << " ] = ( "
-      << logScalesWithValues[ whichIndex ].second << " + ( ( "
-      << ( logScalesWithValues[ whichIndex ].second
-            - logScalesWithValues[ whichIndex - 1 ].second )
-      << " * ( lnQ - " << logScalesWithValues[ whichIndex ].first
-      << " ) ) / "
-      << ( logScalesWithValues[ whichIndex ].first
-           - logScalesWithValues[ whichIndex - 1 ].first )
-      << " ) )";
-      // The above should print
-      // [el]if ( lnQ < [lnQi] ): [or just "else" for the last iteration]
-      //   parameterValues[ n ]
-      //   = ( [Vi]
-      //       + ( ( [Vi-Vbefore] * ( lnQ - lnQi ) )
-      //           / [lnQi-lnQbefore] ) )
+      << logScalesWithValues[ 0 ].second << " )";
+    }
+    else
+    {
+      for( size_t whichIndex( 1 );
+           whichIndex <= lastIndex;
+           ++whichIndex )
+      {
+        // The first iteration should print "if (...):".
+        // The subsequent iterations should have newlines before printing.
+        // Iterations after the first but before the last should print
+        // "elif(...):" after the newline.
+        // The last iterations should print "else:" after the newline.
+        if( whichIndex > 1 )
+        {
+          stringBuilder
+          << PythonNewlineThenIndent( indentationSpaces ) << "el";
+        }
+        if( whichIndex < lastIndex )
+        {
+          stringBuilder
+          << "if ( lnQ < " << logScalesWithValues[ whichIndex ].first << " ):";
+        }
+        else
+        {
+          stringBuilder << "se:";
+        }
+
+        stringBuilder
+        << PythonNewlineThenIndent( indentationSpaces + 2 )
+        << "parameterValues[ " << IndexInValuesVector() << " ] = ( "
+        << logScalesWithValues[ whichIndex ].second << " + ( ( "
+        << ( logScalesWithValues[ whichIndex ].second
+             - logScalesWithValues[ whichIndex - 1 ].second )
+        << " * ( lnQ - " << logScalesWithValues[ whichIndex ].first
+        << " ) ) / "
+        << ( logScalesWithValues[ whichIndex ].first
+             - logScalesWithValues[ whichIndex - 1 ].first )
+        << " ) )";
+        // The above should print
+        // [el]if ( lnQ < [lnQi] ): [or just "else" for the last iteration]
+        //   parameterValues[ n ]
+        //   = ( [Vi]
+        //       + ( ( [Vi-Vbefore] * ( lnQ - lnQi ) )
+        //           / [lnQi-lnQbefore] ) )
+      }
     }
     return stringBuilder.str();
   }

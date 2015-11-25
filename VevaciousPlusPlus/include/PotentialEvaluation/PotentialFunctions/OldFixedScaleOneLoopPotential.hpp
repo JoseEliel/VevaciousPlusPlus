@@ -67,6 +67,11 @@ namespace VevaciousPlusPlus
     virtual PolynomialGradientTargetSystem* HomotopyContinuationTargetSystem()
     { return &homotopyContinuationTargetSystem; }
 
+    // This is for debugging.
+    std::string
+    PrintEvaluation( std::vector< double > const& fieldConfiguration,
+                     double const temperatureValue = 0.0 ) const;
+
 
   protected:
     double inverseRenormalizationScaleSquared;

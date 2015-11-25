@@ -71,6 +71,8 @@ namespace VevaciousPlusPlus
   // the potential at the field origin).
   inline void RgeImprovedOneLoopPotential::respondToObservedSignal()
   {
+    UpdateDsbValues(
+             log( lagrangianParameterManager.AppropriateSingleFixedScale() ) );
     double const
     minimumScale( lagrangianParameterManager.MinimumEvaluationScale() );
     minimumScaleSquared = ( minimumScale * minimumScale );

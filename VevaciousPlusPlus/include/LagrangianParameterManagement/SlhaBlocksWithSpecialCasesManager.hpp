@@ -68,6 +68,15 @@ namespace VevaciousPlusPlus
     ParameterValues( double const logarithmOfScale,
                      std::vector< double >& destinationVector ) const;
 
+    // This first writes a function used by some derived parameters, and then
+    // writes a function in the form
+    // def LagrangianParameters( lnQ ): return ...
+    // to return an array of the values of the Lagrangian parameters evaluated
+    // at the scale exp(lnQ) (i.e. the logarithm of the scale is given as the
+    // argument), in the order in which a call to ParametersAtScale would
+    // return them internal to this C++ code.
+    virtual std::string ParametersAsPython() const;
+
     // This is mainly for debugging.
     virtual std::string AsDebuggingString() const;
 
@@ -156,6 +165,11 @@ namespace VevaciousPlusPlus
                                                std::string const& blockString )
     { aliasesToCaseStrings[ caseString ]
       = aliasesToCaseStrings[ FormatVariable( blockString ) ] = caseString; }
+
+    // This returns a string which is the concatenated set of strings from
+    // parameter functionoids giving their Python evaluations.
+    virtual std::string
+    ParametersInPythonFunction( unsigned int const indentationSpaces ) const;
   };
 
 
@@ -215,6 +229,28 @@ namespace VevaciousPlusPlus
       = (*(*parameterInterpolator))( logarithmOfScale,
                                      destinationVector );
     }
+  }
+
+  // This first writes a function used by some derived parameters, and then
+  // writes a function in the form
+  // def LagrangianParameters( lnQ ): return ...
+  // to return an array of the values of the Lagrangian parameters evaluated
+  // at the scale exp(lnQ) (i.e. the logarithm of the scale is given as the
+  // argument), in the order in which a call to ParametersAtScale would
+  // return them internal to this C++ code.
+  inline std::string
+  SlhaBlocksWithSpecialCasesManager::ParametersAsPython() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << "def FirstIfNonzeroOtherwiseSecond( firstValue, secondValue ):\n"
+    << "  if ( firstValue != 0.0 ):\n"
+    << "    return firstValue\n"
+    << "  else:\n"
+    << "    return secondValue\n"
+    << "\n"
+    << LesHouchesAccordBlockEntryManager::ParametersAsPython();
+    return stringBuilder.str();
   }
 
   // This adds newParameter to activeDerivedParameters and updates
@@ -375,6 +411,28 @@ namespace VevaciousPlusPlus
                                                            0 );
     return temporaryParameter( squareMass,
                                linearMass );
+  }
+
+  // This returns a string which is the concatenated set of strings from
+  // parameter functionoids giving their Python evaluations.
+  inline std::string
+  SlhaBlocksWithSpecialCasesManager::ParametersInPythonFunction(
+                                   unsigned int const indentationSpaces ) const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder
+    << LesHouchesAccordBlockEntryManager::ParametersInPythonFunction(
+                                                           indentationSpaces );
+    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+         activeParameter( activeDerivedParameters.begin() );
+         activeParameter < activeDerivedParameters.end();
+         ++activeParameter )
+    {
+      stringBuilder
+      << (*activeParameter)->PythonParameterEvaluation( indentationSpaces )
+      << "\n";
+    }
+    return stringBuilder.str();
   }
 
 } /* namespace VevaciousPlusPlus */

@@ -84,7 +84,7 @@ namespace VevaciousPlusPlus
          parameterIndex < parameterIndices.size();
          ++parameterIndex )
     {
-      stringBuilder << " * lp[ " << parameterIndex << " ]";
+      stringBuilder << " * lp[ " << parameterIndices[ parameterIndex ] << " ]";
     }
     for( size_t fieldIndex( 0 );
          fieldIndex < fieldPowersByIndex.size();

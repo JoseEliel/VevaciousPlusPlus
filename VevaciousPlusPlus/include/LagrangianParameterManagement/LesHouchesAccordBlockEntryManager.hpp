@@ -112,7 +112,7 @@ namespace VevaciousPlusPlus
   protected:
     // It is probably better to use a set of SlhaLinearlyInterpolatedBlockEntry
     // objects rather than a set of SlhaPolynomialFitBlockEntry objects.
-    typedef SlhaPolynomialFitBlockEntry LhaBlockEntryInterpolator;
+    typedef SlhaLinearlyInterpolatedBlockEntry LhaBlockEntryInterpolator;
 
     // It is necessary to keep track of the number of active parameters
     // separately from the size of activeParametersToIndices because several
@@ -262,7 +262,14 @@ namespace VevaciousPlusPlus
   LesHouchesAccordBlockEntryManager::ParametersAsPython() const
   {
     std::stringstream stringBuilder;
-    stringBuilder << "def LagrangianParameters( lnQ ):\n"
+    stringBuilder
+    << "def FirstIfNonzeroOtherwiseSecond( firstValue, secondValue ):\n"
+    << "  if ( firstValue != 0.0 ):\n"
+    << "    return firstValue\n"
+    << "  else:\n"
+    << "    return secondValue\n"
+    << "\n"
+    << "def LagrangianParameters( lnQ ):\n"
     << "  parameterValues = [ 0.0 ] * " << numberOfDistinctActiveParameters
     << "\n";
     stringBuilder << ParametersInPythonFunction( 2 );

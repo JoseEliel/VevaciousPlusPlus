@@ -36,14 +36,6 @@ namespace VevaciousPlusPlus
     maximumScaleType( maximumScaleType ),
     maximumScaleArgument( maximumScaleArgument )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "LesHouchesAccordBlockEntryManager using SlhaPolynomialFitBlockEntry"
-        " objects! Probably should change this to"
-        " SlhaLinearlyInterpolatedBlockEntry objects.";
-    std::cout << std::endl;/**/
-
     ParseValidBlocks( validBlocksString );
   }
 
@@ -69,13 +61,7 @@ namespace VevaciousPlusPlus
     maximumScaleType( maximumScaleType ),
     maximumScaleArgument( maximumScaleArgument )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "LesHouchesAccordBlockEntryManager using SlhaPolynomialFitBlockEntry"
-        " objects! Probably should change this to"
-        " SlhaLinearlyInterpolatedBlockEntry objects.";
-    std::cout << std::endl;/**/
+    // This constructor is just an initialization list.
   }
 
   LesHouchesAccordBlockEntryManager::LesHouchesAccordBlockEntryManager(
@@ -94,14 +80,6 @@ namespace VevaciousPlusPlus
     maximumScaleType( "FixedNumber" ),
     maximumScaleArgument( "1.0" )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "LesHouchesAccordBlockEntryManager using SlhaPolynomialFitBlockEntry"
-        " objects! Probably should change this to"
-        " SlhaLinearlyInterpolatedBlockEntry objects.";
-    std::cout << std::endl;/**/
-
     BOL::AsciiXmlParser fileParser;
     fileParser.openRootElementOfFile( xmlFileName );
     std::string renormalizationScaleChoices;

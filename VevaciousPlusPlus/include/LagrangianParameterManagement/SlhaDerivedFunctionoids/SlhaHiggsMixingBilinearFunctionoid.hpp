@@ -69,7 +69,7 @@ namespace VevaciousPlusPlus
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = ( ( parameterValues[ " << treePseudoscalarMassSquaredIndex
     << " ] * parameterValues[ " << tanBetaIndex
-    << " ] ) / ( 1.0 + ( parameterValues[ \" << tanBetaIndex << \" ] )**2 ) )";
+    << " ] ) / ( 1.0 + ( parameterValues[ " << tanBetaIndex << " ] )**2 ) )";
     return stringBuilder.str();
   }
 

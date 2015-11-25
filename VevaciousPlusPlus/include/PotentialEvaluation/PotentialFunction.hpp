@@ -91,6 +91,11 @@ namespace VevaciousPlusPlus
     size_t numberOfFields;
     std::vector< std::string > dsbFieldInputStrings;
     std::vector< double > dsbFieldValueInputs;
+
+    // This updates the values of dsbFieldValueInputs based on asking
+    // lagrangianParameterManager for once-off evaluations of the keywords in
+    // dsbFieldInputStrings.
+    void UpdateDsbValues( double const logOfScale );
   };
 
 
@@ -158,6 +163,25 @@ namespace VevaciousPlusPlus
       }
     }
     return -1;
+  }
+
+  // This updates the values of dsbFieldValueInputs based on asking
+  // lagrangianParameterManager for once-off evaluations of the keywords in
+  // dsbFieldInputStrings.
+  inline void PotentialFunction::UpdateDsbValues( double const logOfScale )
+  {
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      if( !(dsbFieldInputStrings[ fieldIndex ].empty()) )
+      {
+        dsbFieldValueInputs[ fieldIndex ]
+        = lagrangianParameterManager.OnceOffParameter(
+                                            dsbFieldInputStrings[ fieldIndex ],
+                                                       logOfScale );
+      }
+    }
   }
 
 } /* namespace VevaciousPlusPlus */
