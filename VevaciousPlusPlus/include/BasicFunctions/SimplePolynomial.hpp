@@ -19,16 +19,34 @@ namespace VevaciousPlusPlus
   class SimplePolynomial
   {
   public:
-    SimplePolynomial();
+    SimplePolynomial() : coefficientVector(),
+                         leadingPower( 0 ) {}
+
     SimplePolynomial( size_t const reserveSize,
-                      size_t const leadingPower = 0 );
+                      size_t const leadingPower = 0 ) :
+      coefficientVector( reserveSize,
+                         0.0 ),
+      leadingPower( leadingPower ) {}
+
     SimplePolynomial( std::vector< double > const& coefficientVector,
-                      size_t const leadingPower = 0 );
+                      size_t const leadingPower = 0 ) :
+      coefficientVector( coefficientVector ),
+      leadingPower( leadingPower ) {}
+
     SimplePolynomial( Eigen::VectorXd const& eigenVector,
                       size_t const leadingPower = 0,
-                      size_t extraEmptyEntriesAtConstruction = 0 );
-    SimplePolynomial( SimplePolynomial const& copySource );
-    virtual ~SimplePolynomial();
+                      size_t extraEmptyEntriesAtConstruction = 0 ) :
+      coefficientVector(),
+      leadingPower( leadingPower )
+    { CopyFromEigen( eigenVector,
+                     leadingPower,
+                     extraEmptyEntriesAtConstruction ); }
+
+    SimplePolynomial( SimplePolynomial const& copySource ) :
+      coefficientVector( copySource.coefficientVector ),
+      leadingPower( copySource.leadingPower ) {}
+
+    virtual ~SimplePolynomial() {}
 
 
     // This returns the sum of coefficientVector[ p ] * inputValue^p over p.

@@ -35,21 +35,36 @@ INCLUDES=-I./include/ \
 CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
+
+LAGRANGIANPARAMETERMANAGEMENT= source/LagrangianParameterManagement/
+BUILDINGBLOCKS= source/PotentialEvaluation/BuildingBlocks/
 BOUNCEACTIONPATHFINDING= source/BounceActionEvaluation/BounceActionPathFinding/
 PATHPARAMETERIZATION= source/BounceActionEvaluation/PathParameterization/
 MASSESSQUAREDCALCULATORS= source/PotentialEvaluation/MassesSquaredCalculators/
 PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
-LAGRANGIANPARAMETERMANAGEMENT= source/LagrangianParameterManagement/
 SLHADERIVEDFUNCTIONOIDS= $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoids/
 POTENTIALMINIMIZATION= source/PotentialMinimization/
 HOMOTOPYCONTINUATION= $(POTENTIALMINIMIZATION)/HomotopyContinuation/
 STARTINGPOINTGENERATION= $(POTENTIALMINIMIZATION)/StartingPointGeneration/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALMINIMIZATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
-SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
- source/BasicFunctions/ParametersAndFieldsProductSum.cpp \
- source/BasicFunctions/PolynomialSum.cpp \
+SOURCES=  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/LhaLinearlyInterpolatedBlockEntry.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/LhaPolynomialFitBlockEntry.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/LhaTwoSourceFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/LhaDifferenceFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaDsbHiggsVevFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaHiggsMixingBilinearFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaMassSquaredDiagonalFunctionoid.cpp \
+ $(SLHADERIVEDFUNCTIONOIDS)/SlhaTrilinearDiagonalFunctionoid.cpp \
+ $(BUILDINGBLOCKS)/ParametersAndFieldsProduct.cpp \
+ $(BUILDINGBLOCKS)/ParametersAndFieldsProduct.cpp
+
+OLDSOURCES= source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/PolynomialTerm.cpp \
  source/BasicFunctions/ProductOfPolynomialSums.cpp \
  source/BasicFunctions/SimplePolynomial.cpp \
@@ -94,22 +109,9 @@ SOURCES= source/BasicFunctions/ParametersAndFieldsProduct.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaDsbHiggsVevFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaHiggsMixingBilinearFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaMassSquaredDiagonalFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaTrilinearDiagonalFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaTwoSourceFunctionoid.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaInterpolatedParameterFunctionoid.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaLinearlyInterpolatedBlockEntry.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaPolynomialFitBlockEntry.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaSourcedParameterFunctionoid.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \

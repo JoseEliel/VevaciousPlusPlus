@@ -69,8 +69,7 @@ namespace LHPC
   inline void
   ParsingUtilities::TransformToUppercase( std::string& stringToTransform )
   {
-    for( std::string::iterator
-         stringCharacter( stringToTransform.begin() );
+    for( std::string::iterator stringCharacter( stringToTransform.begin() );
          stringCharacter != stringToTransform.end();
          ++stringCharacter )
     {
@@ -121,6 +120,7 @@ namespace LHPC
     }
     return returnVector;
   }
+
 }
 
 #endif /* LHPC_PARSINGUTILITIES_HPP_ */

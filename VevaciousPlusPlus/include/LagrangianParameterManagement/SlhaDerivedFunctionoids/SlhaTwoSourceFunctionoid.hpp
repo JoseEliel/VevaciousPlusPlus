@@ -8,13 +8,13 @@
 #ifndef SLHATWOSOURCEFUNCTIONOID_HPP_
 #define SLHATWOSOURCEFUNCTIONOID_HPP_
 
+#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaTwoSourceFunctionoid : public SlhaSourcedParameterFunctionoid
+  class SlhaTwoSourceFunctionoid : public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaTwoSourceFunctionoid( size_t const indexInValuesVector,

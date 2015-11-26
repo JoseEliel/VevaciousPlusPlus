@@ -8,12 +8,12 @@
 #ifndef POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 
+#include "../BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
-#include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
@@ -119,7 +119,7 @@ namespace VevaciousPlusPlus
     size_t
     PutNextNumberOrVariableIntoPolynomial( std::string const& stringToParse,
                                            size_t wordStart,
-                                    ParametersAndFieldsProduct& polynomialTerm,
+                                    ParametersAndFieldsProductTerm& polynomialTerm,
                                            bool& imaginaryTerm );
 
     // This appends the masses-squared and multiplicity from each

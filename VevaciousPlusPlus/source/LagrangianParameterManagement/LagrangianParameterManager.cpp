@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   LagrangianParameterManager::LagrangianParameterManager() :
-    BOL::BasicObserved()
+    LHPC::BasicObserved()
   {
     // This constructor is just an initialization list.
   }
@@ -52,4 +52,5 @@ namespace VevaciousPlusPlus
                            stringToSeparate.substr( ( openBracket + 1 ),
                              ( stringToSeparate.size() - openBracket - 2 ) ) );
   }
+
 } /* namespace VevaciousPlusPlus */

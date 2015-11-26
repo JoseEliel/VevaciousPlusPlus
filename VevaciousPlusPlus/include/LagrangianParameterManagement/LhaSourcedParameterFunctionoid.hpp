@@ -1,23 +1,24 @@
 /*
- * SlhaSourcedParameterFunctionoid.hpp
+ * LhaSourcedParameterFunctionoid.hpp
  *
  *  Created on: Oct 28, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef SLHASOURCEDPARAMETERFUNCTIONOID_HPP_
-#define SLHASOURCEDPARAMETERFUNCTIONOID_HPP_
+#ifndef LHASOURCEDPARAMETERFUNCTIONOID_HPP_
+#define LHASOURCEDPARAMETERFUNCTIONOID_HPP_
 
 #include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaSourcedParameterFunctionoid
+  class LhaSourcedParameterFunctionoid
   {
   public:
-    SlhaSourcedParameterFunctionoid( size_t const indexInValuesVector );
-    virtual ~SlhaSourcedParameterFunctionoid();
+    LhaSourcedParameterFunctionoid( size_t const indexInValuesVector ) :
+      indexInValuesVector( indexInValuesVector ) {}
+    virtual ~LhaSourcedParameterFunctionoid() {}
 
 
     size_t IndexInValuesVector() const { return indexInValuesVector; }
@@ -53,4 +54,4 @@ namespace VevaciousPlusPlus
 
 } /* namespace VevaciousPlusPlus */
 
-#endif /* SLHASOURCEDPARAMETERFUNCTIONOID_HPP_ */
+#endif /* LHASOURCEDPARAMETERFUNCTIONOID_HPP_ */

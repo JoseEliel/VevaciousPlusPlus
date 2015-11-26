@@ -9,8 +9,8 @@
 #define SLHACOMPATIBLEWITHSARAHMANAGER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LhaSourcedParameterFunctionoid.hpp"
 #include "SlhaBlocksWithSpecialCasesManager.hpp"
-#include "SlhaSourcedParameterFunctionoid.hpp"
 #include "SlhaDerivedFunctionoids/SlhaTwoSourceFunctionoid.hpp"
 #include "SlhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
 #include "SlhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"

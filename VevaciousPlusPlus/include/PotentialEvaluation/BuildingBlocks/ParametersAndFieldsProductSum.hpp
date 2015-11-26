@@ -2,14 +2,14 @@
  * ParametersAndFieldsProductSum.hpp
  *
  *  Created on: Oct 9, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
 #ifndef PARAMETERSANDFIELDSPRODUCTSUM_HPP_
 #define PARAMETERSANDFIELDSPRODUCTSUM_HPP_
 
 #include "CommonIncludes.hpp"
-#include "ParametersAndFieldsProduct.hpp"
+#include "ParametersAndFieldsProductTerm.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -36,12 +36,12 @@ namespace VevaciousPlusPlus
     // parametersAndFieldsProducts.
     double operator()( std::vector< double > const& fieldConfiguration ) const;
 
-    std::vector< ParametersAndFieldsProduct > const&
+    std::vector< ParametersAndFieldsProductTerm > const&
     ParametersAndFieldsProducts() const
     { return parametersAndFieldsProducts; }
 
-    std::vector< ParametersAndFieldsProduct >& ParametersAndFieldsProducts()
-    { return parametersAndFieldsProducts; }
+    std::vector< ParametersAndFieldsProductTerm >&
+    ParametersAndFieldsProducts() { return parametersAndFieldsProducts; }
 
     // This returns the highest sum of field powers of all the terms in
     // parametersAndFieldsProducts.
@@ -57,7 +57,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    std::vector< ParametersAndFieldsProduct > parametersAndFieldsProducts;
+    std::vector< ParametersAndFieldsProductTerm > parametersAndFieldsProducts;
   };
 
 
@@ -69,7 +69,7 @@ namespace VevaciousPlusPlus
   inline void ParametersAndFieldsProductSum::UpdateForFixedScale(
                                  std::vector< double > const& parameterValues )
   {
-    for( std::vector< ParametersAndFieldsProduct >::iterator
+    for( std::vector< ParametersAndFieldsProductTerm >::iterator
          parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
          parametersAndFieldsProduct < parametersAndFieldsProducts.end();
          ++parametersAndFieldsProduct )
@@ -85,7 +85,7 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnSum( 0.0 );
-    for( std::vector< ParametersAndFieldsProduct >::const_iterator
+    for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
          parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
          parametersAndFieldsProduct < parametersAndFieldsProducts.end();
          ++parametersAndFieldsProduct )
@@ -102,7 +102,7 @@ namespace VevaciousPlusPlus
                         std::vector< double > const& fieldConfiguration ) const
   {
     double returnSum( 0.0 );
-    for( std::vector< ParametersAndFieldsProduct >::const_iterator
+    for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
          parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
          parametersAndFieldsProduct < parametersAndFieldsProducts.end();
          ++parametersAndFieldsProduct )
@@ -117,7 +117,7 @@ namespace VevaciousPlusPlus
   inline unsigned int ParametersAndFieldsProductSum::HighestFieldPower() const
   {
     unsigned int highestPower( 0 );
-    for( std::vector< ParametersAndFieldsProduct >::const_iterator
+    for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
          parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
          parametersAndFieldsProduct < parametersAndFieldsProducts.end();
          ++parametersAndFieldsProduct )
@@ -135,7 +135,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream returnStream;
     returnStream << "ParametersAndFieldsProductSum =" << std::endl;
-    for( std::vector< ParametersAndFieldsProduct >::const_iterator
+    for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
          parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
          parametersAndFieldsProduct < parametersAndFieldsProducts.end();
          ++parametersAndFieldsProduct )

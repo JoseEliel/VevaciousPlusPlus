@@ -14,7 +14,7 @@ namespace VevaciousPlusPlus
                                               size_t const indexInValuesVector,
                                  size_t const treePseudoscalarMassSquaredIndex,
                                                   size_t const tanBetaIndex ) :
-    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
+    LhaSourcedParameterFunctionoid( indexInValuesVector ),
     treePseudoscalarMassSquaredIndex( treePseudoscalarMassSquaredIndex ),
     tanBetaIndex( tanBetaIndex )
   {

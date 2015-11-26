@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
                                              size_t const directTrilinearIndex,
                                          size_t const trilinearOverYukawaIndex,
                                         size_t const appropriateYukawaIndex ) :
-    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
+    LhaSourcedParameterFunctionoid( indexInValuesVector ),
     directTrilinearIndex( directTrilinearIndex ),
     trilinearOverYukawaIndex( trilinearOverYukawaIndex ),
     appropriateYukawaIndex( appropriateYukawaIndex )

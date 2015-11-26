@@ -1,12 +1,12 @@
 /*
- * ParametersAndFieldsProduct.hpp
+ * ParametersAndFieldsProductTerm.hpp
  *
  *  Created on: Oct 8, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef PARAMETERSANDFIELDSPRODUCT_HPP_
-#define PARAMETERSANDFIELDSPRODUCT_HPP_
+#ifndef PARAMETERSANDFIELDSPRODUCTTERM_HPP_
+#define PARAMETERSANDFIELDSPRODUCTTERM_HPP_
 
 #include "CommonIncludes.hpp"
 
@@ -17,12 +17,13 @@ namespace VevaciousPlusPlus
   // parameters stored from a previous lookup of the parameters for a
   // fixed-scale calculation, or it multiplies out selected values from a given
   // vector of Lagrangian parameters for the relevant scale.
-  class ParametersAndFieldsProduct
+  class ParametersAndFieldsProductTerm
   {
   public:
-    ParametersAndFieldsProduct();
-    ParametersAndFieldsProduct( ParametersAndFieldsProduct const& copySource );
-    virtual ~ParametersAndFieldsProduct();
+    ParametersAndFieldsProductTerm();
+    ParametersAndFieldsProductTerm(
+                            ParametersAndFieldsProductTerm const& copySource );
+    virtual ~ParametersAndFieldsProductTerm();
 
 
     // This is used to indicate that the string read in to create the object
@@ -97,7 +98,7 @@ namespace VevaciousPlusPlus
 
     // This returns a ParametersAndFieldsProduct that is the partial derivative
     // with respect to the field with index fieldIndex.
-    ParametersAndFieldsProduct
+    ParametersAndFieldsProductTerm
     PartialDerivative( size_t const fieldIndex ) const;
 
     // This multiplies the coefficient with the relevant values from the given
@@ -146,8 +147,8 @@ namespace VevaciousPlusPlus
   // This raises the power of the field given by fieldIndex by the number
   // given by powerInt.
   inline void
-  ParametersAndFieldsProduct::RaiseFieldPower( size_t const fieldIndex,
-                                               size_t const powerInt )
+  ParametersAndFieldsProductTerm::RaiseFieldPower( size_t const fieldIndex,
+                                                   size_t const powerInt )
   {
     fieldProductByIndex.insert( fieldProductByIndex.end(),
                                 powerInt,
@@ -162,7 +163,7 @@ namespace VevaciousPlusPlus
 
   // This resets the ParametersAndFieldsProduct to be as if freshly
   // constructed.
-  inline void ParametersAndFieldsProduct::ResetValues()
+  inline void ParametersAndFieldsProductTerm::ResetValues()
   {
     isValid = true;
     coefficientConstant = 1.0;
@@ -176,7 +177,7 @@ namespace VevaciousPlusPlus
   // This returns doubleToMultiply multiplied by the field product using the
   // values in fieldConfiguration.
   inline double
-  ParametersAndFieldsProduct::ElementProduct( double doubleToMultiply,
+  ParametersAndFieldsProductTerm::ElementProduct( double doubleToMultiply,
                                       std::vector< double > const& valueVector,
                                      std::vector< size_t > const& indexVector )
   {
@@ -192,4 +193,4 @@ namespace VevaciousPlusPlus
 
 } /* namespace VevaciousPlusPlus */
 
-#endif /* PARAMETERSANDFIELDSPRODUCT_HPP_ */
+#endif /* PARAMETERSANDFIELDSPRODUCTTERM_HPP_ */

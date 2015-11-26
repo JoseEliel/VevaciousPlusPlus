@@ -14,7 +14,7 @@ namespace VevaciousPlusPlus
                                               size_t const indexInValuesVector,
                                                  size_t const firstChoiceIndex,
                                             size_t const secondChoiceIndex  ) :
-    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
+    LhaSourcedParameterFunctionoid( indexInValuesVector ),
     firstChoiceIndex( firstChoiceIndex ),
     secondChoiceIndex( secondChoiceIndex )
   {

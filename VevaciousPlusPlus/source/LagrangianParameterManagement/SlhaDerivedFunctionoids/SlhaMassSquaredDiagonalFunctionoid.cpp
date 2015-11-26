@@ -14,7 +14,7 @@ namespace VevaciousPlusPlus
                                               size_t const indexInValuesVector,
                                                   size_t const squareMassIndex,
                                                size_t const linearMassIndex ) :
-    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
+    LhaSourcedParameterFunctionoid( indexInValuesVector ),
     squareMassIndex( squareMassIndex ),
     linearMassIndex( linearMassIndex )
   {

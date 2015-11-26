@@ -214,7 +214,7 @@ namespace VevaciousPlusPlus
     stringBuilder << LesHouchesAccordBlockEntryManager::AsDebuggingString()
     << std::endl;
     stringBuilder << "activeDerivedParameters = { " << std::endl;
-    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+    for( std::vector< LhaSourcedParameterFunctionoid* >::const_iterator
          derivedParameter( activeDerivedParameters.begin() );
          derivedParameter < activeDerivedParameters.end();
          ++derivedParameter )
@@ -237,7 +237,7 @@ namespace VevaciousPlusPlus
     }
     stringBuilder << " }";
 
-    std::list< SlhaSourcedParameterFunctionoid const* > parameterSortingList;
+    std::list< LhaSourcedParameterFunctionoid const* > parameterSortingList;
     typedef LesHouchesAccordBlockEntryManager::LhaBlockEntryInterpolator*
             InterpolatorPointer;
     for( std::vector< InterpolatorPointer >::const_iterator
@@ -247,7 +247,7 @@ namespace VevaciousPlusPlus
     {
       parameterSortingList.push_back( *baseInterpolator );
     }
-    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+    for( std::vector< LhaSourcedParameterFunctionoid* >::const_iterator
          derivedParameter( activeDerivedParameters.begin() );
          derivedParameter < activeDerivedParameters.end();
          ++derivedParameter )
@@ -255,10 +255,10 @@ namespace VevaciousPlusPlus
       parameterSortingList.push_back( *derivedParameter );
     }
     parameterSortingList.sort( &SortParameterByIndex );
-    typedef std::pair< std::string, SlhaSourcedParameterFunctionoid const* >
+    typedef std::pair< std::string, LhaSourcedParameterFunctionoid const* >
     nameAndParameter;
     std::vector< nameAndParameter > sortedNamesAndParameters;
-    for( std::list< SlhaSourcedParameterFunctionoid const* >::const_iterator
+    for( std::list< LhaSourcedParameterFunctionoid const* >::const_iterator
          sortedParameter( parameterSortingList.begin() );
          sortedParameter != parameterSortingList.end();
          ++sortedParameter )

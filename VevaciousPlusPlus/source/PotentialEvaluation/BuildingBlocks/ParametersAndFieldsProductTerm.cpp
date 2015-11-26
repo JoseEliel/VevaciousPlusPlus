@@ -1,16 +1,16 @@
 /*
- * ParametersAndFieldsProduct.cpp
+ * ParametersAndFieldsProductTerm.cpp
  *
  *  Created on: Oct 8, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "BasicFunctions/ParametersAndFieldsProduct.hpp"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductTerm.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  ParametersAndFieldsProduct::ParametersAndFieldsProduct() :
+  ParametersAndFieldsProductTerm::ParametersAndFieldsProductTerm() :
     isValid( true ),
     coefficientConstant( 1.0 ),
     fieldProductByIndex(),
@@ -21,8 +21,8 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  ParametersAndFieldsProduct::ParametersAndFieldsProduct(
-                               ParametersAndFieldsProduct const& copySource ) :
+  ParametersAndFieldsProductTerm::ParametersAndFieldsProductTerm(
+                           ParametersAndFieldsProductTerm const& copySource ) :
     isValid( copySource.isValid ),
     coefficientConstant( copySource.coefficientConstant ),
     fieldProductByIndex( copySource.fieldProductByIndex ),
@@ -33,7 +33,7 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  ParametersAndFieldsProduct::~ParametersAndFieldsProduct()
+  ParametersAndFieldsProductTerm::~ParametersAndFieldsProductTerm()
   {
     // This does nothing.
   }
@@ -41,17 +41,18 @@ namespace VevaciousPlusPlus
 
   // This returns a ParametersAndFieldsProduct that is the partial derivative
   // with respect to the field with index fieldIndex.
-  ParametersAndFieldsProduct ParametersAndFieldsProduct::PartialDerivative(
+  ParametersAndFieldsProductTerm
+  ParametersAndFieldsProductTerm::PartialDerivative(
                                                 size_t const fieldIndex ) const
   {
     if( !(NonZeroDerivative( fieldIndex )) )
     {
-      ParametersAndFieldsProduct returnTerm;
+      ParametersAndFieldsProductTerm returnTerm;
       returnTerm.coefficientConstant = 0.0;
       returnTerm.totalCoefficientForFixedScale = 0.0;
       return returnTerm;
     }
-    ParametersAndFieldsProduct returnTerm( *this );
+    ParametersAndFieldsProductTerm returnTerm( *this );
     returnTerm.coefficientConstant *= fieldPowersByIndex[ fieldIndex ];
     returnTerm.totalCoefficientForFixedScale
     *= fieldPowersByIndex[ fieldIndex ];
@@ -72,7 +73,7 @@ namespace VevaciousPlusPlus
   // This returns a string that should be valid Python assuming that the
   // field configuration is given as an array called "fv" and that the
   // Lagrangian parameters are in an array called "lp".
-  std::string ParametersAndFieldsProduct::AsPython() const
+  std::string ParametersAndFieldsProductTerm::AsPython() const
   {
     if( !isValid )
     {
@@ -106,7 +107,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is mainly for debugging.
-  std::string ParametersAndFieldsProduct::AsDebuggingString() const
+  std::string ParametersAndFieldsProductTerm::AsDebuggingString() const
   {
     std::stringstream returnStream;
     returnStream

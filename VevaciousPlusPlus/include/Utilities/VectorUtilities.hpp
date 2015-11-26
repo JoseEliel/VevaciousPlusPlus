@@ -5,13 +5,12 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef LHPC_VECTORUTILITIES_HPP_
-#define LHPC_VECTORUTILITIES_HPP_
+#ifndef VECTORUTILITIES_HPP_
+#define VECTORUTILITIES_HPP_
 
 #include <vector>
-#include <sstream>
 
-namespace LHPC
+namespace Vevacious
 {
   // This class is for a few little things with vectors that just crop up again
   // and again.
@@ -72,6 +71,7 @@ namespace LHPC
     }
     return true;
   }
+
 }
 
 #endif /* LHPC_VECTORUTILITIES_HPP_ */

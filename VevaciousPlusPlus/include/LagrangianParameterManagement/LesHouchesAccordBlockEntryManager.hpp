@@ -10,9 +10,9 @@
 
 #include "CommonIncludes.hpp"
 #include "LagrangianParameterManager.hpp"
-#include "SlhaInterpolatedParameterFunctionoid.hpp"
-#include "SlhaLinearlyInterpolatedBlockEntry.hpp"
-#include "SlhaPolynomialFitBlockEntry.hpp"
+#include "LhaInterpolatedParameterFunctionoid.hpp"
+#include "LhaLinearlyInterpolatedBlockEntry.hpp"
+#include "LhaPolynomialFitBlockEntry.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -112,7 +112,7 @@ namespace VevaciousPlusPlus
   protected:
     // It is probably better to use a set of SlhaLinearlyInterpolatedBlockEntry
     // objects rather than a set of SlhaPolynomialFitBlockEntry objects.
-    typedef SlhaLinearlyInterpolatedBlockEntry LhaBlockEntryInterpolator;
+    typedef LhaLinearlyInterpolatedBlockEntry LhaBlockEntryInterpolator;
 
     // It is necessary to keep track of the number of active parameters
     // separately from the size of activeParametersToIndices because several
@@ -142,7 +142,7 @@ namespace VevaciousPlusPlus
     // numberOfDistinctActiveParameters, and returns true paired with the index
     // given by newParameter.
     std::pair< bool, size_t >
-    RegisterNewParameter( SlhaSourcedParameterFunctionoid const& newParameter,
+    RegisterNewParameter( LhaSourcedParameterFunctionoid const& newParameter,
                           std::string const& parameterName );
 
     // This updates the SLHA file parser with the file with name given by
@@ -162,7 +162,7 @@ namespace VevaciousPlusPlus
     // This adds a new LhaBlockEntryInterpolator for the given parameter
     // to activeInterpolatedParameters and activeParametersToIndices, and
     // returns a reference to it.
-    SlhaInterpolatedParameterFunctionoid const&
+    LhaInterpolatedParameterFunctionoid const&
     CreateNewBlockEntry( std::string const& parameterName );
 
     // This checks to see if the parameter name corresponds to an entry in a
@@ -309,7 +309,7 @@ namespace VevaciousPlusPlus
   // given by newParameter.
   inline std::pair< bool, size_t >
   LesHouchesAccordBlockEntryManager::RegisterNewParameter(
-                           SlhaSourcedParameterFunctionoid const& newParameter,
+                           LhaSourcedParameterFunctionoid const& newParameter,
                                              std::string const& parameterName )
   {
     ++numberOfDistinctActiveParameters;
@@ -331,7 +331,7 @@ namespace VevaciousPlusPlus
     lhaParser.readFile( newInput );
     size_t const
     numberOfActiveInterpolators( referenceSafeActiveParameters.size() );
-    referenceSafeActiveParameters[ 0 ]->UpdateForNewSlhaParameters();
+    referenceSafeActiveParameters[ 0 ]->UpdateForNewLhaParameters();
     referenceUnsafeActiveParameters.resize( numberOfActiveInterpolators,
                                        *(referenceSafeActiveParameters[ 0 ]) );
 
@@ -340,7 +340,7 @@ namespace VevaciousPlusPlus
          ++parameterIndex )
     {
       referenceSafeActiveParameters[
-                                parameterIndex ]->UpdateForNewSlhaParameters();
+                                parameterIndex ]->UpdateForNewLhaParameters();
       referenceUnsafeActiveParameters[ parameterIndex ]
       = *(referenceSafeActiveParameters[ parameterIndex ]);
     }
@@ -349,7 +349,7 @@ namespace VevaciousPlusPlus
   // This adds a new LhaBlockEntryInterpolator for the given parameter
   // to activeInterpolatedParameters and activeParametersToIndices, and
   // returns a reference to it.
-  inline SlhaInterpolatedParameterFunctionoid const&
+  inline LhaInterpolatedParameterFunctionoid const&
   LesHouchesAccordBlockEntryManager::CreateNewBlockEntry(
                                              std::string const& parameterName )
   {
@@ -377,7 +377,7 @@ namespace VevaciousPlusPlus
     LhaBlockEntryInterpolator parameterInterpolator( 0,
                                                      lhaParser,
                                                      parameterName );
-    parameterInterpolator.UpdateForNewSlhaParameters();
+    parameterInterpolator.UpdateForNewLhaParameters();
     return parameterInterpolator( logarithmOfScale );
   }
 

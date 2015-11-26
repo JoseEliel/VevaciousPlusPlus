@@ -9,11 +9,13 @@
 #define LAGRANGIANPARAMETERMANAGER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LHPC/BasicObserverPattern.hpp"
+#include "LHPC/ParsingUtilities.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class LagrangianParameterManager : public BOL::BasicObserved
+  class LagrangianParameterManager : public LHPC::BasicObserved
   {
   public:
     LagrangianParameterManager();
@@ -129,7 +131,7 @@ namespace VevaciousPlusPlus
   LagrangianParameterManager::NewParameterPoint( std::string const& newInput )
   {
     PrepareNewParameterPoint( newInput );
-    updateObservers();
+    UpdateObservers();
   }
 
   // This puts all variables with index brackets into a consistent form.
@@ -166,7 +168,7 @@ namespace VevaciousPlusPlus
       {
         indicesStream << ',';
       }
-      indicesStream << atoi( whichIndex->c_str() );
+      indicesStream << std::atoi( whichIndex->c_str() );
     }
     return indicesStream.str();
   }

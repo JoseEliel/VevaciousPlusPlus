@@ -8,14 +8,14 @@
 #ifndef SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 #define SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 
+#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   class SlhaHiggsMixingBilinearFunctionoid :
-                                         public SlhaSourcedParameterFunctionoid
+                                         public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaHiggsMixingBilinearFunctionoid( size_t const indexInValuesVector,

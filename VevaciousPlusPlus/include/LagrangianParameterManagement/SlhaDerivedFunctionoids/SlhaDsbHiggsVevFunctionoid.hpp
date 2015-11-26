@@ -8,13 +8,13 @@
 #ifndef SLHADSBHIGGSVEVFUNCTIONOID_HPP_
 #define SLHADSBHIGGSVEVFUNCTIONOID_HPP_
 
+#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaDsbHiggsVevFunctionoid : public SlhaSourcedParameterFunctionoid
+  class SlhaDsbHiggsVevFunctionoid : public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaDsbHiggsVevFunctionoid( size_t const indexInValuesVector,

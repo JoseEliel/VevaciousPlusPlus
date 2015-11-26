@@ -1,31 +1,29 @@
 /*
- * SlhaPolynomialFitBlockEntry.hpp
+ * LhaPolynomialFitBlockEntry.hpp
  *
  *  Created on: Oct 28, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef SLHAPOLYNOMIALFITBLOCKENTRY_HPP_
-#define SLHAPOLYNOMIALFITBLOCKENTRY_HPP_
+#ifndef LHAPOLYNOMIALFITBLOCKENTRY_HPP_
+#define LHAPOLYNOMIALFITBLOCKENTRY_HPP_
 
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"
 #include "BasicFunctions/SimplePolynomial.hpp"
-#include "SlhaInterpolatedParameterFunctionoid.hpp"
+#include "LhaInterpolatedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaPolynomialFitBlockEntry :
-                                    public SlhaInterpolatedParameterFunctionoid
+  class LhaPolynomialFitBlockEntry : public LhaInterpolatedParameterFunctionoid
   {
   public:
-    SlhaPolynomialFitBlockEntry( size_t const indexInValuesVector,
+    LhaPolynomialFitBlockEntry( size_t const indexInValuesVector,
                               LHPC::SlhaSimplisticInterpreter const& lhaParser,
-                                 std::string const& parameterName  );
-    SlhaPolynomialFitBlockEntry(
-                               SlhaPolynomialFitBlockEntry const& copySource );
-    virtual ~SlhaPolynomialFitBlockEntry();
+                                std::string const& parameterName  );
+    LhaPolynomialFitBlockEntry( LhaPolynomialFitBlockEntry const& copySource );
+    virtual ~LhaPolynomialFitBlockEntry();
 
 
     // This returns the value of the functionoid for the given logarithm of the
@@ -41,7 +39,7 @@ namespace VevaciousPlusPlus
 
     // This re-calculates the coefficients of the polynomial of the logarithm
     // of the scale used in evaluating the functionoid.
-    virtual void UpdateForNewSlhaParameters();
+    virtual void UpdateForNewLhaParameters();
 
     // This is for creating a Python version of the potential.
     virtual std::string
@@ -60,7 +58,7 @@ namespace VevaciousPlusPlus
 
 
   // This is for creating a Python version of the potential.
-  inline std::string SlhaPolynomialFitBlockEntry::PythonParameterEvaluation(
+  inline std::string LhaPolynomialFitBlockEntry::PythonParameterEvaluation(
                                             int const indentationSpaces ) const
   {
     std::vector< double > const&
@@ -82,17 +80,15 @@ namespace VevaciousPlusPlus
   }
 
   // This is mainly for debugging.
-   inline std::string SlhaPolynomialFitBlockEntry::AsDebuggingString() const
-   {
-     std::stringstream stringBuilder;
-     stringBuilder << "IndexInValuesVector() = " << IndexInValuesVector()
-     << ", scaleLogarithmPowerCoefficients = "
-     << scaleLogarithmPowerCoefficients.AsDebuggingString();
-     return stringBuilder.str();
-   }
-
-
+  inline std::string LhaPolynomialFitBlockEntry::AsDebuggingString() const
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << "IndexInValuesVector() = " << IndexInValuesVector()
+    << ", scaleLogarithmPowerCoefficients = "
+    << scaleLogarithmPowerCoefficients.AsDebuggingString();
+    return stringBuilder.str();
+  }
 
 } /* namespace VevaciousPlusPlus */
 
-#endif /* SLHAPOLYNOMIALFITBLOCKENTRY_HPP_ */
+#endif /* LHAPOLYNOMIALFITBLOCKENTRY_HPP_ */

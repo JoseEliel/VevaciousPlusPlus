@@ -26,10 +26,9 @@
 #include <list>
 #include <map>
 #include <set>
-#include "LHPC/ParsingUtilities.hpp"
-#include "LHPC/VectorUtilities.hpp"
 #include "BOLlib/include/BOLlib.hpp"
 #include "SLHA.hpp"
+#include "Utilities/VectorUtilities.hpp"
 
 // This is just to include most of the standard headers in one place.
 

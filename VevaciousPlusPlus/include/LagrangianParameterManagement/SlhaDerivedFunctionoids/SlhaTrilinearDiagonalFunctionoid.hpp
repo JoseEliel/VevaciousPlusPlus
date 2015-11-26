@@ -8,14 +8,14 @@
 #ifndef SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 #define SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 
+#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/SlhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   class SlhaTrilinearDiagonalFunctionoid :
-                                         public SlhaSourcedParameterFunctionoid
+                                         public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaTrilinearDiagonalFunctionoid( size_t const indexInValuesVector,

@@ -15,7 +15,7 @@ namespace VevaciousPlusPlus
                                                          size_t const vevIndex,
                                                      size_t const tanBetaIndex,
                                                        bool const sinNotCos ) :
-    SlhaSourcedParameterFunctionoid( indexInValuesVector ),
+    LhaSourcedParameterFunctionoid( indexInValuesVector ),
     vevIndex( vevIndex ),
     tanBetaIndex( tanBetaIndex ),
     cosOrSin( &cos ),

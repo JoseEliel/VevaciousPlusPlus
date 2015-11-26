@@ -857,7 +857,7 @@ namespace VevaciousPlusPlus
     }
 
     // Now we have skipped any initial '+' or '-', so we start the 1st term.
-    ParametersAndFieldsProduct polynomialTerm;
+    ParametersAndFieldsProductTerm polynomialTerm;
     if( !positiveTerm )
     {
       polynomialTerm.MultiplyByConstant( -1.0 );
@@ -932,7 +932,7 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialWithMasses::PutNextNumberOrVariableIntoPolynomial(
                                               std::string const& stringToParse,
                                                               size_t wordStart,
-                                    ParametersAndFieldsProduct& polynomialTerm,
+                                    ParametersAndFieldsProductTerm& polynomialTerm,
                                                           bool& imaginaryTerm )
   {
     size_t wordEnd( 0 );

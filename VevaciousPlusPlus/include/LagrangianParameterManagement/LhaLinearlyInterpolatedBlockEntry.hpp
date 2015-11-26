@@ -1,21 +1,21 @@
 /*
- * SlhaLinearlyInterpolatedBlockEntry.hpp
+ * LhaLinearlyInterpolatedBlockEntry.hpp
  *
  *  Created on: Oct 28, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef SLHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_
-#define SLHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_
+#ifndef LHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_
+#define LHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_
 
 #include "CommonIncludes.hpp"
-#include "SlhaInterpolatedParameterFunctionoid.hpp"
+#include "LhaInterpolatedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaLinearlyInterpolatedBlockEntry :
-                                    public SlhaInterpolatedParameterFunctionoid
+  class LhaLinearlyInterpolatedBlockEntry :
+                                    public LhaInterpolatedParameterFunctionoid
   {
   public:
     template< typename secondType > static bool FirstPairDotFirstIsLower(
@@ -23,12 +23,12 @@ namespace VevaciousPlusPlus
                             std::pair< double, secondType > const& secondPair )
     { return ( firstPair.first < secondPair.first ); }
 
-    SlhaLinearlyInterpolatedBlockEntry( size_t const indexInValuesVector,
+    LhaLinearlyInterpolatedBlockEntry( size_t const indexInValuesVector,
                               LHPC::SlhaSimplisticInterpreter const& lhaParser,
                                         std::string const& parameterName );
-    SlhaLinearlyInterpolatedBlockEntry(
-                        SlhaLinearlyInterpolatedBlockEntry const& copySource );
-    virtual ~SlhaLinearlyInterpolatedBlockEntry();
+    LhaLinearlyInterpolatedBlockEntry(
+                         LhaLinearlyInterpolatedBlockEntry const& copySource );
+    virtual ~LhaLinearlyInterpolatedBlockEntry();
 
 
     // This returns the value of the functionoid for the given logarithm of the
@@ -44,7 +44,7 @@ namespace VevaciousPlusPlus
 
     // This re-assigns the vector of values paired with logarithms of the
     // block's scale according to the current status of the block.
-    virtual void UpdateForNewSlhaParameters();
+    virtual void UpdateForNewLhaParameters();
 
     // This is for creating a Python version of the potential.
     virtual std::string
@@ -86,7 +86,7 @@ namespace VevaciousPlusPlus
 
   // This is mainly for debugging.
   inline std::string
-  SlhaLinearlyInterpolatedBlockEntry::AsDebuggingString() const
+  LhaLinearlyInterpolatedBlockEntry::AsDebuggingString() const
   {
     std::stringstream stringBuilder;
     stringBuilder
@@ -113,7 +113,7 @@ namespace VevaciousPlusPlus
   // extrapolation) based on the logarithm-value pairs at the found index and
   // the index just before it. It starts with index 1 so that there is always
   // an index just before.
-  inline double SlhaLinearlyInterpolatedBlockEntry::InterpolateOrExtrapolate(
+  inline double LhaLinearlyInterpolatedBlockEntry::InterpolateOrExtrapolate(
                                           double const logarithmOfScale ) const
   {
     for( size_t whichIndex( 1 );
@@ -135,4 +135,4 @@ namespace VevaciousPlusPlus
 
 } /* namespace VevaciousPlusPlus */
 
-#endif /* SLHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_ */
+#endif /* LHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_ */

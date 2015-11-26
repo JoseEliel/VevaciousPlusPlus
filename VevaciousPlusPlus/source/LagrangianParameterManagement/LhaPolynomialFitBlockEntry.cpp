@@ -1,38 +1,38 @@
 /*
- * SlhaPolynomialFitBlockEntry.cpp
+ * LhaPolynomialFitBlockEntry.cpp
  *
  *  Created on: Oct 28, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "LagrangianParameterManagement/SlhaPolynomialFitBlockEntry.hpp"
+#include "LagrangianParameterManagement/LhaPolynomialFitBlockEntry.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  SlhaPolynomialFitBlockEntry::SlhaPolynomialFitBlockEntry(
+  LhaPolynomialFitBlockEntry::LhaPolynomialFitBlockEntry(
                                               size_t const indexInValuesVector,
                               LHPC::SlhaSimplisticInterpreter const& lhaParser,
                                           std::string const& parameterName  ) :
-    SlhaInterpolatedParameterFunctionoid( indexInValuesVector,
-                                          lhaParser,
-                                          parameterName ),
+    LhaInterpolatedParameterFunctionoid( indexInValuesVector,
+                                         lhaParser,
+                                         parameterName ),
     scaleLogarithmPowerCoefficients( std::vector< double > ( 1,
                                                              0.0 ) )
   {
     // This constructor is just an initialization list.
   }
 
-  SlhaPolynomialFitBlockEntry::SlhaPolynomialFitBlockEntry(
-                              SlhaPolynomialFitBlockEntry const& copySource ) :
-    SlhaInterpolatedParameterFunctionoid( copySource ),
+  LhaPolynomialFitBlockEntry::LhaPolynomialFitBlockEntry(
+                              LhaPolynomialFitBlockEntry const& copySource ) :
+    LhaInterpolatedParameterFunctionoid( copySource ),
     scaleLogarithmPowerCoefficients(
                                    copySource.scaleLogarithmPowerCoefficients )
   {
     // This constructor is just an initialization list.
   }
 
-  SlhaPolynomialFitBlockEntry::~SlhaPolynomialFitBlockEntry()
+  LhaPolynomialFitBlockEntry::~LhaPolynomialFitBlockEntry()
   {
     // This does nothing.
   }
@@ -40,7 +40,7 @@ namespace VevaciousPlusPlus
 
   // This re-calculates the coefficients of the polynomial of the logarithm
   // of the scale used in evaluating the functionoid.
-  void SlhaPolynomialFitBlockEntry::UpdateForNewSlhaParameters()
+  void LhaPolynomialFitBlockEntry::UpdateForNewLhaParameters()
   {
     // We set up a matrix equation for the coefficients of the polynomial in
     // the logarithm of the scale based on how many explicit values of the

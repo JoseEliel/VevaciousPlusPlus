@@ -2,10 +2,10 @@
  * ParametersAndFieldsProductSum.cpp
  *
  *  Created on: Oct 9, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -42,7 +42,7 @@ namespace VevaciousPlusPlus
     }
     else
     {
-      for( std::vector< ParametersAndFieldsProduct >::const_iterator
+      for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
            parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
            parametersAndFieldsProduct < parametersAndFieldsProducts.end();
            ++parametersAndFieldsProduct )

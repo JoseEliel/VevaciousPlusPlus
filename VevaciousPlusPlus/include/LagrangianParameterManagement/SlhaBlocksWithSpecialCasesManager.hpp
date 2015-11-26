@@ -10,7 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "LesHouchesAccordBlockEntryManager.hpp"
-#include "SlhaSourcedParameterFunctionoid.hpp"
+#include "LhaSourcedParameterFunctionoid.hpp"
 #include "SlhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
 #include "SlhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
 #include "SlhaDerivedFunctionoids/SlhaMassSquaredDiagonalFunctionoid.hpp"
@@ -83,12 +83,12 @@ namespace VevaciousPlusPlus
 
   protected:
     static bool
-    SortParameterByIndex( SlhaSourcedParameterFunctionoid const* firstPointer,
-                         SlhaSourcedParameterFunctionoid const* secondPointer )
+    SortParameterByIndex( LhaSourcedParameterFunctionoid const* firstPointer,
+                         LhaSourcedParameterFunctionoid const* secondPointer )
     { return ( firstPointer->IndexInValuesVector()
                < secondPointer->IndexInValuesVector() ); }
 
-    std::vector< SlhaSourcedParameterFunctionoid* > activeDerivedParameters;
+    std::vector< LhaSourcedParameterFunctionoid* > activeDerivedParameters;
     std::map< std::string, std::string > aliasesToCaseStrings;
 
     // This adds all the valid aliases to aliasesToSwitchStrings.
@@ -107,7 +107,7 @@ namespace VevaciousPlusPlus
     // the index of newParameter.
     std::pair< bool, size_t >
     AddNewDerivedParameter( std::string const& caseString,
-                            SlhaSourcedParameterFunctionoid* newParameter );
+                            LhaSourcedParameterFunctionoid* newParameter );
 
     // This checks parameterName against all the special cases. If the
     // parameter name is not recognized as a valid special case, then the
@@ -220,7 +220,7 @@ namespace VevaciousPlusPlus
   {
     LesHouchesAccordBlockEntryManager::ParameterValues( logarithmOfScale,
                                                         destinationVector );
-    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+    for( std::vector< LhaSourcedParameterFunctionoid* >::const_iterator
          parameterInterpolator( activeDerivedParameters.begin() );
          parameterInterpolator < activeDerivedParameters.end();
          ++parameterInterpolator )
@@ -261,7 +261,7 @@ namespace VevaciousPlusPlus
   inline std::pair< bool, size_t >
   SlhaBlocksWithSpecialCasesManager::AddNewDerivedParameter(
                                                  std::string const& caseString,
-                                SlhaSourcedParameterFunctionoid* newParameter )
+                                LhaSourcedParameterFunctionoid* newParameter )
   {
     activeDerivedParameters.push_back( newParameter );
     for( std::map< std::string, std::string >::const_iterator
@@ -423,7 +423,7 @@ namespace VevaciousPlusPlus
     stringBuilder
     << LesHouchesAccordBlockEntryManager::ParametersInPythonFunction(
                                                            indentationSpaces );
-    for( std::vector< SlhaSourcedParameterFunctionoid* >::const_iterator
+    for( std::vector< LhaSourcedParameterFunctionoid* >::const_iterator
          activeParameter( activeDerivedParameters.begin() );
          activeParameter < activeDerivedParameters.end();
          ++activeParameter )

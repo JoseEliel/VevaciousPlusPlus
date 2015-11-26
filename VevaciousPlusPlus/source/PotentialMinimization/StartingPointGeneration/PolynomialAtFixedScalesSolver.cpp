@@ -19,7 +19,7 @@ namespace VevaciousPlusPlus
                                           unsigned int const numberOfFields ) :
     StartingPointFinder(),
     minimizationConditions( numberOfFields,
-                            std::vector< ParametersAndFieldsProduct >() ),
+                            std::vector< ParametersAndFieldsProductTerm >() ),
     polynomialHermitian(),
     lagrangianParameterManager( lagrangianParameterManager ),
     polynomialSystemSolver( polynomialSystemSolver ),
@@ -38,7 +38,7 @@ namespace VevaciousPlusPlus
 
     // The minimization conditions are the set of partial derivatives of the
     // polynomial with respect to the fields.
-    for( std::vector< ParametersAndFieldsProduct >::const_iterator
+    for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
          polynomialTerm(
                  polynomialToExtremize.ParametersAndFieldsProducts().begin() );
          polynomialTerm
@@ -59,7 +59,7 @@ namespace VevaciousPlusPlus
             // We take advantage of the Hessian being real and symmetric to
             // avoid bothering to calculate half of the off-diagonal second
             // derivatives.
-            ParametersAndFieldsProduct const&
+            ParametersAndFieldsProductTerm const&
             firstDerivative( minimizationConditions[ fieldIndex ].back() );
             std::vector< ParametersAndFieldsProductSum >&
             fieldRow( polynomialHermitian[ fieldIndex ] );
@@ -233,7 +233,7 @@ namespace VevaciousPlusPlus
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      for( std::vector< ParametersAndFieldsProduct >::const_iterator
+      for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
            polynomialTerm( minimizationConditions[ fieldIndex ].begin() );
            polynomialTerm != minimizationConditions[ fieldIndex ].end();
            ++polynomialTerm )

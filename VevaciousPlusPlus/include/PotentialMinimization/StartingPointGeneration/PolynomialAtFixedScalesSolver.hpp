@@ -8,11 +8,11 @@
 #ifndef POLYNOMIALATFIXEDSCALESSOLVER_HPP_
 #define POLYNOMIALATFIXEDSCALESSOLVER_HPP_
 
+#include "../../PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
+#include "../../PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductTerm.hpp"
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/StartingPointFinder.hpp"
 #include "PolynomialSystemSolver.hpp"
-#include "BasicFunctions/ParametersAndFieldsProduct.hpp"
-#include "BasicFunctions/ParametersAndFieldsProductSum.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "Eigen/Dense"
 
@@ -58,7 +58,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    std::vector< std::vector< ParametersAndFieldsProduct > >
+    std::vector< std::vector< ParametersAndFieldsProductTerm > >
     minimizationConditions;
     std::vector< std::vector< ParametersAndFieldsProductSum > >
     polynomialHermitian;

@@ -1,20 +1,20 @@
 /*
- * SlhaLinearlyInterpolatedBlockEntry.cpp
+ * LhaLinearlyInterpolatedBlockEntry.cpp
  *
  *  Created on: Oct 28, 2015
- *      Author: bol
+ *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "LagrangianParameterManagement/SlhaLinearlyInterpolatedBlockEntry.hpp"
+#include "LagrangianParameterManagement/LhaLinearlyInterpolatedBlockEntry.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  SlhaLinearlyInterpolatedBlockEntry::SlhaLinearlyInterpolatedBlockEntry(
+  LhaLinearlyInterpolatedBlockEntry::LhaLinearlyInterpolatedBlockEntry(
                                               size_t const indexInValuesVector,
                               LHPC::SlhaSimplisticInterpreter const& lhaParser,
                                            std::string const& parameterName ) :
-    SlhaInterpolatedParameterFunctionoid( indexInValuesVector,
+    LhaInterpolatedParameterFunctionoid( indexInValuesVector,
                                           lhaParser,
                                           parameterName ),
     logScalesWithValues(),
@@ -23,16 +23,16 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-  SlhaLinearlyInterpolatedBlockEntry::SlhaLinearlyInterpolatedBlockEntry(
-                      SlhaLinearlyInterpolatedBlockEntry const& copySource  ) :
-    SlhaInterpolatedParameterFunctionoid( copySource ),
+  LhaLinearlyInterpolatedBlockEntry::LhaLinearlyInterpolatedBlockEntry(
+                       LhaLinearlyInterpolatedBlockEntry const& copySource  ) :
+    LhaInterpolatedParameterFunctionoid( copySource ),
     logScalesWithValues( copySource.logScalesWithValues ),
     lastIndex( copySource.lastIndex )
   {
     // This constructor is just an initialization list.
   }
 
-  SlhaLinearlyInterpolatedBlockEntry::~SlhaLinearlyInterpolatedBlockEntry()
+  LhaLinearlyInterpolatedBlockEntry::~LhaLinearlyInterpolatedBlockEntry()
   {
     // This does nothing.
   }
@@ -40,7 +40,7 @@ namespace VevaciousPlusPlus
 
   // This re-assigns the vector of values paired with logarithms of the
   // block's scale according to the current status of the block.
-  void SlhaLinearlyInterpolatedBlockEntry::UpdateForNewSlhaParameters()
+  void LhaLinearlyInterpolatedBlockEntry::UpdateForNewLhaParameters()
   {
     std::list< std::pair< double, std::string > >
     scalesWithStrings( lhaParser->getScalesPairedWithValues( parameterName ) );
@@ -89,7 +89,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is for creating a Python version of the potential.
-  std::string SlhaLinearlyInterpolatedBlockEntry::PythonParameterEvaluation(
+  std::string LhaLinearlyInterpolatedBlockEntry::PythonParameterEvaluation(
                                             int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
