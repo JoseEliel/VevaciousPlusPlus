@@ -8,7 +8,7 @@
 #ifndef COMPLEXMASSSQUAREDMATRIX_HPP_
 #define COMPLEXMASSSQUAREDMATRIX_HPP_
 
-#include "../../BasicFunctions/ParametersAndFieldsProductTermSum.hpp"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "BaseComplexMassMatrix.hpp"
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"

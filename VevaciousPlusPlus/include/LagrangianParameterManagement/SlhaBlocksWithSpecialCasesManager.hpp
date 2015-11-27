@@ -10,11 +10,11 @@
 
 #include "CommonIncludes.hpp"
 #include "LesHouchesAccordBlockEntryManager.hpp"
+#include "LhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/SlhaMassSquaredDiagonalFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/SlhaTrilinearDiagonalFunctionoid.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
-#include "SlhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
-#include "SlhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
-#include "SlhaDerivedFunctionoids/SlhaMassSquaredDiagonalFunctionoid.hpp"
-#include "SlhaDerivedFunctionoids/SlhaTrilinearDiagonalFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {

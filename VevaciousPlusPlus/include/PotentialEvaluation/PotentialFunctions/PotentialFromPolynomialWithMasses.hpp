@@ -8,11 +8,11 @@
 #ifndef POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 
-#include "../BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "CommonIncludes.hpp"
 #include "boost/math/constants/constants.hpp"
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"

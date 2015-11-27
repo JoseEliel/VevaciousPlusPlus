@@ -17,21 +17,21 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialWithMasses( modelFilename,
                                        assumedPositiveOrNegativeTolerance,
                                        lagrangianParameterManager ),
-    BOL::BasicObserver(),
+    LHPC::BasicObserver(),
     minimumScaleSquared( -1.0 ),
     maximumScaleSquared( -1.0 )
   {
-    lagrangianParameterManager.registerObserver( this );
+    lagrangianParameterManager.RegisterObserver( this );
   }
 
   RgeImprovedOneLoopPotential::RgeImprovedOneLoopPotential(
                    PotentialFromPolynomialWithMasses const& potentialToCopy ) :
     PotentialFromPolynomialWithMasses( potentialToCopy ),
-    BOL::BasicObserver(),
+    LHPC::BasicObserver(),
     minimumScaleSquared( -1.0 ),
     maximumScaleSquared( -1.0 )
   {
-    lagrangianParameterManager.registerObserver( this );
+    lagrangianParameterManager.RegisterObserver( this );
   }
 
   RgeImprovedOneLoopPotential::~RgeImprovedOneLoopPotential()

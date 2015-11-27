@@ -8,21 +8,25 @@
 #ifndef SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 #define SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 
-#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
+#include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   class SlhaTrilinearDiagonalFunctionoid :
-                                         public LhaSourcedParameterFunctionoid
+                                          public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaTrilinearDiagonalFunctionoid( size_t const indexInValuesVector,
                                       size_t const directTrilinearIndex,
                                       size_t const trilinearOverYukawaIndex,
-                                      size_t const appropriateYukawaIndex );
-    virtual ~SlhaTrilinearDiagonalFunctionoid();
+                                      size_t const appropriateYukawaIndex ) :
+      LhaSourcedParameterFunctionoid( indexInValuesVector ),
+      directTrilinearIndex( directTrilinearIndex ),
+      trilinearOverYukawaIndex( trilinearOverYukawaIndex ),
+      appropriateYukawaIndex( appropriateYukawaIndex ) {}
+    virtual ~SlhaTrilinearDiagonalFunctionoid() {}
 
     // This returns the trilinear coupling evaluated at the scale given
     // through logarithmOfScale either from its direct value printed in the TL,
@@ -30,10 +34,9 @@ namespace VevaciousPlusPlus
     // appropriate Yukawa coupling.
     virtual double operator()( double const logarithmOfScale,
                         std::vector< double > const& interpolatedValues ) const
-    { return ( ( interpolatedValues[ directTrilinearIndex ] == 0.0 ) ?
-                   ( interpolatedValues[ trilinearOverYukawaIndex ]
-                     * interpolatedValues[ appropriateYukawaIndex ] ):
-                   interpolatedValues[ directTrilinearIndex ] ); }
+    { return operator()( interpolatedValues[ directTrilinearIndex ],
+                         interpolatedValues[ trilinearOverYukawaIndex ],
+                         interpolatedValues[ appropriateYukawaIndex ] ); }
 
     // This returns the trilinear coupling evaluated at the scale given
     // through logarithmOfScale either from its direct value printed in the TL,

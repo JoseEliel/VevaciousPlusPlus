@@ -9,6 +9,7 @@
 #define LESHOUCHESACCORDBLOCKENTRYMANAGER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LHPC/ParsingUtilities.hpp"
 #include "LagrangianParameterManager.hpp"
 #include "LhaInterpolatedParameterFunctionoid.hpp"
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
@@ -294,10 +295,6 @@ namespace VevaciousPlusPlus
                                          wordStart );
       validBlocks.insert( validBlocksString.substr( wordStart,
                                                    ( wordEnd - wordStart ) ) );
-      if( wordEnd == std::string::npos )
-      {
-        break;
-      }
       wordStart
       = validBlocksString.find_first_not_of( blockNameSeparationCharacters,
                                              wordEnd );
@@ -445,11 +442,13 @@ namespace VevaciousPlusPlus
     }
     else if( evaluationType == "BlockEntry" )
     {
-      return atof( lhaParser( evaluationArgument ).c_str() );
+      return LHPC::ParsingUtilities::StringToDouble(
+                                             lhaParser( evaluationArgument ) );
     }
     else if( evaluationType == "SqrtAbs" )
     {
-      return sqrt( abs( atof( lhaParser( evaluationArgument ).c_str() ) ) );
+      return std::sqrt( std::abs( LHPC::ParsingUtilities::StringToDouble(
+                                         lhaParser( evaluationArgument ) ) ) );
     }
     else
     {

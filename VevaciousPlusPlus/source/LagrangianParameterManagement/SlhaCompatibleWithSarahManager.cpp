@@ -120,7 +120,7 @@ namespace VevaciousPlusPlus
       {
         sarahBlock = "HMIX[ 103 ]";
       }
-      SlhaTwoSourceFunctionoid temporaryParameter( 0,
+      LhaTwoSourceFunctionoid temporaryParameter( 0,
                                                    0,
                                                    0 );
       return temporaryParameter( OnceOffParameter( sarahBlock,
@@ -172,7 +172,7 @@ namespace VevaciousPlusPlus
         sarahBlockEntry = FormatVariable( treeOrLoop + baseCase );
       }
 
-      SlhaTwoSourceFunctionoid temporaryParameter( 0,
+      LhaTwoSourceFunctionoid temporaryParameter( 0,
                                                    0,
                                                    0 );
       return
@@ -238,7 +238,7 @@ namespace VevaciousPlusPlus
       // rather than to the pure SLHA functionoid as was set by
       // RegisterParameter( caseString ) (or previous to that).
       return AddNewDerivedParameter( caseString,
-                                     new SlhaTwoSourceFunctionoid(
+                                     new LhaTwoSourceFunctionoid(
                                               numberOfDistinctActiveParameters,
                                                                    sarahIndex,
                                                              pureSlhaIndex ) );
@@ -307,7 +307,7 @@ namespace VevaciousPlusPlus
       // rather than to the pure SLHA functionoid as was set by
       // RegisterParameter( caseString ) (or previous to that).
       return AddNewDerivedParameter( caseString,
-                                     new SlhaTwoSourceFunctionoid(
+                                     new LhaTwoSourceFunctionoid(
                                               numberOfDistinctActiveParameters,
                                                                    sarahIndex,
                                                              pureSlhaIndex ) );

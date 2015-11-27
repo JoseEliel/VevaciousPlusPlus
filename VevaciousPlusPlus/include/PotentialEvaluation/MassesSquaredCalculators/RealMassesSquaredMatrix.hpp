@@ -8,9 +8,9 @@
 #ifndef REALMASSESSQUAREDMATRIX_HPP_
 #define REALMASSESSQUAREDMATRIX_HPP_
 
-#include "../../BasicFunctions/ParametersAndFieldsProductTermSum.hpp"
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "MassesSquaredFromMatrix.hpp"
 
 namespace VevaciousPlusPlus

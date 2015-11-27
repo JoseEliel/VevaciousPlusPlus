@@ -8,10 +8,10 @@
 #ifndef COMPLEXMASSMATRIX_HPP_
 #define COMPLEXMASSMATRIX_HPP_
 
-#include "../../BasicFunctions/ParametersAndFieldsProductTermSum.hpp"
-#include "BaseComplexMassMatrix.hpp"
 #include "CommonIncludes.hpp"
 #include "Eigen/Dense"
+#include "BaseComplexMassMatrix.hpp"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "MassesSquaredFromMatrix.hpp"
 
 namespace VevaciousPlusPlus

@@ -49,25 +49,19 @@ HOMOTOPYCONTINUATION= $(POTENTIALMINIMIZATION)/HomotopyContinuation/
 STARTINGPOINTGENERATION= $(POTENTIALMINIMIZATION)/StartingPointGeneration/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALMINIMIZATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
-SOURCES=  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
+NEWSOURCES=  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LhaLinearlyInterpolatedBlockEntry.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LhaPolynomialFitBlockEntry.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/LhaTwoSourceFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/LhaDifferenceFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaDsbHiggsVevFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaHiggsMixingBilinearFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaMassSquaredDiagonalFunctionoid.cpp \
- $(SLHADERIVEDFUNCTIONOIDS)/SlhaTrilinearDiagonalFunctionoid.cpp \
- $(BUILDINGBLOCKS)/ParametersAndFieldsProduct.cpp \
- $(BUILDINGBLOCKS)/ParametersAndFieldsProduct.cpp
+ $(BUILDINGBLOCKS)/ParametersAndFieldsProductTerm.cpp \
+ $(BUILDINGBLOCKS)/ParametersAndFieldsProductSum.cpp
 
-OLDSOURCES= source/BasicFunctions/PolynomialSum.cpp \
+SOURCES= $(NEWSOURCES) \
+ source/BasicFunctions/PolynomialSum.cpp \
  source/BasicFunctions/PolynomialTerm.cpp \
  source/BasicFunctions/ProductOfPolynomialSums.cpp \
- source/BasicFunctions/SimplePolynomial.cpp \
  source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \

@@ -9,7 +9,7 @@
 #define MASSESSQUAREDFROMMATRIX_HPP_
 
 #include "CommonIncludes.hpp"
-#include "../MassesSquaredCalculator.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus

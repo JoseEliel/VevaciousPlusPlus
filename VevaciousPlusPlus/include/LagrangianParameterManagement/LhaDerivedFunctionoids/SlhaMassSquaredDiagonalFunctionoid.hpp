@@ -8,20 +8,23 @@
 #ifndef SLHAMASSSQUAREDDIAGONALFUNCTIONOID_HPP_
 #define SLHAMASSSQUAREDDIAGONALFUNCTIONOID_HPP_
 
-#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
+#include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   class SlhaMassSquaredDiagonalFunctionoid :
-                                         public LhaSourcedParameterFunctionoid
+                                          public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaMassSquaredDiagonalFunctionoid( size_t const indexInValuesVector,
                                         size_t const squareMassIndex,
-                                        size_t const linearMassIndex );
-    virtual ~SlhaMassSquaredDiagonalFunctionoid();
+                                        size_t const linearMassIndex ) :
+      LhaSourcedParameterFunctionoid( indexInValuesVector ),
+      squareMassIndex( squareMassIndex ),
+      linearMassIndex( linearMassIndex ) {}
+    virtual ~SlhaMassSquaredDiagonalFunctionoid() {}
 
 
     // This returns the mass-squared parameter evaluated at the scale given
@@ -30,10 +33,8 @@ namespace VevaciousPlusPlus
     // value from the MSOFT block.
     virtual double operator()( double const logarithmOfScale,
                         std::vector< double > const& interpolatedValues ) const
-    { return ( ( interpolatedValues[ squareMassIndex ] == 0.0 ) ?
-               ( interpolatedValues[ linearMassIndex ]
-                 * interpolatedValues[ linearMassIndex ] ) :
-               interpolatedValues[ squareMassIndex ] ); }
+    { return operator()( interpolatedValues[ squareMassIndex ],
+                         interpolatedValues[ linearMassIndex ] ); }
 
     // This returns the mass-squared parameter evaluated at the scale given
     // through logarithmOfScale either from its direct value printed in the
@@ -41,9 +42,8 @@ namespace VevaciousPlusPlus
     // value from the MSOFT block.
     double operator()( double const squareMass,
                        double const linearMass ) const
-    { return ( ( squareMass != 0.0 ) ?
-               squareMass :
-               ( linearMass * linearMass ) ); }
+    { return
+      ( ( squareMass != 0.0 ) ? squareMass : ( linearMass * linearMass ) ); }
 
     // This is for creating a Python version of the potential.
     virtual std::string
@@ -72,7 +72,8 @@ namespace VevaciousPlusPlus
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = FirstIfNonzeroOtherwiseSecond( parameterValues[ "
     << squareMassIndex
-    << " ], ( ( parameterValues[ " << linearMassIndex << " ] )**2 ) )";
+    << " ], ( parameterValues[ " << linearMassIndex
+    << " ] * parameterValues[ "  << linearMassIndex << " ] ) )";
     return stringBuilder.str();
   }
 

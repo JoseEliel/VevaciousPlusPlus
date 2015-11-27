@@ -60,6 +60,41 @@ namespace LHPC
     static std::vector< std::string >
     SplitBySubstrings( std::string const& stringToChange,
                        std::string const& separatorCharacters );
+
+    // This is just a shorthand for a commonly-used conversion.
+    static long int BaseTenStringToInt( std::string const& baseTenString )
+    { return std::strtol( baseTenString.c_str(),
+                          NULL,
+                          10 ); }
+
+    // This is just a shorthand for a commonly-used conversion.
+    static double StringToDouble( std::string const& baseTenString )
+    { return std::strtod( baseTenString.c_str(),
+                          NULL ); }
+
+
+    // This parses indicesString as a set of integers separated by non-digit
+    // characters and returns the set as a vector.
+    static std::vector< int > ParseIndices( std::string const& indicesString );
+
+    // This returns the position in contentLine of the first non-whitespace
+    // character after the substring of contentLine which matches the indices
+    // in indicesVector. If the indices are not matched, std::string::npos is
+    // returned. (Also, if the line is nothing but the indices,
+    // std::string::npos will be returned in this case as well.)
+    static size_t StartOfMatchedContent( std::string const& contentLine,
+                                     std::vector< int > const& indicesVector );
+
+    // This returns the position in contentLine of the first non-whitespace
+    // character after the substring of contentLine starting from startPosition
+    // which matches the index in indexValue. If the index is not matched,
+    // std::string::npos is returned. (Also, if the substring is nothing but
+    // the index, std::string::npos will be returned in this case as well.) It
+    // is assumed that all leading whitespace has already been skipped by
+    // startPosition.
+    static size_t MatchesIndex( std::string const& contentLine,
+                                size_t startPosition,
+                                int const indexValue );
   };
 
 
@@ -103,8 +138,8 @@ namespace LHPC
     size_t
     wordStart( stringToSplit.find_first_not_of( separationCharacters ) );
     size_t wordEnd( 0 );
-    // If there are any more characters in validBlocks which are not in
-    // blockSeparators, we have at least one substring to add.
+    // If there are any more characters in stringToSplit which are not in
+    // separationCharacters, we have at least one substring to add.
     while( wordStart != std::string::npos )
     {
       wordEnd = stringToSplit.find_first_of( separationCharacters,
@@ -119,6 +154,88 @@ namespace LHPC
                                                    wordEnd );
     }
     return returnVector;
+  }
+
+
+  // This parses indicesString as a set of integers separated by non-digit
+  // characters and returns the set as a vector.
+  inline std::vector< int >
+  ParsingUtilities::ParseIndices( std::string const& indicesString )
+  {
+    std::vector< int > indicesVector;
+    size_t wordStart( indicesString.find_first_of(
+                                            ParsingUtilities::DigitChars() ) );
+    size_t wordEnd( 0 );
+    while( wordStart != std::string::npos )
+    {
+      wordEnd
+      = indicesString.find_first_not_of( ParsingUtilities::DigitChars(),
+                                         wordStart );
+      indicesVector.push_back( BaseTenStringToInt( indicesString.substr(
+                                                                     wordStart,
+                                                 ( wordEnd - wordStart ) ) ) );
+      if( wordEnd == std::string::npos )
+      {
+        break;
+      }
+      wordStart = indicesString.find_first_of( ParsingUtilities::DigitChars(),
+                                               wordEnd );
+    }
+    return indicesVector;
+  }
+
+  // This returns the position in contentLine of the first non-whitespace
+  // character after the substring of contentLine which matches the indices
+  // in indicesVector. If the indices are not matched, std::string::npos is
+  // returned. (Also, if the line is nothing but the indices,
+  // std::string::npos will be returned in this case as well.)
+  inline size_t
+  ParsingUtilities::StartOfMatchedContent( std::string const& contentLine,
+                                      std::vector< int > const& indicesVector )
+  {
+    size_t contentStart( contentLine.find_first_not_of(
+                                     ParsingUtilities::WhitespaceChars() ) );
+    for( std::vector< int >::const_iterator
+         indexValue( indicesVector.begin() );
+         indexValue != indicesVector.end();
+         ++indexValue )
+    {
+      contentStart = MatchesIndex( contentLine,
+                                   contentStart,
+                                   *indexValue );
+      if( contentStart == std::string::npos )
+      {
+        return std::string::npos;
+      }
+    }
+    return contentStart;
+  }
+
+  // This returns the position in contentLine of the first non-whitespace
+  // character after the substring of contentLine starting from startPosition
+  // which matches the index in indexValue. If the index is not matched,
+  // std::string::npos is returned. (Also, if the substring is nothing but
+  // the index, std::string::npos will be returned in this case as well.) It
+  // is assumed that all leading whitespace has already been skipped by
+  // startPosition.
+  inline size_t ParsingUtilities::MatchesIndex( std::string const& contentLine,
+                                                size_t startPosition,
+                                                int const indexValue )
+  {
+    size_t
+    indexEnd( contentLine.find_first_of( ParsingUtilities::WhitespaceChars(),
+                                         startPosition ) );
+    if( indexValue == BaseTenStringToInt( contentLine.substr( startPosition,
+                                           ( indexEnd - startPosition ) ) ) )
+    {
+      return
+      contentLine.find_first_not_of( ParsingUtilities::WhitespaceChars(),
+                                     indexEnd );
+    }
+    else
+    {
+      return std::string::npos;
+    }
   }
 
 }

@@ -8,28 +8,31 @@
 #ifndef SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 #define SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 
-#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
+#include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
   class SlhaHiggsMixingBilinearFunctionoid :
-                                         public LhaSourcedParameterFunctionoid
+                                          public LhaSourcedParameterFunctionoid
   {
   public:
     SlhaHiggsMixingBilinearFunctionoid( size_t const indexInValuesVector,
                                  size_t const treePseudoscalarMassSquaredIndex,
-                                        size_t const tanBetaIndex );
-    virtual ~SlhaHiggsMixingBilinearFunctionoid();
+                                        size_t const tanBetaIndex ) :
+      LhaSourcedParameterFunctionoid( indexInValuesVector ),
+      treePseudoscalarMassSquaredIndex( treePseudoscalarMassSquaredIndex ),
+      tanBetaIndex( tanBetaIndex ) {}
+    virtual ~SlhaHiggsMixingBilinearFunctionoid() {}
 
 
     // This returns sin(beta) * cos(beta) * mA^2 evaluated from the given
     // parameters.
     virtual double operator()( double const logarithmOfScale,
                         std::vector< double > const& interpolatedValues ) const
-    { return ( SinBetaCosBeta( interpolatedValues[ tanBetaIndex ] )
-               * interpolatedValues[ treePseudoscalarMassSquaredIndex ] ); }
+    { return operator()( interpolatedValues[ tanBetaIndex ],
+                    interpolatedValues[ treePseudoscalarMassSquaredIndex ] ); }
 
     // This returns sin(beta) * cos(beta) * mA^2 evaluated at the scale given
     // through logarithmOfScale.
@@ -69,7 +72,8 @@ namespace VevaciousPlusPlus
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = ( ( parameterValues[ " << treePseudoscalarMassSquaredIndex
     << " ] * parameterValues[ " << tanBetaIndex
-    << " ] ) / ( 1.0 + ( parameterValues[ " << tanBetaIndex << " ] )**2 ) )";
+    << " ] ) / ( 1.0 + ( parameterValues[ " << tanBetaIndex
+    << " ] * parameterValues[ " << tanBetaIndex << " ] ) ) )";
     return stringBuilder.str();
   }
 

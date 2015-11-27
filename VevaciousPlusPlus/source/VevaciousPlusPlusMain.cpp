@@ -12,6 +12,7 @@
 #include "PotentialEvaluation/PotentialFunctions/OldFixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/OldRgeImprovedOneLoopPotential.hpp"
 #include "PotentialMinimization/HomotopyContinuation/OldHom4ps2Runner.hpp"
+#include "LHPC/SimpleLhaParser.hpp"
 
 
 int main( int argumentCount,
@@ -125,8 +126,55 @@ int main( int argumentCount,
 
   std::string const oldModelFilename( "RealMssmWithStauAndStopVevs.vin" );
 
+  LHPC::SlhaSimplisticInterpreter oldParser;
+  oldParser.readFile( slhaFileName );
+  LHPC::SimpleLhaParser newParser;
+  newParser.ReadFile( slhaFileName );
+  std::string inputString( "" );
+  while( inputString != "q" )
+  {
+    std::cout << std::endl << "Input: ";
+    std::cin >> inputString;
+    std::list< std::pair< double, std::string > >
+    oldValues( oldParser.getScalesPairedWithValues( inputString ) );
+    std::list< std::pair< std::string, double > >
+    newValues;
+    newParser( inputString,
+               newValues );
+    std::cout << std::endl << "Old output: { ";
+    for( std::list< std::pair< double, std::string > >::const_iterator
+         oldPair( oldValues.begin() );
+         oldPair != oldValues.end();
+         ++oldPair )
+    {
+      if( oldPair != oldValues.begin() )
+      {
+        std::cout << "," << std::endl;
+      }
+      std::cout
+      << "[ " << oldPair->first << ", \"" << oldPair->second << "\" ]";
+    }
+    std::cout << " }";
+    std::cout << std::endl << "New output: { ";
+    for( std::list< std::pair< std::string, double > >::const_iterator
+         newPair( newValues.begin() );
+         newPair != newValues.end();
+         ++newPair )
+    {
+      if( newPair != newValues.begin() )
+      {
+        std::cout << "," << std::endl;
+      }
+      std::cout
+      << "[ \"" << newPair->first << "\", " << newPair->second << " ]";
+    }
+  }
+
+
+
   VevaciousPlusPlus::RunningParameterManager
   slhaManager( *lhaParameterManager );
+  slhaManager.UpdateSlhaData( slhaFileName );
   VevaciousPlusPlus::OldFixedScaleOneLoopPotential
   oldFixedScale( oldModelFilename,
                  20.0,
@@ -138,7 +186,6 @@ int main( int argumentCount,
   VevaciousPlusPlus::OldRgeImprovedOneLoopPotential
   oldRgeImproved( oldFixedScale );
 
-  slhaManager.UpdateSlhaData( slhaFileName );
   oldFixedScale.UpdateSelfForNewSlha( slhaManager );
   oldRgeImproved.UpdateSelfForNewSlha( slhaManager );
 
@@ -162,8 +209,10 @@ int main( int argumentCount,
   double const newFixedOriginLoop( newFixedScale( fieldOrigin ) );
   double const newRgeOriginLoop( newRgeImproved( fieldOrigin ) );
 
+  /*
   oldFixedScale.WriteAsPython( "OldFixedPython.py" );
   newFixedScale.WriteAsPython( "NewFixedPython.py" );
+  */
 
   /*std::cout
   << std::endl

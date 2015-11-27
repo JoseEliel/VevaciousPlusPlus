@@ -8,7 +8,7 @@
 #ifndef SLHADSBHIGGSVEVFUNCTIONOID_HPP_
 #define SLHADSBHIGGSVEVFUNCTIONOID_HPP_
 
-#include "../LhaSourcedParameterFunctionoid.hpp"
+#include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
 
 namespace VevaciousPlusPlus
@@ -20,8 +20,12 @@ namespace VevaciousPlusPlus
     SlhaDsbHiggsVevFunctionoid( size_t const indexInValuesVector,
                                 size_t const vevIndex,
                                 size_t const tanBetaIndex,
-                                bool const sinNotCos );
-    virtual ~SlhaDsbHiggsVevFunctionoid();
+                                bool const sinNotCos ) :
+      LhaSourcedParameterFunctionoid( indexInValuesVector ),
+      vevIndex( vevIndex ),
+      tanBetaIndex( tanBetaIndex ),
+      sinNotCos( sinNotCos ) {}
+    virtual ~SlhaDsbHiggsVevFunctionoid() {}
 
 
     // This returns the value of the DSB VEV for the neutral component of the
@@ -31,8 +35,8 @@ namespace VevaciousPlusPlus
     // beta calculated from the value of the functionoid evaluating tan(beta).
     virtual double operator()( double const logarithmOfScale,
                        std::vector< double > const& interpolatedValues ) const
-    {return ( interpolatedValues[ vevIndex ]
-              * (*cosOrSin)( atan( interpolatedValues[ tanBetaIndex ] ) ) ); }
+    { return operator()( interpolatedValues[ vevIndex ],
+                         interpolatedValues[ tanBetaIndex ] ); }
 
     // This returns the value of the DSB VEV for the neutral component of the
     // functionoid's Higgs doublet: HMIX[3] times either cos(beta) or sin(beta)
@@ -41,7 +45,9 @@ namespace VevaciousPlusPlus
     // beta calculated from the value of the functionoid evaluating tan(beta).
     double operator()( double const vevEuclideanLength,
                        double const tanBeta ) const
-    { return ( vevEuclideanLength * (*cosOrSin)( atan( tanBeta ) ) ); }
+    { return
+      ( ( sinNotCos ? ( vevEuclideanLength * tanBeta ) : vevEuclideanLength )
+        / sqrt( 1.0 + ( tanBeta * tanBeta ) ) ); }
 
     // This is for creating a Python version of the potential.
     virtual std::string
@@ -54,8 +60,7 @@ namespace VevaciousPlusPlus
   protected:
     size_t const vevIndex;
     size_t const tanBetaIndex;
-    double (*cosOrSin)( double );
-    std::string cosOrSinPythonString;
+    bool const sinNotCos;
   };
 
 
@@ -70,8 +75,14 @@ namespace VevaciousPlusPlus
     stringBuilder << std::setprecision( 12 )
     << PythonIndent( indentationSpaces )
     << "parameterValues[ " << IndexInValuesVector()
-    << " ] = " << cosOrSinPythonString << "( math.atan( parameterValues[ "
-    << tanBetaIndex << " ] ) )";
+    << " ] = ( ( ";
+    if( sinNotCos )
+    {
+      stringBuilder << "parameterValues[ " << tanBetaIndex << " ] * ";
+    }
+    stringBuilder << "parameterValues[ " << vevIndex
+    << " ] ) / math.sqrt( 1.0 + ( parameterValues[ " << tanBetaIndex
+    << " ] * parameterValues[ " << tanBetaIndex << " ] ) ) )";
     return stringBuilder.str();
   }
 
@@ -84,8 +95,7 @@ namespace VevaciousPlusPlus
     << "IndexInValuesVector() = " << IndexInValuesVector() << std::endl;
     stringBuilder << "vevIndex = " << vevIndex << std::endl;
     stringBuilder << "tanBetaIndex = " << tanBetaIndex << std::endl;
-    stringBuilder
-    << "cosOrSinPythonString = " << cosOrSinPythonString << std::endl;
+    stringBuilder << "sinNotCos = " << sinNotCos << std::endl;
     return stringBuilder.str();
   }
 

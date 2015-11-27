@@ -9,11 +9,11 @@
 #define SLHACOMPATIBLEWITHSARAHMANAGER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LhaDerivedFunctionoids/LhaTwoSourceFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
 #include "SlhaBlocksWithSpecialCasesManager.hpp"
-#include "SlhaDerivedFunctionoids/SlhaTwoSourceFunctionoid.hpp"
-#include "SlhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
-#include "SlhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {

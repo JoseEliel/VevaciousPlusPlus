@@ -17,21 +17,21 @@ namespace VevaciousPlusPlus
     PotentialFromPolynomialWithMasses( modelFilename,
                                        assumedPositiveOrNegativeTolerance,
                                        lagrangianParameterManager ),
-    BOL::BasicObserver(),
+    LHPC::BasicObserver(),
     renormalizationScale( -1.0 ),
     inverseRenormalizationScaleSquared( -1.0 )
   {
-    lagrangianParameterManager.registerObserver( this );
+    lagrangianParameterManager.RegisterObserver( this );
   }
 
   FixedScaleOneLoopPotential::FixedScaleOneLoopPotential(
                    PotentialFromPolynomialWithMasses const& potentialToCopy ) :
     PotentialFromPolynomialWithMasses( potentialToCopy ),
-    BOL::BasicObserver(),
+    LHPC::BasicObserver(),
     renormalizationScale( -1.0 ),
     inverseRenormalizationScaleSquared( -1.0 )
   {
-    lagrangianParameterManager.registerObserver( this );
+    lagrangianParameterManager.RegisterObserver( this );
   }
 
   FixedScaleOneLoopPotential::~FixedScaleOneLoopPotential()
@@ -44,7 +44,7 @@ namespace VevaciousPlusPlus
   // appropriate scale from lagrangianParameterManager, and updates all
   // components used to evaluate the potential to use the Lagrangian
   // parameters evaluated at that scale.
-  void FixedScaleOneLoopPotential::respondToObservedSignal()
+  void FixedScaleOneLoopPotential::RespondToObservedSignal()
   {
     renormalizationScale
     = lagrangianParameterManager.AppropriateSingleFixedScale();

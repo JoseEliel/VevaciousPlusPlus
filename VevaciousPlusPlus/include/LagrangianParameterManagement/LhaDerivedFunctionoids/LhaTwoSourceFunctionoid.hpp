@@ -1,26 +1,29 @@
 /*
- * SlhaTwoSourceFunctionoid.hpp
+ * LhaTwoSourceFunctionoid.hpp
  *
  *  Created on: Oct 27, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#ifndef SLHATWOSOURCEFUNCTIONOID_HPP_
-#define SLHATWOSOURCEFUNCTIONOID_HPP_
+#ifndef LHATWOSOURCEFUNCTIONOID_HPP_
+#define LHATWOSOURCEFUNCTIONOID_HPP_
 
-#include "../LhaSourcedParameterFunctionoid.hpp"
 #include "CommonIncludes.hpp"
+#include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  class SlhaTwoSourceFunctionoid : public LhaSourcedParameterFunctionoid
+  class LhaTwoSourceFunctionoid : public LhaSourcedParameterFunctionoid
   {
   public:
-    SlhaTwoSourceFunctionoid( size_t const indexInValuesVector,
+    LhaTwoSourceFunctionoid( size_t const indexInValuesVector,
                               size_t const firstChoiceIndex,
-                              size_t const secondChoiceIndex );
-    virtual ~SlhaTwoSourceFunctionoid();
+                              size_t const secondChoiceIndex ) :
+      LhaSourcedParameterFunctionoid( indexInValuesVector ),
+      firstChoiceIndex( firstChoiceIndex ),
+      secondChoiceIndex( secondChoiceIndex ) {}
+    virtual ~LhaTwoSourceFunctionoid() {}
 
 
     // This returns the parameter value at firstChoiceIndex if it is non-zero,
@@ -56,7 +59,7 @@ namespace VevaciousPlusPlus
 
 
   // This is for creating a Python version of the potential.
-  inline std::string SlhaTwoSourceFunctionoid::PythonParameterEvaluation(
+  inline std::string LhaTwoSourceFunctionoid::PythonParameterEvaluation(
                                             int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
@@ -70,7 +73,7 @@ namespace VevaciousPlusPlus
   }
 
   // This is mainly for debugging.
-  inline std::string SlhaTwoSourceFunctionoid::AsDebuggingString() const
+  inline std::string LhaTwoSourceFunctionoid::AsDebuggingString() const
   {
     std::stringstream stringBuilder;
     stringBuilder
@@ -82,4 +85,4 @@ namespace VevaciousPlusPlus
 
 } /* namespace VevaciousPlusPlus */
 
-#endif /* SLHATWOSOURCEFUNCTIONOID_HPP_ */
+#endif /* LHATWOSOURCEFUNCTIONOID_HPP_ */

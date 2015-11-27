@@ -9,6 +9,7 @@
 #define FIXEDSCALEONELOOPPOTENTIAL_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LHPC/BasicObserverPattern.hpp"
 #include "PotentialFromPolynomialWithMasses.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
@@ -17,7 +18,7 @@ namespace VevaciousPlusPlus
 {
 
   class FixedScaleOneLoopPotential : public PotentialFromPolynomialWithMasses,
-                                     public BOL::BasicObserver
+                                     public LHPC::BasicObserver
   {
   public:
     FixedScaleOneLoopPotential( std::string const& modelFilename,
@@ -46,7 +47,7 @@ namespace VevaciousPlusPlus
     // appropriate scale from lagrangianParameterManager, and updates all
     // components used to evaluate the potential to use the Lagrangian
     // parameters evaluated at that scale.
-    virtual void respondToObservedSignal();
+    virtual void RespondToObservedSignal();
 
     // This returns a string that is valid Python with no indentation to
     // evaluate the potential in three functions:
