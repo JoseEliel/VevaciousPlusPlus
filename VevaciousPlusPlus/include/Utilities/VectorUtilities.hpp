@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace Vevacious
+namespace VevaciousPlusPlus
 {
   // This class is for a few little things with vectors that just crop up again
   // and again.
@@ -72,6 +72,6 @@ namespace Vevacious
     return true;
   }
 
-}
+} /* namespace VevaciousPlusPlus */
 
 #endif /* LHPC_VECTORUTILITIES_HPP_ */

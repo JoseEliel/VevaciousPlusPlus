@@ -27,7 +27,12 @@ namespace LHPC
                            double const scaleValue = 0.0 ) :
       hasExplicitScale( hasExplicitScale ),
       scaleValue( scaleValue ) {}
-    virtual ~LhaBlockAtSingleScale() {}
+
+    LhaBlockAtSingleScale( LhaBlockAtSingleScale const& copySource ) :
+      hasExplicitScale( copySource.hasExplicitScale ),
+      scaleValue( copySource.scaleValue ) {}
+
+    ~LhaBlockAtSingleScale() {}
 
     bool HasExplicitScale() const { return hasExplicitScale; }
 
@@ -47,8 +52,8 @@ namespace LHPC
 
 
   protected:
-    bool const hasExplicitScale;
-    double const scaleValue;
+    bool hasExplicitScale;
+    double scaleValue;
     std::vector< std::string > contentLines;
   };
 
@@ -62,7 +67,15 @@ namespace LHPC
       noExplicitScales( true ),
       highestBlockScale( -1.0 ),
       lowestBlockScale( -1.0 ) {}
-    virtual ~LhaBlockSet() {}
+
+    LhaBlockSet( LhaBlockSet const& copySource ) :
+      uppercaseName( copySource.uppercaseName ),
+      blocksInReadOrder( copySource.blocksInReadOrder ),
+      noExplicitScales( copySource.noExplicitScales ),
+      highestBlockScale( copySource.highestBlockScale ),
+      lowestBlockScale( copySource.lowestBlockScale ) {}
+
+    ~LhaBlockSet() {}
 
 
     std::string const& UppercaseName() const { return uppercaseName; }
@@ -80,9 +93,7 @@ namespace LHPC
 
     // This adds a LhaBlockAtSingleScale to blocksInReadOrder without an
     // explicit scale and returns a pointer to it.
-    LhaBlockAtSingleScale* NewBlock()
-    { blocksInReadOrder.push_back( LhaBlockAtSingleScale( false ) );
-      return &(blocksInReadOrder.back()); }
+    LhaBlockAtSingleScale* NewBlock();
 
     // This adds a LhaBlockAtSingleScale to blocksInReadOrder with an explicit
     // scale and returns a pointer to it.
@@ -114,6 +125,13 @@ namespace LHPC
   class SimpleLhaParser
   {
   public:
+    // This splits a string in the format of block name followed by whitespace
+    // or an opening bracket character into the substring for just the name
+    // paired with the indices as a vector of integers.
+    static std::pair< std::string, std::vector< int > >
+    ParseBlockNameAndIndices( std::string const& blockNameThenIndices );
+
+
     SimpleLhaParser() : blocksInFirstInstanceReadOrder(),
                         blockNamesToIndices(),
                         currentBlockSet( NULL ),
@@ -121,7 +139,8 @@ namespace LHPC
                         noExplicitScales( true ),
                         highestBlockScale( -1.0 ),
                         lowestBlockScale( -1.0 ) {}
-    virtual ~SimpleLhaParser() {}
+
+    ~SimpleLhaParser() {}
 
 
     // This opens the file with name fileName and parses it into blocks.
@@ -208,19 +227,6 @@ namespace LHPC
     static double ParseScale( std::string const& headerLine,
                               size_t const positionOfQ );
 
-    // This splits a string in the format of block name followed by whitespace
-    // or an opening bracket character into the substring for just the name
-    // paired with the indices as a vector of integers.
-    static std::pair< std::string, std::vector< int > >
-    ParseBlockNameAndIndices( std::string const& blockNameThenIndices )
-    { size_t const
-      blockNameEndPlusOne( blockNameThenIndices.find_first_of( " \t([{," ) );
-      return std::pair< std::string, std::vector< int > >(
-                                                blockNameThenIndices.substr( 0,
-                                                         blockNameEndPlusOne ),
-                                                ParsingUtilities::ParseIndices(
-                      blockNameThenIndices.substr( blockNameEndPlusOne ) ) ); }
-
 
     std::vector< LhaBlockSet > blocksInFirstInstanceReadOrder;
     std::map< std::string, size_t > blockNamesToIndices;
@@ -265,7 +271,7 @@ namespace LHPC
   // then returns the rest of the first line which matches the indices
   // (without the indices). If no match is found, and empty string is
   // returned.
-  std::string LhaBlockAtSingleScale::MatchingEntry(
+  inline std::string LhaBlockAtSingleScale::MatchingEntry(
                                  std::vector< int > const& entryIndices ) const
   {
     size_t contentStart( std::string::npos );
@@ -284,6 +290,14 @@ namespace LHPC
     return "";
   }
 
+
+  // This adds a LhaBlockAtSingleScale to blocksInReadOrder without an
+  // explicit scale and returns a pointer to it.
+  inline LhaBlockAtSingleScale* LhaBlockSet::NewBlock()
+  {
+    blocksInReadOrder.push_back( LhaBlockAtSingleScale( false ) );
+    return &(blocksInReadOrder.back());
+  }
 
   // This adds a LhaBlockAtSingleScale to blocksInReadOrder with an explicit
   // scale and returns a pointer to it.
@@ -337,11 +351,36 @@ namespace LHPC
   }
 
 
+  // This splits a string in the format of block name followed by whitespace
+  // or an opening bracket character into the substring for just the name
+  // paired with the indices as a vector of integers.
+  inline std::pair< std::string, std::vector< int > >
+  SimpleLhaParser::ParseBlockNameAndIndices(
+                                      std::string const& blockNameThenIndices )
+  {
+    size_t const
+    blockNameEndPlusOne( blockNameThenIndices.find_first_of( " \t([{," ) );
+    if( blockNameEndPlusOne != std::string::npos )
+    {
+      return std::pair< std::string, std::vector< int > >(
+                                                blockNameThenIndices.substr( 0,
+                                                         blockNameEndPlusOne ),
+                                                ParsingUtilities::ParseIndices(
+                       blockNameThenIndices.substr( blockNameEndPlusOne ) ) );
+    }
+    else
+    {
+      return
+      std::pair< std::string, std::vector< int > >( blockNameThenIndices,
+                                                    std::vector< int >() );
+    }
+  }
+
   // This opens the file with name fileName and parses it into blocks.
   inline void SimpleLhaParser::ReadFile( std::string const& fileName )
   {
     std::string readLine( "" );
-    std::ifstream fileStream( fileName );
+    std::ifstream fileStream( fileName.c_str() );
     if( !(fileStream.is_open()) )
     {
       std::stringstream errorBuilder;
@@ -394,36 +433,6 @@ namespace LHPC
     }
   }
 
-  // This fills entriesAtScales as operator() above, but first parsing
-  // blockNameThenIndices.
-  inline void
-  SimpleLhaParser::operator()( std::string const& blockNameThenIndices,
-                std::list< std::pair< std::string, double > >& entriesAtScales,
-                               bool const onlyWithExplicitScale,
-                               double const implicitScale ) const
-  {
-    size_t const
-    blockNameEndPlusOne( blockNameThenIndices.find_first_of( " ([{," ) );
-    if( blockNameEndPlusOne != std::string::npos )
-    {
-      operator()( blockNameThenIndices.substr( 0,
-                                               blockNameEndPlusOne ),
-                  ParsingUtilities::ParseIndices(
-                          blockNameThenIndices.substr( blockNameEndPlusOne ) ),
-                  entriesAtScales,
-                  onlyWithExplicitScale,
-                  implicitScale );
-    }
-    else
-    {
-      operator()( blockNameThenIndices,
-                  std::vector< int >(),
-                  entriesAtScales,
-                  onlyWithExplicitScale,
-                  implicitScale );
-    }
-  }
-
   // This returns the double interpreted from the substring following the '='
   // (or throws an exception if any other characters come between the 'Q'/'q'
   // and the '=').
@@ -444,31 +453,6 @@ namespace LHPC
       throw std::runtime_error( errorBuilder.str() );
     }
     return std::atof( headerLine.substr( positionForEquals + 1 ).c_str() );
-  }
-
-  // This splits a string in the format of block name followed by whitespace
-  // or an opening bracket character into the substring for just the name
-  // paired with the indices as a vector of integers.
-  inline std::pair< std::string, std::vector< int > >
-  SimpleLhaParser::ParseBlockNameAndIndices(
-                                      std::string const& blockNameThenIndices )
-  {
-    size_t const
-    blockNameEndPlusOne( blockNameThenIndices.find_first_of( " \t([{," ) );
-    if( blockNameEndPlusOne != std::string::npos )
-    {
-      return std::pair< std::string, std::vector< int > >(
-                                                blockNameThenIndices.substr( 0,
-                                                         blockNameEndPlusOne ),
-                                                ParsingUtilities::ParseIndices(
-                       blockNameThenIndices.substr( blockNameEndPlusOne ) ) );
-    }
-    else
-    {
-      return
-      std::pair< std::string, std::vector< int > >( blockNameThenIndices,
-                                                    std::vector< int >() );
-    }
   }
 
   // This trims leading whitespace, any comments ('#' and all following

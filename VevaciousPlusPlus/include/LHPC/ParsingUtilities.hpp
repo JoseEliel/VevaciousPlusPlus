@@ -238,6 +238,6 @@ namespace LHPC
     }
   }
 
-}
+} /* namespace LHPC */
 
 #endif /* LHPC_PARSINGUTILITIES_HPP_ */

@@ -9,6 +9,7 @@
 #define POLYNOMIALSYSTEMSOLVER_HPP_
 
 #include "CommonIncludes.hpp"
+#include "Utilities/VectorUtilities.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -177,9 +178,9 @@ namespace VevaciousPlusPlus
          existingSolution < solutionSet.end();
          ++existingSolution )
     {
-      if( LHPC::VectorUtilities::DifferenceIsWithinHypercube( givenSolution,
-                                                             *existingSolution,
-                                                             resolutionSize ) )
+      if( VectorUtilities::DifferenceIsWithinHypercube( givenSolution,
+                                                        *existingSolution,
+                                                        resolutionSize ) )
       {
         return true;
       }

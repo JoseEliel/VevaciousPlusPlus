@@ -21,11 +21,29 @@ namespace VevaciousPlusPlus
   public:
     MinuitMinimum( size_t numberOfVariables,
                    ROOT::Minuit2::FunctionMinimum const& minuitMinimum );
+
     MinuitMinimum( std::vector< double > const& variableValues,
-                   std::vector< double > const& variableErrors );
-    MinuitMinimum();
-    MinuitMinimum( MinuitMinimum const& copySource );
-    virtual ~MinuitMinimum();
+                   std::vector< double > const& variableErrors ) :
+      variableValues( variableValues ),
+      variableErrors( variableErrors ),
+      functionValue( 0.0 ),
+      functionError( -1.0 ),
+      isValidMinimum( false ) {}
+
+    MinuitMinimum() : variableValues(),
+                      variableErrors(),
+                      functionValue( 0.0 ),
+                      functionError( -1.0 ),
+                      isValidMinimum( false ) {}
+
+    MinuitMinimum( MinuitMinimum const& copySource ) :
+      variableValues( copySource.variableValues ),
+      variableErrors( copySource.variableErrors ),
+      functionValue( copySource.functionValue ),
+      functionError( copySource.functionError ),
+      isValidMinimum( copySource.isValidMinimum ) {}
+
+    virtual ~MinuitMinimum() {}
 
 
     std::vector< double >& VariableValues(){ return variableValues; }
@@ -55,6 +73,26 @@ namespace VevaciousPlusPlus
 
 
 
+
+
+  inline MinuitMinimum::MinuitMinimum( size_t numberOfVariables,
+                        ROOT::Minuit2::FunctionMinimum const& minuitMinimum ) :
+    variableValues( numberOfVariables ),
+    variableErrors( numberOfVariables ),
+    functionValue( minuitMinimum.Fval() ),
+    functionError( minuitMinimum.Edm() ),
+    isValidMinimum( minuitMinimum.IsValid() )
+  {
+    ROOT::Minuit2::MnUserParameters const&
+    userParameters( minuitMinimum.UserParameters() );
+    for( size_t variableIndex( 0 );
+         variableIndex < numberOfVariables;
+         ++variableIndex )
+    {
+      variableValues[ variableIndex ] = userParameters.Value( variableIndex );
+      variableErrors[ variableIndex ] = userParameters.Error( variableIndex );
+    }
+  }
 
   // This is mainly for debugging.
   inline std::string MinuitMinimum::AsDebuggingString() const

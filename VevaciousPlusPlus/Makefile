@@ -41,9 +41,7 @@ BUILDINGBLOCKS= source/PotentialEvaluation/BuildingBlocks/
 BOUNCEACTIONPATHFINDING= source/BounceActionEvaluation/BounceActionPathFinding/
 PATHPARAMETERIZATION= source/BounceActionEvaluation/PathParameterization/
 MASSESSQUAREDCALCULATORS= source/PotentialEvaluation/MassesSquaredCalculators/
-PARAMETERFUNCTIONOIDS= source/PotentialEvaluation/ParameterFunctionoids/
 POTENTIALFUNCTIONS= source/PotentialEvaluation/PotentialFunctions/
-SLHADERIVEDFUNCTIONOIDS= $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaDerivedFunctionoids/
 POTENTIALMINIMIZATION= source/PotentialMinimization/
 HOMOTOPYCONTINUATION= $(POTENTIALMINIMIZATION)/HomotopyContinuation/
 STARTINGPOINTGENERATION= $(POTENTIALMINIMIZATION)/StartingPointGeneration/
@@ -59,10 +57,6 @@ NEWSOURCES=  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
  $(BUILDINGBLOCKS)/ParametersAndFieldsProductSum.cpp
 
 SOURCES= $(NEWSOURCES) \
- source/BasicFunctions/PolynomialSum.cpp \
- source/BasicFunctions/PolynomialTerm.cpp \
- source/BasicFunctions/ProductOfPolynomialSums.cpp \
- source/BasicFunctions/SumOfProductOfPolynomialSums.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialPerpendicularToPath.cpp \
@@ -80,43 +74,22 @@ SOURCES= $(NEWSOURCES) \
  source/BounceActionEvaluation/OneDimensionalPotentialAlongPath.cpp \
  source/BounceActionEvaluation/SplinePotential.cpp \
  source/BounceActionEvaluation/UndershootOvershootBubble.cpp \
- source/MinuitWrappersAndHelpers/MinuitMinimum.cpp \
  $(MASSESSQUAREDCALCULATORS)/BaseComplexMassMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/OldComplexMassSquaredMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/OldRealMassesSquaredMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/OldSymmetricComplexMassMatrix.cpp \
- $(PARAMETERFUNCTIONOIDS)/BinaryOperationFunctionoid.cpp \
- $(PARAMETERFUNCTIONOIDS)/ConstantFunctionoid.cpp \
- $(PARAMETERFUNCTIONOIDS)/SlhaFunctionoid.cpp \
- $(PARAMETERFUNCTIONOIDS)/UnaryOperationFunctionoid.cpp \
  $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
- $(POTENTIALFUNCTIONS)/OldFixedScaleOneLoopPotential.cpp \
  $(POTENTIALFUNCTIONS)/PotentialFromPolynomialWithMasses.cpp \
- $(POTENTIALFUNCTIONS)/OldPotentialFromPolynomialAndMasses.cpp \
  $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
- $(POTENTIALFUNCTIONS)/OldRgeImprovedOneLoopPotential.cpp \
  source/PotentialEvaluation/MassesSquaredCalculator.cpp \
- source/PotentialEvaluation/OldMassesSquaredCalculator.cpp \
  source/PotentialEvaluation/ParameterFunctionoid.cpp \
  source/PotentialEvaluation/PotentialFunction.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/ParameterUpdatePropagator.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/RunningParameterManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaManager.cpp \
  $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
  $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
  $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \
  $(STARTINGPOINTGENERATION)/PolynomialSystemSolver.cpp \
- $(HOMOTOPYCONTINUATION)/BasicPolynomialHomotopyContinuation.cpp \
- $(HOMOTOPYCONTINUATION)/FieldPolynomialsWithScale.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
- $(HOMOTOPYCONTINUATION)/OldHom4ps2Runner.cpp \
- $(HOMOTOPYCONTINUATION)/HomotopyContinuationSolver.cpp \
- $(HOMOTOPYCONTINUATION)/HomotopyContinuationTargetSystem.cpp \
- $(HOMOTOPYCONTINUATION)/PolynomialGradientTargetSystem.cpp \
  source/PotentialMinimization/GradientFromStartingPoints.cpp \
  source/PotentialMinimization/GradientMinimizer.cpp \
  source/PotentialMinimization/PotentialMinimizer.cpp \

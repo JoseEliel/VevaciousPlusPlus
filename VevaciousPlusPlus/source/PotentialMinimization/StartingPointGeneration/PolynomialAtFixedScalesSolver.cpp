@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
     {
       polynomialHermitian
       = std::vector< std::vector< ParametersAndFieldsProductSum > >(
-                                                               numberOfFields,
+                                                                numberOfFields,
                   std::vector< ParametersAndFieldsProductSum >( numberOfFields,
                                            ParametersAndFieldsProductSum() ) );
     }
@@ -194,7 +194,7 @@ namespace VevaciousPlusPlus
          solutionVector != solutionSet.end();
          ++solutionVector )
     {
-      double const solutionLengthSquared( LHPC::VectorUtilities::LengthSquared(
+      double const solutionLengthSquared( VectorUtilities::LengthSquared(
                                                            *solutionVector ) );
       if( ( solutionLengthSquared
             >= ( lowerSolutionLengthBound * lowerSolutionLengthBound ) )

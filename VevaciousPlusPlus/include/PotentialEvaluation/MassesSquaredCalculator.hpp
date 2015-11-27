@@ -44,18 +44,6 @@ namespace VevaciousPlusPlus
     virtual std::vector< double >
     MassesSquared( std::vector< double > const& fieldConfiguration ) const = 0;
 
-    // This returns the eigenvalues of the matrix, with all functionoids
-    // evaluated at the natural exponent of logarithmOfScale.
-    virtual std::vector< double >
-    MassesSquared( std::vector< double > const& fieldConfiguration,
-                   double const logarithmOfScale ) const
-    { // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Remember to remove this function!";
-    std::cout << std::endl;/**/
-    throw std::runtime_error( "no longer supported!" ); }
-
     // This returns the number of identical copies of this mass-squared matrix
     // that the model has.
     double MultiplicityFactor() const{ return multiplicityFactor; }

@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "PotentialMinimization/StartingPointGeneration/PolynomialSystemSolver.hpp"
+#include "LHPC/ParsingUtilities.hpp"
 
 namespace VevaciousPlusPlus
 {
