@@ -26,11 +26,13 @@ namespace LHPC
     LhaBlockAtSingleScale( bool const hasExplicitScale,
                            double const scaleValue = 0.0 ) :
       hasExplicitScale( hasExplicitScale ),
-      scaleValue( scaleValue ) {}
+      scaleValue( scaleValue ),
+      contentLines() {}
 
     LhaBlockAtSingleScale( LhaBlockAtSingleScale const& copySource ) :
       hasExplicitScale( copySource.hasExplicitScale ),
-      scaleValue( copySource.scaleValue ) {}
+      scaleValue( copySource.scaleValue ),
+      contentLines( copySource.contentLines ) {}
 
     ~LhaBlockAtSingleScale() {}
 
@@ -221,11 +223,36 @@ namespace LHPC
                  ||
                  ( trimmedLine[ 5 ] == '\t' ) ) ); }
 
+    // This returns true if the line begins with "DECAY" then a whitespace
+    // character.
+    static bool IsDecayHeader( std::string const& trimmedLine )
+    { return ( ( trimmedLine.size() > 6 )
+               &&
+               ( std::toupper( trimmedLine[ 0 ] ) == 'D' )
+               &&
+               ( std::toupper( trimmedLine[ 1 ] ) == 'E' )
+               &&
+               ( std::toupper( trimmedLine[ 2 ] ) == 'C' )
+               &&
+               ( std::toupper( trimmedLine[ 3 ] ) == 'A' )
+               &&
+               ( std::toupper( trimmedLine[ 4 ] ) == 'Y' )
+               &&
+               ( ( trimmedLine[ 5 ] == ' ' )
+                 ||
+                 ( trimmedLine[ 5 ] == '\t' ) ) ); }
+
     // This returns the double interpreted from the substring following the '='
     // (or throws an exception if any other characters come between the 'Q'/'q'
     // and the '=').
     static double ParseScale( std::string const& headerLine,
                               size_t const positionOfQ );
+
+    // This puts the block name from trimmedLine into blockName and returns the
+    // position of the first character in trimmedLine after the end of the
+    // name.
+    static size_t ParseBlockName( std::string const& trimmedLine,
+                                  std::string& blockName );
 
 
     std::vector< LhaBlockSet > blocksInFirstInstanceReadOrder;
@@ -441,7 +468,7 @@ namespace LHPC
   {
     size_t const positionForEquals( headerLine.find_first_not_of(
                                          ParsingUtilities::WhitespaceChars(),
-                                                             positionOfQ ) );
+                                                       ( positionOfQ + 1 ) ) );
     if( ( positionForEquals == std::string::npos )
         ||
         headerLine[ positionForEquals ] != '=' )
@@ -461,22 +488,22 @@ namespace LHPC
   inline void SimpleLhaParser::ParseLine( std::string const& readLine )
   {
     size_t const startPosition( readLine.find_first_not_of(
-                                      ParsingUtilities::WhitespaceChars() ) );
+                                       ParsingUtilities::WhitespaceChars() ) );
     if( startPosition == std::string::npos )
     {
       return;
     }
-    size_t endPosition( readLine.find( startPosition,
-                                       '#' ) );
+    size_t endPosition( readLine.find( '#',
+                                       startPosition ) );
     if( endPosition == startPosition )
     {
       return;
     }
     endPosition
     = readLine.find_last_not_of( ParsingUtilities::WhitespaceChars(),
-                                 endPosition );
+                                 ( endPosition - 1 ) );
     ParseContent( readLine.substr( startPosition,
-                                   endPosition ) );
+                                   ( endPosition - startPosition + 1 ) ) );
   }
 
   // This either parses the line denoting a new block, or adds the line to
@@ -486,6 +513,11 @@ namespace LHPC
     if( IsBlockHeader( trimmedLine ) )
     {
       ReadBlockHeader( trimmedLine );
+    }
+    else if( IsDecayHeader( trimmedLine ) )
+    {
+      // This parser does not record decay entries.
+      currentBlock = NULL;
     }
     else if( currentBlock != NULL )
     {
@@ -498,11 +530,9 @@ namespace LHPC
   inline void
   SimpleLhaParser::ReadBlockHeader( std::string const& trimmedLine )
   {
-    size_t const blockNameEndPlusOne(
-            trimmedLine.find_first_of( ParsingUtilities::WhitespaceChars() ) );
-    std::string blockName( trimmedLine.substr( 0,
-                                               blockNameEndPlusOne - 1 ) );
-    ParsingUtilities::TransformToUppercase( blockName );
+    std::string blockName;
+    size_t const blockNameEndPlusOne( ParseBlockName( trimmedLine,
+                                                      blockName ) );
     currentBlockSet = BlockSetForName( blockName );
     size_t const positionOfQ( trimmedLine.find_first_of( "Qq",
                                                ( blockNameEndPlusOne + 1 ) ) );
@@ -515,6 +545,34 @@ namespace LHPC
     {
       currentBlock = currentBlockSet->NewBlock();
     }
+  }
+
+  // This puts the block name from trimmedLine into blockName and returns the
+  // position of the first character in trimmedLine after the end of the
+  // name.
+  inline size_t
+  SimpleLhaParser::ParseBlockName( std::string const& trimmedLine,
+                                   std::string& blockName )
+  {
+    // Characters 0 to 4 are "BLOCK" and character 5 is whitespace.
+    size_t const blockNameStart(
+            trimmedLine.find_first_not_of( ParsingUtilities::WhitespaceChars(),
+                                           6 ) );
+    size_t const blockNameEndPlusOne(
+                trimmedLine.find_first_of( ParsingUtilities::WhitespaceChars(),
+                                           blockNameStart ) );
+    size_t const nameLength( ( blockNameEndPlusOne == std::string::npos ) ?
+                             ( trimmedLine.size() - blockNameStart ) :
+                             ( blockNameEndPlusOne - blockNameStart ) );
+    blockName.resize( nameLength );
+    for( size_t nameIndex( 0 );
+         nameIndex < nameLength;
+         ++nameIndex )
+    {
+      blockName[ nameIndex ]
+      = std::toupper( trimmedLine[ nameIndex + blockNameStart ] );
+    }
+    return blockNameEndPlusOne;
   }
 
   // This returns a pointer to the block set with (uppercase) name which
@@ -532,7 +590,7 @@ namespace LHPC
     blockNamesToIndices[ uppercaseBlockName ]
     = blocksInFirstInstanceReadOrder.size();
     blocksInFirstInstanceReadOrder.push_back(
-                                         LhaBlockSet( uppercaseBlockName ) );
+                                           LhaBlockSet( uppercaseBlockName ) );
     return &(blocksInFirstInstanceReadOrder.back());
   }
 

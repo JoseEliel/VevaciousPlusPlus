@@ -26,7 +26,8 @@ int main( int argumentCount,
   << "Testing old and new LHA parsers.";
   std::cout << std::endl;/**/
 
-  std::string const slhaFileName( "CMSSM_CCB.slha.out" );
+  // std::string const slhaFileName( "CMSSM_CCB.slha.out" );
+  std::string const slhaFileName( "test.slha" );
 
   BOL::AsciiXmlParser lhaManagerParser;
   bool const successfulOpening( lhaManagerParser.openRootElementOfFile(
@@ -128,7 +129,7 @@ int main( int argumentCount,
   while( inputString != "q" )
   {
     std::cout << std::endl << "Input: ";
-    std::cin >> inputString;
+    std::getline( std::cin, inputString );
     std::list< std::pair< double, std::string > >
     oldValues( oldParser.getScalesPairedWithValues( inputString ) );
     std::list< std::pair< std::string, double > >
