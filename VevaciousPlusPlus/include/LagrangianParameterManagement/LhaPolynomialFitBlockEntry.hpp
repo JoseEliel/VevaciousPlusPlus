@@ -9,9 +9,10 @@
 #define LHAPOLYNOMIALFITBLOCKENTRY_HPP_
 
 #include "CommonIncludes.hpp"
+#include "LhaInterpolatedParameterFunctionoid.hpp"
 #include "Eigen/Dense"
 #include "BasicFunctions/SimplePolynomial.hpp"
-#include "LhaInterpolatedParameterFunctionoid.hpp"
+#include "LHPC/SimpleLhaParser.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -20,7 +21,7 @@ namespace VevaciousPlusPlus
   {
   public:
     LhaPolynomialFitBlockEntry( size_t const indexInValuesVector,
-                              LHPC::SlhaSimplisticInterpreter const& lhaParser,
+                                LHPC::SimpleLhaParser const& lhaParser,
                                 std::string const& parameterName  );
     LhaPolynomialFitBlockEntry( LhaPolynomialFitBlockEntry const& copySource );
     virtual ~LhaPolynomialFitBlockEntry();

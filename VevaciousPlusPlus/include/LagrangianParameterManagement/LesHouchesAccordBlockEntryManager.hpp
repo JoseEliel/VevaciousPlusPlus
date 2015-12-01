@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "LHPC/ParsingUtilities.hpp"
+#include "LHPC/SimpleLhaParser.hpp"
 #include "LagrangianParameterManager.hpp"
 #include "LhaInterpolatedParameterFunctionoid.hpp"
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
@@ -126,7 +127,7 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator* > referenceSafeActiveParameters;
     std::vector< LhaBlockEntryInterpolator > referenceUnsafeActiveParameters;
     std::set< std::string > validBlocks;
-    LHPC::SlhaSimplisticInterpreter lhaParser;
+    LHPC::SimpleLhaParser lhaParser;
     std::string minimumScaleType;
     std::string minimumScaleArgument;
     std::string fixedScaleType;
@@ -325,7 +326,7 @@ namespace VevaciousPlusPlus
   inline void LesHouchesAccordBlockEntryManager::PrepareNewParameterPoint(
                                                   std::string const& newInput )
   {
-    lhaParser.readFile( newInput );
+    lhaParser.ReadFile( newInput );
     size_t const
     numberOfActiveInterpolators( referenceSafeActiveParameters.size() );
     referenceSafeActiveParameters[ 0 ]->UpdateForNewLhaParameters();
@@ -434,26 +435,27 @@ namespace VevaciousPlusPlus
   {
     if( evaluationType == "FixedNumber" )
     {
-      return atof( evaluationArgument.c_str() );
+      return LHPC::ParsingUtilities::StringToDouble( evaluationArgument );
     }
     else if( evaluationType == "BlockLowestScale" )
     {
-      return lhaParser.getLowestScale( evaluationArgument );
+      return
+      lhaParser.BlocksWithName( evaluationArgument )->LowestBlockScale();
     }
     else if( evaluationType == "BlockEntry" )
     {
       return LHPC::ParsingUtilities::StringToDouble(
-                                             lhaParser( evaluationArgument ) );
+                    lhaParser.EntryInLastMatchingBlock( evaluationArgument ) );
     }
     else if( evaluationType == "SqrtAbs" )
     {
       return std::sqrt( std::abs( LHPC::ParsingUtilities::StringToDouble(
-                                         lhaParser( evaluationArgument ) ) ) );
+                lhaParser.EntryInLastMatchingBlock( evaluationArgument ) ) ) );
     }
     else
     {
       throw std::runtime_error( evaluationType
-                                  + " is not a valid scale evaluation type!" );
+                                + " is not a valid scale evaluation type!" );
     }
   }
 

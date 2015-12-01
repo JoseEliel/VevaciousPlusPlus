@@ -53,6 +53,13 @@ namespace VevaciousPlusPlus
     ownedTunnelingCalculator( NULL ),
     currentTime()
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "VevaciousPlusPlus::VevaciousPlusPlus( \""
+    << initializationFileName << "\" ) called.";
+    std::cout << std::endl;/**/
+
     std::string potentialFunctionInitializationFilename( "error" );
     std::string potentialMinimizerInitializationFilename( "error" );
     std::string tunnelingCalculatorInitializationFilename( "error" );
@@ -93,6 +100,13 @@ namespace VevaciousPlusPlus
     FullPotentialDescription
     fullPotentialDescription( CreateFullPotentialDescription(
                                    potentialFunctionInitializationFilename ) );
+
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "Read potential and Lagrangian.";
+    std::cout << std::endl;/**/
+
     lagrangianParameterManager = ownedLagrangianParameterManager
     = fullPotentialDescription.first;
     ownedPotentialFunction = fullPotentialDescription.second;
@@ -248,7 +262,7 @@ namespace VevaciousPlusPlus
   }
 
   // This writes the results as an SLHA file.
-  void VevaciousPlusPlus::WriteSlhaResults( std::string const& slhaFilename,
+  void VevaciousPlusPlus::WriteLhaResults( std::string const& slhaFilename,
                                             bool const writeWarnings )
   {
     BOL::StringParser const slhaIndexMaker( 3,
@@ -405,6 +419,13 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::CreateFullPotentialDescription(
                    std::string const& potentialFunctionInitializationFilename )
   {
+    // debugging:
+    /**/std::cout << std::endl << "debugging:"
+    << std::endl
+    << "VevaciousPlusPlus::CreateFullPotentialDescription( \""
+    << potentialFunctionInitializationFilename << "\" ) called.";
+    std::cout << std::endl;/**/
+
     LesHouchesAccordBlockEntryManager*
     createdLagrangianParameterManager( NULL );
     PotentialFromPolynomialWithMasses* createdPotentialFunction( NULL );
@@ -419,6 +440,14 @@ namespace VevaciousPlusPlus
     // <LagrangianParameterManagerClass> and <PotentialFunctionClass>.
     while( xmlParser.readNextElement() )
     {
+      // debugging:
+      /**/std::cout << std::endl << "debugging:"
+      << std::endl
+      << "Reading element " << xmlParser.getCurrentOpeningTagAsFound()
+      << "Content =" << std::endl
+      << xmlParser.getTrimmedCurrentElementContent();
+      std::cout << std::endl;/**/
+
       ReadClassAndArguments( xmlParser,
                              "LagrangianParameterManagerClass",
                              lagrangianParameterManagerClass,

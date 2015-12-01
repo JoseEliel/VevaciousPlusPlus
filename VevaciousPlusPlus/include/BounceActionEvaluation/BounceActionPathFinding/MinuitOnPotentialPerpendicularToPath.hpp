@@ -73,7 +73,7 @@ namespace VevaciousPlusPlus
     // This is an empty hook that can be over-ridden to account for the
     // bubble profile from the last path.
     virtual void AccountForBubbleProfileAroundNode( size_t nodeIndex,
-                                    BubbleProfile const& bubbleFromLastPath ){}
+                                   BubbleProfile const& bubbleFromLastPath ) {}
   };
 
 

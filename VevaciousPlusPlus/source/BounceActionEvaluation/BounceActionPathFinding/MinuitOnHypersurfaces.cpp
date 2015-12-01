@@ -22,15 +22,12 @@ namespace VevaciousPlusPlus
     numberOfVaryingNodes( numberOfPathSegments - 1 ),
     segmentAuxiliaryLength( 1.0
                             / static_cast< double > ( numberOfPathSegments ) ),
-    returnPathNodes( ( numberOfVaryingNodes + 2 ),
-                     std::vector< double >( numberOfFields ) ),
-    currentParallelComponent( Eigen::VectorXd::Zero( numberOfFields ) ),
-    currentHyperplaneOrigin( currentParallelComponent ),
-    reflectionMatrix( numberOfFields,
-                      numberOfFields ),
-    nodeZeroParameterization( ( numberOfFields - 1 ),
-                              0.0 ),
-    minuitResultAsUntransformedVector( currentParallelComponent )
+    returnPathNodes(),
+    currentParallelComponent(),
+    currentHyperplaneOrigin(),
+    reflectionMatrix(),
+    nodeZeroParameterization(),
+    minuitResultAsUntransformedVector()
   {
     // This constructor is just an initialization list.
   }
@@ -40,6 +37,46 @@ namespace VevaciousPlusPlus
     // This does nothing.
   }
 
+
+  // This sets the potential function and vacua to be those given (also
+  // noting the maximum allowed scale as the maximum Euclidean length for
+  // field configurations, and also the number of fields which vary for the
+  // potential), and resets the nodes to describe a straight path between the
+  // new vacua, as well as setting pathTemperature and currentMinuitTolerance
+  // appropriately. It also sets up all the auxiliary vectors and matrices
+  // which depend on the number of fields varying for the potential.
+  void MinuitOnHypersurfaces::SetPotentialAndVacuaAndTemperature(
+                                    PotentialFunction const& potentialFunction,
+                                           PotentialMinimum const& falseVacuum,
+                                            PotentialMinimum const& trueVacuum,
+                                                 double const pathTemperature )
+  {
+    this->pathTemperature = pathTemperature;
+    this->potentialFunction = &potentialFunction;
+    potentialAtOrigin
+    = potentialFunction( potentialFunction.FieldValuesOrigin(),
+                         pathTemperature );
+    double const
+    maximumFieldVectorLength( potentialFunction.GetLagrangianParameterManager(
+                                                  ).MaximumEvaluationScale() );
+    maximumFieldVectorLengthSquared
+    = ( maximumFieldVectorLength * maximumFieldVectorLength );
+    numberOfFields = potentialFunction.NumberOfFieldVariables();
+    returnPathNodes
+    = std::vector< std::vector< double > >( ( numberOfVaryingNodes + 2 ),
+                                         std::vector< double >( numberOfFields,
+                                                                0.0 ) );
+    minuitResultAsUntransformedVector = currentParallelComponent
+    = currentHyperplaneOrigin = Eigen::VectorXd::Zero( numberOfFields );
+    reflectionMatrix = Eigen::MatrixXd( numberOfFields,
+                                        numberOfFields );
+    nodeZeroParameterization = std::vector< double >( ( numberOfFields - 1 ),
+                                                      0.0  );
+    SetNodesForInitialPath( falseVacuum,
+                            trueVacuum );
+    SetCurrentMinuitTolerance( falseVacuum,
+                               trueVacuum );
+  }
 
   // This sets up reflectionMatrix to be the Householder reflection matrix
   // which reflects the axis of field 0 to be parallel to

@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "LhaInterpolatedParameterFunctionoid.hpp"
+#include "LHPC/SimpleLhaParser.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -18,14 +19,14 @@ namespace VevaciousPlusPlus
                                     public LhaInterpolatedParameterFunctionoid
   {
   public:
-    template< typename secondType > static bool FirstPairDotFirstIsLower(
-                              std::pair< double, secondType > const& firstPair,
-                            std::pair< double, secondType > const& secondPair )
-    { return ( firstPair.first < secondPair.first ); }
+    template< typename firstType > static bool FirstPairDotSecondIsLower(
+                              std::pair< firstType, double > const& firstPair,
+                            std::pair< firstType, double > const& secondPair )
+    { return ( firstPair.second < secondPair.second ); }
 
     LhaLinearlyInterpolatedBlockEntry( size_t const indexInValuesVector,
-                              LHPC::SlhaSimplisticInterpreter const& lhaParser,
-                                        std::string const& parameterName );
+                                       LHPC::SimpleLhaParser const& lhaParser,
+                                       std::string const& parameterName );
     LhaLinearlyInterpolatedBlockEntry(
                          LhaLinearlyInterpolatedBlockEntry const& copySource );
     virtual ~LhaLinearlyInterpolatedBlockEntry();

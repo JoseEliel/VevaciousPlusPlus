@@ -10,6 +10,7 @@
 
 #include "CommonIncludes.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
+#include "LHPC/SimpleLhaParser.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -19,7 +20,7 @@ namespace VevaciousPlusPlus
   {
   public:
     LhaInterpolatedParameterFunctionoid( size_t const indexInValuesVector,
-                              LHPC::SlhaSimplisticInterpreter const& lhaParser,
+                                        LHPC::SimpleLhaParser const& lhaParser,
                                           std::string const& parameterName )  :
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       parameterName( parameterName ),
@@ -54,7 +55,7 @@ namespace VevaciousPlusPlus
 
   protected:
     std::string parameterName;
-    LHPC::SlhaSimplisticInterpreter const* lhaParser;
+    LHPC::SimpleLhaParser const* lhaParser;
   };
 
 } /* namespace VevaciousPlusPlus */

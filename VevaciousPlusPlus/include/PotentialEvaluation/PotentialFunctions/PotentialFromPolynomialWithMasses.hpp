@@ -68,6 +68,17 @@ namespace VevaciousPlusPlus
     static std::string const positiveByConvention;
     static std::string const negativeByConvention;
 
+
+    // This splits trimmedXmlContent by newline characters and puts the lines
+    // (trimmed of leading and trailing whitespace) into matrixLines, and
+    // returns the number of rows the matrix has assuming that it is a square
+    // matrix. An exception is thrown if the number of non-empty lines is not a
+    // square of an integer.
+    static size_t PrepareMatrixLines( std::string const& xmlContent,
+                                      std::vector< std::string >& matrixLines,
+                                      std::string const& matrixType );
+
+
     ParametersAndFieldsProductSum treeLevelPotential;
     ParametersAndFieldsProductSum polynomialLoopCorrections;
     std::vector< MassesSquaredCalculator* > scalarSquareMasses;
@@ -109,7 +120,8 @@ namespace VevaciousPlusPlus
     // This interprets stringToParse as a sum of real polynomial terms and sets
     // polynomialSum accordingly.
     void ParseSumOfPolynomialTerms( std::string const& stringToParse,
-                                ParametersAndFieldsProductSum& polynomialSum );
+                                ParametersAndFieldsProductSum& polynomialSum,
+                                    bool const throwIfNotPurelyReal = true );
 
     // This reads in a whole number or variable (including possible raising to
     // a power), applies the correct operation to polynomialTerm, and then
@@ -119,7 +131,7 @@ namespace VevaciousPlusPlus
     size_t
     PutNextNumberOrVariableIntoPolynomial( std::string const& stringToParse,
                                            size_t wordStart,
-                                    ParametersAndFieldsProductTerm& polynomialTerm,
+                                ParametersAndFieldsProductTerm& polynomialTerm,
                                            bool& imaginaryTerm );
 
     // This appends the masses-squared and multiplicity from each
@@ -168,19 +180,59 @@ namespace VevaciousPlusPlus
 
 
 
+  // This splits trimmedXmlContent by newline characters and puts the lines
+  // (trimmed of leading and trailing whitespace) into matrixLines, and
+  // returns the number of rows the matrix has assuming that it is a square
+  // matrix. An exception is thrown if the number of non-empty lines is not a
+  // square of an integer.
+  inline size_t PotentialFromPolynomialWithMasses::PrepareMatrixLines(
+                                                 std::string const& xmlContent,
+                                       std::vector< std::string >& matrixLines,
+                                                std::string const& matrixType )
+  {
+    matrixLines = LHPC::ParsingUtilities::SplitBySubstrings( xmlContent,
+                                                             "\n" );
+    size_t const
+    numberOfRows( sqrt( static_cast< double >( matrixLines.size() ) ) );
+    if( ( numberOfRows * numberOfRows ) != matrixLines.size() )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "Number of elements for <" << matrixType
+      << "> was not a square integer!";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+    return numberOfRows;
+  }
+
   // This interprets stringToParse as a sum of real polynomial terms and sets
   // polynomialSum accordingly.
   inline void PotentialFromPolynomialWithMasses::ParseSumOfPolynomialTerms(
                                               std::string const& stringToParse,
-                                 ParametersAndFieldsProductSum& polynomialSum )
+                                  ParametersAndFieldsProductSum& polynomialSum,
+                                              bool const throwIfNotPurelyReal )
   {
     ComplexParametersAndFieldsProductSum complexSum;
     ParseSumOfPolynomialTerms( stringToParse,
                                complexSum );
     if( !(complexSum.second.ParametersAndFieldsProducts().empty()) )
     {
-      throw std::runtime_error(
+      if( throwIfNotPurelyReal )
+      {
+        throw std::runtime_error(
                       "Polynomial that should be real has imaginary factor!" );
+      }
+      else
+      {
+        std::cout
+        << std::endl
+        << "Read imaginary part of polynomial which should be purely real."
+        << " Ignoring imaginary part, as it may be an artifact of a"
+        << " cancellation which is only apparent when there are values for the"
+        << " Lagrangian parameters (e.g. soft SUSY-breaking mass-squared"
+        << " matrices should be Hermitian so the imaginary part of the sum of"
+        << " opposite off-diagonal elements is zero).";
+        std::cout << std::endl;
+      }
     }
     polynomialSum.ParametersAndFieldsProducts()
     = complexSum.first.ParametersAndFieldsProducts();

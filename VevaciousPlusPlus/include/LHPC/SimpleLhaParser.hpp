@@ -201,6 +201,12 @@ namespace LHPC
                          onlyWithExplicitScale,
                          implicitScale ); }
 
+    // This finds the last block in the file which matches the name parsed from
+    // blockNameThenIndices and then returns the first content which matches
+    // the indices parsed from blockNameThenIndices.
+    std::string
+    EntryInLastMatchingBlock( std::string const& blockNameThenIndices ) const;
+
 
   protected:
     // This returns false if there is no room for "BLOCK " plus a block name of
@@ -458,6 +464,18 @@ namespace LHPC
                             onlyWithExplicitScale,
                             implicitScale );
     }
+  }
+
+  // This finds the last block in the file which matches the name parsed from
+  // blockNameThenIndices and then returns the first content which matches
+  // the indices parsed from blockNameThenIndices.
+  inline std::string SimpleLhaParser::EntryInLastMatchingBlock(
+                                std::string const& blockNameThenIndices ) const
+  {
+    std::pair< std::string, std::vector< int > >
+    blockNameWithIndices( ParseBlockNameAndIndices( blockNameThenIndices ) );
+    return BlocksWithName( blockNameWithIndices.first )->BlocksInReadOrder(
+                         ).back().MatchingEntry( blockNameWithIndices.second );
   }
 
   // This returns the double interpreted from the substring following the '='

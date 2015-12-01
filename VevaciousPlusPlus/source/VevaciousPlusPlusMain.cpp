@@ -121,52 +121,6 @@ int main( int argumentCount,
                                                               maximumScaleType,
                                                       maximumScaleArgument ) );
 
-  LHPC::SlhaSimplisticInterpreter oldParser;
-  oldParser.readFile( slhaFileName );
-  LHPC::SimpleLhaParser newParser;
-  newParser.ReadFile( slhaFileName );
-  std::string inputString( "" );
-  while( inputString != "q" )
-  {
-    std::cout << std::endl << "Input: ";
-    std::getline( std::cin, inputString );
-    std::list< std::pair< double, std::string > >
-    oldValues( oldParser.getScalesPairedWithValues( inputString ) );
-    std::list< std::pair< std::string, double > >
-    newValues;
-    newParser( inputString,
-               newValues );
-    std::cout << std::endl << "Old output: { ";
-    for( std::list< std::pair< double, std::string > >::const_iterator
-         oldPair( oldValues.begin() );
-         oldPair != oldValues.end();
-         ++oldPair )
-    {
-      if( oldPair != oldValues.begin() )
-      {
-        std::cout << "," << std::endl;
-      }
-      std::cout
-      << "[ " << oldPair->first << ", \"" << oldPair->second << "\" ]";
-    }
-    std::cout << " }";
-    std::cout << std::endl << "New output: { ";
-    for( std::list< std::pair< std::string, double > >::const_iterator
-         newPair( newValues.begin() );
-         newPair != newValues.end();
-         ++newPair )
-    {
-      if( newPair != newValues.begin() )
-      {
-        std::cout << "," << std::endl;
-      }
-      std::cout
-      << "[ \"" << newPair->first << "\", " << newPair->second << " ]";
-    }
-  }
-
-
-
   // Cleaning up.
   delete lhaParameterManager;
 
@@ -188,14 +142,14 @@ int main( int argumentCount,
   "./InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml" ) );
 
   // Solve a parameter point, if one was given directly with the <slha> tag:
-  std::string slhaFile( argumentParser.fromTag( "slha",
+  std::string inputFile( argumentParser.fromTag( "InputFile",
                                                 "" ) );
-  if( !(slhaFile.empty()) )
+  if( !(inputFile.empty()) )
   {
-    vevaciousPlusPlus.RunPoint( slhaFile );
-    vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "output",
-                                                    ( slhaFile + ".vout" ) ) );
-    vevaciousPlusPlus.WriteSlhaResults( slhaFile );
+    vevaciousPlusPlus.RunPoint( inputFile );
+    vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "OutputFile",
+                                                   ( inputFile + ".vout" ) ) );
+    vevaciousPlusPlus.WriteLhaResults( inputFile );
   }
 
   // Solve a directory full of parameter points, if one was given with the
@@ -244,7 +198,7 @@ int main( int argumentCount,
       copyCommand.append( " " );
       copyCommand.append( placeholderManager.getOutput() );
       BOL::UsefulStuff::runSystemCommand( copyCommand );
-      vevaciousPlusPlus.WriteSlhaResults( placeholderManager.getOutput() );
+      vevaciousPlusPlus.WriteLhaResults( placeholderManager.getOutput() );
     }
   }
 

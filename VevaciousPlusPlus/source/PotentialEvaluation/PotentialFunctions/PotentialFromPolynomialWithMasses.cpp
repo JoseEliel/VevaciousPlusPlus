@@ -9,14 +9,13 @@
 
 namespace VevaciousPlusPlus
 {
-  std::string const
-  PotentialFromPolynomialWithMasses::digitChars( "0123456789" );
-  std::string const
-  PotentialFromPolynomialWithMasses::dotAndDigits( "."
-                             + PotentialFromPolynomialWithMasses::digitChars );
+  std::string const PotentialFromPolynomialWithMasses::digitChars(
+                                        LHPC::ParsingUtilities::DigitChars() );
+  std::string const PotentialFromPolynomialWithMasses::dotAndDigits(
+                         PotentialFromPolynomialWithMasses::digitChars + "." );
   std::string const PotentialFromPolynomialWithMasses::allowedVariableInitials(
-                                                   "qwertyuiopasdfghjklzxcvbnm"
-                                                "QWERTYUIOPASDFGHJKLZXCVBNM" );
+                               LHPC::ParsingUtilities::UppercaseAlphabetChars()
+                          + LHPC::ParsingUtilities::LowercaseAlphabetChars() );
   std::string const PotentialFromPolynomialWithMasses::allowedVariableChars(
                      PotentialFromPolynomialWithMasses::allowedVariableInitials
                                 + PotentialFromPolynomialWithMasses::digitChars
@@ -52,41 +51,85 @@ namespace VevaciousPlusPlus
     fieldsAssumedNegative(),
     assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
-    BOL::AsciiXmlParser fileParser( true );
-    BOL::AsciiXmlParser elementParser( true );
-    BOL::VectorlikeArray< std::string > elementLines;
+    BOL::AsciiXmlParser xmlParser( false );
+
+    std::string xmlFieldVariables( "" );
+    std::string xmlDsbMinimum( "" );
+    std::string xmlTreeLevelPotential( "" );
+    std::string xmlLoopCorrections( "" );
     bool successfullyReadElement(
-                           fileParser.openRootElementOfFile( modelFilename ) );
+                            xmlParser.openRootElementOfFile( modelFilename ) );
     if( !successfullyReadElement )
     {
       throw std::runtime_error( "Could not parse XML of " + modelFilename );
     }
-    // The model file should always have the XML elements in the correct order!
-    // <ModelFileDetails>
-    successfullyReadElement = fileParser.readNextElement();
-    if( !successfullyReadElement )
+    while( xmlParser.readNextElement() )
     {
-      throw std::runtime_error( "Could not parse <ModelFileDetails>." );
+      if( xmlParser.currentElementNameMatches( "FieldVariables" ) )
+      {
+        xmlFieldVariables = xmlParser.getTrimmedCurrentElementContent();
+      }
+      else if( xmlParser.currentElementNameMatches( "DsbMinimum" ) )
+      {
+        xmlDsbMinimum = xmlParser.getTrimmedCurrentElementContent();
+      }
+      else if( xmlParser.currentElementNameMatches( "TreeLevelPotential" ) )
+      {
+        xmlTreeLevelPotential = xmlParser.getTrimmedCurrentElementContent();
+      }
+      else if( xmlParser.currentElementNameMatches( "LoopCorrections" ) )
+      {
+        std::string
+        renormalizationScheme( xmlParser.getCurrentElementAttributes().find(
+                                           "RenormalizationScheme" )->second );
+        LHPC::ParsingUtilities::TransformToUppercase( renormalizationScheme );
+        if( renormalizationScheme == "MSBAR" )
+        {
+          vectorMassCorrectionConstant = ( 5.0 / 6.0 );
+        }
+        else if( renormalizationScheme == "DRBAR" )
+        {
+          vectorMassCorrectionConstant = 1.5;
+        }
+        else
+        {
+          std::stringstream errorBuilder;
+          errorBuilder << "RenormalizationScheme was not MSBAR or DRBAR"
+          << " (nothing else is currently supported)!";
+          throw std::runtime_error( errorBuilder.str() );
+        }
+        xmlLoopCorrections = xmlParser.getTrimmedCurrentElementContent();
+      }
     }
-    // </ModelFileDetails>
-    // <FieldVariables>
-    successfullyReadElement = fileParser.readNextElement();
-    if( !successfullyReadElement )
+    if( xmlFieldVariables.empty() )
     {
       throw std::runtime_error( "Could not parse <FieldVariables>." );
     }
-
-    BOL::StringParser::parseByChar(
-                                  fileParser.getTrimmedCurrentElementContent(),
-                                    elementLines,
-                                    '\n');
-    std::string readFieldName( "" );
-    for( int lineIndex( 0 );
-         lineIndex < elementLines.getSize();
-         ++lineIndex )
+    if( xmlDsbMinimum.empty() )
     {
-      readFieldName.assign( BOL::StringParser::trimFromFrontAndBack(
-                                                 elementLines[ lineIndex ] ) );
+      throw std::runtime_error( "Could not parse <DsbMinimum>." );
+    }
+    if( xmlTreeLevelPotential.empty() )
+    {
+      throw std::runtime_error( "Could not parse <TreeLevelPotential>." );
+    }
+    if( xmlLoopCorrections.empty() )
+    {
+      throw std::runtime_error( "Could not parse <LoopCorrections>." );
+    }
+
+    // Now we parse <FieldVariables>.
+    std::vector< std::string >
+    fieldLines( LHPC::ParsingUtilities::SplitBySubstrings( xmlFieldVariables,
+                                                           "\n" ) );
+    std::string readFieldName( "" );
+    for( std::vector< std::string >::const_iterator
+         fieldLine( fieldLines.begin() );
+         fieldLine != fieldLines.end();
+         ++fieldLine )
+    {
+      readFieldName.assign(
+        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack( *fieldLine ) );
       if( !(readFieldName.empty()) )
       {
         if( ( readFieldName.size() > positiveByConvention.size() )
@@ -98,7 +141,7 @@ namespace VevaciousPlusPlus
         {
           fieldsAssumedPositive.push_back( fieldNames.size() );
           fieldNames.push_back( lagrangianParameterManager.FormatVariable(
-                                       BOL::StringParser::trimFromFrontAndBack(
+                       LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
                                                        readFieldName.substr( 0,
                 ( readFieldName.size() - positiveByConvention.size() ) ) ) ) );
         }
@@ -111,7 +154,7 @@ namespace VevaciousPlusPlus
         {
           fieldsAssumedNegative.push_back( fieldNames.size() );
           fieldNames.push_back( lagrangianParameterManager.FormatVariable(
-                                       BOL::StringParser::trimFromFrontAndBack(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
                                                        readFieldName.substr( 0,
                 ( readFieldName.size() - negativeByConvention.size() ) ) ) ) );
         }
@@ -126,118 +169,81 @@ namespace VevaciousPlusPlus
     dsbFieldValueInputs.resize( numberOfFields );
     dsbFieldInputStrings.resize( numberOfFields );
     // </FieldVariables>
-    // <DsbMinimum>
-    successfullyReadElement = fileParser.readNextElement();
-    if( !successfullyReadElement )
+    // Now we parse <DsbMinimum>
+    std::vector< std::string >
+    dsbLines( LHPC::ParsingUtilities::SplitBySubstrings( xmlDsbMinimum,
+                                                         "\n" ) );
+    for( std::vector< std::string >::const_iterator
+         dsbLine( dsbLines.begin() );
+         dsbLine != dsbLines.end();
+         ++dsbLine )
     {
-      throw std::runtime_error( "Could not parse <DsbMinimum>." );
-    }
-
-    elementLines.clearEntries();
-    BOL::StringParser::parseByChar(
-                                  fileParser.getTrimmedCurrentElementContent(),
-                                    elementLines,
-                                    '\n');
-    for( int lineIndex( 0 );
-         lineIndex < elementLines.getSize();
-         ++lineIndex )
-    {
-      size_t equalsPosition( elementLines[ lineIndex ].find( '=' ) );
-      if( !( equalsPosition < ( elementLines[ lineIndex ].size() - 1 ) ) )
+      size_t equalsPosition( dsbLine->find( '=' ) );
+      if( !( equalsPosition < ( dsbLine->size() - 1 ) ) )
       {
-        std::string errorMessage(
-                  "Field given no value in DsbMinimum! (Offending line = \"" );
-        errorMessage.append( elementLines[ lineIndex ] );
-        errorMessage.append( "\")" );
-        throw std::runtime_error( errorMessage );
+        std::stringstream errorBuilder;
+        errorBuilder
+        << "Field given no value in <DsbMinimum>! (Offending line = \""
+        << *dsbLine << "\")";
+        throw std::runtime_error( errorBuilder.str() );
       }
 
-      readFieldName.assign( BOL::StringParser::trimFromFrontAndBack(
-                                           elementLines[ lineIndex ].substr( 0,
+      readFieldName.assign(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                            dsbLine->substr( 0,
                                                           equalsPosition ) ) );
       size_t fieldIndex( FieldIndex( lagrangianParameterManager.FormatVariable(
                                                            readFieldName ) ) );
       if( !( fieldIndex < fieldNames.size() ) )
       {
-        std::string errorMessage( "Unknown field (\"" );
-        errorMessage.append( elementLines[ lineIndex ].substr( 0,
-                                                            equalsPosition ) );
-        errorMessage.append( "\") given value in DsbMinimum!" );
-        throw std::runtime_error( errorMessage );
+        std::stringstream errorBuilder;
+        errorBuilder
+        << "Unknown field (\"" << dsbLine->substr( 0,
+                                                   equalsPosition )
+        << "\") given value in DsbMinimum!";
+        throw std::runtime_error( errorBuilder.str() );
       }
       dsbFieldInputStrings[ fieldIndex ]
       = lagrangianParameterManager.FormatVariable(
-                                       BOL::StringParser::trimFromFrontAndBack(
-                   elementLines[ lineIndex ].substr( equalsPosition + 1 ) ) ) ;
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                     dsbLine->substr( equalsPosition + 1 ) ) );
     }
     // </DsbMinimum>
-    // <TreeLevelPotential>
-    successfullyReadElement = fileParser.readNextElement();
-    if( !successfullyReadElement )
-    {
-      throw std::runtime_error( "Could not parse <TreeLevelPotential>." );
-    }
-    ParseSumOfPolynomialTerms( fileParser.getTrimmedCurrentElementContent(),
+    // Now we parse <TreeLevelPotential>
+    ParseSumOfPolynomialTerms( xmlTreeLevelPotential,
                                treeLevelPotential );
     // </TreeLevelPotential>
     // <LoopCorrections>
-    successfullyReadElement = fileParser.readNextElement();
-    if( !successfullyReadElement )
-    {
-      throw std::runtime_error( "Could not parse <LoopCorrections>." );
-    }
-    std::string
-    renormalizationScheme( fileParser.getCurrentElementAttributes().find(
-                                           "RenormalizationScheme" )->second );
-    if( renormalizationScheme == "MSBAR" )
-    {
-      vectorMassCorrectionConstant = ( 5.0 / 6.0 );
-    }
-    else if( renormalizationScheme == "DRBAR" )
-    {
-      vectorMassCorrectionConstant = 1.5;
-    }
-    else
-    {
-      throw std::runtime_error( "RenormalizationScheme was not MSBAR or DRBAR"
-                                " (nothing else is currently supported)!" );
-    }
-    elementParser.loadString( fileParser.getCurrentElementContent() );
-    while( elementParser.readNextElement() )
+    xmlParser.loadString( xmlLoopCorrections );
+    std::vector< std::string > matrixLines;
+    while( xmlParser.readNextElement() )
     {
       //   <ExtraPolynomialPart>
-      if( elementParser.currentElementNameMatches( "ExtraPolynomialPart" ) )
+      if( xmlParser.currentElementNameMatches( "ExtraPolynomialPart" ) )
       {
-        ParseSumOfPolynomialTerms(
-                              elementParser.getTrimmedCurrentElementContent(),
+        ParseSumOfPolynomialTerms( xmlParser.getTrimmedCurrentElementContent(),
                                    polynomialLoopCorrections );
       }
       //   </ExtraPolynomialPart>
       //   <RealBosonMassSquaredMatrix>
-      else if( elementParser.currentElementNameMatches(
+      else if( xmlParser.currentElementNameMatches(
                                                "RealBosonMassSquaredMatrix" ) )
       {
-        elementLines.clearEntries();
-        BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
-                                        elementLines,
-                                        '\n');
-        int numberOfRows(
-                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
-        if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
-        {
-          throw std::runtime_error( "Number of elements for"
-                     " RealBosonMassSquaredMatrix was not a square integer!" );
-        }
+        size_t const numberOfRows( PrepareMatrixLines(
+                                   xmlParser.getTrimmedCurrentElementContent(),
+                                                       matrixLines,
+                                              "RealBosonMassSquaredMatrix" ) );
         RealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
-                                 elementParser.getCurrentElementAttributes() );
-        for( int lineIndex( 0 );
-             lineIndex < elementLines.getSize();
+                                     xmlParser.getCurrentElementAttributes() );
+        for( size_t lineIndex( 0 );
+             lineIndex < matrixLines.size();
              ++lineIndex )
         {
-          ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
-                                                   elementLines[ lineIndex ] ),
-                                    massSquaredMatrix.ElementAt( lineIndex ) );
+          ParseSumOfPolynomialTerms(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                    matrixLines[ lineIndex ] ),
+                                     massSquaredMatrix.ElementAt( lineIndex ),
+                                     false );
         }
         if( massSquaredMatrix.GetSpinType()
             == MassesSquaredCalculator::gaugeBoson )
@@ -251,58 +257,43 @@ namespace VevaciousPlusPlus
       }
       //   </RealBosonMassSquaredMatrix>
       //   <WeylFermionMassMatrix>
-      else if( elementParser.currentElementNameMatches(
-                                                    "WeylFermionMassMatrix" ) )
+      else if( xmlParser.currentElementNameMatches( "WeylFermionMassMatrix" ) )
       {
-        elementLines.clearEntries();
-        BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
-                                        elementLines,
-                                        '\n');
-        int numberOfRows(
-                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
-        if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
-        {
-          throw std::runtime_error( "Number of elements for"
-                          " WeylFermionMassMatrix was not a square integer!" );
-        }
+        size_t const numberOfRows( PrepareMatrixLines(
+                                   xmlParser.getTrimmedCurrentElementContent(),
+                                                       matrixLines,
+                                                   "WeylFermionMassMatrix" ) );
         SymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
-                                 elementParser.getCurrentElementAttributes() );
-        for( int lineIndex( 0 );
-             lineIndex < elementLines.getSize();
+                                     xmlParser.getCurrentElementAttributes() );
+        for( size_t lineIndex( 0 );
+             lineIndex < matrixLines.size();
              ++lineIndex )
         {
-          ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
-                                                   elementLines[ lineIndex ] ),
+          ParseSumOfPolynomialTerms(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                    matrixLines[ lineIndex ] ),
                                     fermionMassMatrix.ElementAt( lineIndex ) );
         }
         fermionMassMatrices.push_back( fermionMassMatrix );
       }
       //   </WeylFermionMassMatrix>
       //   <ComplexWeylFermionMassSquaredMatrix>
-      else if( elementParser.currentElementNameMatches(
+      else if( xmlParser.currentElementNameMatches(
                                       "ComplexWeylFermionMassSquaredMatrix" ) )
       {
-        elementLines.clearEntries();
-        BOL::StringParser::parseByChar(
-                               elementParser.getTrimmedCurrentElementContent(),
-                                        elementLines,
-                                        '\n');
-        int numberOfRows(
-                     sqrt( static_cast< double >( elementLines.getSize() ) ) );
-        if( ( numberOfRows * numberOfRows ) != elementLines.getSize() )
-        {
-          throw std::runtime_error( "Number of elements for"
-            " ComplexWeylFermionMassSquaredMatrix was not a square integer!" );
-        }
+        size_t const numberOfRows( PrepareMatrixLines(
+                                   xmlParser.getTrimmedCurrentElementContent(),
+                                                       matrixLines,
+                                     "ComplexWeylFermionMassSquaredMatrix" ) );
         ComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
-                                 elementParser.getCurrentElementAttributes() );
-        for( int lineIndex( 0 );
-             lineIndex < elementLines.getSize();
+                                     xmlParser.getCurrentElementAttributes() );
+        for( size_t lineIndex( 0 );
+             lineIndex < matrixLines.size();
              ++lineIndex )
         {
-          ParseSumOfPolynomialTerms( BOL::StringParser::trimFromFrontAndBack(
-                                                   elementLines[ lineIndex ] ),
+          ParseSumOfPolynomialTerms(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                    matrixLines[ lineIndex ] ),
                              fermionMassSquaredMatrix.ElementAt( lineIndex ) );
         }
         fermionMassSquaredMatrices.push_back( fermionMassSquaredMatrix );
@@ -479,8 +470,7 @@ namespace VevaciousPlusPlus
          ++whichMatrix )
     {
       pythonFile << "    massSquaredMatrix = numpy.array( [ ";
-      for( std::vector< std::pair< ParametersAndFieldsProductSum,
-                              ParametersAndFieldsProductSum > >::const_iterator
+      for( std::vector< ComplexParametersAndFieldsProductSum >::const_iterator
            matrixElement( whichMatrix->MatrixElements().begin() );
            matrixElement < whichMatrix->MatrixElements().end();
            ++matrixElement )
@@ -504,8 +494,7 @@ namespace VevaciousPlusPlus
          ++whichMatrix )
     {
       pythonFile << "    massMatrix = numpy.array( [ ";
-      for( std::vector< std::pair< ParametersAndFieldsProductSum,
-                              ParametersAndFieldsProductSum > >::const_iterator
+      for( std::vector< ComplexParametersAndFieldsProductSum >::const_iterator
            matrixElement( whichMatrix->MatrixElements().begin() );
            matrixElement < whichMatrix->MatrixElements().end();
            ++matrixElement )
@@ -932,7 +921,7 @@ namespace VevaciousPlusPlus
   PotentialFromPolynomialWithMasses::PutNextNumberOrVariableIntoPolynomial(
                                               std::string const& stringToParse,
                                                               size_t wordStart,
-                                    ParametersAndFieldsProductTerm& polynomialTerm,
+                                ParametersAndFieldsProductTerm& polynomialTerm,
                                                           bool& imaginaryTerm )
   {
     size_t wordEnd( 0 );

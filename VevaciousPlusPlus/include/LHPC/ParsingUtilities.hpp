@@ -72,7 +72,6 @@ namespace LHPC
     { return std::strtod( baseTenString.c_str(),
                           NULL ); }
 
-
     // This parses indicesString as a set of integers separated by non-digit
     // characters and returns the set as a vector.
     static std::vector< int > ParseIndices( std::string const& indicesString );
@@ -95,6 +94,12 @@ namespace LHPC
     static size_t MatchesIndex( std::string const& contentLine,
                                 size_t startPosition,
                                 int const indexValue );
+
+    // This replaces all instances of characterToRemove in stringToModify with
+    // characterToInsert.
+    static void ReplaceAllCharacters( std::string& stringToModify,
+                                      char const characterToRemove,
+                                      char const characterToInsert );
   };
 
 
@@ -235,6 +240,24 @@ namespace LHPC
     else
     {
       return std::string::npos;
+    }
+  }
+
+  // This replaces all instances of characterToRemove in stringToModify with
+  // characterToInsert.
+  inline void
+  ParsingUtilities::ReplaceAllCharacters( std::string& stringToModify,
+                                          char const characterToRemove,
+                                          char const characterToInsert )
+  {
+    for( size_t characterIndex( 0 );
+         characterIndex < stringToModify.size();
+         ++characterIndex )
+    {
+      if( stringToModify[ characterIndex ] == characterToRemove )
+      {
+        stringToModify[ characterIndex ] = characterToInsert;
+      }
     }
   }
 

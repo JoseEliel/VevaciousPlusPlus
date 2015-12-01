@@ -12,7 +12,7 @@ namespace VevaciousPlusPlus
 
   LhaLinearlyInterpolatedBlockEntry::LhaLinearlyInterpolatedBlockEntry(
                                               size_t const indexInValuesVector,
-                              LHPC::SlhaSimplisticInterpreter const& lhaParser,
+                                        LHPC::SimpleLhaParser const& lhaParser,
                                            std::string const& parameterName ) :
     LhaInterpolatedParameterFunctionoid( indexInValuesVector,
                                           lhaParser,
@@ -42,9 +42,11 @@ namespace VevaciousPlusPlus
   // block's scale according to the current status of the block.
   void LhaLinearlyInterpolatedBlockEntry::UpdateForNewLhaParameters()
   {
-    std::list< std::pair< double, std::string > >
-    scalesWithStrings( lhaParser->getScalesPairedWithValues( parameterName ) );
-    size_t const numberOfScales( scalesWithStrings.size() );
+    std::list< std::pair< std::string, double > > entriesAtScales;
+    (*lhaParser)( parameterName,
+                  entriesAtScales,
+                  true );
+    size_t const numberOfScales( entriesAtScales.size() );
 
     // First we guard against no block found (in which case the value is set
     // to a flat zero for all scales) or only 1 block found (in which case
@@ -58,13 +60,29 @@ namespace VevaciousPlusPlus
 
       if( numberOfScales == 0 )
       {
-        logScalesWithValues[ 0 ].second = 0.0;
-        logScalesWithValues[ 1 ].second = 0.0;
+        // If there were no entries with explicit scales, we check for entries
+        // in blocks without scales, which will be assumed to be constant over
+        // all scales.
+        (*lhaParser)( parameterName,
+                      entriesAtScales,
+                      false );
+        if( entriesAtScales.empty() )
+        {
+          logScalesWithValues[ 0 ].second = 0.0;
+        }
+        else
+        {
+          logScalesWithValues[ 0 ].second
+          = LHPC::ParsingUtilities::StringToDouble(
+                                                entriesAtScales.back().first );
+        }
+        logScalesWithValues[ 1 ].second = logScalesWithValues[ 0 ].second;
       }
       else
       {
         logScalesWithValues[ 0 ].second
-        = std::atof( scalesWithStrings.front().second.c_str() );
+        = LHPC::ParsingUtilities::StringToDouble(
+                                               entriesAtScales.front().first );
         logScalesWithValues[ 1 ].second = logScalesWithValues[ 0 ].second;
       }
     }
@@ -72,16 +90,16 @@ namespace VevaciousPlusPlus
     {
       // The blocks are ordered as they were read from the SLHA file, which
       // may not necessarily be in ascending order with respect to the scale.
-      scalesWithStrings.sort( &(FirstPairDotFirstIsLower< std::string >) );
+      entriesAtScales.sort( &(FirstPairDotSecondIsLower< std::string >) );
       logScalesWithValues.resize( numberOfScales );
       size_t scaleIndex( 0 );
-      std::list< std::pair< double, std::string > >::const_iterator
-      listIterator( scalesWithStrings.begin() );
+      std::list< std::pair< std::string, double > >::const_iterator
+      listIterator( entriesAtScales.begin() );
       while( scaleIndex < numberOfScales )
       {
-        logScalesWithValues[ scaleIndex ].first = log( listIterator->first );
+        logScalesWithValues[ scaleIndex ].first = log( listIterator->second );
         logScalesWithValues[ scaleIndex++ ].second
-        = std::atof( (listIterator++)->second.c_str() );
+        = LHPC::ParsingUtilities::StringToDouble( (listIterator++)->first );
         // Post-increments on last use of each variable. Yey terseness.
       }
       lastIndex = ( numberOfScales - 1 );

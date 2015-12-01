@@ -1,7 +1,7 @@
-<VevaciousPlusPlusInitialization>
+<VevaciousPlusPlusMainInput>
 
 <!--
-#  VevaciousPlusPlusInitialization.xml
+#  VevaciousPlusPlusMainInput.xml
 #
 #  Created on: Apr 10, 2014
 #      Author: Ben O'Leary (benjamin.oleary@gmail.com)
@@ -16,18 +16,12 @@
  -->
  
   <InitializationFile>
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml -->
-  /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStop.xml
-  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStau.xml -->
-  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauStop.xml -->
-  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/TestHiggsStauMuSnu.xml -->
+    /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml
   </InitializationFile>
   
-  <slha>
-  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha -->
-  <!-- /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/Fittino.slha -->
+  <InputFile>
   /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest01.slha
-  </slha>
+  </InputFile>
   
   <!-- If <InputFolder> is given, it should contain the path to a folder with
        only files in the SLHA format, which will be taken as input for
@@ -40,5 +34,5 @@
   </OutputFolder>
   -->
 
-</VevaciousPlusPlusInitialization>
+</VevaciousPlusPlusMainInput>
 

@@ -72,7 +72,7 @@ namespace VevaciousPlusPlus
     void WriteXmlResults( std::string const& xmlFilename );
 
     // This writes the results as an SLHA file.
-    void WriteSlhaResults( std::string const& slhaFilename,
+    void WriteLhaResults( std::string const& slhaFilename,
                            bool const writeWarnings = true );
 
 

@@ -58,7 +58,8 @@ namespace VevaciousPlusPlus
     // field configurations, and also the number of fields which vary for the
     // potential), and resets the nodes to describe a straight path between the
     // new vacua, as well as setting pathTemperature and currentMinuitTolerance
-    // appropriately.
+    // appropriately. It also sets up all the auxiliary vectors and matrices
+    // which depend on the number of fields varying for the potential.
     virtual void SetPotentialAndVacuaAndTemperature(
                                     PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
@@ -72,7 +73,7 @@ namespace VevaciousPlusPlus
     double maximumFieldVectorLengthSquared;
     size_t numberOfFields;
     size_t const numberOfVaryingNodes;
-    double segmentAuxiliaryLength;
+    double const segmentAuxiliaryLength;
     std::vector< std::vector< double > > returnPathNodes;
     Eigen::VectorXd currentParallelComponent;
     // This is the vector between the current 2 reference nodes, scaled to be
@@ -86,7 +87,7 @@ namespace VevaciousPlusPlus
     // is called (unless operator() has been over-ridden appropriately).
     Eigen::MatrixXd reflectionMatrix;
     std::vector< double > minuitInitialSteps;
-    std::vector< double > const nodeZeroParameterization;
+    std::vector< double > nodeZeroParameterization;
     Eigen::VectorXd minuitResultAsUntransformedVector;
 
 
@@ -215,35 +216,6 @@ namespace VevaciousPlusPlus
     }
     return ( ( parameterizationLengthSquared * parameterizationLengthSquared )
              + PotentialValue( fieldConfiguration ) );
-  }
-
-  // This sets the potential function and vacua to be those given (also
-  // noting the maximum allowed scale as the maximum Euclidean length for
-  // field configurations, and also the number of fields which vary for the
-  // potential), and resets the nodes to describe a straight path between the
-  // new vacua, as well as setting pathTemperature and currentMinuitTolerance
-  // appropriately.
-  inline void MinuitOnHypersurfaces::SetPotentialAndVacuaAndTemperature(
-                                    PotentialFunction const& potentialFunction,
-                                           PotentialMinimum const& falseVacuum,
-                                            PotentialMinimum const& trueVacuum,
-                                                 double const pathTemperature )
-  {
-    this->potentialFunction = &potentialFunction;
-    numberOfFields = potentialFunction.NumberOfFieldVariables();
-    double const
-    maximumFieldVectorLength( potentialFunction.GetLagrangianParameterManager(
-                                                  ).MaximumEvaluationScale() );
-    maximumFieldVectorLengthSquared
-    = ( maximumFieldVectorLength * maximumFieldVectorLength );
-    this->pathTemperature = pathTemperature;
-    potentialAtOrigin
-    = potentialFunction( potentialFunction.FieldValuesOrigin(),
-                         pathTemperature );
-    SetNodesForInitialPath( falseVacuum,
-                            trueVacuum );
-    SetCurrentMinuitTolerance( falseVacuum,
-                               trueVacuum );
   }
 
   // This caps the field configuration so that the square of its Euclidean
