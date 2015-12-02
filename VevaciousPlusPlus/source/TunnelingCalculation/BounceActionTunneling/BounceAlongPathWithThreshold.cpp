@@ -252,9 +252,9 @@ namespace VevaciousPlusPlus
       << "Passing best path so far to next path finder.";
       std::cout << std::endl;
 
-      (*pathFinder)->SetPotentialAndVacuaAndTemperature(potentialFunction,
-                                                        falseVacuum,
-                                                        trueVacuum,
+      (*pathFinder)->SetPotentialAndVacuaAndTemperature( potentialFunction,
+                                                         falseVacuum,
+                                                         trueVacuum,
                                                         tunnelingTemperature );
       TunnelPath const* currentPath( bestPath );
       BubbleProfile const* currentBubble( bestBubble );

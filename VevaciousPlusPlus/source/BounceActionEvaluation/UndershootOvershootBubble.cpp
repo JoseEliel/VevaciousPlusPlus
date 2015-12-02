@@ -330,9 +330,12 @@ namespace VevaciousPlusPlus
 
     if( radialIndex < odeintProfile.size() )
     {
-      auxiliaryProfile.insert( auxiliaryProfile.end(),
-                               ( odeintProfile.begin() + 1 ),
-                               ( odeintProfile.begin() + radialIndex ) );
+      if( radialIndex > 1 )
+      {
+        auxiliaryProfile.insert( auxiliaryProfile.end(),
+                                 ( odeintProfile.begin() + 1 ),
+                                 ( odeintProfile.begin() + radialIndex ) );
+      }
     }
     else
     {

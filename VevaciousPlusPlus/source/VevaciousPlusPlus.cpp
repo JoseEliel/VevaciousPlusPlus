@@ -53,13 +53,6 @@ namespace VevaciousPlusPlus
     ownedTunnelingCalculator( NULL ),
     currentTime()
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "VevaciousPlusPlus::VevaciousPlusPlus( \""
-    << initializationFileName << "\" ) called.";
-    std::cout << std::endl;/**/
-
     std::string potentialFunctionInitializationFilename( "error" );
     std::string potentialMinimizerInitializationFilename( "error" );
     std::string tunnelingCalculatorInitializationFilename( "error" );
@@ -93,27 +86,20 @@ namespace VevaciousPlusPlus
     // destructor only deletes ownedTunnelingCalculator,
     // ownedPotentialMinimizer, ownedPotentialFunction, and
     // ownedLagrangianParameterManager, while this constructor is allocating
-    // much more memory than that. Everything would be clear if we restricted
-    // ourselves to requiring a C++11-compliant compiler, as then we could have
-    // the constructors use std::unique_ptrs, but, alas, we're sticking to
-    // C++98.
+    // much more memory than that (through the various functions called within
+    // functions). Everything would be clear if we restricted ourselves to
+    // requiring a C++11-compliant compiler, as then we could have the
+    // constructors use std::unique_ptrs, but, alas, we're sticking to C++98.
     FullPotentialDescription
     fullPotentialDescription( CreateFullPotentialDescription(
                                    potentialFunctionInitializationFilename ) );
-
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "Read potential and Lagrangian.";
-    std::cout << std::endl;/**/
-
     lagrangianParameterManager = ownedLagrangianParameterManager
     = fullPotentialDescription.first;
     ownedPotentialFunction = fullPotentialDescription.second;
-    ownedPotentialMinimizer
+    potentialMinimizer = ownedPotentialMinimizer
     = CreatePotentialMinimizer( *ownedPotentialFunction,
                                 potentialMinimizerInitializationFilename );
-    ownedTunnelingCalculator
+    tunnelingCalculator = ownedTunnelingCalculator
     = CreateTunnelingCalculator( tunnelingCalculatorInitializationFilename );
   }
 
@@ -419,13 +405,6 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::CreateFullPotentialDescription(
                    std::string const& potentialFunctionInitializationFilename )
   {
-    // debugging:
-    /**/std::cout << std::endl << "debugging:"
-    << std::endl
-    << "VevaciousPlusPlus::CreateFullPotentialDescription( \""
-    << potentialFunctionInitializationFilename << "\" ) called.";
-    std::cout << std::endl;/**/
-
     LesHouchesAccordBlockEntryManager*
     createdLagrangianParameterManager( NULL );
     PotentialFromPolynomialWithMasses* createdPotentialFunction( NULL );
@@ -440,14 +419,6 @@ namespace VevaciousPlusPlus
     // <LagrangianParameterManagerClass> and <PotentialFunctionClass>.
     while( xmlParser.readNextElement() )
     {
-      // debugging:
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "Reading element " << xmlParser.getCurrentOpeningTagAsFound()
-      << "Content =" << std::endl
-      << xmlParser.getTrimmedCurrentElementContent();
-      std::cout << std::endl;/**/
-
       ReadClassAndArguments( xmlParser,
                              "LagrangianParameterManagerClass",
                              lagrangianParameterManagerClass,

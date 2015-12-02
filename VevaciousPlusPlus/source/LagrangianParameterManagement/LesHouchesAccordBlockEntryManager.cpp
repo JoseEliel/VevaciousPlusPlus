@@ -80,59 +80,43 @@ namespace VevaciousPlusPlus
     maximumScaleType( "FixedNumber" ),
     maximumScaleArgument( "1.0" )
   {
-    BOL::AsciiXmlParser fileParser;
-    fileParser.openRootElementOfFile( xmlFileName );
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.openRootElementOfFile( xmlFileName );
     std::string renormalizationScaleChoices;
-    while( fileParser.readNextElement() )
+    while( xmlParser.readNextElement() )
     {
-      if( fileParser.currentElementNameMatches(
+      if( xmlParser.currentElementNameMatches(
                                               "RenormalizationScaleChoices" ) )
       {
-        BOL::AsciiXmlParser elementParser;
-        elementParser.loadString(
-                                fileParser.getTrimmedCurrentElementContent() );
-        while( elementParser.readNextElement() )
-        {
-          BOL::AsciiXmlParser choiceParser;
-          choiceParser.loadString(
-                            elementParser.getTrimmedCurrentElementContent() );
-          std::string evaluationType( "" );
-          std::string evaluationArgument( "" );
-          while( choiceParser.readNextElement() )
-          {
-            if( choiceParser.currentElementNameMatches( "EvaluationType" ) )
-            {
-              evaluationType = elementParser.getTrimmedCurrentElementContent();
-            }
-            else if( choiceParser.currentElementNameMatches(
-                                                       "EvaluationArgument" ) )
-            {
-              evaluationArgument
-              = elementParser.getTrimmedCurrentElementContent();
-            }
-          }
-          if( elementParser.currentElementNameMatches( "MinimumScaleBound" ) )
-          {
-            minimumScaleType = evaluationType;
-            minimumScaleArgument = evaluationArgument;
-          }
-          else if( elementParser.currentElementNameMatches(
-                                                         "FixedScaleChoice" ) )
-          {
-            fixedScaleType = evaluationType;
-            fixedScaleArgument = evaluationArgument;
-          }
-          else if( elementParser.currentElementNameMatches(
-                                                        "MaximumScaleBound" ) )
-          {
-            maximumScaleType = evaluationType;
-            maximumScaleArgument = evaluationArgument;
-          }
-        }
+        renormalizationScaleChoices
+        = xmlParser.getTrimmedCurrentElementContent();
       }
-      else if( fileParser.currentElementNameMatches( "ValidBlocks" ) )
+      else if( xmlParser.currentElementNameMatches( "ValidBlocks" ) )
       {
-        ParseValidBlocks( fileParser.getTrimmedCurrentElementContent() );
+        ParseValidBlocks( xmlParser.getTrimmedCurrentElementContent() );
+      }
+    }
+    xmlParser.closeFile();
+    xmlParser.loadString( renormalizationScaleChoices );
+    while( xmlParser.readNextElement() )
+    {
+      if( xmlParser.currentElementNameMatches( "MinimumScaleBound" ) )
+      {
+        ParseScaleTypeAndArgument( xmlParser.getTrimmedCurrentElementContent(),
+                                   minimumScaleType,
+                                   minimumScaleArgument );
+      }
+      else if( xmlParser.currentElementNameMatches( "FixedScaleChoice" ) )
+      {
+        ParseScaleTypeAndArgument( xmlParser.getTrimmedCurrentElementContent(),
+                                   fixedScaleType,
+                                   fixedScaleArgument );
+      }
+      else if( xmlParser.currentElementNameMatches( "MaximumScaleBound" ) )
+      {
+        ParseScaleTypeAndArgument( xmlParser.getTrimmedCurrentElementContent(),
+                                   maximumScaleType,
+                                   maximumScaleArgument );
       }
     }
   }

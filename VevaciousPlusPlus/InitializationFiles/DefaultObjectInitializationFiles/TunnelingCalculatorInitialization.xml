@@ -34,7 +34,7 @@
         <!-- Valid options: "NoTunneling", "JustQuantum", "JustThermal",
                             "ThermalThenQuantum", or "QuantumThenThermal"
              (no quote marks in actual element). -->
-        JustQuantum
+        JustThermal
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
@@ -88,7 +88,7 @@
            "CosmoTransitionsRunner", and are ignored if <ClassType> is
            "BounceAlongPathWithThreshold". -->
       <PathToCosmotransitions>
-        /Users/oleary/BOL/machine-specific/CosmoTransitions2/
+        /home/bol/BOL/ProjectDependencies/CosmoTransitions2/
       </PathToCosmotransitions>
       <MaxInnerLoops>
         <!-- This is the number of iterations of the inner loop that
@@ -193,6 +193,7 @@
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
+        <PathFinder>
           <ClassType>
             MinuitOnPotentialPerpendicularToPath
           </ClassType>
@@ -210,7 +211,7 @@
                    path with a higher bounce action than the last try before it
                    decides that it can no longer try to find a path with a
                    lower bounce action. -->
-              3
+              1
             </NumberOfAllowedWorsenings>
             <ConvergenceThresholdFraction>
               <!-- This is the fraction of the length of a path segment (after

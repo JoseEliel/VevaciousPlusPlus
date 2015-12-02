@@ -22,13 +22,12 @@ namespace VevaciousPlusPlus
   {
   public:
     MinuitOnPotentialPerpendicularToPath( size_t const numberOfPathSegments,
-                                       int const numberOfAllowedWorsenings = 3,
-                             double const nodeMovementThresholdFraction = 0.05,
-                                          double const dampingFactor = 0.75,
-                        std::vector< double > const neighborDisplacementWeights
-                        = std::vector< double >(),
-                                         unsigned int const minuitStrategy = 1,
-                                  double const minuitToleranceFraction = 0.5 );
+                                          int const numberOfAllowedWorsenings,
+                                    double const nodeMovementThresholdFraction,
+                                          double const dampingFactor,
+                       std::vector< double > const neighborDisplacementWeights,
+                                          unsigned int const minuitStrategy,
+                                        double const minuitToleranceFraction );
     virtual ~MinuitOnPotentialPerpendicularToPath();
 
 
@@ -63,10 +62,13 @@ namespace VevaciousPlusPlus
     double bounceBeforeLastPath;
     bool nodesConverged;
 
-    // This sets returnPathNodes.front() and lastPathNodes.front() to be
+
+    // This sets up nodeDisplacements and lastPathNodes to have the correct
+    // sizes, sets returnPathNodes.front() and lastPathNodes.front() to be
     // falseVacuum.FieldConfiguration(), and returnPathNodes.back()
     // and lastPathNodes.back() to be trueVacuum.FieldConfiguration(),
-    // assuming that every path given is between the vacua.
+    // assuming that every path given is between the vacua. It also resets
+    // numberOfWorseningsSoFar.
     virtual void SetNodesForInitialPath( PotentialMinimum const& falseVacuum,
                                          PotentialMinimum const& trueVacuum );
 
@@ -100,24 +102,31 @@ namespace VevaciousPlusPlus
     return ( numberOfAllowedWorsenings > numberOfWorseningsSoFar );
   }
 
-  // This sets returnPathNodes.front() and lastPathNodes.front() to be
+  // This sets up nodeDisplacements and lastPathNodes to have the correct
+  // sizes, sets returnPathNodes.front() and lastPathNodes.front() to be
   // falseVacuum.FieldConfiguration(), and returnPathNodes.back()
   // and lastPathNodes.back() to be trueVacuum.FieldConfiguration(),
-  // assuming that every path given is between the vacua.
+  // assuming that every path given is between the vacua. It also resets
+  // numberOfWorseningsSoFar.
   inline void MinuitOnPotentialPerpendicularToPath::SetNodesForInitialPath(
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
-    returnPathNodes.front() = falseVacuum.FieldConfiguration();
-    returnPathNodes.back() = trueVacuum.FieldConfiguration();
+    nodeDisplacements = lastPathNodes
+    = std::vector< Eigen::VectorXd >( ( numberOfVaryingNodes + 2 ),
+                                     Eigen::VectorXd::Zero( numberOfFields ) );
+    std::vector< double > const&
+    falseConfiguration( falseVacuum.FieldConfiguration() );
+    std::vector< double > const&
+    trueConfiguration( trueVacuum.FieldConfiguration() );
+    returnPathNodes.front() = falseConfiguration;
+    returnPathNodes.back() = trueConfiguration;
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
     {
-      lastPathNodes.front()( fieldIndex )
-      = falseVacuum.FieldConfiguration()[ fieldIndex ];
-      lastPathNodes.back()( fieldIndex )
-      = trueVacuum.FieldConfiguration()[ fieldIndex ];
+      lastPathNodes.front()( fieldIndex ) = falseConfiguration[ fieldIndex ];
+      lastPathNodes.back()( fieldIndex ) = trueConfiguration[ fieldIndex ];
     }
     // We reset the number of allowed worsening steps here.
     numberOfWorseningsSoFar = 0;

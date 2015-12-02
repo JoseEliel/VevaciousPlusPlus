@@ -18,7 +18,16 @@ namespace VevaciousPlusPlus
     homotopyType( homotopyType ),
     resolutionSize( resolutionSize )
   {
-    // This constructor is just an initialization list.
+    if( !(( homotopyType == "1" )
+          ||
+          ( homotopyType == "2" )) )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "HOM4PS2 argument must be either"
+      << " \"1\" (for \"The polyhedral homotopy\")"
+      << " or \"2\" (for \"The classical linear homotopy\")";
+      throw std::runtime_error( errorBuilder.str() );
+    }
   }
 
   Hom4ps2Runner::~Hom4ps2Runner()

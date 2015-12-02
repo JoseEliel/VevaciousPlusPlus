@@ -455,7 +455,7 @@ namespace VevaciousPlusPlus
                                      "PathToHom4ps2",
                                      pathToHom4ps2 );
       InterpretElementIfNameMatches( xmlParser,
-                                     "HomotopyType",
+                                     "Hom4ps2Argument",
                                      homotopyType );
       InterpretElementIfNameMatches( xmlParser,
                                      "ResolutionSize",

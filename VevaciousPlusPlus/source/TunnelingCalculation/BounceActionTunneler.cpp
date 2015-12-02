@@ -361,6 +361,12 @@ namespace VevaciousPlusPlus
         rangeOfMaxTemperature.second = temperatureGuess;
       }
     }
+
+    std::cout
+    << std::endl
+    << "Temperature lies between " << rangeOfMaxTemperature.first
+    << " GeV and " << rangeOfMaxTemperature.second << " GeV.";
+    std::cout << std::endl;
   }
 
   // This ensures that thermalSurvivalProbability is set correctly from

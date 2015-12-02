@@ -10,10 +10,10 @@
 
 #include "CommonIncludes.hpp"
 #include "limits"
+#include "TunnelingCalculation/BounceActionTunneler.hpp"
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "../BounceActionTunneler.hpp"
 #include "ThermalActionFitter.hpp"
 #include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"

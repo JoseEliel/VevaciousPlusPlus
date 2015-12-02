@@ -116,6 +116,15 @@ namespace VevaciousPlusPlus
     // objects rather than a set of SlhaPolynomialFitBlockEntry objects.
     typedef LhaLinearlyInterpolatedBlockEntry LhaBlockEntryInterpolator;
 
+
+    // This parses xmlElement for <EvaluationType> and <EvaluationArgument> and
+    // places the content of these child elements into typeDestination and
+    // argumentDestination respectively.
+    static void ParseScaleTypeAndArgument( std::string const& xmlElement,
+                                           std::string& typeDestination,
+                                           std::string& argumentDestination );
+
+
     // It is necessary to keep track of the number of active parameters
     // separately from the size of activeParametersToIndices because several
     // strings could point to the same parameter functionoid, and separately
@@ -277,6 +286,30 @@ namespace VevaciousPlusPlus
     stringBuilder << ParametersInPythonFunction( 2 );
     stringBuilder << "  return parameterValues\n\n";
     return stringBuilder.str();
+  }
+
+  // This parses xmlElement for <EvaluationType> and <EvaluationArgument> and
+  // places the content of these child elements into typeDestination and
+  // argumentDestination respectively.
+  inline void LesHouchesAccordBlockEntryManager::ParseScaleTypeAndArgument(
+                                                 std::string const& xmlElement,
+                                                  std::string& typeDestination,
+                                             std::string& argumentDestination )
+  {
+    BOL::AsciiXmlParser xmlParser;
+    xmlParser.loadString( xmlElement );
+    while( xmlParser.readNextElement() )
+    {
+      if( xmlParser.currentElementNameMatches( "EvaluationType" ) )
+      {
+        typeDestination = xmlParser.getTrimmedCurrentElementContent();
+      }
+      else if( xmlParser.currentElementNameMatches(
+                                                 "EvaluationArgument" ) )
+      {
+        argumentDestination = xmlParser.getTrimmedCurrentElementContent();
+      }
+    }
   }
 
   // This parses validBlocksString into a set of valid block names and

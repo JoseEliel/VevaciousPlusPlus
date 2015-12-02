@@ -27,9 +27,8 @@ namespace VevaciousPlusPlus
                                            * nodeMovementThresholdFraction ),
      dampingFactor( dampingFactor ),
      neighborDisplacementWeights( neighborDisplacementWeights ),
-     lastPathNodes( ( numberOfPathSegments + 1 ),
-                    Eigen::VectorXd::Zero( numberOfFields ) ),
-     nodeDisplacements( lastPathNodes ),
+     lastPathNodes(),
+     nodeDisplacements(),
      bounceBeforeLastPath( functionValueForNanInput ),
      nodesConverged( false )
   {

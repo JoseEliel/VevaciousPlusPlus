@@ -355,6 +355,10 @@ namespace VevaciousPlusPlus
                                               straightSplinePath,
                                               resolutionOfDsbVacuum,
                                               thresholdSeparationSquared );
+      actionCalculator.ResetVacua( potentialFunction,
+                                   thermalFalseVacuum,
+                                   thermalTrueVacuum,
+                                   *fitTemperature );
       BubbleProfile* bubbleProfile( actionCalculator( straightSplinePath,
                                                     potentialApproximation ) );
       straightPathActions.push_back( bubbleProfile->BounceAction() );
