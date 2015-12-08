@@ -100,6 +100,11 @@ namespace LHPC
     static void ReplaceAllCharacters( std::string& stringToModify,
                                       char const characterToRemove,
                                       char const characterToInsert );
+
+    // This returns true if stringToSearch contains at least one instance of
+    // characterToSeek.
+    static bool CharacterIsInString( char const characterToSeek,
+                                     std::string const& stringToSearch );
   };
 
 
@@ -259,6 +264,24 @@ namespace LHPC
         stringToModify[ characterIndex ] = characterToInsert;
       }
     }
+  }
+
+  // This returns true if stringToSearch contains at least one instance of
+  // characterToSeek.
+  inline bool
+  ParsingUtilities::CharacterIsInString( char const characterToSeek,
+                                         std::string const& stringToSearch )
+  {
+    for( std::string::const_iterator stringCharacter(stringToSearch.begin());
+         stringCharacter != stringToSearch.end();
+         ++stringCharacter )
+    {
+      if( *stringCharacter == characterToSeek )
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
 } /* namespace LHPC */

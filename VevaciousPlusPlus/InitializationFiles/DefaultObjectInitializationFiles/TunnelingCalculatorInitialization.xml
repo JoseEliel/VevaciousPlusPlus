@@ -34,7 +34,7 @@
         <!-- Valid options: "NoTunneling", "JustQuantum", "JustThermal",
                             "ThermalThenQuantum", or "QuantumThenThermal"
              (no quote marks in actual element). -->
-        JustThermal
+        QuantumThenThermal
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
