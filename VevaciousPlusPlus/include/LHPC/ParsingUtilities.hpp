@@ -105,6 +105,21 @@ namespace LHPC
     // characterToSeek.
     static bool CharacterIsInString( char const characterToSeek,
                                      std::string const& stringToSearch );
+
+    // This resets the flags of streamToReset and sets its string to be
+    // newString.
+    static void ResetStringstream( std::stringstream& streamToReset,
+                                   std::string const& newString );
+
+    // This resets the flags of streamToReset and sets its string to be "".
+    static void ResetStringstream( std::stringstream& streamToReset )
+    { ResetStringstream( streamToReset,
+                         "" ); }
+
+    // This resets the flags of streamToReset and sets its string to be
+    // newString.
+    static void ResetStringstream( std::istringstream& streamToReset,
+                                   std::string const& newString );
   };
 
 
@@ -282,6 +297,26 @@ namespace LHPC
       }
     }
     return false;
+  }
+
+  // This resets the flags of streamToReset and sets its string to be
+  // newString.
+  inline void
+  ParsingUtilities::ResetStringstream( std::stringstream& streamToReset,
+                                       std::string const& newString )
+  {
+    streamToReset.clear();
+    streamToReset.str( newString );
+  }
+
+  // This resets the flags of streamToReset and sets its string to be
+  // newString.
+  inline void
+  ParsingUtilities::ResetStringstream( std::istringstream& streamToReset,
+                                       std::string const& newString )
+  {
+    streamToReset.clear();
+    streamToReset.str( newString );
   }
 
 } /* namespace LHPC */
