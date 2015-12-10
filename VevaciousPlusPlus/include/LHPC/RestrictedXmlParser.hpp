@@ -136,13 +136,7 @@ namespace LHPC
     // more valid elements could be found. (If no further elements are
     // found, the next call of this function will do nothing, as the next
     // character will just be the EOF character.)
-    bool ReadNextElement() { return ( DiscardToNextTag()
-                                      &&
-                                      ParseTagName( currentName )
-                                      &&
-                                      ParseAttributes( currentAttributes )
-                                      &&
-                                      RecordToEndOfElement( currentName ) ); }
+    bool ReadNextElement();// { NEEDS DOING! }
 
     // This resets the parser so that ReadNextElement() will start from the
     // beginning of the content to be parsed (which is either the string given
@@ -239,14 +233,13 @@ namespace LHPC
       ResetContent();
       std::stringstream prologStream;
       std::stringstream tagStream;
-      while( ReadToNextTagOpener( &prologStream )
-             &&
-             !(TryToReadStartTag( rootName,
-                                  &rootAttributes,
-                                  &tagStream )) )
+      if( ReadToNextTagOpener( &prologStream ) )
       {
-        prologStream << tagStream.str();
+        ReadStartTag( rootName,
+                      &rootAttributes,
+                      tagStream );
       }
+      throw std::runtime_error( "No root element found in file!" );
     }
 
     // This puts characters from xmlStream into nonMarkupDestination if not
@@ -260,7 +253,9 @@ namespace LHPC
     {
       while( ReadToNextHalt( '<',
                              nonMarkupDestination,
-                             false ) )
+                             NULL )
+             &&
+             xmlStream->get( currentChar ).good() )
       {
         // We break from the loop with true as soon as we find a '<' followed
         // by an allowed name start character.
@@ -269,95 +264,107 @@ namespace LHPC
         {
           return true;
         }
+        else if( nonMarkupDestination != NULL )
+        {
+          (*nonMarkupDestination) << '<' << currentChar;
+        }
       }
       // If we did not break from the loop, then a tag opener was not found and
       // xmlStream is finished.
       return false;
     }
 
-    // This puts characters from xmlStream into destinationForReadCharacters
-    // (unless it is NULL, in which case the characters are discarded) until it
-    // reads in the first instance of haltCharacter (which is not put into
-    // destinationForReadCharacters unless appendHaltCharacter is true).
+    // This puts characters from xmlStream into destinationWithoutHalt if it is
+    // not NULL and destinationIncludingHalt if it is not NULL (if both are
+    // NULL, the characters are discarded) until it reads in the first instance
+    // of haltCharacter (which is put into destinationIncludingHalt but not
+    // into destinationWithoutHalt).
     bool ReadToNextHalt( char const haltCharacter,
-                         std::istream* destinationForReadCharacters,
-                         bool appendHaltCharacter )
+                         std::istream* destinationWithoutHalt,
+                         std::istream* destinationIncludingHalt )
     {
-      while( xmlStream->get( currentChar ).good()
+      while( ReadCharacter( destinationIncludingHalt )
              &&
-             currentChar != haltCharacter )
+             ( currentChar != haltCharacter ) )
+      {
+        if( destinationWithoutHalt != NULL )
+        {
+          (*destinationWithoutHalt) << currentChar;
+        }
+      }
+      return ( currentChar == haltCharacter );
+    }
+
+    // This puts the next character from xmlStream into currentChar, then puts
+    // it into destinationForReadCharacters if it is not NULL, then returns
+    // true, unless no character could be read, in which case false is
+    // returned.
+    bool ReadCharacter( std::istream* destinationForReadCharacters )
+    {
+      if( xmlStream->get( currentChar ).good() )
       {
         if( destinationForReadCharacters != NULL )
         {
           (*destinationForReadCharacters) << currentChar;
         }
+        return true;
       }
-      if( appendHaltCharacter
-          &&
-          ( destinationForReadCharacters != NULL ) )
+      else
       {
-        (*destinationForReadCharacters) << currentChar;
+        return false;
       }
-      return ( currentChar == haltCharacter );
     }
 
     // This tries to read a start tag, assuming that '<' was read before
     // currentChar, and that currentChar is the first character of a valid
     // element name. It sets currentElementIsEmpty to be true if the tag was
     // actually an empty-element tag rather than a start tag. All the
-    // characters of the tag get put into tagRecord if it is not NULL.
-    bool TryToReadStartTag( std::string& nameDestination,
+    // characters of the tag are passed into tagRecord. If it fails to read a
+    // valid start tag, it throws an exception.
+    void ReadStartTag( std::string& nameDestination,
                             AttributeMap* attributeDestination,
-                            std::stringstream* tagRecord = NULL )
+                            std::stringstream& tagRecord )
     {
+      ParsingUtilities::ResetStringstream( tagRecord );
+      tagRecord << '<' << currentChar;
       std::stringstream bufferStream;
       bufferStream << currentChar;
 
       // We read to the first character that marks the end of the element name.
-      if( ReadToNextHalt( ( AllowedWhitespaceChars() + ">/" ),
-                          &bufferStream,
-                          false ) )
+      if( !(ReadToNextHalt( ( AllowedWhitespaceChars() + ">/" ),
+                            &bufferStream,
+                            &tagRecord )) )
       {
-        // If we successfully read a name, we assign it to nameDestination, and
-        // prepare the attributes.
-        nameDestination = bufferStream.str();
-        if( tagRecord != NULL )
-        {
-          (*tagRecord) << '<' << nameDestination << currentChar;
-        }
-        if( attributeDestination != NULL )
-        {
-          attributeDestination->clear();
-        }
-        return TryToCloseStartTag( attributeDestination,
-                                   tagRecord );
+        throw std::runtime_error(
+               "Failed to find whitespace or end of tag after element name!" );
       }
-      return false;
+      nameDestination = bufferStream.str();
+      if( attributeDestination != NULL )
+      {
+        attributeDestination->clear();
+      }
+      CloseStartTag( attributeDestination,
+                     tagRecord );
     }
 
-    // This puts characters from xmlStream into destinationForReadCharacters
-    // (unless it is NULL, in which case the characters are discarded), until
-    // it reads in the first instance of any of the characters in
-    // haltCharacters (which is not put into destinationForReadCharacters).
+    // This puts characters from xmlStream into destinationWithoutHalt if it is
+    // not NULL and destinationIncludingHalt if it is not NULL (if both are
+    // NULL, the characters are discarded) until it reads in the first instance
+    // of any of the characters in haltCharacters (which is put into
+    // destinationIncludingHalt but not into destinationWithoutHalt).
     bool ReadToNextHalt( std::string const& haltCharacters,
-                         std::istream* destinationForReadCharacters,
-                         bool appendHaltCharacter )
+                         std::istream* destinationWithoutHalt,
+                         std::istream* destinationIncludingHalt )
     {
-      while( xmlStream->get( currentChar ).good()
+      while( ReadCharacter( destinationIncludingHalt )
              &&
              !(ParsingUtilities::CharacterIsInString( currentChar,
                                                       haltCharacters )) )
       {
-        if( destinationForReadCharacters != NULL )
+        if( destinationWithoutHalt != NULL )
         {
-          (*destinationForReadCharacters) << currentChar;
+          (*destinationWithoutHalt) << currentChar;
         }
-      }
-      if( appendHaltCharacter
-          &&
-          ( destinationForReadCharacters != NULL ) )
-      {
-        (*destinationForReadCharacters) << currentChar;
       }
       return ParsingUtilities::CharacterIsInString( currentChar,
                                                     haltCharacters );
@@ -365,41 +372,42 @@ namespace LHPC
 
     // This reads xmlStream until the end of the start or empty-element tag is
     // reached, parsing attributes along the way into attributeDestination,
-    // returning true if it reaches the end of the tag without the stream
-    // ending or finding malformed XML, or false otherwise. All the
-    // characters of the tag get put into tagRecord if it is not NULL.
-    bool TryToCloseStartTag( AttributeMap* attributeDestination,
-                             std::stringstream* tagRecord )
+    // throwing an exception if it does not reach the end of the tag without
+    // the stream ending or finding malformed XML. All the characters of the
+    // tag get put into tagRecord if it is not NULL.
+    void CloseStartTag( AttributeMap* attributeDestination,
+                        std::stringstream& tagRecord )
     {
-      if( SkipWhitespace( tagRecord ) )
+      if( !(SkipWhitespace( &tagRecord )) )
       {
-        // Now currentChar is the end of the opening tag ('>'), or the first
-        // character of the end of an empty element tag ('/' in "/>") (or the
-        // tag is malformed with a '/' out of place), or is the first character
-        // of an attribute name.
-        if( currentChar == '>' )
+        std::stringstream errorBuilder;
+        errorBuilder << "";
+        throw std::runtime_error( errorBuilder.str() );
+      }
+      // Now currentChar is the end of the start tag ('>'), or the first
+      // character of the end of an empty element tag ('/' in "/>") (or the
+      // tag is malformed with a '/' out of place), or is the first character
+      // of an attribute name.
+      if( currentChar == '>' )
+      {
+        currentElementIsEmpty = false;
+      }
+      else if( currentChar == '/' )
+      {
+        if( ReadCharacter( &tagRecord )
+            &&
+            ( currentChar == '>' ) )
         {
-          currentElementIsEmpty = false;
-          return true;
-        }
-        else if( currentChar == '/' )
-        {
-          if( xmlStream->get( currentChar ).good()
-              &&
-              ( currentChar == '>' ) )
-          {
-            currentElementIsEmpty = true;
-            return true;
-          }
-        }
-        else if( TryToParseAttribute( attributeDestination,
-                                      tagRecord ) )
-        {
-          return TryToCloseStartTag( attributeDestination,
-                                     tagRecord );
+          currentElementIsEmpty = true;
         }
       }
-      return false;
+      else
+      {
+        ParseAttribute( attributeDestination,
+                        tagRecord );
+        CloseStartTag( attributeDestination,
+                       tagRecord );
+      }
     }
 
     // This reads characters from xmlStream into currentChar until the first
@@ -413,18 +421,12 @@ namespace LHPC
       // non-whitespace character, discarding all the whitespace characters
       // along the way.
       while( ParsingUtilities::CharacterIsInString( currentChar,
-                                                 AllowedWhitespaceChars() ) )
+                                                   AllowedWhitespaceChars() ) )
       {
         // If we run out of characters from the stream before finding a
-        // non-whitespace character, we return false.
-        if( xmlStream->get( currentChar ).good() )
-        {
-          if( destinationForReadCharacters != NULL )
-          {
-            (*destinationForReadCharacters) << currentChar;
-          }
-        }
-        else
+        // non-whitespace character, we return false. Evaluating the
+        // conditional does work.
+        if( !(ReadCharacter( destinationForReadCharacters )) )
         {
           return false;
         }
@@ -432,64 +434,66 @@ namespace LHPC
       return true;
     }
 
-    // This parses an attribute from xmlStream, puts it in
-    // attributeDestination, and returns true, unless the XML was malformed.
-    bool TryToParseAttribute( AttributeMap* attributeDestination,
-                              std::stringstream* tagRecord )
+    // This parses an attribute from xmlStream assuming that the first
+    // character of the attribute name is already in currentChar, and puts the
+    // attribute into attributeDestination. It throws an exception if the XML
+    // is malformed.
+    void ParseAttribute( AttributeMap* attributeDestination,
+                         std::stringstream& tagRecord )
     {
-      CHECK THIS LOGIC AND PROPAGATE tagRecord IN REST OF FUNCTIONS!
       // When this function is called, currentChar is the first character of
       // the name of an attribute.
-      std::stringstream bufferStream;
-      bufferStream << currentChar;
-      if( ReadToNextHalt( ( AllowedWhitespaceChars() + "=" ),
-                          &bufferStream,
-                          false ) )
+      std::stringstream nameStream;
+      nameStream << currentChar;
+      std::stringstream valueStream;
+      if( !( ReadToNextHalt( ( AllowedWhitespaceChars() + "=" ),
+                             &nameStream,
+                             &tagRecord )
+             &&
+             SkipWhitespace( &tagRecord )
+             &&
+             ( currentChar == '=' )
+             &&
+             ReadCharacter( &tagRecord )
+             &&
+             SkipWhitespace( &tagRecord )
+             &&
+             ( ( currentChar == '\'' ) || ( currentChar == '\"' ) )
+             &&
+             ReadToNextHalt( currentChar,
+                             &nameStream,
+                             &valueStream ) ) )
       {
-        if( tagRecord != NULL )
-        {
-          (*tagRecord) << bufferStream.str() << currentChar;
-        }
-        if( SkipWhitespace( tagRecord )
-            &&
-            ( currentChar == '=' )
-            &&
-            xmlStream->get( currentChar ).good()
-            &&
-            SkipWhitespace( tagRecord )
-            &&
-            ( ( currentChar == '\'' ) || ( currentChar == '\"' ) ) )
-        {
-          std::string const attributeName( bufferStream.str() );
-          char const quoteCharacter( currentChar );
-          ParsingUtilities::ResetStringstream( bufferStream );
-          if( ReadToNextHalt( quoteCharacter,
-                              &bufferStream,
-                              false ) )
-          {
-            (*attributeDestination)[ attributeName ] = bufferStream.str();
-            if( tagRecord != NULL )
-            {
-              (*tagRecord) << bufferStream.str() << currentChar;
-            }
-            return true;
-          }
-        }
+        throw std::runtime_error( "Could not parse an attribute correctly!" );
       }
-      return false;
+      (*attributeDestination)[ nameStream.str() ] = valueStream.str();
     }
 
-    //
+    // This puts everything except comments from xmlStream into currentBody up
+    // to the end tag for the element named elementName. If any nested start
+    // tags are found for child elements with this name, the text is read in
+    // until each child of that name is closed and then to the next end tag for
+    // that name. It does not validate that any other tags or elements are
+    // correctly nested and so on. It throws an exception if it cannot find the
+    // end of the element.
     void RecordToEndOfElement( std::string const& elementName )
     {
       unsigned int numberOfUnclosedElementsOfGivenName( 1 );
       std::stringstream contentStream;
-      std::string innerElementName;
-      while( ( numberOfUnclosedElementsOfGivenName > 0 )
-             &&
-             ReadToNextHalt( '<',
-                             &contentStream ) )
+      std::stringstream tagStream;
+      std::string innerName;
+      while( ReadToNextHalt( '<',
+                             &contentStream,
+                             NULL ) )
       {
+        if( !(xmlStream->get( currentChar ).good()) )
+        {
+          std::stringstream errorBuilder;
+          errorBuilder
+          << "Could not find end tag for element <" << elementName << ">";
+          throw std::runtime_error( errorBuilder.str() );
+        }
+
         if( currentChar == '?' )
         {
           CloseQuestionMark( &contentStream );
@@ -498,69 +502,172 @@ namespace LHPC
         {
           CloseExclamationMark( &contentStream );
         }
-        else if( TryToReadStartTag( innerElementName,
-                                    NULL ) )
+        else if( ParsingUtilities::CharacterIsInString( currentChar,
+                                                    AllowedNameStartChars() ) )
         {
-          contentStream << '<' << innerElementName;
-          if( !currentElementIsEmpty )
+          ReadStartTag( innerName,
+                        NULL,
+                        tagStream );
+          contentStream << tagStream.str();
+          if( !currentElementIsEmpty
+              &&
+              ( innerName == elementName ) )
           {
             ++numberOfUnclosedElementsOfGivenName;
           }
         }
-        else if( ReadMatch( innerElementName,
-                            &contentStream ) )
+        else if( currentChar == '/' )
         {
-          ++numberOfUnclosedElementsOfGivenName
-        }
-
-        // look for '<'
-        // if comment, skip to end of comment
-        // if cdata, record to end of cdata
-        // if "<" + elementName, look for "/>"
-        //  * if not "/>", ++numberOfUnclosedElementsOfGivenName
-        // if "</" + elementName, --numberOfUnclosedElementsOfGivenName
-
-
-
-        ParsingUtilities::ResetStringstream( bufferStream );
-        if( ReadToNextTagOpener( &contentStream ) )
-        {
-
+          ReadEndTag( innerName,
+                      tagStream );
+          if( innerName == elementName )
+          {
+            --numberOfUnclosedElementsOfGivenName;
+            if( numberOfUnclosedElementsOfGivenName == 0 )
+            {
+              currentBody = contentStream.str();
+              return;
+            }
+          }
+          contentStream << tagStream.str();
         }
       }
     }
 
-
-
-
-
-
-
-
-
-
-
-    //
-    void CloseQuestionMark( std::istream* nonMarkupDestination )
+    // This tries to read an end tag, assuming that "</" was the last pair of
+    // characters read in before this function was called, putting the name of
+    // the element into nameDestination. The characters read in by this
+    // function are passed to tagRecord. It throws an exception if it could not
+    // read a valid end tag.
+    void ReadEndTag( std::string& nameDestination,
+                     std::stringstream& tagRecord )
     {
-      if( nonMarkupDestination != NULL )
+      tagRecord << "</";
+      std::stringstream nameStream;
+      if( !( ReadToNextHalt( ( AllowedWhitespaceChars() + ">" ),
+                             &nameStream,
+                             &tagRecord )
+             &&
+             SkipWhitespace( &tagRecord )
+             &&
+             ( currentChar == '>' ) ) )
       {
-        nonMarkupDestination << "<?";
+        throw std::runtime_error( "Could not close a valid end tag!" );
+      }
+      nameDestination = nameStream.str();
+    }
+
+    // This puts "<?" into destinationForReadCharacters if it is not NULL, then
+    // reads in characters from xmlStream until the next "?>", placing
+    // them all into destinationForReadCharacters if it is not NULL. It throws
+    // an exception if it fails to read in "?>".
+    void CloseQuestionMark( std::istream* destinationForReadCharacters )
+    {
+      if( destinationForReadCharacters != NULL )
+      {
+        destinationForReadCharacters << "<?";
       }
       while( ReadToNextHalt( '?',
-                             nonMarkupDestination ) )
+                             NULL,
+                             destinationForReadCharacters )
+             &&
+             ReadCharacter( destinationForReadCharacters ) )
       {
-        if( xmlStream->get( currentChar ).good() )
+        if( currentChar == '>' )
         {
-          if( nonMarkupDestination != NULL )
-          {
-            nonMarkupDestination << '?' << currentChar;
-          }
-          if( currentChar == '>' )
-          {
-            return;
-          }
+          return;
         }
+      }
+      throw std::runtime_error( "Failed to close processing instruction!" );
+    }
+
+    // This assumes that the characters just read from xmlStream were "<!", and
+    // determines if this is the start of a comment or a CDATA structure or
+    // just malformed XML. If it is a comment, it reads until the end of the
+    // comment, discarding all the characters of the comment, and true is
+    // returned. If it is a CDATA structure, characters are read in until the
+    // end of the structure, and all the characters read are put into
+    // destinationForReadCharacters if it is not NULL, and true is returned.
+    // If the XML was malformed (including being unable to close a comment or
+    // CDATA structure), false is returned.
+    void CloseExclamationMark( std::istream* destinationForReadCharacters )
+    {
+      if( !(xmlStream->get( currentChar ).good()) )
+      {
+        throw
+        std::runtime_error( "Failed to close structure following \"<!\"" );
+      }
+      if( currentChar == '-' )
+      {
+        ReadComment();
+      }
+      else if( currentChar == '[' )
+      {
+        ReadCdata( destinationForReadCharacters );
+      }
+    }
+
+    // This tries to read in characters (discarding them) from xmlStream until
+    // a valid comment has been read, assuming that the previous characters
+    // were "<!-". It throws an exception if it fails to close the comment.
+    void ReadComment()
+    {
+      while( xmlStream->get( currentChar ).good() )
+      {
+        if( ( currentChar == '-' )
+            &&
+            xmlStream->get( currentChar ).good()
+            &&
+            ( currentChar == '-' )
+            &&
+            xmlStream->get( currentChar ).good()
+            &&
+            ( currentChar == '>' ) )
+        {
+          return;
+        }
+      }
+      throw std::runtime_error( "Failed to close comment!" );
+    }
+
+    // This puts "<!" into destinationForReadCharacters if it is not NULL, then
+    // reads in characters from xmlStream until the next "]]>", placing
+    // them all into destinationForReadCharacters if it is not NULL. It throws
+    // an exception if it fails to read in "]]>".
+    void ReadCdata( std::istream* destinationForReadCharacters )
+    {
+      if( destinationForReadCharacters != NULL )
+      {
+        destinationForReadCharacters << "<[";
+      }
+      while( ReadToNextHalt( ']',
+                             NULL,
+                             destinationForReadCharacters )
+             &&
+             ReadCharacter( destinationForReadCharacters )
+             &&
+             ( currentChar == ']' )
+             &&
+             ReadCharacter( destinationForReadCharacters ) )
+      {
+        if( currentChar == '>' )
+        {
+          return;
+        }
+      }
+      throw std::runtime_error( "Failed to close CDATA structure!" );
+    }
+
+
+
+    // This feeds characterToAppend to destinationForReadCharacters if it is
+    // not NULL.
+    void AppendToStream( std::istream* destinationForReadCharacters,
+                         char const characterToAppend )
+    {
+      if( destinationForReadCharacters != NULL )
+      {
+        (*destinationForReadCharacters) << characterToAppend;
       }
     }
 
