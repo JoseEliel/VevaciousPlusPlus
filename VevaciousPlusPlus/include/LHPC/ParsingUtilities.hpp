@@ -10,6 +10,7 @@
 
 #include <string>
 #include <sstream>
+#include <cstdlib>
 
 namespace LHPC
 {
@@ -63,14 +64,14 @@ namespace LHPC
 
     // This is just a shorthand for a commonly-used conversion.
     static long int BaseTenStringToInt( std::string const& baseTenString )
-    { return std::strtol( baseTenString.c_str(),
-                          NULL,
-                          10 ); }
+    { return strtol( baseTenString.c_str(),
+                     NULL,
+                     10 ); }
 
     // This is just a shorthand for a commonly-used conversion.
     static double StringToDouble( std::string const& baseTenString )
-    { return std::strtod( baseTenString.c_str(),
-                          NULL ); }
+    { return strtod( baseTenString.c_str(),
+                     NULL ); }
 
     // This parses indicesString as a set of integers separated by non-digit
     // characters and returns the set as a vector.
