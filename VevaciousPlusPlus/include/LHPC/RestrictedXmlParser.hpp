@@ -294,30 +294,7 @@ namespace LHPC
     bool TryToReadValidAttribute( std::ostream& nameStream,
                                   std::ostream& valueStream,
                                   std::ostream* tagRecord )
-    {
-      // debugging:
-      std::stringstream const* const
-      nameStreamPointer( static_cast< std::stringstream* >( &nameStream ) );
-      std::stringstream const* const
-      valueStreamPointer( static_cast< std::stringstream* >( &valueStream ) );
-      /**/std::cout << std::endl << "debugging:"
-      << std::endl
-      << "TryToReadValidAttribute(...) called. nameStream.str() = \""
-      << nameStreamPointer->str() << "\", valueStream.str() = \""
-      << valueStreamPointer->str() << "\", tagRecord = ";
-      if( tagRecord == NULL )
-      {
-        std::cout << "NULL->str()";
-      }
-      else
-      {
-        std::stringstream const* const
-        tagRecordPointer( static_cast< std::stringstream* >( tagRecord ) );
-        std::cout << "\"" << tagRecordPointer->str();
-      }
-      std::cout << std::endl;/**/
-
-      return ( ReadToNextHalt( ( AllowedWhitespaceChars() + "=" ),
+    { return ( ReadToNextHalt( ( AllowedWhitespaceChars() + "=" ),
                                &nameStream,
                                tagRecord )
                &&
@@ -509,14 +486,14 @@ namespace LHPC
     ResetContent();
     std::stringstream prologStream;
     std::stringstream tagStream;
-    if( ReadToNextTagOpener( &prologStream ) )
+    if( !(ReadToNextTagOpener( &prologStream )) )
     {
-      fileProlog = prologStream.str();
-      ReadStartTag( rootName,
-                    &rootAttributes,
-                    &tagStream );
+      throw std::runtime_error( "No root element found in file!" );
     }
-    throw std::runtime_error( "No root element found in file!" );
+    fileProlog = prologStream.str();
+    ReadStartTag( rootName,
+                  &rootAttributes,
+                  &tagStream );
   }
 
   // This puts characters from xmlStream into nonMarkupDestination if not
@@ -535,13 +512,12 @@ namespace LHPC
            &&
            xmlStream->get( currentCharacter ).good() )
     {
-
       if( ParsingUtilities::CharacterIsInString( currentCharacter,
                                                  AllowedNameStartChars() ) )
       {
         return true;
       }
-      else if( nonMarkupDestination != NULL )
+      else
       {
         TryToCloseNonTagMarkup( nonMarkupDestination );
       }
@@ -665,6 +641,13 @@ namespace LHPC
     {
       ReadCdata( destinationForReadCharacters );
     }
+    else
+    {
+      if( destinationForReadCharacters != NULL )
+      {
+        (*destinationForReadCharacters) << '<' << currentCharacter;
+      }
+    }
   }
 
   // This tries to read in characters (discarding them) from xmlStream until
@@ -699,7 +682,7 @@ namespace LHPC
   {
     if( destinationForReadCharacters != NULL )
     {
-      (*destinationForReadCharacters) << "<[";
+      (*destinationForReadCharacters) << "<![";
     }
     while( ReadToNextHalt( ']',
                            NULL,
@@ -896,11 +879,11 @@ namespace LHPC
   {
     unsigned int numberOfUnclosedElementsOfGivenName( 1 );
     std::stringstream contentStream;
-    while( ReadToNextHalt( '<',
+    while( ( numberOfUnclosedElementsOfGivenName > 0 )
+           &&
+           ReadToNextHalt( '<',
                            &contentStream,
-                           NULL )
-          &&
-          ( numberOfUnclosedElementsOfGivenName > 0 ) )
+                           NULL ) )
     {
       if( !(xmlStream->get( currentCharacter ).good()) )
       {
