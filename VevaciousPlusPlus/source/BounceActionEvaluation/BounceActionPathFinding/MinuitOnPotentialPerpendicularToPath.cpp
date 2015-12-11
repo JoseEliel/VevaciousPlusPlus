@@ -29,7 +29,7 @@ namespace VevaciousPlusPlus
      neighborDisplacementWeights( neighborDisplacementWeights ),
      lastPathNodes(),
      nodeDisplacements(),
-     bounceBeforeLastPath( functionValueForNanInput ),
+     bounceBeforeLastPath( FunctionValueForNanInput() ),
      nodesConverged( false )
   {
     // This constructor is just an initialization list.

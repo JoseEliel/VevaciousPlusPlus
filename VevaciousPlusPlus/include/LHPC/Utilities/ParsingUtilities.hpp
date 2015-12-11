@@ -3,6 +3,11 @@
  *
  *  Created on: Nov 16, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *
+ *      This file is part of LesHouchesParserClasses, released under the
+ *      GNU General Public License. Please see the accompanying
+ *      README.LHPC_CPP.txt file for a full list of files, brief documentation
+ *      on how to use these classes, and further details on the license.
  */
 
 #ifndef LHPC_PARSINGUTILITIES_HPP_
@@ -121,6 +126,10 @@ namespace LHPC
     // newString.
     static void ResetStringstream( std::istringstream& streamToReset,
                                    std::string const& newString );
+
+    // This returns the given double in the form "(1.234567 * 10^(-8))".
+    static std::string
+    FormatNumberForMathematica( double const numberToFormat );
   };
 
 
@@ -181,7 +190,6 @@ namespace LHPC
     }
     return returnVector;
   }
-
 
   // This parses indicesString as a set of integers separated by non-digit
   // characters and returns the set as a vector.
@@ -318,6 +326,23 @@ namespace LHPC
   {
     streamToReset.clear();
     streamToReset.str( newString );
+  }
+
+  // This returns the given double in the form "(1.234567 * 10^(-8))".
+  inline std::string
+  ParsingUtilities::FormatNumberForMathematica( double const numberToFormat )
+  {
+    std::stringstream stringBuilder;
+    stringBuilder << '(' << numberToFormat << ')';
+    std::string returnString( stringBuilder.str() );
+    size_t exponentPosition( returnString.find_first_of( "eE" ) );
+    if( exponentPosition == std::string::npos )
+    {
+      return returnString;
+    }
+    return ( returnString.replace( exponentPosition,
+                                   1,
+                                   "* 10^(" ) + ")" );
   }
 
 } /* namespace LHPC */

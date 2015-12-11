@@ -8,11 +8,17 @@
 #ifndef FIXEDSCALEONELOOPPOTENTIAL_HPP_
 #define FIXEDSCALEONELOOPPOTENTIAL_HPP_
 
-#include "CommonIncludes.hpp"
-#include "LHPC/BasicObserverPattern.hpp"
 #include "PotentialFromPolynomialWithMasses.hpp"
-#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "LHPC/Utilities/BasicObserverPattern.hpp"
+#include <string>
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include <vector>
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include <cmath>
+#include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {

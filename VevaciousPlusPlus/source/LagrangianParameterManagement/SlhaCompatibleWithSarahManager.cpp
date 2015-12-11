@@ -82,18 +82,26 @@ namespace VevaciousPlusPlus
                                            "TREEHMIX[1]" );
     MapCaseStringAndSlhaBlockToCaseString( "muLoop",
                                            "LOOPHMIX[1]" );
+    MapCaseStringAndSlhaBlockToCaseString( "muDelta",
+                                           "DELTAHMIX[1]" );
     MapCaseStringAndSlhaBlockToCaseString( "BmuTree",
                                            "TREEHMIX[101]" );
     MapCaseStringAndSlhaBlockToCaseString( "BmuLoop",
                                            "LOOPHMIX[101]" );
+    MapCaseStringAndSlhaBlockToCaseString( "BmuDelta",
+                                           "DELTAHMIX[101]" );
     MapCaseStringAndSlhaBlockToCaseString( "mHdSqTree",
                                            "TREEMSOFT[ 21 ]" );
     MapCaseStringAndSlhaBlockToCaseString( "mHdSqLoop",
                                            "LOOPMSOFT[ 21 ]" );
+    MapCaseStringAndSlhaBlockToCaseString( "mHdSqDelta",
+                                           "DELTAMSOFT[ 21 ]" );
     MapCaseStringAndSlhaBlockToCaseString( "mHuSqTree",
                                            "TREEMSOFT[ 22 ]" );
     MapCaseStringAndSlhaBlockToCaseString( "mHuSqLoop",
                                            "LOOPMSOFT[ 22 ]" );
+    MapCaseStringAndSlhaBlockToCaseString( "mHuSqDelta",
+                                           "DELTAMSOFT[ 22 ]" );
   }
 
   // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
@@ -121,8 +129,8 @@ namespace VevaciousPlusPlus
         sarahBlock = "HMIX[ 103 ]";
       }
       LhaTwoSourceFunctionoid temporaryParameter( 0,
-                                                   0,
-                                                   0 );
+                                                  0,
+                                                  0 );
       return temporaryParameter( OnceOffParameter( sarahBlock,
                                                    logarithmOfScale ),
              SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase( caseString,
@@ -173,12 +181,55 @@ namespace VevaciousPlusPlus
       }
 
       LhaTwoSourceFunctionoid temporaryParameter( 0,
+                                                  0,
+                                                  0 );
+      return
+      temporaryParameter( OnceOffBlockEntry( sarahBlockEntry,
+                                             logarithmOfScale ),
+                          OnceOffParameter( baseCase,
+                                            logarithmOfScale ) );
+    }
+    else if( ( caseString == "muDelta" )
+             ||
+             ( caseString == "BmuDelta" )
+             ||
+             ( caseString == "mHdSqDelta" )
+             ||
+             ( caseString == "mHuSqDelta" ) )
+    {
+      std::string baseCase( caseString.substr( 0,
+                                               caseString.size() - 5 ) );
+      std::string sarahBlockEntry( "error" );
+      if( baseCase == "Bmu" )
+      {
+        sarahBlockEntry = FormatVariable( "DELTAHMIX[ 101 ]" );
+      }
+      else if( baseCase == "mu" )
+      {
+        sarahBlockEntry = FormatVariable( "DELTAHMIX[ 1 ]" );
+      }
+      else if( baseCase == "mHdSq" )
+      {
+        sarahBlockEntry = FormatVariable( "DELTAMSOFT[ 21 ]" );
+      }
+      else if( baseCase == "mHuSq" )
+      {
+        sarahBlockEntry = FormatVariable( "DELTAMSOFT[ 22 ]" );
+      }
+
+      double const deltaBlockEntry( OnceOffBlockEntry( sarahBlockEntry,
+                                                       logarithmOfScale ) );
+      if( deltaBlockEntry != 0.0 )
+      {
+        return deltaBlockEntry;
+      }
+      LhaDifferenceFunctionoid temporaryParameter( 0,
                                                    0,
                                                    0 );
       return
-      temporaryParameter( OnceOffBlockEntry( ( treeOrLoop + baseCase ),
-                                             logarithmOfScale ),
-                          OnceOffParameter( baseCase,
+      temporaryParameter( OnceOffParameter( ( baseCase + "Tree" ),
+                                            logarithmOfScale ),
+                          OnceOffParameter( ( baseCase + "Loop" ),
                                             logarithmOfScale ) );
     }
     else
@@ -237,10 +288,10 @@ namespace VevaciousPlusPlus
       // values vector (corresponding now to the new SlhaTwoSourceFunctionoid),
       // rather than to the pure SLHA functionoid as was set by
       // RegisterParameter( caseString ) (or previous to that).
-      return AddNewDerivedParameter( caseString,
-                                     new LhaTwoSourceFunctionoid(
+      return PairAddNewDerivedParameter( caseString,
+                                         new LhaTwoSourceFunctionoid(
                                               numberOfDistinctActiveParameters,
-                                                                   sarahIndex,
+                                                                    sarahIndex,
                                                              pureSlhaIndex ) );
     }
     else if( ( caseString == "muTree" )
@@ -306,11 +357,73 @@ namespace VevaciousPlusPlus
       // values vector (corresponding now to the new SlhaTwoSourceFunctionoid),
       // rather than to the pure SLHA functionoid as was set by
       // RegisterParameter( caseString ) (or previous to that).
-      return AddNewDerivedParameter( caseString,
+      return PairAddNewDerivedParameter( caseString,
+                                         new LhaTwoSourceFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                                    sarahIndex,
+                                                             pureSlhaIndex ) );
+    }
+    else if( ( caseString == "muDelta" )
+             ||
+             ( caseString == "BmuDelta" )
+             ||
+             ( caseString == "mHdSqDelta" )
+             ||
+             ( caseString == "mHuSqDelta" ) )
+    {
+      std::string baseCase( caseString.substr( 0,
+                                               caseString.size() - 5 ) );
+      std::string deltaBlockEntry( "error" );
+      if( baseCase == "Bmu" )
+      {
+        deltaBlockEntry = FormatVariable( "DELTAHMIX[ 101 ]" );
+      }
+      else if( baseCase == "mu" )
+      {
+        deltaBlockEntry = FormatVariable( "DELTAHMIX[ 1 ]" );
+      }
+      else if( baseCase == "mHdSq" )
+      {
+        deltaBlockEntry = FormatVariable( "DELTAMSOFT[ 21 ]" );
+      }
+      else if( baseCase == "mHuSq" )
+      {
+        deltaBlockEntry = FormatVariable( "DELTAMSOFT[ 22 ]" );
+      }
+
+      // Since what sarahBlockEntry contains might already be an alias for
+      // caseString (so as to have potential function files designed by SARAH
+      // work with pure SLHA files, which may or may not be a good idea), we
+      // have to look for the block entry functionoid directly, and create it
+      // if it doesn't exist, rather than recursing through
+      // LesHouchesAccordBlockEntryManager::RegisterParameter(sarahBlockEntry),
+      // which will just come back here through
+      // SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredParameter
+      // finding sarahBlockEntry as an alias for caseString, then calling the
+      // derived override of RegisterUnregisteredSpecialCase, bringing us back
+      // here.
+      size_t const deltaIndex( RegisterBlockEntry( deltaBlockEntry ) );
+      size_t const
+      treeIndex( RegisterParameter( ( baseCase + "Tree" ) ).second );
+      size_t const
+      loopIndex( RegisterParameter( ( baseCase + "Loop" ) ).second );
+
+      size_t const differenceIndex( AddNewDerivedParameter( caseString,
+                                                  new LhaDifferenceFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                                     loopIndex,
+                                                               treeIndex ) ) );
+
+      // This will overwrite activeParametersToIndices[ caseString ] to map
+      // caseString to numberOfDistinctActiveParameters as its index in the
+      // values vector (corresponding now to the new SlhaTwoSourceFunctionoid),
+      // rather than to the pure SLHA functionoid as was set by
+      // RegisterParameter( caseString ) (or previous to that).
+      return PairAddNewDerivedParameter( caseString,
                                      new LhaTwoSourceFunctionoid(
                                               numberOfDistinctActiveParameters,
-                                                                   sarahIndex,
-                                                             pureSlhaIndex ) );
+                                                                 deltaIndex,
+                                                           differenceIndex ) );
     }
     else
     {

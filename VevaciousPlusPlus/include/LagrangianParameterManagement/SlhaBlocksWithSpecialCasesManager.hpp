@@ -8,13 +8,20 @@
 #ifndef SLHABLOCKSWITHSPECIALCASESMANAGER_HPP_
 #define SLHABLOCKSWITHSPECIALCASESMANAGER_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LesHouchesAccordBlockEntryManager.hpp"
+#include <string>
+#include <set>
+#include <vector>
+#include "LhaSourcedParameterFunctionoid.hpp"
+#include <map>
+#include <utility>
+#include <sstream>
+#include "LhaDerivedFunctionoids/SlhaTrilinearDiagonalFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/SlhaMassSquaredDiagonalFunctionoid.hpp"
 #include "LhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
 #include "LhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
-#include "LhaDerivedFunctionoids/SlhaMassSquaredDiagonalFunctionoid.hpp"
-#include "LhaDerivedFunctionoids/SlhaTrilinearDiagonalFunctionoid.hpp"
-#include "LhaSourcedParameterFunctionoid.hpp"
+#include <stdexcept>
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {
@@ -82,9 +89,9 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    static bool
-    SortParameterByIndex( LhaSourcedParameterFunctionoid const* firstPointer,
-                         LhaSourcedParameterFunctionoid const* secondPointer )
+    static bool SortParameterByIndex(
+                     LhaSourcedParameterFunctionoid const* const& firstPointer,
+                   LhaSourcedParameterFunctionoid const* const& secondPointer )
     { return ( firstPointer->IndexInValuesVector()
                < secondPointer->IndexInValuesVector() ); }
 
@@ -105,9 +112,17 @@ namespace VevaciousPlusPlus
     // aliases in aliasesToCaseStrings which map to caseString are added
     // mapping to the index of this parameter), and returns true paired with
     // the index of newParameter.
-    std::pair< bool, size_t >
+    size_t
     AddNewDerivedParameter( std::string const& caseString,
                             LhaSourcedParameterFunctionoid* newParameter );
+
+    // This pairs an index with true for convenience.
+    std::pair< bool, size_t >
+    PairAddNewDerivedParameter( std::string const& caseString,
+                                LhaSourcedParameterFunctionoid* newParameter )
+    { return std::pair< bool, size_t >( true,
+                                        AddNewDerivedParameter( caseString,
+                                                            newParameter ) ); }
 
     // This checks parameterName against all the special cases. If the
     // parameter name is not recognized as a valid special case, then the
@@ -258,7 +273,7 @@ namespace VevaciousPlusPlus
   // aliases in aliasesToSwitchStrings which map to switchString are added
   // mapping to the index of this parameter), and returns true paired with
   // the index of newParameter.
-  inline std::pair< bool, size_t >
+  inline size_t
   SlhaBlocksWithSpecialCasesManager::AddNewDerivedParameter(
                                                  std::string const& caseString,
                                 LhaSourcedParameterFunctionoid* newParameter )
@@ -322,8 +337,8 @@ namespace VevaciousPlusPlus
     blockNameWithIndices[ 0 ] = 'Y';
     size_t const
     appropriateYukawaIndex( RegisterBlockEntry( blockNameWithIndices ) );
-    return AddNewDerivedParameter( caseString,
-                                   new SlhaTrilinearDiagonalFunctionoid(
+    return PairAddNewDerivedParameter( caseString,
+                                       new SlhaTrilinearDiagonalFunctionoid(
                                               numberOfDistinctActiveParameters,
                                                           directTrilinearIndex,
                                                       trilinearOverYukawaIndex,
@@ -379,8 +394,8 @@ namespace VevaciousPlusPlus
     std::stringstream msoftBuilder;
     msoftBuilder << "MSOFT[" << msoftIndex << "]";
     size_t const linearMassIndex( RegisterBlockEntry( msoftBuilder.str() ) );
-    return AddNewDerivedParameter( caseString,
-                                   new SlhaMassSquaredDiagonalFunctionoid(
+    return PairAddNewDerivedParameter( caseString,
+                                       new SlhaMassSquaredDiagonalFunctionoid(
                                               numberOfDistinctActiveParameters,
                                                                squareMassIndex,
                                                            linearMassIndex ) );

@@ -8,11 +8,10 @@
 #ifndef BOUNCEPATHFINDER_HPP_
 #define BOUNCEPATHFINDER_HPP_
 
-#include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "PathParameterization/TunnelPath.hpp"
 #include "BubbleProfile.hpp"
+#include "PathParameterization/TunnelPath.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -20,8 +19,9 @@ namespace VevaciousPlusPlus
   class BouncePathFinder
   {
   public:
-    BouncePathFinder();
-    virtual ~BouncePathFinder();
+    BouncePathFinder() : pathTemperature( 0.0 ) {}
+
+    virtual ~BouncePathFinder() {}
 
 
     // This should reset the BouncePathFinder and set pathTemperature

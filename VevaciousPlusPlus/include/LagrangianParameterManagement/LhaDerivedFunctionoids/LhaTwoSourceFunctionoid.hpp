@@ -8,8 +8,10 @@
 #ifndef LHATWOSOURCEFUNCTIONOID_HPP_
 #define LHATWOSOURCEFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -23,6 +25,7 @@ namespace VevaciousPlusPlus
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       firstChoiceIndex( firstChoiceIndex ),
       secondChoiceIndex( secondChoiceIndex ) {}
+
     virtual ~LhaTwoSourceFunctionoid() {}
 
 

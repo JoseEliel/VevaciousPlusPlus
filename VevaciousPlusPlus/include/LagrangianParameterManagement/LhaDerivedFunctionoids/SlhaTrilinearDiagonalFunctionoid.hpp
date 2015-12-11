@@ -8,8 +8,10 @@
 #ifndef SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 #define SLHATRILINEARDIAGONALFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -26,7 +28,9 @@ namespace VevaciousPlusPlus
       directTrilinearIndex( directTrilinearIndex ),
       trilinearOverYukawaIndex( trilinearOverYukawaIndex ),
       appropriateYukawaIndex( appropriateYukawaIndex ) {}
+
     virtual ~SlhaTrilinearDiagonalFunctionoid() {}
+
 
     // This returns the trilinear coupling evaluated at the scale given
     // through logarithmOfScale either from its direct value printed in the TL,

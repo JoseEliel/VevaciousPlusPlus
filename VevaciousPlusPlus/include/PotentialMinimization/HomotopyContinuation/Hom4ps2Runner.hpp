@@ -8,9 +8,20 @@
 #ifndef HOM4PS2RUNNER_HPP_
 #define HOM4PS2RUNNER_HPP_
 
-#include "CommonIncludes.hpp"
 #include "PotentialMinimization/StartingPointGeneration/PolynomialSystemSolver.hpp"
-#include "LHPC/ParsingUtilities.hpp"
+#include <string>
+#include <vector>
+#include <map>
+#include <sstream>
+#include <stdexcept>
+#include <climits>
+#include <unistd.h>
+#include <iostream>
+#include <cstdlib>
+#include <sstream>
+#include <fstream>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {

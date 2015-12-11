@@ -8,10 +8,10 @@
 #ifndef MINUITPATHFINDER_HPP_
 #define MINUITPATHFINDER_HPP_
 
-#include <limits>
-#include "CommonIncludes.hpp"
-#include "../BouncePathFinder.hpp"
+#include "BounceActionEvaluation/BouncePathFinder.hpp"
 #include "Minuit2/FCNBase.h"
+#include <vector>
+#include <limits>
 
 namespace VevaciousPlusPlus
 {
@@ -21,8 +21,14 @@ namespace VevaciousPlusPlus
   {
   public:
     MinuitPathFinder( unsigned int const minuitStrategy = 1,
-                      double const minuitToleranceFraction = 0.5 );
-    virtual ~MinuitPathFinder();
+                      double const minuitToleranceFraction = 0.5 ) :
+      BouncePathFinder(),
+      ROOT::Minuit2::FCNBase(),
+      minuitStrategy( minuitStrategy ),
+      minuitToleranceFraction( minuitToleranceFraction ),
+      currentMinuitTolerance( -1.0 ) {}
+
+    virtual ~MinuitPathFinder() {}
 
 
     // This class implements Up() inherited from ROOT::Minuit2::FCNBase, and
@@ -36,7 +42,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    static double const functionValueForNanInput;
+    static double FunctionValueForNanInput()
+    { return std::numeric_limits< double >::max(); }
 
 
     unsigned int minuitStrategy;

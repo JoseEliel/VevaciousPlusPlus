@@ -8,10 +8,13 @@
 #ifndef LINEARSPLINETHROUGHNODES_HPP_
 #define LINEARSPLINETHROUGHNODES_HPP_
 
-#include "CommonIncludes.hpp"
-#include "Eigen/Dense"
 #include "TunnelPath.hpp"
+#include <vector>
+#include <string>
 #include "LinearSplinePathSegment.hpp"
+#include <utility>
+#include <sstream>
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {

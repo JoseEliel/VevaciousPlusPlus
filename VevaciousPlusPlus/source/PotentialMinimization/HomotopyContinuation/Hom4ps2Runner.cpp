@@ -79,13 +79,13 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     std::string systemCommand( "rm ./bin/input.num" );
-    BOL::UsefulStuff::runSystemCommand( systemCommand );
+    system( systemCommand.c_str() );
     systemCommand.assign( "/bin/bash -c \"./hom4ps2 " );
     systemCommand.append( hom4ps2InputFilename );
     systemCommand.append(  " <<< " );
     systemCommand.append( homotopyType );
     systemCommand.append( "\"" );
-    BOL::UsefulStuff::runSystemCommand( systemCommand );
+    system( systemCommand.c_str() );
 
     // At this point, we are in the directory with hom4ps2 & data.roots, so
     // now we fill purelyRealSolutionSets.
@@ -210,11 +210,8 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     std::vector< std::complex< long double > > complexSolutions;
-    BOL::CommentedTextParser tadpoleSolutionsFile( "###",
-                                                   false );
-    bool successfulOperation( tadpoleSolutionsFile.openFile(
-                                                     hom4ps2OutputFilename ) );
-    if( !successfulOperation )
+    std::ifstream tadpoleSolutionsFile( hom4ps2OutputFilename );
+    if( !(tadpoleSolutionsFile.good()) )
     {
       std::stringstream errorBuilder;
       errorBuilder
@@ -230,17 +227,17 @@ namespace VevaciousPlusPlus
     std::complex< long double > currentComplexNumber( 0.0L,
                                                       0.0L );
     std::stringstream parsingStream;
-    while( tadpoleSolutionsFile.readNextNonEmptyLineOfFileWithoutComment(
-                                                                 lineString ) )
+    while( std::getline( tadpoleSolutionsFile,
+                         lineString ).good() )
     {
       if( lineString[ 0 ] == '(' )
       {
         // If the above condition is satisfied, lineString now contains the
         // root as a complex number, in the form where zero is
         // "(  0.0000000000000000E+00 ,  0.0000000000000000E+00)"
-        BOL::StringParser::substituteCharacterWith( lineString,
-                                                    ',',
-                                                    ' ' );
+        LHPC::ParsingUtilities::ReplaceAllCharacters( lineString,
+                                                      ',',
+                                                      ' ' );
         parsingStream.clear();
         parsingStream.str( lineString.substr( 1,
                                               ( lineString.size() - 2 ) ) );
@@ -275,8 +272,8 @@ namespace VevaciousPlusPlus
                                       -1 );
     std::map< std::string, size_t >::const_iterator indexFinder;
     size_t variableIndex( 0 );
-    while( tadpoleSolutionsFile.readNextNonEmptyLineOfFileWithoutComment(
-                                                                 lineString ) )
+    while( std::getline( tadpoleSolutionsFile,
+                         lineString ).good() )
     {
       if( lineString == "===============>   HOM4PS-2.0   <===============" )
       {
@@ -316,7 +313,8 @@ namespace VevaciousPlusPlus
            variableIndex < numberOfVariables;
            ++variableIndex )
       {
-        if( abs( complexSolutions[ currentStartIndex + variableIndex ].imag() )
+        if( fabs(
+                 complexSolutions[ currentStartIndex + variableIndex ].imag() )
             > resolutionSize )
         {
           solutionIsReal = false;

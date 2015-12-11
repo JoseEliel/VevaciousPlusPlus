@@ -8,15 +8,20 @@
 #ifndef BOUNCEALONGPATHWITHTHRESHOLD_HPP_
 #define BOUNCEALONGPATHWITHTHRESHOLD_HPP_
 
-#include "CommonIncludes.hpp"
-#include "PotentialEvaluation/PotentialFunction.hpp"
-#include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
-#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
-#include "BounceActionEvaluation/BubbleProfile.hpp"
-#include "BounceActionEvaluation/OneDimensionalPotentialAlongPath.hpp"
-#include "../BounceActionTunneler.hpp"
+#include "TunnelingCalculation/BounceActionTunneler.hpp"
+#include <vector>
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
+#include "TunnelingCalculation/TunnelingCalculator.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include <cmath>
+#include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
+#include <iostream>
+#include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/SplinePotential.hpp"
+#include "BounceActionEvaluation/BubbleProfile.hpp"
 
 namespace VevaciousPlusPlus
 {

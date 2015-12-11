@@ -8,8 +8,6 @@
 #ifndef BUBBLERADIALVALUEDESCRIPTION_HPP_
 #define BUBBLERADIALVALUEDESCRIPTION_HPP_
 
-#include "CommonIncludes.hpp"
-
 namespace VevaciousPlusPlus
 {
 
@@ -21,13 +19,24 @@ namespace VevaciousPlusPlus
                        BubbleRadialValueDescription const& secondReference )
     { return ( firstReference.radialValue < secondReference.radialValue ); }
 
-    BubbleRadialValueDescription();
+    BubbleRadialValueDescription() : radialValue( -1.0 ),
+                                     auxiliaryValue( -2.0 ),
+                                     auxiliarySlope( 0.0 ) {}
+
     BubbleRadialValueDescription( double const radialValue,
                                   double const auxiliaryValue,
-                                  double const auxiliarySlope );
+                                  double const auxiliarySlope ) :
+      radialValue( radialValue ),
+      auxiliaryValue( auxiliaryValue ),
+      auxiliarySlope( auxiliarySlope ) {}
+
     BubbleRadialValueDescription(
-                              BubbleRadialValueDescription const& copySource );
-    virtual ~BubbleRadialValueDescription();
+                             BubbleRadialValueDescription const& copySource ) :
+      radialValue( copySource.radialValue ),
+      auxiliaryValue( copySource.auxiliaryValue ),
+      auxiliarySlope( copySource.auxiliarySlope ) {}
+
+    virtual ~BubbleRadialValueDescription() {}
 
     double radialValue;
     double auxiliaryValue;

@@ -8,7 +8,7 @@
 #ifndef ODEINTBUBBLEOBSERVER_HPP_
 #define ODEINTBUBBLEOBSERVER_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
 #include "BubbleRadialValueDescription.hpp"
 
 namespace VevaciousPlusPlus
@@ -18,8 +18,10 @@ namespace VevaciousPlusPlus
   {
   public:
     OdeintBubbleObserver(
-              std::vector< BubbleRadialValueDescription >& bubbleDescription );
-    virtual ~OdeintBubbleObserver();
+             std::vector< BubbleRadialValueDescription >& bubbleDescription ) :
+      bubbleDescription( bubbleDescription ) {}
+
+    virtual ~OdeintBubbleObserver() {}
 
 
     // This pushes back the radial value, the auxiliary value, and its slope

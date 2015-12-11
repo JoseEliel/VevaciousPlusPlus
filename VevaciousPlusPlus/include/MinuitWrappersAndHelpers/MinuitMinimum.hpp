@@ -8,8 +8,10 @@
 #ifndef MINUITMINIMUM_HPP_
 #define MINUITMINIMUM_HPP_
 
-#include "CommonIncludes.hpp"
 #include "Minuit2/FunctionMinimum.h"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -28,6 +30,25 @@ namespace VevaciousPlusPlus
       variableErrors( variableErrors ),
       functionValue( 0.0 ),
       functionError( -1.0 ),
+      isValidMinimum( false ) {}
+
+    MinuitMinimum( std::vector< double > const& variableValues,
+                   double const functionValue ) :
+      variableValues( variableValues ),
+      variableErrors( variableValues.size(),
+                      0.0 ),
+      functionValue( functionValue ),
+      functionError( 0.0 ),
+      isValidMinimum( false ) {}
+
+    MinuitMinimum( std::vector< double > const& variableValues,
+                   std::vector< double > const& variableErrors,
+                   double const functionValue,
+                   double const functionError ) :
+      variableValues( variableValues ),
+      variableErrors( variableErrors ),
+      functionValue( functionValue ),
+      functionError( functionError ),
       isValidMinimum( false ) {}
 
     MinuitMinimum() : variableValues(),

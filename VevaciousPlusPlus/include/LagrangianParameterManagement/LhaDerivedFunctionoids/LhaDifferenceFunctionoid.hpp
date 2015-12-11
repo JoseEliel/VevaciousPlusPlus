@@ -8,8 +8,10 @@
 #ifndef LHADIFFERENCEFUNCTIONOID_HPP_
 #define LHADIFFERENCEFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -23,6 +25,7 @@ namespace VevaciousPlusPlus
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       subtractorIndex( subtractorIndex ),
       subtractedIndex( subtractedIndex ) {}
+
     virtual ~LhaDifferenceFunctionoid() {}
 
 
@@ -79,7 +82,6 @@ namespace VevaciousPlusPlus
     stringBuilder << "subtractedIndex = " << subtractedIndex << std::endl;
     return stringBuilder.str();
   }
-
 
 }
 

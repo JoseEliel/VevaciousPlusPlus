@@ -63,7 +63,7 @@ namespace VevaciousPlusPlus
          elementIndex < numberOfElements;
          ++elementIndex )
     {
-      if( abs( firstVector[ elementIndex ] - secondVector[ elementIndex ] )
+      if( fabs( firstVector[ elementIndex ] - secondVector[ elementIndex ] )
           > hypercubeSide )
       {
         return false;

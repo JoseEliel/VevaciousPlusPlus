@@ -8,20 +8,32 @@
 #ifndef POTENTIALMINIMUM_HPP_
 #define POTENTIALMINIMUM_HPP_
 
-#include "../MinuitWrappersAndHelpers/MinuitMinimum.hpp"
-#include "CommonIncludes.hpp"
+#include "MinuitWrappersAndHelpers/MinuitMinimum.hpp"
+#include <vector>
+#include <string>
+#include "Utilities/VectorUtilities.hpp"
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
+
   class PotentialMinimum : public MinuitMinimum
   {
   public:
     PotentialMinimum( std::vector< double > const& fieldConfiguration,
-                      double const potentialDepth );
-    PotentialMinimum( MinuitMinimum const& minuitMinimum );
-    PotentialMinimum();
-    PotentialMinimum( PotentialMinimum const& copySource );
-    virtual ~PotentialMinimum();
+                      double const potentialDepth ) :
+      MinuitMinimum( fieldConfiguration,
+                     potentialDepth ) {}
+
+    PotentialMinimum( MinuitMinimum const& minuitMinimum ) :
+      MinuitMinimum( minuitMinimum ) {}
+
+    PotentialMinimum() : MinuitMinimum() {}
+
+    PotentialMinimum( PotentialMinimum const& copySource ) :
+      MinuitMinimum( copySource ) {}
+
+    virtual ~PotentialMinimum() {}
 
 
     // This returns the sum of the squares of the differences in the field
@@ -35,7 +47,8 @@ namespace VevaciousPlusPlus
     { return SquareDistanceTo( comparisonMinimum.FieldConfiguration() ); }
 
     // This returns the sum of the squares of the field values.
-    double LengthSquared() const;
+    double LengthSquared() const
+    { return VectorUtilities::LengthSquared( variableValues ); }
 
     std::vector< double > const& FieldConfiguration() const
     { return variableValues; }
@@ -78,20 +91,6 @@ namespace VevaciousPlusPlus
     return returnDouble;
   }
 
-  // This returns the sum of the squares of the field values.
-  inline double PotentialMinimum::LengthSquared() const
-  {
-    double returnDouble( 0.0 );
-    for( unsigned int fieldIndex( 0 );
-         fieldIndex < variableValues.size();
-         ++fieldIndex )
-    {
-      returnDouble += ( variableValues[ fieldIndex ]
-                       * variableValues[ fieldIndex ] );
-    }
-    return returnDouble;
-  }
-
 
   // This prints the minimum as an empty XML element.
   inline std::string
@@ -100,7 +99,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "<" << elementName;
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -120,7 +119,7 @@ namespace VevaciousPlusPlus
     std::stringstream stringBuilder;
     stringBuilder << "  <" << elementName << ">\n"
     "    <FieldValues>\n";
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -142,7 +141,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "{ {";
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {

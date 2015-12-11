@@ -8,19 +8,35 @@
 #ifndef POTENTIALFUNCTION_HPP_
 #define POTENTIALFUNCTION_HPP_
 
-#include "CommonIncludes.hpp"
-#include "PotentialMinimization/PotentialMinimum.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include <vector>
+#include <string>
+#include <stdexcept>
+#include <sstream>
+#include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
+
   class PotentialFunction
   {
   public:
     PotentialFunction(
-                      LagrangianParameterManager& lagrangianParameterManager );
-    PotentialFunction( PotentialFunction const& copySource );
-    virtual ~PotentialFunction();
+                     LagrangianParameterManager& lagrangianParameterManager ) :
+      lagrangianParameterManager( lagrangianParameterManager ),
+      fieldNames(),
+      numberOfFields( 0 ),
+      dsbFieldInputStrings(),
+      dsbFieldValueInputs() {}
+
+    PotentialFunction( PotentialFunction const& copySource ) :
+      lagrangianParameterManager( copySource.lagrangianParameterManager ),
+      fieldNames( copySource.fieldNames ),
+      numberOfFields( copySource.numberOfFields ),
+      dsbFieldInputStrings( copySource.dsbFieldInputStrings ),
+      dsbFieldValueInputs( copySource.dsbFieldValueInputs ) {}
+
+    virtual ~PotentialFunction() {}
 
 
     LagrangianParameterManager const& GetLagrangianParameterManager() const
@@ -40,9 +56,8 @@ namespace VevaciousPlusPlus
     // state strongly peaked around expectation values (in GeV) for the fields
     // given by the values of fieldConfiguration and temperature in GeV given
     // by temperatureValue.
-    virtual double
-    operator()( std::vector< double > const& fieldConfiguration,
-                double const temperatureValue = 0.0 ) const = 0;
+    virtual double operator()( std::vector< double > const& fieldConfiguration,
+                               double const temperatureValue = 0.0 ) const = 0;
 
     // If overridden, this should write the potential as
     // def PotentialFunction( fv ): return ...

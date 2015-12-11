@@ -8,7 +8,6 @@
 #ifndef MINUITONPATHNORMALINERTIALPOTENTIAL_HPP_
 #define MINUITONPATHNORMALINERTIALPOTENTIAL_HPP_
 
-#include "CommonIncludes.hpp"
 #include "MinuitOnPotentialPerpendicularToPath.hpp"
 
 namespace VevaciousPlusPlus

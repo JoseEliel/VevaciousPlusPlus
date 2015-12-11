@@ -8,15 +8,21 @@
 #ifndef LHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_
 #define LHALINEARLYINTERPOLATEDBLOCKENTRY_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LhaInterpolatedParameterFunctionoid.hpp"
+#include <utility>
 #include "LHPC/SimpleLhaParser.hpp"
+#include <string>
+#include <vector>
+#include <sstream>
+#include <list>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {
 
   class LhaLinearlyInterpolatedBlockEntry :
-                                    public LhaInterpolatedParameterFunctionoid
+                                     public LhaInterpolatedParameterFunctionoid
   {
   public:
     template< typename firstType > static bool FirstPairDotSecondIsLower(

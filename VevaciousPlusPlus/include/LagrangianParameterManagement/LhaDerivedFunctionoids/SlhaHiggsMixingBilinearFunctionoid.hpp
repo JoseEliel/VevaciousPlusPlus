@@ -8,8 +8,10 @@
 #ifndef SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 #define SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -24,6 +26,7 @@ namespace VevaciousPlusPlus
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       treePseudoscalarMassSquaredIndex( treePseudoscalarMassSquaredIndex ),
       tanBetaIndex( tanBetaIndex ) {}
+
     virtual ~SlhaHiggsMixingBilinearFunctionoid() {}
 
 

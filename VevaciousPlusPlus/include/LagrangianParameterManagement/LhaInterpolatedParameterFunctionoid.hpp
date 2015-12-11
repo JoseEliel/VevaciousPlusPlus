@@ -8,9 +8,10 @@
 #ifndef LHAINTERPOLATEDPARAMETERFUNCTIONOID_HPP_
 #define LHAINTERPOLATEDPARAMETERFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
 #include "LHPC/SimpleLhaParser.hpp"
+#include <vector>
+#include <string>
 
 namespace VevaciousPlusPlus
 {
@@ -21,13 +22,13 @@ namespace VevaciousPlusPlus
   public:
     LhaInterpolatedParameterFunctionoid( size_t const indexInValuesVector,
                                         LHPC::SimpleLhaParser const& lhaParser,
-                                          std::string const& parameterName )  :
+                                         std::string const& parameterName ) :
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       parameterName( parameterName ),
       lhaParser( &lhaParser ) {}
 
     LhaInterpolatedParameterFunctionoid(
-                    LhaInterpolatedParameterFunctionoid const& copySource )  :
+                      LhaInterpolatedParameterFunctionoid const& copySource ) :
       LhaSourcedParameterFunctionoid( copySource.indexInValuesVector ),
       parameterName( copySource.parameterName ),
       lhaParser( copySource.lhaParser ) {}

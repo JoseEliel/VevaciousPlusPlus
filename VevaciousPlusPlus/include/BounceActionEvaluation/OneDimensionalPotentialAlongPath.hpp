@@ -8,13 +8,8 @@
 #ifndef ONEDIMENSIONALPOTENTIALALONGPATH_HPP_
 #define ONEDIMENSIONALPOTENTIALALONGPATH_HPP_
 
-#include "CommonIncludes.hpp"
-#include "PotentialEvaluation/PotentialFunction.hpp"
-#include "PathParameterization/TunnelPath.hpp"
-
 namespace VevaciousPlusPlus
 {
-
   // An instance of this class acts as the function of the potential energy
   // constrained to a path in field space. It is a function of one variable,
   // which is referred to as the auxiliary (variable), and the auxiliary goes
@@ -26,8 +21,12 @@ namespace VevaciousPlusPlus
   class OneDimensionalPotentialAlongPath
   {
   public:
-    OneDimensionalPotentialAlongPath();
-    virtual ~OneDimensionalPotentialAlongPath();
+    OneDimensionalPotentialAlongPath() : auxiliaryOfPathFalseVacuum( 0.0 ),
+                                         auxiliaryOfPathPanicVacuum( 1.0 ),
+                                         definiteUndershootAuxiliary( 0.0 ),
+                                         thresholdForNearPathPanic( 0.01 ) {}
+
+    virtual ~OneDimensionalPotentialAlongPath() {}
 
 
     // This should return the value of the potential at auxiliaryValue.

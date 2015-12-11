@@ -8,16 +8,25 @@
 #ifndef COSMOTRANSITIONSRUNNER_HPP_
 #define COSMOTRANSITIONSRUNNER_HPP_
 
-#include "CommonIncludes.hpp"
-#include "limits"
 #include "TunnelingCalculation/BounceActionTunneler.hpp"
-#include "VersionInformation.hpp"
+#include "TunnelingCalculation/TunnelingCalculator.hpp"
+#include <string>
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include <vector>
+#include <fstream>
+#include "VersionInformation.hpp"
+#include <cstdlib>
+#include <iostream>
 #include "ThermalActionFitter.hpp"
-#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "Minuit2/MnMigrad.h"
+#include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
+#include <cmath>
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/SplinePotential.hpp"
 #include "BounceActionEvaluation/BubbleProfile.hpp"
+#include <limits>
 
 namespace VevaciousPlusPlus
 {

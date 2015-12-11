@@ -8,7 +8,9 @@
 #ifndef PARAMETERSANDFIELDSPRODUCTTERM_HPP_
 #define PARAMETERSANDFIELDSPRODUCTTERM_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {

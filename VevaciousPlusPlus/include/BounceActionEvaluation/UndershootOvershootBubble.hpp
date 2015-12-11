@@ -8,15 +8,18 @@
 #ifndef UNDERSHOOTOVERSHOOTBUBBLE_HPP_
 #define UNDERSHOOTOVERSHOOTBUBBLE_HPP_
 
-#include "CommonIncludes.hpp"
-#include "boost/numeric/odeint/integrate/integrate.hpp"
-#include "boost/math/special_functions/bessel.hpp"
-#include "BasicFunctions/SimplePolynomial.hpp"
-#include "SplinePotential.hpp"
+#include "BubbleProfile.hpp"
 #include "PathParameterization/TunnelPath.hpp"
+#include "OneDimensionalPotentialAlongPath.hpp"
+#include "BubbleRadialValueDescription.hpp"
+#include <vector>
+#include <utility>
 #include "OdeintBubbleDerivatives.hpp"
 #include "OdeintBubbleObserver.hpp"
-#include "BubbleProfile.hpp"
+#include "boost/numeric/odeint/integrate/integrate.hpp"
+#include <cmath>
+#include "boost/math/special_functions/bessel.hpp"
+#include <algorithm>
 
 namespace VevaciousPlusPlus
 {
@@ -188,7 +191,8 @@ namespace VevaciousPlusPlus
     size_t const maximumIndexForLoop( auxiliaryProfile.size() - 1 );
     while( ( segmentIndex < maximumIndexForLoop )
            &&
-           ( radialValue > auxiliaryProfile[ ++segmentIndex ].radialValue ) ){}
+           ( radialValue > auxiliaryProfile[ ++segmentIndex ].radialValue ) )
+    {}
     // The condition of the loop iterates segmentIndex until it is at the point
     // where auxiliaryProfile[ segmentIndex ] (after increment) starts beyond
     // radialValue, so we know that segmentIndex is 1 beyond what we want to

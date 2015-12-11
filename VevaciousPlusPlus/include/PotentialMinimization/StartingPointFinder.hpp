@@ -8,7 +8,7 @@
 #ifndef STARTINGPOINTFINDER_HPP_
 #define STARTINGPOINTFINDER_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
 
 namespace VevaciousPlusPlus
 {
@@ -16,8 +16,8 @@ namespace VevaciousPlusPlus
   class StartingPointFinder
   {
   public:
-    StartingPointFinder() { ; /* This does nothing. */ }
-    virtual ~StartingPointFinder() { ; /* This does nothing. */ }
+    StartingPointFinder() {}
+    virtual ~StartingPointFinder() {}
 
 
     // This should find all the starting points for the gradient-based

@@ -12,6 +12,10 @@
 #include "StartingPointFinder.hpp"
 #include "GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include "PotentialMinimum.hpp"
+#include <vector>
+#include <iostream>
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {

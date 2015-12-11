@@ -16,8 +16,8 @@ namespace VevaciousPlusPlus
   class VersionInformation
   {
   public:
-    static std::string const currentVersion;
-    static std::string const currentCitation;
+    static std::string CurrentVersion() { return "1.0.00.alpha001"; }
+    static std::string CurrentCitation() { return "[none as yet]"; }
   };
 
 } /* namespace VevaciousPlusPlus */

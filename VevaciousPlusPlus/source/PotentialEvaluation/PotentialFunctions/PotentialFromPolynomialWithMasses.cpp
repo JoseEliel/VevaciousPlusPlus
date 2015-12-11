@@ -51,36 +51,31 @@ namespace VevaciousPlusPlus
     fieldsAssumedNegative(),
     assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
-    BOL::AsciiXmlParser xmlParser( false );
+    LHPC::RestrictedXmlParser xmlParser;
 
     std::string xmlFieldVariables( "" );
     std::string xmlDsbMinimum( "" );
     std::string xmlTreeLevelPotential( "" );
     std::string xmlLoopCorrections( "" );
-    bool successfullyReadElement(
-                            xmlParser.openRootElementOfFile( modelFilename ) );
-    if( !successfullyReadElement )
+    xmlParser.OpenRootElementOfFile( modelFilename );
+    while( xmlParser.ReadNextElement() )
     {
-      throw std::runtime_error( "Could not parse XML of " + modelFilename );
-    }
-    while( xmlParser.readNextElement() )
-    {
-      if( xmlParser.currentElementNameMatches( "FieldVariables" ) )
+      if( xmlParser.CurrentName() == "FieldVariables" )
       {
-        xmlFieldVariables = xmlParser.getTrimmedCurrentElementContent();
+        xmlFieldVariables = xmlParser.CurrentBody();
       }
-      else if( xmlParser.currentElementNameMatches( "DsbMinimum" ) )
+      else if( xmlParser.CurrentName() == "DsbMinimum" )
       {
-        xmlDsbMinimum = xmlParser.getTrimmedCurrentElementContent();
+        xmlDsbMinimum = xmlParser.CurrentBody();
       }
-      else if( xmlParser.currentElementNameMatches( "TreeLevelPotential" ) )
+      else if( xmlParser.CurrentName() == "TreeLevelPotential" )
       {
-        xmlTreeLevelPotential = xmlParser.getTrimmedCurrentElementContent();
+        xmlTreeLevelPotential = xmlParser.CurrentBody();
       }
-      else if( xmlParser.currentElementNameMatches( "LoopCorrections" ) )
+      else if( xmlParser.CurrentName() == "LoopCorrections" )
       {
         std::string
-        renormalizationScheme( xmlParser.getCurrentElementAttributes().find(
+        renormalizationScheme( xmlParser.CurrentAttributes().find(
                                            "RenormalizationScheme" )->second );
         LHPC::ParsingUtilities::TransformToUppercase( renormalizationScheme );
         if( renormalizationScheme == "MSBAR" )
@@ -98,7 +93,7 @@ namespace VevaciousPlusPlus
           << " (nothing else is currently supported)!";
           throw std::runtime_error( errorBuilder.str() );
         }
-        xmlLoopCorrections = xmlParser.getTrimmedCurrentElementContent();
+        xmlLoopCorrections = xmlParser.CurrentBody();
       }
     }
     if( xmlFieldVariables.empty() )
@@ -173,13 +168,20 @@ namespace VevaciousPlusPlus
     std::vector< std::string >
     dsbLines( LHPC::ParsingUtilities::SplitBySubstrings( xmlDsbMinimum,
                                                          "\n" ) );
+    std::string trimmedLine( "" );
     for( std::vector< std::string >::const_iterator
          dsbLine( dsbLines.begin() );
          dsbLine != dsbLines.end();
          ++dsbLine )
     {
-      size_t equalsPosition( dsbLine->find( '=' ) );
-      if( !( equalsPosition < ( dsbLine->size() - 1 ) ) )
+      trimmedLine.assign(
+          LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack( *dsbLine ) );
+      if( trimmedLine.empty() )
+      {
+        continue;
+      }
+      size_t equalsPosition( trimmedLine.find( '=' ) );
+      if( !( equalsPosition < ( trimmedLine.size() - 1 ) ) )
       {
         std::stringstream errorBuilder;
         errorBuilder
@@ -190,23 +192,25 @@ namespace VevaciousPlusPlus
 
       readFieldName.assign(
                         LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
-                                                            dsbLine->substr( 0,
+                                                         trimmedLine.substr( 0,
                                                           equalsPosition ) ) );
-      size_t fieldIndex( FieldIndex( lagrangianParameterManager.FormatVariable(
+      size_t const
+      fieldIndex( FieldIndex( lagrangianParameterManager.FormatVariable(
                                                            readFieldName ) ) );
       if( !( fieldIndex < fieldNames.size() ) )
       {
         std::stringstream errorBuilder;
         errorBuilder
-        << "Unknown field (\"" << dsbLine->substr( 0,
-                                                   equalsPosition )
+        << "Unknown field (\"" << trimmedLine.substr( 0,
+                                                      equalsPosition )
         << "\") given value in DsbMinimum!";
         throw std::runtime_error( errorBuilder.str() );
       }
       dsbFieldInputStrings[ fieldIndex ]
       = lagrangianParameterManager.FormatVariable(
-                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
-                                     dsbLine->substr( equalsPosition + 1 ) ) );
+                                         LHPC::ParsingUtilities::TrimFromFront(
+                                      trimmedLine.substr( equalsPosition + 1 ),
+                                 LHPC::ParsingUtilities::WhitespaceChars() ) );
     }
     // </DsbMinimum>
     // Now we parse <TreeLevelPotential>
@@ -214,27 +218,25 @@ namespace VevaciousPlusPlus
                                treeLevelPotential );
     // </TreeLevelPotential>
     // <LoopCorrections>
-    xmlParser.loadString( xmlLoopCorrections );
+    xmlParser.LoadString( xmlLoopCorrections );
     std::vector< std::string > matrixLines;
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       //   <ExtraPolynomialPart>
-      if( xmlParser.currentElementNameMatches( "ExtraPolynomialPart" ) )
+      if( xmlParser.CurrentName() == "ExtraPolynomialPart" )
       {
-        ParseSumOfPolynomialTerms( xmlParser.getTrimmedCurrentElementContent(),
+        ParseSumOfPolynomialTerms( xmlParser.CurrentBody(),
                                    polynomialLoopCorrections );
       }
       //   </ExtraPolynomialPart>
       //   <RealBosonMassSquaredMatrix>
-      else if( xmlParser.currentElementNameMatches(
-                                               "RealBosonMassSquaredMatrix" ) )
+      else if( xmlParser.CurrentName() == "RealBosonMassSquaredMatrix" )
       {
-        size_t const numberOfRows( PrepareMatrixLines(
-                                   xmlParser.getTrimmedCurrentElementContent(),
+        size_t const numberOfRows( PrepareMatrixLines( xmlParser.CurrentBody(),
                                                        matrixLines,
                                               "RealBosonMassSquaredMatrix" ) );
         RealMassesSquaredMatrix massSquaredMatrix( numberOfRows,
-                                     xmlParser.getCurrentElementAttributes() );
+                                               xmlParser.CurrentAttributes() );
         for( size_t lineIndex( 0 );
              lineIndex < matrixLines.size();
              ++lineIndex )
@@ -257,14 +259,13 @@ namespace VevaciousPlusPlus
       }
       //   </RealBosonMassSquaredMatrix>
       //   <WeylFermionMassMatrix>
-      else if( xmlParser.currentElementNameMatches( "WeylFermionMassMatrix" ) )
+      else if( xmlParser.CurrentName() == "WeylFermionMassMatrix" )
       {
-        size_t const numberOfRows( PrepareMatrixLines(
-                                   xmlParser.getTrimmedCurrentElementContent(),
+        size_t const numberOfRows( PrepareMatrixLines( xmlParser.CurrentBody(),
                                                        matrixLines,
                                                    "WeylFermionMassMatrix" ) );
         SymmetricComplexMassMatrix fermionMassMatrix( numberOfRows,
-                                     xmlParser.getCurrentElementAttributes() );
+                                               xmlParser.CurrentAttributes() );
         for( size_t lineIndex( 0 );
              lineIndex < matrixLines.size();
              ++lineIndex )
@@ -278,15 +279,14 @@ namespace VevaciousPlusPlus
       }
       //   </WeylFermionMassMatrix>
       //   <ComplexWeylFermionMassSquaredMatrix>
-      else if( xmlParser.currentElementNameMatches(
-                                      "ComplexWeylFermionMassSquaredMatrix" ) )
+      else if( xmlParser.CurrentName()
+               == "ComplexWeylFermionMassSquaredMatrix" )
       {
-        size_t const numberOfRows( PrepareMatrixLines(
-                                   xmlParser.getTrimmedCurrentElementContent(),
+        size_t const numberOfRows( PrepareMatrixLines( xmlParser.CurrentBody(),
                                                        matrixLines,
                                      "ComplexWeylFermionMassSquaredMatrix" ) );
         ComplexMassSquaredMatrix fermionMassSquaredMatrix( numberOfRows,
-                                     xmlParser.getCurrentElementAttributes() );
+                                               xmlParser.CurrentAttributes() );
         for( size_t lineIndex( 0 );
              lineIndex < matrixLines.size();
              ++lineIndex )
@@ -351,7 +351,7 @@ namespace VevaciousPlusPlus
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VersionInformation::currentVersion << "\n"
+    << VersionInformation::CurrentVersion() << "\n"
     "from __future__ import division\n"
     "import math\n"
     "import numpy\n"
@@ -1001,7 +1001,7 @@ namespace VevaciousPlusPlus
         std::string variableString( lagrangianParameterManager.FormatVariable(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
-        unsigned int powerInt( 1 );
+        size_t powerInt( 1 );
         if( ( wordEnd < stringToParse.size() )
             &&
             ( stringToParse[ wordEnd ] == '^' ) )
@@ -1020,8 +1020,9 @@ namespace VevaciousPlusPlus
           wordEnd = stringToParse.find_first_not_of( digitChars,
                                                      wordStart );
           powerInt
-          = BOL::StringParser::stringToInt( stringToParse.substr( wordStart,
-                                                   ( wordEnd - wordStart ) ) );
+          = static_cast< size_t >( LHPC::ParsingUtilities::BaseTenStringToInt(
+                                               stringToParse.substr( wordStart,
+                                                 ( wordEnd - wordStart ) ) ) );
         }
 
         // First we check for the imaginary unit.
@@ -1035,10 +1036,13 @@ namespace VevaciousPlusPlus
               ||
               ( variableString[ 0 ] == 'J' ) ) )
         {
-          if( ( powerInt % 2 ) == 1 )
+          // If the term was already imaginary, we take its pre-existing factor
+          // of the imaginary unit into the power just read.
+          if( imaginaryTerm )
           {
-            imaginaryTerm = true;
+            ++powerInt;
           }
+          imaginaryTerm = ( ( powerInt % 2 ) == 1 );
           if( ( powerInt % 4 ) > 1 )
           {
             polynomialTerm.MultiplyByConstant( -1.0 );

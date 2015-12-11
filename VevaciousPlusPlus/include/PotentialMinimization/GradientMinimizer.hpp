@@ -8,9 +8,9 @@
 #ifndef GRADIENTMINIMIZER_HPP_
 #define GRADIENTMINIMIZER_HPP_
 
-#include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimum.hpp"
+#include <vector>
 
 namespace VevaciousPlusPlus
 {
@@ -18,8 +18,10 @@ namespace VevaciousPlusPlus
   class GradientMinimizer
   {
   public:
-    GradientMinimizer( PotentialFunction const& potentialFunction );
-    virtual ~GradientMinimizer();
+    GradientMinimizer( PotentialFunction const& potentialFunction ) :
+      potentialFunction( potentialFunction ) {}
+
+    virtual ~GradientMinimizer() {}
 
 
     // This should find the minimum using startingPoint as a starting point,

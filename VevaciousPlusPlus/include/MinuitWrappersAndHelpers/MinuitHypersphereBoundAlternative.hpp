@@ -8,15 +8,18 @@
 #ifndef MINUITHYPERSPHEREBOUNDALTERNATIVE_HPP_
 #define MINUITHYPERSPHEREBOUNDALTERNATIVE_HPP_
 
+#include <vector>
+#include <cmath>
+
 namespace VevaciousPlusPlus
 {
 
   class MinuitHypersphereBoundAlternative
   {
   public:
-    // This scales down the values of variableVector if the sum of the squares of
-    // the elements is larger than capLengthSquared so that the sum is equal to
-    // capLengthSquared, and returns the difference of the original sum of
+    // This scales down the values of variableVector if the sum of the squares
+    // of the elements is larger than capLengthSquared so that the sum is equal
+    // to capLengthSquared, and returns the difference of the original sum of
     // squares from capLengthSquared.
     static double CapVariableVector( std::vector< double >& variableVector,
                                      double const capLengthSquared );
@@ -46,7 +49,7 @@ namespace VevaciousPlusPlus
       return 0.0;
     }
     double const scaleFactor( sqrt( capLengthSquared / lengthSquared ) );
-    for( unsigned int fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableVector.size();
          ++fieldIndex )
     {

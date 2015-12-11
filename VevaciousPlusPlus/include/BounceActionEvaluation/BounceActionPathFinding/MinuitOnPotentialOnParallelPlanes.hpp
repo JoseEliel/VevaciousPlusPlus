@@ -8,12 +8,10 @@
 #ifndef MINUITONPOTENTIALONPARALLELPLANES_HPP_
 #define MINUITONPOTENTIALONPARALLELPLANES_HPP_
 
-#include "CommonIncludes.hpp"
 #include "MinuitOnHypersurfaces.hpp"
-#include "Minuit2/MnMigrad.h"
-#include "PotentialEvaluation/PotentialFunction.hpp"
-#include "PotentialMinimization/PotentialMinimum.hpp"
-#include "../PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/BubbleProfile.hpp"
+#include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
 {

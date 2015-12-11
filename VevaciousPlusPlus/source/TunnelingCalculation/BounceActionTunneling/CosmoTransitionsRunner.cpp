@@ -62,13 +62,13 @@ namespace VevaciousPlusPlus
     std::string systemCommand( "rm " );
     systemCommand.append( pythonMainFilename );
     systemCommand.append( "c" );
-    BOL::UsefulStuff::runSystemCommand( systemCommand );
+    system( systemCommand.c_str() );
     std::ofstream pythonFile;
     pythonFile.open( pythonMainFilename.c_str() );
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VersionInformation::currentVersion << "\n"
+    << VersionInformation::CurrentVersion() << "\n"
     "from __future__ import division\n"
     "import sys\n"
     "import math\n"
@@ -111,7 +111,7 @@ namespace VevaciousPlusPlus
     "# CosmoTransitions nests a loop within a loop to do its deformations:\n"
     "innerLoopMaxDeformations = " << maxInnerLoops << "\n"
     "outerLoopMaxDeformations = " << maxOuterLoops << "\n";
-    int tunnelingSymmetryDimensionMinusOne( 3 );
+    unsigned int tunnelingSymmetryDimensionMinusOne( 3 );
     std::string underlyingPotential( "JustLoopCorrectedPotential" );
     if( tunnelingTemperature > 0.0 )
     {
@@ -167,7 +167,7 @@ namespace VevaciousPlusPlus
     << std::endl << "Calling system( \"" << systemCommand << "\" )..."
     << std::endl << "-----------------";
     std::cout << std::endl;
-    BOL::UsefulStuff::runSystemCommand( systemCommand );
+    system( systemCommand.c_str() );
     std::cout
     << std::endl << "-----------------" << std::endl
     << "Parsing output from " << pythonMainFilename << ".";
@@ -389,13 +389,13 @@ namespace VevaciousPlusPlus
     std::string systemCommand( "rm " );
     systemCommand.append( pythonMainFilename );
     systemCommand.append( "c" );
-    BOL::UsefulStuff::runSystemCommand( systemCommand );
+    system( systemCommand.c_str() );
     std::ofstream pythonFile;
     pythonFile.open( pythonMainFilename.c_str() );
     pythonFile << std::setprecision( 12 );
     pythonFile << "# Automatically generated file! Modify at your own PERIL!\n"
     "# This file was created by Vevacious version "
-    << VersionInformation::currentVersion << "\n"
+    << VersionInformation::CurrentVersion() << "\n"
     "from __future__ import division\n"
     "import sys\n"
     "import math\n"
@@ -533,7 +533,7 @@ namespace VevaciousPlusPlus
     << std::endl << "Calling system( \"" << systemCommand << "\" )..."
     << std::endl << "-----------------";
     std::cout << std::endl;
-    BOL::UsefulStuff::runSystemCommand( systemCommand );
+    system( systemCommand.c_str() );
     std::cout
     << std::endl << "-----------------" << std::endl
     << "Parsing output from " << pythonMainFilename << ".";

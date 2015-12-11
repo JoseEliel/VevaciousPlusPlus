@@ -8,8 +8,10 @@
 #ifndef LINEARSPLINEPATHSEGMENT_HPP_
 #define LINEARSPLINEPATHSEGMENT_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
 #include "Eigen/Dense"
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -20,9 +22,22 @@ namespace VevaciousPlusPlus
     LinearSplinePathSegment( std::vector< double > const& startNode,
                              std::vector< double > const& endNode,
                              double const segmentAuxiliaryLength );
-    LinearSplinePathSegment( LinearSplinePathSegment const& copySource );
-    LinearSplinePathSegment();
-    virtual ~LinearSplinePathSegment();
+
+    LinearSplinePathSegment( LinearSplinePathSegment const& copySource ) :
+      numberOfFields( copySource.numberOfFields ),
+      fieldConstants( copySource.fieldConstants ),
+      fieldLinears( copySource.fieldLinears ),
+      segmentAuxiliaryLength( copySource.segmentAuxiliaryLength ),
+      slopeSquared( copySource.slopeSquared ) {}
+
+    LinearSplinePathSegment() :
+      numberOfFields( 0 ),
+      fieldConstants(),
+      fieldLinears(),
+      segmentAuxiliaryLength( -1.0 ),
+      slopeSquared( -1.0 ) {}
+
+    virtual ~LinearSplinePathSegment() {}
 
 
     // This fills fieldConfiguration with the values that the fields should
@@ -36,7 +51,8 @@ namespace VevaciousPlusPlus
                        double const segmentAuxiliary ) const;
 
     // This returns the sum of the squares of the slopes at segmentAuxiliary.
-    double SlopeSquared( double const segmentAuxiliary ) const;
+    double SlopeSquared( double const segmentAuxiliary ) const
+    { return slopeSquared; }
 
     // This should return the dot product of the first derivative of the field
     // vector with the second derivative, both with respect to the segment
@@ -59,9 +75,34 @@ namespace VevaciousPlusPlus
     std::vector< double > fieldConstants;
     std::vector< double > fieldLinears;
     double segmentAuxiliaryLength;
+    double slopeSquared;
   };
 
 
+
+
+
+  inline LinearSplinePathSegment::LinearSplinePathSegment(
+                                        std::vector< double > const& startNode,
+                                          std::vector< double > const& endNode,
+                                        double const segmentAuxiliaryLength ) :
+    numberOfFields( startNode.size() ),
+    fieldConstants( startNode ),
+    fieldLinears( numberOfFields ),
+    segmentAuxiliaryLength( segmentAuxiliaryLength ),
+    slopeSquared( 0.0 )
+  {
+    for( size_t fieldIndex( 0 );
+         fieldIndex < numberOfFields;
+         ++fieldIndex )
+    {
+      fieldLinears[ fieldIndex ]
+      = ( ( endNode[ fieldIndex ] - startNode[ fieldIndex ] )
+          / segmentAuxiliaryLength );
+      slopeSquared
+      += ( fieldLinears[ fieldIndex ] * fieldLinears[ fieldIndex ] );
+    }
+  }
 
 
   // This fills fieldConfiguration with the values that the fields should
@@ -92,21 +133,6 @@ namespace VevaciousPlusPlus
       fieldConfiguration( fieldIndex ) = ( fieldConstants[ fieldIndex ]
                          + ( segmentAuxiliary * fieldLinears[ fieldIndex ] ) );
     }
-  }
-
-  // This returns the sum of the squares of the slopes at segmentAuxiliary.
-  inline double LinearSplinePathSegment::SlopeSquared(
-                                          double const segmentAuxiliary ) const
-  {
-    double returnValue( 0.0 );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < numberOfFields;
-         ++fieldIndex )
-    {
-      double const slopeValue( fieldLinears[ fieldIndex ] );
-      returnValue += ( slopeValue * slopeValue );
-    }
-    return returnValue;
   }
 
   // This is for debugging.

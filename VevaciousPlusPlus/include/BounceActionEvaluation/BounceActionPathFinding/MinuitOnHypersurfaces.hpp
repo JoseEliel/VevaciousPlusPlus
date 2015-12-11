@@ -8,15 +8,16 @@
 #ifndef MINUITONHYPERSURFACES_HPP_
 #define MINUITONHYPERSURFACES_HPP_
 
-#include "CommonIncludes.hpp"
-#include "Minuit2/MnMigrad.h"
-#include "Minuit2/MnUserParameters.h"
-#include "Eigen/Dense"
 #include "MinuitPathFinder.hpp"
+#include "Eigen/Dense"
+#include <vector>
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 #include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
+#include <cmath>
+#include "Minuit2/MnMigrad.h"
+#include "Minuit2/FunctionMinimum.h"
+#include "Minuit2/MnUserParameters.h"
 
 namespace VevaciousPlusPlus
 {

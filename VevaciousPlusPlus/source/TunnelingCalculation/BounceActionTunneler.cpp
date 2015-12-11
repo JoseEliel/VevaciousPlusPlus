@@ -206,12 +206,11 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;
       return;
     }
-    quantumLifetimeInSeconds
-    = ( ( exp( 0.25 * quantumAction )
-          * hBarInGigaElectronVoltSeconds )
-        / fourthRootOfSolitonicFactor );
+    quantumLifetimeInSeconds = ( ( exp( 0.25 * quantumAction )
+                                   * hBarInGigaElectronVoltSeconds )
+                                 / fourthRootOfSolitonicFactor );
 
-    double
+    double const
     survivalExponent( ageOfKnownUniverseInSeconds / quantumLifetimeInSeconds );
     if( survivalExponent >= maximumPowerOfNaturalExponent )
     {

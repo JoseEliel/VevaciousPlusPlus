@@ -8,14 +8,18 @@
 #ifndef POLYNOMIALATFIXEDSCALESSOLVER_HPP_
 #define POLYNOMIALATFIXEDSCALESSOLVER_HPP_
 
-#include "CommonIncludes.hpp"
 #include "PotentialMinimization/StartingPointFinder.hpp"
 #include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
-#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductTerm.hpp"
-#include "PolynomialSystemSolver.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
-#include "Eigen/Dense"
+#include "PolynomialSystemSolver.hpp"
+#include <vector>
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductTerm.hpp"
+#include <stdexcept>
+#include <cmath>
 #include "Utilities/VectorUtilities.hpp"
+#include <sstream>
+#include "Eigen/Dense"
+
 
 namespace VevaciousPlusPlus
 {

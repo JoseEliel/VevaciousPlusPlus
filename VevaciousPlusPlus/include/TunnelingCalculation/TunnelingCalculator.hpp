@@ -8,12 +8,12 @@
 #ifndef TUNNELINGCALCULATOR_HPP_
 #define TUNNELINGCALCULATOR_HPP_
 
-#include "CommonIncludes.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 
 namespace VevaciousPlusPlus
 {
+
   class TunnelingCalculator
   {
   public:
@@ -28,8 +28,17 @@ namespace VevaciousPlusPlus
     };
 
     TunnelingCalculator( TunnelingStrategy const tunnelingStrategy = NotSet,
-                         double const survivalProbabilityThreshold = 0.01 );
-    virtual ~TunnelingCalculator();
+                         double const survivalProbabilityThreshold = 0.01 ) :
+      tunnelingStrategy( tunnelingStrategy ),
+      quantumSurvivalProbability( -1.0 ),
+      logOfMinusLogOfQuantumProbability( -1.0E+100 ),
+      quantumLifetimeInSeconds( -1.0 ),
+      thermalSurvivalProbability( -1.0 ),
+      logOfMinusLogOfThermalProbability( -1.0E+100 ),
+      dominantTemperatureInGigaElectronVolts( -1.0 ),
+      survivalProbabilityThreshold( survivalProbabilityThreshold ) {}
+
+    virtual ~TunnelingCalculator() {}
 
 
     // This should try to find the most accurate survival probability for

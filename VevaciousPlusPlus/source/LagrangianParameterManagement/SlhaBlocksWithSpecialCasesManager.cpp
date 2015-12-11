@@ -282,8 +282,7 @@ namespace VevaciousPlusPlus
         parameterName.append( ", " ).append( parameterToIndex->first );
       }
     }
-    double const
-    outputLogScale( log( AppropriateSingleFixedScale() ) );
+    double const outputLogScale( log( AppropriateSingleFixedScale() ) );
     std::vector< double > parameterValues;
     ParameterValues( outputLogScale,
                      parameterValues );
@@ -378,10 +377,10 @@ namespace VevaciousPlusPlus
     {
       size_t const vevIndex( RegisterParameter( "HMIX[ 3 ]" ).second );
       size_t const tanBetaIndex( RegisterParameter( "HMIX[ 2 ]" ).second );
-      return AddNewDerivedParameter( caseString,
-                                     new SlhaDsbHiggsVevFunctionoid(
-                                             numberOfDistinctActiveParameters,
-                                                                     vevIndex,
+      return PairAddNewDerivedParameter( caseString,
+                                         new SlhaDsbHiggsVevFunctionoid(
+                                              numberOfDistinctActiveParameters,
+                                                                      vevIndex,
                                                                   tanBetaIndex,
                                                  ( caseString == "DsbVu" ) ) );
     }
@@ -390,8 +389,8 @@ namespace VevaciousPlusPlus
       size_t const treePseudoscalarMassSquaredIndex(
                                      RegisterParameter( "HMIX[ 4 ]" ).second );
       size_t const tanBetaIndex( RegisterParameter( "HMIX[ 2 ]" ).second );
-      return AddNewDerivedParameter( caseString,
-                                     new SlhaHiggsMixingBilinearFunctionoid(
+      return PairAddNewDerivedParameter( caseString,
+                                        new SlhaHiggsMixingBilinearFunctionoid(
                                               numberOfDistinctActiveParameters,
                                               treePseudoscalarMassSquaredIndex,
                                                               tanBetaIndex ) );

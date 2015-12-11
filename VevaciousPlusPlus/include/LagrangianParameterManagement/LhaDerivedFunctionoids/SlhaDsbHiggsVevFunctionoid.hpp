@@ -9,7 +9,10 @@
 #define SLHADSBHIGGSVEVFUNCTIONOID_HPP_
 
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
-#include "CommonIncludes.hpp"
+#include <vector>
+#include <cmath>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -25,6 +28,7 @@ namespace VevaciousPlusPlus
       vevIndex( vevIndex ),
       tanBetaIndex( tanBetaIndex ),
       sinNotCos( sinNotCos ) {}
+
     virtual ~SlhaDsbHiggsVevFunctionoid() {}
 
 

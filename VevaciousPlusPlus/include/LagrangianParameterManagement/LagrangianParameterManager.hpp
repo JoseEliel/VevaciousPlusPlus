@@ -8,9 +8,13 @@
 #ifndef LAGRANGIANPARAMETERMANAGER_HPP_
 #define LAGRANGIANPARAMETERMANAGER_HPP_
 
-#include "CommonIncludes.hpp"
-#include "LHPC/BasicObserverPattern.hpp"
-#include "LHPC/ParsingUtilities.hpp"
+#include "LHPC/Utilities/BasicObserverPattern.hpp"
+#include <string>
+#include <utility>
+#include <vector>
+#include <sstream>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <stdexcept>
 
 namespace VevaciousPlusPlus
 {
@@ -18,8 +22,8 @@ namespace VevaciousPlusPlus
   class LagrangianParameterManager : public LHPC::BasicObserved
   {
   public:
-    LagrangianParameterManager();
-    virtual ~LagrangianParameterManager();
+    LagrangianParameterManager() : LHPC::BasicObserved() {}
+    virtual ~LagrangianParameterManager() {}
 
 
     // This should return the value of the requested parameter at the requested
@@ -171,6 +175,35 @@ namespace VevaciousPlusPlus
       indicesStream << std::atoi( whichIndex->c_str() );
     }
     return indicesStream.str();
+  }
+
+  // This returns "everything up to the '['" paired with "everything within the
+  // '[' to the ']' (not including the brackets themselves), throwing
+  // exceptions if there anything other than either no square brackets, or a
+  // single '[' with a single ']' coming after it.
+  inline std::pair< std::string, std::string >
+  LagrangianParameterManager::SeparateIndexBracket(
+                                    std::string const& stringToSeparate ) const
+  {
+    size_t openBracket( stringToSeparate.find( '[' ) );
+    if( openBracket == std::string::npos )
+    {
+      return std::make_pair( stringToSeparate, std::string( "" ) );
+    }
+    size_t closeBracket( stringToSeparate.find_last_of( '[' ) );
+    if( ( closeBracket == std::string::npos )
+        ||
+        ( stringToSeparate.find( openBracket, '[' ) != std::string::npos )
+        ||
+        ( stringToSeparate.find_last_of( closeBracket,
+                                         '[' ) != std::string::npos ) )
+    {
+      throw std::runtime_error(
+                           "In parsing variable, [...] not closed properly." );
+    }
+    return std::make_pair( stringToSeparate.substr( 0, openBracket ),
+                           stringToSeparate.substr( ( openBracket + 1 ),
+                             ( stringToSeparate.size() - openBracket - 2 ) ) );
   }
 
 } /* namespace VevaciousPlusPlus */

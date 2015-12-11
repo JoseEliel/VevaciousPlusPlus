@@ -3,6 +3,11 @@
  *
  *  Created on: Dec 8, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *
+ *      This file is part of LesHouchesParserClasses, released under the
+ *      GNU General Public License. Please see the accompanying
+ *      README.LHPC_CPP.txt file for a full list of files, brief documentation
+ *      on how to use these classes, and further details on the license.
  */
 
 #ifndef RESTRICTEDXMLPARSER_HPP_
@@ -14,7 +19,8 @@
 #include <string>
 #include <map>
 #include <stdexcept>
-#include "ParsingUtilities.hpp"
+
+#include "Utilities/ParsingUtilities.hpp"
 
 namespace LHPC
 {
@@ -125,6 +131,11 @@ namespace LHPC
     // This returns the body of the element just read by the last call of
     // ReadNextElement().
     std::string const& CurrentBody() { return currentBody; }
+
+    // This returns a string which is the current body with leading and
+    // trailing whitespace and newline characters removed.
+    std::string TrimmedCurrentBody() const
+    { return ParsingUtilities::TrimWhitespaceFromFrontAndBack( currentBody ); }
 
     // This returns the text of the file opened by OpenRootElementOfFile(...)
     // or ReadAllOfRootElementOfFile(...) up to the beginning of the root
@@ -1003,6 +1014,7 @@ namespace LHPC
     }
     nameDestination = nameStream.str();
   }
+
 }
 
 #endif /* RESTRICTEDXMLPARSER_HPP_ */

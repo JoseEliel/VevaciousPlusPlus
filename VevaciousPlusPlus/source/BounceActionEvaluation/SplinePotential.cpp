@@ -209,15 +209,6 @@ namespace VevaciousPlusPlus
   // This is for debugging.
   std::string SplinePotential::AsDebuggingString() const
   {
-    BOL::StringParser doubleFormatter( 6,
-                                       ' ',
-                                       8,
-                                       2,
-                                       "",
-                                       "-",
-                                       "",
-                                       "-",
-                                       "*10^");
     std::stringstream returnStream;
     returnStream
     << "auxiliaryOfPathFalseVacuum = " << auxiliaryOfPathFalseVacuum
@@ -230,9 +221,11 @@ namespace VevaciousPlusPlus
     << std::endl
     << std::endl;
     returnStream << "potential = ( UnitStep[x] * ( "
-    << doubleFormatter.doubleToString( firstSegmentQuadratic )
+    << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                        firstSegmentQuadratic )
     << " * x^(2) ) * UnitStep["
-    << doubleFormatter.doubleToString( auxiliaryStep ) << " - x]";
+    << LHPC::ParsingUtilities::FormatNumberForMathematica( auxiliaryStep )
+    << " - x]";
     double cumulativeAuxiliary( auxiliaryStep );
     for( size_t segmentIndex( 0 );
          segmentIndex < numberOfNormalSegments;
@@ -240,26 +233,36 @@ namespace VevaciousPlusPlus
     {
       returnStream << " + "
       << "UnitStep[x - "
-      << doubleFormatter.doubleToString( cumulativeAuxiliary )
-      << "] * ( ("
-      << doubleFormatter.doubleToString( potentialValues[ segmentIndex ] )
-      << ") + (x-("
-      << doubleFormatter.doubleToString( cumulativeAuxiliary )
-      << ")) * ("
-      << doubleFormatter.doubleToString( firstDerivatives[ segmentIndex ] )
-      << ") ) * UnitStep[";
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                          cumulativeAuxiliary )
+      << "] * ( "
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                              potentialValues[ segmentIndex ] )
+      << " + (x-"
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                          cumulativeAuxiliary )
+      << ") * "
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                             firstDerivatives[ segmentIndex ] )
+      << " ) * UnitStep[";
       cumulativeAuxiliary += auxiliaryStep;
-      returnStream << doubleFormatter.doubleToString( cumulativeAuxiliary )
+      returnStream
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                          cumulativeAuxiliary )
       << " - x]";
     }
     returnStream
     << " + UnitStep[x - "
-    << doubleFormatter.doubleToString( cumulativeAuxiliary ) << "] * ( ("
-    << doubleFormatter.doubleToString( finalPotential )
-    << ") + (x-" << auxiliaryOfPathPanicVacuum << ")^2 * ("
-    << doubleFormatter.doubleToString( lastSegmentQuadratic )
-    << ") ) * UnitStep["
-    << doubleFormatter.doubleToString( auxiliaryOfPathPanicVacuum )
+    << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                          cumulativeAuxiliary )
+    << "] * ( "
+    << LHPC::ParsingUtilities::FormatNumberForMathematica( finalPotential )
+    << " + (x-" << auxiliaryOfPathPanicVacuum << ")^2 * "
+    << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                         lastSegmentQuadratic )
+    << " ) * UnitStep["
+    << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                                   auxiliaryOfPathPanicVacuum )
     << " - x] )" << std::endl
     << std::endl;
     returnStream
@@ -273,7 +276,8 @@ namespace VevaciousPlusPlus
         returnStream << ",";
       }
       returnStream << " "
-      << doubleFormatter.doubleToString( potentialValues[ segmentIndex ] );
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                             potentialValues[ segmentIndex ] );
     }
     returnStream << std::endl << "(then {";
     for( size_t segmentIndex( numberOfNormalSegments + 1 );
@@ -285,7 +289,8 @@ namespace VevaciousPlusPlus
         returnStream << ",";
       }
       returnStream << " "
-      << doubleFormatter.doubleToString( potentialValues[ segmentIndex ] );
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                             potentialValues[ segmentIndex ] );
     }
     returnStream << " })";
     returnStream << std::endl
@@ -299,7 +304,8 @@ namespace VevaciousPlusPlus
         returnStream << ",";
       }
       returnStream << " "
-      << doubleFormatter.doubleToString( firstDerivatives[ segmentIndex ] );
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                            firstDerivatives[ segmentIndex ] );
     }
     returnStream << std::endl << "(then {";
     for( size_t segmentIndex( numberOfNormalSegments );
@@ -311,7 +317,8 @@ namespace VevaciousPlusPlus
         returnStream << ",";
       }
       returnStream << " "
-      << doubleFormatter.doubleToString( firstDerivatives[ segmentIndex ] );
+      << LHPC::ParsingUtilities::FormatNumberForMathematica(
+                                            firstDerivatives[ segmentIndex ] );
     }
     returnStream << " })";
     returnStream << std::endl;
@@ -328,7 +335,6 @@ namespace VevaciousPlusPlus
     << ", pathTemperature = " << pathTemperature
     << std::endl
     << std::endl;
-
 
     return returnStream.str();
   }

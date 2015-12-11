@@ -8,8 +8,10 @@
 #ifndef TUNNELPATH_HPP_
 #define TUNNELPATH_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
 #include "Eigen/Dense"
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -19,8 +21,13 @@ namespace VevaciousPlusPlus
   public:
     TunnelPath( size_t const numberOfFields,
                 std::vector< double > const& pathParameterization,
-                double const pathTemperature = 0.0 );
-    virtual ~TunnelPath();
+                double const pathTemperature = 0.0 ) :
+      numberOfFields( numberOfFields ),
+      pathParameterization( pathParameterization ),
+      pathTemperature( pathTemperature ),
+      nonZeroTemperature( pathTemperature > 0.0 ) {}
+
+    virtual ~TunnelPath() {}
 
 
     std::vector< double >&
@@ -68,8 +75,8 @@ namespace VevaciousPlusPlus
     std::vector< double > pathParameterization;
 
     void SetTemperature( double const temperatureValue )
-    { this->pathTemperature = temperatureValue;
-      nonZeroTemperature = ( temperatureValue > 0.0 ); }
+    { nonZeroTemperature = ( ( this->pathTemperature = temperatureValue )
+                             > 0.0 ); }
 
 
   private:

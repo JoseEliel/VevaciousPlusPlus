@@ -8,15 +8,17 @@
 #ifndef MINUITPOTENTIALMINIMIZER_HPP_
 #define MINUITPOTENTIALMINIMIZER_HPP_
 
-#include "CommonIncludes.hpp"
-#include "Minuit2/FCNBase.h"
-#include "Minuit2/MnMigrad.h"
-#include "Minuit2/FunctionMinimum.h"
-
-#include "../../MinuitWrappersAndHelpers/MinuitMinimum.hpp"
-#include "../GradientMinimizer.hpp"
-#include "PotentialForMinuit.hpp"
+#include "PotentialMinimization/GradientMinimizer.hpp"
+#include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include <vector>
+#include "MinuitWrappersAndHelpers/MinuitMinimum.hpp"
+#include "Minuit2/FunctionMinimum.h"
+#include "PotentialForMinuit.hpp"
+#include "Minuit2/MnMigrad.h"
+#include <algorithm>
+#include <cmath>
+
 
 namespace VevaciousPlusPlus
 {
@@ -27,8 +29,14 @@ namespace VevaciousPlusPlus
     MinuitPotentialMinimizer( PotentialFunction const& potentialFunction,
                               double const errorFraction = 0.1,
                               double const errorMinimum = 1.0,
-                              unsigned int const minuitStrategy = 1 );
-    virtual ~MinuitPotentialMinimizer();
+                              unsigned int const minuitStrategy = 1 ) :
+      GradientMinimizer( potentialFunction ),
+      minimizationFunction( potentialFunction ),
+      errorFraction( errorFraction ),
+      errorMinimum( errorMinimum ),
+      minuitStrategy( minuitStrategy ) {}
+
+    virtual ~MinuitPotentialMinimizer() {}
 
 
     // This performs a Minuit2 migrad() minimization but puts the result in the
@@ -65,6 +73,40 @@ namespace VevaciousPlusPlus
     double const errorMinimum;
     unsigned int const minuitStrategy;
   };
+
+
+
+
+
+  // This sets up a ROOT::Minuit2::MnMigrad instance and runs its operator().
+  // The initial step sizes are set to be the values of startingPoint
+  // multiplied by errorFraction, absolute values taken. Any step size less
+  // than errorMinimum is set to errorMinimum.
+  inline ROOT::Minuit2::FunctionMinimum MinuitPotentialMinimizer::RunMigrad(
+                                    std::vector< double > const& startingPoint,
+                                                  double givenTolerance ) const
+  {
+    std::vector< double > initialStepSizes( startingPoint.size(),
+                                            errorMinimum );
+    for( size_t vectorIndex( 0 );
+         vectorIndex < startingPoint.size();
+         ++vectorIndex )
+    {
+      initialStepSizes[ vectorIndex ] = std::max( errorMinimum,
+                        fabs( errorFraction * startingPoint[ vectorIndex ] ) );
+    }
+    if( givenTolerance <= 0.0 )
+    {
+      givenTolerance = std::max( errorMinimum,
+                  ( errorFraction * minimizationFunction( startingPoint ) ) );
+    }
+    ROOT::Minuit2::MnMigrad mnMigrad( minimizationFunction,
+                                      startingPoint,
+                                      initialStepSizes,
+                                      minuitStrategy );
+    return mnMigrad( 0,
+                     givenTolerance );
+  }
 
 } /* namespace VevaciousPlusPlus */
 #endif /* MINUITPOTENTIALMINIMIZER_HPP_ */

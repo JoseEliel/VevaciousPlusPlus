@@ -8,15 +8,17 @@
 #ifndef VEVACIOUSPLUSPLUS_HPP_
 #define VEVACIOUSPLUSPLUS_HPP_
 
-#include "CommonIncludes.hpp"
-#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+
+#include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
+#include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
 #include "LagrangianParameterManagement/LesHouchesAccordBlockEntryManager.hpp"
+
+
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialWithMasses.hpp"
 #include "PotentialMinimization/PotentialMinimizer.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
 #include "VersionInformation.hpp"
-#include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
-#include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 #include "PotentialMinimization/GradientFromStartingPoints.hpp"

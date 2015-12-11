@@ -8,8 +8,10 @@
 #ifndef SIMPLEPOLYNOMIAL_HPP_
 #define SIMPLEPOLYNOMIAL_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
 #include "Eigen/Dense"
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {

@@ -8,8 +8,10 @@
 #ifndef SLHAMASSSQUAREDDIAGONALFUNCTIONOID_HPP_
 #define SLHAMASSSQUAREDDIAGONALFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -24,6 +26,7 @@ namespace VevaciousPlusPlus
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       squareMassIndex( squareMassIndex ),
       linearMassIndex( linearMassIndex ) {}
+
     virtual ~SlhaMassSquaredDiagonalFunctionoid() {}
 
 

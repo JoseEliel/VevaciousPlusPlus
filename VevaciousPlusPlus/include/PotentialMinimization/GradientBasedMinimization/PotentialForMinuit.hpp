@@ -8,10 +8,9 @@
 #ifndef POTENTIALFORMINUIT_HPP_
 #define POTENTIALFORMINUIT_HPP_
 
-#include "CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
-#include "Minuit2/MnMigrad.h"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include <vector>
 
 namespace VevaciousPlusPlus
 {
@@ -19,8 +18,15 @@ namespace VevaciousPlusPlus
   class PotentialForMinuit : public ROOT::Minuit2::FCNBase
   {
   public:
-    PotentialForMinuit( PotentialFunction const& minimizationFunction );
-    virtual ~PotentialForMinuit();
+    PotentialForMinuit( PotentialFunction const& minimizationFunction ) :
+      ROOT::Minuit2::FCNBase(),
+      minimizationFunction( minimizationFunction ),
+      fieldOrigin( minimizationFunction.NumberOfFieldVariables(),
+                   0.0 ),
+      functionAtOrigin( minimizationFunction( fieldOrigin ) ),
+      currentTemperature( 0.0 ) {}
+
+    virtual ~PotentialForMinuit() {}
 
 
     // This implements operator() for FCNBase, the function that MINUIT will
@@ -37,7 +43,7 @@ namespace VevaciousPlusPlus
     // temperature.
     void SetTemperature( double const currentTemperature );
 
-    double FunctionAtOrigin() const{ return functionAtOrigin; }
+    double FunctionAtOrigin() const { return functionAtOrigin; }
 
 
   protected:

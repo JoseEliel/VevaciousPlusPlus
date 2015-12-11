@@ -8,10 +8,13 @@
 #ifndef BASECOMPLEXMASSMATRIX_HPP_
 #define BASECOMPLEXMASSMATRIX_HPP_
 
-#include "CommonIncludes.hpp"
-#include "Eigen/Dense"
-#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "MassesSquaredFromMatrix.hpp"
+#include <complex>
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
+#include <map>
+#include <string>
+#include <vector>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -25,10 +28,22 @@ namespace VevaciousPlusPlus
     ComplexParametersAndFieldsProductSum;
 
     BaseComplexMassMatrix( size_t const numberOfElements,
-                    std::map< std::string, std::string > const& attributeMap );
-    BaseComplexMassMatrix( BaseComplexMassMatrix const& copySource );
-    BaseComplexMassMatrix();
-    virtual ~BaseComplexMassMatrix();
+                   std::map< std::string, std::string > const& attributeMap ) :
+      MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
+                                                         attributeMap ),
+      matrixElements( ( numberOfRows * numberOfRows ),
+         ComplexParametersAndFieldsProductSum( ParametersAndFieldsProductSum(),
+                                         ParametersAndFieldsProductSum() ) ) {}
+
+    BaseComplexMassMatrix( BaseComplexMassMatrix const& copySource ) :
+      MassesSquaredFromMatrix< std::complex< double > >( copySource ),
+      matrixElements( copySource.matrixElements ) {}
+
+    BaseComplexMassMatrix() :
+      MassesSquaredFromMatrix< std::complex< double > >(),
+      matrixElements() {}
+
+    virtual ~BaseComplexMassMatrix() {}
 
 
     // This calls UpdateForFixedScale on each element of matrixElements.

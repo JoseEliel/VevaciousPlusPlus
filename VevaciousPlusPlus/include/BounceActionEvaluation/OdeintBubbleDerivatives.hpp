@@ -8,9 +8,9 @@
 #ifndef ODEINTBUBBLEDERIVATIVES_HPP_
 #define ODEINTBUBBLEDERIVATIVES_HPP_
 
-#include "CommonIncludes.hpp"
 #include "OneDimensionalPotentialAlongPath.hpp"
 #include "PathParameterization/TunnelPath.hpp"
+#include <vector>
 
 namespace VevaciousPlusPlus
 {
@@ -20,8 +20,12 @@ namespace VevaciousPlusPlus
   public:
     OdeintBubbleDerivatives(
                          OneDimensionalPotentialAlongPath const& pathPotential,
-                             TunnelPath const& tunnelPath );
-    virtual ~OdeintBubbleDerivatives();
+                             TunnelPath const& tunnelPath ) :
+      pathPotential( pathPotential ),
+      tunnelPath( tunnelPath ),
+      dampingFactor( tunnelPath.NonZeroTemperature() ? 2.0 : 3.0 ) {}
+
+    virtual ~OdeintBubbleDerivatives() {}
 
     // This puts the first and second derivatives based on
     // auxiliaryAndFirstDerivative into firstAndSecondDerivatives, in the form
@@ -44,7 +48,7 @@ namespace VevaciousPlusPlus
   inline void OdeintBubbleDerivatives::operator()(
                       std::vector< double > const& auxiliaryAndFirstDerivative,
                               std::vector< double >& firstAndSecondDerivatives,
-                                            double const radialValue )
+                                                   double const radialValue )
   {
     double const auxiliaryValue( auxiliaryAndFirstDerivative[ 0 ] );
     // This cheats if there has already been an overshoot, to try to avoid the

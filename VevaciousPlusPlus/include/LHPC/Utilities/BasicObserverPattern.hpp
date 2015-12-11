@@ -4,6 +4,11 @@
  *  Created on: Nov 26, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  *
+ *      This file is part of LesHouchesParserClasses, released under the
+ *      GNU General Public License. Please see the accompanying
+ *      README.LHPC_CPP.txt file for a full list of files, brief documentation
+ *      on how to use these classes, and further details on the license.
+ *
  *      This contains the two classes needed for a very basic observer pattern:
  *      BasicObserver and BasicObserved. Classes which inherit from
  *      BasicObserver need only to implement RespondToObservedSignal(), while
@@ -18,6 +23,11 @@
 
 namespace LHPC
 {
+  // These are the two classes needed for a very basic observer pattern:
+  // BasicObserver and BasicObserved. Classes which inherit from BasicObserver
+  // need only to implement RespondToObservedSignal(), while classes which
+  // inherit from BasicObserved don't need to implement anything.
+
   // This is an abstract base class that allows BasicObserved objects to call
   // RespondToObservedSignal() on its observers.
   class BasicObserver

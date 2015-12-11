@@ -8,12 +8,13 @@
 #ifndef MINUITONPOTENTIALPERPENDICULARTOPATH_HPP_
 #define MINUITONPOTENTIALPERPENDICULARTOPATH_HPP_
 
-#include "CommonIncludes.hpp"
 #include "MinuitOnHypersurfaces.hpp"
-#include "Minuit2/MnMigrad.h"
-#include "PotentialEvaluation/PotentialFunction.hpp"
+#include <vector>
+#include "BounceActionEvaluation/BubbleProfile.hpp"
+#include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
+#include "Eigen/Dense"
 #include "PotentialMinimization/PotentialMinimum.hpp"
-#include "../PathParameterization/LinearSplineThroughNodes.hpp"
+#include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
 {

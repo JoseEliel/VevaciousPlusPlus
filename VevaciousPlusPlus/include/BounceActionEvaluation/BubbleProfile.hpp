@@ -8,14 +8,8 @@
 #ifndef BUBBLEPROFILE_HPP_
 #define BUBBLEPROFILE_HPP_
 
-#include "CommonIncludes.hpp"
-#include "boost/numeric/odeint/integrate/integrate.hpp"
-#include "boost/math/special_functions/bessel.hpp"
-#include "BasicFunctions/SimplePolynomial.hpp"
-#include "SplinePotential.hpp"
 #include "PathParameterization/TunnelPath.hpp"
-#include "OdeintBubbleDerivatives.hpp"
-#include "OdeintBubbleObserver.hpp"
+#include "OneDimensionalPotentialAlongPath.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -23,8 +17,9 @@ namespace VevaciousPlusPlus
   class BubbleProfile
   {
   public:
-    BubbleProfile();
-    virtual ~BubbleProfile();
+    BubbleProfile() : bounceAction( -1.0 ) {}
+
+    virtual ~BubbleProfile() {}
 
 
     // The bounce action for the bubble profile is kept along with it, to save

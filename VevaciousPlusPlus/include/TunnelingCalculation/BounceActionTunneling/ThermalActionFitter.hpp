@@ -8,9 +8,10 @@
 #ifndef THERMALACTIONFITTER_HPP_
 #define THERMALACTIONFITTER_HPP_
 
-#include "CommonIncludes.hpp"
 #include "Minuit2/FCNBase.h"
 #include "Minuit2/MnMigrad.h"
+#include <vector>
+#include <cmath>
 #include "Eigen/Dense"
 
 namespace VevaciousPlusPlus

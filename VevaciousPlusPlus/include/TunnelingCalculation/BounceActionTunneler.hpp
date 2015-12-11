@@ -8,12 +8,15 @@
 #ifndef BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 #define BOUNCEACTIONTUNNELINGCALCULATOR_HPP_
 
-#include <limits>
-#include "CommonIncludes.hpp"
 #include "TunnelingCalculator.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include <utility>
+#include <iostream>
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
+#include <cmath>
+#include <limits>
+#include <vector>
 
 namespace VevaciousPlusPlus
 {
@@ -39,8 +42,8 @@ namespace VevaciousPlusPlus
 
   protected:
     static double const maximumPowerOfNaturalExponent;
-    static double const maximumAllowedTemperature;
     // The maximum allowed temperature is the reduced Planck mass.
+    static double const maximumAllowedTemperature;
     static double const hBarInGigaElectronVoltSeconds;
     static double const ageOfKnownUniverseInSeconds;
     static double const ageOfKnownUniverseInInverseGigaElectronVolts;
@@ -213,8 +216,9 @@ namespace VevaciousPlusPlus
     if( falseVacuumLengthSquared > 0.0 )
     {
       return ( resolutionOfDsbVacuum
-               * (size_t)(sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
-                                / falseVacuumLengthSquared ) ) );
+               * static_cast< size_t >(
+                               sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
+                                     / falseVacuumLengthSquared ) ) );
     }
     else
     {

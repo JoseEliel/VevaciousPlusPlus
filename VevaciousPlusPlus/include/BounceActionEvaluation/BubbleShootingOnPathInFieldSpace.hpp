@@ -8,15 +8,19 @@
 #ifndef BUBBLESHOOTINGONPATHINFIELDSPACE_HPP_
 #define BUBBLESHOOTINGONPATHINFIELDSPACE_HPP_
 
-#include "CommonIncludes.hpp"
-#include <limits>
 #include "BounceActionCalculator.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
+#include "PotentialMinimization/PotentialMinimum.hpp"
+#include "BubbleProfile.hpp"
 #include "PathParameterization/TunnelPath.hpp"
 #include "OneDimensionalPotentialAlongPath.hpp"
-#include "BubbleProfile.hpp"
-#include "UndershootOvershootBubble.hpp"
+#include <vector>
+#include <string>
 #include "BubbleRadialValueDescription.hpp"
+#include <cmath>
+#include "UndershootOvershootBubble.hpp"
+#include "boost/math/special_functions/bessel.hpp"
+#include "boost/math/constants/constants.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -51,19 +55,6 @@ namespace VevaciousPlusPlus
     // temperature T given by tunnelPath is greater than 0.0, S_4 otherwise.
     virtual BubbleProfile* operator()( TunnelPath const& tunnelPath,
                  OneDimensionalPotentialAlongPath const& pathPotential ) const;
-
-    // This plots the fields as functions of the bubble radial value in a file
-    // called plotFilename in .eps format, with each field plotted in the color
-    // given by fieldColors: the field with index i is plotted in the color
-    // given by fieldColors[ i ]. An empty string indicates that the field
-    // should not be plotted.
-    virtual void PlotBounceConfiguration( TunnelPath const& tunnelPath,
-                                          BubbleProfile const& bubbleProfile,
-                                  std::vector< std::string > const& fieldNames,
-                                 std::vector< std::string > const& fieldColors,
-                                          unsigned int const plotResolution,
-                                std::string const& gnuplotCommandIncludingPath,
-                                       std::string const& plotFilename ) const;
 
 
   protected:

@@ -28,7 +28,6 @@ namespace VevaciousPlusPlus
     // This constructor is just an initialization list.
   }
 
-
   RealMassesSquaredMatrix::RealMassesSquaredMatrix() :
     MassesSquaredFromMatrix< double >(),
     matrixElements()

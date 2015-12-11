@@ -8,11 +8,15 @@
 #ifndef LHAPOLYNOMIALFITBLOCKENTRY_HPP_
 #define LHAPOLYNOMIALFITBLOCKENTRY_HPP_
 
-#include "CommonIncludes.hpp"
 #include "LhaInterpolatedParameterFunctionoid.hpp"
-#include "Eigen/Dense"
-#include "BasicFunctions/SimplePolynomial.hpp"
 #include "LHPC/SimpleLhaParser.hpp"
+#include <string>
+#include <vector>
+#include "BasicFunctions/SimplePolynomial.hpp"
+#include <sstream>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include "Eigen/Dense"
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {

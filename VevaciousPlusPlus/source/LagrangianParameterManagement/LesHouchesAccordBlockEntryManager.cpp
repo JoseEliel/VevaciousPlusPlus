@@ -80,41 +80,39 @@ namespace VevaciousPlusPlus
     maximumScaleType( "FixedNumber" ),
     maximumScaleArgument( "1.0" )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.openRootElementOfFile( xmlFileName );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.OpenRootElementOfFile( xmlFileName );
     std::string renormalizationScaleChoices;
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
-      if( xmlParser.currentElementNameMatches(
-                                              "RenormalizationScaleChoices" ) )
+      if( xmlParser.CurrentName() == "RenormalizationScaleChoices" )
       {
-        renormalizationScaleChoices
-        = xmlParser.getTrimmedCurrentElementContent();
+        renormalizationScaleChoices = xmlParser.TrimmedCurrentBody();
       }
-      else if( xmlParser.currentElementNameMatches( "ValidBlocks" ) )
+      else if( xmlParser.CurrentName() == "ValidBlocks" )
       {
-        ParseValidBlocks( xmlParser.getTrimmedCurrentElementContent() );
+        ParseValidBlocks( xmlParser.TrimmedCurrentBody() );
       }
     }
-    xmlParser.closeFile();
-    xmlParser.loadString( renormalizationScaleChoices );
-    while( xmlParser.readNextElement() )
+    xmlParser.CloseFile();
+    xmlParser.LoadString( renormalizationScaleChoices );
+    while( xmlParser.ReadNextElement() )
     {
-      if( xmlParser.currentElementNameMatches( "MinimumScaleBound" ) )
+      if( xmlParser.CurrentName() == "MinimumScaleBound" )
       {
-        ParseScaleTypeAndArgument( xmlParser.getTrimmedCurrentElementContent(),
+        ParseScaleTypeAndArgument( xmlParser.TrimmedCurrentBody(),
                                    minimumScaleType,
                                    minimumScaleArgument );
       }
-      else if( xmlParser.currentElementNameMatches( "FixedScaleChoice" ) )
+      else if( xmlParser.CurrentName() == "FixedScaleChoice" )
       {
-        ParseScaleTypeAndArgument( xmlParser.getTrimmedCurrentElementContent(),
+        ParseScaleTypeAndArgument( xmlParser.TrimmedCurrentBody(),
                                    fixedScaleType,
                                    fixedScaleArgument );
       }
-      else if( xmlParser.currentElementNameMatches( "MaximumScaleBound" ) )
+      else if( xmlParser.CurrentName() == "MaximumScaleBound" )
       {
-        ParseScaleTypeAndArgument( xmlParser.getTrimmedCurrentElementContent(),
+        ParseScaleTypeAndArgument( xmlParser.TrimmedCurrentBody(),
                                    maximumScaleType,
                                    maximumScaleArgument );
       }

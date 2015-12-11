@@ -8,13 +8,20 @@
 #ifndef LESHOUCHESACCORDBLOCKENTRYMANAGER_HPP_
 #define LESHOUCHESACCORDBLOCKENTRYMANAGER_HPP_
 
-#include "CommonIncludes.hpp"
-#include "LHPC/ParsingUtilities.hpp"
-#include "LHPC/SimpleLhaParser.hpp"
 #include "LagrangianParameterManager.hpp"
-#include "LhaInterpolatedParameterFunctionoid.hpp"
+#include <string>
+#include <set>
+#include <utility>
+#include <vector>
+#include <map>
+#include "LHPC/SimpleLhaParser.hpp"
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
-#include "LhaPolynomialFitBlockEntry.hpp"
+#include "LhaSourcedParameterFunctionoid.hpp"
+#include <sstream>
+#include "LHPC/Utilities/RestrictedXmlParser.hpp"
+#include <stdexcept>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {
@@ -152,7 +159,7 @@ namespace VevaciousPlusPlus
     // This sets parameterName to map to newParameter, increments
     // numberOfDistinctActiveParameters, and returns true paired with the index
     // given by newParameter.
-    std::pair< bool, size_t >
+    size_t
     RegisterNewParameter( LhaSourcedParameterFunctionoid const& newParameter,
                           std::string const& parameterName );
 
@@ -185,8 +192,9 @@ namespace VevaciousPlusPlus
     virtual std::pair< bool, size_t >
     RegisterUnregisteredParameter( std::string const& parameterName )
     { return ( RefersToValidBlock( parameterName ) ?
-               RegisterNewParameter( CreateNewBlockEntry( parameterName ),
-                                     parameterName ) :
+               std::pair< bool, size_t >( true,
+                    RegisterNewParameter( CreateNewBlockEntry( parameterName ),
+                                          parameterName ) ):
                std::pair< bool, size_t >( false,
                                           -1 ) ); }
 
@@ -296,18 +304,17 @@ namespace VevaciousPlusPlus
                                                   std::string& typeDestination,
                                              std::string& argumentDestination )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( xmlElement );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( xmlElement );
+    while( xmlParser.ReadNextElement() )
     {
-      if( xmlParser.currentElementNameMatches( "EvaluationType" ) )
+      if( xmlParser.CurrentName() == "EvaluationType" )
       {
-        typeDestination = xmlParser.getTrimmedCurrentElementContent();
+        typeDestination = xmlParser.TrimmedCurrentBody();
       }
-      else if( xmlParser.currentElementNameMatches(
-                                                 "EvaluationArgument" ) )
+      else if( xmlParser.CurrentName() == "EvaluationArgument" )
       {
-        argumentDestination = xmlParser.getTrimmedCurrentElementContent();
+        argumentDestination = xmlParser.TrimmedCurrentBody();
       }
     }
   }
@@ -338,7 +345,7 @@ namespace VevaciousPlusPlus
   // This sets parameterName to map to newParameter, increments
   // numberOfDistinctActiveParameters, and returns true paired with the index
   // given by newParameter.
-  inline std::pair< bool, size_t >
+  inline size_t
   LesHouchesAccordBlockEntryManager::RegisterNewParameter(
                            LhaSourcedParameterFunctionoid const& newParameter,
                                              std::string const& parameterName )
@@ -346,8 +353,7 @@ namespace VevaciousPlusPlus
     ++numberOfDistinctActiveParameters;
     activeParametersToIndices[ parameterName ]
     = newParameter.IndexInValuesVector();
-    return std::pair< bool, size_t >( true,
-                                      newParameter.IndexInValuesVector() );
+    return newParameter.IndexInValuesVector();
   }
 
   // This updates the SLHA file parser with the file with name given by
@@ -456,7 +462,7 @@ namespace VevaciousPlusPlus
                   + " is not in the format of block name followed by [...]!" );
       }
       return RegisterNewParameter( CreateNewBlockEntry( nameAfterFormat ),
-                                   nameAfterFormat ).second;
+                                   nameAfterFormat );
     }
   }
 
@@ -482,7 +488,7 @@ namespace VevaciousPlusPlus
     }
     else if( evaluationType == "SqrtAbs" )
     {
-      return std::sqrt( std::abs( LHPC::ParsingUtilities::StringToDouble(
+      return sqrt( fabs( LHPC::ParsingUtilities::StringToDouble(
                 lhaParser.EntryInLastMatchingBlock( evaluationArgument ) ) ) );
     }
     else

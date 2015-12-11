@@ -8,10 +8,12 @@
 #ifndef SPLINEPOTENTIAL_HPP_
 #define SPLINEPOTENTIAL_HPP_
 
-#include "CommonIncludes.hpp"
+#include "OneDimensionalPotentialAlongPath.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PathParameterization/TunnelPath.hpp"
-#include "OneDimensionalPotentialAlongPath.hpp"
+#include <string>
+#include <vector>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
 
 namespace VevaciousPlusPlus
 {

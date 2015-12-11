@@ -8,7 +8,8 @@
 #ifndef POLYNOMIALSYSTEMSOLVER_HPP_
 #define POLYNOMIALSYSTEMSOLVER_HPP_
 
-#include "CommonIncludes.hpp"
+#include <utility>
+#include <vector>
 #include "Utilities/VectorUtilities.hpp"
 
 namespace VevaciousPlusPlus

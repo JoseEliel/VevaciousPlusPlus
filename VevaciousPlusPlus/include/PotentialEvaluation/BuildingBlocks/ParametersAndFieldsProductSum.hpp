@@ -8,8 +8,10 @@
 #ifndef PARAMETERSANDFIELDSPRODUCTSUM_HPP_
 #define PARAMETERSANDFIELDSPRODUCTSUM_HPP_
 
-#include "CommonIncludes.hpp"
 #include "ParametersAndFieldsProductTerm.hpp"
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace VevaciousPlusPlus
 {
@@ -17,10 +19,13 @@ namespace VevaciousPlusPlus
   class ParametersAndFieldsProductSum
   {
   public:
-    ParametersAndFieldsProductSum();
+    ParametersAndFieldsProductSum() : parametersAndFieldsProducts() {}
+
     ParametersAndFieldsProductSum(
-                             ParametersAndFieldsProductSum const& copySource );
-    virtual ~ParametersAndFieldsProductSum();
+                            ParametersAndFieldsProductSum const& copySource ) :
+      parametersAndFieldsProducts( copySource.parametersAndFieldsProducts ) {}
+
+    virtual ~ParametersAndFieldsProductSum() {}
 
 
     // This calls UpdateForFixedScale on each element of
@@ -47,13 +52,13 @@ namespace VevaciousPlusPlus
     // parametersAndFieldsProducts.
     unsigned int HighestFieldPower() const;
 
-    // This is mainly for debugging:
-    std::string AsDebuggingString() const;
-
     // This returns a string that should be valid Python assuming that the
     // field configuration is given as an array called "fv" and that the
     // Lagrangian parameters are in an array called "lp".
     std::string AsPython() const;
+
+    // This is mainly for debugging:
+    std::string AsDebuggingString() const;
 
 
   protected:
@@ -128,6 +133,32 @@ namespace VevaciousPlusPlus
       }
     }
     return highestPower;
+  }
+
+  // This returns a string that should be valid Python assuming that the
+  // field configuration is given as an array called "fv" and that the
+  // Lagrangian parameters are in an array called "lp".
+  inline std::string ParametersAndFieldsProductSum::AsPython() const
+  {
+    if( parametersAndFieldsProducts.empty() )
+    {
+      return "( 0.0 )";
+    }
+    std::stringstream stringBuilder;
+    stringBuilder << "( ";
+    for( std::vector< ParametersAndFieldsProductTerm >::const_iterator
+         parametersAndFieldsProduct( parametersAndFieldsProducts.begin() );
+         parametersAndFieldsProduct < parametersAndFieldsProducts.end();
+         ++parametersAndFieldsProduct )
+    {
+      if( parametersAndFieldsProduct != parametersAndFieldsProducts.begin() )
+      {
+        stringBuilder << " + ";
+      }
+      stringBuilder << parametersAndFieldsProduct->AsPython();
+    }
+    stringBuilder << " )";
+    return stringBuilder.str();
   }
 
   // This is mainly for debugging:

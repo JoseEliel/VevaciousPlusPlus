@@ -8,11 +8,15 @@
 #ifndef RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 #define RGEIMPROVEDONELOOPPOTENTIAL_HPP_
 
-#include "CommonIncludes.hpp"
-#include "LHPC/BasicObserverPattern.hpp"
 #include "PotentialFromPolynomialWithMasses.hpp"
+#include "LHPC/Utilities/BasicObserverPattern.hpp"
+#include <string>
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include <vector>
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include <cmath>
+#include <sstream>
+#include <stdexcept>
 
 namespace VevaciousPlusPlus
 {

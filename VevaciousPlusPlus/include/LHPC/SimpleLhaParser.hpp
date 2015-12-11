@@ -3,6 +3,11 @@
  *
  *  Created on: Nov 26, 2015
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *
+ *      This file is part of LesHouchesParserClasses, released under the
+ *      GNU General Public License. Please see the accompanying
+ *      README.LHPC_CPP.txt file for a full list of files, brief documentation
+ *      on how to use these classes, and further details on the license.
  */
 
 #ifndef SIMPLELHAPARSER_HPP_
@@ -15,7 +20,8 @@
 #include <fstream>
 #include <utility>
 #include <list>
-#include "ParsingUtilities.hpp"
+#include <stdexcept>
+#include "Utilities/ParsingUtilities.hpp"
 
 namespace LHPC
 {
@@ -43,20 +49,87 @@ namespace LHPC
     std::vector< std::string > const& ContentLines() const
     { return contentLines; }
 
-    void AddLine( std::string const& newLine )
-    { contentLines.push_back( newLine ); }
-
     // This examines each line to see if it starts with the given indices, and
     // then returns the rest of the first line which matches the indices
     // (without the indices). If no match is found, and empty string is
     // returned.
     std::string MatchingEntry( std::vector< int > const& entryIndices ) const;
 
+    void AddLine( std::string const& newLine )
+    { contentLines.push_back( newLine ); }
+
 
   protected:
     bool hasExplicitScale;
     double scaleValue;
     std::vector< std::string > contentLines;
+  };
+
+
+  class LhaDecay
+  {
+  public:
+    LhaDecay( int const particleCode,
+              double const totalDecayWidth ) : particleCode( particleCode ),
+                                            totalDecayWidth( totalDecayWidth ),
+                                               partialDecayWidths() {}
+
+    LhaDecay( LhaDecay const& copySource ) :
+      particleCode( copySource.particleCode ),
+      totalDecayWidth( copySource.totalDecayWidth ),
+      partialDecayWidths( copySource.partialDecayWidths ) {}
+
+    virtual ~LhaDecay() {}
+
+
+    int ParticleCode() const { return particleCode; }
+
+    double TotalDecayWidth() const { return totalDecayWidth; }
+
+    std::vector< std::pair< std::vector< int >, double > > const&
+    PartialDecayWidths() const { return partialDecayWidths; }
+
+    // This returns the partial decay width into the given set of particles,
+    // looking only for an exact match for the particle codes (including
+    // signs), returning zero if no match was found.
+    double
+    PartialWidthForProducts( std::vector< int > const& soughtParticles ) const;
+
+    // This parses the given line into a set of decay product codes and a
+    // partial decay width.
+    void AddLine( std::string const& newLine );
+
+
+  protected:
+    // This just checks that lineWords has enough numbers to make a valid decay
+    // line (a decay width, a declaration of the number of products, and then
+    // at least 2 decay product codes).
+    static void CheckForEnoughWords( std::string const& newLine,
+                                 std::vector< std::string > const& lineWords );
+
+    // This just throws an error if
+    // numberOfLineWords != ( declaredNumberOfProducts + 2 ), or returns
+    // declaredNumberOfProducts otherwise.
+    static size_t CheckNumberOfProducts( std::string const& newLine,
+                                         size_t const numberOfLineWords,
+                                       size_t const declaredNumberOfProducts );
+
+    // This converts lineWords[ 2 ] to lineWords[ 1 + numberOfCodes ] into a
+    // sorted vector.
+    static std::vector< int > SortedParticleCodes( size_t const numberOfCodes,
+                                 std::vector< std::string > const& lineWords );
+
+
+    int particleCode;
+    double totalDecayWidth;
+    std::vector< std::pair< std::vector< int >, double > > partialDecayWidths;
+
+
+    // This parses lineWords into a set of decay product codes and a partial
+    // decay width.
+    void ParseProductsAndWidth( std::string const& newLine,
+                                int const declaredNumberOfProducts,
+                                std::vector< std::string > const& lineWords );
   };
 
 
@@ -136,8 +209,12 @@ namespace LHPC
 
     SimpleLhaParser() : blocksInFirstInstanceReadOrder(),
                         blockNamesToIndices(),
+                        blockNameToIndex(),
+                        decaysInFirstInstanceReadOrder(),
+                        decayCodesToIndices(),
                         currentBlockSet( NULL ),
                         currentBlock( NULL ),
+                        currentDecay( NULL ),
                         noExplicitScales( true ),
                         highestBlockScale( -1.0 ),
                         lowestBlockScale( -1.0 ) {}
@@ -153,6 +230,11 @@ namespace LHPC
     std::vector< LhaBlockSet > const& BlocksInFirstInstanceReadOrder() const
     { return blocksInFirstInstanceReadOrder; }
 
+    // This returns the LhaDecay objects in the order in which they were read
+    // from the file.
+    std::vector< LhaDecay > const& DecaysInFirstInstanceReadOrder() const
+    { return decaysInFirstInstanceReadOrder; }
+
     // This returns the highest scale given with any block of any name.
     double HighestBlockScale() const { return highestBlockScale; }
 
@@ -162,6 +244,11 @@ namespace LHPC
     // This returns the set of blocks with name which matches blockName
     // ignoring case. If no blocks match, then NULL is returned.
     LhaBlockSet const* BlocksWithName( std::string blockName ) const;
+
+    // This returns the set of decays for the given particle code. If no decay
+    // sets match, then NULL is returned.
+    LhaDecay const*
+    DecaysForParticleCode( int const decayingParticleCode ) const;
 
     // This fills entriesAtScales based on blockName and entryIndices. Every
     // block which matches blockName is examined to see if it has an entry
@@ -264,8 +351,11 @@ namespace LHPC
     std::vector< LhaBlockSet > blocksInFirstInstanceReadOrder;
     std::map< std::string, size_t > blockNamesToIndices;
     std::map< std::string, size_t >::const_iterator blockNameToIndex;
+    std::vector< LhaDecay > decaysInFirstInstanceReadOrder;
+    std::map< int, size_t > decayCodesToIndices;
     LhaBlockSet* currentBlockSet;
     LhaBlockAtSingleScale* currentBlock;
+    LhaDecay* currentDecay;
     bool noExplicitScales;
     double highestBlockScale;
     double lowestBlockScale;
@@ -294,7 +384,118 @@ namespace LHPC
     // to currentBlockSet, returning a pointer to the newly-created block.
     LhaBlockAtSingleScale*
     AddNewBlockWithExplicitScale( double explicitScale );
+
+    // This parses the decay's particle code and total decay width, and starts
+    // a new decay in decaysInFirstInstanceReadOrder.
+    void ReadDecayHeader( std::string const& trimmedLine );
   };
+
+
+
+
+
+  // This returns the partial decay width into the given set of particles,
+  // looking only for an exact match for the particle codes (including signs),
+  // returning zero if no match was found.
+  inline double LhaDecay::PartialWidthForProducts(
+                              std::vector< int > const& soughtParticles ) const
+  {
+    std::list< int > sortedCodes( soughtParticles.begin(),
+                                  soughtParticles.end() );
+    sortedCodes.sort();
+    std::vector< int > comparisonVector( sortedCodes.begin(),
+                                         sortedCodes.end() );
+    for( size_t decayIndex( 0 );
+         decayIndex < partialDecayWidths.size();
+         ++decayIndex )
+    {
+      if( comparisonVector == partialDecayWidths[ decayIndex ].first )
+      {
+        return partialDecayWidths[ decayIndex ].second;
+      }
+    }
+    return 0.0;
+  }
+
+  // This parses the given line into a set of decay product codes and a
+  // partial decay width.
+  inline void LhaDecay::AddLine( std::string const& newLine )
+  {
+    std::vector< std::string > const
+    lineWords( ParsingUtilities::SplitBySubstrings( newLine,
+                                       ParsingUtilities::WhitespaceChars() ) );
+    CheckForEnoughWords( newLine,
+                         lineWords );
+    ParseProductsAndWidth( newLine,
+                        ParsingUtilities::BaseTenStringToInt( lineWords[ 1 ] ),
+                           lineWords );
+  }
+
+  // This just checks that lineWords has enough numbers to make a valid decay
+  // line (a decay width, a declaration of the number of products, and then at
+  // least 2 decay product codes).
+  inline void LhaDecay::CheckForEnoughWords( std::string const& newLine,
+                                  std::vector< std::string > const& lineWords )
+  {
+    if( lineWords.size() < 4 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "Invalid decay line \"" << newLine
+      << "\" did not have enough numbers to form a valid decay!";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+  }
+
+  // This just throws an error if
+  // numberOfLineWords != ( declaredNumberOfProducts + 2 ), or returns
+  // declaredNumberOfProducts otherwise.
+  inline size_t LhaDecay::CheckNumberOfProducts( std::string const& newLine,
+                                                size_t const numberOfLineWords,
+                                        size_t const declaredNumberOfProducts )
+  {
+    if( numberOfLineWords != ( declaredNumberOfProducts + 2 ) )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "Invalid decay line \"" << newLine << "\" did not match"
+      << " number of particle codes with given number of products!";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+    return declaredNumberOfProducts;
+  }
+
+  // This converts lineWords[ 2 ] to lineWords[ 1 + numberOfCodes ] into a
+  // sorted vector.
+  inline std::vector< int >
+  LhaDecay::SortedParticleCodes( size_t const numberOfCodes,
+                                 std::vector< std::string > const& lineWords )
+  {
+    std::list< int > sortedCodes;
+    for( size_t wordIndex( 2 );
+         wordIndex < lineWords.size();
+         ++wordIndex )
+    {
+      sortedCodes.push_back(static_cast< int >(
+            ParsingUtilities::BaseTenStringToInt( lineWords[ wordIndex ] ) ) );
+    }
+    sortedCodes.sort();
+    return std::vector< int >( sortedCodes.begin(),
+                               sortedCodes.end() );
+  }
+
+  // This parses lineWords into a set of decay product codes and a partial
+  // decay width.
+  inline void LhaDecay::ParseProductsAndWidth( std::string const& newLine,
+                                            int const declaredNumberOfProducts,
+                                  std::vector< std::string > const& lineWords )
+  {
+    size_t const numberOfProducts( CheckNumberOfProducts( newLine,
+                                                          lineWords.size(),
+                         static_cast< size_t >( declaredNumberOfProducts ) ) );
+    partialDecayWidths.push_back( std::pair< std::vector< int >, double >(
+                                 SortedParticleCodes( declaredNumberOfProducts,
+                                                      lineWords ),
+                     ParsingUtilities::StringToDouble( lineWords.front() ) ) );
+  }
 
 
 
@@ -322,6 +523,9 @@ namespace LHPC
     }
     return "";
   }
+
+
+
 
 
   // This adds a LhaBlockAtSingleScale to blocksInReadOrder without an
@@ -384,6 +588,9 @@ namespace LHPC
   }
 
 
+
+
+
   // This splits a string in the format of block name followed by whitespace
   // or an opening bracket character into the substring for just the name
   // paired with the indices as a vector of integers.
@@ -440,6 +647,20 @@ namespace LHPC
       return NULL;
     }
     return &(blocksInFirstInstanceReadOrder[ nameToIndex->second ]);
+  }
+
+  // This returns the set of decays for the given particle code. If no decay
+  // sets match, then NULL is returned.
+  inline LhaDecay const* SimpleLhaParser::DecaysForParticleCode(
+                                         int const decayingParticleCode ) const
+  {
+    std::map< int, size_t >::const_iterator
+    codeToIndex( decayCodesToIndices.find( decayingParticleCode ) );
+    if( codeToIndex == decayCodesToIndices.end() )
+    {
+      return NULL;
+    }
+    return &(decaysInFirstInstanceReadOrder[ codeToIndex->second ]);
   }
 
   // This fills entriesAtScales based on blockName and entryIndices. Every
@@ -530,16 +751,21 @@ namespace LHPC
   {
     if( IsBlockHeader( trimmedLine ) )
     {
+      currentDecay = NULL;
       ReadBlockHeader( trimmedLine );
     }
     else if( IsDecayHeader( trimmedLine ) )
     {
-      // This parser does not record decay entries.
       currentBlock = NULL;
+      ReadDecayHeader( trimmedLine );
     }
     else if( currentBlock != NULL )
     {
       currentBlock->AddLine( trimmedLine );
+    }
+    else if( currentDecay != NULL )
+    {
+      currentDecay->AddLine( trimmedLine );
     }
   }
 
@@ -628,6 +854,30 @@ namespace LHPC
       lowestBlockScale = std::min( explicitScale, lowestBlockScale );
     }
     return currentBlockSet->NewBlock( explicitScale );
+  }
+
+  // This parses the decay's particle code and total decay width, and starts a
+  // new decay in decaysInFirstInstanceReadOrder.
+  inline void
+  SimpleLhaParser::ReadDecayHeader( std::string const& trimmedLine )
+  {
+    std::vector< std::string > const
+    lineWords( ParsingUtilities::SplitBySubstrings( trimmedLine,
+                                       ParsingUtilities::WhitespaceChars() ) );
+    if( lineWords.size() != 3 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "DECAY header line \"" << trimmedLine
+      << "\" was not \"DECAY [particle code] [total decay width]\"!";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+    int const
+    particleCode( ParsingUtilities::BaseTenStringToInt( lineWords[ 1 ] ) );
+    decayCodesToIndices[ particleCode ]
+    = decaysInFirstInstanceReadOrder.size();
+    decaysInFirstInstanceReadOrder.push_back( LhaDecay( particleCode,
+                        ParsingUtilities::StringToDouble( lineWords[ 2 ] ) ) );
+    currentDecay = &(decaysInFirstInstanceReadOrder.back());
   }
 
 } /* namespace LHPC */

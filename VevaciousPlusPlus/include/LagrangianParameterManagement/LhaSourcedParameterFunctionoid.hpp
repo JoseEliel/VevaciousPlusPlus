@@ -8,7 +8,8 @@
 #ifndef LHASOURCEDPARAMETERFUNCTIONOID_HPP_
 #define LHASOURCEDPARAMETERFUNCTIONOID_HPP_
 
-#include "CommonIncludes.hpp"
+#include <vector>
+#include <string>
 
 namespace VevaciousPlusPlus
 {

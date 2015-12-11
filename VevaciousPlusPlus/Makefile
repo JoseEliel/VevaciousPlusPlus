@@ -16,11 +16,6 @@ AR=ar
 ARFLAGS=rcs
 #BOOSTDIR=./Boost/
 BOOSTDIR=/home/bol/BOL/ProjectDependencies/Boost/
-#LHPCDIR=./LHPC/
-LHPCDIR=/home/bol/BOL/ProjectDependencies/LHPC/
-LHPCLIBNAME=LHPC
-LHPCINCLUDEDIR=$(LHPCDIR)/include/
-LHPCLIBDIR=$(LHPCDIR)/lib/
 #EIGENDIR=./Eigen/
 EIGENDIR=/home/bol/BOL/ProjectDependencies/Eigen/
 #MINUITLIBNAME=lcg_Minuit
@@ -47,59 +42,36 @@ HOMOTOPYCONTINUATION= $(POTENTIALMINIMIZATION)/HomotopyContinuation/
 STARTINGPOINTGENERATION= $(POTENTIALMINIMIZATION)/StartingPointGeneration/
 GRADIENTBASEDMINIMIZATION= $(POTENTIALMINIMIZATION)/GradientBasedMinimization/
 BOUNCEACTIONTUNNELING= source/TunnelingCalculation/BounceActionTunneling/
-NEWSOURCES=  $(LAGRANGIANPARAMETERMANAGEMENT)/LagrangianParameterManager.cpp \
- $(LAGRANGIANPARAMETERMANAGEMENT)/LhaLinearlyInterpolatedBlockEntry.cpp \
+
+SOURCES= $(LAGRANGIANPARAMETERMANAGEMENT)/LhaLinearlyInterpolatedBlockEntry.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LhaPolynomialFitBlockEntry.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
  $(BUILDINGBLOCKS)/ParametersAndFieldsProductTerm.cpp \
- $(BUILDINGBLOCKS)/ParametersAndFieldsProductSum.cpp
-
-SOURCES= $(NEWSOURCES) \
+ source/PotentialEvaluation/ThermalFunctions.cpp \
+ source/PotentialEvaluation/MassesSquaredCalculator.cpp \
+ $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
+ $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
+ $(POTENTIALFUNCTIONS)/PotentialFromPolynomialWithMasses.cpp \
+ $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
+ $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
+ $(STARTINGPOINTGENERATION)/PolynomialSystemSolver.cpp \
+ $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \
+ $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
+ source/PotentialMinimization/GradientFromStartingPoints.cpp \
+ $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
+ source/BounceActionEvaluation/SplinePotential.cpp \
+ source/BounceActionEvaluation/UndershootOvershootBubble.cpp \
+ source/BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnHypersurfaces.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialOnParallelPlanes.cpp \
  $(BOUNCEACTIONPATHFINDING)/MinuitOnPotentialPerpendicularToPath.cpp \
- $(BOUNCEACTIONPATHFINDING)/MinuitPathFinder.cpp \
- $(PATHPARAMETERIZATION)/LinearSplinePathSegment.cpp \
- $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
- $(PATHPARAMETERIZATION)/TunnelPath.cpp \
- source/BounceActionEvaluation/BounceActionCalculator.cpp \
- source/BounceActionEvaluation/BouncePathFinder.cpp \
- source/BounceActionEvaluation/BubbleProfile.cpp \
- source/BounceActionEvaluation/BubbleRadialValueDescription.cpp \
- source/BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.cpp \
- source/BounceActionEvaluation/OdeintBubbleDerivatives.cpp \
- source/BounceActionEvaluation/OdeintBubbleObserver.cpp \
- source/BounceActionEvaluation/OneDimensionalPotentialAlongPath.cpp \
- source/BounceActionEvaluation/SplinePotential.cpp \
- source/BounceActionEvaluation/UndershootOvershootBubble.cpp \
- $(MASSESSQUAREDCALCULATORS)/BaseComplexMassMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
- $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \
- $(POTENTIALFUNCTIONS)/FixedScaleOneLoopPotential.cpp \
- $(POTENTIALFUNCTIONS)/PotentialFromPolynomialWithMasses.cpp \
- $(POTENTIALFUNCTIONS)/RgeImprovedOneLoopPotential.cpp \
- source/PotentialEvaluation/MassesSquaredCalculator.cpp \
- source/PotentialEvaluation/ParameterFunctionoid.cpp \
- source/PotentialEvaluation/PotentialFunction.cpp \
- source/PotentialEvaluation/ThermalFunctions.cpp \
- $(GRADIENTBASEDMINIMIZATION)/MinuitPotentialMinimizer.cpp \
- $(GRADIENTBASEDMINIMIZATION)/PotentialForMinuit.cpp \
- $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \
- $(STARTINGPOINTGENERATION)/PolynomialSystemSolver.cpp \
- $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
- source/PotentialMinimization/GradientFromStartingPoints.cpp \
- source/PotentialMinimization/GradientMinimizer.cpp \
- source/PotentialMinimization/PotentialMinimizer.cpp \
- source/PotentialMinimization/PotentialMinimum.cpp \
- $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
- $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
- $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  source/TunnelingCalculation/BounceActionTunneler.cpp \
- source/TunnelingCalculation/TunnelingCalculator.cpp \
- source/VersionInformation.cpp \
+ $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
+ $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
+ $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/
@@ -107,7 +79,6 @@ LIBNAME=VevaciousPlusPlus
 LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
 LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) \
- -L$(LHPCLIBDIR) -l$(LHPCLIBNAME) \
   $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 # -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
 # There is some silly screwing around to force linking to the static Minuit2 

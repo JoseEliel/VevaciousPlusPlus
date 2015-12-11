@@ -8,17 +8,24 @@
 #ifndef POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 #define POTENTIALFROMPOLYNOMIALWITHMASSES_HPP_
 
-#include "CommonIncludes.hpp"
-#include "boost/math/constants/constants.hpp"
-#include "VersionInformation.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
-#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
+#include <string>
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
-#include "PotentialEvaluation/MassesSquaredCalculators/MassesSquaredFromMatrix.hpp"
-#include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
+#include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
+#include <utility>
+#include <vector>
+#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
-#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <cmath>
+#include <sstream>
+#include <stdexcept>
+#include "boost/math/constants/constants.hpp"
+#include "LHPC/Utilities/RestrictedXmlParser.hpp"
+#include <fstream>
+#include "VersionInformation.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
 
 namespace VevaciousPlusPlus
