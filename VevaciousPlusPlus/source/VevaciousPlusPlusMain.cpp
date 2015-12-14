@@ -37,9 +37,9 @@ int main( int argumentCount,
   if( !(inputFile.empty()) )
   {
     vevaciousPlusPlus.RunPoint( inputFile );
-    vevaciousPlusPlus.WriteXmlResults( argumentParser.fromTag( "OutputFile",
+    vevaciousPlusPlus.WriteResultsAsXmlFile( argumentParser.fromTag( "OutputFile",
                                                    ( inputFile + ".vout" ) ) );
-    vevaciousPlusPlus.WriteLhaResults( inputFile );
+    vevaciousPlusPlus.AppendResultsToLhaFile( inputFile );
   }
 
   // Solve a directory full of parameter points, if one was given with the
@@ -81,14 +81,14 @@ int main( int argumentCount,
     while( placeholderManager.holdNextPlace() )
     {
       vevaciousPlusPlus.RunPoint( placeholderManager.getInput() );
-      vevaciousPlusPlus.WriteXmlResults( placeholderManager.getOutput()
+      vevaciousPlusPlus.WriteResultsAsXmlFile( placeholderManager.getOutput()
                                          + ".vout" );
       std::string copyCommand( "cp " );
       copyCommand.append( placeholderManager.getInput() );
       copyCommand.append( " " );
       copyCommand.append( placeholderManager.getOutput() );
       BOL::UsefulStuff::runSystemCommand( copyCommand );
-      vevaciousPlusPlus.WriteLhaResults( placeholderManager.getOutput() );
+      vevaciousPlusPlus.AppendResultsToLhaFile( placeholderManager.getOutput() );
     }
   }
 

@@ -9,6 +9,7 @@
 #define LHATWOSOURCEFUNCTIONOID_HPP_
 
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <cstddef>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -20,8 +21,8 @@ namespace VevaciousPlusPlus
   {
   public:
     LhaTwoSourceFunctionoid( size_t const indexInValuesVector,
-                              size_t const firstChoiceIndex,
-                              size_t const secondChoiceIndex ) :
+                             size_t const firstChoiceIndex,
+                             size_t const secondChoiceIndex ) :
       LhaSourcedParameterFunctionoid( indexInValuesVector ),
       firstChoiceIndex( firstChoiceIndex ),
       secondChoiceIndex( secondChoiceIndex ) {}
@@ -66,8 +67,7 @@ namespace VevaciousPlusPlus
                                             int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
-    stringBuilder << std::setprecision( 12 )
-    << PythonIndent( indentationSpaces )
+    stringBuilder << PythonIndent( indentationSpaces )
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = FirstIfNonzeroOtherwiseSecond( parameterValues[ "
     << firstChoiceIndex

@@ -14,6 +14,7 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include "MinuitWrappersAndHelpers/MinuitHypersphereBoundAlternative.hpp"
+#include <cstddef>
 #include <cmath>
 #include "Minuit2/MnMigrad.h"
 #include "Minuit2/FunctionMinimum.h"
@@ -34,7 +35,7 @@ namespace VevaciousPlusPlus
                                    Eigen::VectorXd& eigenVector );
 
 
-    MinuitOnHypersurfaces( size_t const numberOfPathSegments,
+    MinuitOnHypersurfaces( unsigned int const numberOfPathSegments,
                            unsigned int const minuitStrategy = 1,
                            double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnHypersurfaces();

@@ -9,6 +9,8 @@
 #define VECTORUTILITIES_HPP_
 
 #include <vector>
+#include <cstddef>
+#include <cmath>
 
 namespace VevaciousPlusPlus
 {

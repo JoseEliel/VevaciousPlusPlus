@@ -59,12 +59,12 @@ namespace VevaciousPlusPlus
     temperatureDifference( criticalTemperature - temperatureVector[ 0 ] );
     double fittedAction( fitCoefficients[ 0 ] );
     double termContribution( 0.0 );
-    for( size_t whichPower( 1 );
+    for( std::vector::size_type whichPower( 1 );
          whichPower < fitCoefficients.size();
          ++whichPower )
     {
       termContribution = fitCoefficients[ whichPower ];
-      for( size_t powerCount( 0 );
+      for( std::vector::size_type powerCount( 0 );
            powerCount < whichPower;
            ++powerCount )
       {

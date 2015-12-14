@@ -8,6 +8,7 @@
 #ifndef MINUITMINIMUM_HPP_
 #define MINUITMINIMUM_HPP_
 
+#include <cstddef>
 #include "Minuit2/FunctionMinimum.h"
 #include <vector>
 #include <string>
@@ -67,17 +68,19 @@ namespace VevaciousPlusPlus
     virtual ~MinuitMinimum() {}
 
 
-    std::vector< double >& VariableValues(){ return variableValues; }
+    std::vector< double >& VariableValues() { return variableValues; }
+
     std::vector< double > const& VariableValues() const
     { return variableValues; }
 
     std::vector< double > const& VariableErrors() const
     { return variableErrors; }
 
-    double FunctionValue() const{ return functionValue; }
-    double FunctionError() const{ return functionError; }
+    double FunctionValue() const { return functionValue; }
 
-    bool IsValidMinimum() const{ return isValidMinimum; }
+    double FunctionError() const { return functionError; }
+
+    bool IsValidMinimum() const { return isValidMinimum; }
 
 
     // This is mainly for debugging.

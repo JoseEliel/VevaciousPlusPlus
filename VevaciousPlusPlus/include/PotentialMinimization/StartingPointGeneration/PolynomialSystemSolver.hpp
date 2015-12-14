@@ -18,7 +18,8 @@ namespace VevaciousPlusPlus
   class PolynomialSystemSolver
   {
   public:
-    typedef std::pair< double, std::vector< size_t > > FactorWithPowers;
+    typedef std::pair< double, std::vector< std::vector::size_type > >
+            FactorWithPowers;
     typedef std::vector< FactorWithPowers > PolynomialConstraint;
     typedef std::vector< PolynomialConstraint > ConstraintSystem;
 
@@ -120,13 +121,13 @@ namespace VevaciousPlusPlus
                               std::vector< std::vector< double > >& signFlips )
   {
     signFlips.push_back( solutionToFlip );
-    size_t const numberOfElements( solutionToFlip.size() );
-    for( size_t flipIndex( 0 );
+    std::vector::size_type const numberOfElements( solutionToFlip.size() );
+    for( std::vector::size_type flipIndex( 0 );
          flipIndex < numberOfElements;
          ++flipIndex )
     {
-      size_t const vectorSize( signFlips.size() );
-      for( size_t vectorIndex( 0 );
+      std::vector::size_type const vectorSize( signFlips.size() );
+      for( std::vector::size_type vectorIndex( 0 );
            vectorIndex < vectorSize;
            ++vectorIndex )
       {

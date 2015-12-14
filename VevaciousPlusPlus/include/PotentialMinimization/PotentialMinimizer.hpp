@@ -102,7 +102,7 @@ namespace VevaciousPlusPlus
                                      PotentialMinimum const& comparisonMinimum,
                                          double const thresholdDistance ) const
   {
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < dsbVacuum.FieldConfiguration().size();
          ++fieldIndex )
     {

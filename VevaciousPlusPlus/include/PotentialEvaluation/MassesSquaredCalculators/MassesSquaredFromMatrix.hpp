@@ -10,6 +10,7 @@
 
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "Eigen/Dense"
+#include <cstddef>
 #include <map>
 #include <string>
 #include <vector>
@@ -43,7 +44,7 @@ namespace VevaciousPlusPlus
     virtual std::vector< double >
     MassesSquared( std::vector< double > const& fieldConfiguration ) const;
 
-    size_t NumberOfRows() const{ return numberOfRows; }
+    size_t NumberOfRows() const { return numberOfRows; }
 
 
   protected:

@@ -9,8 +9,10 @@
 #define PARAMETERSANDFIELDSPRODUCTTERM_HPP_
 
 #include <vector>
+#include <cstddef>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {
@@ -65,7 +67,7 @@ namespace VevaciousPlusPlus
     // This raises the power of the field given by fieldIndex by the number
     // given by powerInt.
     void RaiseFieldPower( size_t const fieldIndex,
-                          size_t const powerInt );
+                          unsigned int const powerInt );
 
     // This multiplies coefficientConstant by multiplicationFactor.
     void MultiplyByConstant( double const multiplicationFactor )
@@ -82,7 +84,7 @@ namespace VevaciousPlusPlus
     // the scale-dependent coefficient given a vector of Lagrangian parameters
     // evaluated at the relevant scale.
     void MultiplyByParameter( size_t const parameterIndex,
-                              size_t const powerInt )
+                              unsigned int const powerInt )
     { parameterIndices.insert( parameterIndices.end(),
                                powerInt,
                                parameterIndex ); }
@@ -115,7 +117,8 @@ namespace VevaciousPlusPlus
     { return fieldPowersByIndex; }
 
     // This returns the sum of the powers of the fields.
-    size_t FieldPower() const{ return fieldProductByIndex.size(); }
+    size_t FieldPower() const
+    { return fieldProductByIndex.size(); }
 
     // This returns a string that should be valid Python assuming that the
     // field configuration is given as an array called "fv" and that the
@@ -136,7 +139,7 @@ namespace VevaciousPlusPlus
     bool isValid;
     double coefficientConstant;
     std::vector< size_t > fieldProductByIndex;
-    std::vector< size_t > fieldPowersByIndex;
+    std::vector< unsigned int > fieldPowersByIndex;
     std::vector< size_t > parameterIndices;
     double totalCoefficientForFixedScale;
   };
@@ -150,7 +153,7 @@ namespace VevaciousPlusPlus
   // given by powerInt.
   inline void
   ParametersAndFieldsProductTerm::RaiseFieldPower( size_t const fieldIndex,
-                                                   size_t const powerInt )
+                                                  unsigned int const powerInt )
   {
     fieldProductByIndex.insert( fieldProductByIndex.end(),
                                 powerInt,

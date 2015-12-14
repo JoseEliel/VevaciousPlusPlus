@@ -9,7 +9,9 @@
 #define THERMALFUNCTIONS_HPP_
 
 #include <string>
+#include <cstddef>
 #include <sstream>
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {

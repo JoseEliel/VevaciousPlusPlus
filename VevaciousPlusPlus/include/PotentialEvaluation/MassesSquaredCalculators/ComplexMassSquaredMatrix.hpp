@@ -9,6 +9,7 @@
 #define COMPLEXMASSSQUAREDMATRIX_HPP_
 
 #include "BaseComplexMassMatrix.hpp"
+#include <cstddef>
 #include <map>
 #include <string>
 #include "Eigen/Dense"

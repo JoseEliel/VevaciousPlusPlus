@@ -14,6 +14,7 @@
 #include <vector>
 #include "LhaSourcedParameterFunctionoid.hpp"
 #include <map>
+#include <cstddef>
 #include <utility>
 #include <sstream>
 #include "LhaDerivedFunctionoids/SlhaTrilinearDiagonalFunctionoid.hpp"
@@ -21,6 +22,7 @@
 #include "LhaDerivedFunctionoids/SlhaDsbHiggsVevFunctionoid.hpp"
 #include "LhaDerivedFunctionoids/SlhaHiggsMixingBilinearFunctionoid.hpp"
 #include <stdexcept>
+#include <cctype>
 #include <cmath>
 
 namespace VevaciousPlusPlus
@@ -112,9 +114,8 @@ namespace VevaciousPlusPlus
     // aliases in aliasesToCaseStrings which map to caseString are added
     // mapping to the index of this parameter), and returns true paired with
     // the index of newParameter.
-    size_t
-    AddNewDerivedParameter( std::string const& caseString,
-                            LhaSourcedParameterFunctionoid* newParameter );
+    size_t AddNewDerivedParameter( std::string const& caseString,
+                                LhaSourcedParameterFunctionoid* newParameter );
 
     // This pairs an index with true for convenience.
     std::pair< bool, size_t >

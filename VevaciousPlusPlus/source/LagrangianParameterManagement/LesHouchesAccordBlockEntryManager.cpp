@@ -139,7 +139,7 @@ namespace VevaciousPlusPlus
     std::string const
     trimmedVariable( LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
                                                           variableToFormat ) );
-    size_t openBracket( trimmedVariable.find( '[' ) );
+    size_t const openBracket( trimmedVariable.find( '[' ) );
     if( openBracket == std::string::npos )
     {
       return trimmedVariable;

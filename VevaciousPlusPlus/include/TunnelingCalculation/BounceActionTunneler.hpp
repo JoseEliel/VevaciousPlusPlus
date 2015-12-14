@@ -27,7 +27,7 @@ namespace VevaciousPlusPlus
     BounceActionTunneler(
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                           double const survivalProbabilityThreshold,
-                          size_t const temperatureAccuracy,
+                          unsigned int const temperatureAccuracy,
                           double const vacuumSeparationFraction );
     virtual ~BounceActionTunneler();
 
@@ -50,7 +50,7 @@ namespace VevaciousPlusPlus
     static double const fourVolumeOfKnownUniverseOverGevFourth;
     static double const lnOfThermalIntegrationFactor;
 
-    size_t const temperatureAccuracy;
+    unsigned int const temperatureAccuracy;
     std::pair< double, double > rangeOfMaxTemperatureForOriginToFalse;
     std::pair< double, double > rangeOfMaxTemperatureForOriginToTrue;
 
@@ -133,9 +133,9 @@ namespace VevaciousPlusPlus
     // resolutionOfDsbVacuum points between the field origin and the false
     // vacuum (if the false vacuum is not the field origin: if it is, just
     // resolutionOfDsbVacuum is returned).
-    size_t TunnelPathResolution( PotentialMinimum const& falseVacuum,
-                                 PotentialMinimum const& trueVacuum,
-                                 size_t const resolutionOfDsbVacuum ) const;
+    unsigned int TunnelPathResolution( PotentialMinimum const& falseVacuum,
+                                       PotentialMinimum const& trueVacuum,
+                              unsigned int const resolutionOfDsbVacuum ) const;
 
     // This ensures that thermalSurvivalProbability is set correctly from
     // logOfMinusLogOfThermalProbability.
@@ -207,16 +207,16 @@ namespace VevaciousPlusPlus
   // resolutionOfDsbVacuum points between the field origin and the false
   // vacuum (if the false vacuum is not the field origin: if it is, just
   // resolutionOfDsbVacuum is returned).
-  inline size_t BounceActionTunneler::TunnelPathResolution(
+  inline unsigned int BounceActionTunneler::TunnelPathResolution(
                                            PotentialMinimum const& falseVacuum,
                                             PotentialMinimum const& trueVacuum,
-                                     size_t const resolutionOfDsbVacuum ) const
+                               unsigned int const resolutionOfDsbVacuum ) const
   {
     double const falseVacuumLengthSquared( falseVacuum.LengthSquared() );
     if( falseVacuumLengthSquared > 0.0 )
     {
       return ( resolutionOfDsbVacuum
-               * static_cast< size_t >(
+               * static_cast< unsigned int >(
                                sqrt( trueVacuum.SquareDistanceTo( falseVacuum )
                                      / falseVacuumLengthSquared ) ) );
     }

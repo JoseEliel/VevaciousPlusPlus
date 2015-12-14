@@ -9,6 +9,7 @@
 #define POTENTIALFUNCTION_HPP_
 
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include <cstddef>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -45,9 +46,9 @@ namespace VevaciousPlusPlus
     LagrangianParameterManager& GetLagrangianParameterManager()
     { return lagrangianParameterManager; }
 
-    size_t NumberOfFieldVariables() const{ return numberOfFields; }
+    size_t NumberOfFieldVariables() const { return numberOfFields; }
 
-    std::vector< std::string > const& FieldNames() const{ return fieldNames; }
+    std::vector< std::string > const& FieldNames() const { return fieldNames; }
 
     std::string FieldConfigurationAsMathematica(
                        std::vector< double > const& fieldConfiguration ) const;

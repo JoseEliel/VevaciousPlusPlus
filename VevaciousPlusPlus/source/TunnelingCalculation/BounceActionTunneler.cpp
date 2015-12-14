@@ -75,7 +75,7 @@ namespace VevaciousPlusPlus
   BounceActionTunneler::BounceActionTunneler(
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
-                                              size_t const temperatureAccuracy,
+                                        unsigned int const temperatureAccuracy,
                                       double const vacuumSeparationFraction ) :
     TunnelingCalculator( tunnelingStrategy,
                          survivalProbabilityThreshold ),
@@ -341,7 +341,7 @@ namespace VevaciousPlusPlus
     // We aim to be within a factor of 2^( -temperatureAccuracy ) of the
     // critical temperature,
     // hence temperatureAccuracy iterations of this loop.
-    for( size_t narrowingStep( 0 );
+    for( unsigned int narrowingStep( 0 );
          narrowingStep < temperatureAccuracy;
          ++narrowingStep )
     {

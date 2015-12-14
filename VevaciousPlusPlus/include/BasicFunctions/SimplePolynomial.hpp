@@ -8,9 +8,11 @@
 #ifndef SIMPLEPOLYNOMIAL_HPP_
 #define SIMPLEPOLYNOMIAL_HPP_
 
+#include <cstddef>
 #include <vector>
 #include "Eigen/Dense"
 #include <string>
+#include <cmath>
 #include <sstream>
 
 namespace VevaciousPlusPlus
@@ -25,18 +27,18 @@ namespace VevaciousPlusPlus
                          leadingPower( 0 ) {}
 
     SimplePolynomial( size_t const reserveSize,
-                      size_t const leadingPower = 0 ) :
+                      unsigned int const leadingPower = 0 ) :
       coefficientVector( reserveSize,
                          0.0 ),
       leadingPower( leadingPower ) {}
 
     SimplePolynomial( std::vector< double > const& coefficientVector,
-                      size_t const leadingPower = 0 ) :
+                      unsigned int const leadingPower = 0 ) :
       coefficientVector( coefficientVector ),
       leadingPower( leadingPower ) {}
 
     SimplePolynomial( Eigen::VectorXd const& eigenVector,
-                      size_t const leadingPower = 0,
+                      unsigned int const leadingPower = 0,
                       size_t extraEmptyEntriesAtConstruction = 0 ) :
       coefficientVector(),
       leadingPower( leadingPower )
@@ -57,7 +59,7 @@ namespace VevaciousPlusPlus
     // This sets coefficientVector to have elements equal to those of
     // eigenVector.
     void CopyFromEigen( Eigen::VectorXd const& eigenVector,
-                        size_t const leadingPower = 0,
+                        unsigned int const leadingPower = 0,
                         size_t extraEmptyEntriesAtConstruction = 0 );
 
     // This sets this SimplePolynomial to be the first derivative of
@@ -71,8 +73,11 @@ namespace VevaciousPlusPlus
 
     std::vector< double > const& CoefficientVector() const
     { return coefficientVector; }
+
     std::vector< double >& CoefficientVector(){ return coefficientVector; }
+
     unsigned int const& LeadingPower() const{ return leadingPower; }
+
     unsigned int& LeadingPower(){ return leadingPower; }
 
     // This is for debugging.
@@ -90,8 +95,9 @@ namespace VevaciousPlusPlus
   inline double SimplePolynomial::operator()( double const inputValue ) const
   {
     double returnValue( 0.0 );
-    for( unsigned int whichPower( leadingPower );
-         whichPower < coefficientVector.size();
+    size_t const maximumPowerPlusOne( coefficientVector.size() );
+    for( size_t whichPower( static_cast< size_t >( leadingPower ) );
+         whichPower < maximumPowerPlusOne;
          ++whichPower )
     {
       returnValue += ( coefficientVector[ whichPower ] * pow( inputValue,
@@ -104,16 +110,17 @@ namespace VevaciousPlusPlus
   // eigenVector.
   inline void
   SimplePolynomial::CopyFromEigen( Eigen::VectorXd const& eigenVector,
-                                   size_t const leadingPower,
+                                   unsigned int const leadingPower,
                                    size_t extraEmptyEntriesAtConstruction )
   {
     this->leadingPower = leadingPower;
-    coefficientVector
-    = std::vector< double >( ( eigenVector.rows() + leadingPower
-                               + extraEmptyEntriesAtConstruction ),
+    coefficientVector = std::vector< double >( ( eigenVector.rows()
+                                                 + leadingPower
+                                           + extraEmptyEntriesAtConstruction ),
                              0.0 );
+    size_t const numberOfRows( static_cast< size_t >( eigenVector.rows() ) );
     for( size_t whichIndex( 0 );
-         whichIndex < (size_t)(eigenVector.rows());
+         whichIndex < numberOfRows;
          ++whichIndex )
     {
       coefficientVector[ whichIndex + leadingPower ]
@@ -138,8 +145,9 @@ namespace VevaciousPlusPlus
     {
       leadingPower = ( polynomialToDifferentiate.leadingPower - 1 );
     }
-    for( unsigned int whichPower( 1 );
-         whichPower <= coefficientVector.size();
+    size_t const maximumPowerPlusOne( coefficientVector.size() );
+    for( size_t whichPower( 1 );
+         whichPower <= maximumPowerPlusOne;
          ++whichPower )
     {
       coefficientVector[ whichPower - 1 ]
@@ -161,7 +169,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream returnStream;
     double coefficientMagnitude( 0.0 );
-    for( unsigned int whichPower( leadingPower );
+    for( size_t whichPower( leadingPower );
          whichPower < coefficientVector.size();
          ++whichPower )
     {

@@ -31,11 +31,11 @@ namespace VevaciousPlusPlus
                       std::vector< PolynomialConstraint > const& systemToSolve,
                                                 double const resolutionSize )
   {
-    size_t const numberOfElements( givenSolution.size() );
+    std::vector::size_type const numberOfElements( givenSolution.size() );
     double originalValue( 0.0 );
     double negativePartialSlope( 0.0 );
     double positivePartialSlope( 0.0 );
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < numberOfElements;
          ++fieldIndex )
     {
@@ -76,7 +76,7 @@ namespace VevaciousPlusPlus
          ++factorWithPowers )
     {
       polynomialValue = factorWithPowers->first;
-      for( size_t fieldIndex( 0 );
+      for( std::vector::size_type fieldIndex( 0 );
            fieldIndex < factorWithPowers->second.size();
            ++fieldIndex )
       {
@@ -97,7 +97,7 @@ namespace VevaciousPlusPlus
                                    * fieldConfiguration[ fieldIndex ] );
               break;
             default:
-              for( size_t powerCount( 0 );
+              for( std::vector::size_type powerCount( 0 );
                    powerCount < factorWithPowers->second[ fieldIndex ];
                    ++powerCount )
               {

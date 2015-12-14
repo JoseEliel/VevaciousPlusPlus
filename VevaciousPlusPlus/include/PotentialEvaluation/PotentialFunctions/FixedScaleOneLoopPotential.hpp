@@ -19,6 +19,7 @@
 #include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/ComplexMassSquaredMatrix.hpp"
 #include <sstream>
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {

@@ -11,6 +11,7 @@
 #include "MinuitOnHypersurfaces.hpp"
 #include "BounceActionEvaluation/BubbleProfile.hpp"
 #include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
+#include <cstddef>
 #include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
@@ -19,7 +20,7 @@ namespace VevaciousPlusPlus
   class MinuitOnPotentialOnParallelPlanes : public MinuitOnHypersurfaces
   {
   public:
-    MinuitOnPotentialOnParallelPlanes( size_t const numberOfPathSegments,
+    MinuitOnPotentialOnParallelPlanes( unsigned int const numberOfPathSegments,
                                        unsigned int const minuitStrategy = 1,
                                   double const minuitToleranceFraction = 0.5 );
     virtual ~MinuitOnPotentialOnParallelPlanes();

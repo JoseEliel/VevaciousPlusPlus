@@ -256,7 +256,7 @@ namespace VevaciousPlusPlus
     }
     parameterSortingList.sort( &SortParameterByIndex );
     typedef std::pair< std::string, LhaSourcedParameterFunctionoid const* >
-    nameAndParameter;
+            nameAndParameter;
     std::vector< nameAndParameter > sortedNamesAndParameters;
     for( std::list< LhaSourcedParameterFunctionoid const* >::const_iterator
          sortedParameter( parameterSortingList.begin() );

@@ -14,7 +14,7 @@ namespace VevaciousPlusPlus
 
   BubbleShootingOnPathInFieldSpace::BubbleShootingOnPathInFieldSpace(
                                             double const lengthScaleResolution,
-                                                 size_t const shootAttempts ) :
+                                           unsigned int const shootAttempts ) :
     BounceActionCalculator(),
     lengthScaleResolution( lengthScaleResolution ),
     radialStepSize( -1.0 ),

@@ -80,7 +80,7 @@ namespace VevaciousPlusPlus
   {
     double returnDouble( 0.0 );
     double fieldDifference( 0.0 );
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -99,7 +99,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "<" << elementName;
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -119,7 +119,7 @@ namespace VevaciousPlusPlus
     std::stringstream stringBuilder;
     stringBuilder << "  <" << elementName << ">\n"
     "    <FieldValues>\n";
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -141,7 +141,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "{ {";
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {

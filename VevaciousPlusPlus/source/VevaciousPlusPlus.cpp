@@ -29,8 +29,7 @@ namespace VevaciousPlusPlus
     potentialMinimizer( &potentialMinimizer ),
     ownedPotentialMinimizer( NULL ),
     tunnelingCalculator( &tunnelingCalculator ),
-    ownedTunnelingCalculator( NULL ),
-    currentTime()
+    ownedTunnelingCalculator( NULL )
   {
     // This constructor is just an initialization list.
   }
@@ -50,33 +49,31 @@ namespace VevaciousPlusPlus
     potentialMinimizer( NULL ),
     ownedPotentialMinimizer( NULL ),
     tunnelingCalculator( NULL ),
-    ownedTunnelingCalculator( NULL ),
-    currentTime()
+    ownedTunnelingCalculator( NULL )
   {
     std::string potentialFunctionInitializationFilename( "error" );
     std::string potentialMinimizerInitializationFilename( "error" );
     std::string tunnelingCalculatorInitializationFilename( "error" );
-    BOL::AsciiXmlParser fileParser;
-    fileParser.openRootElementOfFile( initializationFileName );
-    while( fileParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.OpenRootElementOfFile( initializationFileName );
+    while( xmlParser.ReadNextElement() )
     {
-      if( fileParser.currentElementNameMatches(
-                                      "PotentialFunctionInitializationFile" ) )
+      if( xmlParser.CurrentName() == "PotentialFunctionInitializationFile" )
       {
         potentialFunctionInitializationFilename
-        = fileParser.getTrimmedCurrentElementContent();
+        = xmlParser.TrimmedCurrentBody();
       }
-      else if( fileParser.currentElementNameMatches(
-                                     "PotentialMinimizerInitializationFile" ) )
+      else if( xmlParser.CurrentName()
+               == "PotentialMinimizerInitializationFile" )
       {
         potentialMinimizerInitializationFilename
-        = fileParser.getTrimmedCurrentElementContent();
+        = xmlParser.TrimmedCurrentBody();
       }
-      else if( fileParser.currentElementNameMatches(
-                                    "TunnelingCalculatorInitializationFile" ) )
+      else if( xmlParser.CurrentName()
+               == "TunnelingCalculatorInitializationFile" )
       {
         tunnelingCalculatorInitializationFilename
-        = fileParser.getTrimmedCurrentElementContent();
+        = xmlParser.TrimmedCurrentBody();
       }
     }
 
@@ -117,65 +114,67 @@ namespace VevaciousPlusPlus
   // principle itself contain all the necessary parameters.
   void VevaciousPlusPlus::RunPoint( std::string const& newInput )
   {
-    time( &currentTime );
+    time_t runStartTime;
+    time_t runEndTime;
+    time_t stageStartTime;
+    time_t stageEndTime;
+    time( &runStartTime );
     std::cout
     << std::endl
     << "Running \"" << newInput << "\" starting at "
-    << ctime( &currentTime );
+    << ctime( &runStartTime );
     std::cout << std::endl;
-    BOL::BasicTimer stageTimer;
-    BOL::BasicTimer totalTimer;
 
+    time( &stageStartTime );
     lagrangianParameterManager->NewParameterPoint( newInput );
     potentialMinimizer->FindMinima( 0.0 );
-
-    time( &currentTime );
-    std::cout
-    << std::endl
-    << "Minimization of potential took " << stageTimer.secondsSinceStart()
-    << " seconds, finished at " << ctime( &currentTime );
+    time( &stageEndTime );
+    std::cout << std::endl
+    << "Minimization of potential took " << difftime( stageEndTime,
+                                                      stageStartTime )
+    << " seconds, finished at " << ctime( &stageEndTime );
     std::cout << std::endl;
 
     if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
-      stageTimer.setStartTime();
+      time( &stageStartTime );
       tunnelingCalculator->CalculateTunneling(
                                     potentialMinimizer->GetPotentialFunction(),
                                                potentialMinimizer->DsbVacuum(),
                                            potentialMinimizer->PanicVacuum() );
-
-      time( &currentTime );
-      std::cout
-      << std::endl
-      << "Tunneling calculation took " << stageTimer.secondsSinceStart()
-      << " seconds, finished at " << ctime( &currentTime );
+      time( &stageEndTime );
+      std::cout << std::endl
+      << "Tunneling calculation took " << difftime( stageEndTime,
+                                                    stageStartTime )
+      << " seconds, finished at " << ctime( &stageEndTime );
       std::cout << std::endl;
       std::cout << std::endl;
     }
 
-    time( &currentTime );
-    std::cout
-    << std::endl
-    << "Total running time was " << totalTimer.secondsSinceStart()
-    << " seconds, finished at " << ctime( &currentTime );
+    time( &runEndTime );
+    std::cout << std::endl
+    << "Total running time was " << difftime( runEndTime,
+                                              runStartTime )
+    << " seconds, finished at " << ctime( &runEndTime );
     std::cout << std::endl;
   }
 
   // This writes the results as an XML file.
-  void VevaciousPlusPlus::WriteXmlResults( std::string const& xmlFilename )
+  void
+  VevaciousPlusPlus::WriteResultsAsXmlFile( std::string const& xmlFilename )
   {
     std::ofstream xmlFile( xmlFilename.c_str() );
     xmlFile << "<VevaciousResults>\n"
     "  <ReferenceData>\n"
     "     <VevaciousVersion>\n"
-    "       " << VersionInformation::currentVersion << "\n"
+    "       " << VersionInformation::CurrentVersion() << "\n"
     "     </VevaciousVersion>\n"
     "     <CitationArticle>\n"
-    "       " << VersionInformation::currentCitation << "\n"
+    "       " << VersionInformation::CurrentCitation() << "\n"
     "     </CitationArticle>\n"
     "     <ResultTimestamp>\n"
     "       "
-    << std::string( ctime( &currentTime ) )
+    << std::string( ctime( &(time( NULL )) ) )
     << "     </ResultTimestamp>\n"
     "  </ReferenceData>\n"
     "  <StableOrMetastable>\n"
@@ -248,24 +247,17 @@ namespace VevaciousPlusPlus
   }
 
   // This writes the results as an SLHA file.
-  void VevaciousPlusPlus::WriteLhaResults( std::string const& slhaFilename,
-                                            bool const writeWarnings )
+  void
+  VevaciousPlusPlus::AppendResultsToLhaFile( std::string const& lhaFilename,
+                                             bool const writeWarnings )
   {
-    BOL::StringParser const slhaIndexMaker( 3,
-                                            ' ',
-                                            9,
-                                            3,
-                                            "" );
-    BOL::StringParser const slhaDoubleMaker( 9,
-                                             ' ',
-                                             9,
-                                             3,
-                                             "" );
-    std::fstream outputFile( slhaFilename.c_str() );
+    std::fstream outputFile( lhaFilename.c_str() );
     if( !(outputFile.good()) )
     {
-      throw std::runtime_error( "Could not open \"" + slhaFilename
-                                + "\" to append results." );
+      std::stringstream errorBuilder;
+      errorBuilder
+      << "Could not open \"" << lhaFilename << "\" to append results.";
+      throw std::runtime_error( errorBuilder.str() );
     }
     long endPosition( outputFile.seekg( 0,
                                         std::ios::end ).tellg() );
@@ -279,10 +271,10 @@ namespace VevaciousPlusPlus
     // of '\n' characters ending the file.
     outputFile << "\n"
     "BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus\n"
-    "# version " << VersionInformation::currentVersion << ", documented in "
-    << VersionInformation::currentCitation
+    "# version " << VersionInformation::CurrentVersion() << ", documented in "
+    << VersionInformation::CurrentCitation()
     << "\n"
-    "# Results written " << std::string( ctime( &currentTime ) )
+    "# Results written " << std::string( ctime( &(time( NULL )) ) )
     << "# [index] [verdict int]\n"
     "  1  ";
     if( potentialMinimizer->DsbVacuumIsStable() )
@@ -297,25 +289,25 @@ namespace VevaciousPlusPlus
     "# [index] [verdict float]\n";
     if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
     {
-      outputFile <<  "  1  " << slhaDoubleMaker.doubleToString(
+      outputFile <<  "  1  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                             tunnelingCalculator->QuantumSurvivalProbability() )
       << "  # Probability of DSB vacuum surviving 4.3E17 seconds\n";
-      outputFile << "  2  " << slhaDoubleMaker.doubleToString(
+      outputFile << "  2  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                               tunnelingCalculator->QuantumLifetimeInSeconds() )
       << "  # Tunneling time out of DSB vacuum in seconds\n"
-      "  3  " << slhaDoubleMaker.doubleToString(
+      "  3  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                      tunnelingCalculator->LogOfMinusLogOfQuantumProbability() )
       << "  # L = ln(-ln(P)), => P = e^(-e^L)\n";
     }
     else
     {
-      outputFile << "  1  " << slhaDoubleMaker.doubleToString(
+      outputFile << "  1  " << LHPC::ParsingUtilities::FormatNumberForSlha(
           tunnelingCalculator->QuantumSurvivalProbability() )
       << "  # Not calculated: ignore this number\n"
-      "  2  " << slhaDoubleMaker.doubleToString(
+      "  2  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                               tunnelingCalculator->QuantumLifetimeInSeconds() )
       << "  # Not calculated: ignore this number\n"
-      "  3  " << slhaDoubleMaker.doubleToString(
+      "  3  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                      tunnelingCalculator->LogOfMinusLogOfQuantumProbability() )
       << "  # Not calculated: ignore this number\n";
     }
@@ -323,25 +315,25 @@ namespace VevaciousPlusPlus
     "# [index] [verdict float]\n";
     if( tunnelingCalculator->ThermalSurvivalProbability() >= 0.0 )
     {
-      outputFile <<  "  1  " << slhaDoubleMaker.doubleToString(
+      outputFile <<  "  1  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                             tunnelingCalculator->ThermalSurvivalProbability() )
       << "  # Probability of DSB vacuum surviving thermal tunneling\n";
-      outputFile << "  2  " << slhaDoubleMaker.doubleToString(
+      outputFile << "  2  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                 tunnelingCalculator->DominantTemperatureInGigaElectronVolts() )
       << "  # Dominant tunneling temperature in GeV\n"
-      "  3  " << slhaDoubleMaker.doubleToString(
+      "  3  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                      tunnelingCalculator->LogOfMinusLogOfThermalProbability() )
       << "  # L = ln(-ln(P)), => P = e^(-e^L)\n";
     }
     else
     {
-      outputFile << "  1  " << slhaDoubleMaker.doubleToString(
+      outputFile << "  1  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                             tunnelingCalculator->ThermalSurvivalProbability() )
       << "  # Not calculated: ignore this number\n"
-      "  2  " << slhaDoubleMaker.doubleToString(
+      "  2  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                  tunnelingCalculator->DominantTemperatureInGigaElectronVolts() )
       << "  # Not calculated: ignore this number\n"
-      "  3  " << slhaDoubleMaker.doubleToString(
+      "  3  " << LHPC::ParsingUtilities::FormatNumberForSlha(
                      tunnelingCalculator->LogOfMinusLogOfThermalProbability() )
       << "  # Not calculated: ignore this number\n";
     }
@@ -350,24 +342,24 @@ namespace VevaciousPlusPlus
     "# [index] [field name in \"\"]\n";
     std::vector< std::string > const&
     fieldNames( potentialMinimizer->GetPotentialFunction().FieldNames() );
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
-      outputFile << slhaIndexMaker.intToString( fieldIndex ) << "  \""
+      outputFile << ' ' << std::setw( 2 ) << fieldIndex << "  \""
       << fieldNames[ fieldIndex ] << "\"\n";
     }
     outputFile << "BLOCK VEVACIOUSDSBVACUUM # VEVs for DSB vacuum in GeV\n"
     "# [index] [field VEV in GeV]\n";
     std::vector< double > const&
     dsbFields( potentialMinimizer->DsbVacuum().FieldConfiguration() );
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
-      outputFile << slhaIndexMaker.intToString( fieldIndex ) << "  "
-      << slhaDoubleMaker.doubleToString( dsbFields[ fieldIndex ] ) << "  # "
-      << fieldNames[ fieldIndex ] << "\n";
+      outputFile << ' ' << std::setw( 2 ) << fieldIndex << "  "
+      << LHPC::ParsingUtilities::FormatNumberForSlha( dsbFields[ fieldIndex ] )
+      << "  # " << fieldNames[ fieldIndex ] << "\n";
     }
     outputFile
     << "BLOCK VEVACIOUSPANICVACUUM # ";
@@ -386,16 +378,17 @@ namespace VevaciousPlusPlus
     {
       panicFields = &(potentialMinimizer->PanicVacuum().FieldConfiguration());
     }
-    for( size_t fieldIndex( 0 );
+    for( std::vector::size_type fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
-      outputFile << slhaIndexMaker.intToString( fieldIndex ) << "  "
-      << slhaDoubleMaker.doubleToString( (*panicFields)[ fieldIndex ] )
+      outputFile << ' ' << std::setw( 2 ) << fieldIndex << "  "
+      << LHPC::ParsingUtilities::FormatNumberForSlha(
+                                                 (*panicFields)[ fieldIndex ] )
       << "  # " << fieldNames[ fieldIndex ] << "\n";
     }
     std::cout << std::endl << "Wrote results in SLHA format at end of file \""
-    << slhaFilename << "\"." << std::endl;
+    << lhaFilename << "\"." << std::endl;
   }
 
   // This creates a new LagrangianParameterManager and a new
@@ -408,8 +401,8 @@ namespace VevaciousPlusPlus
     LesHouchesAccordBlockEntryManager*
     createdLagrangianParameterManager( NULL );
     PotentialFromPolynomialWithMasses* createdPotentialFunction( NULL );
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.openRootElementOfFile( potentialFunctionInitializationFilename );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.OpenRootElementOfFile( potentialFunctionInitializationFilename );
     std::string lagrangianParameterManagerClass( "error" );
     std::string lagrangianParameterManagerArguments( "error" );
     std::string potentialFunctionClass( "error" );
@@ -417,7 +410,7 @@ namespace VevaciousPlusPlus
 
     // The root element of this file should have child elements
     // <LagrangianParameterManagerClass> and <PotentialFunctionClass>.
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       ReadClassAndArguments( xmlParser,
                              "LagrangianParameterManagerClass",
@@ -445,10 +438,10 @@ namespace VevaciousPlusPlus
                                                 std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
     std::string scaleAndBlockFilename( "error" );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "ScaleAndBlockFile",
@@ -485,11 +478,11 @@ namespace VevaciousPlusPlus
                                        std::string const& constructorArguments,
                        LagrangianParameterManager& lagrangianParameterManager )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
     std::string modelFilename( "error" );
     double assumedPositiveOrNegativeTolerance( 1.0 );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "ModelFile",
@@ -528,8 +521,8 @@ namespace VevaciousPlusPlus
                           PotentialFromPolynomialWithMasses& potentialFunction,
                                       std::string const& constructorArguments )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
     std::string startingPointFinderClass( "error" );
     std::string startingPointFinderArguments( "error" );
     std::string gradientMinimizerClass( "error" );
@@ -540,7 +533,7 @@ namespace VevaciousPlusPlus
     // <StartingPointFinderClass> and <GradientMinimizerClass>, and
     // optionally <ExtremumSeparationThresholdFraction> and
     // <NonDsbRollingToDsbScalingFactor>.
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       ReadClassAndArguments( xmlParser,
                              "StartingPointFinderClass",
@@ -579,13 +572,13 @@ namespace VevaciousPlusPlus
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                       std::string const& constructorArguments )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
     unsigned int numberOfScales( 10 );
     bool returnOnlyPolynomialMinima( false );
     std::string polynomialSystemSolverClass( "error" );
     std::string polynomialSystemSolverArguments( "error" );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "NumberOfScales",
@@ -617,13 +610,13 @@ namespace VevaciousPlusPlus
   // if the element's name matches elementName. If the element content
   // doesn't match any valid input, contentDestination is left untouched.
   void VevaciousPlusPlus::InterpretElementIfNameMatches(
-                                          BOL::AsciiXmlParser const& xmlParser,
+                                    LHPC::RestrictedXmlParser const& xmlParser,
                                                 std::string const& elementName,
                                                      bool& contentDestination )
   {
-    if( xmlParser.currentElementNameMatches( elementName ) )
+    if( xmlParser.CurrentName() == elementName )
     {
-      std::string contentString( xmlParser.getTrimmedCurrentElementContent() );
+      std::string contentString( xmlParser.TrimmedCurrentBody() );
       BOL::StringParser::transformToLowercase( contentString );
       if( ( contentString == "yes" )
           ||
@@ -661,9 +654,9 @@ namespace VevaciousPlusPlus
     double errorFraction( 0.1 );
     double errorMinimum( 1.0 );
     unsigned int minuitStrategy( 1 );
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "InitialStepSizeFraction",
@@ -700,9 +693,9 @@ namespace VevaciousPlusPlus
     double vacuumSeparationFraction( 0.2 );
     unsigned int maxInnerLoops( 10 );
     unsigned int maxOuterLoops( 10 );
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "TunnelingStrategy",
@@ -746,6 +739,41 @@ namespace VevaciousPlusPlus
                                        vacuumSeparationFraction );
   }
 
+  // This interprets the given string as the appropriate element of the
+  // TunnelingCalculator::TunnelingStrategy enum.
+  TunnelingCalculator::TunnelingStrategy
+  VevaciousPlusPlus::InterpretTunnelingStrategy(
+                                               std::string& tunnelingStrategy )
+  {
+    if( ( tunnelingStrategy == "DefaultTunneling" )
+        ||
+        ( tunnelingStrategy == "ThermalThenQuantum" ) )
+    {
+      return TunnelingCalculator::ThermalThenQuantum;
+    }
+    else if( tunnelingStrategy == "QuantumThenthermal" )
+    {
+      return TunnelingCalculator::QuantumThenThermal;
+    }
+    else if( tunnelingStrategy == "JustThermal" )
+    {
+      return TunnelingCalculator::JustThermal;
+    }
+    else if( tunnelingStrategy == "JustQuantum" )
+    {
+      return TunnelingCalculator::JustQuantum;
+    }
+    else if( tunnelingStrategy == "NoTunneling" )
+    {
+      return TunnelingCalculator::NoTunneling;
+    }
+    std::stringstream errorBuilder;
+    errorBuilder << "\"" << tunnelingStrategy << "\" is not a valid tunneling"
+    << " strategy. Valid options are \"NoTunneling\", \"JustQuantum\","
+    << " \"JustThermal\", \"ThermalThenQuantum\", or \"QuantumThenthermal\".";
+    throw std::runtime_error( errorBuilder.str() );
+  }
+
   // This creates a new CosmoTransitionsRunner based on the given arguments
   // and returns a pointer to it.
   BounceAlongPathWithThreshold*
@@ -762,9 +790,9 @@ namespace VevaciousPlusPlus
     unsigned int resolutionOfPathPotential( 100 );
     double vacuumSeparationFraction( 0.2 );
 
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "TunnelingStrategy",
@@ -826,11 +854,11 @@ namespace VevaciousPlusPlus
                                          std::string const& tunnelPathFinders )
   {
     std::vector< BouncePathFinder* > pathFinders;
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( tunnelPathFinders );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( tunnelPathFinders );
     std::string classChoice( "" );
     std::string constructorArguments( "" );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       classChoice.clear();
       constructorArguments.clear();
@@ -882,9 +910,9 @@ namespace VevaciousPlusPlus
     std::string neighborDisplacementWeightsString( "0.5, 0.25" );
     unsigned int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "NumberOfPathSegments",
@@ -908,17 +936,18 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    BOL::VectorlikeArray< std::string > weightsStrings;
-    BOL::StringParser::parseByChar( neighborDisplacementWeightsString,
-                                    weightsStrings,
-                                    " \t\n,;" );
+    std::vector< std::string >
+    weightsStrings( LHPC::ParsingUtilities::SplitBySubstrings(
+                                             neighborDisplacementWeightsString,
+                                                               " \t\n,;" ) );
     std::vector< double > neighborDisplacementWeights;
-    for( int weightIndex( 0 );
-         weightIndex < weightsStrings.getSize();
-         ++weightIndex )
+    for( std::vector< std::string >::iterator
+         weightString( weightsStrings.begin() );
+         weightString != weightsStrings.end();
+         ++weightString )
     {
       neighborDisplacementWeights.push_back(
-          BOL::StringParser::stringToDouble( weightsStrings[ weightIndex ] ) );
+                     LHPC::ParsingUtilities::StringToDouble( *weightString ) );
     }
 
     return new MinuitOnPotentialPerpendicularToPath( numberOfPathSegments,

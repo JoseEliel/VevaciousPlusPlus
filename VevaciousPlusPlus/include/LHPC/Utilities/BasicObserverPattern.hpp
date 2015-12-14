@@ -64,7 +64,9 @@ namespace LHPC
   public:
     BasicObserved() : observerList(),
                       observerIterator() {}
+
     virtual ~BasicObserved() { RemoveAllObservers(); }
+
 
     // This goes through observerList and calls its RespondToObservedSignal()
     // if its bool is true, otherwise it removes the observer.

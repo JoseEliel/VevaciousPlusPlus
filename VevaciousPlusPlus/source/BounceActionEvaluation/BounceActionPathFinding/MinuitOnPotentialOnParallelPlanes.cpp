@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   MinuitOnPotentialOnParallelPlanes::MinuitOnPotentialOnParallelPlanes(
-                                             size_t const numberOfPathSegments,
+                                       unsigned int const numberOfPathSegments,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
     MinuitOnHypersurfaces( numberOfPathSegments,

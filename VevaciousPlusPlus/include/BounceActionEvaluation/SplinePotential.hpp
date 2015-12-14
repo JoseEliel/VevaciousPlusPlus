@@ -12,6 +12,7 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PathParameterization/TunnelPath.hpp"
 #include <string>
+#include <cstddef>
 #include <vector>
 #include "LHPC/Utilities/ParsingUtilities.hpp"
 
@@ -23,7 +24,7 @@ namespace VevaciousPlusPlus
   public:
     SplinePotential( PotentialFunction const& potentialFunction,
                      TunnelPath const& tunnelPath,
-                     size_t const numberOfPotentialSegments,
+                     unsigned int const numberOfPotentialSegments,
                      double const minimumSquareDistanceBetweenPathVacua );
     virtual ~SplinePotential();
 
@@ -113,12 +114,12 @@ namespace VevaciousPlusPlus
     // potentialValues[ 0 ] is the potential at the start of the first straight
     // segment minus pathFalsePotential, potentialValues[ 1 ] at the start of
     // the second segment minus pathFalsePotential, and so on. This continues
-    // until it finds the segment which starts with potential higher than that of
-    // the path false vacuum and ends with potential lower than that of the path
-    // false vacuum. It sets definiteUndershootAuxiliary to be the auxiliary
-    // value of the start of this segment. It returns true if it managed to do
-    // all the above, or false if tunneling was not possible (in which case,
-    // definiteUndershootAuxiliary is a junk value).
+    // until it finds the segment which starts with potential higher than that
+    // of the path false vacuum and ends with potential lower than that of the
+    // path false vacuum. It sets definiteUndershootAuxiliary to be the
+    // auxiliary value of the start of this segment. It returns true if it
+    // managed to do all the above, or false if tunneling was not possible (in
+    // which case, definiteUndershootAuxiliary is a junk value).
     bool
     CheckForEndOfPositiveBarrier( size_t const maximumNumberOfNormalSegments );
 
@@ -156,7 +157,8 @@ namespace VevaciousPlusPlus
     {
       return ( 2.0 * auxiliaryValue * firstSegmentQuadratic );
     }
-    size_t const auxiliarySteps( auxiliaryValue * inverseOfAuxiliaryStep );
+    size_t const auxiliarySteps( static_cast< size_t >( auxiliaryValue
+                                                  * inverseOfAuxiliaryStep ) );
     if( auxiliarySteps > numberOfNormalSegments )
     {
       return FirstDerivativeNearPathPanic( auxiliaryValue

@@ -14,6 +14,7 @@
 #include "BubbleRadialValueDescription.hpp"
 #include <vector>
 #include <utility>
+#include <cstddef>
 #include "OdeintBubbleDerivatives.hpp"
 #include "OdeintBubbleObserver.hpp"
 #include "boost/numeric/odeint/integrate/integrate.hpp"
@@ -75,6 +76,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
+    typedef std::pair< size_t, double > IndexAndRemainder;
     static double const auxiliaryPrecisionResolution;
 
     std::vector< BubbleRadialValueDescription > auxiliaryProfile;
@@ -99,14 +101,14 @@ namespace VevaciousPlusPlus
     // before radialValue and ends after it, in terms of the radial variable,
     // then returns the index of that segment and the difference between
     // radialValue and the radial start of the segment.
-    std::pair< size_t, double >
+    IndexAndRemainder
     SegmentAndRemainder( double const radialValue ) const;
 
     // This returns the weights of the ends of the segment with index
     // segmentAndRemainder.first, according to how close
     // segmentAndRemainder.second is to each end, normalized to summing to 1.
     std::pair< double, double > SegmentEndWeights(
-                std::pair< size_t, double > const& segmentAndRemainder ) const;
+                          IndexAndRemainder const& segmentAndRemainder ) const;
 
     // This looks through odeintProfile to see if there was a definite
     // undershoot or overshoot, setting undershootAuxiliary or
@@ -148,7 +150,7 @@ namespace VevaciousPlusPlus
     {
       return 0.0;
     }
-    std::pair< size_t, double >
+    IndexAndRemainder
     segmentAndRemainder( SegmentAndRemainder( radialValue ) );
     std::pair< double, double >
     segmentEndWeights( SegmentEndWeights( segmentAndRemainder ) );
@@ -169,7 +171,7 @@ namespace VevaciousPlusPlus
     {
       return 0.0;
     }
-    std::pair< size_t, double >
+    IndexAndRemainder
     segmentAndRemainder( SegmentAndRemainder( radialValue ) );
     std::pair< double, double >
     segmentEndWeights( SegmentEndWeights( segmentAndRemainder ) );
@@ -183,7 +185,7 @@ namespace VevaciousPlusPlus
   // before radialValue and ends after it, in terms of the radial variable,
   // then returns the index of that segment and the difference between
   // radialValue and the radial start of the segment.
-  inline std::pair< size_t, double >
+  inline UndershootOvershootBubble::IndexAndRemainder
   UndershootOvershootBubble::SegmentAndRemainder(
                                                double const radialValue ) const
   {
@@ -197,7 +199,7 @@ namespace VevaciousPlusPlus
     // where auxiliaryProfile[ segmentIndex ] (after increment) starts beyond
     // radialValue, so we know that segmentIndex is 1 beyond what we want to
     // return.
-    return std::pair< size_t, double >( segmentIndex - 1,
+    return IndexAndRemainder( segmentIndex - 1,
           ( radialValue - auxiliaryProfile[ segmentIndex - 1 ].radialValue ) );
   }
 
@@ -206,7 +208,7 @@ namespace VevaciousPlusPlus
   // segmentAndRemainder.second is to each end, normalized to summing to 1.
   inline std::pair< double, double >
   UndershootOvershootBubble::SegmentEndWeights(
-                 std::pair< size_t, double > const& segmentAndRemainder ) const
+                           IndexAndRemainder const& segmentAndRemainder ) const
   {
     if( segmentAndRemainder.first >= ( auxiliaryProfile.size() - 1 ) )
     {

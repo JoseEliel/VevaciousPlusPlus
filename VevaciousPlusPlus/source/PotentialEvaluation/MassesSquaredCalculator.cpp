@@ -5,7 +5,7 @@
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  */
 
-#include "../../include/PotentialEvaluation/MassesSquaredCalculator.hpp"
+#include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -20,20 +20,20 @@ namespace VevaciousPlusPlus
     if( attributeFinder != attributeMap.end() )
     {
       multiplicityFactor
-      = BOL::StringParser::stringToDouble( attributeFinder->second );
+      = LHPC::ParsingUtilities::StringToDouble( attributeFinder->second );
     }
     attributeFinder = attributeMap.find( "SpinType" );
     if( attributeFinder != attributeMap.end() )
     {
-      if( attributeFinder->second.compare( "ScalarBoson" ) == 0 )
+      if( attributeFinder->second == "ScalarBoson" )
       {
         spinType = scalarBoson;
       }
-      else if( attributeFinder->second.compare( "WeylFermion" ) == 0 )
+      else if( attributeFinder->second == "WeylFermion" )
       {
         spinType = weylFermion;
       }
-      else if( attributeFinder->second.compare( "GaugeBoson" ) == 0 )
+      else if( attributeFinder->second == "GaugeBoson" )
       {
         spinType = gaugeBoson;
       }

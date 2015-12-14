@@ -10,7 +10,9 @@
 
 #include "MassesSquaredFromMatrix.hpp"
 #include <complex>
+#include <utility>
 #include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
+#include <cstddef>
 #include <map>
 #include <string>
 #include <vector>

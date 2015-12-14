@@ -180,7 +180,7 @@ namespace VevaciousPlusPlus
       {
         continue;
       }
-      size_t equalsPosition( trimmedLine.find( '=' ) );
+      size_t const equalsPosition( trimmedLine.find( '=' ) );
       if( !( equalsPosition < ( trimmedLine.size() - 1 ) ) )
       {
         std::stringstream errorBuilder;
@@ -969,7 +969,8 @@ namespace VevaciousPlusPlus
         }
         // If it is a number, we multiply the polynomial term and return the
         // position of the char just after the chars that we have just parsed.
-        polynomialTerm.MultiplyByConstant( BOL::StringParser::stringToDouble(
+        polynomialTerm.MultiplyByConstant(
+                                        LHPC::ParsingUtilities::StringToDouble(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
         return wordEnd;
@@ -1001,7 +1002,7 @@ namespace VevaciousPlusPlus
         std::string variableString( lagrangianParameterManager.FormatVariable(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
-        size_t powerInt( 1 );
+        unsigned int powerInt( 1 );
         if( ( wordEnd < stringToParse.size() )
             &&
             ( stringToParse[ wordEnd ] == '^' ) )
@@ -1019,8 +1020,8 @@ namespace VevaciousPlusPlus
           wordStart = ( wordEnd + 1 );
           wordEnd = stringToParse.find_first_not_of( digitChars,
                                                      wordStart );
-          powerInt
-          = static_cast< size_t >( LHPC::ParsingUtilities::BaseTenStringToInt(
+          powerInt = static_cast< unsigned int >(
+                                    LHPC::ParsingUtilities::BaseTenStringToInt(
                                                stringToParse.substr( wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
         }
@@ -1068,8 +1069,7 @@ namespace VevaciousPlusPlus
 
         // If we get to here, it wasn't a field name, so we check whether it's
         // a Lagrangian parameter known to lagrangianParameterManager.
-        std::pair< bool, size_t >
-        parameterValidityAndIndex(
+        std::pair< bool, size_t > parameterValidityAndIndex(
               lagrangianParameterManager.RegisterParameter( variableString ) );
         if( parameterValidityAndIndex.first )
         {

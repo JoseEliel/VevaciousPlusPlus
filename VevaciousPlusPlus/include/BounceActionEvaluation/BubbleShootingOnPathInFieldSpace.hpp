@@ -19,6 +19,7 @@
 #include "BubbleRadialValueDescription.hpp"
 #include <cmath>
 #include "UndershootOvershootBubble.hpp"
+#include <cstddef>
 #include "boost/math/special_functions/bessel.hpp"
 #include "boost/math/constants/constants.hpp"
 
@@ -29,7 +30,7 @@ namespace VevaciousPlusPlus
   {
   public:
     BubbleShootingOnPathInFieldSpace( double const lengthScaleResolution,
-                                      size_t const shootAttempts );
+                                      unsigned int const shootAttempts );
     virtual ~BubbleShootingOnPathInFieldSpace();
 
 
@@ -63,7 +64,7 @@ namespace VevaciousPlusPlus
     double const lengthScaleResolution;
     double radialStepSize;
     double estimatedRadialMaximum;
-    size_t const shootAttempts;
+    unsigned int const shootAttempts;
     double const auxiliaryThreshold;
 
 

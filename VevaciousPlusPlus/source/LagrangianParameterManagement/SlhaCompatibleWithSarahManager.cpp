@@ -183,11 +183,10 @@ namespace VevaciousPlusPlus
       LhaTwoSourceFunctionoid temporaryParameter( 0,
                                                   0,
                                                   0 );
-      return
-      temporaryParameter( OnceOffBlockEntry( sarahBlockEntry,
-                                             logarithmOfScale ),
-                          OnceOffParameter( baseCase,
-                                            logarithmOfScale ) );
+      return temporaryParameter( OnceOffBlockEntry( sarahBlockEntry,
+                                                    logarithmOfScale ),
+                                 OnceOffParameter( baseCase,
+                                                   logarithmOfScale ) );
     }
     else if( ( caseString == "muDelta" )
              ||
@@ -226,11 +225,10 @@ namespace VevaciousPlusPlus
       LhaDifferenceFunctionoid temporaryParameter( 0,
                                                    0,
                                                    0 );
-      return
-      temporaryParameter( OnceOffParameter( ( baseCase + "Tree" ),
-                                            logarithmOfScale ),
-                          OnceOffParameter( ( baseCase + "Loop" ),
-                                            logarithmOfScale ) );
+      return temporaryParameter( OnceOffParameter( ( baseCase + "Tree" ),
+                                                   logarithmOfScale ),
+                                 OnceOffParameter( ( baseCase + "Loop" ),
+                                                   logarithmOfScale ) );
     }
     else
     {
@@ -407,7 +405,6 @@ namespace VevaciousPlusPlus
       treeIndex( RegisterParameter( ( baseCase + "Tree" ) ).second );
       size_t const
       loopIndex( RegisterParameter( ( baseCase + "Loop" ) ).second );
-
       size_t const differenceIndex( AddNewDerivedParameter( caseString,
                                                   new LhaDifferenceFunctionoid(
                                               numberOfDistinctActiveParameters,
@@ -420,9 +417,9 @@ namespace VevaciousPlusPlus
       // rather than to the pure SLHA functionoid as was set by
       // RegisterParameter( caseString ) (or previous to that).
       return PairAddNewDerivedParameter( caseString,
-                                     new LhaTwoSourceFunctionoid(
+                                         new LhaTwoSourceFunctionoid(
                                               numberOfDistinctActiveParameters,
-                                                                 deltaIndex,
+                                                                    deltaIndex,
                                                            differenceIndex ) );
     }
     else

@@ -9,6 +9,7 @@
 #define LHAINTERPOLATEDPARAMETERFUNCTIONOID_HPP_
 
 #include "LhaSourcedParameterFunctionoid.hpp"
+#include <cstddef>
 #include "LHPC/SimpleLhaParser.hpp"
 #include <vector>
 #include <string>

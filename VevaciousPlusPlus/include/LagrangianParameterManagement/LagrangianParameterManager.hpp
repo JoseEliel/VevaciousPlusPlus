@@ -11,6 +11,7 @@
 #include "LHPC/Utilities/BasicObserverPattern.hpp"
 #include <string>
 #include <utility>
+#include <cstddef>
 #include <vector>
 #include <sstream>
 #include "LHPC/Utilities/ParsingUtilities.hpp"
@@ -185,12 +186,12 @@ namespace VevaciousPlusPlus
   LagrangianParameterManager::SeparateIndexBracket(
                                     std::string const& stringToSeparate ) const
   {
-    size_t openBracket( stringToSeparate.find( '[' ) );
+    size_t const openBracket( stringToSeparate.find( '[' ) );
     if( openBracket == std::string::npos )
     {
       return std::make_pair( stringToSeparate, std::string( "" ) );
     }
-    size_t closeBracket( stringToSeparate.find_last_of( '[' ) );
+    size_t const closeBracket( stringToSeparate.find_last_of( '[' ) );
     if( ( closeBracket == std::string::npos )
         ||
         ( stringToSeparate.find( openBracket, '[' ) != std::string::npos )

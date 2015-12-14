@@ -13,15 +13,17 @@
 #ifndef SIMPLELHAPARSER_HPP_
 #define SIMPLELHAPARSER_HPP_
 
-#include <cstdlib>
-#include <string>
 #include <vector>
-#include <map>
-#include <fstream>
+#include <string>
 #include <utility>
+#include <cstddef>
 #include <list>
-#include <stdexcept>
+#include <cctype>
+#include <map>
 #include "Utilities/ParsingUtilities.hpp"
+#include <sstream>
+#include <stdexcept>
+#include <fstream>
 
 namespace LHPC
 {
@@ -474,7 +476,7 @@ namespace LHPC
          wordIndex < lineWords.size();
          ++wordIndex )
     {
-      sortedCodes.push_back(static_cast< int >(
+      sortedCodes.push_back( static_cast< int >(
             ParsingUtilities::BaseTenStringToInt( lineWords[ wordIndex ] ) ) );
     }
     sortedCodes.sort();
@@ -492,8 +494,8 @@ namespace LHPC
                                                           lineWords.size(),
                          static_cast< size_t >( declaredNumberOfProducts ) ) );
     partialDecayWidths.push_back( std::pair< std::vector< int >, double >(
-                                 SortedParticleCodes( declaredNumberOfProducts,
-                                                      lineWords ),
+                                  SortedParticleCodes( numberOfProducts,
+                                                       lineWords ),
                      ParsingUtilities::StringToDouble( lineWords.front() ) ) );
   }
 
@@ -579,10 +581,10 @@ namespace LHPC
           ( blockAtSingleScale->HasExplicitScale() ) )
       {
         entriesAtScales.push_back( std::pair< std::string, double >(
-                           blockAtSingleScale->MatchingEntry( entryIndices ),
-                                   ( blockAtSingleScale->HasExplicitScale() ?
-                                     blockAtSingleScale->ScaleValue() :
-                                     implicitScale ) ) );
+                             blockAtSingleScale->MatchingEntry( entryIndices ),
+                                     ( blockAtSingleScale->HasExplicitScale() ?
+                                       blockAtSingleScale->ScaleValue() :
+                                       implicitScale ) ) );
       }
     }
   }
@@ -606,13 +608,13 @@ namespace LHPC
                                                 blockNameThenIndices.substr( 0,
                                                          blockNameEndPlusOne ),
                                                 ParsingUtilities::ParseIndices(
-                       blockNameThenIndices.substr( blockNameEndPlusOne ) ) );
+                        blockNameThenIndices.substr( blockNameEndPlusOne ) ) );
     }
     else
     {
-      return
-      std::pair< std::string, std::vector< int > >( blockNameThenIndices,
-                                                    std::vector< int >() );
+      return std::pair< std::string, std::vector< int > >(
+                                                          blockNameThenIndices,
+                                                        std::vector< int >() );
     }
   }
 
@@ -703,10 +705,10 @@ namespace LHPC
   // (or throws an exception if any other characters come between the 'Q'/'q'
   // and the '=').
   inline double SimpleLhaParser::ParseScale( std::string const& headerLine,
-                                             size_t const positionOfQ )
+                                     size_t const positionOfQ )
   {
     size_t const positionForEquals( headerLine.find_first_not_of(
-                                         ParsingUtilities::WhitespaceChars(),
+                                           ParsingUtilities::WhitespaceChars(),
                                                        ( positionOfQ + 1 ) ) );
     if( ( positionForEquals == std::string::npos )
         ||
@@ -718,7 +720,8 @@ namespace LHPC
       << " \" (needs \"=\" after Q).";
       throw std::runtime_error( errorBuilder.str() );
     }
-    return std::atof( headerLine.substr( positionForEquals + 1 ).c_str() );
+    return LHPC::ParsingUtilities::StringToDouble( headerLine.substr(
+                                                     positionForEquals + 1 ) );
   }
 
   // This trims leading whitespace, any comments ('#' and all following
@@ -850,8 +853,10 @@ namespace LHPC
     }
     else
     {
-      highestBlockScale = std::max( explicitScale, highestBlockScale );
-      lowestBlockScale = std::min( explicitScale, lowestBlockScale );
+      highestBlockScale = std::max( explicitScale,
+                                    highestBlockScale );
+      lowestBlockScale = std::min( explicitScale,
+                                   lowestBlockScale );
     }
     return currentBlockSet->NewBlock( explicitScale );
   }
@@ -871,8 +876,8 @@ namespace LHPC
       << "\" was not \"DECAY [particle code] [total decay width]\"!";
       throw std::runtime_error( errorBuilder.str() );
     }
-    int const
-    particleCode( ParsingUtilities::BaseTenStringToInt( lineWords[ 1 ] ) );
+    int const particleCode( static_cast< int >(
+                    ParsingUtilities::BaseTenStringToInt( lineWords[ 1 ] ) ) );
     decayCodesToIndices[ particleCode ]
     = decaysInFirstInstanceReadOrder.size();
     decaysInFirstInstanceReadOrder.push_back( LhaDecay( particleCode,

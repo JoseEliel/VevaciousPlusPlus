@@ -15,12 +15,12 @@ namespace VevaciousPlusPlus
   CosmoTransitionsRunner::CosmoTransitionsRunner(
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
-                                              size_t const temperatureAccuracy,
+                                        unsigned int const temperatureAccuracy,
                                      std::string const& pathToCosmotransitions,
-                                            size_t const resolutionOfDsbVacuum,
-                                                    size_t const maxInnerLoops,
-                                                    size_t const maxOuterLoops,
-                                 size_t const thermalStraightPathFitResolution,
+                                      unsigned int const resolutionOfDsbVacuum,
+                                              unsigned int const maxInnerLoops,
+                                              unsigned int const maxOuterLoops,
+                           unsigned int const thermalStraightPathFitResolution,
                                       double const vacuumSeparationFraction ) :
     BounceActionTunneler( tunnelingStrategy,
                           survivalProbabilityThreshold,
@@ -215,7 +215,9 @@ namespace VevaciousPlusPlus
     // a kink in the thermal action due to the rapid acceleration of the false
     // vacuum end of the tunneling path followed by a complete halt, with
     // respect to increasing temperature.
-    size_t straightPathPoints( thermalStraightPathFitResolution );
+    std::vector::size_type
+    straightPathPoints( static_cast< std::vector::size_type >(
+                                          thermalStraightPathFitResolution ) );
     double
     lowestFitTemperature( 1.1 * rangeOfMaxTemperatureForOriginToFalse.second );
     if( rangeOfMaxTemperatureForOriginToTrue.first
@@ -233,8 +235,8 @@ namespace VevaciousPlusPlus
     stepTemperature( ( highestFitTemperature - lowestFitTemperature )
                      / static_cast< double >( straightPathPoints - 1 ) );
     double currentTemperature( lowestFitTemperature );
-    for( size_t whichNode( 0 );
-         whichNode < thermalStraightPathFitResolution;
+    for( std::vector::size_type whichNode( 0 );
+         whichNode < straightPathPoints;
          ++whichNode )
     {
       fitTemperatures[ whichNode ] = currentTemperature;
@@ -426,7 +428,7 @@ namespace VevaciousPlusPlus
     PotentialMinimum thermalTrueVacuum( thermalPotentialMinimizer(
                                            trueVacuum.FieldConfiguration() ) );
     straightPathActions.clear();
-    for( size_t whichNode( 0 );
+    for( std::vector::size_type whichNode( 0 );
          whichNode < fitTemperatures.size();
          ++whichNode )
     {
@@ -541,7 +543,7 @@ namespace VevaciousPlusPlus
 
     std::ifstream resultStream;
     resultStream.open( pythonResultFilename.c_str() );
-    for( size_t whichNode( 0 );
+    for( std::vector::size_type whichNode( 0 );
          whichNode < straightPathActions.size();
          ++whichNode )
     {

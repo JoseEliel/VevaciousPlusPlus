@@ -22,14 +22,14 @@ namespace VevaciousPlusPlus
   {
     std::vector< double > segmentLengths( pathSegments.size() );
     double totalLength( 0.0 );
-    for( size_t segmentIndex( 0 );
+    for( std::vector::size_type segmentIndex( 0 );
          segmentIndex < pathSegments.size();
          ++segmentIndex )
     {
       double squaredLength( 0.0 );
       std::vector< double > const& startNode( pathNodes[ segmentIndex ] );
       std::vector< double > const& endNode( pathNodes[ segmentIndex + 1 ] );
-      for( size_t fieldIndex( 0 );
+      for( std::vector::size_type fieldIndex( 0 );
            fieldIndex < numberOfFields;
            ++fieldIndex )
       {
@@ -47,7 +47,7 @@ namespace VevaciousPlusPlus
     // itself is just ( totalLength / 1.0 )^2.
     slopeSquared = ( totalLength * totalLength );
     double const inverseTotalLength( 1.0 / totalLength );
-    for( size_t segmentIndex( 0 );
+    for( std::vector::size_type segmentIndex( 0 );
          segmentIndex < pathSegments.size();
          ++segmentIndex )
     {

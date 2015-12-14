@@ -8,6 +8,7 @@
 #ifndef TUNNELPATH_HPP_
 #define TUNNELPATH_HPP_
 
+#include <cstddef>
 #include <vector>
 #include "Eigen/Dense"
 #include <string>
@@ -30,13 +31,13 @@ namespace VevaciousPlusPlus
     virtual ~TunnelPath() {}
 
 
-    std::vector< double >&
-    PathParameterization(){ return pathParameterization; }
+    std::vector< double >& PathParameterization()
+    { return pathParameterization; }
 
-    std::vector< double > const&
-    PathParameterization() const{ return pathParameterization; }
+    std::vector< double > const& PathParameterization() const
+    { return pathParameterization; }
 
-    size_t NumberOfFields() const{ return numberOfFields; }
+    size_t NumberOfFields() const { return numberOfFields; }
 
     // This should fill fieldConfiguration with the values that the fields
     // should have when the path auxiliary is given by auxiliaryValue.

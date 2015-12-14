@@ -15,6 +15,7 @@
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include <vector>
 #include <fstream>
+#include <iomanip>
 #include "VersionInformation.hpp"
 #include <cstdlib>
 #include <iostream>
@@ -37,12 +38,12 @@ namespace VevaciousPlusPlus
     CosmoTransitionsRunner(
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                             double const survivalProbabilityThreshold,
-                            size_t const temperatureAccuracy,
+                            unsigned int const temperatureAccuracy,
                             std::string const& pathToCosmotransitions,
-                            size_t const resolutionOfDsbVacuum,
-                            size_t const maxInnerLoops,
-                            size_t const maxOuterLoops,
-                            size_t const thermalStraightPathFitResolution,
+                            unsigned int const resolutionOfDsbVacuum,
+                            unsigned int const maxInnerLoops,
+                            unsigned int const maxOuterLoops,
+                           unsigned int const thermalStraightPathFitResolution,
                             double const vacuumSeparationFraction );
     virtual ~CosmoTransitionsRunner();
 
@@ -51,10 +52,10 @@ namespace VevaciousPlusPlus
     static std::string pythonPotentialFilenameBase;
 
     std::string const pathToCosmotransitions;
-    size_t const resolutionOfDsbVacuum;
-    size_t const maxInnerLoops;
-    size_t const maxOuterLoops;
-    size_t const thermalStraightPathFitResolution;
+    unsigned int const resolutionOfDsbVacuum;
+    unsigned int const maxInnerLoops;
+    unsigned int const maxOuterLoops;
+    unsigned int const thermalStraightPathFitResolution;
 
 
     // This creates a Python file with the potential in a form that can be used

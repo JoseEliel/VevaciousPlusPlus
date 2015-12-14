@@ -39,7 +39,7 @@ namespace VevaciousPlusPlus
     double lengthSquared( 0.0 );
     for( std::vector< double >::const_iterator
          variableValue( variableVector.begin() );
-         variableValue < variableVector.end();
+         variableValue != variableVector.end();
          ++variableValue )
     {
       lengthSquared += ( (*variableValue) * (*variableValue) );
@@ -49,11 +49,12 @@ namespace VevaciousPlusPlus
       return 0.0;
     }
     double const scaleFactor( sqrt( capLengthSquared / lengthSquared ) );
-    for( size_t fieldIndex( 0 );
-         fieldIndex < variableVector.size();
-         ++fieldIndex )
+    for( std::vector< double >::iterator
+         variableValue( variableVector.begin() );
+         variableValue != variableVector.end();
+         ++variableValue )
     {
-      variableVector[ fieldIndex ] *= scaleFactor;
+      (*variableValue) *= scaleFactor;
     }
     return ( lengthSquared - capLengthSquared );
   }

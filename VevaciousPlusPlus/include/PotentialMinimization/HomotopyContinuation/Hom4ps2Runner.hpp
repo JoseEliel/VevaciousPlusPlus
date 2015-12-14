@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstddef>
 #include <sstream>
 #include <stdexcept>
 #include <climits>
@@ -37,9 +38,9 @@ namespace VevaciousPlusPlus
 
     // This uses HOM4PS2 to fill systemSolutions with all the solutions of
     // systemToSolve.
-    virtual void operator()(
-                      std::vector< PolynomialConstraint > const& systemToSolve,
-                 std::vector< std::vector< double > >& systemSolutions ) const;
+    virtual void
+    operator()( std::vector< PolynomialConstraint > const& systemToSolve,
+                std::vector< std::vector< double > >& systemSolutions ) const;
 
 
   protected:
@@ -68,8 +69,8 @@ namespace VevaciousPlusPlus
 
     void ParseHom4ps2Output( std::string const& hom4ps2OutputFilename,
                   std::vector< std::vector< double > >& purelyRealSolutionSets,
-                               std::vector< std::string > const& variableNames,
-                 std::map< std::string, size_t > const& nameToIndexMap,
+                             std::vector< std::string > const& variableNames,
+                         std::map< std::string, size_t > const& nameToIndexMap,
               std::vector< PolynomialConstraint > const& systemToSolve ) const;
   };
 

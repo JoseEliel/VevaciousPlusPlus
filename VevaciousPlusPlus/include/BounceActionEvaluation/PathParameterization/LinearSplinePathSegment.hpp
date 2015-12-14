@@ -11,6 +11,7 @@
 #include <vector>
 #include "Eigen/Dense"
 #include <string>
+#include <cstddef>
 #include <sstream>
 
 namespace VevaciousPlusPlus

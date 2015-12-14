@@ -19,6 +19,7 @@
 #include "Utilities/VectorUtilities.hpp"
 #include <sstream>
 #include "Eigen/Dense"
+#include <cstddef>
 
 
 namespace VevaciousPlusPlus
@@ -92,8 +93,8 @@ namespace VevaciousPlusPlus
 
     // This appends the solutions from candidateSolutions which have positive
     // semi-definite eigenvalues for their Hessian matrices.
-    void AddOnlyPolynomialMinima(
-                             std::vector< double > const& lagrangianParameters,
+    void
+    AddOnlyPolynomialMinima( std::vector< double > const& lagrangianParameters,
                 std::vector< std::vector< double > > const& candidateSolutions,
                   std::vector< std::vector< double > >& startingPoints ) const;
   };

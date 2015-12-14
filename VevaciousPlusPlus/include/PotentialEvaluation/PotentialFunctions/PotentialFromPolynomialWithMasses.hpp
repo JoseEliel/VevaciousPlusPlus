@@ -14,6 +14,7 @@
 #include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include <utility>
 #include <vector>
+#include <cstddef>
 #include "PotentialEvaluation/MassesSquaredCalculator.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/RealMassesSquaredMatrix.hpp"
 #include "PotentialEvaluation/MassesSquaredCalculators/SymmetricComplexMassMatrix.hpp"
@@ -27,6 +28,7 @@
 #include <fstream>
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {
@@ -46,8 +48,7 @@ namespace VevaciousPlusPlus
     // polynomial correction part (something like (m^2_tree + delta m^2) phi^2
     // for example).
     virtual ParametersAndFieldsProductSum const&
-    PolynomialApproximation() const
-    { return treeLevelPotential; }
+    PolynomialApproximation() const { return treeLevelPotential; }
 
     // This writes the potential as
     // def PotentialFunction( fv ): return ...
@@ -199,8 +200,8 @@ namespace VevaciousPlusPlus
   {
     matrixLines = LHPC::ParsingUtilities::SplitBySubstrings( xmlContent,
                                                              "\n" );
-    size_t const
-    numberOfRows( sqrt( static_cast< double >( matrixLines.size() ) ) );
+    size_t const numberOfRows( static_cast< size_t >(
+                       sqrt( static_cast< double >( matrixLines.size() ) ) ) );
     if( ( numberOfRows * numberOfRows ) != matrixLines.size() )
     {
       std::stringstream errorBuilder;

@@ -16,6 +16,7 @@
 #include "Minuit2/FunctionMinimum.h"
 #include "PotentialForMinuit.hpp"
 #include "Minuit2/MnMigrad.h"
+#include <cstddef>
 #include <algorithm>
 #include <cmath>
 

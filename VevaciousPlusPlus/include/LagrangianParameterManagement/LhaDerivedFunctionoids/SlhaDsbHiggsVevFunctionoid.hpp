@@ -9,6 +9,7 @@
 #define SLHADSBHIGGSVEVFUNCTIONOID_HPP_
 
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <cstddef>
 #include <vector>
 #include <cmath>
 #include <string>
@@ -76,8 +77,7 @@ namespace VevaciousPlusPlus
                                             int const indentationSpaces ) const
   {
     std::stringstream stringBuilder;
-    stringBuilder << std::setprecision( 12 )
-    << PythonIndent( indentationSpaces )
+    stringBuilder << PythonIndent( indentationSpaces )
     << "parameterValues[ " << IndexInValuesVector()
     << " ] = ( ( ";
     if( sinNotCos )

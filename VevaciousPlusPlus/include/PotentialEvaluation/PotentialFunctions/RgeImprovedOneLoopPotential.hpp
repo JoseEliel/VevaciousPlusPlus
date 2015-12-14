@@ -17,6 +17,7 @@
 #include <cmath>
 #include <sstream>
 #include <stdexcept>
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {

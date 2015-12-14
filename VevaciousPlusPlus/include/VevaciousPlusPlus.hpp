@@ -37,6 +37,8 @@
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
 
+NEED TO FIX std::vector::size_type AND std::string::size_type IN OPEN HEADERS
+AND CHECK ALL SOURCES! ALSO PUSH AND TAG LHPC!
 
 namespace VevaciousPlusPlus
 {
@@ -71,11 +73,11 @@ namespace VevaciousPlusPlus
     void RunPoint( std::string const& newInput );
 
     // This writes the results as an XML file.
-    void WriteXmlResults( std::string const& xmlFilename );
+    void WriteResultsAsXmlFile( std::string const& xmlFilename );
 
     // This writes the results as an SLHA file.
-    void WriteLhaResults( std::string const& slhaFilename,
-                           bool const writeWarnings = true );
+    void AppendResultsToLhaFile( std::string const& lhaFilename,
+                                 bool const writeWarnings = true );
 
 
   protected:
@@ -94,16 +96,17 @@ namespace VevaciousPlusPlus
     // elementName, it puts the contents of the child element <ClassType> into
     // className and <ConstructorArguments> into constructorArguments, both
     // stripped of whitespace.
-    static void ReadClassAndArguments( BOL::AsciiXmlParser const& outerParser,
-                                       std::string const& elementName,
-                                       std::string& className,
-                                       std::string& constructorArguments );
+    static void
+    ReadClassAndArguments( LHPC::RestrictedXmlParser const& outerParser,
+                           std::string const& elementName,
+                           std::string& className,
+                           std::string& constructorArguments );
 
     // This puts the content of the current element of xmlParser into
     // contentDestination, trimmed of leading and trailing whitespace, if the
     // element's name matches elementName.
     static void
-    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+    InterpretElementIfNameMatches( LHPC::RestrictedXmlParser const& xmlParser,
                                    std::string const& elementName,
                                    std::string& contentDestination );
 
@@ -124,7 +127,7 @@ namespace VevaciousPlusPlus
     // contentDestination, interpreted as a double represented in ASCII, if the
     // element's name matches elementName.
     static void
-    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+    InterpretElementIfNameMatches( LHPC::RestrictedXmlParser const& xmlParser,
                                    std::string const& elementName,
                                    double& contentDestination );
 
@@ -165,7 +168,7 @@ namespace VevaciousPlusPlus
     // contentDestination, interpreted as an int represented in ASCII, if the
     // element's name matches elementName.
     static void
-    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+    InterpretElementIfNameMatches( LHPC::RestrictedXmlParser const& xmlParser,
                                    std::string const& elementName,
                                    unsigned int& contentDestination );
 
@@ -175,7 +178,7 @@ namespace VevaciousPlusPlus
     // if the element's name matches elementName. If the element content
     // doesn't match any valid input, contentDestination is left untouched.
     static void
-    InterpretElementIfNameMatches( BOL::AsciiXmlParser const& xmlParser,
+    InterpretElementIfNameMatches( LHPC::RestrictedXmlParser const& xmlParser,
                                    std::string const& elementName,
                                    bool& contentDestination );
 
@@ -274,7 +277,6 @@ namespace VevaciousPlusPlus
     PotentialMinimizer* ownedPotentialMinimizer;
     TunnelingCalculator* tunnelingCalculator;
     TunnelingCalculator* ownedTunnelingCalculator;
-    time_t currentTime;
   };
 
 
@@ -286,16 +288,16 @@ namespace VevaciousPlusPlus
   // className and <ConstructorArguments> into constructorArguments, both
   // stripped of whitespace.
   inline void VevaciousPlusPlus::ReadClassAndArguments(
-                                        BOL::AsciiXmlParser const& outerParser,
+                                  LHPC::RestrictedXmlParser const& outerParser,
                                                 std::string const& elementName,
                                                         std::string& className,
                                             std::string& constructorArguments )
   {
-    if( outerParser.currentElementNameMatches( elementName ) )
+    if( outerParser.CurrentName() == elementName )
     {
-      BOL::AsciiXmlParser innerParser;
-      innerParser.loadString( outerParser.getTrimmedCurrentElementContent() );
-      while( innerParser.readNextElement() )
+      LHPC::RestrictedXmlParser innerParser;
+      innerParser.LoadString( outerParser.TrimmedCurrentBody() );
+      while( innerParser.ReadNextElement() )
       {
         InterpretElementIfNameMatches( innerParser,
                                        "ClassType",
@@ -311,13 +313,13 @@ namespace VevaciousPlusPlus
   // contentDestination, trimmed of leading and trailing whitespace, if the
   // element's name matches elementName.
   inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
-                                          BOL::AsciiXmlParser const& xmlParser,
+                                    LHPC::RestrictedXmlParser const& xmlParser,
                                                 std::string const& elementName,
                                               std::string& contentDestination )
   {
-    if( xmlParser.currentElementNameMatches( elementName ) )
+    if( xmlParser.CurrentName() == elementName )
     {
-      contentDestination.assign( xmlParser.getTrimmedCurrentElementContent() );
+      contentDestination.assign( xmlParser.TrimmedCurrentBody() );
     }
   }
 
@@ -325,14 +327,14 @@ namespace VevaciousPlusPlus
   // contentDestination, interpreted as a double represented in ASCII, if the
   // element's name matches elementName.
   inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
-                                          BOL::AsciiXmlParser const& xmlParser,
+                                    LHPC::RestrictedXmlParser const& xmlParser,
                                                 std::string const& elementName,
                                                    double& contentDestination )
   {
-    if( xmlParser.currentElementNameMatches( elementName ) )
+    if( xmlParser.CurrentName() == elementName )
     {
-      contentDestination = BOL::StringParser::stringToDouble(
-                             ( xmlParser.getTrimmedCurrentElementContent() ) );
+      contentDestination = LHPC::ParsingUtilities::StringToDouble(
+                                              xmlParser.TrimmedCurrentBody() );
     }
   }
 
@@ -343,12 +345,12 @@ namespace VevaciousPlusPlus
                           PotentialFromPolynomialWithMasses& potentialFunction,
                   std::string const& potentialMinimizerInitializationFilename )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.openRootElementOfFile(
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.OpenRootElementOfFile(
                                     potentialMinimizerInitializationFilename );
     std::string classChoice( "error" );
     std::string constructorArguments( "error" );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       ReadClassAndArguments( xmlParser,
                              "PotentialMinimizerClass",
@@ -408,15 +410,15 @@ namespace VevaciousPlusPlus
   // contentDestination, interpreted as an int represented in ASCII, if the
   // element's name matches elementName.
   inline void VevaciousPlusPlus::InterpretElementIfNameMatches(
-                                          BOL::AsciiXmlParser const& xmlParser,
+                                    LHPC::RestrictedXmlParser const& xmlParser,
                                                 std::string const& elementName,
                                              unsigned int& contentDestination )
   {
-    if( xmlParser.currentElementNameMatches( elementName ) )
+    if( xmlParser.CurrentName() == elementName )
     {
-      contentDestination
-      = static_cast< unsigned int >( BOL::StringParser::stringToInt(
-                           ( xmlParser.getTrimmedCurrentElementContent() ) ) );
+      contentDestination = static_cast< unsigned int >(
+                                    LHPC::ParsingUtilities::BaseTenStringToInt(
+                                            xmlParser.TrimmedCurrentBody() ) );
     }
   }
 
@@ -446,12 +448,12 @@ namespace VevaciousPlusPlus
   inline Hom4ps2Runner* VevaciousPlusPlus::CreateHom4ps2Runner(
                                       std::string const& constructorArguments )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
     std::string pathToHom4ps2( "error" );
     std::string homotopyType( "error" );
     double resolutionSize( 1.0 );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "PathToHom4ps2",
@@ -496,12 +498,12 @@ namespace VevaciousPlusPlus
   inline TunnelingCalculator* VevaciousPlusPlus::CreateTunnelingCalculator(
                  std::string const& tunnelingCalculatorInitializationFilename )
   {
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.openRootElementOfFile(
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.OpenRootElementOfFile(
                                    tunnelingCalculatorInitializationFilename );
     std::string classChoice( "error" );
     std::string constructorArguments( "error" );
-    while( xmlParser.readNextElement() )
+    while( xmlParser.ReadNextElement() )
     {
       ReadClassAndArguments( xmlParser,
                              "TunnelingClass",
@@ -555,34 +557,6 @@ namespace VevaciousPlusPlus
     }
   }
 
-  // This interprets the given string as the appropriate element of the
-  // TunnelingCalculator::TunnelingStrategy enum.
-  inline TunnelingCalculator::TunnelingStrategy
-  VevaciousPlusPlus::InterpretTunnelingStrategy(
-                                               std::string& tunnelingStrategy )
-  {
-    BOL::StringParser::transformToLowercase( tunnelingStrategy );
-    if( ( tunnelingStrategy == "defaulttunneling" )
-        ||
-        ( tunnelingStrategy == "thermalthenquantum" ) )
-    {
-      return TunnelingCalculator::ThermalThenQuantum;
-    }
-    else if( tunnelingStrategy == "quantumthenthermal" )
-    {
-      return TunnelingCalculator::QuantumThenThermal;
-    }
-    else if( tunnelingStrategy == "justthermal" )
-    {
-      return TunnelingCalculator::JustThermal;
-    }
-    else if( tunnelingStrategy == "justquantum" )
-    {
-      return TunnelingCalculator::JustQuantum;
-    }
-    return TunnelingCalculator::NoTunneling;
-  }
-
   // This parses arguments from constructorArguments and uses them to
   // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
   // extremize the bounce action.
@@ -593,9 +567,9 @@ namespace VevaciousPlusPlus
     unsigned int numberOfPathSegments( 100 );
     unsigned int minuitStrategy( 1 );
     double minuitToleranceFraction( 0.5 );
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "NumberOfPathSegments",
@@ -641,9 +615,9 @@ namespace VevaciousPlusPlus
   {
     double lengthScaleResolutionForBounce( 0.05 );
     unsigned int shootAttemptsForBounce( 32 );
-    BOL::AsciiXmlParser xmlParser;
-    xmlParser.loadString( constructorArguments );
-    while( xmlParser.readNextElement() )
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+    while( xmlParser.ReadNextElement() )
     {
       InterpretElementIfNameMatches( xmlParser,
                                      "RadialResolution",

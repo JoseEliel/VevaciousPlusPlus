@@ -12,7 +12,9 @@
 #include <string>
 #include <set>
 #include <utility>
+#include <cstddef>
 #include "LhaDerivedFunctionoids/LhaTwoSourceFunctionoid.hpp"
+#include "LhaDerivedFunctionoids/LhaDifferenceFunctionoid.hpp"
 
 namespace VevaciousPlusPlus
 {

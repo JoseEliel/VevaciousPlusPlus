@@ -9,6 +9,7 @@
 #define REALMASSESSQUAREDMATRIX_HPP_
 
 #include "MassesSquaredFromMatrix.hpp"
+#include <cstddef>
 #include <map>
 #include <string>
 #include <vector>

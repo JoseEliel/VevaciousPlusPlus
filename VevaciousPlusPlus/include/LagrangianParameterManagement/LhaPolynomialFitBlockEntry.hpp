@@ -9,14 +9,17 @@
 #define LHAPOLYNOMIALFITBLOCKENTRY_HPP_
 
 #include "LhaInterpolatedParameterFunctionoid.hpp"
+#include <cstddef>
 #include "LHPC/SimpleLhaParser.hpp"
 #include <string>
 #include <vector>
+#include <cstddef>
 #include "BasicFunctions/SimplePolynomial.hpp"
 #include <sstream>
 #include "LHPC/Utilities/ParsingUtilities.hpp"
 #include "Eigen/Dense"
 #include <cmath>
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {

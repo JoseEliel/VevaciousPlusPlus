@@ -10,7 +10,7 @@
 namespace VevaciousPlusPlus
 {
   MinuitOnHypersurfaces::MinuitOnHypersurfaces(
-                                             size_t const numberOfPathSegments,
+                                       unsigned int const numberOfPathSegments,
                                              unsigned int const minuitStrategy,
                                        double const minuitToleranceFraction ) :
     MinuitPathFinder( minuitStrategy,

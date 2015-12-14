@@ -25,8 +25,8 @@ MINUITINCLUDEDIR=/home/bol/BOL/ProjectDependencies/Minuit2/include/
 #MINUITLIBDIR=./MINUIT/include/
 MINUITLIBDIR=/home/bol/BOL/ProjectDependencies/Minuit2/lib/
 DEBUGFLAGS=
-INCLUDES=-I./include/ \
- -I$(LHPCINCLUDEDIR) -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
+INCLUDES=-I./include/ -I./include/LHPC/ \
+ -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
 CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
@@ -50,7 +50,6 @@ SOURCES= $(LAGRANGIANPARAMETERMANAGEMENT)/LhaLinearlyInterpolatedBlockEntry.cpp 
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
  $(BUILDINGBLOCKS)/ParametersAndFieldsProductTerm.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
- source/PotentialEvaluation/MassesSquaredCalculator.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/ComplexMassSquaredMatrix.cpp \
  $(MASSESSQUAREDCALCULATORS)/SymmetricComplexMassMatrix.cpp \

@@ -12,10 +12,11 @@
 #include <string>
 #include <set>
 #include <utility>
+#include <cstddef>
 #include <vector>
 #include <map>
-#include "LHPC/SimpleLhaParser.hpp"
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
+#include "LHPC/SimpleLhaParser.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
 #include <sstream>
 #include "LHPC/Utilities/RestrictedXmlParser.hpp"
@@ -242,7 +243,8 @@ namespace VevaciousPlusPlus
     alreadyExistsResult( activeParametersToIndices.find( nameAfterFormat ) );
     if( alreadyExistsResult != activeParametersToIndices.end() )
     {
-      return std::pair< bool, size_t >( true, alreadyExistsResult->second );
+      return std::pair< bool, size_t >( true,
+                                        alreadyExistsResult->second );
     }
     else
     {
@@ -331,9 +333,8 @@ namespace VevaciousPlusPlus
     // blockSeparators, we have at least one substring to add.
     while( wordStart != std::string::npos )
     {
-      wordEnd
-      = validBlocksString.find_first_of( blockNameSeparationCharacters,
-                                         wordStart );
+      wordEnd = validBlocksString.find_first_of( blockNameSeparationCharacters,
+                                                 wordStart );
       validBlocks.insert( validBlocksString.substr( wordStart,
                                                    ( wordEnd - wordStart ) ) );
       wordStart
@@ -345,8 +346,7 @@ namespace VevaciousPlusPlus
   // This sets parameterName to map to newParameter, increments
   // numberOfDistinctActiveParameters, and returns true paired with the index
   // given by newParameter.
-  inline size_t
-  LesHouchesAccordBlockEntryManager::RegisterNewParameter(
+  inline size_t LesHouchesAccordBlockEntryManager::RegisterNewParameter(
                            LhaSourcedParameterFunctionoid const& newParameter,
                                              std::string const& parameterName )
   {
@@ -377,7 +377,7 @@ namespace VevaciousPlusPlus
          ++parameterIndex )
     {
       referenceSafeActiveParameters[
-                                parameterIndex ]->UpdateForNewLhaParameters();
+                                 parameterIndex ]->UpdateForNewLhaParameters();
       referenceUnsafeActiveParameters[ parameterIndex ]
       = *(referenceSafeActiveParameters[ parameterIndex ]);
     }
@@ -443,8 +443,7 @@ namespace VevaciousPlusPlus
   // and throws an exception if the name was not in the correct format of block
   // name followed by square brackets containing nothing, an index, or several
   // indices.
-  inline size_t
-  LesHouchesAccordBlockEntryManager::RegisterBlockEntry(
+  inline size_t LesHouchesAccordBlockEntryManager::RegisterBlockEntry(
                                              std::string const& parameterName )
   {
     std::string const nameAfterFormat( FormatVariable( parameterName ) );
@@ -458,8 +457,10 @@ namespace VevaciousPlusPlus
     {
       if( nameAfterFormat.find( '[' ) == std::string::npos )
       {
-        throw std::runtime_error( parameterName
-                  + " is not in the format of block name followed by [...]!" );
+        std::stringstream errorBuilder;
+        errorBuilder << "\"" << parameterName
+        << "\" is not in the format of block name followed by [...]!";
+        throw std::runtime_error( errorBuilder.str() );
       }
       return RegisterNewParameter( CreateNewBlockEntry( nameAfterFormat ),
                                    nameAfterFormat );
@@ -503,7 +504,7 @@ namespace VevaciousPlusPlus
   inline std::string LesHouchesAccordBlockEntryManager::BlockNamePart(
                                        std::string const& parameterName ) const
   {
-    size_t openBracket( parameterName.find( '[' ) );
+    size_t const openBracket( parameterName.find( '[' ) );
     if( openBracket == std::string::npos )
     {
       return "";

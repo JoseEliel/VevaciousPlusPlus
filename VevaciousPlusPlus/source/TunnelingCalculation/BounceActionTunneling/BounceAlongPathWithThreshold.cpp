@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
   {
     delete actionCalculator;
 
-    for( size_t deletionIndex( 0 );
+    for( std::vector::size_type deletionIndex( 0 );
          deletionIndex < pathFinders.size();
          ++deletionIndex )
     {
@@ -107,7 +107,7 @@ namespace VevaciousPlusPlus
     double smallestExponent( bounceOverTemperature );
     dominantTemperatureInGigaElectronVolts = 0.0;
 
-    for( size_t whichStep( 1 );
+    for( unsigned int whichStep( 1 );
          whichStep < thermalIntegrationResolution;
          ++whichStep )
     {

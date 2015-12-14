@@ -14,8 +14,14 @@
 #define LHPC_PARSINGUTILITIES_HPP_
 
 #include <string>
-#include <sstream>
+#include <vector>
 #include <cstdlib>
+#include <cstddef>
+#include <utility>
+#include <sstream>
+#include <cctype>
+#include <cmath>
+#include <iomanip>
 
 namespace LHPC
 {
@@ -130,6 +136,19 @@ namespace LHPC
     // This returns the given double in the form "(1.234567 * 10^(-8))".
     static std::string
     FormatNumberForMathematica( double const numberToFormat );
+
+    // This returns numberToAnalyse as a mantissa with absolute value in the
+    // range [1.0, 10.0), paired with the power of ten to use to recover
+    // numberToAnalyse.
+    // Hence numberToAnalyse == [return double] * 10^[return int].
+    static std::pair< double, int >
+    BaseTenScientific( double const numberToAnalyse );
+
+    // This returns the given double in the stated "E16.8" form:
+    // "3E16.8: a 16-character wide real number in scientific notation, whereof
+    // 8 digits are decimals, e.g. "-0.12345678E+000".
+    static std::string
+    FormatNumberForSlha( double const numberToFormat );
   };
 
 
@@ -151,7 +170,8 @@ namespace LHPC
   ParsingUtilities::TrimFromFrontAndBack( std::string const& stringToTrim,
                                           std::string const& charsToTrim )
   {
-    size_t startPosition( stringToTrim.find_first_not_of( charsToTrim ) );
+    size_t const
+    startPosition( stringToTrim.find_first_not_of( charsToTrim ) );
     if( startPosition == std::string::npos )
     {
       return "";
@@ -197,14 +217,12 @@ namespace LHPC
   ParsingUtilities::ParseIndices( std::string const& indicesString )
   {
     std::vector< int > indicesVector;
-    size_t wordStart( indicesString.find_first_of(
-                                            ParsingUtilities::DigitChars() ) );
+    size_t wordStart( indicesString.find_first_of( DigitChars() ) );
     size_t wordEnd( 0 );
     while( wordStart != std::string::npos )
     {
-      wordEnd
-      = indicesString.find_first_not_of( ParsingUtilities::DigitChars(),
-                                         wordStart );
+      wordEnd = indicesString.find_first_not_of( DigitChars(),
+                                                 wordStart );
       indicesVector.push_back( BaseTenStringToInt( indicesString.substr(
                                                                      wordStart,
                                                  ( wordEnd - wordStart ) ) ) );
@@ -212,7 +230,7 @@ namespace LHPC
       {
         break;
       }
-      wordStart = indicesString.find_first_of( ParsingUtilities::DigitChars(),
+      wordStart = indicesString.find_first_of( DigitChars(),
                                                wordEnd );
     }
     return indicesVector;
@@ -227,8 +245,7 @@ namespace LHPC
   ParsingUtilities::StartOfMatchedContent( std::string const& contentLine,
                                       std::vector< int > const& indicesVector )
   {
-    size_t contentStart( contentLine.find_first_not_of(
-                                     ParsingUtilities::WhitespaceChars() ) );
+    size_t contentStart( contentLine.find_first_not_of( WhitespaceChars() ) );
     for( std::vector< int >::const_iterator
          indexValue( indicesVector.begin() );
          indexValue != indicesVector.end();
@@ -256,15 +273,13 @@ namespace LHPC
                                                 size_t startPosition,
                                                 int const indexValue )
   {
-    size_t
-    indexEnd( contentLine.find_first_of( ParsingUtilities::WhitespaceChars(),
-                                         startPosition ) );
+    size_t indexEnd( contentLine.find_first_of( WhitespaceChars(),
+                                                startPosition ) );
     if( indexValue == BaseTenStringToInt( contentLine.substr( startPosition,
                                            ( indexEnd - startPosition ) ) ) )
     {
-      return
-      contentLine.find_first_not_of( ParsingUtilities::WhitespaceChars(),
-                                     indexEnd );
+      return contentLine.find_first_not_of( WhitespaceChars(),
+                                            indexEnd );
     }
     else
     {
@@ -296,7 +311,7 @@ namespace LHPC
   ParsingUtilities::CharacterIsInString( char const characterToSeek,
                                          std::string const& stringToSearch )
   {
-    for( std::string::const_iterator stringCharacter(stringToSearch.begin());
+    for( std::string::const_iterator stringCharacter( stringToSearch.begin() );
          stringCharacter != stringToSearch.end();
          ++stringCharacter )
     {
@@ -335,7 +350,7 @@ namespace LHPC
     std::stringstream stringBuilder;
     stringBuilder << '(' << numberToFormat << ')';
     std::string returnString( stringBuilder.str() );
-    size_t exponentPosition( returnString.find_first_of( "eE" ) );
+    size_t const exponentPosition( returnString.find_first_of( "eE" ) );
     if( exponentPosition == std::string::npos )
     {
       return returnString;
@@ -343,6 +358,54 @@ namespace LHPC
     return ( returnString.replace( exponentPosition,
                                    1,
                                    "* 10^(" ) + ")" );
+  }
+
+  // This returns numberToAnalyse as a mantissa with absolute value in the
+  // range [1.0, 10.0), paired with the power of ten to use to recover
+  // numberToAnalyse.
+  // Hence numberToAnalyse == [return double] * 10^[return int].
+  inline std::pair< double, int >
+  ParsingUtilities::BaseTenScientific( double const numberToAnalyse )
+  {
+    if( numberToAnalyse == 0.0 )
+    {
+      return std::pair< double, int >( 0.0,
+                                       0 );
+    }
+    int powerOfTen( 0 );
+    double mantissaPart( fabs( numberToAnalyse ) );
+    while( mantissaPart >= 10.0 )
+    {
+      mantissaPart /= 10.0;
+      ++powerOfTen;
+    }
+    while( mantissaPart < 1.0 )
+    {
+      mantissaPart *= 10.0;
+      --powerOfTen;
+    }
+    return std::pair< double, int >( mantissaPart,
+                                     powerOfTen );
+  }
+
+  // This returns the given double in the stated "E16.8" form:
+  // '3E16.8: a 16-character wide real number in scientific notation, whereof
+  // 8 digits are decimals, e.g. "-0.12345678E+000".'
+  inline std::string
+  ParsingUtilities::FormatNumberForSlha( double const numberToFormat )
+  {
+    if( numberToFormat == 0.0 )
+    {
+      return " 0.00000000E+000";
+    }
+    std::pair< double, int >
+    numberAsPair( BaseTenScientific( numberToFormat ) );
+    std::stringstream numberStream;
+    numberStream << ( ( numberToFormat < 0.0 ) ? '-' : ' ' )
+    << std::setprecision( 8 ) << std::fixed << numberAsPair.first << 'E'
+    << ( ( numberAsPair.second < 0 ) ? '-' : '+' ) << std::setw( 3 )
+    << std::setfill( '0' ) << abs( numberAsPair.second );
+    return numberStream.str();
   }
 
 } /* namespace LHPC */

@@ -8,6 +8,7 @@
 #ifndef LHASOURCEDPARAMETERFUNCTIONOID_HPP_
 #define LHASOURCEDPARAMETERFUNCTIONOID_HPP_
 
+#include <cstddef>
 #include <vector>
 #include <string>
 
@@ -19,6 +20,7 @@ namespace VevaciousPlusPlus
   public:
     LhaSourcedParameterFunctionoid( size_t const indexInValuesVector ) :
       indexInValuesVector( indexInValuesVector ) {}
+
     virtual ~LhaSourcedParameterFunctionoid() {}
 
 

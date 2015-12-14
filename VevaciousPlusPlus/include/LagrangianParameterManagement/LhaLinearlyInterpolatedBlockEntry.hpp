@@ -10,6 +10,7 @@
 
 #include "LhaInterpolatedParameterFunctionoid.hpp"
 #include <utility>
+#include <cstddef>
 #include "LHPC/SimpleLhaParser.hpp"
 #include <string>
 #include <vector>
@@ -17,6 +18,7 @@
 #include <list>
 #include "LHPC/Utilities/ParsingUtilities.hpp"
 #include <cmath>
+#include <iomanip>
 
 namespace VevaciousPlusPlus
 {

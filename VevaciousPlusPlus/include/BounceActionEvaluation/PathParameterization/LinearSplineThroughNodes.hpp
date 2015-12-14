@@ -13,6 +13,7 @@
 #include <string>
 #include "LinearSplinePathSegment.hpp"
 #include <utility>
+#include <cstddef>
 #include <sstream>
 #include <cmath>
 

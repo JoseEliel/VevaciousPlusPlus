@@ -14,6 +14,7 @@
 #include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
 #include "Eigen/Dense"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include <cstddef>
 #include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 
 namespace VevaciousPlusPlus
@@ -22,8 +23,9 @@ namespace VevaciousPlusPlus
   class MinuitOnPotentialPerpendicularToPath : public MinuitOnHypersurfaces
   {
   public:
-    MinuitOnPotentialPerpendicularToPath( size_t const numberOfPathSegments,
-                                          int const numberOfAllowedWorsenings,
+    MinuitOnPotentialPerpendicularToPath(
+                                       unsigned int const numberOfPathSegments,
+                                  unsigned int const numberOfAllowedWorsenings,
                                     double const nodeMovementThresholdFraction,
                                           double const dampingFactor,
                        std::vector< double > const neighborDisplacementWeights,

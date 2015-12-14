@@ -11,8 +11,8 @@ namespace VevaciousPlusPlus
 {
 
   MinuitOnPotentialPerpendicularToPath::MinuitOnPotentialPerpendicularToPath(
-                                             size_t const numberOfPathSegments,
-                                           int const numberOfAllowedWorsenings,
+                                       unsigned int const numberOfPathSegments,
+                                  unsigned int const numberOfAllowedWorsenings,
                                     double const nodeMovementThresholdFraction,
                                                     double const dampingFactor,
                        std::vector< double > const neighborDisplacementWeights,

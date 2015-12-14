@@ -79,10 +79,6 @@ namespace VevaciousPlusPlus
     { return thresholdForNearPathPanic; }
 
 
-    // This is for debugging.
-    std::string AsDebuggingString() const;
-
-
   protected:
     // Numerical effects might lead to the path ends not being quite at the
     // positions of the vacua they are supposed to be at, so the minima along

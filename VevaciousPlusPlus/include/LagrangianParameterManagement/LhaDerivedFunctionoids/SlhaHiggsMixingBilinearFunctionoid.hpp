@@ -9,6 +9,7 @@
 #define SLHAHIGGSMIXINGBILINEARFUNCTIONOID_HPP_
 
 #include "LagrangianParameterManagement/LhaSourcedParameterFunctionoid.hpp"
+#include <cstddef>
 #include <vector>
 #include <string>
 #include <sstream>

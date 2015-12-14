@@ -12,13 +12,14 @@ namespace VevaciousPlusPlus
 
   SplinePotential::SplinePotential( PotentialFunction const& potentialFunction,
                                     TunnelPath const& tunnelPath,
-                                    size_t const numberOfPotentialSegments,
+                                  unsigned int const numberOfPotentialSegments,
                          double const minimumSquareDistanceBetweenPathVacua ) :
     OneDimensionalPotentialAlongPath(),
     auxiliaryStep( 1.0 / static_cast< double >( numberOfPotentialSegments ) ),
     inverseOfAuxiliaryStep( numberOfPotentialSegments ),
-    numberOfNormalSegments( numberOfPotentialSegments - 2 ),
-    potentialValues( numberOfPotentialSegments,
+    numberOfNormalSegments( static_cast< size_t >(
+                                             numberOfPotentialSegments - 2 ) ),
+    potentialValues( ( numberOfNormalSegments + 2 ),
                      0.0 ),
     firstDerivatives( numberOfNormalSegments,
                       0.0 ),
