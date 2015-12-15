@@ -32,6 +32,7 @@
 
 namespace VevaciousPlusPlus
 {
+
   class PotentialFromPolynomialWithMasses : public PotentialFunction
   {
   public:
@@ -100,6 +101,7 @@ namespace VevaciousPlusPlus
     std::vector< size_t > fieldsAssumedPositive;
     std::vector< size_t > fieldsAssumedNegative;
     double const assumedPositiveOrNegativeTolerance;
+    bool readImaginaryPartForRealValue;
 
 
     // This is just for derived classes.
@@ -233,15 +235,7 @@ namespace VevaciousPlusPlus
       }
       else
       {
-        std::cout
-        << std::endl
-        << "Read imaginary part of polynomial which should be purely real."
-        << " Ignoring imaginary part, as it may be an artifact of a"
-        << " cancellation which is only apparent when there are values for the"
-        << " Lagrangian parameters (e.g. soft SUSY-breaking mass-squared"
-        << " matrices should be Hermitian so the imaginary part of the sum of"
-        << " opposite off-diagonal elements is zero).";
-        std::cout << std::endl;
+        readImaginaryPartForRealValue = true;
       }
     }
     polynomialSum.ParametersAndFieldsProducts()

@@ -273,9 +273,10 @@ namespace VevaciousPlusPlus
     {
       std::stringstream errorBuilder;
       errorBuilder << "Parsed " << complexSolutions.size()
-      << " values from the output of HOM4PS2, but it should have been a"
-      << " multiple of " << numberOfVariables << " as there are "
-      << numberOfVariables << " variables.";
+      << ( ( complexSolutions.size() == 1 ) ? " value" : " values" )
+      << " from the output of HOM4PS2, but it should have been a multiple of "
+      << numberOfVariables << " as there are " << numberOfVariables
+      << " variables.";
       throw std::runtime_error( errorBuilder.str() );
     }
 
@@ -357,13 +358,18 @@ namespace VevaciousPlusPlus
       }
     }
 
+    unsigned int const numberOfParsedComplexSolutions( complexSolutions.size()
+                                                       / numberOfVariables );
     std::cout
     << std::endl
     << "-----------------" << std::endl << "Parsed "
-    << ( complexSolutions.size() / numberOfVariables )
-    << " complex solutions from HOM4PS2. After trying sign-flip variations,"
+    << numberOfParsedComplexSolutions
+    << " complex solution"
+    << ( ( numberOfParsedComplexSolutions == 1 ) ? "" : "s" )
+    << " from HOM4PS2. After trying sign-flip variations,"
     << " returning " << purelyRealSolutionSets.size()
-    << " purely real solutions."
+    << " purely real solution"
+    << ( ( purelyRealSolutionSets.size() == 1 ) ? "." : "s." )
     << std::endl;
     std::cout << std::endl;
   }

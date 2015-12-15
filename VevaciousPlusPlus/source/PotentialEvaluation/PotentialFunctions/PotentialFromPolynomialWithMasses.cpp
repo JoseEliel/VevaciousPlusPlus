@@ -49,7 +49,8 @@ namespace VevaciousPlusPlus
     vectorMassCorrectionConstant( 5.0 / 6.0 ),
     fieldsAssumedPositive(),
     fieldsAssumedNegative(),
-    assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
+    assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance ),
+    readImaginaryPartForRealValue( false )
   {
     LHPC::RestrictedXmlParser xmlParser;
     std::string xmlFieldVariables( "" );
@@ -300,6 +301,21 @@ namespace VevaciousPlusPlus
       //   </WeylFermionMassMatrix>
     }
     // </LoopCorrections>
+
+    if( readImaginaryPartForRealValue )
+    {
+      std::cout
+      << std::endl
+      << "At least once in \"" << modelFilename << "\", an imaginary part was"
+      << " read for a polynomial which should be purely real."
+      << " This imaginary part or these imaginary parts have been ignored, as"
+      << " it may be an artifact of a cancellation which is only apparent when"
+      << " there are values for the Lagrangian parameters (e.g. soft"
+      << " SUSY-breaking mass-squared matrices should be Hermitian so the"
+      << " imaginary part of the sum of opposite off-diagonal elements is"
+      << " zero).";
+      std::cout << std::endl;
+    }
 
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
@@ -683,7 +699,8 @@ namespace VevaciousPlusPlus
     vectorMassCorrectionConstant( 5.0 / 6.0 ),
     fieldsAssumedPositive(),
     fieldsAssumedNegative(),
-    assumedPositiveOrNegativeTolerance( -1.0 )
+    assumedPositiveOrNegativeTolerance( -1.0 ),
+    readImaginaryPartForRealValue( false )
   {
     // This protected constructor is just an initialization list only used by
     // derived classes which are going to fill up the data members in their own
@@ -707,7 +724,8 @@ namespace VevaciousPlusPlus
     fieldsAssumedPositive( copySource.fieldsAssumedPositive ),
     fieldsAssumedNegative( copySource.fieldsAssumedNegative ),
     assumedPositiveOrNegativeTolerance(
-                                copySource.assumedPositiveOrNegativeTolerance )
+                               copySource.assumedPositiveOrNegativeTolerance ),
+    readImaginaryPartForRealValue( copySource.readImaginaryPartForRealValue )
   {
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers
     // should remain valid as the other vectors do not change size any more
