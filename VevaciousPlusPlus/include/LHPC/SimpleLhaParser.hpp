@@ -363,6 +363,9 @@ namespace LHPC
     double lowestBlockScale;
 
 
+    // This resets all the internal data members.
+    void ResetForNewFile();
+
     // This trims leading whitespace, any comments ('#' and all following
     // characters to the end of the line), and any trailing whitespace after
     // removing comments, then passes the trimmed line to ParseContent(...).
@@ -621,6 +624,7 @@ namespace LHPC
   // This opens the file with name fileName and parses it into blocks.
   inline void SimpleLhaParser::ReadFile( std::string const& fileName )
   {
+    ResetForNewFile();
     std::string readLine( "" );
     std::ifstream fileStream( fileName.c_str() );
     if( !(fileStream.is_open()) )
@@ -722,6 +726,21 @@ namespace LHPC
     }
     return LHPC::ParsingUtilities::StringToDouble( headerLine.substr(
                                                      positionForEquals + 1 ) );
+  }
+
+  // This resets all the internal data members.
+  inline void SimpleLhaParser::ResetForNewFile()
+  {
+    blocksInFirstInstanceReadOrder.clear();
+    blockNamesToIndices.clear();
+    decaysInFirstInstanceReadOrder.clear();
+    decayCodesToIndices.clear();
+    currentBlockSet = NULL;
+    currentBlock = NULL;
+    currentDecay = NULL;
+    noExplicitScales = true;
+    highestBlockScale = -1.0;
+    lowestBlockScale = -1.0;
   }
 
   // This trims leading whitespace, any comments ('#' and all following

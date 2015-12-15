@@ -8,40 +8,46 @@
 #ifndef VEVACIOUSPLUSPLUS_HPP_
 #define VEVACIOUSPLUSPLUS_HPP_
 
-
-#include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
-#include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
-#include "LagrangianParameterManagement/LesHouchesAccordBlockEntryManager.hpp"
-
-
-#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
-#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialWithMasses.hpp"
 #include "PotentialMinimization/PotentialMinimizer.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
-#include "VersionInformation.hpp"
-#include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
-#include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
+#include <string>
+#include "LagrangianParameterManagement/LesHouchesAccordBlockEntryManager.hpp"
+#include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
+#include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialWithMasses.hpp"
+#include <utility>
+#include "LHPC/Utilities/RestrictedXmlParser.hpp"
 #include "PotentialMinimization/GradientFromStartingPoints.hpp"
 #include "PotentialMinimization/StartingPointFinder.hpp"
-#include "PotentialMinimization/GradientMinimizer.hpp"
 #include "PotentialMinimization/StartingPointGeneration/PolynomialAtFixedScalesSolver.hpp"
 #include "PotentialMinimization/StartingPointGeneration/PolynomialSystemSolver.hpp"
 #include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
+#include "PotentialMinimization/GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/CosmoTransitionsRunner.hpp"
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
 #include "BounceActionEvaluation/BouncePathFinder.hpp"
-#include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialOnParallelPlanes.hpp"
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
+#include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
-
-NEED TO FIX std::vector::size_type AND std::string::size_type IN OPEN HEADERS
-AND CHECK ALL SOURCES! ALSO PUSH AND TAG LHPC!
+#include <sstream>
+#include <stdexcept>
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <ctime>
+#include <iostream>
+#include <fstream>
+#include "VersionInformation.hpp"
+#include <vector>
+#include <cstddef>
+#include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
+#include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
+#include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
+#include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 
 namespace VevaciousPlusPlus
 {
+
   class VevaciousPlusPlus
   {
   public:

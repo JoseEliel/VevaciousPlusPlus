@@ -35,7 +35,7 @@ namespace VevaciousPlusPlus
   {
     delete actionCalculator;
 
-    for( std::vector::size_type deletionIndex( 0 );
+    for( size_t deletionIndex( 0 );
          deletionIndex < pathFinders.size();
          ++deletionIndex )
     {
@@ -52,7 +52,7 @@ namespace VevaciousPlusPlus
   void BounceAlongPathWithThreshold::ContinueThermalTunneling(
                                     PotentialFunction const& potentialFunction,
                                            PotentialMinimum const& falseVacuum,
-                                           PotentialMinimum const& trueVacuum,
+                                            PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
   {
     // First we set up the (square of the) threshold distance that we demand
@@ -151,8 +151,10 @@ namespace VevaciousPlusPlus
       // thresholdDecayWidth, which would mean that the survival probability is
       // definitely lower than survivalProbabilityThreshold.
       actionThreshold = ( -currentTemperature
-                          * log( currentTemperature * currentTemperature
-                             * ( thresholdDecayWidth - partialDecayWidth ) ) );
+                          * log( currentTemperature
+                                 * currentTemperature
+                                 * ( thresholdDecayWidth
+                                     - partialDecayWidth ) ) );
       bounceOverTemperature = ( BoundedBounceAction( potentialFunction,
                                                      thermalFalseVacuum,
                                                      thermalTrueVacuum,

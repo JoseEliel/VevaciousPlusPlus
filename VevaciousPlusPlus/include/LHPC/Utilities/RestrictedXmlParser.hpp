@@ -68,6 +68,7 @@ namespace LHPC
                             xmlStream( NULL ),
                             currentCharacter( '?' ),
                             currentElementIsEmpty( true ) {}
+
     ~RestrictedXmlParser() { CloseFile(); }
 
 
@@ -121,16 +122,16 @@ namespace LHPC
 
     // This returns the name of the element just read by the last call of
     // ReadNextElement().
-    std::string const& CurrentName() { return currentName; }
+    std::string const& CurrentName() const { return currentName; }
 
     // This returns the attributes of the element just read by the last call of
     // ReadNextElement().
-    std::map< std::string, std::string > const& CurrentAttributes()
+    std::map< std::string, std::string > const& CurrentAttributes() const
     { return currentAttributes; }
 
     // This returns the body of the element just read by the last call of
     // ReadNextElement().
-    std::string const& CurrentBody() { return currentBody; }
+    std::string const& CurrentBody() const { return currentBody; }
 
     // This returns a string which is the current body with leading and
     // trailing whitespace and newline characters removed.
@@ -140,20 +141,21 @@ namespace LHPC
     // This returns the text of the file opened by OpenRootElementOfFile(...)
     // or ReadAllOfRootElementOfFile(...) up to the beginning of the root
     // element.
-    std::string const& FileProlog() { return fileProlog; }
+    std::string const& FileProlog() const { return fileProlog; }
 
     // This returns the name of the root element of the file opened by
     // OpenRootElementOfFile(...) or ReadAllOfRootElementOfFile(...).
-    std::string const& RootName() { return rootName; }
+    std::string const& RootName() const { return rootName; }
 
     // This returns the attributes of the root element of the file opened by
     // OpenRootElementOfFile(...) or ReadAllOfRootElementOfFile(...).
-    std::map< std::string, std::string > const& RootAttributes()
+    std::map< std::string, std::string > const& RootAttributes() const
     { return rootAttributes; }
 
 
   protected:
     typedef std::map< std::string, std::string > AttributeMap;
+
     static std::string const AllowedWhitespaceChars() { return " \t\r\n"; }
     static std::string const AllowedQuoteChars() { return "\'\""; }
     static std::string const AllowedNameStartChars()

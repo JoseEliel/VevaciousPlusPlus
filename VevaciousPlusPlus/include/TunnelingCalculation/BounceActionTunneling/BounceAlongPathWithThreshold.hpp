@@ -16,6 +16,7 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include <cmath>
+#include <cstddef>
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include <iostream>
 #include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"

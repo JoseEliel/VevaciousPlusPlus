@@ -11,6 +11,7 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include <vector>
 #include "PotentialMinimum.hpp"
+#include <cstddef>
 #include <cmath>
 
 namespace VevaciousPlusPlus
@@ -73,6 +74,7 @@ namespace VevaciousPlusPlus
 
     PotentialFunction const& GetPotentialFunction() const
     { return potentialFunction; }
+
     PotentialFunction& GetPotentialFunction() { return potentialFunction; }
 
 
@@ -102,7 +104,7 @@ namespace VevaciousPlusPlus
                                      PotentialMinimum const& comparisonMinimum,
                                          double const thresholdDistance ) const
   {
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < dsbVacuum.FieldConfiguration().size();
          ++fieldIndex )
     {

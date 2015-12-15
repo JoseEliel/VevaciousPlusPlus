@@ -12,6 +12,7 @@
 #include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductSum.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "PolynomialSystemSolver.hpp"
+#include <cstddef>
 #include <vector>
 #include "PotentialEvaluation/BuildingBlocks/ParametersAndFieldsProductTerm.hpp"
 #include <stdexcept>
@@ -34,7 +35,7 @@ namespace VevaciousPlusPlus
                           PolynomialSystemSolver* const polynomialSystemSolver,
                                    unsigned int const numberOfScales,
                                    bool const returnOnlyPolynomialMinima,
-                                   unsigned int const numberOfFields );
+                                   size_t const numberOfFields );
     virtual ~PolynomialAtFixedScalesSolver();
 
 
@@ -72,7 +73,7 @@ namespace VevaciousPlusPlus
     PolynomialSystemSolver* polynomialSystemSolver;
     unsigned int const numberOfScales;
     bool const returnOnlyPolynomialMinima;
-    unsigned int const numberOfFields;
+    size_t const numberOfFields;
 
     // This uses polynomialSystemSolver to solve the system at the scale given
     // by exp(logCurrentScale), discarding solutions with Euclidean length

@@ -62,7 +62,14 @@ namespace VevaciousPlusPlus
     std::string systemCommand( "rm " );
     systemCommand.append( pythonMainFilename );
     systemCommand.append( "c" );
-    system( systemCommand.c_str() );
+    int systemReturn( system( systemCommand.c_str() ) );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
     std::ofstream pythonFile;
     pythonFile.open( pythonMainFilename.c_str() );
     pythonFile << std::setprecision( 12 );
@@ -121,7 +128,7 @@ namespace VevaciousPlusPlus
       underlyingPotential.assign( "LoopAndThermallyCorrectedPotential" );
     }
     pythonFile << "tunnelingSymmetryDimensionMinusOne = "
-                             << tunnelingSymmetryDimensionMinusOne << "\n"
+                                  << tunnelingSymmetryDimensionMinusOne << "\n"
     "\n"
     "VPD.UnderlyingPotential = VPD." << underlyingPotential << "\n"
     "\n"
@@ -167,7 +174,13 @@ namespace VevaciousPlusPlus
     << std::endl << "Calling system( \"" << systemCommand << "\" )..."
     << std::endl << "-----------------";
     std::cout << std::endl;
-    system( systemCommand.c_str() );
+    systemReturn = system( systemCommand.c_str() );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
     std::cout
     << std::endl << "-----------------" << std::endl
     << "Parsing output from " << pythonMainFilename << ".";
@@ -215,8 +228,7 @@ namespace VevaciousPlusPlus
     // a kink in the thermal action due to the rapid acceleration of the false
     // vacuum end of the tunneling path followed by a complete halt, with
     // respect to increasing temperature.
-    std::vector::size_type
-    straightPathPoints( static_cast< std::vector::size_type >(
+    size_t straightPathPoints( static_cast< size_t >(
                                           thermalStraightPathFitResolution ) );
     double
     lowestFitTemperature( 1.1 * rangeOfMaxTemperatureForOriginToFalse.second );
@@ -235,7 +247,7 @@ namespace VevaciousPlusPlus
     stepTemperature( ( highestFitTemperature - lowestFitTemperature )
                      / static_cast< double >( straightPathPoints - 1 ) );
     double currentTemperature( lowestFitTemperature );
-    for( std::vector::size_type whichNode( 0 );
+    for( size_t whichNode( 0 );
          whichNode < straightPathPoints;
          ++whichNode )
     {
@@ -391,7 +403,13 @@ namespace VevaciousPlusPlus
     std::string systemCommand( "rm " );
     systemCommand.append( pythonMainFilename );
     systemCommand.append( "c" );
-    system( systemCommand.c_str() );
+    int systemReturn( system( systemCommand.c_str() ) );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
     std::ofstream pythonFile;
     pythonFile.open( pythonMainFilename.c_str() );
     pythonFile << std::setprecision( 12 );
@@ -428,7 +446,7 @@ namespace VevaciousPlusPlus
     PotentialMinimum thermalTrueVacuum( thermalPotentialMinimizer(
                                            trueVacuum.FieldConfiguration() ) );
     straightPathActions.clear();
-    for( std::vector::size_type whichNode( 0 );
+    for( size_t whichNode( 0 );
          whichNode < fitTemperatures.size();
          ++whichNode )
     {
@@ -535,7 +553,13 @@ namespace VevaciousPlusPlus
     << std::endl << "Calling system( \"" << systemCommand << "\" )..."
     << std::endl << "-----------------";
     std::cout << std::endl;
-    system( systemCommand.c_str() );
+    systemReturn = system( systemCommand.c_str() );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
     std::cout
     << std::endl << "-----------------" << std::endl
     << "Parsing output from " << pythonMainFilename << ".";
@@ -543,7 +567,7 @@ namespace VevaciousPlusPlus
 
     std::ifstream resultStream;
     resultStream.open( pythonResultFilename.c_str() );
-    for( std::vector::size_type whichNode( 0 );
+    for( size_t whichNode( 0 );
          whichNode < straightPathActions.size();
          ++whichNode )
     {

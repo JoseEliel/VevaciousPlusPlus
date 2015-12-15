@@ -163,6 +163,7 @@ namespace VevaciousPlusPlus
   void
   VevaciousPlusPlus::WriteResultsAsXmlFile( std::string const& xmlFilename )
   {
+    std::time_t currentTime( time( NULL ) );
     std::ofstream xmlFile( xmlFilename.c_str() );
     xmlFile << "<VevaciousResults>\n"
     "  <ReferenceData>\n"
@@ -174,7 +175,7 @@ namespace VevaciousPlusPlus
     "     </CitationArticle>\n"
     "     <ResultTimestamp>\n"
     "       "
-    << std::string( ctime( &(time( NULL )) ) )
+    << std::string( ctime( &currentTime ) )
     << "     </ResultTimestamp>\n"
     "  </ReferenceData>\n"
     "  <StableOrMetastable>\n"
@@ -191,8 +192,7 @@ namespace VevaciousPlusPlus
                                                               fieldNames );
     if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
-      xmlFile
-      << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
+      xmlFile << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
                                                                 "PanicVacuum",
                                                                 fieldNames );
       if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
@@ -261,20 +261,22 @@ namespace VevaciousPlusPlus
     }
     long endPosition( outputFile.seekg( 0,
                                         std::ios::end ).tellg() );
-    while( '\n' == (char)(outputFile.seekg( (--endPosition) ).peek()) )
+    while( static_cast< char >( outputFile.seekg( --endPosition ).peek() )
+           == '\n' )
     {
       // this loop just brings the get pointer back to the char before the
       // last '\n'.
     }
-    outputFile.seekp( (++endPosition) );
+    outputFile.seekp( ++endPosition );
     // the put pointer is now about to overwrite the 1st '\n' of the sequence
     // of '\n' characters ending the file.
+    std::time_t currentTime( time( NULL ) );
     outputFile << "\n"
     "BLOCK VEVACIOUSSTABILITY # Results from VevaciousPlusPlus\n"
     "# version " << VersionInformation::CurrentVersion() << ", documented in "
     << VersionInformation::CurrentCitation()
     << "\n"
-    "# Results written " << std::string( ctime( &(time( NULL )) ) )
+    "# Results written " << std::string( ctime( &currentTime ) )
     << "# [index] [verdict int]\n"
     "  1  ";
     if( potentialMinimizer->DsbVacuumIsStable() )
@@ -342,7 +344,7 @@ namespace VevaciousPlusPlus
     "# [index] [field name in \"\"]\n";
     std::vector< std::string > const&
     fieldNames( potentialMinimizer->GetPotentialFunction().FieldNames() );
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
@@ -353,7 +355,7 @@ namespace VevaciousPlusPlus
     "# [index] [field VEV in GeV]\n";
     std::vector< double > const&
     dsbFields( potentialMinimizer->DsbVacuum().FieldConfiguration() );
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
@@ -378,7 +380,7 @@ namespace VevaciousPlusPlus
     {
       panicFields = &(potentialMinimizer->PanicVacuum().FieldConfiguration());
     }
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < fieldNames.size();
          ++fieldIndex )
     {
@@ -617,7 +619,7 @@ namespace VevaciousPlusPlus
     if( xmlParser.CurrentName() == elementName )
     {
       std::string contentString( xmlParser.TrimmedCurrentBody() );
-      BOL::StringParser::transformToLowercase( contentString );
+      LHPC::ParsingUtilities::TransformToLowercase( contentString );
       if( ( contentString == "yes" )
           ||
           ( contentString == "y" )
@@ -751,7 +753,7 @@ namespace VevaciousPlusPlus
     {
       return TunnelingCalculator::ThermalThenQuantum;
     }
-    else if( tunnelingStrategy == "QuantumThenthermal" )
+    else if( tunnelingStrategy == "QuantumThenThermal" )
     {
       return TunnelingCalculator::QuantumThenThermal;
     }
@@ -770,7 +772,7 @@ namespace VevaciousPlusPlus
     std::stringstream errorBuilder;
     errorBuilder << "\"" << tunnelingStrategy << "\" is not a valid tunneling"
     << " strategy. Valid options are \"NoTunneling\", \"JustQuantum\","
-    << " \"JustThermal\", \"ThermalThenQuantum\", or \"QuantumThenthermal\".";
+    << " \"JustThermal\", \"ThermalThenQuantum\", or \"QuantumThenThermal\".";
     throw std::runtime_error( errorBuilder.str() );
   }
 
@@ -941,7 +943,7 @@ namespace VevaciousPlusPlus
                                              neighborDisplacementWeightsString,
                                                                " \t\n,;" ) );
     std::vector< double > neighborDisplacementWeights;
-    for( std::vector< std::string >::iterator
+    for( std::vector< std::string >::const_iterator
          weightString( weightsStrings.begin() );
          weightString != weightsStrings.end();
          ++weightString )

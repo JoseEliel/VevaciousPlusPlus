@@ -14,11 +14,12 @@
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
 #include <vector>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include "VersionInformation.hpp"
-#include <cstdlib>
 #include <iostream>
+#include <cstddef>
 #include "ThermalActionFitter.hpp"
 #include "Minuit2/MnMigrad.h"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"

@@ -1,0 +1,225 @@
+<VevaciousPlusPlusObjectInitialization>
+
+<!--
+#  VevaciousPlusPlusObjectInitialization.xml
+#
+#  Created on: Apr 10, 2014
+#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+#      Copyright 2014 Ben O'Leary
+#
+#      This file is part of VevaciousPlusPlus, released under the
+#      GNU General Public License. Please see the accompanying
+#      README.VevaciousPlusPlus.txt file for a full list of files, brief
+#      documentation on how to use these classes, and further details on the
+#      license.
+#
+ -->
+
+<!-- Quick start: if you just want to change the model (i.e. the potential in
+     terms of a set of fields), change
+     <PotentialClass><ConstructorArguments><ModelFile> to the name of the file
+     with the model in it (such as ./ModelFiles/TwoHiggsDoublet.vin or
+     ./ModelFiles/RestrictedToRealVevsRealMssm.vin). Almost everything else is
+     for tweaking the way in which the (meta)stability is calculated, such as
+     the resolution of the tunneling path, or whether thermal tunneling is
+     skipped, and so on. Most of the elements have some documentation in nearby
+     comments in VerboselyCommentedDefaultObjectInitialization.xml in the
+     VevaciousPlusPlus/InitializationFiles/ folder. -->
+ 
+  <PotentialClass>
+    <!-- Either "FixedScaleOneLoopPotential" or
+         "RgeImprovedOneLoopPotential" -->
+    <ClassType>
+      FixedScaleOneLoopPotential
+    </ClassType>
+    <ConstructorArguments>
+      <ModelFile>
+        /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/RealMssmWithStauAndStopVevs.vin
+      </ModelFile>
+      <ScaleRangeMinimumFactor>
+        10.0
+      </ScaleRangeMinimumFactor>
+      <RollOnlyMinima>
+        <!-- Either "true"/"yes" or "false"/"no" -->
+        true
+      </RollOnlyMinima>
+      <AssumedPositiveOrNegativeTolerance>
+        0.5
+      </AssumedPositiveOrNegativeTolerance>
+    </ConstructorArguments>
+  </PotentialClass>
+  
+  <MinimizerClass>
+    <ClassType>
+      GradientFromStartingPoints
+    </ClassType>
+    <ConstructorArguments>
+      <StartingPointFinderClass>
+        <ClassType>
+          Hom4ps2Runner
+        </ClassType>
+        <ConstructorArguments>
+          <PathToHom4ps2>
+            /home/bol/BOL/ProjectDependencies/HOM4PS2/
+          </PathToHom4ps2>
+          <Hom4ps2Argument>
+            <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
+                 "Please enter the option of homotopy method
+                    1. The polyhedral homotopy
+                    2. The classical linear homotopy"
+                 1 can be faster for systems of many variables,
+                 but 2 seems more reliable. -->
+            2
+          </Hom4ps2Argument>
+        </ConstructorArguments>
+      </StartingPointFinderClass>
+      <GradientMinimizerClass>
+        <ClassType>
+          MinuitPotentialMinimizer
+        </ClassType>
+        <ConstructorArguments>
+          <InitialStepSizeFraction>
+            0.1
+          </InitialStepSizeFraction>
+          <MinimumInitialStepSize>
+            1.0
+          </MinimumInitialStepSize>
+          <MinuitStrategy>
+            <!-- The number given here is given to Minuit2 to decide how
+                 precise it tries to be, through more or less calls of the
+                 function to be minimized. The default is 1, while 0 emphasizes
+                 making less function calls, and 2 emphasizes more accuracy
+                 through more function calls. -->
+            1
+          </MinuitStrategy>
+        </ConstructorArguments>
+      </GradientMinimizerClass>
+      <ExtremumSeparationThresholdFraction>
+        0.05
+      </ExtremumSeparationThresholdFraction>
+      <NonDsbRollingToDsbScalingFactor>
+        10.0
+      </NonDsbRollingToDsbScalingFactor>
+    </ConstructorArguments>
+  </MinimizerClass>
+  
+  <TunnelingClass>
+    <ClassType>
+      <!-- Either "BounceAlongPathWithThreshold" or
+           "CosmoTransitionsRunner". -->
+      BounceAlongPathWithThreshold
+    </ClassType>
+    <ConstructorArguments>
+      <TunnelingStrategy>
+        <!-- "NoTunneling", "JustQuantum", "JustThermal", "ThermalThenQuantum",
+             or "QuantumThenThermal" -->
+        QuantumThenThermal
+      </TunnelingStrategy>
+      <SurvivalProbabilityThreshold>
+        0.01
+      </SurvivalProbabilityThreshold>
+      <ThermalActionResolution>
+        5
+      </ThermalActionResolution>
+      <CriticalTemperatureAccuracy>
+        7
+      </CriticalTemperatureAccuracy>
+      <PathToCosmotransitions>
+        /home/bol/BOL/ProjectDependencies/CosmoTransitions1/
+      </PathToCosmotransitions>
+      <PathResolution>
+        100
+      </PathResolution>
+      <MinimumVacuumSeparationFraction>
+        0.2
+      </MinimumVacuumSeparationFraction>
+      <MaxInnerLoops>
+        10
+      </MaxInnerLoops>
+      <MaxOuterLoops>
+        10
+      </MaxOuterLoops>
+      <BouncePotentialFit>
+        <ClassType>
+          BubbleShootingOnPathInFieldSpace
+        </ClassType>
+        <ConstructorArguments>
+          <NumberOfSegmentsForPotentialFit>
+            100
+          </NumberOfSegmentsForPotentialFit>
+          <NumberShootAttemptsAllowed>
+            32
+          </NumberShootAttemptsAllowed>
+          <RadialResolution>
+            0.05
+          </RadialResolution>
+        </ConstructorArguments>
+      </BouncePotentialFit>
+      <TunnelPathFinders>
+        <!-- Valid options, in an ordered list, are:
+             "MinuitOnPotentialOnParallelPlanes",
+             "MinuitOnPotentialPerpendicularToPath", and
+             "MinuitOnPathPerpendicularForces". -->
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialOnParallelPlanes
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              20
+            </NumberOfPathSegments>
+            <MinuitStrategy>
+              1
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              20
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              2
+            </NumberOfAllowedWorsenings>
+            <MinuitStrategy>
+              2
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.5
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+        <PathFinder>
+          <ClassType>
+            MinuitOnPotentialPerpendicularToPath
+          </ClassType>
+          <ConstructorArguments>
+            <NumberOfPathSegments>
+              100
+            </NumberOfPathSegments>
+            <NumberOfAllowedWorsenings>
+              2
+            </NumberOfAllowedWorsenings>
+            <ConvergenceThresholdFraction>
+              0.05
+            </ConvergenceThresholdFraction>
+            <MinuitStrategy>
+              2
+            </MinuitStrategy>
+            <MinuitTolerance>
+              0.05
+            </MinuitTolerance>
+          </ConstructorArguments>
+        </PathFinder>
+      </TunnelPathFinders>
+    </ConstructorArguments>
+  </TunnelingClass>
+
+</VevaciousPlusPlusObjectInitialization>
+

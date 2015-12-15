@@ -22,6 +22,7 @@
 #include <sstream>
 #include <fstream>
 #include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <complex>
 #include <cmath>
 
 namespace VevaciousPlusPlus

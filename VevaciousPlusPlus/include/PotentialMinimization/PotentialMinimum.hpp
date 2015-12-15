@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include "Utilities/VectorUtilities.hpp"
+#include <cstddef>
 #include <sstream>
 
 namespace VevaciousPlusPlus
@@ -80,7 +81,7 @@ namespace VevaciousPlusPlus
   {
     double returnDouble( 0.0 );
     double fieldDifference( 0.0 );
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -99,7 +100,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "<" << elementName;
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -119,7 +120,7 @@ namespace VevaciousPlusPlus
     std::stringstream stringBuilder;
     stringBuilder << "  <" << elementName << ">\n"
     "    <FieldValues>\n";
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {
@@ -141,7 +142,7 @@ namespace VevaciousPlusPlus
   {
     std::stringstream stringBuilder;
     stringBuilder << "{ {";
-    for( std::vector::size_type fieldIndex( 0 );
+    for( size_t fieldIndex( 0 );
          fieldIndex < variableValues.size();
          ++fieldIndex )
     {

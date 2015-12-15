@@ -44,8 +44,9 @@ namespace LHPC
 
     static std::string DigitChars() { return "0123456789"; }
 
-    static void
-    TransformToUppercase( std::string& stringToTransform );
+    static void TransformToLowercase( std::string& stringToTransform );
+
+    static void TransformToUppercase( std::string& stringToTransform );
 
     static std::string TrimFromFrontAndBack( std::string const& stringToTrim,
                                              std::string const& charsToTrim );
@@ -154,6 +155,17 @@ namespace LHPC
 
 
 
+
+  inline void
+  ParsingUtilities::TransformToLowercase( std::string& stringToTransform )
+  {
+    for( std::string::iterator stringCharacter( stringToTransform.begin() );
+         stringCharacter != stringToTransform.end();
+         ++stringCharacter )
+    {
+      *stringCharacter = std::tolower( *stringCharacter );
+    }
+  }
 
   inline void
   ParsingUtilities::TransformToUppercase( std::string& stringToTransform )

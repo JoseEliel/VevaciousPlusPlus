@@ -29,7 +29,7 @@ namespace VevaciousPlusPlus
     std::pair< ParametersAndFieldsProductSum, ParametersAndFieldsProductSum >
     ComplexParametersAndFieldsProductSum;
 
-    BaseComplexMassMatrix( size_t const numberOfElements,
+    BaseComplexMassMatrix( size_t const numberOfRows,
                    std::map< std::string, std::string > const& attributeMap ) :
       MassesSquaredFromMatrix< std::complex< double > >( numberOfRows,
                                                          attributeMap ),

@@ -223,6 +223,19 @@ namespace VevaciousPlusPlus
     << std::endl << "fixedScaleType = \"" << fixedScaleType << "\""
     << std::endl << "fixedScaleArgument = \"" << fixedScaleArgument << "\""
     << std::endl;
+    std::vector< double > fixedScaleparameters;
+    ParameterValues( log( AppropriateSingleFixedScale() ),
+                     fixedScaleparameters );
+    stringBuilder
+    << "ParameterValues( log( AppropriateSingleFixedScale(), x ) makes x = { ";
+    for( std::vector< double >::const_iterator
+         fixedScaleParameter( fixedScaleparameters.begin() );
+         fixedScaleParameter != fixedScaleparameters.end();
+         ++fixedScaleParameter )
+    {
+      stringBuilder << *fixedScaleParameter << ", ";
+    }
+    stringBuilder << "}" << std::endl;
     return stringBuilder.str();
   }
 

@@ -10,6 +10,7 @@
 
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/PotentialMinimum.hpp"
+#include "BubbleProfile.hpp"
 #include "PathParameterization/TunnelPath.hpp"
 #include "OneDimensionalPotentialAlongPath.hpp"
 

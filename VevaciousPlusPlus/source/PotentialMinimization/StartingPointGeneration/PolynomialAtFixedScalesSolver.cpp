@@ -16,7 +16,7 @@ namespace VevaciousPlusPlus
                           PolynomialSystemSolver* const polynomialSystemSolver,
                                              unsigned int const numberOfScales,
                                          bool const returnOnlyPolynomialMinima,
-                                          unsigned int const numberOfFields ) :
+                                                size_t const numberOfFields ) :
     StartingPointFinder(),
     minimizationConditions( numberOfFields,
                             std::vector< ParametersAndFieldsProductTerm >() ),
@@ -189,7 +189,7 @@ namespace VevaciousPlusPlus
                                solutionSet );
 
     std::vector< std::vector< double > > solutionsInRange;
-    for( std::vector< std::vector< double > >::iterator
+    for( std::vector< std::vector< double > >::const_iterator
          solutionVector( solutionSet.begin() );
          solutionVector != solutionSet.end();
          ++solutionVector )

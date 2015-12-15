@@ -52,7 +52,6 @@ namespace VevaciousPlusPlus
     assumedPositiveOrNegativeTolerance( assumedPositiveOrNegativeTolerance )
   {
     LHPC::RestrictedXmlParser xmlParser;
-
     std::string xmlFieldVariables( "" );
     std::string xmlDsbMinimum( "" );
     std::string xmlTreeLevelPotential( "" );

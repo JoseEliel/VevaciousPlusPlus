@@ -113,7 +113,7 @@ namespace VevaciousPlusPlus
                              parameterValues,
                              parameterIndices ); }
 
-    std::vector< size_t > const& FieldPowersByIndex() const
+    std::vector< unsigned int > const& FieldPowersByIndex() const
     { return fieldPowersByIndex; }
 
     // This returns the sum of the powers of the fields.

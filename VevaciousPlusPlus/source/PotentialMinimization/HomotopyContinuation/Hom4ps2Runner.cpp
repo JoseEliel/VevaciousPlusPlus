@@ -79,13 +79,26 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     std::string systemCommand( "rm ./bin/input.num" );
-    system( systemCommand.c_str() );
+    int systemReturn( system( systemCommand.c_str() ) );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
     systemCommand.assign( "/bin/bash -c \"./hom4ps2 " );
     systemCommand.append( hom4ps2InputFilename );
     systemCommand.append(  " <<< " );
     systemCommand.append( homotopyType );
     systemCommand.append( "\"" );
-    system( systemCommand.c_str() );
+    systemReturn = system( systemCommand.c_str() );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
 
     // At this point, we are in the directory with hom4ps2 & data.roots, so
     // now we fill purelyRealSolutionSets.
@@ -138,9 +151,8 @@ namespace VevaciousPlusPlus
          constraintToWrite != systemToSolve.end();
          ++constraintToWrite )
     {
-      hom4ps2Input
-      << WriteConstraint( *constraintToWrite,
-                          variableNames ) << ";\n";
+      hom4ps2Input << WriteConstraint( *constraintToWrite,
+                                       variableNames ) << ";\n";
     }
     hom4ps2Input << "}\n";
     hom4ps2Input.close();
@@ -210,7 +222,7 @@ namespace VevaciousPlusPlus
     std::cout << std::endl;
 
     std::vector< std::complex< long double > > complexSolutions;
-    std::ifstream tadpoleSolutionsFile( hom4ps2OutputFilename );
+    std::ifstream tadpoleSolutionsFile( hom4ps2OutputFilename.c_str() );
     if( !(tadpoleSolutionsFile.good()) )
     {
       std::stringstream errorBuilder;
@@ -245,7 +257,9 @@ namespace VevaciousPlusPlus
         >> currentComplexNumber.real() >> currentComplexNumber.imag();
         complexSolutions.push_back( currentComplexNumber );
       }
-      else if( lineString == "The order of variables :" )
+      else if( LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                                   lineString )
+               == "The order of variables :" )
       {
         break;
       }
@@ -275,7 +289,14 @@ namespace VevaciousPlusPlus
     while( std::getline( tadpoleSolutionsFile,
                          lineString ).good() )
     {
-      if( lineString == "===============>   HOM4PS-2.0   <===============" )
+      lineString
+      = LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack( lineString );
+      if( lineString.empty() )
+      {
+        continue;
+      }
+      else if( lineString
+               == "===============>   HOM4PS-2.0   <===============" )
       {
         break;
       }

@@ -73,9 +73,8 @@ namespace VevaciousPlusPlus
     // vector in order to the functionoids in activeDerivedParameters, as each
     // derived parameter functionoid relies on the parameter values with
     // indices less than its own.
-    virtual void
-    ParameterValues( double const logarithmOfScale,
-                     std::vector< double >& destinationVector ) const;
+    virtual void ParameterValues( double const logarithmOfScale,
+                              std::vector< double >& destinationVector ) const;
 
     // This first writes a function used by some derived parameters, and then
     // writes a function in the form

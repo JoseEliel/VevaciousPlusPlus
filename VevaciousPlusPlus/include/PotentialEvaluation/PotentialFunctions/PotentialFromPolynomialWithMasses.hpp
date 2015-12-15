@@ -198,7 +198,9 @@ namespace VevaciousPlusPlus
                                        std::vector< std::string >& matrixLines,
                                                 std::string const& matrixType )
   {
-    matrixLines = LHPC::ParsingUtilities::SplitBySubstrings( xmlContent,
+    matrixLines = LHPC::ParsingUtilities::SplitBySubstrings(
+                        LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
+                                                                  xmlContent ),
                                                              "\n" );
     size_t const numberOfRows( static_cast< size_t >(
                        sqrt( static_cast< double >( matrixLines.size() ) ) ) );
