@@ -232,7 +232,6 @@ namespace VevaciousPlusPlus
                         OneDimensionalPotentialAlongPath const& pathPotential )
   {
     odeintProfile.clear();
-
     OdeintBubbleDerivatives bubbleDerivatives( pathPotential,
                                                tunnelPath );
     OdeintBubbleObserver bubbleObserver( odeintProfile );

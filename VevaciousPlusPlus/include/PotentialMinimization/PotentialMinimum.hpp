@@ -132,7 +132,7 @@ namespace VevaciousPlusPlus
     "      " << functionValue
     << " <!-- Potential in GeV^4 minus value for all fields = 0 -->\n"
     "    </RelativeDepth>\n"
-    "  </" << elementName << ">\n";
+    "  </" << elementName << ">";
     return stringBuilder.str();
   }
 

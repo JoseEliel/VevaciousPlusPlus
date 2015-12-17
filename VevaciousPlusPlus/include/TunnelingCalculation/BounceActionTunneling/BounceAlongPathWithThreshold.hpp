@@ -19,6 +19,7 @@
 #include <cstddef>
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include <iostream>
+#include "Utilities/WarningLogger.hpp"
 #include "BounceActionEvaluation/PathParameterization/TunnelPath.hpp"
 #include "BounceActionEvaluation/PathParameterization/LinearSplineThroughNodes.hpp"
 #include "BounceActionEvaluation/SplinePotential.hpp"
@@ -110,13 +111,10 @@ namespace VevaciousPlusPlus
     // valid temperature (i.e. we treat T < 0 and T "= NaN" as T = 0.0).
     if( !(tunnelingTemperature > 0.0 ) )
     {
-      double const squareRootOfSolitonicFactor(
-                potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
-                                                                trueVacuum ) );
-      double const solitonicFactorTimesFourVolume( squareRootOfSolitonicFactor
-                                                  * squareRootOfSolitonicFactor
-                                    * fourVolumeOfKnownUniverseOverGevFourth );
-      actionThreshold = ( log( -solitonicFactorTimesFourVolume
+      actionThreshold = ( log( -SolitonicFactor( potentialFunction,
+                                                 falseVacuum,
+                                                 trueVacuum )
+                                * fourVolumeOfKnownUniverseOverGevFourth
                                / log( survivalProbabilityThreshold ) ) );
     }
     return BoundedBounceAction( potentialFunction,
@@ -124,7 +122,7 @@ namespace VevaciousPlusPlus
                                 trueVacuum,
                                 tunnelingTemperature,
                                 actionThreshold,
-                               ( vacuumSeparationFractionSquared
+                                ( vacuumSeparationFractionSquared
                               * falseVacuum.SquareDistanceTo( trueVacuum ) ) );
   }
 

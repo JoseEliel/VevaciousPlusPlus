@@ -304,17 +304,16 @@ namespace VevaciousPlusPlus
 
     if( readImaginaryPartForRealValue )
     {
-      std::cout
-      << std::endl
-      << "At least once in \"" << modelFilename << "\", an imaginary part was"
-      << " read for a polynomial which should be purely real."
-      << " This imaginary part or these imaginary parts have been ignored, as"
-      << " it may be an artifact of a cancellation which is only apparent when"
-      << " there are values for the Lagrangian parameters (e.g. soft"
-      << " SUSY-breaking mass-squared matrices should be Hermitian so the"
+      std::stringstream warningBuilder;
+      warningBuilder << "At least once in \"" << modelFilename
+      << "\", an imaginary part was read for a polynomial which should be"
+      << " purely real. This imaginary part or these imaginary parts have been"
+      << " ignored, as it may be an artifact of a cancellation which is only"
+      << " apparent when there are values for the Lagrangian parameters (e.g."
+      << " soft SUSY-breaking mass-squared matrices should be Hermitian so the"
       << " imaginary part of the sum of opposite off-diagonal elements is"
       << " zero).";
-      std::cout << std::endl;
+      WarningLogger::LogWarning( warningBuilder.str() );
     }
 
     // Now we can fill the MassesSquaredCalculator* vectors, as their pointers

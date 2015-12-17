@@ -257,7 +257,6 @@ namespace VevaciousPlusPlus
                                        * integrationStartRadius );
       }
 
-
       // We have to ensure that the end radius is larger than the start radius.
       integrationEndRadius = std::max( integrationEndRadius,
                                        ( 2.0 * integrationStartRadius ) );

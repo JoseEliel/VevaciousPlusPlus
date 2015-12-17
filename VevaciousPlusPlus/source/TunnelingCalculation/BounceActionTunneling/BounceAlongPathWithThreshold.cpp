@@ -61,8 +61,7 @@ namespace VevaciousPlusPlus
     double const thresholdSeparationSquared( vacuumSeparationFractionSquared
                                 * falseVacuum.SquareDistanceTo( trueVacuum ) );
 
-    // Now we start at almost the critical temperature, and sum up for
-    // decreasing temperatures:
+    // We sum up decay widths over increasing temperatures.
     double partialDecayWidth( 0.0 );
     // The partial decay width scaled by the volume of the observable Universe
     // is recorded in partialDecayWidth so that the bounce action threshold for
@@ -70,54 +69,21 @@ namespace VevaciousPlusPlus
     // from higher temperatures.
     double const temperatureStep( rangeOfMaxTemperatureForOriginToTrue.first
                  / static_cast< double >( thermalIntegrationResolution + 1 ) );
-    double currentTemperature( temperatureStep );
+    double currentTemperature( 0.0 );
     MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
     thermalPotentialMinimizer.SetTemperature( currentTemperature );
-    PotentialMinimum thermalFalseVacuum( thermalPotentialMinimizer(
-                                          falseVacuum.FieldConfiguration() ) );
-    // We have to check to see if the field origin should be the thermal false
-    // vacuum. The result of thermalPotentialMinimizer already has the value of
-    // the potential at the field origin subtracted, so we just compare with
-    // zero.
-    if( thermalFalseVacuum.PotentialValue() > 0.0 )
-    {
-      thermalFalseVacuum
-      = PotentialMinimum( potentialFunction.FieldValuesOrigin(),
-                          0.0 );
-    }
-    PotentialMinimum thermalTrueVacuum( thermalPotentialMinimizer(
-                                           trueVacuum.FieldConfiguration() ) );
+    PotentialMinimum thermalFalseVacuum( falseVacuum );
+    PotentialMinimum thermalTrueVacuum( trueVacuum );
     double const thresholdDecayWidth( -log( survivalProbabilityThreshold )
                  / ( temperatureStep * exp( lnOfThermalIntegrationFactor ) ) );
-    double actionThreshold( -currentTemperature
-      * log( currentTemperature * currentTemperature * thresholdDecayWidth ) );
-    double bounceOverTemperature( BoundedBounceAction( potentialFunction,
-                                                       thermalFalseVacuum,
-                                                       thermalTrueVacuum,
-                                                       currentTemperature,
-                                                       actionThreshold,
-                                                   thresholdSeparationSquared )
-                                  / currentTemperature );
-    if( bounceOverTemperature < maximumPowerOfNaturalExponent )
-    {
-      partialDecayWidth += ( exp( -bounceOverTemperature )
-                             / ( currentTemperature * currentTemperature ) );
-    }
 
-    double smallestExponent( bounceOverTemperature );
+    double smallestExponent( maximumPowerOfNaturalExponent );
     dominantTemperatureInGigaElectronVolts = 0.0;
 
-    for( unsigned int whichStep( 1 );
+    for( unsigned int whichStep( 0 );
          whichStep < thermalIntegrationResolution;
          ++whichStep )
     {
-      if( partialDecayWidth > thresholdDecayWidth )
-      {
-        // We don't bother calculating the rest of the contributions to the
-        // integral of the decay width if it is already large enough that the
-        // survival probability is below the threshold.
-        break;
-      }
       currentTemperature += temperatureStep;
       thermalPotentialMinimizer.SetTemperature( currentTemperature );
       // We update the positions of the thermal vacua based on their positions
@@ -137,31 +103,50 @@ namespace VevaciousPlusPlus
       thermalTrueVacuum
       = thermalPotentialMinimizer( thermalTrueVacuum.FieldConfiguration() );
 
-      if( thermalTrueVacuum.SquareDistanceTo( thermalFalseVacuum )
+      if( !( thermalTrueVacuum.FunctionValue()
+             < thermalFalseVacuum.FunctionValue() ) )
+      {
+        // If the thermal vacua are the wrong way around in depth order
+        // (possibly due to the thermal minimizer failing to converge properly)
+        // then we break without adding in any decay width for this
+        // temperature.
+        std::stringstream warningBuilder;
+        warningBuilder << "At temperature " << currentTemperature
+        << " GeV, minimizer rolled from panic vacuum from a lower temperature"
+        << " to configuration which is not deeper than the configuration to"
+        << " which it rolled from the DSB vacuum from that lower temperature."
+        << " Skipping the contribution of this temperature.";
+        WarningLogger::LogWarning( warningBuilder.str() );
+        continue;
+      }
+      else if( thermalTrueVacuum.SquareDistanceTo( thermalFalseVacuum )
           < thresholdSeparationSquared )
       {
         // If the thermal vacua have gotten so close that a tunneling
-        // calculation is suspect, we break and take only the contributions
-        // from lower temperatures.
+        // calculation is suspect, we break without adding in any decay width
+        // for this temperature.
+        std::stringstream warningBuilder;
+        warningBuilder << "At temperature " << currentTemperature
+        << " GeV, minimizer found DSB vacuum and panic vacuum to be so close"
+        << " that a tunneling calculation is not trustworthy. Skipping the"
+        << " contribution of this temperature and higher temperatures.";
+        WarningLogger::LogWarning( warningBuilder.str() );
         break;
       }
 
-      // If the bounce action from the next step is sufficiently small, then
-      // the contribution to survivalExponent could make survivalExponent >
-      // thresholdDecayWidth, which would mean that the survival probability is
-      // definitely lower than survivalProbabilityThreshold.
-      actionThreshold = ( -currentTemperature
-                          * log( currentTemperature
-                                 * currentTemperature
-                                 * ( thresholdDecayWidth
-                                     - partialDecayWidth ) ) );
-      bounceOverTemperature = ( BoundedBounceAction( potentialFunction,
-                                                     thermalFalseVacuum,
-                                                     thermalTrueVacuum,
-                                                     currentTemperature,
-                                                     actionThreshold,
-                                                   thresholdSeparationSquared )
-                                / currentTemperature );
+      double const actionThreshold( -currentTemperature
+                                    * log( currentTemperature
+                                           * currentTemperature
+                                           * ( thresholdDecayWidth
+                                               - partialDecayWidth ) ) );
+      double const
+      bounceOverTemperature( BoundedBounceAction( potentialFunction,
+                                                  thermalFalseVacuum,
+                                                  thermalTrueVacuum,
+                                                  currentTemperature,
+                                                  actionThreshold,
+                                                  thresholdSeparationSquared )
+                             / currentTemperature );
 
       if( bounceOverTemperature < maximumPowerOfNaturalExponent )
       {
@@ -173,6 +158,15 @@ namespace VevaciousPlusPlus
         smallestExponent = bounceOverTemperature;
         dominantTemperatureInGigaElectronVolts = currentTemperature;
       }
+
+      if( partialDecayWidth > thresholdDecayWidth )
+      {
+        // We don't bother calculating the rest of the contributions to the
+        // integral of the decay width if it is already large enough that the
+        // survival probability is below the threshold.
+        break;
+      }
+
     }
     if( partialDecayWidth > 0.0 )
     {
@@ -183,13 +177,13 @@ namespace VevaciousPlusPlus
     {
       logOfMinusLogOfThermalProbability
       = -exp( maximumPowerOfNaturalExponent );
-      std::cout
-      << std::endl
-      << "Warning! The calculated integrated thermal decay width was so close"
-      << " to 0 that taking its logarithm would be problematic, so setting the"
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated integrated thermal decay width was so close to zero"
+      << " that taking its logarithm would be problematic, so setting the"
       << " logarithm of the negative of the logarithm of the thermal survival"
       << " probability to " << logOfMinusLogOfThermalProbability << ".";
-      std::cout << std::endl;
+      WarningLogger::LogWarning( warningBuilder.str() );
     }
     SetThermalSurvivalProbability();
   }
@@ -221,12 +215,20 @@ namespace VevaciousPlusPlus
                                   trueVacuum,
                                   tunnelingTemperature );
 
-
     SplinePotential pathPotential( potentialFunction,
                                    *bestPath,
                                    pathPotentialResolution,
                                    requiredVacuumSeparationSquared );
 
+    if( !(pathPotential.EnergyBarrierWasResolved()) )
+    {
+      std::stringstream warningBuilder;
+      warningBuilder << "Unable to resolve an energy barrier between false"
+      << " vacuum and true vacuum: returning bounce action of zero (which"
+      << " should be sufficient to exclude the parameter point).";
+      WarningLogger::LogWarning( warningBuilder.str() );
+      return 0.0;
+    }
 
     BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath,
                                                           pathPotential ) );

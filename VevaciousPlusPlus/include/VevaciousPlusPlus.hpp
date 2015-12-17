@@ -31,13 +31,14 @@
 #include "BounceActionEvaluation/BounceActionPathFinding/MinuitOnPotentialPerpendicularToPath.hpp"
 #include "BounceActionEvaluation/BounceActionCalculator.hpp"
 #include "BounceActionEvaluation/BubbleShootingOnPathInFieldSpace.hpp"
-#include <sstream>
-#include <stdexcept>
-#include "LHPC/Utilities/ParsingUtilities.hpp"
 #include <ctime>
-#include <iostream>
 #include <fstream>
 #include "VersionInformation.hpp"
+#include "LHPC/Utilities/ParsingUtilities.hpp"
+#include <sstream>
+#include <stdexcept>
+#include "Utilities/WarningLogger.hpp"
+#include <iostream>
 #include <vector>
 #include <cstddef>
 #include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
@@ -283,11 +284,47 @@ namespace VevaciousPlusPlus
     PotentialMinimizer* ownedPotentialMinimizer;
     TunnelingCalculator* tunnelingCalculator;
     TunnelingCalculator* ownedTunnelingCalculator;
+    std::vector< std::string > warningMessagesFromConstructor;
+    std::string resultsFromLastRunAsXml;
+    std::vector< std::string > warningMessagesFromLastRun;
+
+
+    // This prepares the results in XML format, stored in resultsAsXml;
+    void PrepareResultsAsXml();
+
+    // This returns a vector which is the union of
+    // warningMessagesFromConstructor with warningMessagesFromLastRun.
+    std::vector< std::string > WarningMessagesToReport() const;
   };
 
 
 
 
+
+  // This writes the results as an XML file.
+  inline void
+  VevaciousPlusPlus::WriteResultsAsXmlFile( std::string const& xmlFilename )
+  {
+    std::time_t currentTime( time( NULL ) );
+    std::ofstream xmlFile( xmlFilename.c_str() );
+    xmlFile << "<VevaciousResults>\n"
+    "  <ReferenceData>\n"
+    "     <VevaciousVersion>\n"
+    "       " << VersionInformation::CurrentVersion() << "\n"
+    "     </VevaciousVersion>\n"
+    "     <CitationArticle>\n"
+    "       " << VersionInformation::CurrentCitation() << "\n"
+    "     </CitationArticle>\n"
+    "     <ResultTimestamp>\n"
+    "       " << std::string( ctime( &currentTime ) )
+    << "     </ResultTimestamp>\n"
+    "  </ReferenceData>\n"
+    << resultsFromLastRunAsXml << "\n"
+    << "</VevaciousResults>\n";
+    xmlFile.close();
+    std::cout << std::endl << "Wrote results in XML in file \"" << xmlFilename
+    << "\"." << std::endl;
+  }
 
   // This reads the current element of outerParser and if its name matches
   // elementName, it puts the contents of the child element <ClassType> into
@@ -635,6 +672,19 @@ namespace VevaciousPlusPlus
     return
     new BubbleShootingOnPathInFieldSpace( lengthScaleResolutionForBounce,
                                           shootAttemptsForBounce );
+  }
+
+  // This returns a vector which is the union of
+  // warningMessagesFromConstructor with warningMessagesFromLastRun.
+  inline std::vector< std::string >
+  VevaciousPlusPlus::WarningMessagesToReport() const
+  {
+    std::vector< std::string >
+    warningMessagesToReport( warningMessagesFromConstructor );
+    warningMessagesToReport.insert( warningMessagesToReport.end(),
+                                    warningMessagesFromLastRun.begin(),
+                                    warningMessagesFromLastRun.end() );
+    return warningMessagesToReport;
   }
 
 } /* namespace VevaciousPlusPlus */

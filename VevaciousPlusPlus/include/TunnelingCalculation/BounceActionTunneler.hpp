@@ -16,6 +16,7 @@
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
 #include <cmath>
 #include <limits>
+#include "Utilities/WarningLogger.hpp"
 #include <vector>
 
 namespace VevaciousPlusPlus
@@ -140,6 +141,11 @@ namespace VevaciousPlusPlus
     // This ensures that thermalSurvivalProbability is set correctly from
     // logOfMinusLogOfThermalProbability.
     void SetThermalSurvivalProbability();
+
+    // This should return the A factor of dimension energy^4.
+    virtual double SolitonicFactor( PotentialFunction const& potentialFunction,
+                                    PotentialMinimum const& falseVacuum,
+                                    PotentialMinimum const& trueVacuum );
   };
 
 
@@ -224,6 +230,20 @@ namespace VevaciousPlusPlus
     {
       return resolutionOfDsbVacuum;
     }
+  }
+
+  // This should return the A factor of dimension energy^4. This particular
+  // implementation does the naive thing of just taking an appropriate energy
+  // scale and returning it to the fourth power.
+  inline double BounceActionTunneler::SolitonicFactor(
+                                   PotentialFunction const& potentialFunction,
+                                  PotentialMinimum const& falseVacuum,
+                                  PotentialMinimum const& trueVacuum )
+  {
+    double const squareRootOfSolitonicFactor(
+              potentialFunction.ScaleSquaredRelevantToTunneling( falseVacuum,
+                                                                trueVacuum ) );
+    return ( squareRootOfSolitonicFactor * squareRootOfSolitonicFactor );
   }
 
 } /* namespace VevaciousPlusPlus */

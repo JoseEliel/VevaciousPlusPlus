@@ -63,7 +63,12 @@
       <EvaluationArgument>
         GAUGE
       </EvaluationArgument>
-         would use the value given after "GAUGE Q=" in the LHA file.
+         would use the lowest value given after any "GAUGE Q=" in the LHA file.
+
+         EvaluationType can be "BlockLowestScale", and works exactly as
+         "BlockLowestScale" (including the possibilities for
+         EvaluationArgument), except the highest scale explicitly given for the
+         block is used.
 
          EvaluationType can be "BlockEntry", in which case
          EvaluationArgument should be the name of a block which will be read in

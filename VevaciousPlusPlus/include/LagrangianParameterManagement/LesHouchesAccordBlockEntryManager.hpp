@@ -482,6 +482,11 @@ namespace VevaciousPlusPlus
       return
       lhaParser.BlocksWithName( evaluationArgument )->LowestBlockScale();
     }
+    else if( evaluationType == "BlockHighestScale" )
+    {
+      return
+      lhaParser.BlocksWithName( evaluationArgument )->HighestBlockScale();
+    }
     else if( evaluationType == "BlockEntry" )
     {
       return LHPC::ParsingUtilities::StringToDouble(

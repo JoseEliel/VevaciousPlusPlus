@@ -99,6 +99,21 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
+    if( !( potentialFunction( trueVacuum.FieldConfiguration() )
+           < potentialFunction( falseVacuum.FieldConfiguration() ) ) )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "Tunneling from a given vacuum at"
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                            falseVacuum.FieldConfiguration() )
+      << " to what should be a deeper vacuum at "
+      << potentialFunction.FieldConfigurationAsMathematica(
+                                              trueVacuum.FieldConfiguration() )
+      << " requested, but the given deeper vacuum was not actually deeper, so"
+      << " tunneling is impossible.";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
     // First we set all variables to their "not calculated" values.
     quantumSurvivalProbability = -1.0;
     quantumLifetimeInSeconds = -1.0;
@@ -182,28 +197,26 @@ namespace VevaciousPlusPlus
     {
       quantumLifetimeInSeconds = 1.0E+100;
       quantumSurvivalProbability = 1.0;
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and positive that"
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated bounce action was so large and positive that"
       << " exponentiating it would result in an overflow error, so capping the"
       << " lifetime at " << quantumLifetimeInSeconds
-      << " seconds and the survival probability at "
-      << quantumSurvivalProbability;
-      std::cout << std::endl;
+      << " seconds and setting the survival probability to one.";
+      WarningLogger::LogWarning( warningBuilder.str() );
       return;
     }
     else if( quantumAction <= -maximumPowerOfNaturalExponent )
     {
       quantumLifetimeInSeconds = 0.1;
       quantumSurvivalProbability = 0.0;
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and negative that"
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated bounce action was so large and negative that"
       << " exponentiating it would result in an overflow error, so capping the"
       << " lifetime at " << quantumLifetimeInSeconds
-      << " seconds and the survival probability at "
-      << quantumSurvivalProbability;
-      std::cout << std::endl;
+      << " seconds and setting the survival probability to zero.";
+      WarningLogger::LogWarning( warningBuilder.str() );
       return;
     }
     quantumLifetimeInSeconds = ( ( exp( 0.25 * quantumAction )
@@ -214,12 +227,13 @@ namespace VevaciousPlusPlus
     survivalExponent( ageOfKnownUniverseInSeconds / quantumLifetimeInSeconds );
     if( survivalExponent >= maximumPowerOfNaturalExponent )
     {
-      std::cout
-      << std::endl
-      << "Warning! The calculated decay width was so large that"
-      << " exponentiating it would result in an overflow error, so setting the"
-      << " survival probability to zero.";
       quantumSurvivalProbability = 0.0;
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated decay width was so large that exponentiating it"
+      << " would result in an overflow error, so setting the survival"
+      << " probability to zero.";
+      WarningLogger::LogWarning( warningBuilder.str() );
     }
     else
     {
@@ -243,17 +257,17 @@ namespace VevaciousPlusPlus
     if( potentialFunction( falseVacuum.FieldConfiguration() )
         > potentialAtOriginAtZeroTemperature )
     {
-      std::cout
-      << std::endl
-      << "DSB vacuum has higher energy density than vacuum with no non-zero"
-      << " VEVs! Assuming that it is implausible that the Universe cooled into"
-      << " this false vacuum from the symmetric phase, and so setting survival"
-      << " probability to 0.";
-      std::cout << std::endl;
       dominantTemperatureInGigaElectronVolts = 0.0;
       thermalSurvivalProbability = 0.0;
       logOfMinusLogOfThermalProbability
       = -exp( maximumPowerOfNaturalExponent );
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "DSB vacuum has higher energy density than vacuum with no non-zero"
+      << " VEVs! Assuming that it is implausible that the Universe cooled into"
+      << " this false vacuum from the symmetric phase, and so setting survival"
+      << " probability to zero.";
+      WarningLogger::LogWarning( warningBuilder.str() );
       return;
     }
     SetUpMaximumTemperatureRanges( potentialFunction,
@@ -374,35 +388,35 @@ namespace VevaciousPlusPlus
   {
     if( logOfMinusLogOfThermalProbability >= maximumPowerOfNaturalExponent )
     {
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and positive that"
-      << " exponentiating it would result in an overflow error, so setting the"
-      << " survival probability to 0.";
-      std::cout << std::endl;
       thermalSurvivalProbability = 0.0;
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated bounce action was so large and positive that"
+      << " exponentiating it would result in an overflow error, so setting the"
+      << " survival probability to zero.";
+      WarningLogger::LogWarning( warningBuilder.str() );
     }
     else if( logOfMinusLogOfThermalProbability
              <= -maximumPowerOfNaturalExponent )
     {
-      std::cout
-      << std::endl
-      << "Warning! The calculated bounce action was so large and negative that"
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated bounce action was so large and negative that"
       << " exponentiating it would result in an overflow error, so setting the"
-      << " survival probability to 1.";
-      std::cout << std::endl;
+      << " survival probability to one.";
+      WarningLogger::LogWarning( warningBuilder.str() );
       thermalSurvivalProbability = 1.0;
     }
     else if( exp( logOfMinusLogOfThermalProbability )
              >= maximumPowerOfNaturalExponent )
     {
-      std::cout
-      << std::endl
-      << "Warning! The calculated integrated decay width was so large and"
-      << " positive that exponentiating it would result in an overflow error,"
-      << " so setting the survival probability to 0.";
-      std::cout << std::endl;
       thermalSurvivalProbability = 0.0;
+      std::stringstream warningBuilder;
+      warningBuilder
+      << "The calculated integrated decay width was so large and positive that"
+      << " exponentiating it would result in an overflow error, so setting the"
+      << " survival probability to zero.";
+      WarningLogger::LogWarning( warningBuilder.str() );
     }
     else
     {

@@ -29,6 +29,8 @@ namespace VevaciousPlusPlus
     virtual ~OneDimensionalPotentialAlongPath() {}
 
 
+    virtual bool EnergyBarrierWasResolved() const = 0;
+
     // This should return the value of the potential at auxiliaryValue.
     virtual double operator()( double auxiliaryValue ) const = 0;
 

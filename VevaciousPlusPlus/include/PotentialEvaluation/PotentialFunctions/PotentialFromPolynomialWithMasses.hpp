@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include "boost/math/constants/constants.hpp"
 #include "LHPC/Utilities/RestrictedXmlParser.hpp"
+#include "Utilities/WarningLogger.hpp"
 #include <fstream>
 #include "VersionInformation.hpp"
 #include "PotentialEvaluation/ThermalFunctions.hpp"

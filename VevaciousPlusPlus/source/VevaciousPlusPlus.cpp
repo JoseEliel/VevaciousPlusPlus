@@ -29,7 +29,10 @@ namespace VevaciousPlusPlus
     potentialMinimizer( &potentialMinimizer ),
     ownedPotentialMinimizer( NULL ),
     tunnelingCalculator( &tunnelingCalculator ),
-    ownedTunnelingCalculator( NULL )
+    ownedTunnelingCalculator( NULL ),
+    warningMessagesFromConstructor(),
+    resultsFromLastRunAsXml( "<!-- No results yet. -->" ),
+    warningMessagesFromLastRun()
   {
     // This constructor is just an initialization list.
   }
@@ -49,8 +52,12 @@ namespace VevaciousPlusPlus
     potentialMinimizer( NULL ),
     ownedPotentialMinimizer( NULL ),
     tunnelingCalculator( NULL ),
-    ownedTunnelingCalculator( NULL )
+    ownedTunnelingCalculator( NULL ),
+    warningMessagesFromConstructor(),
+    resultsFromLastRunAsXml( "<!-- No results yet. -->" ),
+    warningMessagesFromLastRun()
   {
+    WarningLogger::SetWarningRecord( &warningMessagesFromConstructor );
     std::string potentialFunctionInitializationFilename( "error" );
     std::string potentialMinimizerInitializationFilename( "error" );
     std::string tunnelingCalculatorInitializationFilename( "error" );
@@ -98,6 +105,7 @@ namespace VevaciousPlusPlus
                                 potentialMinimizerInitializationFilename );
     tunnelingCalculator = ownedTunnelingCalculator
     = CreateTunnelingCalculator( tunnelingCalculatorInitializationFilename );
+    WarningLogger::SetWarningRecord( NULL );
   }
 
   VevaciousPlusPlus::~VevaciousPlusPlus()
@@ -114,6 +122,8 @@ namespace VevaciousPlusPlus
   // principle itself contain all the necessary parameters.
   void VevaciousPlusPlus::RunPoint( std::string const& newInput )
   {
+    warningMessagesFromLastRun.clear();
+    WarningLogger::SetWarningRecord( &warningMessagesFromLastRun );
     time_t runStartTime;
     time_t runEndTime;
     time_t stageStartTime;
@@ -151,99 +161,19 @@ namespace VevaciousPlusPlus
       std::cout << std::endl;
     }
 
+    WarningLogger::SetWarningRecord( NULL );
+    PrepareResultsAsXml();
+    std::cout
+    << std::endl
+    << "Result:" << std::endl << resultsFromLastRunAsXml;
+    std::cout << std::endl;
+
     time( &runEndTime );
     std::cout << std::endl
     << "Total running time was " << difftime( runEndTime,
                                               runStartTime )
     << " seconds, finished at " << ctime( &runEndTime );
     std::cout << std::endl;
-  }
-
-  // This writes the results as an XML file.
-  void
-  VevaciousPlusPlus::WriteResultsAsXmlFile( std::string const& xmlFilename )
-  {
-    std::time_t currentTime( time( NULL ) );
-    std::ofstream xmlFile( xmlFilename.c_str() );
-    xmlFile << "<VevaciousResults>\n"
-    "  <ReferenceData>\n"
-    "     <VevaciousVersion>\n"
-    "       " << VersionInformation::CurrentVersion() << "\n"
-    "     </VevaciousVersion>\n"
-    "     <CitationArticle>\n"
-    "       " << VersionInformation::CurrentCitation() << "\n"
-    "     </CitationArticle>\n"
-    "     <ResultTimestamp>\n"
-    "       "
-    << std::string( ctime( &currentTime ) )
-    << "     </ResultTimestamp>\n"
-    "  </ReferenceData>\n"
-    "  <StableOrMetastable>\n"
-    "    ";
-    if( potentialMinimizer->DsbVacuumIsMetastable() )
-    {
-      xmlFile << "meta";
-    }
-    std::vector< std::string > const&
-    fieldNames( potentialMinimizer->GetPotentialFunction().FieldNames() );
-    xmlFile << "stable\n"
-    "  </StableOrMetastable>\n"
-    << potentialMinimizer->DsbVacuum().AsVevaciousXmlElement( "DsbVacuum",
-                                                              fieldNames );
-    if( potentialMinimizer->DsbVacuumIsMetastable() )
-    {
-      xmlFile << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
-                                                                "PanicVacuum",
-                                                                fieldNames );
-      if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
-      {
-        xmlFile << "  <ZeroTemperatureDsbSurvival>\n"
-        "    <DsbSurvivalProbability>\n"
-        "      " << tunnelingCalculator->QuantumSurvivalProbability() << "\n"
-        "    </DsbSurvivalProbability>\n"
-        "    <LogOfMinusLogOfDsbSurvival>\n"
-        "      " << tunnelingCalculator->LogOfMinusLogOfQuantumProbability()
-        << " <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->\n"
-        "    </LogOfMinusLogOfDsbSurvival>\n"
-        "    <DsbLifetime>\n"
-        "      " << tunnelingCalculator->QuantumLifetimeInSeconds()
-        << " <!-- in seconds; age of observed Universe is 4.3E+17s -->\n"
-        << "    </DsbLifetime>\n"
-        "  </ZeroTemperatureDsbSurvival>\n";
-      }
-      else
-      {
-        xmlFile << "  <!-- Survival probability at zero temperature not"
-                                                          " calculated. -->\n";
-      }
-      if( tunnelingCalculator->ThermalSurvivalProbability() >= 0.0 )
-      {
-        xmlFile << "  <NonZeroTemperatureDsbSurvival>\n"
-        "    <DsbSurvivalProbability>\n"
-        "      " << tunnelingCalculator->ThermalSurvivalProbability() << "\n"
-        "    </DsbSurvivalProbability>\n"
-        "    <LogOfMinusLogOfDsbSurvival>\n"
-        "      " << tunnelingCalculator->LogOfMinusLogOfThermalProbability()
-        << " <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> \n"
-        "    </LogOfMinusLogOfDsbSurvival>\n"
-        "    <DominantTunnelingTemperature>\n"
-        "      "
-        << tunnelingCalculator->DominantTemperatureInGigaElectronVolts()
-        << " <!-- in GeV -->\n"
-        << "    </DominantTunnelingTemperature>\n"
-        "  </NonZeroTemperatureDsbSurvival>\n";
-      }
-      else
-      {
-        xmlFile << "  <!-- Survival probability at non-zero temperatures not"
-                                                          " calculated. -->\n";
-      }
-    }
-    xmlFile << "</VevaciousResults>\n";
-    xmlFile.close();
-
-    std::cout << std::endl << "Wrote results in XML in file \"" << xmlFilename
-    << "\"." << std::endl;
   }
 
   // This writes the results as an SLHA file.
@@ -363,8 +293,7 @@ namespace VevaciousPlusPlus
       << LHPC::ParsingUtilities::FormatNumberForSlha( dsbFields[ fieldIndex ] )
       << "  # " << fieldNames[ fieldIndex ] << "\n";
     }
-    outputFile
-    << "BLOCK VEVACIOUSPANICVACUUM # ";
+    outputFile << "BLOCK VEVACIOUSPANICVACUUM # ";
     if( potentialMinimizer->DsbVacuumIsMetastable() )
     {
       outputFile << "VEVs for panic vacuum in GeV\n";
@@ -388,6 +317,23 @@ namespace VevaciousPlusPlus
       << LHPC::ParsingUtilities::FormatNumberForSlha(
                                                  (*panicFields)[ fieldIndex ] )
       << "  # " << fieldNames[ fieldIndex ] << "\n";
+    }
+    outputFile << "BLOCK VEVACIOUSWARNINGS # ";
+    std::vector< std::string > const
+    warningMessagesToReport( WarningMessagesToReport() );
+    if( warningMessagesToReport.empty() )
+    {
+      outputFile << "   0  No warnings\n";
+    }
+    else
+    {
+      for( size_t messageIndex( 0 );
+           messageIndex < warningMessagesToReport.size();
+           ++messageIndex )
+      {
+        outputFile << "  " << std::setw(2) << messageIndex << "  "
+        << warningMessagesToReport[ messageIndex ] << '#' << "\n";
+      }
     }
     std::cout << std::endl << "Wrote results in SLHA format at end of file \""
     << lhaFilename << "\"." << std::endl;
@@ -959,6 +905,101 @@ namespace VevaciousPlusPlus
                                                    neighborDisplacementWeights,
                                                      minuitStrategy,
                                                      minuitToleranceFraction );
+  }
+
+  // This prepares the results in XML format, stored in resultsAsXml;
+  void VevaciousPlusPlus::PrepareResultsAsXml()
+  {
+    std::stringstream xmlBuilder;
+    xmlBuilder << "  <StableOrMetastable>\n"
+    << "    ";
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
+    {
+      xmlBuilder << "meta";
+    }
+    std::vector< std::string > const&
+    fieldNames( potentialMinimizer->GetPotentialFunction().FieldNames() );
+    xmlBuilder << "stable\n"
+    << "  </StableOrMetastable>\n"
+    << potentialMinimizer->DsbVacuum().AsVevaciousXmlElement( "DsbVacuum",
+                                                              fieldNames )
+    << "\n";
+    if( potentialMinimizer->DsbVacuumIsMetastable() )
+    {
+      xmlBuilder
+      << potentialMinimizer->PanicVacuum().AsVevaciousXmlElement(
+                                                                 "PanicVacuum",
+                                                                  fieldNames )
+      << "\n";
+      if( tunnelingCalculator->QuantumSurvivalProbability() >= 0.0 )
+      {
+        xmlBuilder << "  <ZeroTemperatureDsbSurvival>\n"
+        << "    <DsbSurvivalProbability>\n"
+        << "      " << tunnelingCalculator->QuantumSurvivalProbability()
+        << "\n"
+        << "    </DsbSurvivalProbability>\n"
+        << "    <LogOfMinusLogOfDsbSurvival>\n"
+        << "      " << tunnelingCalculator->LogOfMinusLogOfQuantumProbability()
+        << " <!-- this = ln(-ln(P)), so P = e^(-e^this)) -->\n"
+        << "    </LogOfMinusLogOfDsbSurvival>\n"
+        << "    <DsbLifetime>\n"
+        << "      " << tunnelingCalculator->QuantumLifetimeInSeconds()
+        << " <!-- in seconds; age of observed Universe is 4.3E+17s -->\n"
+        << "    </DsbLifetime>\n"
+        "  </ZeroTemperatureDsbSurvival>\n";
+      }
+      else
+      {
+        xmlBuilder << "  <!-- Survival probability at zero temperature not"
+        << " calculated. -->\n";
+      }
+      if( tunnelingCalculator->ThermalSurvivalProbability() >= 0.0 )
+      {
+        xmlBuilder << "  <NonZeroTemperatureDsbSurvival>\n"
+        << "    <DsbSurvivalProbability>\n"
+        << "      " << tunnelingCalculator->ThermalSurvivalProbability()
+        << "\n"
+        << "    </DsbSurvivalProbability>\n"
+        << "    <LogOfMinusLogOfDsbSurvival>\n"
+        << "      " << tunnelingCalculator->LogOfMinusLogOfThermalProbability()
+        << " <!-- this = ln(-ln(P)), so P = e^(-e^this)) --> \n"
+        << "    </LogOfMinusLogOfDsbSurvival>\n"
+        << "    <DominantTunnelingTemperature>\n"
+        << "      "
+        << tunnelingCalculator->DominantTemperatureInGigaElectronVolts()
+        << " <!-- in GeV -->\n"
+        << "    </DominantTunnelingTemperature>\n"
+        << "  </NonZeroTemperatureDsbSurvival>\n";
+      }
+      else
+      {
+        xmlBuilder << "  <!-- Survival probability at non-zero temperatures"
+        << " not calculated. -->\n";
+      }
+    }
+    xmlBuilder << "  <WarningMessages>";
+    std::vector< std::string > const
+    warningMessagesToReport( WarningMessagesToReport() );
+    if( warningMessagesToReport.empty() )
+    {
+      xmlBuilder << "<!-- No warnings. -->";
+    }
+    else
+    {
+      for( std::vector< std::string >::const_iterator
+           warningMessage( warningMessagesToReport.begin() );
+           warningMessage != warningMessagesToReport.end();
+           ++warningMessage )
+      {
+        xmlBuilder << "\n"
+        << "    " << "<WarningMessage>" << "\n"
+        << "      " << *warningMessage << "\n"
+        << "    " << "<WarningMessage>";
+      }
+      xmlBuilder << "\n  ";
+    }
+    xmlBuilder << "</WarningMessages>";
+    resultsFromLastRunAsXml.assign( xmlBuilder.str() );
   }
 
 } /* namespace VevaciousPlusPlus */
