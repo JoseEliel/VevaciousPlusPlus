@@ -59,7 +59,7 @@
     </ClassType>
     <ConstructorArguments>
       <ModelFile>
-        /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/PotentialFunctions/RealMssmWithStauAndStopVevs.vin
+        /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/PotentialFunctions/RestrictedToRealVevsRealMssm.vin
       </ModelFile>
       <AssumedPositiveOrNegativeTolerance>
         0.5

@@ -75,17 +75,29 @@
     /home/bol/BOL/VevaciousPlusPlusTesting/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml
   </InitializationFile>
   
-  <!-- By default, the content of this element is assumed to be the name of a
-       file in (S)LHA format, and the output will be written in 2 places:
-       appended to the end of the (S)LHA file in several blocks
-       (VEVACIOUSSTABILITY, VEVACIOUSZEROTEMPERATURE,
-       VEVACIOUSNONZEROTEMPERATURE, VEVACIOUSFIELDNAMES, VEVACIOUSDSBVACUUM,
-       and VEVACIOUSPANICVACUUM);
-       and as a separate XML file, which has the same name as the input file
-       with ".vout" appended (e.g. for "InputExample.lha", the output will be
-       written in "InputExample.lha.vout"). -->
+  <!-- Every SingleParameterPoint element will be run by Vevacious in the order
+       in which they appear in this file. Each needs the RunPointInput child
+       element, and at least one of the OutputFilename child element and/or the
+       AppendLhaOutputToLhaInput child empty element. -->
   <SingleParameterPoint>
-    /home/bol/BOL/VevaciousPlusPlusTesting/StopVevsTest01.slha
+    <!-- By default, the content of RunPointInput is assumed to be the name of
+         a file in (S)LHA format. -->
+    <RunPointInput>
+      /home/bol/BOL/VevaciousPlusPlusTesting/StopVevsTest01.slha
+    </RunPointInput>
+    <!-- If the OutputFilename child element is present, its content will be
+         taken as the name to use for the file with the results of the
+         parameter point in XML format. -->
+    <OutputFilename>
+      /home/bol/BOL/VevaciousPlusPlusTesting/StopVevsTest01.vout
+    </OutputFilename>
+    <!-- If the AppendLhaOutputToLhaInput child empty element is present, then
+         the results of the parameter point appended to the end of the (S)LHA
+         file given in RunPointInput, in several blocks
+         (VEVACIOUSSTABILITY, VEVACIOUSZEROTEMPERATURE,
+         VEVACIOUSNONZEROTEMPERATURE, VEVACIOUSFIELDNAMES, VEVACIOUSDSBVACUUM,
+         and VEVACIOUSPANICVACUUM). -->
+    <!-- <AppendLhaOutputToLhaInput /> -->
   </SingleParameterPoint>
   
   <!--
