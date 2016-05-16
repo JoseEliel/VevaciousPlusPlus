@@ -60,7 +60,7 @@ int main( int argumentCount,
 
     std::string runPointInput( "" );
     std::string outputFilename( "" );
-    bool appendLhaOutputToLhaInput( "" );
+    bool appendLhaOutputToLhaInput( false );
     std::string inputFolder( "" );
     std::string outputFolder( "" );
     for( std::vector< std::pair< std::string, std::string > >::const_iterator

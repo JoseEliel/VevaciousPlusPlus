@@ -436,7 +436,7 @@ namespace VevaciousPlusPlus
     "        currentThermalCorrection = 0.0\n"
     "        for MSq in massSquaredWithFactor[ 0 ]:\n"
     "            MM = abs( MSq )\n"
-    "            if ( MM > 1.0 ):\n"
+    "            if ( MM > 0.0 ):\n"
     "                currentQuantumCorrection += ( MM**2\n"
     "                                       * ( math.log( MM * invQSq )\n"
     "                                           - subtractionConstant ) )\n"
