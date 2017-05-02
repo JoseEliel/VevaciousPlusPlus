@@ -48,8 +48,8 @@ REQUIRES LesHouchesParserClasses (LHPC) version 0.8.12 or later!
  VevaciousPlusPlus is an implementation of the process of attempting to find
  the minima of a quantum field theory potential with loop and thermal
  corrections, as decided upon by the collaboration of
- Jos� Eliel Camargo Molina (elielx@gmail.com),
- Bj�rn Garbrecht (garbrecht@tum.de),
+ José Eliel Camargo Molina (elielx@gmail.com),
+ Björn Garbrecht (garbrecht@tum.de),
  Ben O'Leary (benjamin.oleary@gmail.com),
  Werner Porod (porod@physik.uni-wuerzburg.de), and
  Florian Staub (florian.staub@googlemail.com). This README file was written by
