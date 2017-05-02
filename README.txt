@@ -10,7 +10,7 @@
  *      minima of a quantum field theory potential energy function, and to   *
  *      calculate quantum and thermal tunneling out of a given desired       *
  *      symmetry-breaking vacuum if possible. It is a re-write of Vevacious  *
- *      by Ben O'Leary, Florian Staub, Jos� Eliel Camargo Molina, and Werner *
+ *      by Ben O'Leary, Florian Staub, José Eliel Camargo Molina, and Werner *
  *      Porod.                                                               *
  *                                                                           *
  *      VevaciousPlusPlus is free software: you can redistribute it and/or   *
