@@ -190,7 +190,7 @@ namespace LHPC
     // attributes into rootAttributes, and leaves xmlStream ready to read in
     // the first character after the '>' which closes the opening tag of the
     // root element.
-    void ReadPrologAndOpenRootElement();
+    void ReadPrologAndOpenRootElement( std::string const& fileName );
 
     // This puts characters from xmlStream into nonMarkupDestination if not
     // NULL, or discards the characters if nonMarkupDestination is NULL, until
@@ -404,7 +404,7 @@ namespace LHPC
     CloseFile();
     xmlFileStream.open( fileName.c_str() );
     xmlStream = &xmlFileStream;
-    ReadPrologAndOpenRootElement();
+    ReadPrologAndOpenRootElement(fileName);
   }
 
   // This closes the file which was being parsed, if there is one open.
@@ -494,14 +494,15 @@ namespace LHPC
   // attributes into rootAttributes, and leaves xmlStream ready to read in
   // the first character after the '>' which closes the opening tag of the
   // root element.
-  inline void RestrictedXmlParser::ReadPrologAndOpenRootElement()
+  inline void RestrictedXmlParser::ReadPrologAndOpenRootElement(
+                                                  std::string const& fileName )
   {
     ResetContent();
     std::stringstream prologStream;
     std::stringstream tagStream;
     if( !(ReadToNextTagOpener( &prologStream )) )
     {
-      throw std::runtime_error( "No root element found in file!" );
+      throw std::runtime_error( "No root element found in " + fileName );
     }
     fileProlog = prologStream.str();
     ReadStartTag( rootName,
