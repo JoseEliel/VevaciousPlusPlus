@@ -132,7 +132,9 @@ namespace VevaciousPlusPlus
     std::stringstream nameBuilder;
     nameBuilder << numberOfFields;
     size_t const numberOfDigits( nameBuilder.str().size() );
+	
     nameBuilder.fill( '0' );
+	
     for( size_t fieldIndex( 0 );
          fieldIndex < numberOfFields;
          ++fieldIndex )
@@ -188,7 +190,6 @@ namespace VevaciousPlusPlus
         {
           stringBuilder << " + " << factorWithPowers->first;
         }
-
         for( size_t fieldIndex( 0 );
              fieldIndex < factorWithPowers->second.size();
              ++fieldIndex )
@@ -247,6 +248,7 @@ namespace VevaciousPlusPlus
         // If the above condition is satisfied, lineString now contains the
         // root as a complex number, in the form where zero is
         // "(  0.0000000000000000E+00 ,  0.0000000000000000E+00)"
+		double Re,Im;
         LHPC::ParsingUtilities::ReplaceAllCharacters( lineString,
                                                       ',',
                                                       ' ' );
@@ -254,7 +256,9 @@ namespace VevaciousPlusPlus
         parsingStream.str( lineString.substr( 1,
                                               ( lineString.size() - 2 ) ) );
         parsingStream
-        >> currentComplexNumber.real() >> currentComplexNumber.imag();
+        >> Re >> Im;
+		currentComplexNumber.real(Re);
+		currentComplexNumber.imag(Im);
         complexSolutions.push_back( currentComplexNumber );
       }
       else if( LHPC::ParsingUtilities::TrimWhitespaceFromFrontAndBack(
