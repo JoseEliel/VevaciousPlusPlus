@@ -27,7 +27,7 @@ MINUITLIBDIR=/home/bol/BOL/ProjectDependencies/Minuit2/lib/
 DEBUGFLAGS=
 INCLUDES=-I./include/ -I./include/LHPC/ \
  -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
-CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp $(DEBUGFLAGS) $(INCLUDES)
+CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp -std=c++11 $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 
