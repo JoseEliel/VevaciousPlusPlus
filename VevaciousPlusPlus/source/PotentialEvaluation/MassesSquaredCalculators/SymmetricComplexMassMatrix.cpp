@@ -57,15 +57,13 @@ namespace VevaciousPlusPlus
            ++columnIndex )
       {
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).real()
-        = matrixElements[ rowsTimesLength + columnIndex ].first(
+                               columnIndex ).real(matrixElements[ rowsTimesLength + columnIndex ].first(
                                                                parameterValues,
-                                                          fieldConfiguration );
+                                                          fieldConfiguration ));
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).imag()
-        = matrixElements[ rowsTimesLength + columnIndex ].second(
+                               columnIndex ).imag(matrixElements[ rowsTimesLength + columnIndex ].second(
                                                                parameterValues,
-                                                          fieldConfiguration );
+                                                          fieldConfiguration ));
         // We use the fact that the matrix is symmetric.
         valuesMatrix.coeffRef( columnIndex,
                                rowIndex )
@@ -73,13 +71,11 @@ namespace VevaciousPlusPlus
                               columnIndex );
       }
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).real()
-      = matrixElements[ rowsTimesLength + rowIndex ].first( parameterValues,
-                                                          fieldConfiguration );
+                             rowIndex ).real(matrixElements[ rowsTimesLength + rowIndex ].first( parameterValues,
+                                                          fieldConfiguration ));
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).imag()
-      = matrixElements[ rowsTimesLength + rowIndex ].second( parameterValues,
-                                                          fieldConfiguration );
+                             rowIndex ).imag(matrixElements[ rowsTimesLength + rowIndex ].second( parameterValues,
+                                                          fieldConfiguration ));
       rowsTimesLength += numberOfRows;
     }
     return valuesMatrix;
@@ -103,13 +99,11 @@ namespace VevaciousPlusPlus
            ++columnIndex )
       {
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).real()
-        = matrixElements[ rowsTimesLength + columnIndex ].first(
-                                                          fieldConfiguration );
+                               columnIndex ).real(matrixElements[ rowsTimesLength + columnIndex ].first(
+                                                          fieldConfiguration ));
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).imag()
-        = matrixElements[ rowsTimesLength + columnIndex ].second(
-                                                          fieldConfiguration );
+                               columnIndex ).imag(matrixElements[ rowsTimesLength + columnIndex ].second(
+                                                          fieldConfiguration ));
         // We use the fact that the matrix is symmetric.
         valuesMatrix.coeffRef( columnIndex,
                                rowIndex )
@@ -117,13 +111,11 @@ namespace VevaciousPlusPlus
                               columnIndex );
       }
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).real()
-      = matrixElements[ rowsTimesLength + rowIndex ].first(
-                                                          fieldConfiguration );
+                             rowIndex ).real(matrixElements[ rowsTimesLength + rowIndex ].first(
+                                                          fieldConfiguration ));
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).imag()
-      = matrixElements[ rowsTimesLength + rowIndex ].second(
-                                                          fieldConfiguration );
+                             rowIndex ).imag(matrixElements[ rowsTimesLength + rowIndex ].second(
+                                                          fieldConfiguration ));
       rowsTimesLength += numberOfRows;
     }
     return valuesMatrix;
@@ -145,16 +137,16 @@ namespace VevaciousPlusPlus
            ++columnIndex )
       {
         valuesSquaredMatrix.coeffRef( rowIndex,
-                                      columnIndex ).real() = 0.0;
+                                      columnIndex ).real(0.0);
         valuesSquaredMatrix.coeffRef( rowIndex,
-                                      columnIndex ).imag() = 0.0;
+                                      columnIndex ).imag(0.0);
         for( size_t sumIndex( 0 );
              sumIndex < numberOfRows;
              ++sumIndex )
         {
-          valuesSquaredMatrix.coeffRef( rowIndex,
+          double temp = valuesSquaredMatrix.coeffRef( rowIndex,
                                         columnIndex ).real()
-          += ( ( matrixToSquare.coeff( sumIndex,
+          + ( ( matrixToSquare.coeff( sumIndex,
                                      rowIndex ).real()
                  * matrixToSquare.coeff( sumIndex,
                                        columnIndex ).real() )
@@ -162,9 +154,10 @@ namespace VevaciousPlusPlus
                                        rowIndex ).imag()
                    * matrixToSquare.coeff( sumIndex,
                                          columnIndex ).imag() ) );
-          valuesSquaredMatrix.coeffRef( rowIndex,
+		valuesSquaredMatrix.coeffRef( rowIndex, columnIndex ).real(temp);
+          temp = valuesSquaredMatrix.coeffRef( rowIndex,
                                         columnIndex ).imag()
-          += ( ( matrixToSquare.coeff( sumIndex,
+          + ( ( matrixToSquare.coeff( sumIndex,
                                      rowIndex ).real()
                  * matrixToSquare.coeff( sumIndex,
                                        columnIndex ).imag() )
@@ -172,6 +165,8 @@ namespace VevaciousPlusPlus
                                        rowIndex ).imag()
                    * matrixToSquare.coeff( sumIndex,
                                          columnIndex ).real() ) );
+		valuesSquaredMatrix.coeffRef( rowIndex,
+                                        columnIndex ).imag(temp);
           // The Eigen routines don't bother looking at elements of
           // valuesSquaredMatrix where columnIndex > rowIndex, so we don't even
           // bother filling them with the conjugates of the transpose.
