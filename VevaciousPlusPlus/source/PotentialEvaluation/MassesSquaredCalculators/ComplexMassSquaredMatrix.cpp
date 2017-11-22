@@ -56,25 +56,22 @@ namespace VevaciousPlusPlus
            ++columnIndex )
       {
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).real()
-        = matrixElements[ rowsTimesLength + columnIndex ].first(
+                               columnIndex ).real(matrixElements[ rowsTimesLength + columnIndex ].first(
                                                                parameterValues,
-                                                          fieldConfiguration );
+                                                          fieldConfiguration ));
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).imag()
-        = matrixElements[ rowsTimesLength + columnIndex ].second(
+                               columnIndex ).imag(matrixElements[ rowsTimesLength + columnIndex ].second(
                                                                parameterValues,
-                                                          fieldConfiguration );
+                                                          fieldConfiguration ));
         // The Eigen routines don't bother looking at elements of valuesMatrix
         // where columnIndex > rowIndex, so we don't even bother filling them
         // with the conjugates of the transpose.
       }
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).real()
-      = matrixElements[ rowsTimesLength + rowIndex ].first( parameterValues,
-                                                          fieldConfiguration );
+                             rowIndex ).real(matrixElements[ rowsTimesLength + rowIndex ].first( parameterValues,
+                                                          fieldConfiguration ));
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).imag() = 0.0;
+                             rowIndex ).imag(0.0);
       rowsTimesLength += numberOfRows;
     }
     return valuesMatrix;
@@ -98,23 +95,20 @@ namespace VevaciousPlusPlus
            ++columnIndex )
       {
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).real()
-        = matrixElements[ rowsTimesLength + columnIndex ].first(
-                                                          fieldConfiguration );
+                               columnIndex ).real(matrixElements[ rowsTimesLength + columnIndex ].first(
+                                                          fieldConfiguration ));
         valuesMatrix.coeffRef( rowIndex,
-                               columnIndex ).imag()
-        = matrixElements[ rowsTimesLength + columnIndex ].second(
-                                                          fieldConfiguration );
+                               columnIndex ).imag(matrixElements[ rowsTimesLength + columnIndex ].second(
+                                                          fieldConfiguration ));
         // The Eigen routines don't bother looking at elements of valuesMatrix
         // where columnIndex > rowIndex, so we don't even bother filling them
         // with the conjugates of the transpose.
       }
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).real()
-      = matrixElements[ rowsTimesLength + rowIndex ].first(
-                                                          fieldConfiguration );
+                             rowIndex ).real(matrixElements[ rowsTimesLength + rowIndex ].first(
+                                                          fieldConfiguration ));
       valuesMatrix.coeffRef( rowIndex,
-                             rowIndex ).imag() = 0.0;
+                             rowIndex ).imag(0.0);
       rowsTimesLength += numberOfRows;
     }
     return valuesMatrix;
