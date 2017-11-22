@@ -21,6 +21,7 @@
 #include "PotentialMinimization/StartingPointGeneration/PolynomialAtFixedScalesSolver.hpp"
 #include "PotentialMinimization/StartingPointGeneration/PolynomialSystemSolver.hpp"
 #include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
+#include "PotentialMinimization/HomotopyContinuation/PHCRunner.hpp"
 #include "PotentialMinimization/GradientMinimizer.hpp"
 #include "PotentialEvaluation/PotentialFunction.hpp"
 #include "PotentialMinimization/GradientBasedMinimization/MinuitPotentialMinimizer.hpp"
@@ -199,6 +200,11 @@ namespace VevaciousPlusPlus
     // returns a pointer to it.
     static Hom4ps2Runner*
     CreateHom4ps2Runner( std::string const& constructorArguments );
+
+    // This creates a new PHCRunner based on the given arguments and
+    // returns a pointer to it.
+    static PHCRunner*
+    CreatePHCRunner( std::string const& constructorArguments );
 
     // This creates a new GradientMinimizer based on the given arguments and
     // returns a pointer to it.
@@ -476,12 +482,17 @@ namespace VevaciousPlusPlus
     {
       return CreateHom4ps2Runner( constructorArguments );
     }
+	else if( classChoice == "PHCRunner" )
+    {
+      return CreatePHCRunner( constructorArguments );
+    }
     else
     {
       std::stringstream errorStream;
       errorStream
       << "<PolynomialSystemSolver> was not a recognized class! The only"
-      << " option currently valid is \"Hom4ps2Runner\".";
+      << " options currently valid are \"Hom4ps2Runner\" or \"PHCRunner\"." << std::endl;
+	  errorStream << "Classchoice: " << classChoice << std::endl << "Constructorarguments:" << constructorArguments<< std::endl;
       throw std::runtime_error( errorStream.str() );
     }
   }
@@ -511,6 +522,25 @@ namespace VevaciousPlusPlus
     return new Hom4ps2Runner( pathToHom4ps2,
                               homotopyType,
                               resolutionSize );
+  }
+  
+    inline PHCRunner* VevaciousPlusPlus::CreatePHCRunner(
+                                      std::string const& constructorArguments )
+  {
+    LHPC::RestrictedXmlParser xmlParser;
+    xmlParser.LoadString( constructorArguments );
+	std::string pathToPHC( "error" );
+    double resolutionSize( 1.0 );
+    while( xmlParser.ReadNextElement() )
+    {
+	  InterpretElementIfNameMatches( xmlParser,
+                                     "PathToPHC",
+                                     pathToPHC );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "ResolutionSize",
+                                     resolutionSize );
+    }
+    return new PHCRunner(  pathToPHC, resolutionSize );
   }
 
   // This creates a new GradientMinimizer based on the given arguments and
