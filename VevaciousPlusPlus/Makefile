@@ -60,6 +60,7 @@ SOURCES= source/Utilities/WarningLogger.cpp \
  $(STARTINGPOINTGENERATION)/PolynomialSystemSolver.cpp \
  $(STARTINGPOINTGENERATION)/PolynomialAtFixedScalesSolver.cpp \
  $(HOMOTOPYCONTINUATION)/Hom4ps2Runner.cpp \
+ $(HOMOTOPYCONTINUATION)/PHCRunner.cpp \
  source/PotentialMinimization/GradientFromStartingPoints.cpp \
  $(PATHPARAMETERIZATION)/LinearSplineThroughNodes.cpp \
  source/BounceActionEvaluation/SplinePotential.cpp \
