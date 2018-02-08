@@ -12,9 +12,10 @@ namespace VevaciousPlusPlus
   std::string const PHCRunner::fieldNamePrefix( "fv" );
 
   PHCRunner::PHCRunner( std::string const& pathToPHC,
-                                double const resolutionSize ) :
+                                double const resolutionSize, unsigned const int taskcount ) :
     pathToPHC( pathToPHC ),
-    resolutionSize( resolutionSize )
+    resolutionSize( resolutionSize ),
+    taskcount(  taskcount  )
   {
   }
 
@@ -32,7 +33,7 @@ namespace VevaciousPlusPlus
   {
 
     std::string PHCInputFileName = pathToPHC + "VevaciousHomotopyContinuation.txt";
-	std::string PHCOutputFilename = pathToPHC + "PHCOutput";
+    std::string PHCOutputFilename = pathToPHC + "PHCOutput";
     std::vector< std::string > variableNames( systemToSolve.size(),
                                               "" );
     std::map< std::string, size_t > nameToIndexMap;
@@ -44,12 +45,14 @@ namespace VevaciousPlusPlus
     std::cout
     << std::endl
     << "Running PHC!" << std::endl << "-----------------" << std::endl;
+        std::cout << std::endl;
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    std::cout << std::endl;
+
 	int systemReturn(0);
-	std::string systemCommand= "rm " + PHCOutputFilename;
+	std::string systemCommand = "rm " + PHCOutputFilename;
+	
 	struct stat buffer; //Checking if file exists, fastest method.
-	if(stat(PHCInputFileName.c_str(), &buffer)==0){		
+	if(stat(PHCOutputFilename.c_str(), &buffer)==0){		
 		systemReturn = system(systemCommand.c_str());
 		if( systemReturn == -1 )
 		{
@@ -58,7 +61,7 @@ namespace VevaciousPlusPlus
 		  throw std::runtime_error( errorBuilder.str() );
 		}
 	}
-	systemCommand.assign(pathToPHC + "phc -b "); //calls the blackbox solver
+	systemCommand.assign(pathToPHC + "phc -b -t" + std::to_string(taskcount)+ " "); //calls the blackbox solver
     systemCommand.append( PHCInputFileName );
 	systemCommand.append(" ");
 	systemCommand.append( PHCOutputFilename );
@@ -239,12 +242,13 @@ namespace VevaciousPlusPlus
 					auto itm2 = itm;
 					itm++;
 					solmap.erase(itm2);
-				} //We want all fieldvalues to be real, if one isn't, then the vector is erased. We need a temp iterator (simplest method) to not mess up the map order.
+				} //We want all fieldvalues to be real, if one isn't, then the vector is erased. We need a temp iterator to not mess up the map order.
 			}
 		}
 	}
 	//-------------------
 	//Appending Solutions
+
 	if(!(solmap.empty())){
 		for(auto it = solmap.begin(); it !=solmap.end(); it++)
 		{
@@ -264,7 +268,7 @@ namespace VevaciousPlusPlus
 	}
 	else {
 		std::stringstream errorBuilder;
-		errorBuilder << "No Real solutions have been found. Check on your ResolutionSize or your Input system." << std::endl;
+		errorBuilder << "No real solutions have been found. Check on your ResolutionSize or your input system." << std::endl;
 		throw std::runtime_error( errorBuilder.str() );
 		}
 	
