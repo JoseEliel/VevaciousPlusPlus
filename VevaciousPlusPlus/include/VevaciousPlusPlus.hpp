@@ -531,16 +531,20 @@ namespace VevaciousPlusPlus
     xmlParser.LoadString( constructorArguments );
 	std::string pathToPHC( "error" );
     double resolutionSize( 1.0 );
+	unsigned int taskcount(1);
     while( xmlParser.ReadNextElement() )
     {
-	  InterpretElementIfNameMatches( xmlParser,
+	InterpretElementIfNameMatches( xmlParser,
                                      "PathToPHC",
                                      pathToPHC );
-      InterpretElementIfNameMatches( xmlParser,
+	InterpretElementIfNameMatches( xmlParser,
                                      "ResolutionSize",
                                      resolutionSize );
+	InterpretElementIfNameMatches( xmlParser,
+                                     "Tasks",
+                                     taskcount );
     }
-    return new PHCRunner(  pathToPHC, resolutionSize );
+    return new PHCRunner(  pathToPHC, resolutionSize, taskcount);
   }
 
   // This creates a new GradientMinimizer based on the given arguments and
