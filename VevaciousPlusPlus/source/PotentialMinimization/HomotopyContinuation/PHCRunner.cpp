@@ -201,6 +201,7 @@ namespace VevaciousPlusPlus
 	std::ifstream t(PHCInputFileName); //PHC appends the final solutions to the Inputfile. The Outputfile contains further information, which isn't needed.
 	std::string container((std::istreambuf_iterator<char>(t)),
 							std::istreambuf_iterator<char>());
+	t.close();
 	//-----------------
 	
 	//Parsing container
