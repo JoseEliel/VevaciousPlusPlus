@@ -79,9 +79,22 @@ namespace VevaciousPlusPlus
     // case gives the name of a file with the input parameters, but could in
     // principle itself contain all the necessary parameters.
     void RunPoint( std::string const& newInput );
+    
+    //This reads in a Slha block and passes it over to LagrangianParameterManager updating 
+    //the given parameters in the blockset object. The parameter values are given in a vector 
+    // and the dimension is given, with 1 is given the block is read as a list, if n is given
+    // the vector is read as a n x n matrix in sequential order row by row. 
+    
+    void ReadLhaBlock( std::string const& uppercaseBlockName,
+    				   double const scale, 
+    				   std::vector<std::pair<int,double>> const& parameters, 
+    				   int const dimension );
 
     // This writes the results as an XML file.
     void WriteResultsAsXmlFile( std::string const& xmlFilename );
+    
+    // This gives the results as a string.
+    std::string GetResultsAsString();
 
     // This writes the results as an SLHA file.
     void AppendResultsToLhaFile( std::string const& lhaFilename,
@@ -330,6 +343,19 @@ namespace VevaciousPlusPlus
     xmlFile.close();
     std::cout << std::endl << "Wrote results in XML in file \"" << xmlFilename
     << "\"." << std::endl;
+  }
+
+  inline std::string VevaciousPlusPlus::GetResultsAsString()
+  {
+    std::string result= "Error";
+    if( potentialMinimizer->DsbVacuumIsStable() )
+    {
+     result="Stable";
+    }
+    else
+    {
+     result="Metastable";
+    }
   }
 
   // This reads the current element of outerParser and if its name matches

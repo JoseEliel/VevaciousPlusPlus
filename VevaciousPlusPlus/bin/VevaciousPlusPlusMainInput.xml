@@ -1,7 +1,7 @@
-<VevaciousPlusPlusInitialization>
+<VevaciousPlusPlusMainInput>
 
 <!--
-#  VevaciousPlusPlusInitialization.xml
+#  VevaciousPlusPlusMainInput.xml
 #
 #  Created on: Apr 10, 2014
 #      Author: Ben O'Leary (benjamin.oleary@gmail.com)
@@ -15,26 +15,104 @@
 #
  -->
  
+
+<!-- Quick start:
+     This file is intended to provide the choice of potential and the parameter
+     point or points to be run. It has 2 types of element.
+
+     1) The <InitializationFile> element gives a file
+        name which is used for creating the code objects which play the role of
+        the potential and Lagrangian parameters, and the objects which solve
+        the system.
+
+     2) There are 2 types of parameter-point-defining element. The primary type
+        is <SingleParameterPoint>, which defines a single point. The secondary
+        type is <ParameterPointSet>, which gives a folder where a set of
+        parameter-point-defining files should be.
+        2a) By default, the content of a <SingleParameterPoint> element is
+            passed to the RunPoint(...) function of the VevaciousPlusPlus
+            object, which by default assumes that this is the name of a file
+            which contains Lagrangian parameter values in the (SUSY) Les
+            Houches Accord ((S)LHA) format. Multiple <SingleParameterPoint>
+            elements can be given here, and each of them will be run in turn.
+        2b) A <ParameterPointSet> element must contain 2 elements:
+            <InputFolder>, which gives the path of a folder which contains
+            files which will be run through RunPoint(...) as (S)LHA files, and
+            optionally <OutputFolder>, which will be used as a destination for
+            output files. If <OutputFolder> is not given, output files will be
+            placed in the folder given by <InputFolder>.
+            Every file in the folder given by <InputFolder> will be taken as
+            input, but no subdirectories will be entered.
+            A primitive locking system is used to allow multiple computers to
+            use a shared folder to work through all the files in parallel: each
+            process looks for an input file in the input folder which does not
+            have its corresponding output file (which will have the same name
+            with ".vout" appended) or a corresponding "placeholder" file (which
+            has the same name but with ".placeholder" appended). When it finds
+            such an input file, it creates an empty "placeholder" file, and
+            then proceeds to run the point, then when it is finished, it writes
+            the output file and then deletes the placeholder, and moves on to
+            look for the next input file. Multiple <ParameterPointSet>
+            elements can be given here, and each of them will be run in turn.
+            
+         Multiple <SingleParameterPoint> elements and <ParameterPointSet>
+         elements can be given in this file, and they will be run in the order
+         in which they appear, though the "placeholder" files are only created
+         for files in input folders given by <ParameterPointSet> elements. -->
+
+
+
+  <!-- The <InitializationFile> element is required for setting up the
+       VevaciousPlusPlus object. It should be the name of an XML file which
+       contains all the information required to assemble the VevaciousPlusPlus
+       object. An example is provided:
+       InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml
+       which has comments describing each of the elements. Its main purpose is
+       do define the model to be used (potential function, source of Lagrangian
+       parameters) and choices of technical details for the calculation, all
+       through names of further files containing the information. -->
+ 
   <InitializationFile>
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml
+  /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/VevaciousPlusPlusDefaultObjectInitialization.xml
   </InitializationFile>
   
-  <slha>
-  <!-- /home/bol/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest.slha -->
-  /Users/oleary/BOL/Cplusplus/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest.slha
-  </slha>
+  <!-- Every SingleParameterPoint element will be run by Vevacious in the order
+       in which they appear in this file. Each needs the RunPointInput child
+       element, and at least one of the OutputFilename child element and/or the
+       AppendLhaOutputToLhaInput child empty element. -->
+         
+ <SingleParameterPoint>
+    <!-- By default, the content of RunPointInput is assumed to be the name of
+         a file in (S)LHA format. -->
+    <RunPointInput>
+      /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/StopVevsTest.slha
+    </RunPointInput>
+    <!-- If the OutputFilename child element is present, its content will be
+         taken as the name to use for the file with the results of the
+         parameter point in XML format. -->
+    <OutputFilename>
+      /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/results/StopVevsTest.vout
+    </OutputFilename>
+    <!-- If the AppendLhaOutputToLhaInput child empty element is present, then
+         the results of the parameter point appended to the end of the (S)LHA
+         file given in RunPointInput, in several blocks
+         (VEVACIOUSSTABILITY, VEVACIOUSZEROTEMPERATURE,
+         VEVACIOUSNONZEROTEMPERATURE, VEVACIOUSFIELDNAMES, VEVACIOUSDSBVACUUM,
+         and VEVACIOUSPANICVACUUM). -->
+    <!-- <AppendLhaOutputToLhaInput /> -->
+  </SingleParameterPoint>
   
-  <!-- If <InputFolder> is given, it should contain the path to a folder with
-       only files in the SLHA format, which will be taken as input for
-       VevaciousPlusPlus, and <OutputFolder> must also be given, as the place
-       where the output files will be put. The 2 folders must be different! -->
-  <!--
-  <InputFolder>
-  </InputFolder>
-  <OutputFolder>
-  </OutputFolder>
+
+<!--
+  <ParameterPointSet>
+    <InputFolder>
+      /home/bol/BOL/VevaciousPlusPlusTesting/InputFolderTest/
+    </InputFolder>
+    <OutputFolder>
+      /home/bol/BOL/VevaciousPlusPlusTesting/OutputFolderTest/
+    </OutputFolder>
+  </ParameterPointSet>
   -->
 
-</VevaciousPlusPlusInitialization>
 
+</VevaciousPlusPlusMainInput>

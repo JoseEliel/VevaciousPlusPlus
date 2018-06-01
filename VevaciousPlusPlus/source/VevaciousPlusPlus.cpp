@@ -116,6 +116,20 @@ namespace VevaciousPlusPlus
     delete ownedLagrangianParameterManager;
   }
 
+    //This reads in a Slha block and passes it over to LagrangianParameterManager updating 
+    //the given parameters in the blockset object. The parameter values are given in a vector 
+    // and the dimension is given, with 1 is given the block is read as a list, if n is given
+    // the vector is read as a n x n matrix in sequential order row by row. 
+    
+  void VevaciousPlusPlus::ReadLhaBlock( std::string const& uppercaseBlockName, 
+  										double const scale, 
+  										std::vector<std::pair<int,double>> const& parameters, 
+  										int const dimension )
+  {
+   lagrangianParameterManager->NewLhaBlock( uppercaseBlockName, scale, parameters, dimension  );
+  }
+
+
 
   // This runs the point parameterized by newInput, which for the default
   // case gives the name of a file with the input parameters, but could in
@@ -175,7 +189,7 @@ namespace VevaciousPlusPlus
     << " seconds, finished at " << ctime( &runEndTime );
     std::cout << std::endl;
   }
-
+  
   // This writes the results as an SLHA file.
   void
   VevaciousPlusPlus::AppendResultsToLhaFile( std::string const& lhaFilename,

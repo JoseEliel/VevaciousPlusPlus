@@ -46,7 +46,7 @@
     </ClassType>
     <ConstructorArguments>
       <ScaleAndBlockFile>
-        /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LagrangianParameters/MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml
+        /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LagrangianParameters/MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml
       </ScaleAndBlockFile>
     </ConstructorArguments>
   </LagrangianParameterManagerClass>
@@ -59,7 +59,7 @@
     </ClassType>
     <ConstructorArguments>
       <ModelFile>
-        /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/PotentialFunctions/RestrictedToRealVevsRealMssm.vin
+         /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/PotentialFunctions/RealMssmWithStauAndStopVevs.vin
       </ModelFile>
       <AssumedPositiveOrNegativeTolerance>
         0.5

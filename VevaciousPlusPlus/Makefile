@@ -11,19 +11,19 @@
 
 SHELL=/bin/sh
 
-CC=g++
+CC=g++-7
 AR=ar
 ARFLAGS=rcs
 #BOOSTDIR=./Boost/
-BOOSTDIR=/home/bol/BOL/ProjectDependencies/Boost/
+BOOSTDIR=/usr/local/include/boost/
 #EIGENDIR=./Eigen/
-EIGENDIR=/home/bol/BOL/ProjectDependencies/Eigen/
+EIGENDIR=/usr/local/include/eigen3/
 #MINUITLIBNAME=lcg_Minuit
 MINUITLIBNAME=Minuit2
 #MINUITINCLUDEDIR=./MINUIT/include/
-MINUITINCLUDEDIR=/home/bol/BOL/ProjectDependencies/Minuit2/include/
+MINUITINCLUDEDIR=/usr/local/include/
 #MINUITLIBDIR=./MINUIT/include/
-MINUITLIBDIR=/home/bol/BOL/ProjectDependencies/Minuit2/lib/
+MINUITLIBDIR=/usr/local/lib
 DEBUGFLAGS=
 INCLUDES=-I./include/ -I./include/LHPC/ \
  -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
@@ -79,8 +79,9 @@ BINDIR=./bin/
 LIBNAME=VevaciousPlusPlus
 LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
-LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) \
-  $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
+LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
+#-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
+ 
 # -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
 # There is some silly screwing around to force linking to the static Minuit2 
 # library.
