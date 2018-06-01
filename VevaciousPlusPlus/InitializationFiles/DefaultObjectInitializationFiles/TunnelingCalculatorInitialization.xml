@@ -7,6 +7,7 @@
 #      Author: Ben O'Leary (benjamin.oleary@gmail.com)
 #      Copyright 2014 Ben O'Leary
 #
+#
 #      This file is part of VevaciousPlusPlus, released under the
 #      GNU General Public License. Please see the accompanying
 #      README.VevaciousPlusPlus.txt file for a full list of files, brief
@@ -34,7 +35,7 @@
         <!-- Valid options: "NoTunneling", "JustQuantum", "JustThermal",
                             "ThermalThenQuantum", or "QuantumThenThermal"
              (no quote marks in actual element). -->
-        QuantumThenThermal
+        JustQuantum
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
@@ -88,7 +89,7 @@
            "CosmoTransitionsRunner", and are ignored if <ClassType> is
            "BounceAlongPathWithThreshold". -->
       <PathToCosmotransitions>
-        /home/bol/BOL/ProjectDependencies/CosmoTransitions2/
+        /Users/Eliel/VevaciousPlusPlus/CosmoTransitions2/
       </PathToCosmotransitions>
       <MaxInnerLoops>
         <!-- This is the number of iterations of the inner loop that

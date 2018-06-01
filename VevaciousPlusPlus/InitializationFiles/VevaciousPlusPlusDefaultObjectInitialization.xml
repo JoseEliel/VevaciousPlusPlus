@@ -24,15 +24,15 @@
      is skipped, and so on. -->
 
   <PotentialFunctionInitializationFile>
-    /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/PotentialFunctionInitialization.xml
+    /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/PotentialFunctionInitialization.xml
   </PotentialFunctionInitializationFile>
    
   <PotentialMinimizerInitializationFile>
-    /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/PotentialMinimizerInitialization.xml
+   /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/PotentialMinimizerInitialization.xml
   </PotentialMinimizerInitializationFile>
    
   <TunnelingCalculatorInitializationFile>
-    /home/bol/BOL/C++Projects/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/TunnelingCalculatorInitialization.xml
+   /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/TunnelingCalculatorInitialization.xml
   </TunnelingCalculatorInitializationFile>
 
 </VevaciousPlusPlusObjectInitialization>

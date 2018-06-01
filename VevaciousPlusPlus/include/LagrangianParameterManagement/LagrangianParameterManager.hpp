@@ -77,6 +77,11 @@ namespace VevaciousPlusPlus
     // This just runs the internal PrepareNewParameterPoint method then updates
     // the observers.
     virtual void NewParameterPoint( std::string const& newInput );
+    
+    // This passes the necessary information of a slha block to internally to setup a lhablockset as if
+    // parsed from a file
+    
+    virtual void NewLhaBlock(  std::string const& uppercaseBlockName, double const scale, std::vector<std::pair<int,double>> const& parameters, int const dimension );
 
     // This puts all variables with index brackets into a consistent form. It
     // can be overridden if necessary.
@@ -112,6 +117,11 @@ namespace VevaciousPlusPlus
     // some code to prepare the parameters so that code objects which depend on
     // them can be informed that there is a new parameter point.
     virtual void PrepareNewParameterPoint( std::string const& newInput ) = 0;
+    
+    virtual void ReadNewBlock( 	std::string const& uppercaseBlockName,
+								double const scale, 
+								std::vector<std::pair<int,double>> const& parameters, 
+								int const dimension) = 0;
 
     // This puts all index brackets into a consistent form. It can be
     // overridden if necessary.
@@ -132,13 +142,19 @@ namespace VevaciousPlusPlus
 
   // This just runs the internal PrepareNewParameterPoint method then updates
   // the observers.
-  inline void
-  LagrangianParameterManager::NewParameterPoint( std::string const& newInput )
+  inline void LagrangianParameterManager::NewParameterPoint( std::string const& newInput )
   {
     PrepareNewParameterPoint( newInput );
     UpdateObservers();
   }
 
+
+  inline void LagrangianParameterManager::NewLhaBlock(  std::string const& uppercaseBlockName, double const scale,std::vector<std::pair<int,double>> const& parameters, int const dimension )
+
+  {
+    ReadNewBlock( uppercaseBlockName, scale, parameters, dimension );
+    UpdateObservers();
+  }
   // This puts all variables with index brackets into a consistent form.
   inline std::string LagrangianParameterManager::FormatVariable(
                                     std::string const& variableToFormat ) const

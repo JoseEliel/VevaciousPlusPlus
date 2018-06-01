@@ -16,7 +16,8 @@
 #include <vector>
 #include <map>
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
-#include "LHPC/SimpleLhaParser.hpp"
+//#include "LHPC/SimpleLhaParser.hpp"
+#include "Utilities/VirtualSimpleLhaParser.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
 #include <sstream>
 #include "LHPC/Utilities/RestrictedXmlParser.hpp"
@@ -144,7 +145,8 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator* > referenceSafeActiveParameters;
     std::vector< LhaBlockEntryInterpolator > referenceUnsafeActiveParameters;
     std::set< std::string > validBlocks;
-    LHPC::SimpleLhaParser lhaParser;
+    //LHPC::SimpleLhaParser lhaParser;
+    VirtualSimpleLhaParser lhaParser;
     std::string minimumScaleType;
     std::string minimumScaleArgument;
     std::string fixedScaleType;
@@ -171,6 +173,13 @@ namespace VevaciousPlusPlus
     // LhaBlockEntryInterpolator objects copied from the objects pointed at by
     // the pointers in referenceSafeActiveParameters.
     virtual void PrepareNewParameterPoint( std::string const& newInput );
+    
+    
+    virtual void ReadNewBlock( std::string const& uppercaseBlockName,
+    						   double const scale, 
+    					       std::vector<std::pair<int,double>> const& parameters, 
+    					       int const dimension );
+ 
 
     // This finds the block name part of parameterName, returns true if the
     // block name is found in validBlocks.
@@ -382,7 +391,15 @@ namespace VevaciousPlusPlus
       = *(referenceSafeActiveParameters[ parameterIndex ]);
     }
   }
-
+  
+  inline void LesHouchesAccordBlockEntryManager::ReadNewBlock( std::string const& uppercaseBlockName, 
+  															   double const scale, 
+  															   std::vector<std::pair<int,double>> const& parameters, 
+  															   int const dimension )
+  {
+   lhaParser.ReadBlock(uppercaseBlockName, scale, parameters, dimension);
+  }
+  
   // This adds a new LhaBlockEntryInterpolator for the given parameter
   // to activeInterpolatedParameters and activeParametersToIndices, and
   // returns a reference to it.

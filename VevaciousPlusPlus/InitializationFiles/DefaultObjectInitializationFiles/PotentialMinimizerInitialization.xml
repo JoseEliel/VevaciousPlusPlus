@@ -92,7 +92,7 @@
             </ClassType>
             <ConstructorArguments>
               <PathToHom4ps2>
-                /home/bol/BOL/ProjectDependencies/HOM4PS2/
+				/Users/Eliel/VevaciousPlusPlus/HOM4PS2/
               </PathToHom4ps2>
               <Hom4ps2Argument>
                 <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
@@ -101,7 +101,7 @@
                         2. The classical linear homotopy"
                      1 can be faster for systems of many variables,
                      but 2 seems more reliable. -->
-                2
+                1
               </Hom4ps2Argument>
               <ResolutionSize>
                 <!-- Solutions within a hypercube with side length given by
@@ -139,7 +139,7 @@
                  function to be minimized. The default is 1, while 0 emphasizes
                  making less function calls, and 2 emphasizes more accuracy
                  through more function calls. -->
-            1
+            0
           </MinuitStrategy>
         </ConstructorArguments>
       </GradientMinimizerClass>
