@@ -318,7 +318,7 @@ namespace LHPC
                  ||
                  ( trimmedLine[ 5 ] == '\t' ) ) ); }
 
-    // This returns true if the line begins with "DECAY" then a whitespace
+    // This returns true if the line begins with "DECAY" or "DECAY1L" then a whitespace
     // character.
     static bool IsDecayHeader( std::string const& trimmedLine )
     { return ( ( trimmedLine.size() > 6 )
@@ -333,9 +333,9 @@ namespace LHPC
                &&
                ( std::toupper( trimmedLine[ 4 ] ) == 'Y' )
                &&
-               ( ( trimmedLine[ 5 ] == ' ' )
+	( ( trimmedLine[ 5 ] == ' ' || trimmedLine[ 5 ] == '1' )
                  ||
-                 ( trimmedLine[ 5 ] == '\t' ) ) ); }
+                 ( trimmedLine[ 5 ] == '\t'  || trimmedLine [6] == 'L') ) ); }
 
     // This returns the double interpreted from the substring following the '='
     // (or throws an exception if any other characters come between the 'Q'/'q'
@@ -802,7 +802,7 @@ namespace LHPC
     currentBlockSet = BlockSetForName( blockName );
     size_t const positionOfQ( trimmedLine.find_first_of( "Qq",
                                                ( blockNameEndPlusOne + 1 ) ) );
-    if( positionOfQ != std::string::npos )
+    if( positionOfQ != std::string::npos && blockNameEndPlusOne != std::string::npos)
     {
       currentBlock = AddNewBlockWithExplicitScale( ParseScale( trimmedLine,
                                                                positionOfQ ) );
