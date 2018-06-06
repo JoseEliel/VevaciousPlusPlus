@@ -78,28 +78,12 @@ namespace VevaciousPlusPlus
     // class over-writes what ends up as its functionoid.
     MapCaseStringAndSlhaBlockToCaseString( "Bmu",
                                            "HMIX[101]" );
-    MapCaseStringAndSlhaBlockToCaseString( "muTree",
-                                           "TREEHMIX[1]" );
-    MapCaseStringAndSlhaBlockToCaseString( "muLoop",
-                                           "LOOPHMIX[1]" );
     MapCaseStringAndSlhaBlockToCaseString( "muDelta",
                                            "DELTAHMIX[1]" );
-    MapCaseStringAndSlhaBlockToCaseString( "BmuTree",
-                                           "TREEHMIX[101]" );
-    MapCaseStringAndSlhaBlockToCaseString( "BmuLoop",
-                                           "LOOPHMIX[101]" );
     MapCaseStringAndSlhaBlockToCaseString( "BmuDelta",
                                            "DELTAHMIX[101]" );
-    MapCaseStringAndSlhaBlockToCaseString( "mHdSqTree",
-                                           "TREEMSOFT[ 21 ]" );
-    MapCaseStringAndSlhaBlockToCaseString( "mHdSqLoop",
-                                           "LOOPMSOFT[ 21 ]" );
     MapCaseStringAndSlhaBlockToCaseString( "mHdSqDelta",
                                            "DELTAMSOFT[ 21 ]" );
-    MapCaseStringAndSlhaBlockToCaseString( "mHuSqTree",
-                                           "TREEMSOFT[ 22 ]" );
-    MapCaseStringAndSlhaBlockToCaseString( "mHuSqLoop",
-                                           "LOOPMSOFT[ 22 ]" );
     MapCaseStringAndSlhaBlockToCaseString( "mHuSqDelta",
                                            "DELTAMSOFT[ 22 ]" );
   }
@@ -135,58 +119,6 @@ namespace VevaciousPlusPlus
                                                    logarithmOfScale ),
              SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase( caseString,
                                                           logarithmOfScale ) );
-    }
-    else if( ( caseString == "muTree" )
-             ||
-             ( caseString == "muLoop" )
-             ||
-             ( caseString == "BmuTree" )
-             ||
-             ( caseString == "BmuLoop" )
-             ||
-             ( caseString == "mHdSqTree" )
-             ||
-             ( caseString == "mHdSqLoop" )
-             ||
-             ( caseString == "mHuSqTree" )
-             ||
-             ( caseString == "mHuSqLoop" ) )
-    {
-      std::string baseCase( caseString.substr( 0,
-                                               caseString.size() - 4 ) );
-      std::string const
-      treeOrLoop( ( caseString[ caseString.size() - 1 ] == 'e' ) ?
-                  "TREE" :
-                  "LOOP" );
-      std::string sarahBlockEntry( "error" );
-      if( baseCase == "Bmu" )
-      {
-        sarahBlockEntry = FormatVariable( treeOrLoop + "HMIX[ 101 ]" );
-      }
-      else
-      {
-        if( baseCase == "mu" )
-        {
-          baseCase = "HMIX[ 1 ]";
-        }
-        else if( baseCase == "mHdSq" )
-        {
-          baseCase = "MSOFT[ 21 ]";
-        }
-        else if( baseCase == "mHuSq" )
-        {
-          baseCase = "MSOFT[ 22 ]";
-        }
-        sarahBlockEntry = FormatVariable( treeOrLoop + baseCase );
-      }
-
-      LhaTwoSourceFunctionoid temporaryParameter( 0,
-                                                  0,
-                                                  0 );
-      return temporaryParameter( OnceOffBlockEntry( sarahBlockEntry,
-                                                    logarithmOfScale ),
-                                 OnceOffParameter( baseCase,
-                                                   logarithmOfScale ) );
     }
     else if( ( caseString == "muDelta" )
              ||
@@ -280,75 +212,6 @@ namespace VevaciousPlusPlus
       size_t const pureSlhaIndex(
             SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredSpecialCase(
                                                          caseString ).second );
-
-      // This will overwrite activeParametersToIndices[ caseString ] to map
-      // caseString to numberOfDistinctActiveParameters as its index in the
-      // values vector (corresponding now to the new SlhaTwoSourceFunctionoid),
-      // rather than to the pure SLHA functionoid as was set by
-      // RegisterParameter( caseString ) (or previous to that).
-      return PairAddNewDerivedParameter( caseString,
-                                         new LhaTwoSourceFunctionoid(
-                                              numberOfDistinctActiveParameters,
-                                                                    sarahIndex,
-                                                             pureSlhaIndex ) );
-    }
-    else if( ( caseString == "muTree" )
-             ||
-             ( caseString == "muLoop" )
-             ||
-             ( caseString == "BmuTree" )
-             ||
-             ( caseString == "BmuLoop" )
-             ||
-             ( caseString == "mHdSqTree" )
-             ||
-             ( caseString == "mHdSqLoop" )
-             ||
-             ( caseString == "mHuSqTree" )
-             ||
-             ( caseString == "mHuSqLoop" ) )
-    {
-      std::string baseCase( caseString.substr( 0,
-                                               caseString.size() - 4 ) );
-      std::string const
-      treeOrLoop( ( caseString[ caseString.size() - 1 ] == 'e' ) ?
-                  "TREE" :
-                  "LOOP" );
-      std::string sarahBlockEntry( "error" );
-      if( baseCase == "Bmu" )
-      {
-        sarahBlockEntry = FormatVariable( treeOrLoop + "HMIX[ 101 ]" );
-      }
-      else
-      {
-        if( baseCase == "mu" )
-        {
-          baseCase = "HMIX[ 1 ]";
-        }
-        else if( baseCase == "mHdSq" )
-        {
-          baseCase = "MSOFT[ 21 ]";
-        }
-        else if( baseCase == "mHuSq" )
-        {
-          baseCase = "MSOFT[ 22 ]";
-        }
-        sarahBlockEntry = FormatVariable( treeOrLoop + baseCase );
-      }
-
-      // Since what sarahBlockEntry contains might already be an alias for
-      // caseString (so as to have potential function files designed by SARAH
-      // work with pure SLHA files, which may or may not be a good idea), we
-      // have to look for the block entry functionoid directly, and create it
-      // if it doesn't exist, rather than recursing through
-      // LesHouchesAccordBlockEntryManager::RegisterParameter(sarahBlockEntry),
-      // which will just come back here through
-      // SlhaBlocksWithSpecialCasesManager::RegisterUnregisteredParameter
-      // finding sarahBlockEntry as an alias for caseString, then calling the
-      // derived override of RegisterUnregisteredSpecialCase, bringing us back
-      // here.
-      size_t const sarahIndex( RegisterBlockEntry( sarahBlockEntry ) );
-      size_t const pureSlhaIndex( RegisterParameter( baseCase ).second );
 
       // This will overwrite activeParametersToIndices[ caseString ] to map
       // caseString to numberOfDistinctActiveParameters as its index in the
