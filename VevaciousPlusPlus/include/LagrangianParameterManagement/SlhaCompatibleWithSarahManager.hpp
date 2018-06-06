@@ -46,6 +46,9 @@ namespace VevaciousPlusPlus
     // This adds all the valid aliases to aliasesToSwitchStrings.
     void InitializeSarahAliases();
 
+    //Add new Derived Parameters from Vector. Allows the use of IFNONZERO
+    virtual void RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameters);
+
     // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
     // there doesn't seem to be an elegant way of using the common code as
     // there is too much entanglement with registering new parameters or not.
