@@ -429,5 +429,38 @@ namespace VevaciousPlusPlus
                                                                   caseString );
     }
   }
+  //Registers a new derived Parameter given by the arguments in the Modelfile.
+  //Currently only supports IFNONZERO[ ... ] and SLHAblock parameters
+  void SlhaCompatibleWithSarahManager::RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameters)
+      {
+      for( auto it = parameters.begin(); it != parameters.end(); it++) //first get all the parameter definitions
+    {
+      if(((*it).second).find("IFNONZERO")==std::string::npos)
+      {
+         LesHouchesAccordBlockEntryManager::RegisterNewParameter(LesHouchesAccordBlockEntryManager::CreateNewBlockEntry((*it).second),(*it).first);
+      }
+    }
+      for( auto it = parameters.begin(); it != parameters.end(); it++) //TwoSource
+        {
+          if(((*it).second).find("IFNONZERO")!=std::string::npos)
+              {
+        std::string parnames(it->second);
+        parnames = parnames.substr(parnames.find('[')+1, (parnames.find(']') - parnames.find('[') - 1));
+        std::pair< bool, size_t > ifnonzero1 = LesHouchesAccordBlockEntryManager::RegisterParameter(parnames.substr(0,parnames.find(',')));
+              std::pair< bool, size_t > ifnonzero2 = LesHouchesAccordBlockEntryManager::RegisterParameter(parnames.substr(parnames.find(',') + 1));
+              if(ifnonzero1.first && ifnonzero2.first)
+              {
+                  AddNewDerivedParameter((*it).first, new LhaTwoSourceFunctionoid(numberOfDistinctActiveParameters,ifnonzero1.second,ifnonzero2.second));
 
+              }
+              else
+              {
+                  std::stringstream errorBuilder;
+                  errorBuilder
+                  << "RegisterDerivedParameter does not recognize the given IFNONZERO parameters, please check if the given parameters are correctly defined." << std::endl;
+                  throw std::runtime_error( errorBuilder.str() );
+              }
+              }
+        }
+    }
 } /* namespace VevaciousPlusPlus */
