@@ -1008,7 +1008,7 @@ namespace VevaciousPlusPlus
         xmlBuilder << "\n"
         << "    " << "<WarningMessage>" << "\n"
         << "      " << *warningMessage << "\n"
-        << "    " << "<WarningMessage>";
+        << "    " << "</WarningMessage>";
       }
       xmlBuilder << "\n  ";
     }
