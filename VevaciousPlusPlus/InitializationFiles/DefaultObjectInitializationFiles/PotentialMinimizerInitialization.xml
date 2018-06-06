@@ -81,7 +81,7 @@
             No
           </ReturnOnlyPolynomialMinima>
           <PolynomialSystemSolver>
-            <!-- Currently <ClassType> must be "Hom4ps2Runner", and
+            <!-- Currently <ClassType> must be "Hom4ps2Runner" or "PHCRunner, and
                  <ConstructorArguments> must give the path to the directory
                  with the hom4ps2 executable by <PathToHom4ps2> and the
                  argument for the executable by <Hom4ps2Argument>.
@@ -111,6 +111,22 @@
                 1.0
               </ResolutionSize>
             </ConstructorArguments>
+		  
+	<!--	<ClassType>
+		PHCRunner
+		</Classtype>
+		<ConstructorArguments>
+			<PathToPHC>
+			~/path/to/phc_executable
+			</PathToPHC>
+			<ResolutionSize>
+			1.0
+			</ResolutionSize>
+			<Tasks>
+			4
+			</Tasks>
+		</ConstructorArguments> -->
+		  
           </PolynomialSystemSolver>
         </ConstructorArguments>
       </StartingPointFinderClass>
