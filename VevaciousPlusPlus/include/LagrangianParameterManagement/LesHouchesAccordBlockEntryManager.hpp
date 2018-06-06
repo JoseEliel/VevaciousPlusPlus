@@ -165,6 +165,8 @@ namespace VevaciousPlusPlus
     size_t
     RegisterNewParameter( LhaSourcedParameterFunctionoid const& newParameter,
                           std::string const& parameterName );
+    //Add new Derived Parameters from Vector. Allows the use of IFNONZERO
+    
 
     // This updates the SLHA file parser with the file with name given by
     // newInput and then, once the blocks have been updated, tells each
@@ -391,6 +393,13 @@ namespace VevaciousPlusPlus
       = *(referenceSafeActiveParameters[ parameterIndex ]);
     }
   }
+  
+  inline void LesHouchesAccordBlockEntryManager::RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameter){
+                std::stringstream errorBuilder;
+                errorBuilder
+                << "RegisterDerivedParameter is only allowed with SlhaCompatibleWithSarahManager change the Lagrangianparametermanager in the Initialization file."<<std::endl;
+                throw std::runtime_error( errorBuilder.str() );
+              }
   
   inline void LesHouchesAccordBlockEntryManager::ReadNewBlock( std::string const& uppercaseBlockName, 
   															   double const scale, 
