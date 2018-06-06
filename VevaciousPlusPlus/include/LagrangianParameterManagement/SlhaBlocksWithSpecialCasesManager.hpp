@@ -185,6 +185,8 @@ namespace VevaciousPlusPlus
     // parameter functionoids giving their Python evaluations.
     virtual std::string
     ParametersInPythonFunction( unsigned int const indentationSpaces ) const;
+    //Add new Derived Parameters from Vector. Allows the use of IFNONZERO
+    virtual void RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameters);
   };
 
 
@@ -266,6 +268,14 @@ namespace VevaciousPlusPlus
     << "\n"
     << LesHouchesAccordBlockEntryManager::ParametersAsPython();
     return stringBuilder.str();
+  }
+  
+  //DerivedParameters only works with SARAH Manager
+  inline void SlhaBlocksWithSpecialCasesManager::RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameters) {
+                std::stringstream errorBuilder;
+                errorBuilder
+                << "RegisterDerivedParameter is only allowed with SlhaCompatibleWithSarahManager" <<" change the Lagrangianparametermanager in the Initialization files."<<std::endl;
+                throw std::runtime_error( errorBuilder.str() );
   }
 
   // This adds newParameter to activeDerivedParameters and updates
