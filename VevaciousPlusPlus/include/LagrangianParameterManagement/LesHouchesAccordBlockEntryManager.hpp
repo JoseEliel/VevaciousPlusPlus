@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
 //#include "LHPC/SimpleLhaParser.hpp"
 #include "Utilities/VirtualSimpleLhaParser.hpp"
@@ -145,6 +146,7 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator* > referenceSafeActiveParameters;
     std::vector< LhaBlockEntryInterpolator > referenceUnsafeActiveParameters;
     std::set< std::string > validBlocks;
+    std::vector<std::pair<std::string,std::string>> derivedparameters;
     //LHPC::SimpleLhaParser lhaParser;
     VirtualSimpleLhaParser lhaParser;
     std::string minimumScaleType;
@@ -165,7 +167,9 @@ namespace VevaciousPlusPlus
     size_t
     RegisterNewParameter( LhaSourcedParameterFunctionoid const& newParameter,
                           std::string const& parameterName );
-    //Add new Derived Parameters from Vector. Allows the use of IFNONZERO
+                          
+    //Parse Derived Parameters. Allows the use of IFNONZERO
+    virtual void ParseDerivedParameters(std::string xmlbody);
     
 
     // This updates the SLHA file parser with the file with name given by
@@ -394,12 +398,35 @@ namespace VevaciousPlusPlus
     }
   }
   
-  inline void LesHouchesAccordBlockEntryManager::RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameter){
-                std::stringstream errorBuilder;
-                errorBuilder
-                << "RegisterDerivedParameter is only allowed with SlhaCompatibleWithSarahManager change the Lagrangianparametermanager in the Initialization file."<<std::endl;
-                throw std::runtime_error( errorBuilder.str() );
-              }
+//Parse Derived Parameters from the xmlbody and save it in the derivedparameters vector
+  inline void LesHouchesAccordBlockEntryManager::ParseDerivedParameters(std::string xmlbody){
+    std::vector< std::string >
+    dPLines( LHPC::ParsingUtilities::SplitBySubstrings( xmlbody,
+                                                         "\n" ) );
+    std::string trimmedLine( "" );
+    for( std::vector< std::string >::const_iterator
+         dPLine( dPLines.begin() );
+         dPLine != dPLines.end();
+         ++dPLine )
+    {
+        trimmedLine.assign(*dPLine);
+        trimmedLine.erase(std::remove_if( trimmedLine.begin(),trimmedLine.end(),  ::isspace), trimmedLine.end()); //remove whitespaces
+        if( trimmedLine.empty() )
+          {
+            continue;
+          }
+        size_t equalsPos =  trimmedLine.find( '=' ) ;
+        if( !( equalsPos < ( trimmedLine.size() - 1 ) ) )
+          {
+            std::stringstream errorBuilder;
+            errorBuilder
+            << "Parameter given no value in <DerivedParameters>! (Offending line = \""
+            << *dPLine << "\")";
+            throw std::runtime_error( errorBuilder.str() );
+          }
+        derivedparameters.push_back(std::make_pair(trimmedLine.substr(0,equalsPos), trimmedLine.substr(equalsPos+1)));
+    }
+}
   
   inline void LesHouchesAccordBlockEntryManager::ReadNewBlock( std::string const& uppercaseBlockName, 
   															   double const scale, 
