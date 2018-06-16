@@ -54,9 +54,6 @@ namespace VevaciousPlusPlus
     // be, in my opinion.
     virtual std::pair< bool, size_t >
     RegisterParameter( std::string const& parameterName ) = 0;
-    
-    //Add new Derived Parameters from Vector. Allows the use of IFNONZERO in DerivedParameters
-    virtual void RegisterDerivedParameter(std::vector<std::pair<std::string,std::string>> parameters) = 0;
 
     // This should fill the given vector with the values of the Lagrangian
     // parameters evaluated at the given scale, ordered so that the indices
