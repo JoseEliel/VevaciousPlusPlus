@@ -57,7 +57,6 @@ namespace VevaciousPlusPlus
     std::string xmlDsbMinimum( "" );
     std::string xmlTreeLevelPotential( "" );
     std::string xmlLoopCorrections( "" );
-    std::string xmlDerivedParameters("");
     xmlParser.OpenRootElementOfFile( modelFilename );
     while( xmlParser.ReadNextElement() )
     {
@@ -68,10 +67,6 @@ namespace VevaciousPlusPlus
       else if( xmlParser.CurrentName() == "DsbMinimum" )
       {
         xmlDsbMinimum = xmlParser.CurrentBody();
-      }
-      else if( xmlParser.CurrentName() == "DerivedParameters" )
-      {
-        xmlDerivedParameters = xmlParser.CurrentBody();
       }
       else if( xmlParser.CurrentName() == "TreeLevelPotential" )
       {
