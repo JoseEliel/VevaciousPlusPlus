@@ -93,6 +93,10 @@ namespace VevaciousPlusPlus
       {
         ParseValidBlocks( xmlParser.TrimmedCurrentBody() );
       }
+      else if( xmlParser.CurrentName() == "DerivedParameters" )
+      {
+       ParseDerivedParameters( xmlParser.TrimmedCurrentBody() );
+      }
     }
     xmlParser.CloseFile();
     xmlParser.LoadString( renormalizationScaleChoices );
