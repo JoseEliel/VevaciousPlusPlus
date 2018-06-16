@@ -218,38 +218,6 @@ namespace VevaciousPlusPlus
                                  LHPC::ParsingUtilities::WhitespaceChars() ) );
     }
     // </DsbMinimum>
-  // Now we parse <DerivedParameters> Simon
-    if(!(xmlDerivedParameters.empty())){
-    std::vector<std::pair<std::string,std::string>> derivedParametervector;
-      std::vector< std::string >
-      dPLines( LHPC::ParsingUtilities::SplitBySubstrings( xmlDerivedParameters,
-                                                           "\n" ) );
-      std::string trimmedLine( "" );
-      for( std::vector< std::string >::const_iterator
-           dPLine( dPLines.begin() );
-           dPLine != dPLines.end();
-           ++dPLine )
-      {
-    trimmedLine.assign(*dPLine);
-      trimmedLine.erase(std::remove_if( trimmedLine.begin(),trimmedLine.end(),  ::isspace), trimmedLine.end()); //remove whitespaces
-      if( trimmedLine.empty() )
-        {
-          continue;
-        }
-      size_t equalsPos =  trimmedLine.find( '=' ) ;
-      if( !( equalsPos < ( trimmedLine.size() - 1 ) ) )
-        {
-          std::stringstream errorBuilder;
-          errorBuilder
-          << "Parameter given no value in <DerivedParameters>! (Offending line = \""
-          << *dPLine << "\")";
-          throw std::runtime_error( errorBuilder.str() );
-        }
-      derivedParametervector.push_back(std::make_pair(trimmedLine.substr(0,equalsPos), trimmedLine.substr(equalsPos+1)));
-      }
-    lagrangianParameterManager.RegisterDerivedParameter(derivedParametervector);
-    }
-    // </DerivedParameters>
       
     // Now we parse <TreeLevelPotential>
     ParseSumOfPolynomialTerms( xmlTreeLevelPotential,
