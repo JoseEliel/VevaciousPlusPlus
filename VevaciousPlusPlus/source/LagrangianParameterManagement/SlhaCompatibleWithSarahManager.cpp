@@ -26,7 +26,6 @@ namespace VevaciousPlusPlus
                                        maximumScaleType,
                                        maximumScaleArgument )
   {
-    RegisterDerivedParameters(derivedparameters);
     InitializeSarahAliases();
   }
 
@@ -53,6 +52,7 @@ namespace VevaciousPlusPlus
                                              std::string const& xmlFileName ) :
     SlhaBlocksWithSpecialCasesManager( xmlFileName )
   {
+    RegisterDerivedParameters(derivedparameters);
     InitializeSarahAliases();
   }
 
@@ -61,7 +61,6 @@ namespace VevaciousPlusPlus
     // This does nothing beyond what the base SlhaBlocksWithSpecialCasesManager
     // destructor does.
   }
-
 
   // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaCompatibleWithSarahManager::InitializeSarahAliases()
@@ -77,8 +76,6 @@ namespace VevaciousPlusPlus
     // The constructor for the base SlhaBlocksWithSpecialCasesManager covers
     // adding the basic Bmu to the alias mapping, even though this derived
     // class over-writes what ends up as its functionoid.
-    MapCaseStringAndSlhaBlockToCaseString( "Bmu",
-                                           "HMIX[101]" );
     MapCaseStringAndSlhaBlockToCaseString( "muDelta",
                                            "DELTAHMIX[1]" );
     MapCaseStringAndSlhaBlockToCaseString( "BmuDelta",
@@ -88,7 +85,6 @@ namespace VevaciousPlusPlus
     MapCaseStringAndSlhaBlockToCaseString( "mHuSqDelta",
                                            "DELTAMSOFT[ 22 ]" );
   }
-
   // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
   // there doesn't seem to be an elegant way of using the common code as
   // there is too much entanglement with registering new parameters or not.
@@ -96,20 +92,15 @@ namespace VevaciousPlusPlus
                                                  std::string const& caseString,
                                           double const logarithmOfScale ) const
   {
-    if( ( caseString == "Bmu" )
-        ||
+    if ( 
         ( caseString == "DsbVd" )
         ||
         ( caseString == "DsbVu" ) )
     {
-      // Assume that the special case is "Bmu" and then change if it is "DsbVd"
-      // or "DsbVu".
-      std::string sarahBlock( "HMIX[ 101 ]" );
-      if( caseString == "DsbVd" )
-      {
-        sarahBlock = "HMIX[ 102 ]";
-      }
-      else if( caseString == "DsbVu" )
+      // Assume that the special case is "DsbVd" else it is
+      // "DsbVu".
+      std::string sarahBlock( "HMIX[ 102 ]" );
+      if( caseString == "DsbVu" )
       {
         sarahBlock = "HMIX[ 103 ]";
       }
@@ -121,6 +112,7 @@ namespace VevaciousPlusPlus
              SlhaBlocksWithSpecialCasesManager::OnceOffSpecialCase( caseString,
                                                           logarithmOfScale ) );
     }
+ 
     else if( ( caseString == "muDelta" )
              ||
              ( caseString == "BmuDelta" )
@@ -176,20 +168,16 @@ namespace VevaciousPlusPlus
   SlhaCompatibleWithSarahManager::RegisterUnregisteredSpecialCase(
                                                 std::string const& caseString )
   {
-    if( ( caseString == "Bmu" )
-        ||
+    if ( 
         ( caseString == "DsbVd" )
         ||
         ( caseString == "DsbVu" ) )
     {
-      // Assume that the special case is "Bmu" and then change if it is "DsbVd"
+      // Assume that the special case is  "DsbVd"
       // or "DsbVu".
-      std::string sarahBlockEntry( "HMIX[ 101 ]" );
-      if( caseString == "DsbVd" )
-      {
-        sarahBlockEntry = "HMIX[ 102 ]";
-      }
-      else if( caseString == "DsbVu" )
+      std::string sarahBlockEntry( "HMIX[ 102 ]" );
+
+      if( caseString == "DsbVu" )
       {
         sarahBlockEntry = "HMIX[ 103 ]";
       }
@@ -293,9 +281,7 @@ namespace VevaciousPlusPlus
                                                                   caseString );
     }
   }
-  //Registers a new derived Parameter given by the arguments in the ScaleAndBlock File.
-  //Currently only supports IFNONZERO[ ... ] and SLHA block parameters
- void SlhaCompatibleWithSarahManager::RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> derivedparameters)
+void SlhaCompatibleWithSarahManager::RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> derivedparameters)
     {
     for( auto it = derivedparameters.begin(); it != derivedparameters.end(); it++) //first get all the parameter definitions
 	{
@@ -327,4 +313,5 @@ namespace VevaciousPlusPlus
             }
       }
 	}
+
 } /* namespace VevaciousPlusPlus */
