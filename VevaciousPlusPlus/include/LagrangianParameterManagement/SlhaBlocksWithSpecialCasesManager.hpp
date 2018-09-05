@@ -274,7 +274,7 @@ namespace VevaciousPlusPlus
   inline void SlhaBlocksWithSpecialCasesManager::RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> parameters) {
                 std::stringstream errorBuilder;
                 errorBuilder
-                << "RegisterDerivedParameter is only allowed with SlhaCompatibleWithSarahManager" << " change the Lagrangianparametermanager in the Initialization files."<<std::endl;
+                << "RegisterDerivedParameter is only allowed with SlhaCompatibleWithSarahManager and SARAHManager" << " change the Lagrangianparametermanager in the Initialization files."<<std::endl;
                 throw std::runtime_error( errorBuilder.str() );
   }
 
