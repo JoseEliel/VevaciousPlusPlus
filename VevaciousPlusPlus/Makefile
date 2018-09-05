@@ -1,8 +1,9 @@
 #
 # Makefile for VevaciousPlusPlus.
-#     Author: Ben O'Leary (benjamin.oleary@gmail.com)
-#      Copyright 2014 Ben O'Leary
-#
+#     Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+#      
+#              José Eliel Camargo-Molina (Eliel.camargo.molina@gmail.com)
+#      Copyright 2018 
 #      This file is part of VevaciousPlusPlus, released under the GNU General
 #      Public License. Please see the accompanying README.VevaciousPlusPlus.txt
 #      file for a full list of files, brief documentation on how to use these
@@ -11,7 +12,7 @@
 
 SHELL=/bin/sh
 
-CC=g++-7
+CC=g++-8
 AR=ar
 ARFLAGS=rcs
 #BOOSTDIR=./Boost/
@@ -27,7 +28,7 @@ MINUITLIBDIR=/usr/local/lib
 DEBUGFLAGS=
 INCLUDES=-I./include/ -I./include/LHPC/ \
  -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
-CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp -std=c++11 $(DEBUGFLAGS) $(INCLUDES)
+CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp -fPIC -std=c++11 $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 
@@ -80,6 +81,7 @@ BINDIR=./bin/
 LIBNAME=VevaciousPlusPlus
 LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
+SHAREDLIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).so
 LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 #-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
  
@@ -89,7 +91,7 @@ LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 MAINCPP=source/VevaciousPlusPlusMain.cpp
 EXEFILE=$(BINDIR)/VevaciousPlusPlus.exe
 
-all: $(OBJECTS) $(LIBRARYFILE) $(EXEFILE)
+all: $(OBJECTS) $(LIBRARYFILE) $(SHAREDLIBRARYFILE) $(EXEFILE)
 
 .PHONY: all clean
 
@@ -102,14 +104,20 @@ $(LIBDIR):
 $(LIBRARYFILE): $(LIBDIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
+
+$(SHAREDLIBRARYFILE): LDFLAGS += -shared
+
+$(SHAREDLIBRARYFILE): $(OBJECTS) 
+	$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $^ 
+
 $(BINDIR):
 	mkdir $@
 
-$(EXEFILE): $(BINDIR) $(LIBRARYFILE)
+$(EXEFILE): $(BINDIR) $(LIBRARYFILE) $(SHAREDLIBRARYFILE)
 	$(CC) $(CCFLAGS) $(CCEXEFLAGS) -o $@ $(MAINCPP) $(LDFLAGS)
 
 clean:
-	\rm -f $(OBJECTS) $(LIBRARYFILE) $(EXEFILE)
+	\rm -f $(OBJECTS) $(LIBRARYFILE)  $(SHAREDLIBRARYFILE) $(EXEFILE)
 
 deleteobjects:
 	\rm -f $(OBJECTS)
