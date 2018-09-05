@@ -421,6 +421,10 @@ namespace VevaciousPlusPlus
     {
       return new LesHouchesAccordBlockEntryManager( scaleAndBlockFilename );
     }
+	else if( classChoice == "SARAHManager" )
+    {
+      return new SARAHManager( scaleAndBlockFilename );
+    }
     else
     {
       std::stringstream errorBuilder;
@@ -428,7 +432,7 @@ namespace VevaciousPlusPlus
       << "\" as a Lagrangian parameter manager class, but this is not one of"
       << " the known types (\"LesHouchesAccordBlockEntryManager\" or"
       << " \"SlhaBlocksWithSpecialCasesManager\" or"
-      << " \"SlhaCompatibleWithSarahManager\").";
+      << " \"SlhaCompatibleWithSarahManager\" or \"SARAHManager\").";
       throw std::runtime_error( errorBuilder.str() );
     }
   }

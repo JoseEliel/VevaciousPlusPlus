@@ -44,6 +44,7 @@
 #include <cstddef>
 #include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
 #include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
+#include "LagrangianParameterManagement/SARAHManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 

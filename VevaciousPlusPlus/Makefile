@@ -49,6 +49,7 @@ SOURCES= source/Utilities/WarningLogger.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/LesHouchesAccordBlockEntryManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaBlocksWithSpecialCasesManager.cpp \
  $(LAGRANGIANPARAMETERMANAGEMENT)/SlhaCompatibleWithSarahManager.cpp \
+ $(LAGRANGIANPARAMETERMANAGEMENT)/SARAHManager.cpp \
  $(BUILDINGBLOCKS)/ParametersAndFieldsProductTerm.cpp \
  source/PotentialEvaluation/ThermalFunctions.cpp \
  $(MASSESSQUAREDCALCULATORS)/RealMassesSquaredMatrix.cpp \
