@@ -32,7 +32,7 @@ namespace VevaciousPlusPlus
     PolynomialAtFixedScalesSolver(
                     ParametersAndFieldsProductSum const& polynomialToExtremize,
                   LagrangianParameterManager const& lagrangianParameterManager,
-                          PolynomialSystemSolver* const polynomialSystemSolver,
+                          std::unique_ptr<PolynomialSystemSolver> polynomialSystemSolver,
                                    unsigned int const numberOfScales,
                                    bool const returnOnlyPolynomialMinima,
                                    size_t const numberOfFields );
@@ -70,7 +70,7 @@ namespace VevaciousPlusPlus
     std::vector< std::vector< ParametersAndFieldsProductSum > >
     polynomialHermitian;
     LagrangianParameterManager const& lagrangianParameterManager;
-    PolynomialSystemSolver* polynomialSystemSolver;
+    std::unique_ptr<PolynomialSystemSolver> polynomialSystemSolver;
     unsigned int const numberOfScales;
     bool const returnOnlyPolynomialMinima;
     size_t const numberOfFields;

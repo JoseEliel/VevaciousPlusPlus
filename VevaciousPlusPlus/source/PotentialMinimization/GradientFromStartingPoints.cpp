@@ -12,13 +12,13 @@ namespace VevaciousPlusPlus
 
   GradientFromStartingPoints::GradientFromStartingPoints(
                                           PotentialFunction& potentialFunction,
-                                StartingPointFinder* const startingPointFinder,
-                                    GradientMinimizer* const gradientMinimizer,
+                                std::unique_ptr<StartingPointFinder> startingPointFinder,
+                                    std::unique_ptr<GradientMinimizer> gradientMinimizer,
                               double const extremumSeparationThresholdFraction,
                                double const nonDsbRollingToDsbScalingFactor ) :
     PotentialMinimizer( potentialFunction ),
-    startingPointFinder( startingPointFinder ),
-    gradientMinimizer( gradientMinimizer ),
+    startingPointFinder( std::move(startingPointFinder) ),
+    gradientMinimizer( std::move(gradientMinimizer) ),
     startingPoints(),
     extremumSeparationThresholdFraction( extremumSeparationThresholdFraction ),
     nonDsbRollingToDsbScalingFactor( nonDsbRollingToDsbScalingFactor )
@@ -28,8 +28,6 @@ namespace VevaciousPlusPlus
 
   GradientFromStartingPoints::~GradientFromStartingPoints()
   {
-    delete gradientMinimizer;
-    delete startingPointFinder;
   }
 
 

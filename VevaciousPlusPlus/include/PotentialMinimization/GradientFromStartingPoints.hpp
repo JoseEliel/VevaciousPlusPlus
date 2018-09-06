@@ -26,8 +26,8 @@ namespace VevaciousPlusPlus
   {
   public:
     GradientFromStartingPoints( PotentialFunction& potentialFunction,
-                                StartingPointFinder* const startingPointFinder,
-                                GradientMinimizer* const gradientMinimizer,
+                                std::unique_ptr<StartingPointFinder> startingPointFinder,
+                                std::unique_ptr<GradientMinimizer> gradientMinimizer,
                               double const extremumSeparationThresholdFraction,
                                 double const nonDsbRollingToDsbScalingFactor );
     virtual ~GradientFromStartingPoints();
@@ -52,8 +52,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    StartingPointFinder* startingPointFinder;
-    GradientMinimizer* gradientMinimizer;
+    std::unique_ptr<StartingPointFinder> startingPointFinder;
+    std::unique_ptr<GradientMinimizer> gradientMinimizer;
     std::vector< std::vector< double > > startingPoints;
     double extremumSeparationThresholdFraction;
     double nonDsbRollingToDsbScalingFactor;

@@ -11,6 +11,7 @@
 #include "PotentialMinimization/PotentialMinimizer.hpp"
 #include "TunnelingCalculation/TunnelingCalculator.hpp"
 #include <string>
+#include <memory>
 #include "LagrangianParameterManagement/LesHouchesAccordBlockEntryManager.hpp"
 #include "LagrangianParameterManagement/LagrangianParameterManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialWithMasses.hpp"
@@ -50,6 +51,11 @@
 
 namespace VevaciousPlusPlus
 {
+	//fixes the missing make_unique in std=-c++11
+	template<typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args) 
+        {
+			return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+        }
 
   class VevaciousPlusPlus
   {
@@ -103,9 +109,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    typedef LesHouchesAccordBlockEntryManager LhaParameterManager;
     typedef PotentialFromPolynomialWithMasses OneLoopPotential;
-    typedef std::pair< LhaParameterManager*, OneLoopPotential* >
+    typedef std::pair<std::unique_ptr <LesHouchesAccordBlockEntryManager>, std::unique_ptr <PotentialFromPolynomialWithMasses> >
             FullPotentialDescription;
 
     // This creates a new LagrangianParameterManager and a new
@@ -134,13 +139,13 @@ namespace VevaciousPlusPlus
 
     // This creates a new LagrangianParameterManager based on the given
     // arguments and returns a pointer to it.
-    static LesHouchesAccordBlockEntryManager*
+    static std::unique_ptr<LesHouchesAccordBlockEntryManager>
     CreateLagrangianParameterManager( std::string const& classChoice,
                                      std::string const& constructorArguments );
 
     // This creates a new PotentialFunction based on the given arguments and
     // returns a pointer to it.
-    static PotentialFromPolynomialWithMasses*
+    static std::unique_ptr<PotentialFromPolynomialWithMasses>
     CreatePotentialFunction( std::string const& classChoice,
                              std::string const& constructorArguments,
                       LagrangianParameterManager& lagrangianParameterManager );
@@ -156,33 +161,33 @@ namespace VevaciousPlusPlus
     // This creates a PotentialMinimizer according to the XML elements in the
     // file given by potentialMinimizerInitializationFilename and returns
     // a pointer to it.
-    static PotentialMinimizer* CreatePotentialMinimizer(
+    static std::unique_ptr<PotentialMinimizer> CreatePotentialMinimizer(
                           PotentialFromPolynomialWithMasses& potentialFunction,
                  std::string const& potentialMinimizerInitializationFilename );
 
     // This creates a new PotentialMinimizer based on the given arguments and
     // returns a pointer to it.
-    static PotentialMinimizer* CreatePotentialMinimizer(
+    static std::unique_ptr<PotentialMinimizer> CreatePotentialMinimizer(
                          PotentialFromPolynomialWithMasses& potentialFunction,
                                                 std::string const& classChoice,
                                      std::string const& constructorArguments );
 
     // This creates a new GradientFromStartingPoints based on the given
     // arguments and returns a pointer to it.
-    static GradientFromStartingPoints* CreateGradientFromStartingPoints(
+    static std::unique_ptr<GradientFromStartingPoints> CreateGradientFromStartingPoints(
                           PotentialFromPolynomialWithMasses& potentialFunction,
                                      std::string const& constructorArguments );
 
     // This creates a new StartingPointFinder based on the given arguments and
     // returns a pointer to it.
-    static StartingPointFinder* CreateStartingPointFinder(
+    static std::unique_ptr<StartingPointFinder> CreateStartingPointFinder(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                                 std::string const& classChoice,
                                      std::string const& constructorArguments );
 
     // This creates a new PolynomialAtFixedScalesSolver based on the given
     // arguments and returns a pointer to it.
-    static PolynomialAtFixedScalesSolver* CreatePolynomialAtFixedScalesSolver(
+    static std::unique_ptr<PolynomialAtFixedScalesSolver> CreatePolynomialAtFixedScalesSolver(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                      std::string const& constructorArguments );
 
@@ -206,48 +211,48 @@ namespace VevaciousPlusPlus
 
     // This creates a new PolynomialSystemSolver based on the given arguments
     // and returns a pointer to it.
-    static PolynomialSystemSolver*
+    static std::unique_ptr<PolynomialSystemSolver>
     CreatePolynomialSystemSolver( std::string const& classChoice,
                                   std::string const& constructorArguments );
 
     // This creates a new Hom4ps2Runner based on the given arguments and
     // returns a pointer to it.
-    static Hom4ps2Runner*
+    static std::unique_ptr<Hom4ps2Runner>
     CreateHom4ps2Runner( std::string const& constructorArguments );
 
     // This creates a new PHCRunner based on the given arguments and
     // returns a pointer to it.
-    static PHCRunner*
+    static std::unique_ptr<PHCRunner>
     CreatePHCRunner( std::string const& constructorArguments );
 
     // This creates a new GradientMinimizer based on the given arguments and
     // returns a pointer to it.
-    static GradientMinimizer*
+    static std::unique_ptr<GradientMinimizer>
     CreateGradientMinimizer( PotentialFunction const& potentialFunction,
                              std::string const& classChoice,
                              std::string const& constructorArguments );
 
     // This creates a new MinuitPotentialMinimizer based on the given arguments
     // and returns a pointer to it.
-    static MinuitPotentialMinimizer*
+    static std::unique_ptr<MinuitPotentialMinimizer>
     CreateMinuitPotentialMinimizer( PotentialFunction const& potentialFunction,
                                     std::string const& constructorArguments );
 
     // This creates a TunnelingCalculator according to the XML elements in the
     // file given by tunnelingCalculatorInitializationFilename and returns
     // a pointer to it.
-    static TunnelingCalculator* CreateTunnelingCalculator(
+    static std::unique_ptr<TunnelingCalculator> CreateTunnelingCalculator(
                 std::string const& tunnelingCalculatorInitializationFilename );
 
     // This creates a new PotentialMinimizer based on the given arguments and
     // returns a pointer to it.
-    static TunnelingCalculator*
+    static std::unique_ptr<TunnelingCalculator>
     CreateTunnelingCalculator( std::string const& classChoice,
                                std::string const& constructorArguments );
 
     // This creates a new CosmoTransitionsRunner based on the given arguments
     // and returns a pointer to it.
-    static CosmoTransitionsRunner*
+    static std::unique_ptr<CosmoTransitionsRunner>
     CreateCosmoTransitionsRunner( std::string const& constructorArguments );
 
     // This throws an exception if the survival probability threshold was
@@ -262,48 +267,45 @@ namespace VevaciousPlusPlus
 
     // This creates a new CosmoTransitionsRunner based on the given arguments
     // and returns a pointer to it.
-    static BounceAlongPathWithThreshold* CreateBounceAlongPathWithThreshold(
+    static std::unique_ptr<BounceAlongPathWithThreshold> CreateBounceAlongPathWithThreshold(
                                      std::string const& constructorArguments );
 
     // This parses the XMl of tunnelPathFinders to construct a set of
     // BouncePathFinder instances, filling pathFinders with pointers to them.
-    static std::vector< BouncePathFinder* >
+    static std::vector< std::shared_ptr<BouncePathFinder> >
     CreateBouncePathFinders( std::string const& tunnelPathFinders );
 
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
     // extremize the bounce action.
-    static MinuitOnPotentialOnParallelPlanes*
-    CreateMinuitOnPotentialOnParallelPlanes(
+    static std::shared_ptr<MinuitOnPotentialOnParallelPlanes>
+     CreateMinuitOnPotentialOnParallelPlanes(
                                      std::string const& constructorArguments );
 
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPotentialPerpendicularToPath instance to use to try
     // to extremize the bounce action.
-    static MinuitOnPotentialPerpendicularToPath*
+    static std::shared_ptr<MinuitOnPotentialPerpendicularToPath>
     CreateMinuitOnPotentialPerpendicularToPath(
                                      std::string const& constructorArguments );
 
     // This creates a new BounceActionCalculator based on the given arguments
     // and returns a pointer to it.
-    static BounceActionCalculator*
+    static std::unique_ptr<BounceActionCalculator>
     CreateBounceActionCalculator( std::string const& classChoice,
                                   std::string const& constructorArguments );
 
     // This creates a new BubbleShootingOnPathInFieldSpace based on the given
     // arguments and returns a pointer to it.
-    static BubbleShootingOnPathInFieldSpace*
+    static std::unique_ptr<BubbleShootingOnPathInFieldSpace>
     CreateBubbleShootingOnPathInFieldSpace(
                                      std::string const& constructorArguments );
 
 
-    LagrangianParameterManager* lagrangianParameterManager;
-    LesHouchesAccordBlockEntryManager* ownedLagrangianParameterManager;
-    PotentialFromPolynomialWithMasses* ownedPotentialFunction;
-    PotentialMinimizer* potentialMinimizer;
-    PotentialMinimizer* ownedPotentialMinimizer;
-    TunnelingCalculator* tunnelingCalculator;
-    TunnelingCalculator* ownedTunnelingCalculator;
+    std::unique_ptr<LagrangianParameterManager> lagrangianParameterManager;
+    std::unique_ptr<PotentialFromPolynomialWithMasses> ownedPotentialFunction;
+    std::unique_ptr<PotentialMinimizer> potentialMinimizer;
+    std::unique_ptr<TunnelingCalculator> tunnelingCalculator;
     std::vector< std::string > warningMessagesFromConstructor;
     std::string resultsFromLastRunAsXml;
     std::vector< std::string > warningMessagesFromLastRun;
@@ -357,6 +359,7 @@ namespace VevaciousPlusPlus
     {
      result="Metastable";
     }
+    return result;
   }
 
   // This reads the current element of outerParser and if its name matches
@@ -417,7 +420,7 @@ namespace VevaciousPlusPlus
   // This creates a PotentialMinimizer according to the XML elements in the
   // file given by potentialMinimizerInitializationFilename and returns
   // a pointer to it.
-  inline PotentialMinimizer* VevaciousPlusPlus::CreatePotentialMinimizer(
+  inline std::unique_ptr<PotentialMinimizer> VevaciousPlusPlus::CreatePotentialMinimizer(
                           PotentialFromPolynomialWithMasses& potentialFunction,
                   std::string const& potentialMinimizerInitializationFilename )
   {
@@ -433,22 +436,22 @@ namespace VevaciousPlusPlus
                              classChoice,
                              constructorArguments );
     }
-    return CreatePotentialMinimizer( potentialFunction,
+    return std::move(CreatePotentialMinimizer( potentialFunction,
                                      classChoice,
-                                     constructorArguments );
+                                     constructorArguments ));
   }
 
   // This creates a new PotentialMinimizer based on the given arguments and
   // returns a pointer to it.
-  inline PotentialMinimizer* VevaciousPlusPlus::CreatePotentialMinimizer(
+  inline std::unique_ptr<PotentialMinimizer> VevaciousPlusPlus::CreatePotentialMinimizer(
                           PotentialFromPolynomialWithMasses& potentialFunction,
                                                 std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
     if( classChoice == "GradientFromStartingPoints" )
     {
-      return CreateGradientFromStartingPoints( potentialFunction,
-                                               constructorArguments );
+      return std::move(CreateGradientFromStartingPoints( potentialFunction,
+                                               constructorArguments ));
     }
     else
     {
@@ -462,15 +465,15 @@ namespace VevaciousPlusPlus
 
   // This creates a new StartingPointFinder based on the given arguments and
   // returns a pointer to it.
-  inline StartingPointFinder* VevaciousPlusPlus::CreateStartingPointFinder(
+  inline std::unique_ptr<StartingPointFinder> VevaciousPlusPlus::CreateStartingPointFinder(
                     PotentialFromPolynomialWithMasses const& potentialFunction,
                                                 std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
     if( classChoice == "PolynomialAtFixedScalesSolver" )
     {
-      return CreatePolynomialAtFixedScalesSolver( potentialFunction,
-                                                  constructorArguments );
+      return std::move(CreatePolynomialAtFixedScalesSolver( potentialFunction,
+                                                  constructorArguments ));
     }
     else
     {
@@ -500,18 +503,18 @@ namespace VevaciousPlusPlus
 
   // This creates a new PolynomialSystemSolver based on the given arguments
   // and returns a pointer to it.
-  inline PolynomialSystemSolver*
+  inline std::unique_ptr<PolynomialSystemSolver>
   VevaciousPlusPlus::CreatePolynomialSystemSolver(
                                                 std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
     if( classChoice == "Hom4ps2Runner" )
     {
-      return CreateHom4ps2Runner( constructorArguments );
+      return std::move(CreateHom4ps2Runner( constructorArguments ));
     }
 	else if( classChoice == "PHCRunner" )
     {
-      return CreatePHCRunner( constructorArguments );
+      return std::move(CreatePHCRunner( constructorArguments ));
     }
     else
     {
@@ -526,7 +529,7 @@ namespace VevaciousPlusPlus
 
   // This creates a new Hom4ps2Runner based on the given arguments and
   // returns a pointer to it.
-  inline Hom4ps2Runner* VevaciousPlusPlus::CreateHom4ps2Runner(
+  inline std::unique_ptr<Hom4ps2Runner> VevaciousPlusPlus::CreateHom4ps2Runner(
                                       std::string const& constructorArguments )
   {
     LHPC::RestrictedXmlParser xmlParser;
@@ -546,12 +549,12 @@ namespace VevaciousPlusPlus
                                      "ResolutionSize",
                                      resolutionSize );
     }
-    return new Hom4ps2Runner( pathToHom4ps2,
+    return make_unique<Hom4ps2Runner>( pathToHom4ps2,
                               homotopyType,
                               resolutionSize );
   }
   
-    inline PHCRunner* VevaciousPlusPlus::CreatePHCRunner(
+    inline std::unique_ptr<PHCRunner> VevaciousPlusPlus::CreatePHCRunner(
                                       std::string const& constructorArguments )
   {
     LHPC::RestrictedXmlParser xmlParser;
@@ -571,20 +574,20 @@ namespace VevaciousPlusPlus
                                      "Tasks",
                                      taskcount );
     }
-    return new PHCRunner(  pathToPHC, resolutionSize, taskcount);
+    return make_unique<PHCRunner>(  pathToPHC, resolutionSize, taskcount);
   }
 
   // This creates a new GradientMinimizer based on the given arguments and
   // returns a pointer to it.
-  inline GradientMinimizer* VevaciousPlusPlus::CreateGradientMinimizer(
+  inline std::unique_ptr<GradientMinimizer> VevaciousPlusPlus::CreateGradientMinimizer(
                                     PotentialFunction const& potentialFunction,
                                                 std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
     if( classChoice == "MinuitPotentialMinimizer" )
     {
-      return CreateMinuitPotentialMinimizer( potentialFunction,
-                                             constructorArguments );
+      return std::move(CreateMinuitPotentialMinimizer( potentialFunction,
+                                             constructorArguments ));
     }
     else
     {
@@ -599,7 +602,7 @@ namespace VevaciousPlusPlus
   // This creates a TunnelingCalculator according to the XML elements in the
   // file given by tunnelingCalculatorInitializationFilename and returns
   // a pointer to it.
-  inline TunnelingCalculator* VevaciousPlusPlus::CreateTunnelingCalculator(
+  inline std::unique_ptr<TunnelingCalculator> VevaciousPlusPlus::CreateTunnelingCalculator(
                  std::string const& tunnelingCalculatorInitializationFilename )
   {
     LHPC::RestrictedXmlParser xmlParser;
@@ -614,23 +617,23 @@ namespace VevaciousPlusPlus
                              classChoice,
                              constructorArguments );
     }
-    return CreateTunnelingCalculator( classChoice,
-                                      constructorArguments );
+    return std::move(CreateTunnelingCalculator( classChoice,
+                                      constructorArguments ));
   }
 
   // This creates a new PotentialMinimizer based on the given arguments and
   // returns a pointer to it.
-  inline TunnelingCalculator*
+  inline std::unique_ptr<TunnelingCalculator>
   VevaciousPlusPlus::CreateTunnelingCalculator( std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
     if( classChoice == "CosmoTransitionsRunner" )
     {
-      return CreateCosmoTransitionsRunner( constructorArguments );
+      return std::move(CreateCosmoTransitionsRunner( constructorArguments ));
     }
     else if( classChoice == "BounceAlongPathWithThreshold" )
     {
-      return CreateBounceAlongPathWithThreshold( constructorArguments );
+      return std::move(CreateBounceAlongPathWithThreshold( constructorArguments ));
     }
     else
     {
@@ -664,7 +667,7 @@ namespace VevaciousPlusPlus
   // This parses arguments from constructorArguments and uses them to
   // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
   // extremize the bounce action.
-  inline MinuitOnPotentialOnParallelPlanes*
+  inline std::shared_ptr<MinuitOnPotentialOnParallelPlanes>
   VevaciousPlusPlus::CreateMinuitOnPotentialOnParallelPlanes(
                                       std::string const& constructorArguments )
   {
@@ -685,21 +688,21 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    return new MinuitOnPotentialOnParallelPlanes( numberOfPathSegments,
+    return std::shared_ptr<MinuitOnPotentialOnParallelPlanes>(new MinuitOnPotentialOnParallelPlanes( numberOfPathSegments,
                                                   minuitStrategy,
-                                                  minuitToleranceFraction );
+                                                  minuitToleranceFraction ));
   }
 
   // This creates a new BounceActionCalculator based on the given arguments
   // and returns a pointer to it.
-  inline BounceActionCalculator*
+  inline std::unique_ptr<BounceActionCalculator>
   VevaciousPlusPlus::CreateBounceActionCalculator(
                                                 std::string const& classChoice,
                                       std::string const& constructorArguments )
   {
     if( classChoice == "BubbleShootingOnPathInFieldSpace" )
     {
-      return CreateBubbleShootingOnPathInFieldSpace( constructorArguments );
+      return std::move(CreateBubbleShootingOnPathInFieldSpace( constructorArguments ));
     }
     else
     {
@@ -713,7 +716,7 @@ namespace VevaciousPlusPlus
 
   // This creates a new BubbleShootingOnPathInFieldSpace based on the given
   // arguments and returns a pointer to it.
-  inline BubbleShootingOnPathInFieldSpace*
+  inline std::unique_ptr<BubbleShootingOnPathInFieldSpace>
   VevaciousPlusPlus::CreateBubbleShootingOnPathInFieldSpace(
                                       std::string const& constructorArguments )
   {
@@ -731,7 +734,7 @@ namespace VevaciousPlusPlus
                                      shootAttemptsForBounce );
     }
     return
-    new BubbleShootingOnPathInFieldSpace( lengthScaleResolutionForBounce,
+    make_unique<BubbleShootingOnPathInFieldSpace>( lengthScaleResolutionForBounce,
                                           shootAttemptsForBounce );
   }
 
@@ -747,6 +750,7 @@ namespace VevaciousPlusPlus
                                     warningMessagesFromLastRun.end() );
     return warningMessagesToReport;
   }
+
 
 } /* namespace VevaciousPlusPlus */
 #endif /* VEVACIOUSPLUSPLUS_HPP_ */

@@ -26,7 +26,7 @@ namespace VevaciousPlusPlus
                                        maximumScaleType,
                                        maximumScaleArgument )
   {
-	RegisterDerivedParameters(derivedparameters); //This is not optimal since the derived parameters shouldn't overlap with the SarahAliases
+    RegisterDerivedParameters(derivedparameters);
     InitializeSarahAliases();
   }
 
@@ -46,7 +46,6 @@ namespace VevaciousPlusPlus
                                        maximumScaleType,
                                        maximumScaleArgument )
   {
-	RegisterDerivedParameters(derivedparameters); //This is not optimal since the derived parameters shouldn't overlap with the SarahAliases
     InitializeSarahAliases();
   }
 
@@ -54,7 +53,6 @@ namespace VevaciousPlusPlus
                                              std::string const& xmlFileName ) :
     SlhaBlocksWithSpecialCasesManager( xmlFileName )
   {
-    RegisterDerivedParameters(derivedparameters); //This is not optimal since the derived parameters shouldn't overlap with the SarahAliases
     InitializeSarahAliases();
   }
 
@@ -64,7 +62,8 @@ namespace VevaciousPlusPlus
     // destructor does.
   }
 
-   // This adds all the valid aliases to aliasesToSwitchStrings.
+
+  // This adds all the valid aliases to aliasesToSwitchStrings.
   void SlhaCompatibleWithSarahManager::InitializeSarahAliases()
   {
     // Putting the simple block names as special cases for SARAH means that
@@ -294,10 +293,9 @@ namespace VevaciousPlusPlus
                                                                   caseString );
     }
   }
-
-  //Registers a new derived Parameter given by the arguments in the Modelfile.
-  //Currently only supports IFNONZERO[ ... ] and SLHAblock parameters
-  void SlhaCompatibleWithSarahManager::RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> derivedparameters)
+  //Registers a new derived Parameter given by the arguments in the ScaleAndBlock File.
+  //Currently only supports IFNONZERO[ ... ] and SLHA block parameters
+ void SlhaCompatibleWithSarahManager::RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> derivedparameters)
     {
     for( auto it = derivedparameters.begin(); it != derivedparameters.end(); it++) //first get all the parameter definitions
 	{
@@ -329,5 +327,4 @@ namespace VevaciousPlusPlus
             }
       }
 	}
-
 } /* namespace VevaciousPlusPlus */
