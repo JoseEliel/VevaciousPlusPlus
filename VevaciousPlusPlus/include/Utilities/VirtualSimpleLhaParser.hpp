@@ -93,7 +93,7 @@ namespace VevaciousPlusPlus
    std::string linetopushback;
    if (dimension == 1)
    {
-     for( int currentParameter=0;currentParameter < parameters.size(); currentParameter=currentParameter+1 ) 
+     for(unsigned int currentParameter=0;currentParameter < parameters.size(); currentParameter=currentParameter+1 ) 
     {
     linetopushback = (boost::format("%s %s") % parameters[currentParameter].first % parameters[currentParameter].second).str();  
     currentBlock->AddLine( linetopushback ); 
@@ -103,7 +103,7 @@ namespace VevaciousPlusPlus
    {
    	 int row = 0;
      int column = 0 ;
-     for( int currentParameter=0;currentParameter< parameters.size(); currentParameter=currentParameter+1 ) 
+     for(unsigned int currentParameter=0;currentParameter< parameters.size(); currentParameter=currentParameter+1 ) 
     {
  	row = parameters[currentParameter].first / 10; // Get first digit 
  	column= parameters[currentParameter].first % 10; // Get second digit
