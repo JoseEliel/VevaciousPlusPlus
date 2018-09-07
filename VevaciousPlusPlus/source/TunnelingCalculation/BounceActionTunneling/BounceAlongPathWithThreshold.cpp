@@ -11,7 +11,7 @@ namespace VevaciousPlusPlus
 {
 
   BounceAlongPathWithThreshold::BounceAlongPathWithThreshold(
-                           std::vector< std::shared_ptr<BouncePathFinder> > const& pathFinders,
+                           std::vector< std::unique_ptr<BouncePathFinder> > pathFinders,
                                 std::unique_ptr<BounceActionCalculator> actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                      double const survivalProbabilityThreshold,
@@ -23,7 +23,7 @@ namespace VevaciousPlusPlus
                           survivalProbabilityThreshold,
                           temperatureAccuracy,
                           vacuumSeparationFraction ),
-    pathFinders( pathFinders ),
+    pathFinders( std::move(pathFinders) ),
     actionCalculator( std::move(actionCalculator) ),
     thermalIntegrationResolution( thermalIntegrationResolution ),
     pathPotentialResolution( pathPotentialResolution )
@@ -33,14 +33,6 @@ namespace VevaciousPlusPlus
 
   BounceAlongPathWithThreshold::~BounceAlongPathWithThreshold()
   {
-	  /* 
-    for( size_t deletionIndex( 0 );
-         deletionIndex < pathFinders.size();
-         ++deletionIndex )
-    {
-      delete pathFinders[ deletionIndex ];
-    }
-	*/
   }
 
 

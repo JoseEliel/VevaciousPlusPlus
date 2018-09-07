@@ -46,6 +46,7 @@ namespace VevaciousPlusPlus
                                        maximumScaleType,
                                        maximumScaleArgument )
   {
+	RegisterDerivedParameters(derivedparameters);
     InitializeSarahAliases();
   }
 
@@ -53,6 +54,7 @@ namespace VevaciousPlusPlus
                                              std::string const& xmlFileName ) :
     SlhaBlocksWithSpecialCasesManager( xmlFileName )
   {
+	RegisterDerivedParameters(derivedparameters);
     InitializeSarahAliases();
   }
 

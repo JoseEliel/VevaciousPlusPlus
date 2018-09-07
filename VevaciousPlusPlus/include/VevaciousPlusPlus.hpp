@@ -272,20 +272,20 @@ namespace VevaciousPlusPlus
 
     // This parses the XMl of tunnelPathFinders to construct a set of
     // BouncePathFinder instances, filling pathFinders with pointers to them.
-    static std::vector< std::shared_ptr<BouncePathFinder> >
+    static std::vector< std::unique_ptr<BouncePathFinder> >
     CreateBouncePathFinders( std::string const& tunnelPathFinders );
 
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
     // extremize the bounce action.
-    static std::shared_ptr<MinuitOnPotentialOnParallelPlanes>
+    static std::unique_ptr<MinuitOnPotentialOnParallelPlanes>
      CreateMinuitOnPotentialOnParallelPlanes(
                                      std::string const& constructorArguments );
 
     // This parses arguments from constructorArguments and uses them to
     // construct a MinuitOnPotentialPerpendicularToPath instance to use to try
     // to extremize the bounce action.
-    static std::shared_ptr<MinuitOnPotentialPerpendicularToPath>
+    static std::unique_ptr<MinuitOnPotentialPerpendicularToPath>
     CreateMinuitOnPotentialPerpendicularToPath(
                                      std::string const& constructorArguments );
 
@@ -667,7 +667,7 @@ namespace VevaciousPlusPlus
   // This parses arguments from constructorArguments and uses them to
   // construct a MinuitOnPotentialOnParallelPlanes instance to use to try to
   // extremize the bounce action.
-  inline std::shared_ptr<MinuitOnPotentialOnParallelPlanes>
+  inline std::unique_ptr<MinuitOnPotentialOnParallelPlanes>
   VevaciousPlusPlus::CreateMinuitOnPotentialOnParallelPlanes(
                                       std::string const& constructorArguments )
   {
@@ -688,9 +688,9 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    return std::shared_ptr<MinuitOnPotentialOnParallelPlanes>(new MinuitOnPotentialOnParallelPlanes( numberOfPathSegments,
+    return make_unique<MinuitOnPotentialOnParallelPlanes>(numberOfPathSegments,
                                                   minuitStrategy,
-                                                  minuitToleranceFraction ));
+                                                  minuitToleranceFraction );
   }
 
   // This creates a new BounceActionCalculator based on the given arguments

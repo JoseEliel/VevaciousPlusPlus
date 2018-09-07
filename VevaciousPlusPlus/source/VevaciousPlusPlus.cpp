@@ -69,8 +69,8 @@ namespace VevaciousPlusPlus
       }
     }
     FullPotentialDescription
-    fullPotentialDescription( CreateFullPotentialDescription(
-                                   potentialFunctionInitializationFilename ) );
+    fullPotentialDescription(std::move( CreateFullPotentialDescription(
+                                   potentialFunctionInitializationFilename ) ));
     lagrangianParameterManager = std::move(fullPotentialDescription.first);
     ownedPotentialFunction = std::move(fullPotentialDescription.second);
     potentialMinimizer =  std::move(CreatePotentialMinimizer( *ownedPotentialFunction,
@@ -753,8 +753,8 @@ namespace VevaciousPlusPlus
 
     CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
 
-    std::vector< std::shared_ptr<BouncePathFinder>> 
-    pathFinders = CreateBouncePathFinders( tunnelPathFinders );
+    std::vector< std::unique_ptr<BouncePathFinder>> 
+    pathFinders = std::move(CreateBouncePathFinders( tunnelPathFinders ));
     if( pathFinders.empty() )
     {
       std::stringstream errorStream;
@@ -768,7 +768,7 @@ namespace VevaciousPlusPlus
                        CreateBounceActionCalculator( bouncePotentialFitClass,
                                                bouncePotentialFitArguments ) ) );
 
-    return make_unique<BounceAlongPathWithThreshold>( pathFinders,
+    return make_unique<BounceAlongPathWithThreshold>( std::move(pathFinders),
                                              std::move(bounceActionCalculator),
                                InterpretTunnelingStrategy( tunnelingStrategy ),
                                              survivalProbabilityThreshold,
@@ -780,10 +780,10 @@ namespace VevaciousPlusPlus
 
   // This parses the XMl of tunnelPathFinders to construct a set of
   // BouncePathFinder instances, filling pathFinders with pointers to them.
-  std::vector< std::shared_ptr<BouncePathFinder>> VevaciousPlusPlus::CreateBouncePathFinders(
+  std::vector< std::unique_ptr<BouncePathFinder>> VevaciousPlusPlus::CreateBouncePathFinders(
                                          std::string const& tunnelPathFinders )
   {
-    std::vector< std::shared_ptr<BouncePathFinder>> pathFinders;
+    std::vector< std::unique_ptr<BouncePathFinder>> pathFinders;
     LHPC::RestrictedXmlParser xmlParser;
     xmlParser.LoadString( tunnelPathFinders );
     std::string classChoice( "" );
@@ -802,13 +802,13 @@ namespace VevaciousPlusPlus
       {
         if( classChoice == "MinuitOnPotentialOnParallelPlanes" )
         {
-          pathFinders.push_back( CreateMinuitOnPotentialOnParallelPlanes(
-                                                      constructorArguments ) );
+          pathFinders.push_back( std::move(CreateMinuitOnPotentialOnParallelPlanes(
+                                                      constructorArguments ) ));
         }
         else if( classChoice == "MinuitOnPotentialPerpendicularToPath" )
         {
-          pathFinders.push_back( CreateMinuitOnPotentialPerpendicularToPath(
-                                                      constructorArguments ) );
+          pathFinders.push_back(std::move( CreateMinuitOnPotentialPerpendicularToPath(
+                                                      constructorArguments ) ) );
         }
         else
         {
@@ -821,13 +821,13 @@ namespace VevaciousPlusPlus
         }
       }
     }
-    return pathFinders;
+    return std::move(pathFinders);
   }
 
   // This parses arguments from constructorArguments and uses them to
   // construct a MinuitOnPotentialPerpendicularToPath instance to use to try
   // to extremize the bounce action.
-  std::shared_ptr<MinuitOnPotentialPerpendicularToPath>
+  std::unique_ptr<MinuitOnPotentialPerpendicularToPath>
   VevaciousPlusPlus::CreateMinuitOnPotentialPerpendicularToPath(
                                       std::string const& constructorArguments )
   {
@@ -880,13 +880,13 @@ namespace VevaciousPlusPlus
                      LHPC::ParsingUtilities::StringToDouble( *weightString ) );
     }
 
-    return std::shared_ptr <MinuitOnPotentialPerpendicularToPath> (new MinuitOnPotentialPerpendicularToPath( numberOfPathSegments,
+    return make_unique<MinuitOnPotentialPerpendicularToPath>( numberOfPathSegments,
                                                      numberOfAllowedWorsenings,
                                                   convergenceThresholdFraction,
                                                      minuitDampingFraction,
                                                    neighborDisplacementWeights,
                                                      minuitStrategy,
-                                                     minuitToleranceFraction ));
+                                                     minuitToleranceFraction );
   }
 
   // This prepares the results in XML format, stored in resultsAsXml;

@@ -31,7 +31,7 @@ namespace VevaciousPlusPlus
   {
   public:
     BounceAlongPathWithThreshold(
-                           std::vector< std::shared_ptr<BouncePathFinder> > const& pathFinders,
+                           std::vector< std::unique_ptr<BouncePathFinder> > pathFinders,
                                 std::unique_ptr<BounceActionCalculator> actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold,
@@ -43,7 +43,7 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    std::vector< std::shared_ptr<BouncePathFinder> > pathFinders;
+    std::vector< std::unique_ptr<BouncePathFinder> > pathFinders;
     std::unique_ptr<BounceActionCalculator> actionCalculator;
     unsigned int thermalIntegrationResolution;
     unsigned int const pathPotentialResolution;
