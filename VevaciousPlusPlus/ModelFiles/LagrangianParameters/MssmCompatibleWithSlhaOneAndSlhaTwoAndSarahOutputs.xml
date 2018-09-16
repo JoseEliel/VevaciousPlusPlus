@@ -157,11 +157,7 @@
        original SUSY Les Houches Accords). -->
     GAUGE
     HMIX
-    TREEHMIX
-    LOOPHMIX
     MSOFT
-    TREEMSOFT
-    LOOPMSOFT
     MSQ2
     MSU2
     MSD2
@@ -177,26 +173,5 @@
     TE
     AE
   </ValidBlocks>
-  <DerivedParameters>
-    mu = HMIX[1]
-  	muTL = TREEHMIX[1]
-    muTree = IFNONZERO[muTL,mu]
-	  muLL = LOOPHMIX[1]
-    muLoop = IFNONZERO[muLL,mu]
-    Bmu = HMIX[101]
-    BmuTL = TREEHMIX[101]
-	  BmuTree = IFNONZERO[BmuTL,Bmu]
-	  BmuLL = LOOPHMIX[101]
-    BmuLoop = IFNONZERO[BmuLL,Bmu]
-    mHdSq = MSOFT[21]
-	  mHdSqTL = TREEMSOFT[21]
-    mHdSqTree = IFNONZERO[mHdSqTL,mHdSq]
-    mHdSqLL = LOOPMSOFT[21]
-	  mHdSqLoop = IFNONZERO[mHdSqLL,mHdSq]
-    mHuSq= MSOFT[22]
-    mHuSqTL = TREEMSOFT[22]
-	  mHuSqTree = IFNONZERO[mHuSqTL,mHuSq]
-	  mHuSqLL = LOOPMSOFT[22]
-    mHuSqLoop = IFNONZERO[mHuSqLL,mHuSq]
-  </DerivedParameters>
+
 </LhaBlockParameterManagerInitializationFile>
