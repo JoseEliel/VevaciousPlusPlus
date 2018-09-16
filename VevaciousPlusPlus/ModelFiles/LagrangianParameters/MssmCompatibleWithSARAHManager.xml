@@ -1,7 +1,7 @@
 <LhaBlockParameterManagerInitializationFile>
 
   <ParameterManagerDetails
-   ParameterManagerName="MssmCompatibleWithSlhaOneAndSlhaTwoOutputs"
+   ParameterManagerName="SARAHManager"
    VevaciousMajorVersion="2" VevaciousMinorVersion="0" />
 
   <!-- This LHA block parameter file was created by Ben O'Leary. -->
