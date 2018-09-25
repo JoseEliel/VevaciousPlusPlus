@@ -83,6 +83,9 @@ namespace VevaciousPlusPlus
     
     virtual void NewLhaBlock(  std::string const& uppercaseBlockName, double const scale, std::vector<std::pair<int,double>> const& parameters, int const dimension );
 
+    // This deletes a point that has been read parameter point by using ReadNewBlock above
+    virtual void ClearParameterPoint()  = 0;
+
     // This puts all variables with index brackets into a consistent form. It
     // can be overridden if necessary.
     virtual std::string
@@ -148,6 +151,8 @@ namespace VevaciousPlusPlus
     UpdateObservers();
   }
 
+  // This passes the necessary information of a slha block to internally to setup a lhablockset as if
+  // parsed from a file
 
   inline void LagrangianParameterManager::NewLhaBlock(  std::string const& uppercaseBlockName, double const scale,std::vector<std::pair<int,double>> const& parameters, int const dimension )
 

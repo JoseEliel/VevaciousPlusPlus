@@ -167,7 +167,6 @@ namespace VevaciousPlusPlus
     size_t
     RegisterNewParameter( LhaSourcedParameterFunctionoid const& newParameter,
                           std::string const& parameterName );
-                          
     //Parse Derived Parameters. Allows the use of IFNONZERO
     virtual void ParseDerivedParameters(std::string xmlbody);
     
@@ -180,12 +179,14 @@ namespace VevaciousPlusPlus
     // the pointers in referenceSafeActiveParameters.
     virtual void PrepareNewParameterPoint( std::string const& newInput );
     
-    
+    // This reads a slha block into a lhaParser object
     virtual void ReadNewBlock( std::string const& uppercaseBlockName,
     						   double const scale, 
     					       std::vector<std::pair<int,double>> const& parameters, 
     					       int const dimension );
- 
+
+    // This clears the lhaParser object that has been filled with ReadNewBlock
+    virtual void ClearParameterPoint();
 
     // This finds the block name part of parameterName, returns true if the
     // block name is found in validBlocks.
@@ -428,6 +429,11 @@ namespace VevaciousPlusPlus
     }
 }
   
+  inline void LesHouchesAccordBlockEntryManager::ClearParameterPoint()
+  {
+    lhaParser.DeleteBlocks();
+  }
+
   inline void LesHouchesAccordBlockEntryManager::ReadNewBlock( std::string const& uppercaseBlockName, 
   															   double const scale, 
   															   std::vector<std::pair<int,double>> const& parameters, 

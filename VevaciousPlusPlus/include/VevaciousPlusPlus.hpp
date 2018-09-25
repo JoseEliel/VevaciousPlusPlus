@@ -97,6 +97,9 @@ namespace VevaciousPlusPlus
     // This gives the results as a string.
     std::string GetResultsAsString();
 
+     // This gives the lifetime in seconds
+    double GetLifetimeInSeconds();
+
     // This writes the results as an SLHA file.
     void AppendResultsToLhaFile( std::string const& lhaFilename,
                                  bool const writeWarnings = true );
@@ -357,7 +360,22 @@ namespace VevaciousPlusPlus
     {
      result="Metastable";
     }
+    return result;
   }
+
+     // This gives the Lifetime in seconds as output.
+    inline double
+    VevaciousPlusPlus::GetLifetimeInSeconds() {
+      if (tunnelingCalculator->QuantumSurvivalProbability() >= 0.0)
+      {
+      return tunnelingCalculator->QuantumLifetimeInSeconds();
+      }
+    else
+      {
+        return -1;
+      }
+    }
+
 
   // This reads the current element of outerParser and if its name matches
   // elementName, it puts the contents of the child element <ClassType> into

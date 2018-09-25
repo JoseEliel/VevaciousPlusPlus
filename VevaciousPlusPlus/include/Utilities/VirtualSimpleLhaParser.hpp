@@ -37,7 +37,7 @@ namespace VevaciousPlusPlus
     
     
    // This prepares for reading in a parameter point as a set of blocks read with Read Block
-    void PrepareToReadParameterPoint();
+    void DeleteBlocks();
 
 	// This reads a block and creates the appropriate LhaBlock object storing that value. 
     // The Block name should be uppercase. The parameter values are given in a vector 
@@ -71,9 +71,9 @@ namespace VevaciousPlusPlus
     }
   }
   
-// This prepares for reading in a parameter point as a set of blocks read with Read Block
+// This prepares for reading in a parameter point as a set of blocks that have been read with Read Block
 
-  inline void VirtualSimpleLhaParser::PrepareToReadParameterPoint()
+  inline void VirtualSimpleLhaParser::DeleteBlocks()
   {
    ResetForNewFile();
   }
