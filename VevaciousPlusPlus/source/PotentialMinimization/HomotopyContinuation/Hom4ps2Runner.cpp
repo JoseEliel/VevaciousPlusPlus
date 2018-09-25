@@ -6,6 +6,10 @@
  */
 
 #include "PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 namespace VevaciousPlusPlus
 {
@@ -57,6 +61,7 @@ namespace VevaciousPlusPlus
       throw std::runtime_error(
                              "could not determine current working directory" );
     }
+    // Here we change to HOM4PS2 directory
     int directoryChangeSuccess( chdir( pathToHom4ps2.c_str() ) );
     if( 0 != directoryChangeSuccess )
     {
@@ -64,7 +69,50 @@ namespace VevaciousPlusPlus
                            "could not change directory to HOM4PS2 directory" );
     }
 
-    std::string hom4ps2InputFilename( "./VevaciousHomotopyContinuation.txt" );
+    // Here we create a unique name for a folder within HOM4PS2's folder to run
+    // the point.
+
+    std::string pathname = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
+    std::string absolutepathname = pathToHom4ps2 + "/" + pathname;
+
+    // Here we make to the unique directory
+
+    std::string systemCommand( "mkdir "+ pathname );
+
+    int systemReturn( system( systemCommand.c_str() ) );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
+    // Here we go inside the unique directory
+
+    int tempdirectoryChangeSuccess( chdir( absolutepathname.c_str() ) );
+    if( 0 != tempdirectoryChangeSuccess )
+    {
+      throw std::runtime_error(
+              "could not change directory to the temporary folder within HOM4PS2 directory" );
+    }
+
+    // Here we make a symlink to the folder with HOM4PS2 binary files (bin/) within the unique
+    // directory, otherwise HOM4PS2 main executable won't work as it always searchers for the
+    // binary files in ./bin (relative path)
+
+    systemCommand.assign( "ln -s ../bin ./bin" );
+
+    systemReturn = system( systemCommand.c_str() ) ;
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
+    std::string hom4ps2InputFilename("VevaciousHomotopyContinuation.txt" );
+
+
     std::vector< std::string > variableNames( systemToSolve.size(),
                                               "" );
     std::map< std::string, size_t > nameToIndexMap;
@@ -78,16 +126,18 @@ namespace VevaciousPlusPlus
     << "Running HOM4PS2!" << std::endl << "-----------------" << std::endl;
     std::cout << std::endl;
 
-    std::string systemCommand( "rm ./bin/input.num" );
-    int systemReturn( system( systemCommand.c_str() ) );
+    // This is to avoid a bug in HOM4PS2 where it tries to run this file instead of the input.
+
+    systemCommand.assign( "rm ../bin/input.num" );
+    systemReturn = system( systemCommand.c_str() );
     if( systemReturn == -1 )
     {
       std::stringstream errorBuilder;
       errorBuilder << "System could not execute \"" << systemCommand << "\".";
       throw std::runtime_error( errorBuilder.str() );
     }
-
-    systemCommand.assign( "/bin/bash -c \"./hom4ps2 " );
+    // Running HOM4PS2
+    systemCommand.assign( "/bin/bash -c \"../hom4ps2 " );
     systemCommand.append( hom4ps2InputFilename );
     systemCommand.append(  " <<< " );
     systemCommand.append( homotopyType );
@@ -100,14 +150,23 @@ namespace VevaciousPlusPlus
       throw std::runtime_error( errorBuilder.str() );
     }
 
-    // At this point, we are in the directory with hom4ps2 & data.roots, so
-    // now we fill purelyRealSolutionSets.
+    // At this point, we are in the unique directory with hom4ps2 & data.roots
+    // one directory above, so now we fill purelyRealSolutionSets.
+
     ParseHom4ps2Output( "./data.roots",
                         systemSolutions,
                         variableNames,
                         nameToIndexMap,
                         systemToSolve );
 
+    systemCommand.assign( "rm ../bin/input.num" );
+    systemReturn = system( systemCommand.c_str() );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
     // Now we return to the original working directory so as to avoid confusing
     // the user.
     directoryChangeSuccess = chdir( originalWorkingDirectory );
@@ -116,6 +175,19 @@ namespace VevaciousPlusPlus
       throw std::runtime_error(
                       "could not change directory back to initial directory" );
     }
+
+    systemCommand.assign( "rm -rf " + absolutepathname );
+
+    systemReturn = system( systemCommand.c_str() ) ;
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not execute \"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
+
+
+
   }
 
   // This sets up the variable names in variableNames and nameToIndexMap,
