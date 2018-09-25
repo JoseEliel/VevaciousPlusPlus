@@ -1,9 +1,12 @@
 #
 # Makefile for VevaciousPlusPlus.
-#     Authors: Ben O'Leary (benjamin.oleary@gmail.com)
-#      
-#              José Eliel Camargo-Molina (Eliel.camargo.molina@gmail.com)
-#      Copyright 2018 
+#     Add your name if you modify
+#     Author: Ben O'Leary (benjamin.oleary@gmail.com)
+#     Date: 2014
+#
+#     Author: José Eliel Camargo-Molina (Elielcamargomolina@gmail.com)
+#     Date: Sept. 2018
+#
 #      This file is part of VevaciousPlusPlus, released under the GNU General
 #      Public License. Please see the accompanying README.VevaciousPlusPlus.txt
 #      file for a full list of files, brief documentation on how to use these
@@ -12,7 +15,7 @@
 
 SHELL=/bin/sh
 
-CC=g++-8
+CC=g++-7
 AR=ar
 ARFLAGS=rcs
 #BOOSTDIR=./Boost/
@@ -75,6 +78,9 @@ SOURCES= source/Utilities/WarningLogger.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
+ source/BOSS_factory_VevaciousPlusPlus.cpp \
+ source/BOSS_VevaciousPlusPlus.cpp \
+ source/BOSS_wrapperutils.cpp \
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/
@@ -83,8 +89,8 @@ LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
 SHAREDLIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).so
 LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
-#-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
- 
+#-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a 
+
 # -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
 # There is some silly screwing around to force linking to the static Minuit2 
 # library.
@@ -108,7 +114,7 @@ $(LIBRARYFILE): $(LIBDIR) $(OBJECTS)
 $(SHAREDLIBRARYFILE): LDFLAGS += -shared
 
 $(SHAREDLIBRARYFILE): $(OBJECTS) 
-	$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $^ 
+	$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $^
 
 $(BINDIR):
 	mkdir $@
@@ -117,7 +123,7 @@ $(EXEFILE): $(BINDIR) $(LIBRARYFILE) $(SHAREDLIBRARYFILE)
 	$(CC) $(CCFLAGS) $(CCEXEFLAGS) -o $@ $(MAINCPP) $(LDFLAGS)
 
 clean:
-	\rm -f $(OBJECTS) $(LIBRARYFILE)  $(SHAREDLIBRARYFILE) $(EXEFILE)
+	\rm -f $(OBJECTS) $(LIBRARYFILE) $(SHAREDLIBRARYFILE) $(EXEFILE)
 
 deleteobjects:
 	\rm -f $(OBJECTS)

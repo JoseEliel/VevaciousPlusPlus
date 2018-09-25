@@ -47,8 +47,7 @@ namespace VevaciousPlusPlus
     void InitializeSarahAliases();
 
     //Add new Derived Parameters from Vector. Allows the use of IFNONZERO
-    virtual void RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> derivedparameters);
-
+    virtual void RegisterDerivedParameters(std::vector<std::pair<std::string,std::string>> derivedparameters);    
     // This duplicates a lot of code from RegisterUnregisteredSpecialCase, but
     // there doesn't seem to be an elegant way of using the common code as
     // there is too much entanglement with registering new parameters or not.

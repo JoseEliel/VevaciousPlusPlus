@@ -1,125 +1,25 @@
 <VevaciousPlusPlusPotentialFunctionInitialization>
-
-<!--
-#  PotentialFunctionInitialization.xml
-#
-#  Created on: Nov 11, 2015
-#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
-#      Copyright 2015 Ben O'Leary
-#
-#      This file is part of VevaciousPlusPlus, released under the
-#      GNU General Public License. Please see the accompanying
-#      README.VevaciousPlusPlus.txt file for a full list of files, brief
-#      documentation on how to use these classes, and further details on the
-#      license.
-#
- -->
-
-<!-- Quick start: if you just want to change the model (i.e. the potential in
-     terms of a set of fields), change
-     <PotentialClass><ConstructorArguments><ModelFile> to the name of the file
-     with the model in it (such as ./ModelFiles/TwoHiggsDoublet.vin or
-     ./ModelFiles/RestrictedToRealVevsRealMssm.vin). However, please be aware
-     of the kind of Lagrangian parameter manager needed by the potential - for
-     example, it may require a different set of (S)LHA blocks to be present, so
-     the Lagrangian parameter manager initialization file should ensure that
-     these blocks are recognized. -->
- 
-  <LagrangianParameterManagerClass>
- <!-- Either "LesHouchesAccordBlockEntryManager",
-      "SlhaBlocksWithSpecialCasesManager", or
-      "SlhaCompatibleWithSarahManager".
-
-      Each of these 3 options reads in a file in the (SUSY) Les Houches Accord
-      format (though the Flavor Les Houches Accord format is the same, just
-      defining more blocks) and interpolates values between those found in the
-      blocks according to the scale (the interpolation is actually based on the
-      logarithm of the scale.
-
-      The difference in the options is whether or not various keywords are
-      recognized, as for example the SLHA format does not explicitly print out
-      some Lagrangian parameters directly (e.g. the Higgs-mixing bilinear
-      mass-squared term, sometimes called m^2_3 or Bmu). The keywords are
-      explained in a long comment at the end of this file. -->
+ <LagrangianParameterManagerClass>
     <ClassType>
-      SlhaCompatibleWithSarahManager
+SlhaCompatibleWithSarahManager
     </ClassType>
     <ConstructorArguments>
       <ScaleAndBlockFile>
-        /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LagrangianParameters/MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml
+      /Users/eliel/gambit/Backends/installed/VevaciousPlusPlus/1.0/VevaciousPlusPlus/lib/../ModelFiles/LagrangianParameters/MssmCompatibleWithSARAHManager.xml
       </ScaleAndBlockFile>
     </ConstructorArguments>
   </LagrangianParameterManagerClass>
- 
   <PotentialFunctionClass>
-    <!-- Either "FixedScaleOneLoopPotential" or
-         "RgeImprovedOneLoopPotential" -->
     <ClassType>
       FixedScaleOneLoopPotential
     </ClassType>
     <ConstructorArguments>
       <ModelFile>
-         /Users/Eliel/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/PotentialFunctions/RealMssmWithStauAndStopVevs.vin
+         /Users/eliel/gambit/Backends/installed/VevaciousPlusPlus/1.0/VevaciousPlusPlus/lib/../ModelFiles/PotentialFunctions/RealMssmWithStauAndStopVevs.vin
       </ModelFile>
       <AssumedPositiveOrNegativeTolerance>
         0.5
       </AssumedPositiveOrNegativeTolerance>
     </ConstructorArguments>
   </PotentialFunctionClass>
-
-<!-- The SLHA1/2 keywords:
-       * DsbVd, DsbVu: the VEVs for Hd and Hu respectively at the SM-like
-         vacuum, because only v = sqrt(vd^2 + vu^2) and tan(beta) = vu/vd
-         are printed in HMIX.
-       * Bmu (m3Sq is an alternative alias): the bilinear soft SUSY-breaking
-         parameter, of dimension mass^2, coupling the Hd and Hu scalar
-         fields, because only mA^2 = ( Bmu / (sin(beta) * cos(beta) ) and
-         tan(beta) are given in HMIX.
-       * Te11, Te22, Te33, Td11, Td22, Td33, Tu11, Tu22, Tu33: the diagonal
-         entries of the trilinear soft SUSY-breaking terms corresponding to
-         TE[1,1] etc. in the official SLHA2 standard. Unfortunately, SLHA1
-         output only prints the diagonal A terms, which have to be multiplied
-         with the Yukawa couplings to get the actual trilinear couplings (of
-         dimension mass^1) in the Lagrangian. Hence to accept both SLHA1 and
-         SLHA2 output, Te11 has to be a special case, checking for the TE
-         block first, then if necessary checking for AE and YE and
-         multiplying the values, and so on.
-       * TE[1,1] and so on are also set to be special case aliases of the
-         above, rather than looked for directly.
-       * Msl211, Msl222, Msl233, Mse211, Mse222, Mse233, Msq211, Msq222,
-         Msq233, Msu211, Msu222, Msu233, Msd211, Msd222, Msd233: the diagonal
-         soft SUSY-breaking mass-squared terms for the sfermions
-         corresponding to MSL2[1,1] and so on in the official SLHA2 standard.
-         Unfortunately, SLHA1 output only prints the positive square roots of
-         these Lagrangian parameters, in various entries in MSOFT. Hence to
-         accept both SLHA1 and SLHA2 output, Msl211 has to be a special case,
-         checking for the MSL2 block first, then if necessary checking for
-         MSOFT[31] and squaring it, and so on.
-       * MSL2[1,1] and so on are also set to be special case aliases of the
-         above, rather than looked for directly.
-
-     The SARAH keywords:
-       * DsbVd, DsbVu: the same as DsbVd and DsbVu above, except first
-         looking for their values directly in HMIX[102] and HMIX[103]
-         respectively.
-       * Bmu: the same as Bmu above, except first looking for its value in
-         HMIX[101].
-       * muTree, BmuTree, mHdSqTree, mHuSqTree: these are the tree-level
-         values of mu, Bmu, m^2_Hd, m^2_Hu respectively in the
-         Liebler-Porod-Staub scheme printed by SARAH-generated SPheno (where
-         the SM-like vacuum VEVs are constant at every loop order), taking
-         the values in TREEHMIX[1], TREEHMIX[101], TREEMSOFT[21],
-         TREEMSOFT[22] respectively first, defaulting to the values in the
-         blocks without TREE prepended if the TREE-prepended values are
-         absent.
-       * muLoop, BmuLoop, mHdSqLoop, mHuSqLoop: these are the 1-loop-level
-         values of the above, taking the values in LOOPHMIX[1] etc. first.
-
-     No other keywords are defined in Vevacious 2.0.00, but user-defined
-     Lagrangian parameter manager classes inheriting from
-     SlhaBlocksWithSpecialCasesManager could easily add more, similarly to how
-     SlhaCompatibleWithSarahManager adds the SARAH keywords to the SLHA
-     keywords. -->
-
 </VevaciousPlusPlusPotentialFunctionInitialization>
-

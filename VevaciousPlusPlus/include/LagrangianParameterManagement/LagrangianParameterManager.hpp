@@ -154,12 +154,12 @@ namespace VevaciousPlusPlus
   // This passes the necessary information of a slha block to internally to setup a lhablockset as if
   // parsed from a file
 
-  inline void LagrangianParameterManager::NewLhaBlock(  std::string const& uppercaseBlockName, double const scale,std::vector<std::pair<int,double>> const& parameters, int const dimension )
-
+   inline void LagrangianParameterManager::NewLhaBlock(  std::string const& uppercaseBlockName, double const scale,std::vector<std::pair<int,double>> const& parameters, int const dimension )
   {
     ReadNewBlock( uppercaseBlockName, scale, parameters, dimension );
     UpdateObservers();
   }
+
   // This puts all variables with index brackets into a consistent form.
   inline std::string LagrangianParameterManager::FormatVariable(
                                     std::string const& variableToFormat ) const

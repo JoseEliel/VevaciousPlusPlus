@@ -70,7 +70,7 @@ namespace VevaciousPlusPlus
     for( std::vector< std::vector< double > >::const_iterator
          realSolution( startingPoints.begin() );
          realSolution < startingPoints.end();
-         ++realSolution )
+         ++realSolution)
     {
       std::cout
       << std::endl

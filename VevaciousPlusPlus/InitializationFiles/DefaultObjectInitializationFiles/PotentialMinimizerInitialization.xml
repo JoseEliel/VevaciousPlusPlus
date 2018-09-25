@@ -1,148 +1,43 @@
 <VevaciousPlusPlusPotentialMinimizerInitialization>
-
-<!--
-#  PotentialMinimizerInitialization.xml
-#
-#  Created on: Apr 10, 2014
-#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
-#      Copyright 2014 Ben O'Leary
-#
-#      This file is part of VevaciousPlusPlus, released under the
-#      GNU General Public License. Please see the accompanying
-#      README.VevaciousPlusPlus.txt file for a full list of files, brief
-#      documentation on how to use these classes, and further details on the
-#      license.
-#
- -->
-
-<!-- Need some sort of introduction here. -->
- 
   <PotentialMinimizerClass>
-    <!-- Currently <ClassType> must be "GradientFromStartingPoints", and
-         <ConstructorArguments> must give the <StartingPointFinderClass> and
-         <GradientMinimizerClass> components. Optional elements
-         <ExtremumSeparationThresholdFraction> and
-         <NonDsbRollingToDsbScalingFactor> may also be given. -->
     <ClassType>
       GradientFromStartingPoints
     </ClassType>
     <ConstructorArguments>
       <StartingPointFinderClass>
-        <!-- Currently <ClassType> must be
-             "PolynomialAtFixedScalesSolver", and
-             <ConstructorArguments> must give <NumberOfScales>,
-             <ReturnOnlyPolynomialMinima>, and <PolynomialSystemSolver>. -->
         <ClassType>
           PolynomialAtFixedScalesSolver
         </ClassType>
         <ConstructorArguments>
           <NumberOfScales>
-            <!-- If this number is 1, only 1 scale will be used for the
-                 Lagrangian parameters and the polynomial approximation to the
-                 potential will only be solved at this scale. The scale used
-                 will be the "appropriate single scale" given by the Lagrangian
-                 parameter manager.
-                 
-                 If a number greater than 1 is given, then this number of
-                 scales will be generated in a geometric sequence from the
-                 minimum scale given by the Lagrangian parameter manager to the
-                 maximum scale it gives. For example, if this number were 5 and
-                 the minimum and maximum scales 10^2 GeV and 10^14 GeV
-                 respectively, then the scales used would be:
-                 10^2 GeV, 10^5 GeV, 10^8 GeV, 10^11 GeV, and 10^14 GeV.
-                 Solutions found at each scale are only kept if their Euclidean
-                 length does not reach to another of the used scales. Still
-                 with the above example, if at 10^5 GeV a solution were found
-                 where the square root of the sum of the squares of the field
-                 values were smaller than 10^2 GeV or greater than 10^8 GeV,
-                 such a solution would be discarded. -->
             1
           </NumberOfScales>
           <ReturnOnlyPolynomialMinima>
-            <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if
-                 true then the starting points for gradient-based minimization
-                 are only the subset of solutions which also are minima of the
-                 polynomial function (so discarding maxima and saddle points).
-                 This should only be used with caution: it could be, for
-                 example, that the panic vacuum at the one-loop level is near a
-                 tree-level saddle point rather than near a tree-level minimum,
-                 and if such a saddle point is discarded rather than used as a
-                 starting point for the minimization of the one-loop potential,
-                 the panic vacuum might be missed. (It is debatable whether a
-                 potential where the loop expansion turns a tree-level saddle
-                 point into a one-loop-level minimum can be trusted as a loop
-                 expansion, but Vevacious allows it.) The advantage of
-                 discarding the saddle points and maxima of the polynomial is
-                 that if you are sure that it will not lead to important vacua
-                 being missed, it will speed up the subsequent gradient-based
-                 minimization by reducing the number of points to minimize, but
-                 under usual circumstances, it is the tunneling calculation
-                 which is the bottleneck. -->
             No
           </ReturnOnlyPolynomialMinima>
           <PolynomialSystemSolver>
-            <!-- Currently <ClassType> must be "Hom4ps2Runner" or "PHCRunner, and
-                 <ConstructorArguments> must give the path to the directory
-                 with the hom4ps2 executable by <PathToHom4ps2> and the
-                 argument for the executable by <Hom4ps2Argument>.
-
-                 We hope to be able to offer alternative solvers soon. -->
             <ClassType>
               Hom4ps2Runner
             </ClassType>
             <ConstructorArguments>
               <PathToHom4ps2>
-				/Users/Eliel/VevaciousPlusPlus/HOM4PS2/
+        /Users/eliel/gambit/Backends/installed/VevaciousPlusPlus/1.0/VevaciousPlusPlus/lib/..//../HOM4PS2
               </PathToHom4ps2>
               <Hom4ps2Argument>
-                <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
-                     "Please enter the option of homotopy method
-                        1. The polyhedral homotopy
-                        2. The classical linear homotopy"
-                     1 can be faster for systems of many variables,
-                     but 2 seems more reliable. -->
                 1
               </Hom4ps2Argument>
               <ResolutionSize>
-                <!-- Solutions within a hypercube with side length given by
-                     this number are considered to be the same solution, and
-                     also imaginary parts of solutions are considered to be
-                     zero if they are less than this number. -->
                 1.0
               </ResolutionSize>
             </ConstructorArguments>
-		  
-	<!--	<ClassType>
-		PHCRunner
-		</Classtype>
-		<ConstructorArguments>
-			<PathToPHC>
-			~/path/to/phc_executable
-			</PathToPHC>
-			<ResolutionSize>
-			1.0
-			</ResolutionSize>
-			<Tasks>
-			4
-			</Tasks>
-		</ConstructorArguments> -->
-		  
           </PolynomialSystemSolver>
         </ConstructorArguments>
       </StartingPointFinderClass>
       <GradientMinimizerClass>
-        <!-- Currently <ClassType> must be "MinuitPotentialMinimizer" and
-             <ConstructorArguments> must have <MinimaSeparationThreshold>. -->
         <ClassType>
           MinuitPotentialMinimizer
         </ClassType>
         <ConstructorArguments>
-          <!-- The initial step sizes for Minuit2 will be equal to the
-               starting point scaled by the number given in
-               <InitialStepSizeFraction>, or equal to the number given in
-               <MinimumInitialStepSize>, whichever is larger (so a starting
-               value of 0 will still have an initial step size given by the
-               number in <MinimumInitialStepSize>, for example). -->
           <InitialStepSizeFraction>
             0.1
           </InitialStepSizeFraction>
@@ -150,46 +45,16 @@
             1.0
           </MinimumInitialStepSize>
           <MinuitStrategy>
-            <!-- The number given here is given to Minuit2 to decide how
-                 precise it tries to be, through more or less calls of the
-                 function to be minimized. The default is 1, while 0 emphasizes
-                 making less function calls, and 2 emphasizes more accuracy
-                 through more function calls. -->
             0
           </MinuitStrategy>
         </ConstructorArguments>
       </GradientMinimizerClass>
       <ExtremumSeparationThresholdFraction>
-        <!-- The number given here is used as a threshold for ensuring that
-             the same minimum rolled to from separate starting points is
-             treated as the same minimum even if the minimizations did not lead
-             to exactly the same numbers for the values of the fields. If the
-             shorter of the Euclidean lengths of the 2 vectors in field space
-             describing the minima is l, and the Euclidean length of the
-             difference is d, and the number given by this element is f, then
-             2 minima are treated as the same minimum if d < (f * l). If not
-             given, 0.05 is taken as the default. -->
         0.05
       </ExtremumSeparationThresholdFraction>
       <NonDsbRollingToDsbScalingFactor>
-        <!-- The number given here is used as a scaling factor if the minimum
-             is suspected of being the result of some unfortunate shifting of
-             basins of attraction: we discovered in explorations with
-             Vevacious 1 that it could happen that the basin of attraction of
-             the DSB minimum at 1-loop level could grow so large that it would
-             encompass tree-level minima that belong in some sense to other
-             1-loop minima, which moved very far away due to loop corrections,
-             so even though their basins of attraction also grew very large in
-             the same way that of the DSB minimum did, they moved enough that
-             "their" tree-level minima were left out. If a starting point is
-             sufficiently far away from the DSB minimum yet rolls there under
-             gradient-based minimization, the starting point's field values are
-             scaled up by the number given by this element, and used as a new
-             starting point. If not given, 4.0 is taken as the default. -->
         4.0
       </NonDsbRollingToDsbScalingFactor>
     </ConstructorArguments>
   </PotentialMinimizerClass>
-
-</VevaciousPlusPlusPotentialMinimizerInitialization>
-
+</VevaciousPlusPlusObjectInitialization>

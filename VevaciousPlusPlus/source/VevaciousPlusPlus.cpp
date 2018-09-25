@@ -108,6 +108,78 @@ namespace VevaciousPlusPlus
     WarningLogger::SetWarningRecord( NULL );
   }
 
+  // This constructor takes all options necessary as strings, akin to reading
+  // them from the XML files but instead they are passed internally
+
+//  VevaciousPlusPlus::VevaciousPlusPlus(
+//          std::string const& LagrangianParameterManagerClassType ,
+//            std::string const& ScaleAndBlockFile ,
+//          std::string const& PotentialFunctionClassType ,
+//            std::string const& ModelFile,
+//            std::string const& AssumedPositiveOrNegativeTolerance ,
+//          std::string const& PotentialMinimizerClassType,
+//            std::string const& StartingPointFinderClassType,
+//              std::string const& NumberOfScales,
+//              std::string const& ReturnOnlyPolynomialMinima,
+//            std::string const& PolynomialSystemSolverClassType,
+//              std::string const& PathToRunner,
+//              std::string const& Hom4ps2Arg,
+//              std::string const& ResolutionSize,
+//            std::string const& GradientMinimizerClassType,
+//              std::string const& InitialStepSizeFraction,
+//              std::string const& MinimumInitialStepSize,
+//              std::string const& MinuitStrategy,
+//            std::string const& ExtremumSeparationThresholdFraction,
+//            std::string const& NonDsbRollingToDsbScalingFactor,
+//          std::string const& TunnelingClassType,
+//            std::string const& TunnelingStrategy,
+//            std::string const& SurvivalProbabilityThreshold,
+//            std::string const& ThermalActionResolution,
+//            std::string const& CriticalTemperatureAccuracy,
+//            std::string const& PathResolution,
+//            std::string const& MinimumVacuumSeparationFraction,
+//          std::string const& BouncePotentialFitClassType,
+//            std::string const& NumberShootAttemptsAllowed,
+//            std::string const& RadialResolution,
+//          std::string const& PathFinderClassType,
+//            std::string const& NumberOfPathSegments,
+//            std::string const& MinuitStrategy,
+//            std::string const& MinuitTolerance
+//
+//  ) :
+//            lagrangianParameterManager( NULL ),
+//            ownedLagrangianParameterManager( NULL ),
+//            ownedPotentialFunction( NULL ),
+//            potentialMinimizer( NULL ),
+//            ownedPotentialMinimizer( NULL ),
+//            tunnelingCalculator( NULL ),
+//            ownedTunnelingCalculator( NULL ),
+//            warningMessagesFromConstructor(),
+//            resultsFromLastRunAsXml( "<!-- No results yet. -->" ),
+//            warningMessagesFromLastRun()
+//    {
+//        FullPotentialDescription
+//                fullPotentialDescription( CreateFullPotentialDescription(
+//                potentialFunctionInitializationFilename ) );
+//        lagrangianParameterManager = ownedLagrangianParameterManager
+//                = fullPotentialDescription.first;
+//        ownedPotentialFunction = fullPotentialDescription.second;
+//        potentialMinimizer = ownedPotentialMinimizer
+//                = CreatePotentialMinimizer( *ownedPotentialFunction,
+//                                            potentialMinimizerInitializationFilename );
+//        tunnelingCalculator = ownedTunnelingCalculator
+//                = CreateTunnelingCalculator( tunnelingCalculatorInitializationFilename );
+//        WarningLogger::SetWarningRecord( NULL );
+//    }
+//
+//
+//
+//
+//
+//
+//
+
+
   VevaciousPlusPlus::~VevaciousPlusPlus()
   {
     delete ownedTunnelingCalculator;

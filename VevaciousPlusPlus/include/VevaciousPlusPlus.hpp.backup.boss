@@ -1,6 +1,3 @@
-#ifndef __boss__VevaciousPlusPlus_VevaciousPlusPlus_1_0_hpp__
-#define __boss__VevaciousPlusPlus_VevaciousPlusPlus_1_0_hpp__
-
 /*
  * VevaciousPlusPlus.hpp
  *
@@ -47,20 +44,13 @@
 #include <cstddef>
 #include "LagrangianParameterManagement/SlhaCompatibleWithSarahManager.hpp"
 #include "LagrangianParameterManagement/SlhaBlocksWithSpecialCasesManager.hpp"
-#include "LagrangianParameterManagement/SARAHManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
 
 namespace VevaciousPlusPlus
 {
 
-  } 
-  #define ENUMS_DECLARED
-  #include "backend_types/VevaciousPlusPlus_1_0/abstract_VevaciousPlusPlus.hpp"
-  #include "gambit/Backends/abstracttypedefs.hpp"
-  #include "gambit/Backends/wrappertypedefs.hpp"
-  namespace VevaciousPlusPlus { 
-  class VevaciousPlusPlus : public virtual Abstract_VevaciousPlusPlus
+  class VevaciousPlusPlus
   {
   public:
     // This is the constructor for those who know what they are doing, to allow
@@ -105,9 +95,6 @@ namespace VevaciousPlusPlus
     
     // This gives the results as a string.
     std::string GetResultsAsString();
-
-     // This gives the lifetime in seconds
-    double GetLifetimeInSeconds();
 
     // This writes the results as an SLHA file.
     void AppendResultsToLhaFile( std::string const& lhaFilename,
@@ -327,18 +314,7 @@ namespace VevaciousPlusPlus
     // This returns a vector which is the union of
     // warningMessagesFromConstructor with warningMessagesFromLastRun.
     std::vector< std::string > WarningMessagesToReport() const;
-  
-        public:
-            Abstract_VevaciousPlusPlus* pointer_copy__BOSS();
-
-            using Abstract_VevaciousPlusPlus::pointer_assign__BOSS;
-            void pointer_assign__BOSS(Abstract_VevaciousPlusPlus* in);
-
-
-        public:
-            void AppendResultsToLhaFile__BOSS(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&);
-
-};
+  };
 
 
 
@@ -380,22 +356,7 @@ namespace VevaciousPlusPlus
     {
      result="Metastable";
     }
-    return result;
   }
-
-     // This gives the Lifetime in seconds as output.
-    inline double
-    VevaciousPlusPlus::GetLifetimeInSeconds() {
-      if (tunnelingCalculator->QuantumSurvivalProbability() >= 0.0)
-      {
-      return tunnelingCalculator->QuantumLifetimeInSeconds();
-      }
-    else
-      {
-        return -1;
-      }
-    }
-
 
   // This reads the current element of outerParser and if its name matches
   // elementName, it puts the contents of the child element <ClassType> into
@@ -788,5 +749,3 @@ namespace VevaciousPlusPlus
 
 } /* namespace VevaciousPlusPlus */
 #endif /* VEVACIOUSPLUSPLUS_HPP_ */
-
-#endif /* __boss__VevaciousPlusPlus_VevaciousPlusPlus_1_0_hpp__ */

@@ -170,7 +170,6 @@ namespace VevaciousPlusPlus
     //Parse Derived Parameters. Allows the use of IFNONZERO
     virtual void ParseDerivedParameters(std::string xmlbody);
     
-
     // This updates the SLHA file parser with the file with name given by
     // newInput and then, once the blocks have been updated, tells each
     // parameter in referenceSafeActiveParameters to update itself, and sets up
