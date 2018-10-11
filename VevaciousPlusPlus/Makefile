@@ -78,9 +78,6 @@ SOURCES= source/Utilities/WarningLogger.cpp \
  $(BOUNCEACTIONTUNNELING)/ThermalActionFitter.cpp \
  $(BOUNCEACTIONTUNNELING)/CosmoTransitionsRunner.cpp \
  $(BOUNCEACTIONTUNNELING)/BounceAlongPathWithThreshold.cpp \
- source/BOSS_factory_VevaciousPlusPlus.cpp \
- source/BOSS_VevaciousPlusPlus.cpp \
- source/BOSS_wrapperutils.cpp \
  source/VevaciousPlusPlus.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin/
@@ -99,7 +96,7 @@ EXEFILE=$(BINDIR)/VevaciousPlusPlus.exe
 
 all: $(OBJECTS) $(LIBRARYFILE) $(SHAREDLIBRARYFILE) $(EXEFILE)
 
-shared: $(SHAREDLIBRARYFILE)
+shared: $(LIB) $(SHAREDLIBRARYFILE)
 
 .PHONY: all clean
 
@@ -112,7 +109,7 @@ $(LIBDIR):
 $(LIBRARYFILE): $(LIBDIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
-$(SHAREDLIBRARYFILE):$(LIBDIR) $(OBJECTS)
+$(SHAREDLIBRARYFILE): $(OBJECTS)
 	$(CC) $(CCFLAGS) -shared -o $@ $^ $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 
 $(BINDIR):
