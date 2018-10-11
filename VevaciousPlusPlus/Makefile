@@ -89,32 +89,31 @@ LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
 SHAREDLIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).so
 LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
-#-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a 
+#-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
 
 # -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
-# There is some silly screwing around to force linking to the static Minuit2 
+# There is some silly screwing around to force linking to the static Minuit2
 # library.
 MAINCPP=source/VevaciousPlusPlusMain.cpp
 EXEFILE=$(BINDIR)/VevaciousPlusPlus.exe
 
 all: $(OBJECTS) $(LIBRARYFILE) $(SHAREDLIBRARYFILE) $(EXEFILE)
 
+shared: $(SHAREDLIBRARYFILE)
+
 .PHONY: all clean
 
 $(OBJECTS): %.o: %.cpp
 	$(CC) $(CCFLAGS) $(CCOBJECTFLAGS) $< -o $@
-	
+
 $(LIBDIR):
 	mkdir $@
 
 $(LIBRARYFILE): $(LIBDIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
-
-$(SHAREDLIBRARYFILE): LDFLAGS += -shared
-
-$(SHAREDLIBRARYFILE): $(OBJECTS) $(LIBRARYFILE)
-	$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $^
+$(SHAREDLIBRARYFILE): $(OBJECTS)
+	$(CC) $(CCFLAGS) -shared -o $@ $^ $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 
 $(BINDIR):
 	mkdir $@
