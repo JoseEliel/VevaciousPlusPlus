@@ -1,5 +1,5 @@
 #include "VevaciousPlusPlus.hpp"
-#include "backend_types/VevaciousPlusPlus_1_0/wrapper_VevaciousPlusPlus.hpp"
+#include "backend_types/vevacious_1_0/wrapper_VevaciousPlusPlus.hpp"
 #include <string>
 #include "gambit/Backends/abstracttypedefs.hpp"
 #include "gambit/Backends/wrappertypedefs.hpp"

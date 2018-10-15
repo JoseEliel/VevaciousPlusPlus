@@ -1,5 +1,5 @@
-#ifndef __boss__VevaciousPlusPlus_VevaciousPlusPlus_1_0_hpp__
-#define __boss__VevaciousPlusPlus_VevaciousPlusPlus_1_0_hpp__
+#ifndef __boss__VevaciousPlusPlus_vevacious_1_0_hpp__
+#define __boss__VevaciousPlusPlus_vevacious_1_0_hpp__
 
 /*
  * VevaciousPlusPlus.hpp
@@ -56,7 +56,7 @@ namespace VevaciousPlusPlus
 
   } 
   #define ENUMS_DECLARED
-  #include "backend_types/VevaciousPlusPlus_1_0/abstract_VevaciousPlusPlus.hpp"
+  #include "backend_types/vevacious_1_0/abstract_VevaciousPlusPlus.hpp"
   #include "gambit/Backends/abstracttypedefs.hpp"
   #include "gambit/Backends/wrappertypedefs.hpp"
   namespace VevaciousPlusPlus { 
@@ -789,4 +789,4 @@ namespace VevaciousPlusPlus
 } /* namespace VevaciousPlusPlus */
 #endif /* VEVACIOUSPLUSPLUS_HPP_ */
 
-#endif /* __boss__VevaciousPlusPlus_VevaciousPlusPlus_1_0_hpp__ */
+#endif /* __boss__VevaciousPlusPlus_vevacious_1_0_hpp__ */

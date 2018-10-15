@@ -32,8 +32,8 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         {
             return get_BEptr()->GetResultsAsString();
         }
-
-        inline double VevaciousPlusPlus::GetLifetimeInSeconds()
+        
+         inline double VevaciousPlusPlus::GetLifetimeInSeconds() 
         {
             return get_BEptr()->GetLifetimeInSeconds();
         }
@@ -50,7 +50,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         
         
         // Wrappers for original constructors: 
-        inline VevaciousPlusPlus::VevaciousPlusPlus::VevaciousPlusPlus(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >& initializationFileName) :
+        inline VevaciousPlusPlus::VevaciousPlusPlus(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >& initializationFileName) :
             WrapperBase(__factory0(initializationFileName))
         {
             get_BEptr()->set_wptr(this);
@@ -58,7 +58,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         }
         
         // Special pointer-based constructor: 
-        inline VevaciousPlusPlus::VevaciousPlusPlus::VevaciousPlusPlus(Abstract_VevaciousPlusPlus* in) :
+        inline VevaciousPlusPlus::VevaciousPlusPlus(Abstract_VevaciousPlusPlus* in) :
             WrapperBase(in)
         {
             get_BEptr()->set_wptr(this);
@@ -66,7 +66,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         }
         
         // Copy constructor: 
-        inline VevaciousPlusPlus::VevaciousPlusPlus::VevaciousPlusPlus(const VevaciousPlusPlus& in) :
+        inline VevaciousPlusPlus::VevaciousPlusPlus(const VevaciousPlusPlus& in) :
             WrapperBase(in.get_BEptr()->pointer_copy__BOSS())
         {
             get_BEptr()->set_wptr(this);
@@ -74,7 +74,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         }
         
         // Assignment operator: 
-        inline VevaciousPlusPlus& VevaciousPlusPlus::operator=(const VevaciousPlusPlus& in)
+        inline VevaciousPlusPlus & VevaciousPlusPlus::operator=(const VevaciousPlusPlus& in)
         {
             if (this != &in)
             {
@@ -85,7 +85,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         
         
         // Destructor: 
-        inline VevaciousPlusPlus::VevaciousPlusPlus::~VevaciousPlusPlus()
+        inline VevaciousPlusPlus::~VevaciousPlusPlus()
         {
             if (get_BEptr() != 0)
             {
@@ -100,7 +100,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         }
         
         // Returns correctly casted pointer to Abstract class: 
-        inline Abstract_VevaciousPlusPlus* VevaciousPlusPlus::VevaciousPlusPlus::get_BEptr() const
+        inline  Abstract_VevaciousPlusPlus* VevaciousPlusPlus::VevaciousPlusPlus::get_BEptr() const
         {
             return dynamic_cast<Abstract_VevaciousPlusPlus*>(BEptr);
         }

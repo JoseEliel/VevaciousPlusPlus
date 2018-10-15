@@ -1,11 +1,11 @@
 <VevaciousPlusPlusPotentialFunctionInitialization>
  <LagrangianParameterManagerClass>
     <ClassType>
-SlhaCompatibleWithSarahManager
+      SlhaCompatibleWithSarahManager
     </ClassType>
     <ConstructorArguments>
       <ScaleAndBlockFile>
-      /Users/eliel/gambit/Backends/installed/VevaciousPlusPlus/1.0/VevaciousPlusPlus/lib/../ModelFiles/LagrangianParameters/MssmCompatibleWithSARAHManager.xml
+      /Users/eliel/gambit/Backends/installed/VevaciousPlusPlus/1.0/VevaciousPlusPlus/lib/../ModelFiles/LagrangianParameters/MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml
       </ScaleAndBlockFile>
     </ConstructorArguments>
   </LagrangianParameterManagerClass>
