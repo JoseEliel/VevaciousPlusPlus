@@ -6,6 +6,10 @@
  */
 
 #include "PotentialMinimization/HomotopyContinuation/PHCRunner.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 namespace VevaciousPlusPlus
 {
@@ -31,9 +35,13 @@ namespace VevaciousPlusPlus
                       std::vector< PolynomialConstraint > const& systemToSolve,
                   std::vector< std::vector< double > >& systemSolutions ) const
   {
+    // Here I find unique names for the input and output files, to allow for parallel running.
+    std::string PHCInputFileUUID = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
+    std::string PHCOutputFileUUID = boost::lexical_cast<std::string>(boost::uuids::random_generator()());
 
-    std::string PHCInputFileName = pathToPHC + "VevaciousHomotopyContinuation.txt";
-    std::string PHCOutputFilename = pathToPHC + "PHCOutput";
+
+    std::string PHCInputFileName = pathToPHC + "/" + PHCInputFileUUID;
+    std::string PHCOutputFilename = pathToPHC + "/" + PHCOutputFileUUID;
     std::vector< std::string > variableNames( systemToSolve.size(),
                                               "" );
     std::map< std::string, size_t > nameToIndexMap;
@@ -61,7 +69,7 @@ namespace VevaciousPlusPlus
 		  throw std::runtime_error( errorBuilder.str() );
 		}
 	}
-	systemCommand.assign(pathToPHC + "phc -b -t" + std::to_string(taskcount)+ " "); //calls the blackbox solver
+	systemCommand.assign(pathToPHC +"/"+ "phc -b -t" + std::to_string(taskcount)+ " "); //calls the blackbox solver
     systemCommand.append( PHCInputFileName );
 	systemCommand.append(" ");
 	systemCommand.append( PHCOutputFilename );
@@ -83,7 +91,15 @@ namespace VevaciousPlusPlus
                         systemToSolve );
 	end= std::chrono::steady_clock::now();
 	std::cout << "Parsing time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" <<std::endl << std::endl  << "-----------------" << std::endl;
-	
+	//Deleting files after they have been used
+	systemCommand.assign("rm " + PHCInputFileName + " && " + "rm " + PHCOutputFilename );
+    systemReturn = system( systemCommand.c_str() );
+    if( systemReturn == -1 )
+    {
+      std::stringstream errorBuilder;
+      errorBuilder << "System could not delete PHC files.\"" << systemCommand << "\".";
+      throw std::runtime_error( errorBuilder.str() );
+    }
   }
 
   // This sets up the variable names in variableNames and nameToIndexMap,
