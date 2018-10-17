@@ -59,7 +59,7 @@ namespace VevaciousPlusPlus
     // between the vacua at every temperature to trust the tunneling
     // calculation.
     double const thresholdSeparationSquared( vacuumSeparationFractionSquared
-                                * falseVacuum.SquareDistanceTo( trueVacuum ) );
+                                * falseVacuum.SquareDistanceTo( trueVacuum ));
 
     // We sum up decay widths over increasing temperatures.
     double partialDecayWidth( 0.0 );

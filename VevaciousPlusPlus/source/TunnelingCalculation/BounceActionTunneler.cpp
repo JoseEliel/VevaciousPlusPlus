@@ -219,10 +219,13 @@ namespace VevaciousPlusPlus
       WarningLogger::LogWarning( warningBuilder.str() );
       return;
     }
-    quantumLifetimeInSeconds = ( ( exp( 0.25 * quantumAction )
-                                   * hBarInGigaElectronVoltSeconds )
-                                 / fourthRootOfSolitonicFactor );
+    //quantumLifetimeInSeconds = ( ( exp( 0.25 * quantumAction )
+    //                               * hBarInGigaElectronVoltSeconds )
+    //                             / fourthRootOfSolitonicFactor );
 
+    quantumLifetimeInSeconds = ( ( exp( quantumAction )
+                                   * hBarInGigaElectronVoltSeconds )
+                                 / (std::pow(ageOfKnownUniverseInInverseGigaElectronVolts, 3) * std::pow(fourthRootOfSolitonicFactor , 4 )));
     double const
     survivalExponent( ageOfKnownUniverseInSeconds / quantumLifetimeInSeconds );
     if( survivalExponent >= maximumPowerOfNaturalExponent )
