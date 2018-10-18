@@ -37,6 +37,11 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         {
             return get_BEptr()->GetLifetimeInSeconds();
         }
+
+        inline double VevaciousPlusPlus::GetThermalProbability()
+        {
+            return get_BEptr()->GetThermalProbability();
+        }
         
         inline void VevaciousPlusPlus::AppendResultsToLhaFile(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >& lhaFilename, const bool writeWarnings)
         {

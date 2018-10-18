@@ -107,7 +107,10 @@ namespace VevaciousPlusPlus
     std::string GetResultsAsString();
 
      // This gives the lifetime in seconds
-    double GetLifetimeInSeconds();
+     double GetLifetimeInSeconds();
+
+     // This gives the upper bound on thermal survival probability
+     double GetThermalProbability();
 
     // This writes the results as an SLHA file.
     void AppendResultsToLhaFile( std::string const& lhaFilename,
@@ -397,7 +400,20 @@ namespace VevaciousPlusPlus
     }
 
 
-  // This reads the current element of outerParser and if its name matches
+    // This gives the upper bound on the thermal survival probability as output.
+    inline double
+    VevaciousPlusPlus::GetThermalProbability() {
+      if (tunnelingCalculator->ThermalSurvivalProbability()  >= 0.0)
+      {
+        return tunnelingCalculator->ThermalSurvivalProbability();
+      }
+      else
+      {
+        return -1;
+      }
+    }
+
+      // This reads the current element of outerParser and if its name matches
   // elementName, it puts the contents of the child element <ClassType> into
   // className and <ConstructorArguments> into constructorArguments, both
   // stripped of whitespace.

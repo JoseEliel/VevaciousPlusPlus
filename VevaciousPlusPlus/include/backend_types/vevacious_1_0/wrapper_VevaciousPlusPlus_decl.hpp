@@ -36,6 +36,8 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
                 ::std::basic_string<char, std::char_traits<char>, std::allocator<char> > GetResultsAsString();
                 
                 double GetLifetimeInSeconds();
+
+                double GetThermalProbability();
         
                 void AppendResultsToLhaFile(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >& lhaFilename, const bool writeWarnings);
         
