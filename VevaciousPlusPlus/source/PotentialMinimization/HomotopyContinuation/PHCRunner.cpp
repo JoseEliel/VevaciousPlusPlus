@@ -10,7 +10,6 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
-#include <boost/regex.hpp>
 
 namespace VevaciousPlusPlus
 {
@@ -229,14 +228,14 @@ namespace VevaciousPlusPlus
 		std::string doublepattern (it->first); //Fieldvalue names.
 		doublepattern += "\\s+:\\s+"; //whitespaces, colon, whitespaces
 		doublepattern += "(-?[0-9]+.[0-9]+E[+-][0-9]+)\\s+(-?[0-9]+.[0-9]+E[+-][0-9]+)"; //match[1]: Re in scientific double; whitespaces; match[2] : Im in scientific double
-		boost::regex pattern(doublepattern);
-		boost::sregex_iterator next(container.begin(), container.end(), pattern);
-		boost::sregex_iterator end;
+		std::regex pattern(doublepattern);
+		std::sregex_iterator next(container.begin(), container.end(), pattern);
+		std::sregex_iterator end;
 		double Re,Im;
 		int step(0);
 		if(it == nameToIndexMap.begin()){ //With the first iteration we need to fill solmap with all Real occurences of the starting Variable
 			while (next != end) { //Going through all matches.
-                boost::smatch match = *next;
+				std::smatch match = *next;
 				Re = std::stod(match[1]);
 				Im = std::stod(match[2]);
 				if(fabs(Im) < resolutionSize) solmap[step].push_back(Re);
@@ -249,7 +248,7 @@ namespace VevaciousPlusPlus
 			{
 				for(int k=0;k<(itm->first - step);k++) ++next;  //We don't want to iterate all over from the beginning every time, we just go through all entrys of solmap in one cumulative iteration
 				step = itm->first;
-                boost::smatch match = *next;
+				std::smatch match = *next;
 				Re = std::stod(match[1]);
 				Im = std::stod(match[2]);
 				if(fabs(Im) < resolutionSize) {

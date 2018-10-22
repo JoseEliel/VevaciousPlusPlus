@@ -20,7 +20,6 @@ AR=ar
 ARFLAGS=rcs
 #BOOSTDIR=./Boost/
 BOOSTDIR=/usr/local/include/boost/
-BOOSTLIBDIR=/usr/local/lib/
 #EIGENDIR=./Eigen/
 EIGENDIR=/usr/local/include/eigen3/
 #MINUITLIBNAME=lcg_Minuit
@@ -32,7 +31,7 @@ MINUITLIBDIR=/usr/local/lib
 DEBUGFLAGS=
 INCLUDES=-I./include/ -I./include/LHPC/ \
  -I$(EIGENDIR) -I$(BOOSTDIR) -I$(MINUITINCLUDEDIR)
-CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp -fPIC -std=c++11  $(DEBUGFLAGS) $(INCLUDES)
+CCFLAGS=-Wall -Wno-unused-local-typedefs -O3 -fopenmp -fPIC -std=c++11 $(DEBUGFLAGS) $(INCLUDES)
 CCOBJECTFLAGS=-c
 CCEXEFLAGS=
 
@@ -89,7 +88,7 @@ LIBNAME=VevaciousPlusPlus
 LIBDIR=./lib/
 LIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).a
 SHAREDLIBRARYFILE=$(LIBDIR)/lib$(LIBNAME).so
-LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) -L$(BOOSTLIBDIR) -lboost_regex $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a 
+LDFLAGS= -L$(LIBDIR) -l$(LIBNAME) $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 #-L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
 
 # -l$(LHPCLIBNAME) -L$(MINUITLIBDIR) -l:lib$(MINUITLIBNAME).a
@@ -114,7 +113,7 @@ $(LIBRARYFILE): $(LIBDIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 $(SHAREDLIBRARYFILE): $(OBJECTS)
-	$(CC) $(CCFLAGS) -shared -o $@ $^ $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a -L$(BOOSTLIBDIR) -lboost_regex
+	$(CC) $(CCFLAGS) -shared -o $@ $^ $(MINUITLIBDIR)/lib$(MINUITLIBNAME).a
 
 $(BINDIR):
 	mkdir $@
