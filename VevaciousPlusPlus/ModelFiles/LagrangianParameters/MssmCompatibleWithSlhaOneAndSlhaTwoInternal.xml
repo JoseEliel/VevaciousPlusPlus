@@ -1,0 +1,178 @@
+<LhaBlockParameterManagerInitializationFile>
+
+  <ParameterManagerDetails
+   ParameterManagerName="MssmCompatibleWithSlhaOneAndSlhaTwoOutputs"
+   VevaciousMajorVersion="2" VevaciousMinorVersion="0" />
+
+  <!-- This LHA block parameter file was created by Ben O'Leary. -->
+
+  <!-- PLEASE TAKE NOTE! There are 2 XML elements, each with long explanatory
+       comments. -->
+
+  <RenormalizationScaleChoices>
+    <!-- Vevacious needs three scales:
+         1) a minimum parameter-evaluation scale: MinimumScaleBound;
+         2) a per-parameter-point renormalization scale in case the potential
+            function is for a fixed scale: FixedScaleChoice; and
+         3) a maximum parameter-evaluation and Euclidean length for the field
+            configuration vector: MaximumScaleBound.
+
+         The minimum parameter-evaluation scale MinimumScaleBound is used to
+         avoid trying to evaluate Lagrangian parameters at scales much lower
+         than those for the blocks in the LHA file, and also prevents the
+         parameters being evalated at log(0). It is only used by the
+         RgeImprovedOneLoopPotential class, and can be ignored if using the
+         FixedScaleOneLoopPotential class or a user-defined class which does
+         not call MinimumEvaluationScale() from its Lagrangian parameter
+         manager.
+
+         The per-parameter-point renormalization scale FixedScaleChoice is only
+         used by the FixedScaleOneLoopPotential class and can be ignored if
+         using the RgeImprovedOneLoopPotential class or a user-defined class
+         which does not call AppropriateFixedScaleForParameterPoint() from its
+         Lagrangian parameter manager.
+
+         The maximum parameter-evaluation scale MaximumScaleBound is used for
+         two purposes: to avoid trying to evaluate Lagrangian parameters at
+         scales much higher than those for the blocks in the LHA file; and also
+         to bound the gradient-based minimization from rolling to field values
+         so large that it would result in a very untrustworthy evaluation of
+         the potential. Thus it cannot be ignored and must be given.
+
+         Each element consists of two child elements: EvaluationType and
+         EvaluationArgument.
+
+         EvaluationType can be "FixedNumber", in which case
+         EvaluationArgument should be a fixed number, e.g.
+      <EvaluationType>
+        FixedNumber
+      </EvaluationType>
+      <EvaluationArgument>
+        91.1876
+      </EvaluationArgument>
+         would use the central value of the Z mass given by the Particle Data
+         Group live listings on 2015-11-05.
+
+         EvaluationType can be "BlockLowestScale", in which case
+         EvaluationArgument should be the name of a block which will be read in
+         the parameter point's LHA file, and the lowest scale explicitly given
+         for that block will be used, e.g.
+      <EvaluationType>
+        BlockLowestScale
+      </EvaluationType>
+      <EvaluationArgument>
+        GAUGE
+      </EvaluationArgument>
+         would use the lowest value given after any "GAUGE Q=" in the LHA file.
+
+         EvaluationType can be "BlockLowestScale", and works exactly as
+         "BlockLowestScale" (including the possibilities for
+         EvaluationArgument), except the highest scale explicitly given for the
+         block is used.
+
+         EvaluationType can be "BlockEntry", in which case
+         EvaluationArgument should be the name of a block which will be read in
+         the parameter point's LHA file followed by an index or set of indices
+         in square brackets, and the value in that block (the copy of the block
+         in the file with the lowest scale if multiple blocks of the same name
+         are in a single file) with that index or those indices will be used,
+         e.g.
+      <EvaluationType>
+        BlockEntry
+      </EvaluationType>
+      <EvaluationArgument>
+        SMINPUTS[4]
+      </EvaluationArgument>
+         would use the value given with index 4 in the SMINPUTS block in the
+         LHA file (which is the input Z mass), while
+      <EvaluationArgument>
+        MSU2[3,3]
+      </EvaluationArgument>
+         would use the value with indices (3, 3) in the MSU2 block (which is
+         the (3, 3) entry in the soft SUSY-breaking up-type squark mass-squared
+         matrix).
+
+         Finally, EvaluationType can be "SqrtAbs", in which case
+         EvaluationArgument should be the same as for "BlockEntry", but in this
+         case the square root of the absolute value of the entry will be used,
+         e.g.
+      <EvaluationType>
+        SqrtAbs
+      </EvaluationType>
+      <EvaluationArgument>
+        MSOFT[22]
+      </EvaluationArgument>
+         would use the square root of the absolute value of the value given
+         with index 22 in the MSOFT block in the LHA file (which is the soft
+         SUSY-breaking mass-squared parameter for Hu, which is often
+         negative). -->
+
+    <MinimumScaleBound>
+      <EvaluationType>
+        BlockEntry
+      </EvaluationType>
+      <EvaluationArgument>
+        SMINPUTS[4]
+      </EvaluationArgument>
+    </MinimumScaleBound>
+
+    <FixedScaleChoice>
+      <EvaluationType>
+        BlockEntry
+      </EvaluationType>
+      <EvaluationArgument>
+        FIXEDSCALE[1]
+      </EvaluationArgument>
+    </FixedScaleChoice>
+
+    <MaximumScaleBound>
+      <EvaluationType>
+        FixedNumber
+      </EvaluationType>
+      <EvaluationArgument>
+        1.0E+016 <!-- Roughly the GUT scale. -->
+      </EvaluationArgument>
+    </MaximumScaleBound>
+
+  </RenormalizationScaleChoices>
+
+
+  <ValidBlocks>
+  <!-- Every block that will be read in from a file in the (SUSY) Les Houches
+       Accords format should be enumerated here, separated by whitespace -
+       i.e. spaces, tabs, newlines. Also permitted for readability are commas
+       and semicolons, as valid block names should just be single strings of
+       alphanumeric characters. Block names are NOT case-sensitive (following
+       the SLHA conventions). Any blocks not explicitly mentioned here will be
+       considered invalid requests when the potential function object requests
+       values from the parameter manager object!
+       N.B.: Only a subset of possible LHA-style blocks are permitted: those
+       where each line is of the form of a set of integer indices followed by a
+       single floating-point number. The number of indices is not limited.
+       For a block named BLAH, the elements are referred to as BLAH[ 1 ] or
+       BLAH[ 2, 3 ] or BLAH[4,5,6] and so on for blocks with 1, 2 or 3 indices
+       respectively and so on. Also, blocks which are just a single line with
+       a single floating-point number are permitted, but must be referred to
+       with empty square brackets: BLAH[] (e.g. the ALPHA block of the
+       original SUSY Les Houches Accords). -->
+    GAUGE
+    FIXEDSCALE
+    HMIX
+    MSOFT
+    MSQ2
+    MSU2
+    MSD2
+    MSL2
+    MSE2
+    YU
+    TU
+    AU
+    YD
+    TD
+    AD
+    YE
+    TE
+    AE
+  </ValidBlocks>
+
+</LhaBlockParameterManagerInitializationFile>
