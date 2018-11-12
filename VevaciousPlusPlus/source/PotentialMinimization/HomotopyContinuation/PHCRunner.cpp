@@ -69,6 +69,8 @@ namespace VevaciousPlusPlus
 		  throw std::runtime_error( errorBuilder.str() );
 		}
 	}
+	std::string lockfile = pathToPHC + "/../busy.lock" ;
+	std::ofstream file ( lockfile.c_str() );
 	systemCommand.assign(pathToPHC +"/"+ "phc -b -t" + std::to_string(taskcount)+ " "); //calls the blackbox solver
     systemCommand.append( PHCInputFileName );
 	systemCommand.append(" ");
@@ -80,6 +82,7 @@ namespace VevaciousPlusPlus
       errorBuilder << "System could not run PHC with \"" << systemCommand << "\".";
       throw std::runtime_error( errorBuilder.str() );
     }
+    std::remove( lockfile.c_str() );
 	std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now(); // we want to measure the elapsed time
 	std::cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" <<std::endl;
     // now we fill purelyRealSolutionSets.
