@@ -27,15 +27,12 @@
 
 namespace VevaciousPlusPlus
 {
-  // This class takes memory management ownership of the components given to
-  // the constructor as pointers! It'd be nice to use std::unique_ptrs, but we
-  // are stubbornly sticking to allowing non-C++11-compliant compilers.
   class BounceAlongPathWithThreshold : public BounceActionTunneler
   {
   public:
     BounceAlongPathWithThreshold(
-                           std::vector< BouncePathFinder* > const& pathFinders,
-                                BounceActionCalculator* const actionCalculator,
+                           std::vector< std::unique_ptr<BouncePathFinder> > pathFinders,
+                                std::unique_ptr<BounceActionCalculator> actionCalculator,
                 TunnelingCalculator::TunnelingStrategy const tunnelingStrategy,
                                   double const survivalProbabilityThreshold,
                                unsigned int const thermalIntegrationResolution,
@@ -46,8 +43,8 @@ namespace VevaciousPlusPlus
 
 
   protected:
-    std::vector< BouncePathFinder* > pathFinders;
-    BounceActionCalculator* actionCalculator;
+    std::vector< std::unique_ptr<BouncePathFinder> > pathFinders;
+    std::unique_ptr<BounceActionCalculator> actionCalculator;
     unsigned int thermalIntegrationResolution;
     unsigned int const pathPotentialResolution;
 

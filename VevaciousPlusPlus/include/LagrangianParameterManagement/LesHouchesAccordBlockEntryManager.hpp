@@ -17,7 +17,6 @@
 #include <map>
 #include <algorithm>
 #include "LhaLinearlyInterpolatedBlockEntry.hpp"
-//#include "LHPC/SimpleLhaParser.hpp"
 #include "Utilities/VirtualSimpleLhaParser.hpp"
 #include "LhaSourcedParameterFunctionoid.hpp"
 #include <sstream>
@@ -147,7 +146,6 @@ namespace VevaciousPlusPlus
     std::vector< LhaBlockEntryInterpolator > referenceUnsafeActiveParameters;
     std::set< std::string > validBlocks;
     std::vector<std::pair<std::string,std::string>> derivedparameters;
-    //LHPC::SimpleLhaParser lhaParser;
     VirtualSimpleLhaParser lhaParser;
     std::string minimumScaleType;
     std::string minimumScaleArgument;
