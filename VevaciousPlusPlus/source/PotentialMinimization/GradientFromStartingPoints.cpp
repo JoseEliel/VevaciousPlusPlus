@@ -167,7 +167,11 @@ namespace VevaciousPlusPlus
     }
     else
     {
-      std::cout << "Panic vacuum = "
+      std::cout << "There are"
+                << panicVacua.size()
+                <<" panic vacua."
+                << std::endl;
+      std::cout << "Panic vacuum used in tunneling = "
       << panicVacuum.AsMathematica( potentialFunction.FieldNames() )
       << std::endl;
     }
