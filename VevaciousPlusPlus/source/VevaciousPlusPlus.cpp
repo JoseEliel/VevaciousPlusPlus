@@ -80,7 +80,7 @@ namespace VevaciousPlusPlus
   }
   VevaciousPlusPlus::~VevaciousPlusPlus()
   {
-~     std::cout
+     std::cout
         << std::endl
         << " Vevacious object has died! ";
       std::cout << std::endl;
