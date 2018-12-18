@@ -158,6 +158,7 @@ namespace VevaciousPlusPlus
                                               runStartTime )
     << " seconds, finished at " << ctime( &runEndTime );
     std::cout << std::endl;
+    if( newInput == "internal" ){lagrangianParameterManager->ClearParameterPoint(); }
   }
   
   // This writes the results as an SLHA file.
