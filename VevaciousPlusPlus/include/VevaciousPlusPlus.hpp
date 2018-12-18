@@ -51,25 +51,28 @@
 #include "LagrangianParameterManagement/SARAHManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
+#define ENUMS_DECLARED
+#include "backend_types/vevacious_1_0/abstract_VevaciousPlusPlus.hpp"
+#include "gambit/Backends/abstracttypedefs.hpp"
+#include "gambit/Backends/wrappertypedefs.hpp"
 
 namespace VevaciousPlusPlus
 {
 	//fixes the missing make_unique in std=-c++11
-	template<typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args) 
+	template<typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args)
         {
 			return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
         }
 
-  } 
-  #define ENUMS_DECLARED
-  #include "backend_types/vevacious_1_0/abstract_VevaciousPlusPlus.hpp"
-  #include "gambit/Backends/abstracttypedefs.hpp"
-  #include "gambit/Backends/wrappertypedefs.hpp"
-  namespace VevaciousPlusPlus { 
+
   class VevaciousPlusPlus : public virtual Abstract_VevaciousPlusPlus
   {
   public:
-    // This is the constructor for those who know what they are doing, to allow
+
+      VevaciousPlusPlus(const VevaciousPlusPlus&){}
+
+      VevaciousPlusPlus& operator=(const VevaciousPlusPlus&){}
+      // This is the constructor for those who know what they are doing, to allow
     // the main function of the program to decide the components and pass them
     // in to the constructor, allowing for custom components without having to
     // edit the VevaciousPlusPlus files. Those wishing to just use the default
@@ -78,6 +81,8 @@ namespace VevaciousPlusPlus
     // in that file.
     VevaciousPlusPlus( PotentialMinimizer& potentialMinimizer,
                        TunnelingCalculator& tunnelingCalculator );
+
+
 
     // This is the constructor that we expect to be used in normal use: it
     // reads in an initialization file in XML with name given by
@@ -332,16 +337,16 @@ namespace VevaciousPlusPlus
     // This returns a vector which is the union of
     // warningMessagesFromConstructor with warningMessagesFromLastRun.
     std::vector< std::string > WarningMessagesToReport() const;
-  
-        public:
-            Abstract_VevaciousPlusPlus* pointer_copy__BOSS();
 
-            using Abstract_VevaciousPlusPlus::pointer_assign__BOSS;
-            void pointer_assign__BOSS(Abstract_VevaciousPlusPlus* in);
+  public:
+      Abstract_VevaciousPlusPlus* pointer_copy__BOSS();
+
+      using Abstract_VevaciousPlusPlus::pointer_assign__BOSS;
+      void pointer_assign__BOSS(Abstract_VevaciousPlusPlus* in);
 
 
-        public:
-            void AppendResultsToLhaFile__BOSS(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&);
+  public:
+      void AppendResultsToLhaFile__BOSS(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&);
 
 };
 

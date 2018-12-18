@@ -7,9 +7,20 @@
 #include <string>
 #include <vector>
 #include <cstddef>
-#include <iostream>
 
 #include "identification.hpp"
+
+// Forward declaration needed by the destructor pattern.
+void set_delete_BEptr(CAT_3(BACKENDNAME,_,SAFE_VERSION)::VevaciousPlusPlus::VevaciousPlusPlus*, bool);
+
+
+// Forward declaration needed by the destructor pattern.
+void wrapper_deleter(CAT_3(BACKENDNAME,_,SAFE_VERSION)::VevaciousPlusPlus::VevaciousPlusPlus*);
+
+
+// Forward declaration for wrapper_creator.
+CAT_3(BACKENDNAME,_,SAFE_VERSION)::VevaciousPlusPlus::VevaciousPlusPlus* wrapper_creator(CAT_3(BACKENDNAME,_,SAFE_VERSION)::VevaciousPlusPlus::Abstract_VevaciousPlusPlus*);
+
 
 namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
 {
@@ -32,7 +43,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
                 virtual double GetLifetimeInSeconds() = 0;
 
                 virtual double GetThermalProbability()  = 0;
-                
+
                 virtual void AppendResultsToLhaFile(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&, const bool) =0;
     
                 virtual void AppendResultsToLhaFile__BOSS(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&) =0;
@@ -65,7 +76,14 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
     
                 Abstract_VevaciousPlusPlus& operator=(const Abstract_VevaciousPlusPlus&) { return *this; }
     
-                virtual void init_wrapper() =0;
+                virtual void init_wrapper()
+                {
+                    if (wptr == 0)
+                    {
+                        wptr = wrapper_creator(this);
+                        delete_wrapper = true;
+                    }
+                }
     
                 VevaciousPlusPlus* get_init_wptr()
                 {
@@ -79,7 +97,19 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
                     return *wptr;
                 }
     
-                virtual ~Abstract_VevaciousPlusPlus() =0;
+                virtual ~Abstract_VevaciousPlusPlus()
+                {
+                    if (wptr != 0)
+                    {
+                        set_delete_BEptr(wptr, false);
+                        if (delete_wrapper == true)
+                        {
+                            wrapper_deleter(wptr);
+                            wptr = 0;
+                            delete_wrapper = false;
+                        }
+                    }
+                }
         };
     }
     

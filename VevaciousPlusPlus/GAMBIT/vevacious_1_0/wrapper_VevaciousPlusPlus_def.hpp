@@ -32,8 +32,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         {
             return get_BEptr()->GetResultsAsString();
         }
-        
-         inline double VevaciousPlusPlus::GetLifetimeInSeconds() 
+        inline double VevaciousPlusPlus::GetLifetimeInSeconds() 
         {
             return get_BEptr()->GetLifetimeInSeconds();
         }
@@ -42,7 +41,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         {
             return get_BEptr()->GetThermalProbability();
         }
-        
+               
         inline void VevaciousPlusPlus::AppendResultsToLhaFile(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >& lhaFilename, const bool writeWarnings)
         {
             get_BEptr()->AppendResultsToLhaFile(lhaFilename, writeWarnings);
@@ -70,16 +69,8 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
             get_BEptr()->set_delete_wrapper(false);
         }
         
-        // Copy constructor: 
-        inline VevaciousPlusPlus::VevaciousPlusPlus(const VevaciousPlusPlus& in) :
-            WrapperBase(in.get_BEptr()->pointer_copy__BOSS())
-        {
-            get_BEptr()->set_wptr(this);
-            get_BEptr()->set_delete_wrapper(false);
-        }
-        
         // Assignment operator: 
-        inline VevaciousPlusPlus & VevaciousPlusPlus::operator=(const VevaciousPlusPlus& in)
+        inline VevaciousPlusPlus& VevaciousPlusPlus::operator=(const VevaciousPlusPlus& in)
         {
             if (this != &in)
             {
@@ -105,7 +96,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         }
         
         // Returns correctly casted pointer to Abstract class: 
-        inline  Abstract_VevaciousPlusPlus* VevaciousPlusPlus::VevaciousPlusPlus::get_BEptr() const
+        inline Abstract_VevaciousPlusPlus* VevaciousPlusPlus::VevaciousPlusPlus::get_BEptr() const
         {
             return dynamic_cast<Abstract_VevaciousPlusPlus*>(BEptr);
         }

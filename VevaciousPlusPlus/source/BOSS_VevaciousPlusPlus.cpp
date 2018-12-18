@@ -22,7 +22,7 @@ VevaciousPlusPlus::Abstract_VevaciousPlusPlus* VevaciousPlusPlus::VevaciousPlusP
 
 void VevaciousPlusPlus::VevaciousPlusPlus::pointer_assign__BOSS(VevaciousPlusPlus::Abstract_VevaciousPlusPlus* in)
 {
-    CAT_3(BACKENDNAME,_,SAFE_VERSION)::VevaciousPlusPlus::VevaciousPlusPlus* wptr_temp = Abstract_VevaciousPlusPlus::get_wptr();
+    CAT_3(BACKENDNAME,_,SAFE_VERSION)::VevaciousPlusPlus::VevaciousPlusPlus* wptr_temp = VevaciousPlusPlus::Abstract_VevaciousPlusPlus::get_wptr();
     *this = *dynamic_cast<VevaciousPlusPlus*>(in);
     Abstract_VevaciousPlusPlus::set_wptr(wptr_temp);
 }

@@ -40,10 +40,10 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
     
                 virtual ::std::basic_string<char, std::char_traits<char>, std::allocator<char> > GetResultsAsString() =0;
     
-                virtual double GetLifetimeInSeconds()  = 0;
+                virtual double GetLifetimeInSeconds() = 0;
 
                 virtual double GetThermalProbability()  = 0;
-               
+
                 virtual void AppendResultsToLhaFile(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&, const bool) =0;
     
                 virtual void AppendResultsToLhaFile__BOSS(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&) =0;

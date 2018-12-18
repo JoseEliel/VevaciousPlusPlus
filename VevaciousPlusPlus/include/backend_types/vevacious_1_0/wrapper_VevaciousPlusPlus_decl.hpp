@@ -34,7 +34,7 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
                 void WriteResultsAsXmlFile(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >& xmlFilename);
         
                 ::std::basic_string<char, std::char_traits<char>, std::allocator<char> > GetResultsAsString();
-                
+
                 double GetLifetimeInSeconds();
 
                 double GetThermalProbability();
@@ -50,9 +50,6 @@ namespace CAT_3(BACKENDNAME,_,SAFE_VERSION)
         
                 // Special pointer-based constructor: 
                 VevaciousPlusPlus(Abstract_VevaciousPlusPlus* in);
-        
-                // Copy constructor: 
-                VevaciousPlusPlus(const VevaciousPlusPlus& in);
         
                 // Assignment operator: 
                 VevaciousPlusPlus& operator=(const VevaciousPlusPlus& in);
