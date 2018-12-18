@@ -106,13 +106,7 @@ namespace VevaciousPlusPlus
     // allowing non-C++11-compliant compilers.
     VevaciousPlusPlus( std::string const& initializationFileName );
 
-    virtual ~VevaciousPlusPlus(){
-      std::cout
-              << std::endl
-              << " Vevacious object has died! ";
-      std::cout << std::endl;
-
-    };
+    virtual ~VevaciousPlusPlus()
 
 
     // This runs the point parameterized by newInput, which for the default

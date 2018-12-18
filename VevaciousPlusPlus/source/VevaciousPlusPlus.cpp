@@ -80,7 +80,10 @@ namespace VevaciousPlusPlus
   }
   VevaciousPlusPlus::~VevaciousPlusPlus()
   {
-
+~     std::cout
+        << std::endl
+        << " Vevacious object has died! ";
+      std::cout << std::endl;
   }
 
     //This reads in a Slha block and passes it over to LagrangianParameterManager updating 
