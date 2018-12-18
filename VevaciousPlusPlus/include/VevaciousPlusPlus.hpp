@@ -70,9 +70,21 @@ namespace VevaciousPlusPlus
   {
   public:
 
-      VevaciousPlusPlus(const VevaciousPlusPlus&){}
+      VevaciousPlusPlus(const VevaciousPlusPlus&){
+        std::cout
+                << std::endl
+                << " Copy constructor has ben run!!!! ";
+        std::cout << std::endl;
 
-      VevaciousPlusPlus& operator=(const VevaciousPlusPlus&){}
+      }
+
+      VevaciousPlusPlus& operator=(const VevaciousPlusPlus&){
+        std::cout
+                << std::endl
+                << " Assignment operator has ben run!!!! ";
+        std::cout << std::endl;
+
+      }
       // This is the constructor for those who know what they are doing, to allow
     // the main function of the program to decide the components and pass them
     // in to the constructor, allowing for custom components without having to
@@ -94,7 +106,13 @@ namespace VevaciousPlusPlus
     // allowing non-C++11-compliant compilers.
     VevaciousPlusPlus( std::string const& initializationFileName );
 
-    virtual ~VevaciousPlusPlus();
+    virtual ~VevaciousPlusPlus(){
+      std::cout
+              << std::endl
+              << " Vevacious object has died! ";
+      std::cout << std::endl;
+
+    };
 
 
     // This runs the point parameterized by newInput, which for the default
