@@ -375,19 +375,19 @@ namespace VevaciousPlusPlus
     }
     if( classChoice == "SlhaCompatibleWithSarahManager" )
     {
-      return make_unique<SlhaCompatibleWithSarahManager>( scaleAndBlockFilename );
+      return Utils::make_unique<SlhaCompatibleWithSarahManager>( scaleAndBlockFilename );
     }
     else if( classChoice == "SlhaBlocksWithSpecialCasesManager" )
     {
-      return make_unique<SlhaBlocksWithSpecialCasesManager>( scaleAndBlockFilename );
+      return Utils::make_unique<SlhaBlocksWithSpecialCasesManager>( scaleAndBlockFilename );
     }
     else if( classChoice == "LesHouchesAccordBlockEntryManager" )
     {
-      return make_unique<LesHouchesAccordBlockEntryManager>( scaleAndBlockFilename );
+      return Utils::make_unique<LesHouchesAccordBlockEntryManager>( scaleAndBlockFilename );
     }
 	else if( classChoice == "SARAHManager" )
     {
-      return make_unique<SARAHManager>( scaleAndBlockFilename );
+      return Utils::make_unique<SARAHManager>( scaleAndBlockFilename );
     }
     else
     {
@@ -423,13 +423,13 @@ namespace VevaciousPlusPlus
     }
     if( classChoice == "FixedScaleOneLoopPotential" )
     {
-      return make_unique<FixedScaleOneLoopPotential>( modelFilename,
+      return Utils::make_unique<FixedScaleOneLoopPotential>( modelFilename,
                                             assumedPositiveOrNegativeTolerance,
                                              lagrangianParameterManager );
     }
     else if( classChoice == "RgeImprovedOneLoopPotential" )
     {
-      return make_unique<RgeImprovedOneLoopPotential> ( modelFilename,
+      return Utils::make_unique<RgeImprovedOneLoopPotential> ( modelFilename,
                                             assumedPositiveOrNegativeTolerance,
                                               lagrangianParameterManager );
     }
@@ -488,7 +488,7 @@ namespace VevaciousPlusPlus
     gradientMinimizer(std::move( CreateGradientMinimizer( potentialFunction,
                                                 gradientMinimizerClass,
                                                 gradientMinimizerArguments ) ));
-    return make_unique<GradientFromStartingPoints>( potentialFunction,
+    return Utils::make_unique<GradientFromStartingPoints>( potentialFunction,
                                            std::move(startingPointFinder),
                                            std::move(gradientMinimizer),
                                            extremumSeparationThresholdFraction,
@@ -525,7 +525,7 @@ namespace VevaciousPlusPlus
     polynomialSystemSolver(std::move( CreatePolynomialSystemSolver(
                                                  polynomialSystemSolverClass,
                                          polynomialSystemSolverArguments ) ));
-    return make_unique<PolynomialAtFixedScalesSolver>(
+    return Utils::make_unique<PolynomialAtFixedScalesSolver>(
                                    potentialFunction.PolynomialApproximation(),
                              potentialFunction.GetLagrangianParameterManager(),
                                               std::move(polynomialSystemSolver),
@@ -598,7 +598,7 @@ namespace VevaciousPlusPlus
                                      "MinuitStrategy",
                                      minuitStrategy );
     }
-    return make_unique<MinuitPotentialMinimizer>( potentialFunction,
+    return Utils::make_unique<MinuitPotentialMinimizer>( potentialFunction,
                                          errorFraction,
                                          errorMinimum,
                                          minuitStrategy );
@@ -657,7 +657,7 @@ namespace VevaciousPlusPlus
     }
     CheckSurvivalProbabilityThreshold( survivalProbabilityThreshold );
 
-    return make_unique<CosmoTransitionsRunner>(
+    return Utils::make_unique<CosmoTransitionsRunner>(
                                InterpretTunnelingStrategy( tunnelingStrategy ),
                                        survivalProbabilityThreshold,
                                        temperatureAccuracy,
@@ -768,7 +768,7 @@ namespace VevaciousPlusPlus
                        CreateBounceActionCalculator( bouncePotentialFitClass,
                                                bouncePotentialFitArguments ) ) );
 
-    return make_unique<BounceAlongPathWithThreshold>( std::move(pathFinders),
+    return Utils::make_unique<BounceAlongPathWithThreshold>( std::move(pathFinders),
                                              std::move(bounceActionCalculator),
                                InterpretTunnelingStrategy( tunnelingStrategy ),
                                              survivalProbabilityThreshold,
@@ -880,7 +880,7 @@ namespace VevaciousPlusPlus
                      LHPC::ParsingUtilities::StringToDouble( *weightString ) );
     }
 
-    return make_unique<MinuitOnPotentialPerpendicularToPath>( numberOfPathSegments,
+    return Utils::make_unique<MinuitOnPotentialPerpendicularToPath>( numberOfPathSegments,
                                                      numberOfAllowedWorsenings,
                                                   convergenceThresholdFraction,
                                                      minuitDampingFraction,

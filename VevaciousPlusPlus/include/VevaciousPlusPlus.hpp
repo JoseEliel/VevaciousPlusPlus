@@ -58,12 +58,13 @@
 
 namespace VevaciousPlusPlus
 {
-	//fixes the missing make_unique in std=-c++11
-	template<typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args)
-        {
-			return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    namespace Utils {
+        //fixes the missing make_unique in std=-c++11
+        template<typename T, typename... Args>
+        std::unique_ptr <T> make_unique(Args &&... args) {
+          return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
         }
-
+           }
 
   class VevaciousPlusPlus : public virtual Abstract_VevaciousPlusPlus
   {
@@ -607,7 +608,7 @@ namespace VevaciousPlusPlus
                                      "ResolutionSize",
                                      resolutionSize );
     }
-    return make_unique<Hom4ps2Runner>( pathToHom4ps2,
+    return Utils::make_unique<Hom4ps2Runner>( pathToHom4ps2,
                               homotopyType,
                               resolutionSize );
   }
@@ -632,7 +633,7 @@ namespace VevaciousPlusPlus
                                      "Tasks",
                                      taskcount );
     }
-    return make_unique<PHCRunner>(  pathToPHC, resolutionSize, taskcount);
+    return Utils::make_unique<PHCRunner>(  pathToPHC, resolutionSize, taskcount);
   }
 
   // This creates a new GradientMinimizer based on the given arguments and
@@ -746,7 +747,7 @@ namespace VevaciousPlusPlus
                                      "MinuitTolerance",
                                      minuitToleranceFraction );
     }
-    return make_unique<MinuitOnPotentialOnParallelPlanes>(numberOfPathSegments,
+    return Utils::make_unique<MinuitOnPotentialOnParallelPlanes>(numberOfPathSegments,
                                                   minuitStrategy,
                                                   minuitToleranceFraction );
   }
@@ -792,7 +793,7 @@ namespace VevaciousPlusPlus
                                      shootAttemptsForBounce );
     }
     return
-    make_unique<BubbleShootingOnPathInFieldSpace>( lengthScaleResolutionForBounce,
+    Utils::make_unique<BubbleShootingOnPathInFieldSpace>( lengthScaleResolutionForBounce,
                                           shootAttemptsForBounce );
   }
 
