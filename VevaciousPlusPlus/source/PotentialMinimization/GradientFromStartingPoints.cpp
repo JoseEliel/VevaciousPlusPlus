@@ -39,7 +39,8 @@ namespace VevaciousPlusPlus
     // given by minimizationTemperature, recording the found minima in
     // foundMinima. It also records the minima lower than dsbVacuum in
     // panicVacua, and of those, it sets panicVacuum to be the minimum in
-    // panicVacua closest to dsbVacuum.
+    // panicVacua closest to dsbVacuum or the global minimum depending on what the user
+    // set for global_Is_Panic. The default is the former.
     void GradientFromStartingPoints::FindMinima(
             double const minimizationTemperature )
     {
@@ -139,6 +140,18 @@ namespace VevaciousPlusPlus
             }
 
             foundMinima.push_back( foundMinimum );
+
+            // Here I do some checks so that we know minuit is behaving properly
+            // This can be an issue with pathological parameter points or minima that
+            // are too far away from the DSB, for which it makes no sense to calculate
+            // tunneling without RG running anyway
+
+            if(isnan(foundMinimum.FunctionValue()) || isnan(foundMinimum.FunctionError()) )
+            {
+                std::stringstream errorBuilder;
+                errorBuilder << "Problem with Minuit, NaN given in minimum value/error. ";
+                throw std::runtime_error( errorBuilder.str() );
+            }
 
             // Here we set the panic vacuum to the closest lower minimum to the DSB minimum
 
