@@ -18,6 +18,7 @@ namespace VevaciousPlusPlus
                                unsigned int const thermalIntegrationResolution,
                                         unsigned int const temperatureAccuracy,
                                     unsigned int const pathPotentialResolution,
+                                    unsigned int const pathFindingTimeout,
                                       double const vacuumSeparationFraction ) :
     BounceActionTunneler( tunnelingStrategy,
                           survivalProbabilityThreshold,
@@ -26,7 +27,8 @@ namespace VevaciousPlusPlus
     pathFinders( std::move(pathFinders) ),
     actionCalculator( std::move(actionCalculator) ),
     thermalIntegrationResolution( thermalIntegrationResolution ),
-    pathPotentialResolution( pathPotentialResolution )
+    pathPotentialResolution( pathPotentialResolution ),
+    pathFindingTimeout( pathFindingTimeout )
   {
     // This constructor is just an initialization list.
   }
@@ -239,10 +241,26 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
+    // Declaring variables for timing
+    time_t pathFindingStartTime;
+    time_t currentTime;
+    // Setting the starting time of the path finding
+    time( &pathFindingStartTime );
+
     for( auto pathFinder( pathFinders.begin() );
          pathFinder < pathFinders.end();
          ++pathFinder )
     {
+      time(&currentTime);
+
+      if (difftime( currentTime, pathFindingStartTime ) > pathFindingTimeout ) // HERE THE CUTOFF IS SET, MAKE A VARIABLE IN INPUT
+      {
+          std::stringstream errorBuilder;
+          errorBuilder << "Path finder has been running longer than the specified timeout of " << pathFindingTimeout << " seconds.";
+          throw std::runtime_error( errorBuilder.str() );
+          break;
+      };
+
       std::cout << std::endl
       << "Passing best path so far to next path finder.";
       std::cout << std::endl;
@@ -276,11 +294,22 @@ namespace VevaciousPlusPlus
       // pathFinder decides that the path can be improved once the bubble
       // profile is obtained, as long as the bounce action has not dropped
       // below the threshold.
+
       do
       {
         // The nextPath and nextBubble pointers are not strictly necessary,
         // but they make the logic of the code clearer and will probably be
         // optimized away by the compiler anyway.
+        time(&currentTime);
+
+        if (difftime( currentTime, pathFindingStartTime ) > pathFindingTimeout ) // HERE THE CUTOFF IS SET, MAKE A VARIABLE IN INPUT
+        {
+          std::stringstream errorBuilder;
+          errorBuilder << "Path finder has been running longer than the specified timeout of " << pathFindingTimeout << "seconds.";
+          throw std::runtime_error( errorBuilder.str() );
+          break;
+        };
+
         TunnelPath const*
         nextPath( (*pathFinder)->TryToImprovePath( *currentPath,
                                                    *currentBubble ) );

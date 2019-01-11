@@ -80,10 +80,10 @@ namespace VevaciousPlusPlus
   }
   VevaciousPlusPlus::~VevaciousPlusPlus()
   {
-     std::cout
-        << std::endl
-        << " Vevacious object has died! ";
-      std::cout << std::endl;
+//     std::cout
+//        << std::endl
+//        << " Vevacious object has died! ";
+//      std::cout << std::endl;
   }
 
     //This reads in a Slha block and passes it over to LagrangianParameterManager updating 
@@ -463,6 +463,7 @@ namespace VevaciousPlusPlus
     std::string gradientMinimizerArguments( "error" );
     double extremumSeparationThresholdFraction( 0.05 );
     double nonDsbRollingToDsbScalingFactor( 4.0 );
+    bool global_Is_Panic = false;
     // The <ConstructorArguments> for this class should have child elements
     // <StartingPointFinderClass> and <GradientMinimizerClass>, and
     // optionally <ExtremumSeparationThresholdFraction> and
@@ -483,6 +484,9 @@ namespace VevaciousPlusPlus
       InterpretElementIfNameMatches( xmlParser,
                                      "NonDsbRollingToDsbScalingFactor",
                                      nonDsbRollingToDsbScalingFactor );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "GlobalIsPanic",
+                                     global_Is_Panic );
     }
     std::unique_ptr<StartingPointFinder>
     startingPointFinder(std::move( CreateStartingPointFinder( potentialFunction,
@@ -496,7 +500,7 @@ namespace VevaciousPlusPlus
                                            std::move(startingPointFinder),
                                            std::move(gradientMinimizer),
                                            extremumSeparationThresholdFraction,
-                                           nonDsbRollingToDsbScalingFactor );
+                                           nonDsbRollingToDsbScalingFactor, global_Is_Panic );
   }
 
   // This creates a new PolynomialAtFixedScalesSolver based on the given
@@ -708,7 +712,7 @@ namespace VevaciousPlusPlus
     throw std::runtime_error( errorBuilder.str() );
   }
 
-  // This creates a new CosmoTransitionsRunner based on the given arguments
+  // This creates a new Bounce calculator based on the given arguments
   // and returns a pointer to it.
   std::unique_ptr<BounceAlongPathWithThreshold>
   VevaciousPlusPlus::CreateBounceAlongPathWithThreshold(
@@ -722,6 +726,7 @@ namespace VevaciousPlusPlus
     unsigned int thermalIntegrationResolution( 5 );
     unsigned int temperatureAccuracy( 7 );
     unsigned int resolutionOfPathPotential( 100 );
+    unsigned int pathFindingTimeout( 10000000 );
     double vacuumSeparationFraction( 0.2 );
 
     LHPC::RestrictedXmlParser xmlParser;
@@ -743,6 +748,9 @@ namespace VevaciousPlusPlus
       InterpretElementIfNameMatches( xmlParser,
                                      "PathResolution",
                                      resolutionOfPathPotential );
+      InterpretElementIfNameMatches( xmlParser,
+                                     "Timeout",
+                                     pathFindingTimeout );
       InterpretElementIfNameMatches( xmlParser,
                                      "MinimumVacuumSeparationFraction",
                                      vacuumSeparationFraction );
@@ -779,6 +787,7 @@ namespace VevaciousPlusPlus
                                              thermalIntegrationResolution,
                                              temperatureAccuracy,
                                              resolutionOfPathPotential,
+                                             pathFindingTimeout,
                                              vacuumSeparationFraction );
   }
 

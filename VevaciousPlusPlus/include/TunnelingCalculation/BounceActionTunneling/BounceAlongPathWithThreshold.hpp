@@ -38,6 +38,7 @@ namespace VevaciousPlusPlus
                                unsigned int const thermalIntegrationResolution,
                                   unsigned int const temperatureAccuracy,
                                   unsigned int const pathPotentialResolution,
+                                  unsigned int const pathFindingTimeout,
                                   double const vacuumSeparationFraction );
     virtual ~BounceAlongPathWithThreshold();
 
@@ -47,6 +48,8 @@ namespace VevaciousPlusPlus
     std::unique_ptr<BounceActionCalculator> actionCalculator;
     unsigned int thermalIntegrationResolution;
     unsigned int const pathPotentialResolution;
+    unsigned int const pathFindingTimeout;
+
 
     // This returns either the dimensionless bounce action integrated over four
     // dimensions (for zero temperature) or the dimensionful bounce action
