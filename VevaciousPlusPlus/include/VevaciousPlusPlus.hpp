@@ -1,11 +1,9 @@
-#ifndef __boss__VevaciousPlusPlus_vevacious_1_0_hpp__
-#define __boss__VevaciousPlusPlus_vevacious_1_0_hpp__
-
 /*
  * VevaciousPlusPlus.hpp
  *
  *  Created on: Feb 25, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-Molina (elielcamargomolina@gmail.com)
  */
 
 #ifndef VEVACIOUSPLUSPLUS_HPP_
@@ -51,10 +49,6 @@
 #include "LagrangianParameterManagement/SARAHManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
-#define ENUMS_DECLARED
-#include "backend_types/vevacious_1_0/abstract_VevaciousPlusPlus.hpp"
-#include "gambit/Backends/abstracttypedefs.hpp"
-#include "gambit/Backends/wrappertypedefs.hpp"
 
 namespace VevaciousPlusPlus
 {
@@ -66,26 +60,11 @@ namespace VevaciousPlusPlus
         }
            }
 
-  class VevaciousPlusPlus : public virtual Abstract_VevaciousPlusPlus
+  class VevaciousPlusPlus 
   {
   public:
 
-      VevaciousPlusPlus(const VevaciousPlusPlus&){
-        std::cout
-                << std::endl
-                << " Copy constructor has ben run!!!! ";
-        std::cout << std::endl;
-
-      }
-
-      VevaciousPlusPlus& operator=(const VevaciousPlusPlus&){
-        std::cout
-                << std::endl
-                << " Assignment operator has ben run!!!! ";
-        std::cout << std::endl;
-
-      }
-      // This is the constructor for those who know what they are doing, to allow
+    // This is the constructor for those who know what they are doing, to allow
     // the main function of the program to decide the components and pass them
     // in to the constructor, allowing for custom components without having to
     // edit the VevaciousPlusPlus files. Those wishing to just use the default
@@ -350,16 +329,6 @@ namespace VevaciousPlusPlus
     // This returns a vector which is the union of
     // warningMessagesFromConstructor with warningMessagesFromLastRun.
     std::vector< std::string > WarningMessagesToReport() const;
-
-  public:
-      Abstract_VevaciousPlusPlus* pointer_copy__BOSS();
-
-      using Abstract_VevaciousPlusPlus::pointer_assign__BOSS;
-      void pointer_assign__BOSS(Abstract_VevaciousPlusPlus* in);
-
-
-  public:
-      void AppendResultsToLhaFile__BOSS(const ::std::basic_string<char, std::char_traits<char>, std::allocator<char> >&);
 
 };
 
@@ -826,4 +795,3 @@ namespace VevaciousPlusPlus
 } /* namespace VevaciousPlusPlus */
 #endif /* VEVACIOUSPLUSPLUS_HPP_ */
 
-#endif /* __boss__VevaciousPlusPlus_vevacious_1_0_hpp__ */

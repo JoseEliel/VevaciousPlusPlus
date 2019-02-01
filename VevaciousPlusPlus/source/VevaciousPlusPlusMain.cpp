@@ -2,8 +2,8 @@
  * VevaciousPlusPlusMain.cpp
  *
  *  Created on: Feb 25, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
- *
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-Molina (elielcamargomolina@gmail.com)
  */
 
 #include "VevaciousPlusPlus.hpp"
