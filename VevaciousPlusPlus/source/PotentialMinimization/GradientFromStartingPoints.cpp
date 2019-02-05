@@ -3,9 +3,13 @@
  *
  *  Created on: Jun 30, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *
+ *  Modified on: Nov 2018
+ *      Author: José Eliel Camargo-molina (elielcamargomolina@gmail.com)
  */
 
 #include "PotentialMinimization/GradientFromStartingPoints.hpp"
+
 
 namespace VevaciousPlusPlus
 {
@@ -57,13 +61,26 @@ namespace VevaciousPlusPlus
                 << dsbVacuum.AsMathematica( potentialFunction.FieldNames() );
         std::cout << std::endl;
 
-        (*startingPointFinder)( startingPoints );
         double const
                 thresholdSepartionSquared( ( extremumSeparationThresholdFraction
                                              * extremumSeparationThresholdFraction
                                              * dsbVacuum.LengthSquared() ) + 1.0 );
+
         double const thresholdSepartion( sqrt( thresholdSepartionSquared ) );
         PotentialMinimum foundMinimum;
+
+        bool DsbRolledToOrigin( dsbVacuum.LengthSquared()
+                                      < thresholdSepartionSquared );
+
+        if(DsbRolledToOrigin)
+        {
+            std::cout
+            << "DSB vacuum input rolled to the origin, suggesting it only appears at the two-loop order. Tunneling will be calculated from origin to panic vacuum."
+            << std::endl;
+        }
+
+        (*startingPointFinder)( startingPoints );
+
         std::cout
                 << std::endl
                 << "Gradient-based minimization from a set of starting points:";
@@ -146,7 +163,7 @@ namespace VevaciousPlusPlus
             // are too far away from the DSB, for which it makes no sense to calculate
             // tunneling without RG running anyway
 
-            if(isnan(foundMinimum.FunctionValue()) || isnan(foundMinimum.FunctionError()) )
+            if(std::isnan(foundMinimum.FunctionValue()) || std::isnan(foundMinimum.FunctionError()) )
             {
                 std::stringstream errorBuilder;
                 errorBuilder << "Problem with Minuit, NaN given in minimum value/error. ";
@@ -167,10 +184,7 @@ namespace VevaciousPlusPlus
 
                     panicVacuum = foundMinimum;
 
-                    panicVacua.push_back( foundMinimum );
-                }
-
-            }else {
+                    panicVacua.push_back( foundMinimum );}else {
 
                 if (((foundMinimum.FunctionValue() + foundMinimum.FunctionError())
                      < dsbVacuum.FunctionValue())
@@ -212,4 +226,5 @@ namespace VevaciousPlusPlus
         std::cout << std::endl;
     }
 
-} /* namespace VevaciousPlusPlus */
+ }
+}/* namespace VevaciousPlusPlus */
