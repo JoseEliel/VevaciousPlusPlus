@@ -184,7 +184,9 @@ namespace VevaciousPlusPlus
 
                     panicVacuum = foundMinimum;
 
-                    panicVacua.push_back( foundMinimum );}else {
+                    panicVacua.push_back( foundMinimum );}
+
+                }else {
 
                 if (((foundMinimum.FunctionValue() + foundMinimum.FunctionError())
                      < dsbVacuum.FunctionValue())
@@ -201,7 +203,7 @@ namespace VevaciousPlusPlus
 
             }
 
-        }
+
 
         std::cout
                 << std::endl
