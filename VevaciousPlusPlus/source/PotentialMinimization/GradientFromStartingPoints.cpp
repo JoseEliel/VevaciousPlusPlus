@@ -202,14 +202,16 @@ namespace VevaciousPlusPlus
                 }
 
             }
-
-
+        }
 
         std::cout
                 << std::endl
                 << "DSB vacuum = "
                 << dsbVacuum.AsMathematica( potentialFunction.FieldNames() ) << std::endl;
-        if( panicVacua.empty() )
+
+
+
+         if( panicVacua.empty() )
         {
             std::cout
                     << "DSB vacuum is stable as far as the model file allows." << std::endl;
@@ -226,7 +228,7 @@ namespace VevaciousPlusPlus
         }
         std::cout << std::endl;
         std::cout << std::endl;
-    }
+
 
  }
 }/* namespace VevaciousPlusPlus */
