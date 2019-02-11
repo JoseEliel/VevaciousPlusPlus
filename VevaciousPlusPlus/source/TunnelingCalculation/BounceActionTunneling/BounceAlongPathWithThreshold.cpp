@@ -241,6 +241,21 @@ namespace VevaciousPlusPlus
     std::cout << ".";
     std::cout << std::endl;
 
+    // Checking if initial path already has a very low action
+
+    if( bestBubble->BounceAction() < actionThreshold )
+    {
+      std::cout
+              << std::endl
+              << "Bounce action dropped below threshold, breaking off from looking"
+              << " for further path improvements.";
+      std::cout << std::endl;
+      double const bounceAction( bestBubble->BounceAction() );
+      delete bestBubble;
+      delete bestPath;
+      return bounceAction;
+    }
+
     // Declaring variables for timing
     time_t pathFindingStartTime;
     time_t currentTime;
@@ -253,7 +268,7 @@ namespace VevaciousPlusPlus
     {
       time(&currentTime);
 
-      if (difftime( currentTime, pathFindingStartTime ) > pathFindingTimeout ) // HERE THE CUTOFF IS SET, MAKE A VARIABLE IN INPUT
+      if (difftime( currentTime, pathFindingStartTime ) > pathFindingTimeout )
       {
           std::stringstream errorBuilder;
           errorBuilder << "Path finder has been running longer than the specified timeout of " << pathFindingTimeout << " seconds.";
