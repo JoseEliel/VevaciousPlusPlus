@@ -1,0 +1,69 @@
+<!--  
+ This model file was automatically created by SARAH version4.14.1  
+ SARAH References: arXiv:0806.0538, 0909.2863, 1002.0840, 1207.0906, 1309.7223 
+ (c) Florian Staub, 2013   
+ 
+ File created at 17:12 on 13.3.2019  
+ 
+                                      -->
+ 
+ 
+<LhaBlockParameterManagerInitializationFile> 
+<ParameterManagerDetails 
+ParameterManagerName="SARAHManager" 
+VevaciousMajorVersion="2" VevaciousMinorVersion="0" /> 
+
+<RenormalizationScaleChoices> 
+	<FixedScaleChoice>
+	  <EvaluationType>
+		BlockLowestScale
+	  </EvaluationType>
+		  <EvaluationArgument>
+			GAUGE
+		  </EvaluationArgument>
+		</FixedScaleChoice>
+		<MaximumScaleBound>
+		  <EvaluationType>
+			FixedNumber
+		  </EvaluationType>
+		  <EvaluationArgument>
+			1.0E+016 <!-- Roughly the GUT scale. -->
+		  </EvaluationArgument>
+		</MaximumScaleBound>
+	</RenormalizationScaleChoices>
+<ValidBlocks>
+HMIX
+CHARGEMIX
+GAUGE
+HMIX
+TREEHMIX
+LOOPHMIX
+None
+PSEUDOSCALARMIX
+SCALARMIX
+SMINPUTS
+UDLMIX
+UDRMIX
+UELMIX
+UERMIX
+UULMIX
+UURMIX
+YD
+YE
+YU
+</ValidBlocks>
+
+<DerivedParameters> 
+M112=HMIX[20] 
+M112SarahTree=TREEHMIX[20] 
+M112Tree=IFNONZERO[M112SarahTree,M112] 
+M112SarahLoop=LOOPHMIX[20] 
+M112Loop=IFNONZERO[M112SarahLoop,M112] 
+M222=HMIX[21] 
+M222SarahTree=TREEHMIX[21] 
+M222Tree=IFNONZERO[M222SarahTree,M222] 
+M222SarahLoop=LOOPHMIX[21] 
+M222Loop=IFNONZERO[M222SarahLoop,M222] 
+</DerivedParameters> 
+
+</LhaBlockParameterManagerInitializationFile> 

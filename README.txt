@@ -1,9 +1,10 @@
 /*****************************************************************************\
- * README.txt                                              *
+ * README.txt                                       		             *
  *                                                                           *
  *  Created on: Feb 14, 2014                                                 *
+ *  Last update: Jan 22, 2019                                                *
  *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)                     *
- *      Copyright 2014 Ben O'Leary                                           *
+ *		 José Eliel Camargo-Molina (elielcamargomolina@gmail.com).   *
  *                                                                           *
  *      This file is part of VevaciousPlusPlus, a program designed to find   *
  *      configurations of vacuum expectation values (VEVs) for the           *
@@ -48,67 +49,17 @@ REQUIRES LesHouchesParserClasses (LHPC) version 0.8.12 or later!
  VevaciousPlusPlus is an implementation of the process of attempting to find
  the minima of a quantum field theory potential with loop and thermal
  corrections, as decided upon by the collaboration of
- José Eliel Camargo Molina (elielx@gmail.com),
+ José Eliel Camargo-Molina (elielcamargomolina@gmail.com),
  Björn Garbrecht (garbrecht@tum.de),
  Ben O'Leary (benjamin.oleary@gmail.com),
  Werner Porod (porod@physik.uni-wuerzburg.de), and
  Florian Staub (florian.staub@googlemail.com). This README file was written by
- Ben O'Leary.
+ Ben O'Leary and  José Eliel Camargo-Molina.
  
  A manual describing the physics and process of VevaciousPlusPlus will be
  available from http://arxiv.org/abs/????.???? and there will be a quickstart
  guide available from http://vevacious.hepforge.org/ following the appropriate
- link. A rough version of the installation instructions will be also contained
- in this README file, below the description of the process.
-
- Phase 1) Collect underpants
- Phase 2) ?
- Phase 3) Profit!
- Phase 4) Download and compile the LesHouchesParserClasses (LHPC) C++ library.
-          The files are available at
-          http://www.hepforge.org/downloads/lhpc
-          (link last checked 2014-03-04) or
-          https://github.com/benoleary/LesHouchesParserClasses_CPP
-          (link last checked 2014-03-04). The installation should just be
-          downloading, unzipping, and then running make. Version 0.8.7 or later
-          is necessary!
- Phase 5) Download the Eigen header library, available from
-          http://eigen.tuxfamily.org/index.php?title=Main_Page#Download
-          (link last checked 2014-02-25). No compilation is necessary.
- Phase 6) Compile VevaciousPlusPlus. The Makefile should be edited to have the
-          correct paths to the header files and library file of LHPC (these are
-          /path/to/unzipped/LHPC/include/ and /path/to/unzipped/LHPC/lib/ by
-          default). LHPC version 0.8.7 or higher is required. The Makefile
-          should also have the correct path to the header files from Eigen.
-
-
-TODO:
- * Decent bundled model files
- * TakenPositive for PotentialFromPolynomialAndMasses
- * Implementing BasicPolynomialHomotopyContinuation class
- * Implementing MinuitBounceActionMinimizer class
-
-
-CHANGELOG:
- * 12th May 2014: version 1.0.00.alpha.003
- - Added batch functionality to VevaciousPlusPlus.exe
- - Re-worked PolynomialTerm class a bit to try to increase cache hits by
-   caching the coefficient times functionoid product for a fixed scale through
-   making it derive from BOL::BasicObserver.
-
- * 11th May 2014: version 1.0.00.alpha.002
- - Fixed bundled full MSSM (restricted to real values for the scalar fields and
-   real values for the Lagrangian parameters).
- - Fixed stupid typo in SLHA output from VevaciousPlusPlus class.
-
- * 9th May 2014: version 1.0.00.alpha.001
- - Seems to work on the test case.
- - Needs HOM4PS2 and CosmoTransitions (1 or 2).
- 
- * 25th February 2014: version prealpha0001
- - Not even released!
- - Overhaul and rename of VevaciousTwo, which had not been released.
-
+ link.
 
 The C++ files of VevaciousPlusPlus are:
 

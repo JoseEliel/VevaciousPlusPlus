@@ -94,10 +94,8 @@ set(ver "2.4.58")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(dl "http://www.math.uic.edu/~jan/mactel64y_phcv24p.tar.gz")
-    set(md5 "999c0a4471b0efa4e0bf1d847569b4c4")
 else()
     set(dl "http://www.math.uic.edu/~jan/x86_64phcv24p.tar.gz")
-    set(md5 "f508fd268f20fc7b98cf9d2dbcbbd131")
 endif()
 
 set(dir "${PROJECT_SOURCE_DIR}/../${name}/${ver}")
@@ -158,7 +156,14 @@ add_library( objlib OBJECT ${sources})
 #############################################################################
 
 # Setting compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC -fopenmp")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC ")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC -fopenmp")
+endif()
+
+
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
@@ -196,7 +201,6 @@ target_link_libraries(VevaciousPlusPlus ${Minuit_lib}/libminuit2.a)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/)
 
 add_library(VevaciousPlusPlus-lib SHARED $<TARGET_OBJECTS:objlib>)
-
 
 # Linking to minuit 
 
