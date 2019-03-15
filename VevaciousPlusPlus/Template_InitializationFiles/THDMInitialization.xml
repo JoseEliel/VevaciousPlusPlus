@@ -1,11 +1,10 @@
 <VevaciousPlusPlusObjectInitialization>
-
 <!--
 #  VevaciousPlusPlusObjectInitialization.xml
 #
-#  Created on: Apr 10, 2014
-#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
-#      Copyright 2014 Ben O'Leary
+#  Authors
+#  \author José Eliel Camargo-Molina (elielcamargomolina@gmail.com) March 2019
+#      
 #
 #      This file is part of VevaciousPlusPlus, released under the
 #      GNU General Public License. Please see the accompanying
@@ -14,6 +13,7 @@
 #      license.
 #
  -->
+
 
 <!-- Quick start: if you just want to change the model (i.e. the potential in
      terms of a set of fields), change it in the file given by
@@ -24,15 +24,15 @@
      is skipped, and so on. -->
 
   <PotentialFunctionInitializationFile>
-  /Users/eliel/VevaciousPlusPlus-GambitBOSSED/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/PotentialFunctionInitialization.xml
+    ${vevacious_path}/InitializationFiles/THDMInitializationFiles/PotentialFunctionInitialization.xml
   </PotentialFunctionInitializationFile>
    
   <PotentialMinimizerInitializationFile>
-/Users/eliel/VevaciousPlusPlus-GambitBOSSED/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/PotentialMinimizerInitialization.xml
+    ${vevacious_path}/InitializationFiles/THDMInitializationFiles/PotentialMinimizerInitialization.xml
   </PotentialMinimizerInitializationFile>
    
   <TunnelingCalculatorInitializationFile>
-  /Users/eliel/VevaciousPlusPlus-GambitBOSSED/VevaciousPlusPlus/InitializationFiles/DefaultObjectInitializationFiles/TunnelingCalculatorInitialization.xml
+    ${vevacious_path}/InitializationFiles/THDMInitializationFiles/TunnelingCalculatorInitialization.xml
   </TunnelingCalculatorInitializationFile>
 
 </VevaciousPlusPlusObjectInitialization>

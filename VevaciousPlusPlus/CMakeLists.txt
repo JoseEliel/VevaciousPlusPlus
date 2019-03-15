@@ -212,3 +212,39 @@ add_dependencies(VevaciousPlusPlus objlib)
 
 set_target_properties(VevaciousPlusPlus-lib
         PROPERTIES OUTPUT_NAME VevaciousPlusPlus)
+
+
+#############################################################################
+# Writing Paths to Initialization Files
+#############################################################################
+
+message("Writing Input and Initialization files from templates")
+
+set(vevacious_path ${PROJECT_SOURCE_DIR})
+
+# Here I copy all Initialization File templates into the InitializationFiles folder
+file(COPY ${vevacious_path}/Template_InitializationFiles/ DESTINATION ${vevacious_path}/InitializationFiles/)
+
+# Here I make a list of all xml recursively within InitializationFiles
+file(GLOB_RECURSE allinitxmls "${vevacious_path}/InitializationFiles/*.xml" )
+
+# This replaces the ${vevacious_path} variable in all xmls in InitializationFiles.
+foreach(xml ${allinitxmls})
+    message("${xml}")
+    configure_file( ${xml}  ${xml} )
+endforeach()
+
+
+# Here I copy all the input files template into bin folder
+file(COPY ${vevacious_path}/Template_inputFiles/ DESTINATION ${vevacious_path}/bin/)
+
+# Here I make a list of all xml recursively within the bin folder
+file(GLOB_RECURSE allinputxmls "${vevacious_path}/bin/*.xml" )
+
+# This replaces the ${vevacious_path} variable in all xmls in InitializationFiles.
+foreach(xml ${allinputxmls})
+    message("${xml}")
+    configure_file( ${xml}  ${xml} )
+endforeach()
+
+

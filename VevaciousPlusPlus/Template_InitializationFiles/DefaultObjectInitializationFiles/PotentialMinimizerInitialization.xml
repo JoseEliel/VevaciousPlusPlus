@@ -21,7 +21,7 @@
             </ClassType>
             <ConstructorArguments>
               <PathToHom4ps2>
-       /Users/eliel/VevaciousPlusPlus/hom4ps/2.0
+        ${vevacious_path}/../HOM4PS2
               </PathToHom4ps2>
               <Hom4ps2Argument>
                 1

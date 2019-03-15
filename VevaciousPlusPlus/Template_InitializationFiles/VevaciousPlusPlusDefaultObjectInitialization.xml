@@ -3,9 +3,10 @@
 <!--
 #  VevaciousPlusPlusObjectInitialization.xml
 #
-#  Created on: Apr 10, 2014
-#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
-#      Copyright 2014 Ben O'Leary
+#  Authors
+#  \author Ben O'Leary (benjamin.oleary@gmail.com) Apr 2014
+#  \author José Eliel Camargo-Molina (elielcamargomolina@gmail.com) March 2019
+#      
 #
 #      This file is part of VevaciousPlusPlus, released under the
 #      GNU General Public License. Please see the accompanying
@@ -24,15 +25,15 @@
      is skipped, and so on. -->
 
   <PotentialFunctionInitializationFile>
-    /Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/THDM/PotentialFunctionInitialization.xml
+  ${vevacious_path}/DefaultObjectInitializationFiles/PotentialFunctionInitialization.xml
   </PotentialFunctionInitializationFile>
    
   <PotentialMinimizerInitializationFile>
-/Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/THDM/PotentialMinimizerInitialization.xml
+  ${vevacious_path}/DefaultObjectInitializationFiles/PotentialMinimizerInitialization.xml
   </PotentialMinimizerInitializationFile>
    
   <TunnelingCalculatorInitializationFile>
-    /Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/THDM/TunnelingCalculatorInitialization.xml
+  ${vevacious_path}/DefaultObjectInitializationFiles/TunnelingCalculatorInitialization.xml
   </TunnelingCalculatorInitializationFile>
 
 </VevaciousPlusPlusObjectInitialization>

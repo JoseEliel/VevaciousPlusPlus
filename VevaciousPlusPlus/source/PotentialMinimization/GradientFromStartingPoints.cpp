@@ -62,20 +62,22 @@ namespace VevaciousPlusPlus
         std::cout << std::endl;
 
         double const
-                thresholdSepartionSquared( ( extremumSeparationThresholdFraction
+                thresholdSeparationSquared( ( extremumSeparationThresholdFraction
                                              * extremumSeparationThresholdFraction
                                              * dsbVacuum.LengthSquared() ) + 1.0 );
 
-        double const thresholdSepartion( sqrt( thresholdSepartionSquared ) );
+        double const thresholdSeparation( sqrt( thresholdSeparationSquared ) );
         PotentialMinimum foundMinimum;
 
         bool DsbRolledToOrigin( dsbVacuum.LengthSquared()
-                                      < thresholdSepartionSquared );
+                                      < thresholdSeparationSquared );
 
         if(DsbRolledToOrigin)
         {
             std::cout
             << "DSB vacuum input rolled to the origin, suggesting it only appears at the two-loop order. Tunneling will be calculated from origin to panic vacuum."
+            <<  "Length:" << dsbVacuum.LengthSquared()
+            << "Sep:" << thresholdSeparationSquared
             << std::endl;
         }
 
@@ -86,8 +88,7 @@ namespace VevaciousPlusPlus
                 << "Gradient-based minimization from a set of starting points:";
         for( std::vector< std::vector< double > >::const_iterator
                 realSolution( startingPoints.begin() );
-                realSolution < startingPoints.end();
-        ++realSolution)
+                realSolution != startingPoints.end(); ++realSolution )
         {
             std::cout
                     << std::endl
@@ -100,10 +101,10 @@ namespace VevaciousPlusPlus
                     << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
             std::cout << std::endl;
             bool rolledToDsbOrSignFlip( ( foundMinimum.SquareDistanceTo( dsbVacuum )
-                                          < thresholdSepartionSquared )
+                                          < thresholdSeparationSquared )
                                         ||
                                         !( IsNotPhaseRotationOfDsbVacuum( foundMinimum,
-                                                                          thresholdSepartion ) ) );
+                                                                          thresholdSeparation ) ) );
 
             // We check to see if a starting point that was not the DSB minimum
             // rolled to the DSB minimum: if so, we scale the starting point's fields
@@ -120,7 +121,7 @@ namespace VevaciousPlusPlus
             if( rolledToDsbOrSignFlip
                 &&
                 ( dsbVacuum.SquareDistanceTo( *realSolution )
-                  > thresholdSepartionSquared ) )
+                  > thresholdSeparationSquared ) )
             {
                 // We don't want to bother re-rolling the field origin, so we keep note
                 // of how far away from the field origin realSolution is.
@@ -134,7 +135,7 @@ namespace VevaciousPlusPlus
                     lengthSquared += ( (*scaledField) * (*scaledField) );
                     *scaledField *= nonDsbRollingToDsbScalingFactor;
                 }
-                if( lengthSquared > thresholdSepartionSquared )
+                if( lengthSquared > thresholdSeparationSquared )
                 {
                     std::cout
                             << "Non-DSB-minimum starting point rolled to the DSB minimum, or a"
@@ -145,10 +146,10 @@ namespace VevaciousPlusPlus
 
                     foundMinimum = (*gradientMinimizer)( scaledPoint );
                     rolledToDsbOrSignFlip = ( foundMinimum.SquareDistanceTo( dsbVacuum )
-                                              < thresholdSepartionSquared )
+                                              < thresholdSeparationSquared )
                                             ||
                                             !( IsNotPhaseRotationOfDsbVacuum( foundMinimum,
-                                                                              thresholdSepartion ) );
+                                                                              thresholdSeparation ) );
                     std::cout
                             << "Rolled to: "
                             << foundMinimum.AsMathematica( potentialFunction.FieldNames() );

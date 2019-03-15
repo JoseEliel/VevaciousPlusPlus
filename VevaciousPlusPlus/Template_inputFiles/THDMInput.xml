@@ -3,9 +3,10 @@
 <!--
 #  VevaciousPlusPlusMainInput.xml
 #
-#  Created on: Apr 10, 2014
-#      Author: Ben O'Leary (benjamin.oleary@gmail.com)
-#      Copyright 2014 Ben O'Leary
+#  
+#      Authors: 
+#      /author Ben O'Leary (benjamin.oleary@gmail.com) Apr 10 2014
+#      /author José Eliel Camargo-Molina (elielcamargomolina@gmail.com) March 2019
 #
 #      This file is part of VevaciousPlusPlus, released under the
 #      GNU General Public License. Please see the accompanying
@@ -73,7 +74,7 @@
        through names of further files containing the information. -->
  
   <InitializationFile>
-    /Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/InitializationFiles/THDMInitialization.xml
+    ${vevacious_path}/InitializationFiles/THDMInitialization.xml
   </InitializationFile>
   
   <!-- Every SingleParameterPoint element will be run by Vevacious in the order
@@ -85,13 +86,14 @@
     <!-- By default, the content of RunPointInput is assumed to be the name of
          a file in (S)LHA format. -->
     <RunPointInput>
-     /Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/InputFiles/SPheno.spc.THDM
+     ${vevacious_path}/ExampleSLHAFiles/SPheno.spc.THDM
     </RunPointInput>
     <!-- If the OutputFilename child element is present, its content will be
          taken as the name to use for the file with the results of the
          parameter point in XML format. -->
     <OutputFilename>
-/Users/eliel/VevaciousPlusPlus-GambitBOSSED/VevaciousPlusPlus/Results/THDM.vout   </OutputFilename>
+    ${vevacious_path}/Results/THDM.vout   
+    </OutputFilename>
     <!-- If the AppendLhaOutputToLhaInput child empty element is present, then
          the results of the parameter point appended to the end of the (S)LHA
          file given in RunPointInput, in several blocks
@@ -105,10 +107,10 @@
 <!--
   <ParameterPointSet>
     <InputFolder>
-      /home/bol/BOL/VevaciousPlusPlusTesting/InputFolderTest/
+      /path/to/InputFolderTest/
     </InputFolder>
     <OutputFolder>
-      /home/bol/BOL/VevaciousPlusPlusTesting/OutputFolderTest/
+      /path/to/OutputFolderTest/
     </OutputFolder>
   </ParameterPointSet>
   -->

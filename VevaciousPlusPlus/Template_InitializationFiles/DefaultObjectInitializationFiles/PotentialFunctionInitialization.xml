@@ -5,7 +5,7 @@
     </ClassType>
     <ConstructorArguments>
       <ScaleAndBlockFile>
-        /Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/LagrangianParameters/THDM.xml
+      ${vevacious_path}/ModelFiles/LagrangianParameters/MssmCompatibleWithSlhaOneAndSlhaTwoAndSarahOutputs.xml
       </ScaleAndBlockFile>
     </ConstructorArguments>
   </LagrangianParameterManagerClass>
@@ -15,7 +15,7 @@
     </ClassType>
     <ConstructorArguments>
       <ModelFile>
-       /Users/eliel/VevaciousPlusPlus/VevaciousPlusPlus/ModelFiles/PotentialFunctions/THDM.vin
+         ${vevacious_path}/ModelFiles/PotentialFunctions/RealMssmWithStauAndStopVevs.vin
       </ModelFile>
       <AssumedPositiveOrNegativeTolerance>
         0.5

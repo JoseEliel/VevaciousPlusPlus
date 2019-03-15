@@ -21,7 +21,7 @@
             </ClassType>
             <ConstructorArguments>
               <PathToHom4ps2>
-        /Users/eliel/gambit/Backends/installed/VevaciousPlusPlus/1.0/VevaciousPlusPlus/lib/..//../HOM4PS2
+       ${vevacious_path}/../hom4ps/2.0
               </PathToHom4ps2>
               <Hom4ps2Argument>
                 1
@@ -45,12 +45,12 @@
             1.0
           </MinimumInitialStepSize>
           <MinuitStrategy>
-            0
+            2
           </MinuitStrategy>
         </ConstructorArguments>
       </GradientMinimizerClass>
       <ExtremumSeparationThresholdFraction>
-        0.05
+        0.005
       </ExtremumSeparationThresholdFraction>
       <NonDsbRollingToDsbScalingFactor>
         4.0
