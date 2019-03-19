@@ -21,6 +21,7 @@
 #include <sstream>
 #include "Eigen/Dense"
 #include <cstddef>
+#include <memory>
 
 
 namespace VevaciousPlusPlus
