@@ -18,6 +18,8 @@ project(VevaciousPlusPlus)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
+cmake_policy(SET CMP0042 NEW)
+
 #############################################################################
 # CHECKS
 #############################################################################
@@ -81,16 +83,16 @@ ExternalProject_Add(${Minuit_name}_${Minuit_ver}
 
 # HOM4PS
 set(name "hom4ps")
-set(ver "2.0")
+set(hom4ps_ver "2.0")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(dl "http://www.math.nsysu.edu.tw/~leetsung/works/HOM4PS_soft_files/HOM4PS2_MacOSX.tar.gz")
 else()
     set(dl "http://www.math.nsysu.edu.tw/~leetsung/works/HOM4PS_soft_files/HOM4PS2_64-bit.tar.gz")
 endif()
 
-set(dir "${PROJECT_SOURCE_DIR}/../${name}/${ver}")
+set(dir "${PROJECT_SOURCE_DIR}/../${name}/${hom4ps_ver}")
 
-ExternalProject_Add(${name}_${ver}
+ExternalProject_Add(${name}_${hom4ps_ver}
         DOWNLOAD_COMMAND wget -qO- ${dl} | tar xvz -C ${dir} --strip-components 1
         SOURCE_DIR ${dir}
         BUILD_IN_SOURCE 1
@@ -101,7 +103,7 @@ ExternalProject_Add(${name}_${ver}
 
 # PHC
 set(name "phc")
-set(ver "2.4.58")
+set(phc_ver "2.4.58")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(dl "http://www.math.uic.edu/~jan/mactel64y_phcv24p.tar.gz")
@@ -109,10 +111,10 @@ else()
     set(dl "http://www.math.uic.edu/~jan/x86_64phcv24p.tar.gz")
 endif()
 
-set(dir "${PROJECT_SOURCE_DIR}/../${name}/${ver}")
+set(dir "${PROJECT_SOURCE_DIR}/../${name}/${phc_ver}")
 
 
-ExternalProject_Add(${name}_${ver}
+ExternalProject_Add(${name}_${phc_ver}
         DOWNLOAD_COMMAND wget -qO- ${dl} | tar xvz -C ${dir}
         SOURCE_DIR ${dir}
         BUILD_IN_SOURCE 1
@@ -182,9 +184,16 @@ add_dependencies(objlib ${Minuit_name}_${Minuit_ver})
 add_executable(VevaciousPlusPlus
         $<TARGET_OBJECTS:objlib>)
 
+# Adding dependencies, including Homotopy continuation codes
+
 add_dependencies(VevaciousPlusPlus objlib)
 
 add_dependencies(VevaciousPlusPlus VevaciousPlusPlus-lib)
+
+add_dependencies(VevaciousPlusPlus hom4ps_${hom4ps_ver})
+
+add_dependencies(VevaciousPlusPlus phc_${phc_ver})
+
 
 # Linking to minuit
 
