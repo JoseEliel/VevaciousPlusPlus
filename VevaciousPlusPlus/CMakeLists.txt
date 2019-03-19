@@ -13,8 +13,10 @@
 #************************************************
 
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 2.8.12)
 project(VevaciousPlusPlus)
+
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 #############################################################################
 # CHECKS
@@ -48,21 +50,30 @@ else()
     message("${BoldRed} Boost libraries 1.41 or greater not found. This is required for Vevacious to work. ${ColourReset}")
 endif()
 
+# Set the general compiler flags
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC -fopenmp")
+
+
 #############################################################################
 # EXTERNAL PROJECTS
 #############################################################################
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
+message("${CMAKE_C_COMPILER}")
+
 # MINUIT2
-set(name "minuit2")
-set(dl "https://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz")
-set(ver "5.34.14")
-set(dir "${PROJECT_SOURCE_DIR}/../${name}/${ver}")
-ExternalProject_Add(${name}_${ver}
-            DOWNLOAD_COMMAND wget -qO- ${dl} | tar xvz -C ${dir} --strip-components 1
-            SOURCE_DIR ${dir}
+set(Minuit_name "minuit2")
+set(Minuit_lib_name "Minuit2")
+set(Minuit_ver "5.34.14")
+set(Minuit_include "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}/include/")
+set(Minuit_dl "https://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz")
+set(Minuit_dir "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}")
+ExternalProject_Add(${Minuit_name}_${Minuit_ver}
+            DOWNLOAD_COMMAND wget -qO- ${Minuit_dl} | tar xvz -C ${Minuit_dir} --strip-components 1
+            SOURCE_DIR ${Minuit_dir}
             BUILD_IN_SOURCE 1
-            CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} ./configure --prefix=${dir}
+            CONFIGURE_COMMAND ./configure --prefix=${Minuit_dir} CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=${CMAKE_C_FLAGS} CXXFLAGS=${CMAKE_CXX_FLAGS}
             BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
             INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
         )
@@ -145,52 +156,41 @@ set(sources source/BounceActionEvaluation/BounceActionPathFinding/MinuitOnHypers
         source/VevaciousPlusPlusMain.cpp)
 
 
-#############################################################################
-# OBJECT LIBRARY (For making the objects used in executable and dynamic library)
-#############################################################################
-
-add_library( objlib OBJECT ${sources})
 
 #############################################################################
-# VEVACIOUS EXECUTABLE
+# GENERAL INCLUDE DIRS
 #############################################################################
-
-# Setting compiler flags
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC ")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC -fopenmp")
-endif()
-
-
-
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-
-set(Minuit_name "minuit2")
-set(Minuit_lib_name "Minuit2")
-set(Minuit_ver "5.34.14")
-set(Minuit_include "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}/include/")
 
 include_directories("${Minuit_include}")
 include_directories(include)
 include_directories(include/LHPC)
 
 
+#############################################################################
+# OBJECT LIBRARY (For making the objects used in executable and dynamic library)
+#############################################################################
+
+add_library(objlib OBJECT ${sources})
+
+add_dependencies(objlib ${Minuit_name}_${Minuit_ver})
+
+
+#############################################################################
+# VEVACIOUS EXECUTABLE
+#############################################################################
+
 add_executable(VevaciousPlusPlus
         $<TARGET_OBJECTS:objlib>)
-
-add_dependencies(VevaciousPlusPlus ${Minuit_name}_${Minuit_ver})
 
 add_dependencies(VevaciousPlusPlus objlib)
 
 add_dependencies(VevaciousPlusPlus VevaciousPlusPlus-lib)
 
-# Linking to minuit 
+# Linking to minuit
 
 set(Minuit_lib "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}/lib/")
 
-target_link_libraries(VevaciousPlusPlus ${Minuit_lib}/libminuit2.a)
+target_link_libraries(VevaciousPlusPlus ${Minuit_lib}/libMinuit2.a)
 
 
 
@@ -202,13 +202,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/)
 
 add_library(VevaciousPlusPlus-lib SHARED $<TARGET_OBJECTS:objlib>)
 
-# Linking to minuit 
+# Linking to minuit
 
-target_link_libraries(VevaciousPlusPlus-lib ${Minuit_lib}/libminuit2.a)
+target_link_libraries(VevaciousPlusPlus-lib ${Minuit_lib}/libMinuit2.a)
 
-add_dependencies(VevaciousPlusPlus objlib)
+add_dependencies(VevaciousPlusPlus-lib objlib)
 
-# Setting correct name for library 
+# Setting correct name for library
 
 set_target_properties(VevaciousPlusPlus-lib
         PROPERTIES OUTPUT_NAME VevaciousPlusPlus)
