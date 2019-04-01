@@ -139,9 +139,9 @@ the default Initialization files included with Vevacious.
 LHA input parameter points are given in InputFile.xml
 
 
-****************************************************
+*****************************************************
               Adding your own models
-****************************************************
+*****************************************************
 
 Models can be implemented in SARAH and added to Vevacious. This will require you to implement the 
 model first in SARAH and within do "MakeVevacious[Version->"++"]". 
