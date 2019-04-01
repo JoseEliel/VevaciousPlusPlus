@@ -4,7 +4,7 @@
  *  Created on: Feb 14, 2014                                                 *
  *  Last update: April 1, 2019                                               *
  *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)                     *
- *		             José Eliel Camargo-Molina (Eliel@camargo-molina.com)        *
+ *               José Eliel Camargo-Molina (Eliel@camargo-molina.com)        *
  *                                                                           *
  *      This file is part of VevaciousPlusPlus, a program designed to find   *
  *      configurations of vacuum expectation values (VEVs) for the           *
