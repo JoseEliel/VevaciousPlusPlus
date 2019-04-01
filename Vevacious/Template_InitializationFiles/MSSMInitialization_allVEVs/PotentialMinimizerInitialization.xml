@@ -1,10 +1,19 @@
 <VevaciousPlusPlusPotentialMinimizerInitialization>
   <PotentialMinimizerClass>
+  <!-- Currently <ClassType> must be "GradientFromStartingPoints", and
+   <ConstructorArguments> must give the <StartingPointFinderClass> and
+   <GradientMinimizerClass> components. Optional elements
+   <ExtremumSeparationThresholdFraction> and
+   <NonDsbRollingToDsbScalingFactor> may also be given. -->
     <ClassType>
       GradientFromStartingPoints
     </ClassType>
     <ConstructorArguments>
       <StartingPointFinderClass>
+  <!-- Currently <ClassType> must be
+       "PolynomialAtFixedScalesSolver", and
+       <ConstructorArguments> must give <NumberOfScales>,
+       <ReturnOnlyPolynomialMinima>, and <PolynomialSystemSolver>. -->
         <ClassType>
           PolynomialAtFixedScalesSolver
         </ClassType>
@@ -13,6 +22,25 @@
             1
           </NumberOfScales>
           <ReturnOnlyPolynomialMinima>
+   <!-- Either "true"/"yes" or "false"/"no" (case-insensitive): if
+                 true then the starting points for gradient-based minimization
+                 are only the subset of solutions which also are minima of the
+                 polynomial function (so discarding maxima and saddle points).
+                 This should only be used with caution: it could be, for
+                 example, that the panic vacuum at the one-loop level is near a
+                 tree-level saddle point rather than near a tree-level minimum,
+                 and if such a saddle point is discarded rather than used as a
+                 starting point for the minimization of the one-loop potential,
+                 the panic vacuum might be missed. (It is debatable whether a
+                 potential where the loop expansion turns a tree-level saddle
+                 point into a one-loop-level minimum can be trusted as a loop
+                 expansion, but Vevacious allows it.) The advantage of
+                 discarding the saddle points and maxima of the polynomial is
+                 that if you are sure that it will not lead to important vacua
+                 being missed, it will speed up the subsequent gradient-based
+                 minimization by reducing the number of points to minimize, but
+                 under usual circumstances, it is the tunneling calculation
+                 which is the bottleneck. -->
             No
           </ReturnOnlyPolynomialMinima>
           <PolynomialSystemSolver>
@@ -24,9 +52,19 @@
         ${vevacious_path}/../hom4ps/2.0
               </PathToHom4ps2>
               <Hom4ps2Argument>
+                  <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
+                     "Please enter the option of homotopy method
+                        1. The polyhedral homotopy
+                        2. The classical linear homotopy"
+                     1 can be faster for systems of many variables,
+                     but 2 seems more reliable. -->
                 1
               </Hom4ps2Argument>
               <ResolutionSize>
+                      <!-- Solutions within a hypercube with side length given by
+                     this number are considered to be the same solution, and
+                     also imaginary parts of solutions are considered to be
+                     zero if they are less than this number. -->
                 1.0
               </ResolutionSize>
             </ConstructorArguments>
@@ -51,10 +89,18 @@
         </ConstructorArguments>
       </StartingPointFinderClass>
       <GradientMinimizerClass>
+        <!-- Currently <ClassType> must be "MinuitPotentialMinimizer" and
+             <ConstructorArguments> must have <MinimaSeparationThreshold>. -->
         <ClassType>
           MinuitPotentialMinimizer
         </ClassType>
         <ConstructorArguments>
+          <!-- The initial step sizes for Minuit2 will be equal to the
+               starting point scaled by the number given in
+               <InitialStepSizeFraction>, or equal to the number given in
+               <MinimumInitialStepSize>, whichever is larger (so a starting
+               value of 0 will still have an initial step size given by the
+               number in <MinimumInitialStepSize>, for example). -->
           <InitialStepSizeFraction>
             0.1
           </InitialStepSizeFraction>
@@ -62,14 +108,42 @@
             1.0
           </MinimumInitialStepSize>
           <MinuitStrategy>
-            0
+            <!-- The number given here is given to Minuit2 to decide how
+                 precise it tries to be, through more or less calls of the
+                 function to be minimized. The default is 1, while 0 emphasizes
+                 making less function calls, and 2 emphasizes more accuracy
+                 through more function calls. -->
+            1
           </MinuitStrategy>
         </ConstructorArguments>
       </GradientMinimizerClass>
       <ExtremumSeparationThresholdFraction>
+        <!-- The number given here is used as a threshold for ensuring that
+             the same minimum rolled to from separate starting points is
+             treated as the same minimum even if the minimizations did not lead
+             to exactly the same numbers for the values of the fields. If the
+             shorter of the Euclidean lengths of the 2 vectors in field space
+             describing the minima is l, and the Euclidean length of the
+             difference is d, and the number given by this element is f, then
+             2 minima are treated as the same minimum if d < (f * l). If not
+             given, 0.05 is taken as the default. -->
         0.05
       </ExtremumSeparationThresholdFraction>
       <NonDsbRollingToDsbScalingFactor>
+         <!-- The number given here is used as a scaling factor if the minimum
+             is suspected of being the result of some unfortunate shifting of
+             basins of attraction: we discovered in explorations with
+             Vevacious 1 that it could happen that the basin of attraction of
+             the DSB minimum at 1-loop level could grow so large that it would
+             encompass tree-level minima that belong in some sense to other
+             1-loop minima, which moved very far away due to loop corrections,
+             so even though their basins of attraction also grew very large in
+             the same way that of the DSB minimum did, they moved enough that
+             "their" tree-level minima were left out. If a starting point is
+             sufficiently far away from the DSB minimum yet rolls there under
+             gradient-based minimization, the starting point's field values are
+             scaled up by the number given by this element, and used as a new
+             starting point. If not given, 4.0 is taken as the default. -->
         4.0
       </NonDsbRollingToDsbScalingFactor>
     </ConstructorArguments>

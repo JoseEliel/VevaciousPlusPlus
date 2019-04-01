@@ -1,53 +1,177 @@
 <VevaciousPlusPlusObjectInitialization>
   <TunnelingClass>
+     <!-- Currently <ClassType> must be either "BounceAlongPathWithThreshold" or
+         "CosmoTransitionsRunner", both needing <ConstructorArguments> to have
+         child elements <TunnelingStrategy> and <SurvivalProbabilityThreshold>.
+         If <ClassType> is "CosmoTransitionsRunner", then
+         <ConstructorArguments> must also give the path to the CosmoTransitions
+         directory (where pathDeformation.py is) by <PathToCosmotransitions>,
+         while "BounceAlongPathWithThreshold" needs <BouncePotentialFit> and
+         <BouncePathFinder>. -->
     <ClassType>
       BounceAlongPathWithThreshold
     </ClassType>
     <ConstructorArguments>
       <TunnelingStrategy>
-    JustQuantum
+        <!-- Valid options: "NoTunneling", "JustQuantum", "JustThermal",
+                            "ThermalThenQuantum", or "QuantumThenThermal"
+             (no quote marks in actual element). -->
+    QuantumThenThermal
       </TunnelingStrategy>
       <SurvivalProbabilityThreshold>
         0.01
       </SurvivalProbabilityThreshold>
       <ThermalActionResolution>
+         <!-- This is the number of temperatures taken for the thermal bounce
+           action calculation. If using "CosmoTransitionsRunner", the thermal
+           bounce actions with a straight path is sampled at this many
+           temperatures (equally spaced) and then used to estimate the thermal
+           dependence of the bounce action, which is then used to estimate the
+           temperature which dominates thermal tunneling, which is then used
+           for the full calculation by CosmoTransitions. If using
+           "BounceAlongPathWithThreshold", the integration of the decay width
+           over temperature is performed by a numerical approximation summing
+           over this many temperatures (equally spaced). -->
         5
       </ThermalActionResolution>
       <CriticalTemperatureAccuracy>
+           <!-- This option gives the accuracy to which the critical and
+             evaporation temperatures will be calculated if necessary, in that
+             the temperature used will be within 2^-(the number given here) of
+             the exact value. -->
         7
       </CriticalTemperatureAccuracy>
       <PathResolution>
+          <!-- If using "CosmoTransitionsRunner", this is the number of nodes
+             along the path between the false vacuum and the true vacuum that
+             CosmoTransitions varies. If using "BounceAlongPathWithThreshold",
+             this is the number of points along every tried tunneling path
+             which are sampled to create the one-dimensional potential along
+             the path, which is taken as pure quadratics between the end nodes
+             and their nearest neighbors, and straight lines between the rest
+             of the nodes. -->
         100
       </PathResolution>
       <MinimumVacuumSeparationFraction>
+               <!-- This gives a fraction which is used to try to avoid tunneling from
+             a numerical approximation of the position of a vacuum to a
+             different numerical approximation of the same vacuum position. If
+             this fraction times the length between the DSB vacuum and panic
+             vacuum at zero temperature is greater than the distance between to
+             field configurations, tunneling between the field configurations
+             is aborted. (An example case is when investigating tunneling at
+             higher temperatures, it could be that the survival probability
+             flips to being based on tunneling between the field origin and the
+             field configuration that would cool to be the DSB vacuum, rather
+             than on tunneling to the panic vacuum.) -->
         0.8
       </MinimumVacuumSeparationFraction>
+      <!-- The following elements are read only if <ClassType> is
+           "CosmoTransitionsRunner", and are ignored if <ClassType> is
+           "BounceAlongPathWithThreshold". -->
+      <PathToCosmotransitions>
+        /PATH/TO/COSMOTRANSITIONS2/
+      </PathToCosmotransitions>
+      <MaxInnerLoops>
+        <!-- This is the number of iterations of the inner loop that
+             CosmoTransitions is allowed. The inner loop adjusts the path along
+             the normal force directions. If not given, 10 is used as the
+             default. -->
+        10
+      </MaxInnerLoops>
+      <MaxOuterLoops>
+        <!-- This is the number of iterations of the outer loop that
+             CosmoTransitions is allowed. The outer loop adjusts the
+             1-dimensional bounce action along the path then runs the inner
+             loop. If not given, 10 is used as the default. -->
+        10
+      </MaxOuterLoops>
+      <!-- End of set of elements only read if <ClassType> is
+           "CosmoTransitionsRunner". -->
+
+      <!-- The following elements are read only if <ClassType> is
+           "BounceAlongPathWithThreshold", and are ignored if <ClassType> is
+           "CosmoTransitionsRunner". -->
       <BouncePotentialFit>
+        <!-- Currently the only valid option for <ClassType> is
+             "BubbleShootingOnPathInFieldSpace", which implements the Coleman
+             undershoot-overshoot method on a tunneling path from the true
+             vacuum to the false vacuum, ignoring the "forces" perpendicular to
+             the path. -->
         <ClassType>
           BubbleShootingOnPathInFieldSpace
         </ClassType>
         <ConstructorArguments>
           <NumberShootAttemptsAllowed>
+               <!-- This is the number of shoot attempts allowed to try to find
+                 the perfect shot before moving on with the best shot so far to
+                 calculate the bounce action. -->
             32
           </NumberShootAttemptsAllowed>
           <RadialResolution>
+             <!-- The initial step size in 1/GeV for numerically integrating the
+                 bubble's equations of motion is given by the number given here
+                 divided by the largest energy scale from the potential (from
+                 among the Euclidean lengths of the vacua and the tunneling
+                 scale given by the PotentialFunction object). -->
             0.05
           </RadialResolution>
         </ConstructorArguments>
       </BouncePotentialFit>
       <TunnelPathFinders>
+        <!-- This should be a list, *in order*, of the various objects which
+             will be used to try to find the dominant bounce action bubble
+             configuration. This allows faster approximations to set up rough
+             paths which are then refined by better approximations.
+             
+             Each path finder object should be enclosed in a "PathFinder" XML
+             element, and the element should have just 2 child elements:
+             "ClassType" and "ConstructorArguments".
+             
+             The valid path finder "ClassType" options are:
+             "MinuitOnPotentialOnParallelPlanes", which just tries to minimize
+             the energy barrier between the vacua, on planes without regard to
+             how the path is between the planes;
+             "MinuitOnPotentialPerpendicularToPath", which tries to minimize
+             the barrier so that the force at points along the path is aligned
+             locally with the path around each point;
+             and "MinuitOnPathPerpendicularForces", which actually tries to do
+             the same as "MinuitOnPotentialPerpendicularToPath" but with an
+             extra term which, when differentiated, would give the effective
+             force accounting for the rate of change of the field configuration
+             with respect to the radial space-time variable (this is similar to
+             the method used by CosmoTransitions right from the start, though
+             should be a lot faster since it starts from what should be a good
+             guess for the final path, and uses the power of Minuit2). -->
         <PathFinder>
           <ClassType>
             MinuitOnPotentialOnParallelPlanes
           </ClassType>
           <ConstructorArguments>
             <NumberOfPathSegments>
+              <!-- This is the number of segments to break the path between
+                   vacua in field space into, with the ends of the segments
+                   being the points moved around, and the resulting path being
+                   straight interpolations between these nodes. -->
               50
             </NumberOfPathSegments>
             <MinuitStrategy>
-              2
+              <!-- The number given here is given to Minuit2 to decide how
+                   precise it tries to be, through more or less calls of the
+                   function to be minimized. The default is 1, while 0
+                   emphasizes making less function calls, and 2 emphasizes more
+                   accuracy through more function calls. -->
+              1
             </MinuitStrategy>
             <MinuitTolerance>
+              <!-- The number given here is a fraction to multiply Minuit2's
+                   default 0.001 to yield the tolerance fraction, which is the
+                   fraction of the value of the function at a point which is
+                   used to compare to the estimated ("vertical") distance to
+                   the minimum. For example, if 0.5 is given, then as soon as
+                   Minuit2 estimates that it is at a point with function value
+                   within 0.0005 of what it estimates is the value at the
+                   minimum, it considers its minimization complete. -->
               0.5
             </MinuitTolerance>
           </ConstructorArguments>
@@ -58,30 +182,77 @@
           </ClassType>
           <ConstructorArguments>
             <NumberOfPathSegments>
+              <!-- This is the number of segments to break the path between
+                   vacua in field space into, with the ends of the segments
+                   being the points moved around, and the resulting path being
+                   straight interpolations between these nodes. -->
               100
             </NumberOfPathSegments>
             <NumberOfAllowedWorsenings>
+               <!-- This is the number of times the
+                   MinuitOnPotentialPerpendicularToPath is allowed to produce a
+                   path with a higher bounce action than the last try before it
+                   decides that it can no longer try to find a path with a
+                   lower bounce action. -->
               1
             </NumberOfAllowedWorsenings>
             <ConvergenceThresholdFraction>
+              <!-- This is the fraction of the length of a path segment (after
+                   dividing the path into NumberOfPathSegments segments) that a
+                   node is allowed to move from its starting point without
+                   flagging that the path has not yet converged. -->
               0.05
             </ConvergenceThresholdFraction>
             <MinuitDampingFraction>
+              <!-- This is the fraction which multiplies the displacements of
+                   the nodes from the last path. The new positions of the nodes
+                   are calculated by a minimization by Minuit2 starting from
+                   points on the last path, and the displacements of these new
+                   nodes are multiplied by this fraction before being added to
+                   the starting points to get the nodes along the new path, so
+                   "damping" the difference between the paths. This is an
+                   attempt to improve the convergence of the path finder. -->
               0.75
             </MinuitDampingFraction>
             <NeighborDisplacementWeights>
+              <!-- This is a set of weights used in averaging the change in
+                   the path. A given node has its displacement calculated by
+                   Minuit2, then the actual displacement used (which is also
+                   multiplied by MinuitDampingFraction) is the weighted average
+                   of that displacement with the displacements from the nearest
+                   neighbor nodes. The first number given is the weight of the
+                   nearest neighbor node displacements (i.e. those of the nodes
+                   at the end of the segments either side of the original node)
+                   compared to the original displacement having weight 1.0, the
+                   second number given is the weight of the next-nearest node,
+                   and so on. The numbers should be separated by newlines. -->
               0.5
               0.25
             </NeighborDisplacementWeights>
             <MinuitStrategy>
+              <!-- The number given here is given to Minuit2 to decide how
+                   precise it tries to be, through more or less calls of the
+                   function to be minimized. The default is 1, while 0
+                   emphasizes making less function calls, and 2 emphasizes more
+                   accuracy through more function calls. -->
               1
             </MinuitStrategy>
             <MinuitTolerance>
+               <!-- The number given here is a fraction to multiply Minuit2's
+                   default 0.001 to yield the tolerance fraction, which is the
+                   fraction of the value of the function at a point which is
+                   used to compare to the estimated ("vertical") distance to
+                   the minimum. For example, if 0.5 is given, then as soon as
+                   Minuit2 estimates that it is at a point with function value
+                   within 0.0005 of what it estimates is the value at the
+                   minimum, it considers its minimization complete. -->
               0.5
             </MinuitTolerance>
           </ConstructorArguments>
         </PathFinder>
       </TunnelPathFinders>
+      <!-- End of set of elements only read if <ClassType> is
+           "BounceAlongPathWithThreshold". -->
     </ConstructorArguments>
   </TunnelingClass>
 </VevaciousPlusPlusObjectInitialization>
