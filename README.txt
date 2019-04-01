@@ -80,12 +80,16 @@ The C++ files of VevaciousPlusPlus are:
                    Quick Start 
 ****************************************************
 
-<> From the Vevacious/ directory do "mkdir build"
-<> From the newly created build/ directory do "cmake .."
-<> Once CMake has finished setting everything up do "make VevaciousPlusPlus"
+<> From the Vevacious/ directory do 
+   > mkdir build
+<> From the newly created build/ directory do 
+   > cmake ..
+<> Once CMake has finished setting everything up do 
+   > make VevaciousPlusPlus
 <> Besides making the main executable and library, this will download and compile 
 the Minuit2 library, Hom4PS2 and PHC (homotopy continuation codes)
-<> Now you can run Vevacious with "VevaciousPlusPlus InputFile.xml". 
+<> Now you can run Vevacious with 
+   > VevaciousPlusPlus InputFile.xml 
 The executable is in /bin.
 
 ****************************************************
