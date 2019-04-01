@@ -131,6 +131,7 @@ InputFile.xml --> InitializationFile.xml --> PotentialMinimizerInitialization.xm
                                          | 
                                           --> TunnelingCalculationInitialization.xml
 
+
 The only place where you have model dependent settings is in PotentialFunctionInitialization.xml.
 
 The other files contain all the settings which are explained in detail in the comments of 
