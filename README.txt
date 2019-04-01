@@ -122,6 +122,7 @@ files with the most common settings set to their default values.
 ** In the following and for clarity the file names are written but they can be
  chosen to be anything you want ** 
 
+
 The input file structure is as follows: 
                                                                     
 
