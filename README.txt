@@ -4,7 +4,7 @@
  *  Created on: Feb 14, 2014                                                 *
  *  Last update: April 1, 2019                                               *
  *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)                     *
- *		             José Eliel Camargo-Molina (elielcamargomolina@gmail.com)    *
+ *		             José Eliel Camargo-Molina (Eliel@camargo-molina.com)        *
  *                                                                           *
  *      This file is part of VevaciousPlusPlus, a program designed to find   *
  *      configurations of vacuum expectation values (VEVs) for the           *
@@ -146,13 +146,14 @@ LHA input parameter points are given in InputFile.xml
 Models can be implemented in SARAH and added to Vevacious. This will require you to implement the 
 model first in SARAH and within do "MakeVevacious[Version->"++"]". 
 Sarah will give two output files a "YOURMODEL.vin" and "ScaleAndBlock.xml". 
-The first one is the potential for your model and the second one tells Vevacious how to handle the input
-from LHA files. 
+The first one is the potential for your model and the second one tells Vevacious 
+how to handle the input from LHA files. 
 If you want to follow what is done with the default models then 
 Put "YOURMODEL.vin" -> /Vevacious/PotentialFunctions
 and "ScaleAndBlock.vin" -> /Vevacious/LagrangianParameters
 
-No matter where you place them, you will have to tell Vevacious where they are in your chosen PotentialFunctionInitialization.xml file. 
+No matter where you place them, you will have to tell Vevacious where they are in your 
+chosen PotentialFunctionInitialization.xml file. 
 
 Once you have set everything up, just provide LHA files in the InputFile.xml file. 
 
