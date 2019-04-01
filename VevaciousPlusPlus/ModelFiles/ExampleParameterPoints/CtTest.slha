@@ -1,6 +1,0 @@
-Block CTTEST Q= 10.0 # Just putting some stuff here for comparison with CosmoTransitions
- 1 0.02 # delta
- 2 1.8 # (x-1)^2 prefactor
- 3 0.2 # (y-1)^2 prefactor
- 4 0.0 # DSB x
- 5 0.0 # DSB y

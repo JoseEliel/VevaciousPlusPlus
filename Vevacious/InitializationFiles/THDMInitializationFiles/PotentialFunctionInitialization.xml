@@ -1,0 +1,25 @@
+<VevaciousPlusPlusPotentialFunctionInitialization>
+ <LagrangianParameterManagerClass>
+    <ClassType>
+      SlhaCompatibleWithSarahManager
+    </ClassType>
+    <ConstructorArguments>
+      <ScaleAndBlockFile>
+        /Users/eliel/VevaciousPlusPlus/Vevacious/ModelFiles/LagrangianParameters/THDM.xml
+      </ScaleAndBlockFile>
+    </ConstructorArguments>
+  </LagrangianParameterManagerClass>
+  <PotentialFunctionClass>
+    <ClassType>
+      FixedScaleOneLoopPotential
+    </ClassType>
+    <ConstructorArguments>
+      <ModelFile>
+       /Users/eliel/VevaciousPlusPlus/Vevacious/ModelFiles/PotentialFunctions/THDM.vin
+      </ModelFile>
+      <AssumedPositiveOrNegativeTolerance>
+        0.5
+      </AssumedPositiveOrNegativeTolerance>
+    </ConstructorArguments>
+  </PotentialFunctionClass>
+</VevaciousPlusPlusPotentialFunctionInitialization>

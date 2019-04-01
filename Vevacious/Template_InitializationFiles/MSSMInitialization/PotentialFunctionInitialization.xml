@@ -1,0 +1,26 @@
+<VevaciousPlusPlusPotentialFunctionInitialization>
+ <LagrangianParameterManagerClass>
+    <ClassType>
+      SlhaCompatibleWithSarahManager
+    </ClassType>
+    <ConstructorArguments>
+      <ScaleAndBlockFile>
+      ${vevacious_path}/ModelFiles/LagrangianParameters/MSSM.xml
+      </ScaleAndBlockFile>
+    </ConstructorArguments>
+  </LagrangianParameterManagerClass>
+  <PotentialFunctionClass>
+    <ClassType>
+      FixedScaleOneLoopPotential
+    </ClassType>
+    <ConstructorArguments>
+      <ModelFile>
+         ${vevacious_path}/ModelFiles/PotentialFunctions/MSSM_StauAndStop_RealVevs.vin
+         <!-- ${vevacious_path}/ModelFiles/PotentialFunctions/MSSM_All_Sfermion_RealVevs.vin -->
+      </ModelFile>
+      <AssumedPositiveOrNegativeTolerance>
+        0.5
+      </AssumedPositiveOrNegativeTolerance>
+    </ConstructorArguments>
+  </PotentialFunctionClass>
+</VevaciousPlusPlusPotentialFunctionInitialization>
