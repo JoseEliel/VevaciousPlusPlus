@@ -84,6 +84,9 @@ The C++ files of VevaciousPlusPlus are:
    > mkdir build
 <> From the newly created build/ directory do 
    > cmake ..
+<> OPTIONAL: If you want to use PHC instead of the default HOM4PS2 for  
+   The homotopy continuation, do
+   > make phc phc_2.4.66
 <> Once CMake has finished setting everything up do 
    > make VevaciousPlusPlus
 <> Besides making the main executable and library, this will download and compile 

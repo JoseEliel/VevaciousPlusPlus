@@ -191,7 +191,7 @@ add_executable(VevaciousPlusPlus
 
 add_dependencies(VevaciousPlusPlus hom4ps_${hom4ps_ver})
 
-add_dependencies(VevaciousPlusPlus phc_${phc_ver})
+#add_dependencies(VevaciousPlusPlus phc_${phc_ver})
 
 add_dependencies(VevaciousPlusPlus objlib)
 
