@@ -1,8 +1,9 @@
 /*
  * SplinePotential.cpp
  *
- *  Created on: Jun 10, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *  Created on: Feb 25, 2014
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-Molina (elielcamargomolina@gmail.com)
  */
 
 #include "BounceActionEvaluation/SplinePotential.hpp"
@@ -33,7 +34,8 @@ namespace VevaciousPlusPlus
     fieldConfiguration( potentialFunction.NumberOfFieldVariables() ),
     potentialFunction( potentialFunction ),
     tunnelPath( tunnelPath ),
-    pathTemperature( tunnelPath.TemperatureValue() )
+    pathTemperature( tunnelPath.TemperatureValue() ),
+    relativeBarrierThreshold(1e-06)
   {
     // First we have to find the path false minimum. The base constructor
     // already set auxiliaryOfPathPanicVacuum to zero.

@@ -34,6 +34,7 @@ namespace VevaciousPlusPlus
     allowShootingAttempts( allowShootingAttempts ),
     worthIntegratingFurther( true ),
     currentShotGoodEnough( false ),
+    badInitialConditions( false ),
     tunnelPath( NULL )
   {
     // This constructor is just an initialization list.
@@ -334,6 +335,15 @@ namespace VevaciousPlusPlus
         auxiliaryProfile.insert( auxiliaryProfile.end(),
                                  ( odeintProfile.begin() + 1 ),
                                  ( odeintProfile.begin() + radialIndex ) );
+      }
+      else
+      {
+          // If we ever end up here, it means that at radialIndex 0, either an under/overshoot was
+          // detected. This is a signal that the initial conditions given to odeint were bad.
+          // In particular, this happens when e.g. integrationStartRadius is very large. This can be
+          // caused by an extremely small radius resolution set by the user.
+          badInitialConditions = true;
+
       }
     }
     else

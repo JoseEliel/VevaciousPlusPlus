@@ -2,11 +2,14 @@
  * OneDimensionalPotentialAlongPath.hpp
  *
  *  Created on: Nov 13, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-molina (elielcamargomolina@gmail.com)
  */
 
 #ifndef ONEDIMENSIONALPOTENTIALALONGPATH_HPP_
 #define ONEDIMENSIONALPOTENTIALALONGPATH_HPP_
+
+#include <string>
 
 namespace VevaciousPlusPlus
 {
@@ -79,6 +82,9 @@ namespace VevaciousPlusPlus
     // terms of how accurate a double can be.
     double ThresholdForNearPathPanic() const
     { return thresholdForNearPathPanic; }
+
+    // This is for debugging.
+    virtual std::string AsDebuggingString() const = 0;
 
 
   protected:

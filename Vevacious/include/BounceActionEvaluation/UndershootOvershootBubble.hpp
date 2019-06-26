@@ -94,6 +94,7 @@ namespace VevaciousPlusPlus
     unsigned int const allowShootingAttempts;
     bool worthIntegratingFurther;
     bool currentShotGoodEnough;
+    bool badInitialConditions;
     TunnelPath const* tunnelPath;
 
 
@@ -242,6 +243,24 @@ namespace VevaciousPlusPlus
                                        integrationStepSize,
                                        bubbleObserver );
     RecordFromOdeintProfile( tunnelPath );
+    if(badInitialConditions)
+    {
+        // If odeint is misbehaving and bogus profiles are being given,
+        // we get here. This gives the error and prints debugging info.
+        std::stringstream errorBuilder;
+        errorBuilder
+                << std::endl
+                << " The initial conditions for the numerical integration of "
+                << " the bubble profile lead to numerical problems. \n"
+                << " Please check your options in your tunneling calculation intialization XML file."
+                << " Try increasing the <RadialResolution> option, as too small steps are known to cause"
+                << " problem with initial conditions given to odeint.\n"
+                << " Below you will find debugging information, including the potential along the current"
+                << " path in Mathematica form.\n"
+                << pathPotential.AsDebuggingString() << std::endl;
+        throw std::runtime_error( errorBuilder.str() );
+
+    }
   }
 
   // This returns the slope of the solution for the bubble equation of motion
