@@ -10,7 +10,7 @@
 namespace VevaciousPlusPlus
 {
   double const
-  UndershootOvershootBubble::auxiliaryPrecisionResolution( 1.0e-6 );
+  UndershootOvershootBubble::auxiliaryPrecisionResolution( 1.0e-7 );
 
   UndershootOvershootBubble::UndershootOvershootBubble(
                                        double const initialIntegrationStepSize,
@@ -71,18 +71,19 @@ namespace VevaciousPlusPlus
     undershootAuxiliary = pathPotential.DefiniteUndershootAuxiliary();
     overshootAuxiliary = pathPotential.AuxiliaryOfPathPanicVacuum();
 
-    // If undershootAuxiliary or overshootAuxiliary is close to the path panic
+//    std::cout << "Just starting " << "Undershoot: " << undershootAuxiliary << " " << "Overshoot: " << overshootAuxiliary<< std::endl;
+
+    // If undershootAuxiliary is too close to the path panic
     // vacuum, it is set to be the (negative) offset from the panic vacuum.
     // (This should mitigate precision issues for trying to start very close to
     // the path panic minimum.)
+//    std::cout << "Threshold " << pathPotential.ThresholdForNearPathPanic() << std::endl;
+
     if( undershootAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
     {
-      undershootAuxiliary -= pathPotential.AuxiliaryOfPathPanicVacuum();
+        undershootAuxiliary -= pathPotential.AuxiliaryOfPathPanicVacuum();
     }
-    if( overshootAuxiliary >= pathPotential.ThresholdForNearPathPanic() )
-    {
-      overshootAuxiliary -= pathPotential.AuxiliaryOfPathPanicVacuum();
-    }
+
 
     // This loop is broken out of if the shoot attempt seems to have been close
     // enough that the integration would take too long to find an overshoot or
@@ -94,6 +95,11 @@ namespace VevaciousPlusPlus
       worthIntegratingFurther = true;
       auxiliaryProfile.clear();
       integrationStartRadius = integrationStepSize;
+
+//      std::cout << "integrationStartRadius I " << integrationStartRadius << std::endl;
+//
+//
+//      std::cout << " " << "Undershoot: " << undershootAuxiliary << " " << "Overshoot: " << overshootAuxiliary<< std::endl;
 
       // It shouldn't ever happen that undershootAuxiliary is negative while
       // overshootAuxiliary is positive, as then the undershoot would be at a
@@ -163,6 +169,8 @@ namespace VevaciousPlusPlus
         integrationStartRadius = ( -auxiliaryPrecisionResolution
                / ( 2.0 * initialQuadraticCoefficient * integrationStepSize ) );
 
+//        std::cout << "integrationStartRadius II " << integrationStartRadius << std::endl;
+
         if( integrationStartRadius <= integrationStepSize )
         {
           // If integrationStartRadius turns out to be relatively small, we
@@ -229,6 +237,8 @@ namespace VevaciousPlusPlus
           initialConditions[ 1 ]
           = ( initialAuxiliary * inverseRadialScale * scaledSlope );
           integrationStartRadius = ( scaledRadius / inverseRadialScale );
+//          std::cout << "integrationStartRadius III " << integrationStartRadius << std::endl;
+
         }
       }
       else
@@ -250,7 +260,9 @@ namespace VevaciousPlusPlus
         integrationStartRadius = ( -auxiliaryPrecisionResolution
                / ( 2.0 * initialQuadraticCoefficient * integrationStepSize ) );
 
-        initialConditions[ 0 ] = ( initialAuxiliary
+//        std::cout << "integrationStartRadius IV " << integrationStartRadius << std::endl;
+
+          initialConditions[ 0 ] = ( initialAuxiliary
                                    + ( initialQuadraticCoefficient
                                        * integrationStartRadius
                                        * integrationStartRadius ) );
@@ -270,6 +282,11 @@ namespace VevaciousPlusPlus
         initialConditions[ 0 ] = auxiliaryProfile.back().auxiliaryValue;
         initialConditions[ 1 ] = auxiliaryProfile.back().auxiliarySlope;
         integrationEndRadius = ( 2.0 * integrationStartRadius );
+
+//        std::cout << "Initial Conditions V " << initialConditions[0] << " " << initialConditions[1] << " " << auxiliaryProfile.back().auxiliaryValue << " " << auxiliaryAtRadialInfinity << std::endl;
+//
+//        std::cout << "integrationStartRadius V " << integrationStartRadius << std::endl;
+
         ShootFromInitialConditions( tunnelPath,
                                     pathPotential );
       }
@@ -311,6 +328,10 @@ namespace VevaciousPlusPlus
       if( odeintProfile[ radialIndex ].auxiliaryValue
           < auxiliaryAtRadialInfinity )
       {
+//          std::cout<< "we are at overshoot detection "<< odeintProfile[ radialIndex ].auxiliaryValue <<" "<< auxiliaryAtRadialInfinity  <<std::endl;
+//          std::cout << "throwing point " << initialAuxiliary <<std::endl;
+//          std::cout << "Previous Undershoot " << undershootAuxiliary <<std::endl;
+//          std::cout << "Previous Overshoot " << overshootAuxiliary <<std::endl;
         overshootAuxiliary = initialAuxiliary;
         worthIntegratingFurther = false;
         currentShotGoodEnough = false;
@@ -320,6 +341,10 @@ namespace VevaciousPlusPlus
       // vacuum, it was definitely an undershoot.
       else if( odeintProfile[ radialIndex ].auxiliarySlope > 0.0 )
       {
+//        std::cout<< "we are at undershoot detection "<< odeintProfile[ radialIndex ].auxiliarySlope<< std::endl;
+//        std::cout << "throwing point " << initialAuxiliary <<std::endl;
+//        std::cout << "Previous Undershoot " << undershootAuxiliary <<std::endl;
+//        std::cout << "Previous Overshoot " << overshootAuxiliary <<std::endl;
         undershootAuxiliary = initialAuxiliary;
         worthIntegratingFurther = false;
         currentShotGoodEnough = false;
@@ -338,11 +363,12 @@ namespace VevaciousPlusPlus
       }
       else
       {
-          // If we ever end up here, it means that at radialIndex 0, either an under/overshoot was
-          // detected. This is a signal that the initial conditions given to odeint were bad.
-          // In particular, this happens when e.g. integrationStartRadius is very large. This can be
-          // caused by an extremely small radius resolution set by the user.
+          // Here we check whether the initial radius was so large that we end up at step 0 in a definite
+          // undershoot/overshoot. In that case, we go back and set the initial step radius to be smaller.
+          // this happens in ShootFromInitialConditions.
           badInitialConditions = true;
+          std::cout<< " Rescaling initial integration radius in under/overshoot to help with"
+                       << " detected numerical problems. Shooting again now."<<std::endl;
 
       }
     }
