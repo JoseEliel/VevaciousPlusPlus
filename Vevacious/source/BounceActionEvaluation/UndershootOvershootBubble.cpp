@@ -357,6 +357,7 @@ namespace VevaciousPlusPlus
     {
       if( radialIndex > 1 )
       {
+        badInitialConditions = false;
         auxiliaryProfile.insert( auxiliaryProfile.end(),
                                  ( odeintProfile.begin() + 1 ),
                                  ( odeintProfile.begin() + radialIndex ) );
@@ -374,6 +375,7 @@ namespace VevaciousPlusPlus
     }
     else
     {
+      badInitialConditions = false;
       auxiliaryProfile.insert( auxiliaryProfile.end(),
                                ( odeintProfile.begin() + 1 ),
                                odeintProfile.end() );
