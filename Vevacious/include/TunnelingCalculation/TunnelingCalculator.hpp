@@ -37,7 +37,9 @@ namespace VevaciousPlusPlus
       thermalSurvivalProbability( -1.0 ),
       logOfMinusLogOfThermalProbability( -1.0E+100 ),
       dominantTemperatureInGigaElectronVolts( -1.0 ),
-      survivalProbabilityThreshold( survivalProbabilityThreshold ) {}
+      survivalProbabilityThreshold( survivalProbabilityThreshold ),
+      thresholdAndActions(0),
+      thermalThresholdAndActions(0) {}
 
     virtual ~TunnelingCalculator() {}
 
