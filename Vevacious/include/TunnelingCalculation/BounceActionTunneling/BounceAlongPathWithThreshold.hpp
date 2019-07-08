@@ -2,7 +2,8 @@
  * BounceAlongPathWithThreshold.hpp
  *
  *  Created on: Jul 1, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-Molina (elielcamargomolina@gmail.com)
  */
 
 #ifndef BOUNCEALONGPATHWITHTHRESHOLD_HPP_
@@ -39,7 +40,7 @@ namespace VevaciousPlusPlus
                                   unsigned int const temperatureAccuracy,
                                   unsigned int const pathPotentialResolution,
                                   unsigned int const pathFindingTimeout,
-                                  double const vacuumSeparationFraction );
+                                  double const vacuumSeparationFraction);
     virtual ~BounceAlongPathWithThreshold();
 
 
@@ -87,6 +88,7 @@ namespace VevaciousPlusPlus
                                 double const tunnelingTemperature,
                                 double const actionThreshold,
                                 double const requiredVacuumSeparationSquared );
+
   };
 
 

@@ -2,7 +2,8 @@
  * BounceAlongPathWithThreshold.cpp
  *
  *  Created on: Jul 1, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-Molina (elielcamargomolina@gmail.com)
  */
 
 #include "TunnelingCalculation/BounceActionTunneling/BounceAlongPathWithThreshold.hpp"
@@ -227,12 +228,23 @@ namespace VevaciousPlusPlus
     BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath,
                                                           pathPotential ) );
 
+
     std::cout << std::endl
     << "Initial path bounce action = " << bestBubble->BounceAction();
+
     if( bestPath->NonZeroTemperature() )
     {
       std::cout << " GeV";
+
+      thermalThresholdAndActions.push_back(actionThreshold);
+      thermalThresholdAndActions.push_back(bestBubble->BounceAction());
     }
+    else
+    {
+      thresholdAndActions.push_back(actionThreshold);
+      thresholdAndActions.push_back(bestBubble->BounceAction());
+    }
+
     std::cout << ", threshold is " << actionThreshold;
     if( bestPath->NonZeroTemperature() )
     {
@@ -395,6 +407,17 @@ namespace VevaciousPlusPlus
       delete bubbleDeleter;
       delete pathDeleter;
 
+      // Recording the best action for each pathfinder
+
+      if( bestPath->NonZeroTemperature() )
+      {
+        thermalThresholdAndActions.push_back(bestBubble->BounceAction());
+      }
+      else
+      {
+        thresholdAndActions.push_back(bestBubble->BounceAction());
+      }
+
       // We don't bother with the rest of the path finders if the action has
       // already dropped below the threshold.
       if( bestBubble->BounceAction() < actionThreshold )
@@ -429,5 +452,6 @@ namespace VevaciousPlusPlus
     delete bestPath;
     return bounceAction;
   }
+
 
 } /* namespace VevaciousPlusPlus */

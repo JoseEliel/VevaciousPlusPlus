@@ -110,10 +110,16 @@ namespace VevaciousPlusPlus
     std::string GetResultsAsString();
 
      // This gives the lifetime in seconds
-     double GetLifetimeInSeconds();
+    double GetLifetimeInSeconds();
 
      // This gives the upper bound on thermal survival probability
-     double GetThermalProbability();
+    double GetThermalProbability();
+
+     // This gives the threshold and the best actions for each path finder
+
+    std::vector< double > GetThresholdAndActions();
+
+    std::vector< double > GetThermalThresholdAndActions();
 
     // This writes the results as an SLHA file.
     void AppendResultsToLhaFile( std::string const& lhaFilename,
@@ -376,33 +382,48 @@ namespace VevaciousPlusPlus
   }
 
      // This gives the Lifetime in seconds as output.
-    inline double
-    VevaciousPlusPlus::GetLifetimeInSeconds() {
-      if (tunnelingCalculator->QuantumSurvivalProbability() >= 0.0)
-      {
-      return tunnelingCalculator->QuantumLifetimeInSeconds();
-      }
+  inline double
+  VevaciousPlusPlus::GetLifetimeInSeconds() {
+    if (tunnelingCalculator->QuantumSurvivalProbability() >= 0.0)
+    {
+    return tunnelingCalculator->QuantumLifetimeInSeconds();
+    }
+  else
+    {
+      return -1;
+    }
+  }
+
+
+  // This gives the upper bound on the thermal survival probability as output.
+  inline double
+  VevaciousPlusPlus::GetThermalProbability() {
+    if (tunnelingCalculator->ThermalSurvivalProbability()  >= 0.0)
+    {
+      return tunnelingCalculator->ThermalSurvivalProbability();
+    }
     else
-      {
-        return -1;
-      }
+    {
+      return -1;
     }
+  }
+
+  inline
+  std::vector<double> VevaciousPlusPlus::GetThresholdAndActions(){
+
+    return tunnelingCalculator->GetThresholdAndActions();
+
+  }
+
+  inline
+  std::vector<double> VevaciousPlusPlus::GetThermalThresholdAndActions(){
+
+   return tunnelingCalculator->GetThermalThresholdAndActions();
+  }
 
 
-    // This gives the upper bound on the thermal survival probability as output.
-    inline double
-    VevaciousPlusPlus::GetThermalProbability() {
-      if (tunnelingCalculator->ThermalSurvivalProbability()  >= 0.0)
-      {
-        return tunnelingCalculator->ThermalSurvivalProbability();
-      }
-      else
-      {
-        return -1;
-      }
-    }
 
-      // This reads the current element of outerParser and if its name matches
+// This reads the current element of outerParser and if its name matches
   // elementName, it puts the contents of the child element <ClassType> into
   // className and <ConstructorArguments> into constructorArguments, both
   // stripped of whitespace.

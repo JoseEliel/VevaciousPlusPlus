@@ -2,7 +2,8 @@
  * TunnelingCalculator.hpp
  *
  *  Created on: Feb 25, 2014
- *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
+ *      Authors: Ben O'Leary (benjamin.oleary@gmail.com)
+ *               José Eliel Camargo-Molina (elielcamargomolina@gmail.com)
  */
 
 #ifndef TUNNELINGCALCULATOR_HPP_
@@ -76,6 +77,15 @@ namespace VevaciousPlusPlus
     double SurvivalProbabilityThreshold() const
     { return survivalProbabilityThreshold; }
 
+    // This returns a vector with the bounce action for the straight path
+    // and the best action found by each used pathfinder.
+
+    std::vector< double > GetThresholdAndActions() const
+    { return thresholdAndActions; }
+
+    std::vector< double > GetThermalThresholdAndActions() const
+    { return thermalThresholdAndActions;}
+
 
   protected:
     TunnelingStrategy tunnelingStrategy;
@@ -86,6 +96,11 @@ namespace VevaciousPlusPlus
     double logOfMinusLogOfThermalProbability;
     double dominantTemperatureInGigaElectronVolts;
     double survivalProbabilityThreshold;
+    // The vectors below will hold the action threshold in their 0 component
+    // the straight path action in their 1 component
+    // and subsequently the best action for each path finder
+    std::vector< double > thresholdAndActions;
+    std::vector< double > thermalThresholdAndActions;
   };
 
 } /* namespace VevaciousPlusPlus */
