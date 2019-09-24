@@ -22,14 +22,9 @@
  *      VevaciousPlusPlus is distributed in the hope that it will be         *
  *      useful, but WITHOUT ANY WARRANTY; without even the implied warranty  *
  *       of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU *
- *      General Public License for more details.                             *
+ *      General Public License for more details                              *
+ *      <http://www.gnu.org/licenses/>.                                      *
  *                                                                           *
- *      You should have received a copy of the GNU General Public License    *
- *      (in VevaciousPlusPlus/GNU_public_license.txt ) along with            *
- *      VevaciousPlusPlus.                                                   *
- *      If not, see <http://www.gnu.org/licenses/>.                          *
- *      A full list of the files of VevaciousPlusPlus is at the end of this  *
- *      file.                                                                *
 \*****************************************************************************/
 
  Now that the legalese preamble is out of the way, the description of the code
