@@ -294,6 +294,24 @@ namespace VevaciousPlusPlus
                                  PotentialMinimum const& zeroTemperatureVacuum,
                               double const potentialAtOriginAtZeroTemperature )
   {
+
+    // Here we check if we are actually looking at the origin as the Potential
+    // Minimum. Then we set the maximum temperature range to be the maximum
+    // as we are assuming the origin persists as a minimum up to the planck Scale
+
+    bool DsbRolledToOrigin( dsbVacuum.LengthSquared()
+                                      < thresholdSeparationSquared )
+
+    if(DsbRolledToOrigin)
+        {
+          rangeOfMaxTemperature.first = maximumAllowedTemperature;
+          rangeOfMaxTemperature.second = maximumAllowedTemperature;
+          std::cout << "We are tunneling from the origin as DSB is not"
+          << " present at one-loop. Setting maximum temperature to the Planck scale";
+          std::cout << std::endl;
+          return;
+        }
+
     // The corrections are ( T^4 / ( 2 pi^2 ) ) * sum of J functions, and the
     // values of the J functions are about 2 for massless bosonic & fermionic
     // degrees of freedom, & there are ~100 degrees of freedom in the SM. Hence

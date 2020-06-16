@@ -96,6 +96,32 @@ namespace VevaciousPlusPlus
                     << potentialFunction.FieldConfigurationAsMathematica( *realSolution );
             std::cout << std::endl;
             foundMinimum = (*gradientMinimizer)( *realSolution );
+
+            // Here I do some checks so that we know minuit is behaving properly
+            // This can be an issue with pathological parameter points or minima that
+            // are too far away from the DSB, for which it makes no sense to calculate
+            // tunneling without RG running anyway
+
+            while(std::isnan(foundMinimum.FunctionValue()) || std::isnan(foundMinimum.FunctionError()) )
+            {
+//                std::stringstream errorBuilder;
+//                errorBuilder << "Problem with Minuit, NaN given in minimum value/error. ";
+//                throw std::runtime_error( errorBuilder.str() );
+
+                std::cout << "Minuit encountered numerical issues. Trying from a scaled starting point. " << std::endl;
+                std::vector< double > scaledPoint( *realSolution );
+                for( std::vector< double >::iterator
+                             scaledField( scaledPoint.begin() );
+                     scaledField < scaledPoint.end();
+                     ++scaledField )
+                {
+                    *scaledField *= 0.8;
+                }
+
+                foundMinimum = (*gradientMinimizer)( scaledPoint );
+
+            }
+
             std::cout
                     << "Rolled to: "
                     << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
@@ -159,20 +185,7 @@ namespace VevaciousPlusPlus
 
             foundMinima.push_back( foundMinimum );
 
-            // Here I do some checks so that we know minuit is behaving properly
-            // This can be an issue with pathological parameter points or minima that
-            // are too far away from the DSB, for which it makes no sense to calculate
-            // tunneling without RG running anyway
-
-            if(std::isnan(foundMinimum.FunctionValue()) || std::isnan(foundMinimum.FunctionError()) )
-            {
-                std::stringstream errorBuilder;
-                errorBuilder << "Problem with Minuit, NaN given in minimum value/error. ";
-                throw std::runtime_error( errorBuilder.str() );
-            }
-
             // Here we set the panic vacuum to the closest lower minimum to the DSB minimum
-
 
             if(global_Is_Panic)
             {
@@ -232,4 +245,5 @@ namespace VevaciousPlusPlus
 
 
  }
+
 }/* namespace VevaciousPlusPlus */
