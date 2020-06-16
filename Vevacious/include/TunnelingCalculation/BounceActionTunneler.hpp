@@ -162,6 +162,47 @@ namespace VevaciousPlusPlus
                                             PotentialMinimum const& trueVacuum,
                               double const potentialAtOriginAtZeroTemperature )
   {
+
+
+    
+    // First we set up the (square of the) threshold distance that we demand
+    // between the vacua at every temperature to trust the tunneling
+    // calculation.
+    
+    double const thresholdSeparationSquared( vacuumSeparationFractionSquared 
+       * falseVacuum.SquareDistanceTo( trueVacuum ) );
+
+
+    // Here we check whether we are in the case when the false vacuum is actually
+    // the field origin. 
+
+    bool DsbRolledToOrigin( falseVacuum.LengthSquared()
+                                      < thresholdSeparationSquared );
+
+    if(DsbRolledToOrigin)
+        {
+          // Here we have the origin as the false vacuum. 
+          rangeOfMaxTemperatureForOriginToFalse.first = maximumAllowedTemperature;
+          rangeOfMaxTemperatureForOriginToFalse.second = maximumAllowedTemperature;
+          std::cout << "We are tunneling from the origin as DSB is not"
+          << " present at one-loop. Setting maximum temperature at which"
+          << " the false vacuum is still present to the Planck scale";
+          std::cout << std::endl;
+        }
+    else
+        {
+          // false vacuum is NOT the origin. 
+          std::cout << std::endl
+          << "Looking for temperature at which tunneling from the field origin to"
+          << " the false vacuum at "
+          << falseVacuum.AsMathematica( potentialFunction.FieldNames() )
+          << " becomes impossible." << std::endl;
+          SetMaximumTunnelingTemperatureRange( potentialFunction,
+                                               rangeOfMaxTemperatureForOriginToFalse,
+                                               falseVacuum,
+                                               potentialAtOriginAtZeroTemperature );
+        }
+
     std::cout << std::endl
     << "Looking for temperature at which tunneling from the field origin to"
     << " the false vacuum at "

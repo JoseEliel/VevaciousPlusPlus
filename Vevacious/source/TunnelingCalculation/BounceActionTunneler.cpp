@@ -251,14 +251,30 @@ namespace VevaciousPlusPlus
                                            PotentialMinimum const& falseVacuum,
                                            PotentialMinimum const& trueVacuum )
   {
-    // First we check whether we exclude the parameter point based on DSB being
-    // less deep than origin.
+
+
+    // First we set up the (square of the) threshold distance that we demand
+    // between the vacua at every temperature to trust the tunneling
+    // calculation.
+    
+    double const thresholdSeparationSquared( vacuumSeparationFractionSquared 
+       * falseVacuum.SquareDistanceTo( trueVacuum ) );
+
+
+    // Here we check whether we are in the case when the false vacuum is actually
+    // the field origin. 
+
+    bool DsbRolledToOrigin( falseVacuum.LengthSquared()
+                                      < thresholdSeparationSquared );
+
+
+    // Second we check whether we exclude the parameter point based on DSB being
     std::vector< double > const&
     fieldOrigin( potentialFunction.FieldValuesOrigin() );
     double const
     potentialAtOriginAtZeroTemperature( potentialFunction( fieldOrigin ) );
     if( potentialFunction( falseVacuum.FieldConfiguration() )
-        > potentialAtOriginAtZeroTemperature )
+         > potentialAtOriginAtZeroTemperature && !DsbRolledToOrigin)
     {
       dominantTemperatureInGigaElectronVolts = 0.0;
       thermalSurvivalProbability = 0.0;
@@ -299,18 +315,6 @@ namespace VevaciousPlusPlus
     // Minimum. Then we set the maximum temperature range to be the maximum
     // as we are assuming the origin persists as a minimum up to the planck Scale
 
-    bool DsbRolledToOrigin( dsbVacuum.LengthSquared()
-                                      < thresholdSeparationSquared )
-
-    if(DsbRolledToOrigin)
-        {
-          rangeOfMaxTemperature.first = maximumAllowedTemperature;
-          rangeOfMaxTemperature.second = maximumAllowedTemperature;
-          std::cout << "We are tunneling from the origin as DSB is not"
-          << " present at one-loop. Setting maximum temperature to the Planck scale";
-          std::cout << std::endl;
-          return;
-        }
 
     // The corrections are ( T^4 / ( 2 pi^2 ) ) * sum of J functions, and the
     // values of the J functions are about 2 for massless bosonic & fermionic
