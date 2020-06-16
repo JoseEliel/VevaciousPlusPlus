@@ -177,7 +177,15 @@ include_directories(include/LHPC)
 
 add_library(objlib OBJECT ${sources})
 
-add_dependencies(objlib ${Minuit_name}_${Minuit_ver})
+if(WITHIN_GAMBIT)
+  
+  #Nothing    
+
+else()
+
+  add_dependencies(objlib ${Minuit_name}_${Minuit_ver})
+
+endif()
 
 
 #############################################################################
@@ -188,15 +196,24 @@ add_executable(VevaciousPlusPlus
         $<TARGET_OBJECTS:objlib>)
 
 # Adding dependencies, including Homotopy continuation codes
+# This is skipped if within the GAMBIT ecosystem
 
-add_dependencies(VevaciousPlusPlus hom4ps_${hom4ps_ver})
 
-#add_dependencies(VevaciousPlusPlus phc_${phc_ver})
+if(WITHIN_GAMBIT)
+  
+  #Nothing    
 
-add_dependencies(VevaciousPlusPlus objlib)
+else()
 
-add_dependencies(VevaciousPlusPlus VevaciousPlusPlus-lib)
+  add_dependencies(VevaciousPlusPlus hom4ps_${hom4ps_ver})
 
+  #add_dependencies(VevaciousPlusPlus phc_${phc_ver})
+
+  add_dependencies(VevaciousPlusPlus objlib)
+
+  add_dependencies(VevaciousPlusPlus VevaciousPlusPlus-lib)
+
+endif()
 
 
 # Linking to minuit
@@ -225,6 +242,8 @@ add_dependencies(VevaciousPlusPlus-lib objlib)
 
 set_target_properties(VevaciousPlusPlus-lib
         PROPERTIES OUTPUT_NAME VevaciousPlusPlus)
+
+
 
 
 #############################################################################
@@ -259,5 +278,4 @@ foreach(xml ${allinputxmls})
     message("${xml}")
     configure_file( ${xml}  ${xml} )
 endforeach()
-
 
