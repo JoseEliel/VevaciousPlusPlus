@@ -47,6 +47,7 @@ namespace VevaciousPlusPlus
     AdjustMinimumForTemperature( PotentialMinimum const& minimumToAdjust,
                                  double const minimizationTemperature );
 
+    virtual void setWhichPanicVacuum( bool global_Is_Panic_setting);
 
   protected:
     std::unique_ptr<StartingPointFinder> startingPointFinder;
@@ -55,6 +56,7 @@ namespace VevaciousPlusPlus
     double extremumSeparationThresholdFraction;
     double nonDsbRollingToDsbScalingFactor;
     bool global_Is_Panic;
+    bool done_homotopy;
   };
 
 

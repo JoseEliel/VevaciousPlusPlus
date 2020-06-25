@@ -146,6 +146,9 @@
              starting point. If not given, 4.0 is taken as the default. -->
         4.0
       </NonDsbRollingToDsbScalingFactor>
+      <GlobalIsPanic>
+        false
+      </GlobalIsPanic>
     </ConstructorArguments>
   </PotentialMinimizerClass>
 </VevaciousPlusPlusObjectInitialization>

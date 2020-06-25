@@ -101,11 +101,69 @@ namespace VevaciousPlusPlus
   }
 
 
+  
+  // std::pair< std::vector<double>, std::vector<double> > VevaciousPlusPlus::GetPanicVacua()
+  // {
+  //   std::vector<double> global_minimum;
+  //   std::vector<double> nearest_minimum;
+
+  //   // First we find the global minimum 
+
+  //   potentialMinimizer->setWhichPanicVacuum(true);
+
+  //   potentialMinimizer->FindMinima( 0.0 );
+
+  //   global_minimum = potentialMinimizer->PanicVacuum().FieldConfiguration();
+
+  //   potentialMinimizer->ClearVacua();
+
+  //   int size = potentialMinimizer->PanicVacua().size();
+  //   std::cout<< "Size " << size << std::endl;
+
+
+  //   // Now we find the closest deeper minimum 
+
+
+  //   potentialMinimizer->setWhichPanicVacuum(false);
+
+  //   potentialMinimizer->FindMinima( 0.0 );
+
+  //   nearest_minimum = potentialMinimizer->PanicVacuum().FieldConfiguration();
+
+  //   potentialMinimizer->ClearVacua();
+
+  //   size = potentialMinimizer->PanicVacua().size();
+  //   std::cout<< "Size " << size << std::endl;
+
+  //   return std::make_pair(global_minimum, nearest_minimum);
+
+  //  }
+
+  // This returns a pair of vectors where the first vector are the field values for the global
+  // minimum and the second are the field values for the nearest minimum to the DSB. 
+
+  std::pair< std::vector<double>, std::vector<double> > VevaciousPlusPlus::GetPanicVacua()
+  {
+    std::vector<double> global_minimum;
+    std::vector<double> nearest_minimum;
+
+    // First we find the global minimum 
+
+    global_minimum = potentialMinimizer->PanicVacuum_global().FieldConfiguration();
+
+    // Now we get the nearest minimum 
+
+    nearest_minimum = potentialMinimizer->PanicVacuum_nearest().FieldConfiguration();
+
+
+    return std::make_pair(global_minimum, nearest_minimum);
+
+   }
 
   // This runs the point parameterized by newInput, which for the default
   // case gives the name of a file with the input parameters, but could in
   // principle itself contain all the necessary parameters.
-  void VevaciousPlusPlus::RunPoint( std::string const& newInput )
+   void VevaciousPlusPlus::RunPoint( std::string const& newInput )
   {
     warningMessagesFromLastRun.clear();
     WarningLogger::SetWarningRecord( &warningMessagesFromLastRun );
@@ -122,7 +180,22 @@ namespace VevaciousPlusPlus
 
     time( &stageStartTime );
     lagrangianParameterManager->NewParameterPoint( newInput );
+
+    // Here we check whether Vevacious is being used as a library
+    // and if so, which option for the vacuum to tunnel to is being used
+    // i.e. the global minimum or the nearest minimum in field space.
+
+    if(newInput == "global"){ potentialMinimizer->setWhichPanicVacuum(true);}
+
+    if(newInput == "nearest"){ potentialMinimizer->setWhichPanicVacuum(false);}
+
     potentialMinimizer->FindMinima( 0.0 );
+
+    std::pair< std::vector<double>, std::vector<double> > minima = GetPanicVacua();
+
+    std::cout<< "Global: "<< minima.first[0] << ", " << minima.first[1] << std::endl;
+    std::cout<< "Nearest: "<< minima.second[0] << ", " << minima.second[1] << std::endl;
+
     time( &stageEndTime );
     std::cout << std::endl
     << "Minimization of potential took " << difftime( stageEndTime,
@@ -159,8 +232,9 @@ namespace VevaciousPlusPlus
                                               runStartTime )
     << " seconds, finished at " << ctime( &runEndTime );
     std::cout << std::endl;
-    if( newInput == "internal" ){lagrangianParameterManager->ClearParameterPoint(); }
+    if( newInput == "global" || newInput == "nearest" || newInput == "internal" ){lagrangianParameterManager->ClearParameterPoint(); }
   }
+  
   
   // This writes the results as an SLHA file.
   void

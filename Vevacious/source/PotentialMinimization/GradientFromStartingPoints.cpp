@@ -4,7 +4,7 @@
  *  Created on: Jun 30, 2014
  *      Author: Ben O'Leary (benjamin.oleary@gmail.com)
  *
- *  Modified on: Nov 2018
+ *  Modified on: Jun 2020
  *      Author: José Eliel Camargo-molina (elielcamargomolina@gmail.com)
  */
 
@@ -26,7 +26,8 @@ namespace VevaciousPlusPlus
             startingPoints(),
             extremumSeparationThresholdFraction( extremumSeparationThresholdFraction ),
             nonDsbRollingToDsbScalingFactor( nonDsbRollingToDsbScalingFactor ),
-            global_Is_Panic(global_Is_Panic)
+            global_Is_Panic(global_Is_Panic),
+            done_homotopy(false)
     {
         // This constructor is just an initialization list.
     }
@@ -81,11 +82,15 @@ namespace VevaciousPlusPlus
             << std::endl;
         }
 
-        (*startingPointFinder)( startingPoints );
-
+        if(!done_homotopy)
+        {    
+          (*startingPointFinder)( startingPoints );
+          done_homotopy = true;
+        }
         std::cout
                 << std::endl
                 << "Gradient-based minimization from a set of starting points:";
+
         for( std::vector< std::vector< double > >::const_iterator
                 realSolution( startingPoints.begin() );
                 realSolution != startingPoints.end(); ++realSolution )
@@ -185,37 +190,45 @@ namespace VevaciousPlusPlus
 
             foundMinima.push_back( foundMinimum );
 
-            // Here we set the panic vacuum to the closest lower minimum to the DSB minimum
+            
+           // Here we find the global and nearest lower minimum 
 
-            if(global_Is_Panic)
-            {
-                // Here we set the panic vacuum to the global minimum
-                if( ( ( foundMinimum.FunctionValue() + foundMinimum.FunctionError() )
+           if( ( ( foundMinimum.FunctionValue() + foundMinimum.FunctionError() )
                       < dsbVacuum.FunctionValue() )
                     &&
                     !rolledToDsbOrSignFlip )
                 {
+                    
+                    if (panicVacua.empty()
+                        ||
+                        (foundMinimum.FunctionValue()
+                         < panicVacuum_global.FunctionValue()))
+                    {
+                        panicVacuum_global = foundMinimum;
+                    }
 
-                    panicVacuum = foundMinimum;
-
-                    panicVacua.push_back( foundMinimum );}
-
-                }else {
-
-                if (((foundMinimum.FunctionValue() + foundMinimum.FunctionError())
-                     < dsbVacuum.FunctionValue())
-                    &&
-                    !rolledToDsbOrSignFlip) {
                     if (panicVacua.empty()
                         ||
                         (foundMinimum.SquareDistanceTo(dsbVacuum)
-                         < panicVacuum.SquareDistanceTo(dsbVacuum))) {
-                        panicVacuum = foundMinimum;
+                         < panicVacuum_nearest.SquareDistanceTo(dsbVacuum))) 
+                    {
+                        panicVacuum_nearest = foundMinimum;
                     }
-                    panicVacua.push_back(foundMinimum);
+
+
+                    panicVacua.push_back( foundMinimum );
+                    
+                    if(global_Is_Panic)
+                    {
+                        panicVacuum = panicVacuum_global;
+                    }
+                    else
+                    {
+                        panicVacuum = panicVacuum_nearest;
+                    }
                 }
 
-            }
+            
         }
 
         std::cout
@@ -238,12 +251,32 @@ namespace VevaciousPlusPlus
                       << std::endl;
             std::cout << "Panic vacuum used in tunneling = "
                       << panicVacuum.AsMathematica( potentialFunction.FieldNames() )
+                      << std::endl
+                      << std::endl;
+            std::cout << "Global minimum = "
+                      << panicVacuum_global.AsMathematica( potentialFunction.FieldNames() )
+                      << std::endl
+                      << std::endl;
+            std::cout << "Nearest panic vacuum = "
+                      << panicVacuum_nearest.AsMathematica( potentialFunction.FieldNames() )
                       << std::endl;
         }
         std::cout << std::endl;
         std::cout << std::endl;
 
+    }
 
- }
+
+    // This sets whether the nearest minimum is the one chosen for tunneling
+    // or if the global minimum is chosen instead. 
+
+    void GradientFromStartingPoints::setWhichPanicVacuum( bool global_Is_Panic_setting) 
+    {
+       
+       global_Is_Panic = global_Is_Panic_setting;
+    
+    }
+
+ 
 
 }/* namespace VevaciousPlusPlus */

@@ -25,7 +25,9 @@ namespace VevaciousPlusPlus
       foundMinima(),
       dsbVacuum(),
       panicVacua(),
-      panicVacuum() {}
+      panicVacuum(),
+      panicVacuum_global(),
+      panicVacuum_nearest() {}
 
     virtual ~PotentialMinimizer() {}
 
@@ -43,6 +45,8 @@ namespace VevaciousPlusPlus
     // be the prime candidate for tunneling out of dsbVacuum (by default, taken
     // to be the minimum in panicVacua closest to dsbVacuum).
     virtual void FindMinima( double const minimizationTemperature = 0.0 ) = 0;
+
+    virtual void setWhichPanicVacuum( bool global_Is_Panic_setting = false) = 0;
 
     // This should find the minimum at temperature minimizationTemperature
     // nearest to minimumToAdjust (which is assumed to be a minimum of the
@@ -65,8 +69,18 @@ namespace VevaciousPlusPlus
 
     // This returns the minimum which is considered to be the prime candidate
     // for tunneling to from the DSB minimum, taken by default to be the
-    // minimum from panicVacua which is closest to dsbVacuum.
+    // minimum from panicVacua which is closest to dsbVacuum but can also 
+    // be chosen to be the global minimum.
+
     PotentialMinimum const& PanicVacuum() const { return panicVacuum; }
+
+    // This returns the closest minimum to the DSB minimum 
+
+    PotentialMinimum const& PanicVacuum_nearest() const { return panicVacuum_nearest; }
+
+    // This returns the global minimum 
+
+    PotentialMinimum const& PanicVacuum_global() const { return panicVacuum_global; }
 
     bool DsbVacuumIsStable() const { return panicVacua.empty(); }
 
@@ -77,13 +91,16 @@ namespace VevaciousPlusPlus
 
     PotentialFunction& GetPotentialFunction() { return potentialFunction; }
 
-
+    void ClearVacua();
+  
   protected:
     PotentialFunction& potentialFunction;
     std::vector< PotentialMinimum > foundMinima;
     PotentialMinimum dsbVacuum;
     std::vector< PotentialMinimum > panicVacua;
     PotentialMinimum panicVacuum;
+    PotentialMinimum panicVacuum_nearest;
+    PotentialMinimum panicVacuum_global;
 
     // This returns false if the vector of the absolute values of the fields of
     // comparisonMinimum lies within a hypercube of side thresholdDistance
@@ -91,6 +108,9 @@ namespace VevaciousPlusPlus
     bool
     IsNotPhaseRotationOfDsbVacuum( PotentialMinimum const& comparisonMinimum,
                                    double const thresholdDistance ) const;
+
+   
+  
   };
 
 
@@ -116,6 +136,12 @@ namespace VevaciousPlusPlus
       }
     }
     return false;
+  }
+
+  inline void PotentialMinimizer::ClearVacua()
+  {
+    foundMinima.clear();
+    panicVacua.clear();
   }
 
 } /* namespace VevaciousPlusPlus */

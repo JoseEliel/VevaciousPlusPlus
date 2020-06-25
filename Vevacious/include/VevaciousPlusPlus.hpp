@@ -86,7 +86,12 @@ namespace VevaciousPlusPlus
     VevaciousPlusPlus( std::string const& initializationFileName );
 
     virtual ~VevaciousPlusPlus();
+    //
 
+    // This just gives a pair of vectors, the first one being the global 
+    // minimum and the second the nearest deeper minimum to the DSB
+
+    std::pair< std::vector<double> , std::vector<double> > GetPanicVacua();
 
     // This runs the point parameterized by newInput, which for the default
     // case gives the name of a file with the input parameters, but could in
