@@ -49,7 +49,7 @@
             </ClassType>
             <ConstructorArguments>
               <PathToHom4ps2>
-        ${vevacious_path}/../hom4ps/2.0
+        ${vevacious_path}/hom4ps/2.0
               </PathToHom4ps2>
               <Hom4ps2Argument>
                   <!-- The argument for HOM4PS2, as prompted by HOM4PS2:
@@ -76,7 +76,7 @@
             </ClassType>
             <ConstructorArguments>
               <PathToPHC>
-              ${vevacious_path}/../phc/2.4.58/
+              ${vevacious_path}/phc/2.4.58/
               </PathToPHC>
               <ResolutionSize>
                 1.0

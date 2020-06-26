@@ -191,10 +191,10 @@ namespace VevaciousPlusPlus
 
     potentialMinimizer->FindMinima( 0.0 );
 
-    std::pair< std::vector<double>, std::vector<double> > minima = GetPanicVacua();
+    // std::pair< std::vector<double>, std::vector<double> > minima = GetPanicVacua();
 
-    std::cout<< "Global: "<< minima.first[0] << ", " << minima.first[1] << std::endl;
-    std::cout<< "Nearest: "<< minima.second[0] << ", " << minima.second[1] << std::endl;
+    // std::cout<< "Global: "<< minima.first[0] << ", " << minima.first[1] << std::endl;
+    // std::cout<< "Nearest: "<< minima.second[0] << ", " << minima.second[1] << std::endl;
 
     time( &stageEndTime );
     std::cout << std::endl

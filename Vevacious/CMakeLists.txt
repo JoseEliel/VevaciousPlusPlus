@@ -64,13 +64,19 @@ include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 message("${CMAKE_C_COMPILER}")
 
+if(WITHIN_GAMBIT)
+
+# Nothing
+
+else()
+
 # MINUIT2
 set(Minuit_name "minuit2")
 set(Minuit_lib_name "Minuit2")
 set(Minuit_ver "5.34.14")
-set(Minuit_include "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}/include/")
+set(Minuit_include "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/include/")
 set(Minuit_dl "https://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz")
-set(Minuit_dir "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}")
+set(Minuit_dir "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}")
 ExternalProject_Add(${Minuit_name}_${Minuit_ver}
             #DOWNLOAD_COMMAND wget -qO- ${Minuit_dl} | tar xvz -C ${Minuit_dir} --strip-components 1
             URL ${Minuit_dl} 
@@ -80,7 +86,7 @@ ExternalProject_Add(${Minuit_name}_${Minuit_ver}
             BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
             INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
         )
-
+endif()
 
 # HOM4PS
 set(name "hom4ps")
@@ -91,7 +97,7 @@ else()
     set(dl "http://www.math.nsysu.edu.tw/~leetsung/works/HOM4PS_soft_files/HOM4PS2_64-bit.tar.gz")
 endif()
 
-set(dir "${PROJECT_SOURCE_DIR}/../${name}/${hom4ps_ver}")
+set(dir "${PROJECT_SOURCE_DIR}/${name}/${hom4ps_ver}")
 
 ExternalProject_Add(${name}_${hom4ps_ver}
         #DOWNLOAD_COMMAND wget -qO- ${dl} | tar xvz -C ${dir} --strip-components 1
@@ -113,7 +119,7 @@ else()
     set(dl "http://www.math.uic.edu/~jan/x86_64phcv24p.tar.gz")
 endif()
 
-set(dir "${PROJECT_SOURCE_DIR}/../${name}/${phc_ver}")
+set(dir "${PROJECT_SOURCE_DIR}/${name}/${phc_ver}")
 
 
 ExternalProject_Add(${name}_${phc_ver}
@@ -218,7 +224,7 @@ endif()
 
 # Linking to minuit
 
-set(Minuit_lib "${PROJECT_SOURCE_DIR}/../${Minuit_name}/${Minuit_ver}/lib/")
+set(Minuit_lib "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/lib/")
 
 target_link_libraries(VevaciousPlusPlus ${Minuit_lib}/libMinuit2.a)
 
@@ -250,6 +256,12 @@ set_target_properties(VevaciousPlusPlus-lib
 # Writing Paths to Initialization Files
 #############################################################################
 
+if(EXISTS "${PROJECT_SOURCE_DIR}/InitializationFiles/MSSMInitialization.xml")
+
+message("Initialization files have been modified or already copied from the templates, skipping writing new files")
+
+else()
+
 message("Writing Input and Initialization files from templates")
 
 set(vevacious_path ${PROJECT_SOURCE_DIR})
@@ -266,7 +278,6 @@ foreach(xml ${allinitxmls})
     configure_file( ${xml}  ${xml} )
 endforeach()
 
-
 # Here I copy all the input files template into bin folder
 file(COPY ${vevacious_path}/Template_inputFiles/ DESTINATION ${vevacious_path}/bin/)
 
@@ -279,3 +290,4 @@ foreach(xml ${allinputxmls})
     configure_file( ${xml}  ${xml} )
 endforeach()
 
+endif()
