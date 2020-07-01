@@ -86,18 +86,24 @@ namespace VevaciousPlusPlus
     VevaciousPlusPlus( std::string const& initializationFileName );
 
     virtual ~VevaciousPlusPlus();
-    //
-
-    // This just gives a pair of vectors, the first one being the global 
-    // minimum and the second the nearest deeper minimum to the DSB
-
-    std::pair< std::vector<double> , std::vector<double> > GetPanicVacua();
 
     // This runs the point parameterized by newInput, which for the default
     // case gives the name of a file with the input parameters, but could in
     // principle itself contain all the necessary parameters.
     void RunPoint( std::string const& newInput );
     
+    // This just gives a pair of vectors, the first one being the global 
+    // minimum and the second the nearest deeper minimum to the DSB
+    // it needs RunPoint to have run before it. 
+
+    std::pair< std::vector<double> , std::vector<double> > GetPanicVacua();
+
+    // This makes a lite run of Vevacious
+    // without tunneling, and returns a pair of vectors, the first one being the global 
+    // minimum and the second the nearest deeper minimum to the DSB
+
+    std::pair< std::vector<double> , std::vector<double> > RunVacua( std::string const& newInput );
+
     //This reads in a Slha block and passes it over to LagrangianParameterManager updating 
     //the given parameters in the blockset object. The parameter values are given in a vector 
     // and the dimension is given, with 1 is given the block is read as a list, if n is given

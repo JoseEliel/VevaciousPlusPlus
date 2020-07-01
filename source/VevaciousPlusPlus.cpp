@@ -235,6 +235,55 @@ namespace VevaciousPlusPlus
     if( newInput == "global" || newInput == "nearest" || newInput == "internal" ){lagrangianParameterManager->ClearParameterPoint(); }
   }
   
+   std::pair< std::vector<double>, std::vector<double> >  VevaciousPlusPlus::RunVacua( std::string const& newInput )
+  {
+    warningMessagesFromLastRun.clear();
+    WarningLogger::SetWarningRecord( &warningMessagesFromLastRun );
+    time_t runStartTime;
+    time_t runEndTime;
+    time_t stageStartTime;
+    time_t stageEndTime;
+    time( &runStartTime );
+    std::cout
+    << std::endl
+    << "Running vacua analysis only, \"" << newInput << "\" starting at "
+    << ctime( &runStartTime );
+    std::cout << std::endl;
+
+    time( &stageStartTime );
+    lagrangianParameterManager->NewParameterPoint( newInput );
+
+    // Here we check whether Vevacious is being used as a library
+    // and if so, which option for the vacuum to tunnel to is being used
+    // i.e. the global minimum or the nearest minimum in field space.
+
+    if(newInput == "global"){ potentialMinimizer->setWhichPanicVacuum(true);}
+
+    if(newInput == "nearest"){ potentialMinimizer->setWhichPanicVacuum(false);}
+
+    potentialMinimizer->FindMinima( 0.0 );
+
+    std::pair< std::vector<double>, std::vector<double> > minima = GetPanicVacua();
+
+    // std::cout<< "Global: "<< minima.first[0] << ", " << minima.first[1] << std::endl;
+    // std::cout<< "Nearest: "<< minima.second[0] << ", " << minima.second[1] << std::endl;
+
+    time( &stageEndTime );
+    std::cout << std::endl
+    << "Minimization of potential took " << difftime( stageEndTime,
+                                                      stageStartTime )
+    << " seconds, finished at " << ctime( &stageEndTime );
+    std::cout << std::endl;
+
+  
+    if( newInput == "global" || newInput == "nearest" || newInput == "internal" ){lagrangianParameterManager->ClearParameterPoint(); }
+    
+    return minima;
+
+  }
+  
+
+
   
   // This writes the results as an SLHA file.
   void
