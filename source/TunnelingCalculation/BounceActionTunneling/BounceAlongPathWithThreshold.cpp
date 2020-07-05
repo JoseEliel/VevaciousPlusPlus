@@ -181,6 +181,7 @@ namespace VevaciousPlusPlus
       WarningLogger::LogWarning( warningBuilder.str() );
     }
     SetThermalSurvivalProbability();
+    SetPartialThermalDecayWidth(partialDecayWidth);
   }
 
   // This returns either the dimensionless bounce action integrated over four

@@ -36,6 +36,7 @@ namespace VevaciousPlusPlus
       quantumLifetimeInSeconds( -1.0 ),
       thermalSurvivalProbability( -1.0 ),
       logOfMinusLogOfThermalProbability( -1.0E+100 ),
+      partialThermalDecayWidth(-1),
       dominantTemperatureInGigaElectronVolts( -1.0 ),
       survivalProbabilityThreshold( survivalProbabilityThreshold ),
       thresholdAndActions(0),
@@ -79,6 +80,9 @@ namespace VevaciousPlusPlus
     double SurvivalProbabilityThreshold() const
     { return survivalProbabilityThreshold; }
 
+    double PartialThermalDecayWidth() const
+    { return partialThermalDecayWidth; }
+
     // This returns a vector with the bounce action for the straight path
     // and the best action found by each used pathfinder.
 
@@ -98,6 +102,7 @@ namespace VevaciousPlusPlus
     double logOfMinusLogOfThermalProbability;
     double dominantTemperatureInGigaElectronVolts;
     double survivalProbabilityThreshold;
+    double partialThermalDecayWidth;
     // The vectors below will hold the action threshold in their 0 component
     // the straight path action in their 1 component
     // and subsequently the best action for each path finder

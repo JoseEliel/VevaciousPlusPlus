@@ -142,6 +142,10 @@ namespace VevaciousPlusPlus
     // logOfMinusLogOfThermalProbability.
     void SetThermalSurvivalProbability();
 
+    // This ensures that the thermal partial decay width is set correctly. 
+
+    void SetPartialThermalDecayWidth( double partialDecayWidth);
+
     // This should return the A factor of dimension energy^4.
     virtual double SolitonicFactor( PotentialFunction const& potentialFunction,
                                     PotentialMinimum const& falseVacuum,

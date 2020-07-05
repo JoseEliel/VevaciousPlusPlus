@@ -125,6 +125,9 @@ namespace VevaciousPlusPlus
 
      // This gives the upper bound on thermal survival probability
     double GetThermalProbability();
+ 
+     // This gives the thermal decay width probability
+    double GetThermalDecayWidth();    
 
      // This gives the threshold and the best actions for each path finder
 
@@ -405,6 +408,18 @@ namespace VevaciousPlusPlus
     }
   }
 
+
+  inline double
+  VevaciousPlusPlus::GetThermalDecayWidth() {
+    if (tunnelingCalculator->ThermalSurvivalProbability() >= 0.0)
+    {
+    return tunnelingCalculator->QuantumLifetimeInSeconds();
+    }
+  else
+    {
+      return -1;
+    }
+  }
 
   // This gives the upper bound on the thermal survival probability as output.
   inline double
