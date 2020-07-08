@@ -224,7 +224,12 @@ endif()
 
 # Linking to minuit
 
-set(Minuit_lib "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/lib/")
+# Linking to minuit
+if(WITHIN_GAMBIT)
+    #Nothing 
+else()
+    set(Minuit_lib "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/lib/")
+endif()
 
 target_link_libraries(VevaciousPlusPlus ${Minuit_lib}/libMinuit2.a)
 
