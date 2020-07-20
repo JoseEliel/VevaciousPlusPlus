@@ -465,7 +465,7 @@ namespace VevaciousPlusPlus
     else if( exp( logOfMinusLogOfThermalProbability )
              >= maximumPowerOfNaturalExponent )
     {
-      partialThermalDecayWidth = -1.0;
+      partialThermalDecayWidth = 1E100;
     }
     else
     {
