@@ -413,7 +413,7 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::GetThermalDecayWidth() {
     if (tunnelingCalculator->ThermalSurvivalProbability() >= 0.0)
     {
-    return tunnelingCalculator->QuantumLifetimeInSeconds();
+    return tunnelingCalculator->PartialThermalDecayWidth();
     }
   else
     {
