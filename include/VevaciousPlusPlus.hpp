@@ -413,7 +413,9 @@ namespace VevaciousPlusPlus
   VevaciousPlusPlus::GetThermalDecayWidth() {
     if (tunnelingCalculator->ThermalSurvivalProbability() >= 0.0)
     {
-    return tunnelingCalculator->PartialThermalDecayWidth();
+    // Here we multiply by M_Planck^3 to get the witdth in GeV   
+    double MPCubed = 1.4437663e+55;
+    return MPCubed * tunnelingCalculator->PartialThermalDecayWidth();
     }
   else
     {
