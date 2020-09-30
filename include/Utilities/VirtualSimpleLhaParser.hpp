@@ -52,7 +52,7 @@ namespace VevaciousPlusPlus
   // This opens the file with name fileName and parses it into blocks.
   inline void VirtualSimpleLhaParser::ReadFile( std::string const& fileName )
   {
-  	if(fileName != "internal")
+  	if(fileName != "internal" && fileName != "global" && fileName != "nearest")
   	{ 
      ResetForNewFile();
      std::string readLine( "" );
