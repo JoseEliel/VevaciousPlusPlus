@@ -561,12 +561,18 @@ namespace VevaciousPlusPlus
                                             assumedPositiveOrNegativeTolerance,
                                               lagrangianParameterManager );
     }
+    else if( classChoice == "TreeLevelPotential" )
+    {
+      return Utils::make_unique<TreeLevelPotential> ( modelFilename,
+                                            assumedPositiveOrNegativeTolerance,
+                                              lagrangianParameterManager );
+    }
     else
     {
       std::stringstream errorStream;
       errorStream
       << "<PotentialClass> was not a recognized class! The only options"
-      << " currently valid are \"FixedScaleOneLoopPotential\" and"
+      << " currently valid are \"FixedScaleOneLoopPotential\", \"TreeLevelPotential\" and"
       << " \"RgeImprovedOneLoopPotential\".";
       throw std::runtime_error( errorStream.str() );
     }

@@ -152,6 +152,7 @@ set(sources source/BounceActionEvaluation/BounceActionPathFinding/MinuitOnHypers
         source/PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.cpp
         source/PotentialEvaluation/PotentialFunctions/PotentialFromPolynomialWithMasses.cpp
         source/PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.cpp
+        source/PotentialEvaluation/PotentialFunctions/TreeLevelPotential.cpp
         source/PotentialEvaluation/ThermalFunctions.cpp
         source/PotentialMinimization/HomotopyContinuation/Hom4ps2Runner.cpp
         source/PotentialMinimization/HomotopyContinuation/PHCRunner.cpp

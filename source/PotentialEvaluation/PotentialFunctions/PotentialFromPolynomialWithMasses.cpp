@@ -835,6 +835,83 @@ namespace VevaciousPlusPlus
                  * temperatureValue * temperatureValue ) );
   }
 
+
+  // This only returns the thermal corrections 
+
+  double
+  PotentialFromPolynomialWithMasses::JustThermalCorrections(
+          std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
+         std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
+          std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
+                                              double const inverseScaleSquared,
+                                          double const temperatureValue ) const
+  {
+    bool const temperatureGreaterThanZero( temperatureValue > 0.0 );
+    double const inverseTemperatureSquared( temperatureGreaterThanZero ?
+                            ( 1.0 / ( temperatureValue * temperatureValue ) ) :
+                                            -1.0 );
+    double totalQuantumCorrections( 0.0 );
+    double totalThermalCorrections( 0.0 );
+
+    double scalarQuantumCorrections( 0.0 );
+    double scalarThermalCorrections( 0.0 );
+    AddToCorrections( scalarMassesSquaredWithFactors,
+                      inverseScaleSquared,
+                      temperatureGreaterThanZero,
+                      inverseTemperatureSquared,
+                      1.5,
+                      &(ThermalFunctions::BosonicJ),
+                      scalarQuantumCorrections,
+                      scalarThermalCorrections );
+
+    // Real scalar degrees of freedom add to both quantum and thermal
+    // corrections without any factors.
+    totalQuantumCorrections += scalarQuantumCorrections;
+    totalThermalCorrections += scalarThermalCorrections;
+
+    double fermionQuantumCorrections( 0.0 );
+    double fermionThermalCorrections( 0.0 );
+    AddToCorrections( fermionMassesSquaredWithFactors,
+                      inverseScaleSquared,
+                      temperatureGreaterThanZero,
+                      inverseTemperatureSquared,
+                      1.5,
+                      &(ThermalFunctions::FermionicJ),
+                      fermionQuantumCorrections,
+                      fermionThermalCorrections );
+
+    // Weyl fermion degrees of freedom add to both quantum and thermal
+    // corrections with a factor of 2, though there is an additional minus sign
+    // for the quantum corrections. (The conventions used in Vevacious are that
+    // the thermal correction functions already have any minus signs for
+    // fermions.)
+    totalQuantumCorrections -= ( 2.0 * fermionQuantumCorrections );
+    totalThermalCorrections += ( 2.0 * fermionThermalCorrections );
+
+    double vectorQuantumCorrections( 0.0 );
+    double vectorThermalCorrections( 0.0 );
+    AddToCorrections( vectorMassesSquaredWithFactors,
+                      inverseScaleSquared,
+                      temperatureGreaterThanZero,
+                      inverseTemperatureSquared,
+                      vectorMassCorrectionConstant,
+                      &(ThermalFunctions::BosonicJ),
+                      vectorQuantumCorrections,
+                      vectorThermalCorrections );
+
+    // Vector boson degrees of freedom add to quantum corrections with a factor
+    // of 3 in dimensional regularization schemes, and to thermal corrections
+    // with a factor of 2.
+    totalQuantumCorrections += ( 3.0 * vectorQuantumCorrections );
+    totalThermalCorrections += ( 2.0 * vectorThermalCorrections );
+
+    return ( ( totalThermalCorrections * thermalFactor
+                 * temperatureValue * temperatureValue
+                 * temperatureValue * temperatureValue ) );
+  }
+
+
+
   // This interprets stringToParse as a sum of polynomial terms and sets
   // polynomialSum accordingly.
   void PotentialFromPolynomialWithMasses::ParseSumOfPolynomialTerms(

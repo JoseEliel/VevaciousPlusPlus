@@ -113,7 +113,7 @@
                  function to be minimized. The default is 1, while 0 emphasizes
                  making less function calls, and 2 emphasizes more accuracy
                  through more function calls. -->
-            1
+            2
           </MinuitStrategy>
         </ConstructorArguments>
       </GradientMinimizerClass>

@@ -49,6 +49,7 @@
 #include "LagrangianParameterManagement/SARAHManager.hpp"
 #include "PotentialEvaluation/PotentialFunctions/FixedScaleOneLoopPotential.hpp"
 #include "PotentialEvaluation/PotentialFunctions/RgeImprovedOneLoopPotential.hpp"
+#include "PotentialEvaluation/PotentialFunctions/TreeLevelPotential.hpp"
 
 namespace VevaciousPlusPlus
 {

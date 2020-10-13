@@ -123,6 +123,17 @@ namespace VevaciousPlusPlus
                                               double const inverseScaleSquared,
                                          double const temperatureValue ) const;
 
+    // This does the same as LoopAndThermalCorrections, but returns only thermal
+    // corrections
+
+    double
+    JustThermalCorrections(
+          std::vector< DoubleVectorWithDouble > scalarMassesSquaredWithFactors,
+         std::vector< DoubleVectorWithDouble > fermionMassesSquaredWithFactors,
+          std::vector< DoubleVectorWithDouble > vectorMassesSquaredWithFactors,
+                                              double const inverseScaleSquared,
+                                         double const temperatureValue ) const;
+
     // This interprets stringToParse as a sum of complex polynomial terms and
     // sets polynomialSum accordingly.
     void ParseSumOfPolynomialTerms( std::string const& stringToParse,
