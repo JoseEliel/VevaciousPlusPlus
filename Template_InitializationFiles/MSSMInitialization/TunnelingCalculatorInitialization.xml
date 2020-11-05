@@ -64,7 +64,7 @@
              flips to being based on tunneling between the field origin and the
              field configuration that would cool to be the DSB vacuum, rather
              than on tunneling to the panic vacuum.) -->
-        0.8
+        0.005
       </MinimumVacuumSeparationFraction>
       <!-- The following elements are read only if <ClassType> is
            "CosmoTransitionsRunner", and are ignored if <ClassType> is

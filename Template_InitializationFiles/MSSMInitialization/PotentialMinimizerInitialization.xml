@@ -127,7 +127,7 @@
              difference is d, and the number given by this element is f, then
              2 minima are treated as the same minimum if d < (f * l). If not
              given, 0.05 is taken as the default. -->
-        0.05
+        0.005
       </ExtremumSeparationThresholdFraction>
       <NonDsbRollingToDsbScalingFactor>
          <!-- The number given here is used as a scaling factor if the minimum
