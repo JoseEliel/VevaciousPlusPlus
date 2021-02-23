@@ -180,6 +180,9 @@ namespace VevaciousPlusPlus
     // Here we check whether we are in the case when the false vacuum is actually
     // the field origin. 
 
+    //std::cout << "thresholdSeparationSquared " << thresholdSeparationSquared <<std::endl;
+    //std::cout << "thresholdSeparationSquared " << falseVacuum.LengthSquared() <<std::endl;
+
     bool DsbRolledToOrigin( falseVacuum.LengthSquared()
                                       < thresholdSeparationSquared );
 
@@ -188,39 +191,46 @@ namespace VevaciousPlusPlus
           // Here we have the origin as the false vacuum. 
           rangeOfMaxTemperatureForOriginToFalse.first = maximumAllowedTemperature;
           rangeOfMaxTemperatureForOriginToFalse.second = maximumAllowedTemperature;
-          std::cout << "We are tunneling from the origin as DSB is not"
-          << " present at one-loop. Setting maximum temperature at which"
-          << " the false vacuum is still present to the Planck scale";
-          std::cout << std::endl;
+          #ifndef SILENT_MODE
+            std::cout << "We are tunneling from the origin as DSB is not"
+            << " present at one-loop. Setting maximum temperature at which"
+            << " the false vacuum is still present to the Planck scale";
+            std::cout << std::endl;
+          #endif
         }
     else
         {
           // false vacuum is NOT the origin. 
-          std::cout << std::endl
-          << "Looking for temperature at which tunneling from the field origin to"
-          << " the false vacuum at "
-          << falseVacuum.AsMathematica( potentialFunction.FieldNames() )
-          << " becomes impossible." << std::endl;
+          #ifndef SILENT_MODE
+            std::cout << std::endl
+            << "Looking for temperature at which tunneling from the field origin to"
+            << " the false vacuum at "
+            << falseVacuum.AsMathematica( potentialFunction.FieldNames() )
+            << " becomes impossible." << std::endl;
+          #endif
           SetMaximumTunnelingTemperatureRange( potentialFunction,
                                                rangeOfMaxTemperatureForOriginToFalse,
                                                falseVacuum,
                                                potentialAtOriginAtZeroTemperature );
         }
-
-    std::cout << std::endl
-    << "Looking for temperature at which tunneling from the field origin to"
-    << " the false vacuum at "
-    << falseVacuum.AsMathematica( potentialFunction.FieldNames() )
-    << " becomes impossible." << std::endl;
+    #ifndef SILENT_MODE
+      std::cout << std::endl
+      << "Looking for temperature at which tunneling from the field origin to"
+      << " the false vacuum at "
+      << falseVacuum.AsMathematica( potentialFunction.FieldNames() )
+      << " becomes impossible." << std::endl;
+    #endif
     SetMaximumTunnelingTemperatureRange( potentialFunction,
                                          rangeOfMaxTemperatureForOriginToFalse,
                                          falseVacuum,
                                          potentialAtOriginAtZeroTemperature );
-    std::cout << std::endl
-    << "Looking for temperature at which tunneling from the field origin to"
-    << " the true vacuum at "
-    << trueVacuum.AsMathematica( potentialFunction.FieldNames() )
-    << " becomes impossible." << std::endl;
+    #ifndef SILENT_MODE
+      std::cout << std::endl
+      << "Looking for temperature at which tunneling from the field origin to"
+      << " the true vacuum at "
+      << trueVacuum.AsMathematica( potentialFunction.FieldNames() )
+      << " becomes impossible." << std::endl;
+    #endif
     SetMaximumTunnelingTemperatureRange( potentialFunction,
                                          rangeOfMaxTemperatureForOriginToTrue,
                                          trueVacuum,
@@ -246,10 +256,18 @@ namespace VevaciousPlusPlus
     {
       MinuitPotentialMinimizer thermalPotentialMinimizer( potentialFunction );
       thermalPotentialMinimizer.SetTemperature( temperatureGuess );
+      //std::cout << "Origin =" << thermalPotentialAtOrigin << std::endl;
+      //std::cout << "Minimum = " << ( thermalPotentialMinimizer(
+      //             zeroTemperatureVacuum.FieldConfiguration() ).FunctionValue()
+      //           + thermalPotentialMinimizer.FunctionOffset() ) <<std::endl;
       return ( ( thermalPotentialMinimizer(
                    zeroTemperatureVacuum.FieldConfiguration() ).FunctionValue()
                  + thermalPotentialMinimizer.FunctionOffset() )
                < thermalPotentialAtOrigin );
+
+
+
+
     }
   }
 

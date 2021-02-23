@@ -161,6 +161,9 @@ namespace VevaciousPlusPlus
       systemCommand.append( hom4ps2InputFilename );
       systemCommand.append(  " <<< " );
       systemCommand.append( homotopyType );
+      #ifdef SILENT_MODE
+        systemCommand.append(" >> /dev/null ");
+      #endif
       systemCommand.append( "\"" );
       systemReturn = system( systemCommand.c_str() );
       if( systemReturn == -1 )
@@ -308,11 +311,13 @@ namespace VevaciousPlusPlus
                                        std::map< std::string, size_t > const& nameToIndexMap,
                                        std::vector< PolynomialConstraint > const& systemToSolve ) const
     {
-      std::cout
-              << std::endl
-              << "-----------------" << std::endl << "Parsing output from HOM4PS2."
-              << std::endl ;
-      std::cout << std::endl;
+      #ifndef SILENT_MODE
+        std::cout
+                << std::endl
+                << "-----------------" << std::endl << "Parsing output from HOM4PS2."
+                << std::endl ;
+        std::cout << std::endl;
+      #endif
 
       std::vector< std::complex< long double > > complexSolutions;
       std::ifstream tadpoleSolutionsFile( hom4ps2OutputFilename.c_str() );

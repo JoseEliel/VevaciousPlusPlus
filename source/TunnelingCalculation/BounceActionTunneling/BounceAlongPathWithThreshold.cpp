@@ -229,14 +229,16 @@ namespace VevaciousPlusPlus
     BubbleProfile const* bestBubble( (*actionCalculator)( *bestPath,
                                                           pathPotential ) );
 
-
-    std::cout << std::endl
-    << "Initial path bounce action = " << bestBubble->BounceAction();
+    #ifndef SILENT_MODE
+      std::cout << std::endl
+      << "Initial path bounce action = " << bestBubble->BounceAction();
+    #endif
 
     if( bestPath->NonZeroTemperature() )
     {
-      std::cout << " GeV";
-
+      #ifndef SILENT_MODE
+        std::cout << " GeV";
+      #endif
       thermalThresholdAndActions.push_back(actionThreshold);
       thermalThresholdAndActions.push_back(bestBubble->BounceAction());
     }
@@ -245,14 +247,19 @@ namespace VevaciousPlusPlus
       thresholdAndActions.push_back(actionThreshold);
       thresholdAndActions.push_back(bestBubble->BounceAction());
     }
+    #ifndef SILENT_MODE
+      std::cout << ", threshold is " << actionThreshold;
+      if( bestPath->NonZeroTemperature() )
+      {
+        
+        std::cout << " GeV";
+      
+      }
+      
+      std::cout << ".";
 
-    std::cout << ", threshold is " << actionThreshold;
-    if( bestPath->NonZeroTemperature() )
-    {
-      std::cout << " GeV";
-    }
-    std::cout << ".";
-    std::cout << std::endl;
+      std::cout << std::endl;
+    #endif
 
     // Checking if initial path already has a very low action
 
@@ -288,10 +295,11 @@ namespace VevaciousPlusPlus
           throw std::runtime_error( errorBuilder.str() );
           break;
       };
-
-      std::cout << std::endl
-      << "Passing best path so far to next path finder.";
-      std::cout << std::endl;
+      #ifndef SILENT_MODE
+        std::cout << std::endl
+        << "Passing best path so far to next path finder.";
+        std::cout << std::endl;
+      #endif
 
       (*pathFinder)->SetPotentialAndVacuaAndTemperature( potentialFunction,
                                                          falseVacuum,
@@ -380,26 +388,27 @@ namespace VevaciousPlusPlus
         }
         currentBubble = nextBubble;
         currentPath = nextPath;
-
-        std::cout << std::endl
-        << "bounce action for new path = " << currentBubble->BounceAction();
-        if( currentPath->NonZeroTemperature() )
-        {
-          std::cout << " GeV";
-        }
-        std::cout << ", lowest bounce action so far = "
-        << bestBubble->BounceAction();
-        if( currentPath->NonZeroTemperature() )
-        {
-          std::cout << " GeV";
-        }
-        std::cout << ", threshold is " << actionThreshold;
-        if( currentPath->NonZeroTemperature() )
-        {
-          std::cout << " GeV";
-        }
-        std::cout << ".";
-        std::cout << std::endl;
+        #ifndef SILENT_MODE
+          std::cout << std::endl
+          << "bounce action for new path = " << currentBubble->BounceAction();
+          if( currentPath->NonZeroTemperature() )
+          {
+            std::cout << " GeV";
+          }
+          std::cout << ", lowest bounce action so far = "
+          << bestBubble->BounceAction();
+          if( currentPath->NonZeroTemperature() )
+          {
+            std::cout << " GeV";
+          }
+          std::cout << ", threshold is " << actionThreshold;
+          if( currentPath->NonZeroTemperature() )
+          {
+            std::cout << " GeV";
+          }
+          std::cout << ".";
+          std::cout << std::endl;
+      #endif
       } while( ( bestBubble->BounceAction() > actionThreshold )
                &&
                (*pathFinder)->PathCanBeImproved( *currentBubble ) );
@@ -432,22 +441,23 @@ namespace VevaciousPlusPlus
         break;
       }
     }
-
-    std::cout << std::endl
-    << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
-    << bestBubble->BounceAction();
-    if( bestPath->NonZeroTemperature() )
-    {
-      std::cout << " GeV";
-    }
-    std::cout << ", threshold is " << actionThreshold;
-    if( bestPath->NonZeroTemperature() )
-    {
-      std::cout << " GeV";
-    }
-    std::cout << ".";
-    std::cout << std::endl;
-
+    #ifndef SILENT_MODE
+      std::cout << std::endl
+      << "Lowest path bounce action at " << tunnelingTemperature << " GeV was "
+      << bestBubble->BounceAction();
+      if( bestPath->NonZeroTemperature() )
+      {
+        std::cout << " GeV";
+      }
+      std::cout << ", threshold is " << actionThreshold;
+      if( bestPath->NonZeroTemperature() )
+      {
+        std::cout << " GeV";
+      }
+      std::cout << ".";
+      std::cout << std::endl;
+    #endif 
+    
     double const bounceAction( bestBubble->BounceAction() );
     delete bestBubble;
     delete bestPath;

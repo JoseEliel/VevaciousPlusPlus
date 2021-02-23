@@ -368,8 +368,10 @@ namespace VevaciousPlusPlus
           // undershoot/overshoot. In that case, we go back and set the initial step radius to be smaller.
           // this happens in ShootFromInitialConditions.
           badInitialConditions = true;
-          std::cout<< " Rescaling initial integration radius in under/overshoot to help with"
+          #ifndef SILENT_MODE
+            std::cout<< " Rescaling initial integration radius in under/overshoot to help with"
                        << " detected numerical problems. Shooting again now."<<std::endl;
+          #endif
 
       }
     }

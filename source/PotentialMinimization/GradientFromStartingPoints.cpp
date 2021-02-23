@@ -50,17 +50,21 @@ namespace VevaciousPlusPlus
             double const minimizationTemperature )
     {
         gradientMinimizer->SetTemperature( minimizationTemperature );
-        std::cout
-                << std::endl
-                << "DSB vacuum input: "
-                << potentialFunction.FieldConfigurationAsMathematica(
-                        potentialFunction.DsbFieldValues() );
-        std::cout << std::endl;
         dsbVacuum = (*gradientMinimizer)( potentialFunction.DsbFieldValues() );
-        std::cout
-                << "Rolled to: "
-                << dsbVacuum.AsMathematica( potentialFunction.FieldNames() );
-        std::cout << std::endl;
+
+        #ifndef SILENT_MODE
+            std::cout
+                    << std::endl
+                    << "DSB vacuum input: "
+                    << potentialFunction.FieldConfigurationAsMathematica(
+                            potentialFunction.DsbFieldValues() );
+            std::cout << std::endl;
+
+            std::cout
+                    << "Rolled to: "
+                    << dsbVacuum.AsMathematica( potentialFunction.FieldNames() );
+            std::cout << std::endl;
+        #endif
 
         double const
                 thresholdSeparationSquared( ( extremumSeparationThresholdFraction
@@ -72,34 +76,40 @@ namespace VevaciousPlusPlus
 
         bool DsbRolledToOrigin( dsbVacuum.LengthSquared()
                                       < thresholdSeparationSquared );
-
-        if(DsbRolledToOrigin)
-        {
-            std::cout
-            << "DSB vacuum input rolled to the origin, suggesting it only appears at the two-loop order. Tunneling will be calculated from origin to panic vacuum."
-            <<  "Length:" << dsbVacuum.LengthSquared()
-            << "Sep:" << thresholdSeparationSquared
-            << std::endl;
-        }
-
+        #ifndef SILENT_MODE
+            if(DsbRolledToOrigin)
+            {
+                std::cout
+                << "DSB vacuum input rolled to the origin, suggesting it only appears at the two-loop order. Tunneling will be calculated from origin to panic vacuum."
+                <<  "Length:" << dsbVacuum.LengthSquared()
+                << "Sep:" << thresholdSeparationSquared
+                << std::endl;
+            }
+        #endif
+        
         if(!done_homotopy)
         {    
           (*startingPointFinder)( startingPoints );
           done_homotopy = true;
         }
-        std::cout
-                << std::endl
-                << "Gradient-based minimization from a set of starting points:";
+        
+        #ifndef SILENT_MODE
+            std::cout
+                    << std::endl
+                    << "Gradient-based minimization from a set of starting points:";
+        #endif
 
         for( std::vector< std::vector< double > >::const_iterator
                 realSolution( startingPoints.begin() );
                 realSolution != startingPoints.end(); ++realSolution )
         {
-            std::cout
-                    << std::endl
-                    << "Starting point: "
-                    << potentialFunction.FieldConfigurationAsMathematica( *realSolution );
-            std::cout << std::endl;
+            #ifndef SILENT_MODE
+                std::cout
+                        << std::endl
+                        << "Starting point: "
+                        << potentialFunction.FieldConfigurationAsMathematica( *realSolution );
+                std::cout << std::endl;
+            #endif
             foundMinimum = (*gradientMinimizer)( *realSolution );
 
             // Here I do some checks so that we know minuit is behaving properly
@@ -112,8 +122,9 @@ namespace VevaciousPlusPlus
 //                std::stringstream errorBuilder;
 //                errorBuilder << "Problem with Minuit, NaN given in minimum value/error. ";
 //                throw std::runtime_error( errorBuilder.str() );
-
-                std::cout << "Minuit encountered numerical issues. Trying from a scaled starting point. " << std::endl;
+                #ifndef SILENT_MODE
+                    std::cout << "Minuit encountered numerical issues. Trying from a scaled starting point. " << std::endl;
+                #endif 
                 std::vector< double > scaledPoint( *realSolution );
                 for( std::vector< double >::iterator
                              scaledField( scaledPoint.begin() );
@@ -126,11 +137,12 @@ namespace VevaciousPlusPlus
                 foundMinimum = (*gradientMinimizer)( scaledPoint );
 
             }
-
-            std::cout
-                    << "Rolled to: "
-                    << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
-            std::cout << std::endl;
+            #ifndef SILENT_MODE
+                std::cout
+                        << "Rolled to: "
+                        << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
+                std::cout << std::endl;
+            #endif
             bool rolledToDsbOrSignFlip( ( foundMinimum.SquareDistanceTo( dsbVacuum )
                                           < thresholdSeparationSquared )
                                         ||
@@ -168,23 +180,26 @@ namespace VevaciousPlusPlus
                 }
                 if( lengthSquared > thresholdSeparationSquared )
                 {
-                    std::cout
-                            << "Non-DSB-minimum starting point rolled to the DSB minimum, or a"
-                            << " phase rotation, using the full potential. Trying a scaled"
-                            << " starting point: "
-                            << potentialFunction.FieldConfigurationAsMathematica( scaledPoint );
-                    std::cout << std::endl;
-
+                    #ifndef SILENT_MODE
+                        std::cout
+                                << "Non-DSB-minimum starting point rolled to the DSB minimum, or a"
+                                << " phase rotation, using the full potential. Trying a scaled"
+                                << " starting point: "
+                                << potentialFunction.FieldConfigurationAsMathematica( scaledPoint );
+                        std::cout << std::endl;
+                    #endif
                     foundMinimum = (*gradientMinimizer)( scaledPoint );
                     rolledToDsbOrSignFlip = ( foundMinimum.SquareDistanceTo( dsbVacuum )
                                               < thresholdSeparationSquared )
                                             ||
                                             !( IsNotPhaseRotationOfDsbVacuum( foundMinimum,
                                                                               thresholdSeparation ) );
-                    std::cout
-                            << "Rolled to: "
-                            << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
-                    std::cout << std::endl;
+                    #ifndef SILENT_MODE
+                        std::cout
+                                << "Rolled to: "
+                                << foundMinimum.AsMathematica( potentialFunction.FieldNames() );
+                        std::cout << std::endl;
+                    #endif
                 }
             }
 
@@ -230,40 +245,40 @@ namespace VevaciousPlusPlus
 
             
         }
-
-        std::cout
-                << std::endl
-                << "DSB vacuum = "
-                << dsbVacuum.AsMathematica( potentialFunction.FieldNames() ) << std::endl;
-
-
-
-         if( panicVacua.empty() )
-        {
+        #ifndef SILENT_MODE
             std::cout
-                    << "DSB vacuum is stable as far as the model file allows." << std::endl;
-        }
-        else
-        {
-            std::cout << "There are "
-                      << panicVacua.size()
-                      <<" panic vacua."
-                      << std::endl;
-            std::cout << "Panic vacuum used in tunneling = "
-                      << panicVacuum.AsMathematica( potentialFunction.FieldNames() )
-                      << std::endl
-                      << std::endl;
-            std::cout << "Global minimum = "
-                      << panicVacuum_global.AsMathematica( potentialFunction.FieldNames() )
-                      << std::endl
-                      << std::endl;
-            std::cout << "Nearest panic vacuum = "
-                      << panicVacuum_nearest.AsMathematica( potentialFunction.FieldNames() )
-                      << std::endl;
-        }
-        std::cout << std::endl;
-        std::cout << std::endl;
+                    << std::endl
+                    << "DSB vacuum = "
+                    << dsbVacuum.AsMathematica( potentialFunction.FieldNames() ) << std::endl;
 
+
+
+             if( panicVacua.empty() )
+            {
+                std::cout
+                        << "DSB vacuum is stable as far as the model file allows." << std::endl;
+            }
+            else
+            {
+                std::cout << "There are "
+                          << panicVacua.size()
+                          <<" panic vacua."
+                          << std::endl;
+                std::cout << "Panic vacuum used in tunneling = "
+                          << panicVacuum.AsMathematica( potentialFunction.FieldNames() )
+                          << std::endl
+                          << std::endl;
+                std::cout << "Global minimum = "
+                          << panicVacuum_global.AsMathematica( potentialFunction.FieldNames() )
+                          << std::endl
+                          << std::endl;
+                std::cout << "Nearest panic vacuum = "
+                          << panicVacuum_nearest.AsMathematica( potentialFunction.FieldNames() )
+                          << std::endl;
+            }
+            std::cout << std::endl;
+            std::cout << std::endl;
+        #endif
     }
 
 

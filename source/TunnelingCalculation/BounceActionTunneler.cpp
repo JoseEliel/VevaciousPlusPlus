@@ -329,8 +329,10 @@ namespace VevaciousPlusPlus
     // we start doubling the temperature, recording the previous temperature
     // each time. If it was above, we start halving the temperature, recording
     // the previous temperature each time.
-    std::cout << "Trying " << temperatureGuess << " GeV.";
-    std::cout << std::endl;
+    #ifndef SILENT_MODE
+      std::cout << "Trying " << temperatureGuess << " GeV.";
+      std::cout << std::endl;
+    #endif
 
     while( BelowCriticalTemperature( potentialFunction,
                                      temperatureGuess,
@@ -340,26 +342,32 @@ namespace VevaciousPlusPlus
       if( temperatureGuess >= maximumAllowedTemperature )
       {
         temperatureGuess = maximumAllowedTemperature;
-        std::cout << "... too low. Trying the Planck scale:"
-        << temperatureGuess << " GeV.";
-        std::cout << std::endl;
+        #ifndef SILENT_MODE
+          std::cout << "... too low. Trying the Planck scale:"
+          << temperatureGuess << " GeV.";
+          std::cout << std::endl;
+        #endif
         if( BelowCriticalTemperature( potentialFunction,
                                       temperatureGuess,
                                       zeroTemperatureVacuum ) )
         {
           rangeOfMaxTemperature.first = maximumAllowedTemperature;
           rangeOfMaxTemperature.second = maximumAllowedTemperature;
-          std::cout << "... too low. Apparently this vacuum persists up to"
-          << " the Planck temperature.";
-          std::cout << std::endl;
+          #ifndef SILENT_MODE
+            std::cout << "... too low. Apparently this vacuum persists up to"
+            << " the Planck temperature.";
+            std::cout << std::endl;
+          #endif
           return;
         }
         break;
       }
       else
       {
-        std::cout << "... too low. Trying " << temperatureGuess << " GeV.";
-        std::cout << std::endl;
+        #ifndef SILENT_MODE
+          std::cout << "... too low. Trying " << temperatureGuess << " GeV.";
+          std::cout << std::endl;
+        #endif
       }
     }
     // Now temperatureGuess is definitely about the sought temperature, so we
@@ -371,8 +379,10 @@ namespace VevaciousPlusPlus
                                        zeroTemperatureVacuum )) )
     {
       temperatureGuess = ( 0.5 * temperatureGuess );
-      std::cout << "... too high. Trying " << temperatureGuess << " GeV.";
-      std::cout << std::endl;
+      #ifndef SILENT_MODE
+        std::cout << "... too high. Trying " << temperatureGuess << " GeV.";
+        std::cout << std::endl;
+      #endif
     }
     // At this point, temperatureGuess should be between 0.5 and 1.0 times the
     // critical temperature.
@@ -387,8 +397,10 @@ namespace VevaciousPlusPlus
     {
       temperatureGuess = sqrt( rangeOfMaxTemperature.first
                                * rangeOfMaxTemperature.second );
-      std::cout << "Trying " << temperatureGuess << " GeV.";
-      std::cout << std::endl;
+      #ifndef SILENT_MODE
+        std::cout << "Trying " << temperatureGuess << " GeV.";
+        std::cout << std::endl;
+      #endif
       if( BelowCriticalTemperature( potentialFunction,
                                     temperatureGuess,
                                     zeroTemperatureVacuum ) )
@@ -400,12 +412,13 @@ namespace VevaciousPlusPlus
         rangeOfMaxTemperature.second = temperatureGuess;
       }
     }
-
-    std::cout
-    << std::endl
-    << "Temperature lies between " << rangeOfMaxTemperature.first
-    << " GeV and " << rangeOfMaxTemperature.second << " GeV.";
-    std::cout << std::endl;
+    #ifndef SILENT_MODE
+      std::cout
+      << std::endl
+      << "Temperature lies between " << rangeOfMaxTemperature.first
+      << " GeV and " << rangeOfMaxTemperature.second << " GeV.";
+      std::cout << std::endl;
+    #endif
   }
 
   // This ensures that thermalSurvivalProbability is set correctly from

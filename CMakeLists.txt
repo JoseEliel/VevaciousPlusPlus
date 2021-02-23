@@ -52,6 +52,12 @@ else()
     message("${BoldRed} Boost libraries 1.41 or greater not found. This is required for Vevacious to work. ${ColourReset}")
 endif()
 
+# Checking for silent mode request
+
+if(SILENT_MODE)
+add_definitions(-DSILENT_MODE)
+endif()
+
 # Set the general compiler flags
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fPIC")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs -O3 -fPIC -fopenmp")
@@ -74,10 +80,8 @@ else()
 set(Minuit_name "minuit2")
 set(Minuit_lib_name "Minuit2")
 set(Minuit_ver "5.34.14")
-set(Minuit_include "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/include/")
-#set(Minuit_dl "https://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz")
-# Official Minuit2 website seems to be down. Temporary fix. 
-set(Minuit_dl "https://web.archive.org/web/20160322211910/http://project-mathlibs.web.cern.ch/project-mathlibs/sw/Minuit2/Minuit2.tar.gz")
+set(Minuit_include "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/include/") 
+set(Minuit_dl "http://seal.web.cern.ch/seal/MathLibs/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz")
 set(Minuit_dir "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}")
 ExternalProject_Add(${Minuit_name}_${Minuit_ver}
             #DOWNLOAD_COMMAND wget -qO- ${Minuit_dl} | tar xvz -C ${Minuit_dir} --strip-components 1
@@ -255,9 +259,7 @@ add_dependencies(VevaciousPlusPlus-lib objlib)
 # Setting correct name for library
 
 set_target_properties(VevaciousPlusPlus-lib
-        PROPERTIES OUTPUT_NAME VevaciousPlusPlus)
-
-
+        PROPERTIES OUTPUT_NAME VevaciousPlusPlus SUFFIX ".so")
 
 
 #############################################################################
