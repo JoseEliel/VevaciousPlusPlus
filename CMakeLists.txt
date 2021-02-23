@@ -77,7 +77,7 @@ set(Minuit_ver "5.34.14")
 set(Minuit_include "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}/include/")
 #set(Minuit_dl "https://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz")
 # Official Minuit2 website seems to be down. Temporary fix. 
-set(Minuid_dl "https://web.archive.org/web/20160322211910/http://project-mathlibs.web.cern.ch/project-mathlibs/sw/Minuit2/Minuit2.tar.gz")
+set(Minuit_dl "https://web.archive.org/web/20160322211910/http://project-mathlibs.web.cern.ch/project-mathlibs/sw/Minuit2/Minuit2.tar.gz")
 set(Minuit_dir "${PROJECT_SOURCE_DIR}/${Minuit_name}/${Minuit_ver}")
 ExternalProject_Add(${Minuit_name}_${Minuit_ver}
             #DOWNLOAD_COMMAND wget -qO- ${Minuit_dl} | tar xvz -C ${Minuit_dir} --strip-components 1
