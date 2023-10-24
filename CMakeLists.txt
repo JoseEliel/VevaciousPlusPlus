@@ -117,12 +117,12 @@ ExternalProject_Add(${name}_${hom4ps_ver}
 
 # PHC
 set(name "phc")
-set(phc_ver "2.4.66")
+set(phc_ver "2.4.68")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(dl "http://www.math.uic.edu/~jan/mactel64y_phcv24p.tar.gz")
+    set(dl "https://github.com/janverschelde/PHCpack/releases/download/v2.4.68/mactel64y_phcv24p.tar.gz")
 else()
-    set(dl "http://www.math.uic.edu/~jan/x86_64phcv24p.tar.gz")
+    set(dl "https://github.com/janverschelde/PHCpack/releases/download/v2.4.68/x86_64phcv24p.tar.gz")
 endif()
 
 set(dir "${PROJECT_SOURCE_DIR}/${name}/${phc_ver}")
