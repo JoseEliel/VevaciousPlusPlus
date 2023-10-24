@@ -76,7 +76,7 @@
             </ClassType>
             <ConstructorArguments>
               <PathToPHC>
-              ${vevacious_path}/phc/2.4.58/
+              ${vevacious_path}/phc/2.4.68/
               </PathToPHC>
               <ResolutionSize>
                 1.0
